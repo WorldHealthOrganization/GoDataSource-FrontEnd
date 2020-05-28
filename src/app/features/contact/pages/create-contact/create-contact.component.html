@@ -16,6 +16,14 @@
                 <!-- Personal Details section -->
                 <mat-card class="page-section">
                     <div fxLayout="column">
+                        <!-- Warnings -->
+                        <div
+                            *ngIf="TeamModel.canList(authUser)"
+                            class="warning-message"
+                            fxLayout="row">
+                            {{ 'LNG_PAGE_CREATE_CONTACT_SET_FOLLOW_UP_TEAM_INFO_TITLE' | translate }}
+                        </div>
+
                         <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="firstName"
@@ -118,7 +126,26 @@
                                 tooltip="LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION">
                             </app-form-slide-toggle>
 
-                            <div fxFlex><!-- placeholder --></div>
+                            <!-- Contact follow-up team -->
+                            <ng-container
+                                *ngIf="TeamModel.canList(authUser); else cantListTeams">
+                                <app-form-select
+                                    fxFlex
+                                    name="followUpTeamId"
+                                    [(ngModel)]="contactData.followUpTeamId"
+                                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID' | translate"
+                                    tooltip="LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID_DESCRIPTION"
+                                    [options]="teamList$ | async"
+                                    optionLabelKey="name"
+                                    optionValueKey="id">
+                                </app-form-select>
+                            </ng-container>
+                            <ng-template
+                                #cantListTeams>
+                                <div fxFlex>
+                                    {{ 'LNG_PAGE_CREATE_CONTACT_CANT_SET_FOLLOW_UP_TEAM_TITLE' | translate }}
+                                </div>
+                            </ng-template>
                         </div>
                     </div>
                 </mat-card>
@@ -176,7 +203,18 @@
                 </app-form-document-list>
 
                 <div class="stepper-navigation-buttons">
-                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                    <button
+                        [disabled]="personalForm.pending"
+                        class="button-with-spinner"
+                        mat-raised-button color="accent" matStepperNext
+                    >
+                        <div
+                            *ngIf="personalForm.pending"
+                            class="loading-chips">
+                            <mat-spinner></mat-spinner>
+                        </div>
+                        {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
+                    </button>
                 </div>
             </form>
         </mat-step>
@@ -197,7 +235,18 @@
 
                 <div class="stepper-navigation-buttons">
                     <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                    <button
+                        [disabled]="addressForm.pending"
+                        class="button-with-spinner"
+                        mat-raised-button color="accent" matStepperNext
+                    >
+                        <div
+                        *ngIf="addressForm.pending"
+                        class="loading-chips">
+                        <mat-spinner></mat-spinner>
+                    </div>
+                        {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
+                    </button>
                 </div>
             </form>
         </mat-step>
@@ -216,7 +265,18 @@
 
                 <div class="stepper-navigation-buttons">
                     <button matStepperPrevious mat-raised-button type="button">{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}</button>
+                    <button
+                        [disabled]="questionnaireForm.pending"
+                        class="button-with-spinner"
+                        mat-raised-button color="accent" matStepperNext
+                    >
+                        <div
+                            *ngIf="questionnaireForm.pending"
+                            class="loading-chips">
+                            <mat-spinner></mat-spinner>
+                        </div>
+                        {{'LNG_STEPPER_BUTTON_NEXT'| translate}}
+                    </button>
                 </div>
             </form>
         </mat-step>
@@ -240,7 +300,18 @@
 
                 <div class="stepper-navigation-buttons">
                     <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                    <button
+                        [disabled]="relationshipForm.pending"
+                        class="button-with-spinner"
+                        mat-raised-button color="accent" matStepperNext
+                    >
+                        <div
+                        *ngIf="relationshipForm.pending"
+                        class="loading-chips">
+                        <mat-spinner></mat-spinner>
+                    </div>
+                        {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
+                    </button>
                 </div>
             </form>
         </mat-step>

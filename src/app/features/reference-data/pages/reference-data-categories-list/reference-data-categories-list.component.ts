@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
@@ -15,6 +15,7 @@ import { catchError, tap } from 'rxjs/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { IconModel } from '../../../../core/models/icon.model';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-reference-data-categories-list',
@@ -22,7 +23,7 @@ import { IconModel } from '../../../../core/models/icon.model';
     templateUrl: './reference-data-categories-list.component.html',
     styleUrls: ['./reference-data-categories-list.component.less']
 })
-export class ReferenceDataCategoriesListComponent extends ListComponent implements OnInit {
+export class ReferenceDataCategoriesListComponent extends ListComponent implements OnInit, OnDestroy {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '..', true)
@@ -65,14 +66,15 @@ export class ReferenceDataCategoriesListComponent extends ListComponent implemen
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private referenceDataDataService: ReferenceDataDataService,
         private authDataService: AuthDataService,
         private i18nService: I18nService,
         private dialogService: DialogService,
-        protected snackbarService: SnackbarService
+        private snackbarService: SnackbarService
     ) {
-        super(snackbarService);
+        super(listHelperService);
     }
 
     /**
@@ -88,6 +90,14 @@ export class ReferenceDataCategoriesListComponent extends ListComponent implemen
         this.referenceDataExporFileName = this.i18nService.instant('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE') +
             ' - ' +
             this.referenceDataExporFileName;
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

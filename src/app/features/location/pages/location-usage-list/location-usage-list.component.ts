@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -19,6 +19,7 @@ import { throwError } from 'rxjs/internal/observable/throwError';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { CaseModel } from '../../../../core/models/case.model';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-location-usage-list',
@@ -26,7 +27,7 @@ import { CaseModel } from '../../../../core/models/case.model';
     templateUrl: './location-usage-list.component.html',
     styleUrls: ['./location-usage-list.component.less']
 })
-export class LocationUsageListComponent extends ListComponent implements OnInit {
+export class LocationUsageListComponent extends ListComponent implements OnInit, OnDestroy {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -80,16 +81,15 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private locationDataService: LocationDataService,
         private outbreakDataService: OutbreakDataService,
         protected route: ActivatedRoute
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**
@@ -116,6 +116,14 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
                     this.needsRefreshList(true);
                 });
         });
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

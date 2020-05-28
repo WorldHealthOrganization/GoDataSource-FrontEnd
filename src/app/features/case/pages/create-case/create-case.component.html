@@ -171,7 +171,18 @@
                 </app-form-document-list>
 
                 <div class="stepper-navigation-buttons">
-                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                    <button
+                        [disabled]="personalForm.pending"
+                        class="button-with-spinner"
+                        mat-raised-button color="accent" matStepperNext
+                    >
+                        <div
+                            *ngIf="personalForm.pending"
+                            class="loading-chips">
+                            <mat-spinner></mat-spinner>
+                        </div>
+                        {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
+                    </button>
                 </div>
             </form>
         </mat-step>
@@ -189,7 +200,18 @@
 
                 <div class="stepper-navigation-buttons">
                     <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                    <button
+                        [disabled]="addressForm.pending"
+                        class="button-with-spinner"
+                        mat-raised-button color="accent" matStepperNext
+                    >
+                        <div
+                            *ngIf="addressForm.pending"
+                            class="loading-chips">
+                            <mat-spinner></mat-spinner>
+                        </div>
+                        {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
+                    </button>
                 </div>
             </form>
         </mat-step>
@@ -227,7 +249,7 @@
                                 tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_ONSET_DESCRIPTION"
                                 [maxDate]="serverToday"
                                 app-date-validator
-                                required="true"
+                                [required]="selectedOutbreak ? selectedOutbreak.isDateOfOnsetRequired : true"
                                 [dateSameOrBefore]="[
                                     serverToday,
                                     'dateOfOutcome'
@@ -292,8 +314,8 @@
                                 app-date-validator
                                 [dateSameOrBefore]="serverToday"
                                 [dateSameOrAfter]="[
-                                'dateOfOnset'
-                            ]">
+                                    'dateOfOnset'
+                                ]">
                             </app-form-datepicker>
 
                             <app-form-slide-toggle
@@ -367,7 +389,18 @@
 
                 <div class="stepper-navigation-buttons">
                     <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                    <button
+                        [disabled]="infectionForm.pending"
+                        class="button-with-spinner"
+                        mat-raised-button color="accent" matStepperNext
+                    >
+                        <div
+                            *ngIf="infectionForm.pending"
+                            class="loading-chips">
+                            <mat-spinner></mat-spinner>
+                        </div>
+                        {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
+                    </button>
                 </div>
             </form>
         </mat-step>
@@ -386,7 +419,18 @@
 
                 <div class="stepper-navigation-buttons">
                     <button matStepperPrevious mat-raised-button type="button">{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}</button>
+                    <button
+                        [disabled]="questionnaireForm.pending"
+                        class="button-with-spinner"
+                        mat-raised-button color="accent" matStepperNext
+                    >
+                        <div
+                            *ngIf="questionnaireForm.pending"
+                            class="loading-chips">
+                            <mat-spinner></mat-spinner>
+                        </div>
+                        {{'LNG_STEPPER_BUTTON_NEXT'| translate}}
+                    </button>
                 </div>
             </form>
         </mat-step>
