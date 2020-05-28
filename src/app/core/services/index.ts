@@ -110,6 +110,6 @@ export const services: any[] = [
     DomService,
     RedirectService,
     EntityHelperService,
-    ListHelperService
+    ListHelperService,
     SnackbarHelperService
 ];

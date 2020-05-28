@@ -1,7 +1,8 @@
-import { Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from '@angular/material';
 import { SnackbarHelperService } from '../../../core/services/helper/snackbar-helper.service';
 import * as _ from 'lodash';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-multiple-snackbar',
@@ -9,7 +10,7 @@ import * as _ from 'lodash';
     templateUrl: './multiple-snackbar.component.html',
     styleUrls: ['./multiple-snackbar.component.less']
 })
-export class MultipleSnackbarComponent implements OnInit {
+export class MultipleSnackbarComponent implements OnInit, OnDestroy {
 
     errors: {message: string, messageClass: string}[] = [];
 
@@ -17,7 +18,8 @@ export class MultipleSnackbarComponent implements OnInit {
     theme: string;
     message: string;
     html: boolean;
-    snackClass: string;
+
+    private errorSubscription: Subscription;
 
     constructor(
         @Inject(MAT_SNACK_BAR_DATA) public data: any[],
@@ -35,7 +37,7 @@ export class MultipleSnackbarComponent implements OnInit {
         console.log('data', this.data);
         // console.log(this.errors);
         this.snackBarRef.afterOpened().subscribe(() => {
-            this.snackbarHelperService.errorSubject.subscribe((message) => {
+            this.errorSubscription = this.snackbarHelperService.errorSubject.subscribe((message) => {
                 console.log(message);
                 this.errors.push(message);
                 // console.log(this.errors);
@@ -64,4 +66,7 @@ export class MultipleSnackbarComponent implements OnInit {
         this.snackBarRef.dismiss();
     }
 
+    ngOnDestroy(): void {
+        this.errorSubscription.unsubscribe();
+    }
 }

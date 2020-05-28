@@ -3,10 +3,24 @@
          [ngClass]="err.messageClass"
          class="message" >
         {{ err.message }} {{err.messageClass}}
-        <div class="snackbar-close-button">
-            <button (click)="closeSnackbar(err, i)">x</button>
+        <div class="snackbar-close-button-container">
+            <button
+                (click)="closeSnackbar(err, i)"
+                class="snackbar-close-button"
+            >
+                Close
+            </button>
         </div>
     </div>
 
-    <button (click)="closeAllSnackbars()" *ngIf="errors.length > 1">close all</button>
+    <div
+        *ngIf="errors.length > 1"
+        class="close-all-button-container">
+        <button
+            (click)="closeAllSnackbars()"
+            class="close-all-button">
+            Close all
+        </button>
+    </div>
+
 </div>

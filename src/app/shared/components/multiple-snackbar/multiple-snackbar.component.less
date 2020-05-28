@@ -5,6 +5,7 @@ snack-bar-container {
     box-shadow: none !important;
     width: 100%;
     max-width: 600px !important;
+    margin: 0 !important;
 }
 
 app-multiple-snackbar {
@@ -15,8 +16,11 @@ app-multiple-snackbar {
     .message {
         display: flex;
         justify-content: space-between;
+        align-items: center;
         margin: 5px 0;
         color: white;
+        padding: 15px;
+        border-radius: 5px;
     }
 
     .success {
@@ -33,22 +37,41 @@ app-multiple-snackbar {
         margin: 0px !important;
     }
 
-    .snackbar-close-button {
-        margin-left: 60px;
+    .snackbar-close-button-container {
         display: flex;
         align-items: center;
         justify-content: center;
+        color: white;
 
-        &:hover {
-            cursor: pointer;
+        .snackbar-close-button {
+            margin-left: 10px;
+            background: #4DB0A0;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            box-shadow: none;
+            //outline-color: white;
+
+            &:hover {
+                cursor: pointer;
+            }
         }
     }
 
-    .snackbar-close-button {
-        margin-left: 60px;
+    //.snackbar-close-button {
+    //    margin-left: 60px;
+    //
+    //    &:hover {
+    //        cursor: pointer;
+    //    }
+    //}
 
-        &:hover {
-            cursor: pointer;
+    .close-all-button-container {
+        display: flex;
+        justify-content: flex-end;
+
+        .close-all-button {
+
         }
     }
 

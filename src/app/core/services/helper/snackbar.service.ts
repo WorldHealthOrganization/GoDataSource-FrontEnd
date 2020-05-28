@@ -1,32 +1,32 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
 import { SnackbarComponent } from '../../../shared/components/snackbar/snackbar.component';
 import * as _ from 'lodash';
 import { I18nService } from './i18n.service';
 import { Observable } from 'rxjs/internal/Observable';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
 import { MultipleSnackbarComponent } from '../../../shared/components/multiple-snackbar/multiple-snackbar.component';
 import { SnackbarHelperService } from './snackbar-helper.service';
 
 @Injectable()
-export class SnackbarService {
+export class SnackbarService implements OnDestroy {
 
     // amount of time (in ms) to wait before automatically closing the snackbar
     static DURATION: number = 4500;
     static DURATION_LONG: number = 8000;
 
     snackBarOpened: boolean = false;
+    private snackBarOpenedSubscription: Subscription;
 
     constructor(
         private snackbar: MatSnackBar,
         private i18nService: I18nService,
         private snackbarHelperService: SnackbarHelperService
     ) {
-
-        this.snackbarHelperService.snackbarsOpenedSubject.subscribe((value) => {
-            console.log(value);
+        // subscribe to see if we have already an opened snackbar
+        this.snackBarOpenedSubscription = this.snackbarHelperService.snackbarsOpenedSubject.subscribe((value: boolean) => {
             this.snackBarOpened = value;
         });
     }
@@ -47,16 +47,25 @@ export class SnackbarService {
         return this.i18nService
             .get(messageToken, translateData)
             .subscribe((message) => {
-                // show the translated message
-                this.snackbar.openFromComponent(SnackbarComponent, {
-                    panelClass: 'success',
-                    data: {
-                        message: message,
-                        html: html
-                    },
-                    duration: duration,
-                    horizontalPosition: 'center',
-                    verticalPosition: 'top'
+                if (!this.snackBarOpened) {
+
+                    // show the translated message
+                    this.snackbar.openFromComponent(MultipleSnackbarComponent, {
+                        panelClass: 'success',
+                        data: {
+                            message: message,
+                            html: html
+                        },
+                        duration: duration,
+                        horizontalPosition: 'center',
+                        verticalPosition: 'top'
+                    });
+
+                    this.snackBarOpened = true;
+                }
+
+                setTimeout(() => {
+                    this.snackbarHelperService.errorSubject.next({message: message, messageClass: 'success'});
                 });
             });
     }
@@ -114,21 +123,21 @@ export class SnackbarService {
             .get(messageToken, translateData)
             .subscribe((message) => {
                 if (!this.snackBarOpened) {
-                // show the translated message
-                this.snackbar.openFromComponent(MultipleSnackbarComponent, {
-                    panelClass: 'notice',
-                    data: {
-                        message: message,
-                        html: html
-                    },
-                    horizontalPosition: 'center',
-                    verticalPosition: 'top'
-                });
+                    // show the translated message
+                    this.snackbar.openFromComponent(MultipleSnackbarComponent, {
+                        panelClass: 'notice',
+                        data: {
+                            message: message,
+                            html: html
+                        },
+                        horizontalPosition: 'center',
+                        verticalPosition: 'top'
+                    });
                     this.snackBarOpened = true;
 
                 }
                 setTimeout(() => {
-                    this.snackbarHelperService.errorSubject.next({message: message, messageClass: 'notice'  });
+                    this.snackbarHelperService.errorSubject.next({message: message, messageClass: 'notice'});
                 });
 
             });
@@ -243,6 +252,10 @@ export class SnackbarService {
 
     dismissAll() {
         this.snackbar.dismiss();
+    }
+
+    ngOnDestroy(): void {
+        this.snackBarOpenedSubscription.unsubscribe();
     }
 }
 
