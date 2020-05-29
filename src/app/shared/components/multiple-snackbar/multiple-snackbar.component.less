@@ -19,22 +19,30 @@ app-multiple-snackbar {
         align-items: center;
         margin: 5px 0;
         color: white;
-        padding: 15px;
         border-radius: 5px;
+
+        .text-message {
+            padding: 15px;
+            display: flex;
+            align-items: center;
+        }
     }
 
     .success {
         background-color: @color-success;
+        align-items: stretch;
     }
 
     .error {
         background-color: @color-error;
+        align-items: stretch;
     }
 
     .notice{
         background-color: #f4723c;
         max-width: 100% !important;
         margin: 0px !important;
+        align-items: stretch;
     }
 
     .snackbar-close-button-container {
@@ -42,20 +50,41 @@ app-multiple-snackbar {
         align-items: center;
         justify-content: center;
         color: white;
+        padding: 10px;
+        border-radius: 5px;
 
-        .snackbar-close-button {
-            margin-left: 10px;
-            background: #4DB0A0;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            box-shadow: none;
-            //outline-color: white;
-
-            &:hover {
-                cursor: pointer;
-            }
+        .error {
+            background-color: blue;
         }
+
+        .success {
+            background-color: grey;
+        }
+
+        .notice {
+            background-color: yellow;
+        }
+
+        &:hover {
+            cursor: pointer;
+        }
+
+
+
+        //.snackbar-close-button {
+        //    margin-left: 10px;
+        //    //background: #4DB0A0;
+        //    color: white;
+        //    border: none;
+        //    border-radius: 5px;
+        //    box-shadow: none;
+        //    //outline-color: white;
+        //
+        //    &:hover {
+        //        cursor: pointer;
+        //        background: rgba(0,0,0,0.3)
+        //    }
+        //}
     }
 
     //.snackbar-close-button {
@@ -69,6 +98,7 @@ app-multiple-snackbar {
     .close-all-button-container {
         display: flex;
         justify-content: flex-end;
+        margin-top: 10px;
 
         .close-all-button {
 

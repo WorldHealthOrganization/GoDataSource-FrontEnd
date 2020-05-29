@@ -1,25 +1,30 @@
 <div class="errors-container">
-    <div *ngFor="let err of errors; let i = index"
-         [ngClass]="err.messageClass"
-         class="message" >
-        {{ err.message }} {{err.messageClass}}
-        <div class="snackbar-close-button-container">
-            <button
+    <div class="message"
+         *ngFor="let err of errors; let i = index"
+         [ngClass]="err.messageClass">
+        <div class="text-message">
+            {{ err.message }}
+        </div>
+
+        <div class="snackbar-close-button-container {{err.messageClass}}">
+            <p
                 (click)="closeSnackbar(err, i)"
                 class="snackbar-close-button"
             >
-                Close
-            </button>
+                {{'LNG_MULTIPLE_SNACKBAR_BUTTON_CLOSE' | translate}}
+            </p>
         </div>
     </div>
+
 
     <div
         *ngIf="errors.length > 1"
         class="close-all-button-container">
         <button
             (click)="closeAllSnackbars()"
-            class="close-all-button">
-            Close all
+            class="close-all-button"
+            type="button" mat-raised-button color="primary">
+            {{'LNG_MULTIPLE_SNACKBAR_BUTTON_CLOSE_ALL' | translate}}
         </button>
     </div>
 

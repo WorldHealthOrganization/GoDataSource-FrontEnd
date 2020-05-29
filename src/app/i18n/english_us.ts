@@ -123,8 +123,13 @@ export const EnglishUsLang = {
         /**
          * uiModifyFollowUpListPage
          */
-        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_MODIFY_DATA_IN_THE_FUTURE_LABEL': '*You can\'t modify some fields because at least one of the selected follow-ups is in the future'
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_MODIFY_DATA_IN_THE_FUTURE_LABEL': '*You can\'t modify some fields because at least one of the selected follow-ups is in the future',
 
+        /**
+         * uiMultipleSnackbar
+         */
+        'LNG_MULTIPLE_SNACKBAR_BUTTON_CLOSE': 'Close',
+        'LNG_MULTIPLE_SNACKBAR_BUTTON_CLOSE_ALL': 'Close all'
 
 
         /**

@@ -35,7 +35,6 @@ export class MultipleSnackbarComponent implements OnInit, OnDestroy {
         // reset errors
         this.errors = [];
         console.log('data', this.data);
-        // console.log(this.errors);
         this.snackBarRef.afterOpened().subscribe(() => {
             this.errorSubscription = this.snackbarHelperService.errorSubject.subscribe((message) => {
                 console.log(message);
