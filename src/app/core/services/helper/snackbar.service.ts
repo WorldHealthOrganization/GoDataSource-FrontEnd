@@ -1,6 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
-import { SnackbarComponent } from '../../../shared/components/snackbar/snackbar.component';
 import * as _ from 'lodash';
 import { I18nService } from './i18n.service';
 import { Observable } from 'rxjs/internal/Observable';
@@ -25,7 +24,7 @@ export class SnackbarService implements OnDestroy {
         private i18nService: I18nService,
         private snackbarHelperService: SnackbarHelperService
     ) {
-        // subscribe to see if we have already an opened snackbar
+        // subscribe to check if we have already an opened snackbar
         this.snackBarOpenedSubscription = this.snackbarHelperService.snackbarsOpenedSubject.subscribe((value: boolean) => {
             this.snackBarOpened = value;
         });

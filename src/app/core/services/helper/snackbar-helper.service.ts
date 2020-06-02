@@ -11,7 +11,5 @@ export class SnackbarHelperService {
     // Subject to pass data from snackbar component to snackbar service for error handling
     snackbarsOpenedSubject: Subject<boolean> = new Subject<boolean>();
 
-    constructor() {
-
-    }
+    constructor() {}
 }

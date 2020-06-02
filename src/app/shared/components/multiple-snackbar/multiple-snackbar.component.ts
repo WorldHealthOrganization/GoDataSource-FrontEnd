@@ -17,7 +17,6 @@ export class MultipleSnackbarComponent implements OnInit, OnDestroy {
 
     // available themes: 'success', 'error'
     theme: string;
-    message: string;
     html: boolean;
 
     private errorSubscription: Subscription;
@@ -60,11 +59,11 @@ export class MultipleSnackbarComponent implements OnInit, OnDestroy {
      */
     closeAllSnackbars() {
         this.errors = [];
+        this.snackbarHelperService.snackbarsOpenedSubject.next(false);
         this.snackBarRef.dismiss();
     }
 
     ngOnDestroy(): void {
         this.errorSubscription.unsubscribe();
-        this.snackbarHelperService.snackbarsOpenedSubject.next(false);
     }
 }

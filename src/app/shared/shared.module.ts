@@ -38,7 +38,7 @@ import * as fromSharedPipes from './pipes';
     declarations: [
         ...fromSharedComponents.components,
         ...fromSharedDirectives.directives,
-        ...fromSharedPipes.pipes,
+        ...fromSharedPipes.pipes
     ],
     providers: [],
     exports: [
@@ -56,7 +56,6 @@ import * as fromSharedPipes from './pipes';
         ...fromSharedComponents.components
     ],
     entryComponents: [
-        fromSharedComponents.SnackbarComponent,
         fromSharedComponents.MultipleSnackbarComponent,
         fromSharedComponents.DialogComponent,
         fromSharedComponents.ModifyContactFollowUpQuestionnaireDialogComponent,
