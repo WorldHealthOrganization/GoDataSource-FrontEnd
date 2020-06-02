@@ -22,9 +22,34 @@ app-multiple-snackbar {
         border-radius: 5px;
 
         .text-message {
-            padding: 15px;
+            padding: 10px;
             display: flex;
             align-items: center;
+        }
+
+        .snackbar-close-button-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+
+            &.error {
+                background-color: @color-button-error;
+            }
+
+            &.notice {
+                background-color: @color-button-notice;
+            }
+
+            &.success {
+                background-color: @color-button-success;
+            }
+
+            &:hover {
+                cursor: pointer;
+            }
         }
     }
 
@@ -44,56 +69,6 @@ app-multiple-snackbar {
         margin: 0px !important;
         align-items: stretch;
     }
-
-    .snackbar-close-button-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        padding: 10px;
-        border-radius: 5px;
-
-        .error {
-            background-color: blue;
-        }
-
-        .success {
-            background-color: grey;
-        }
-
-        .notice {
-            background-color: yellow;
-        }
-
-        &:hover {
-            cursor: pointer;
-        }
-
-
-
-        //.snackbar-close-button {
-        //    margin-left: 10px;
-        //    //background: #4DB0A0;
-        //    color: white;
-        //    border: none;
-        //    border-radius: 5px;
-        //    box-shadow: none;
-        //    //outline-color: white;
-        //
-        //    &:hover {
-        //        cursor: pointer;
-        //        background: rgba(0,0,0,0.3)
-        //    }
-        //}
-    }
-
-    //.snackbar-close-button {
-    //    margin-left: 60px;
-    //
-    //    &:hover {
-    //        cursor: pointer;
-    //    }
-    //}
 
     .close-all-button-container {
         display: flex;
