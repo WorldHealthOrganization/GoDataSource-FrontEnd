@@ -12,6 +12,7 @@ import { Subscription } from 'rxjs';
 })
 export class MultipleSnackbarComponent implements OnInit, OnDestroy {
 
+    // error messages
     errors: {message: string, messageClass: string}[] = [];
 
     // available themes: 'success', 'error'
@@ -27,45 +28,43 @@ export class MultipleSnackbarComponent implements OnInit, OnDestroy {
         public snackbarHelperService: SnackbarHelperService
     ) {
         this.theme = _.get(data, 'theme');
-        this.message = _.get(data, 'message');
         this.html = _.get(data, 'html');
     }
 
     ngOnInit() {
         // reset errors
         this.errors = [];
-        console.log('data', this.data);
-        this.snackBarRef.afterOpened().subscribe(() => {
-            this.errorSubscription = this.snackbarHelperService.errorSubject.subscribe((message) => {
-                console.log(message);
-                this.errors.push(message);
-                // console.log(this.errors);
-            });
-        });
-        this.snackBarRef.afterDismissed().subscribe(() => {
-            // console.log(`after dismiss function`);
-            this.snackbarHelperService.snackbarsOpenedSubject.next(false);
+        // get message to display
+        this.errorSubscription = this.snackbarHelperService.errorSubject.subscribe((message) => {
+            this.errors.push(message);
         });
     }
 
-    closeSnackbar(item, ind) {
+    /**
+     * Close snackbar
+     */
+    closeSnackbar(ind) {
+        // reset error messages collection and dismiss snackbar if there is only one message
         if (this.errors.length === 1) {
             this.closeAllSnackbars();
         } else {
+            // close message
             this.errors = this.errors.filter((err, index) => {
                 return index !== ind ? err : '';
             });
-            // console.log(this.errors);
         }
     }
 
+    /**
+     * Close all snackbars
+     */
     closeAllSnackbars() {
-        console.log(`close function`);
         this.errors = [];
         this.snackBarRef.dismiss();
     }
 
     ngOnDestroy(): void {
         this.errorSubscription.unsubscribe();
+        this.snackbarHelperService.snackbarsOpenedSubject.next(false);
     }
 }

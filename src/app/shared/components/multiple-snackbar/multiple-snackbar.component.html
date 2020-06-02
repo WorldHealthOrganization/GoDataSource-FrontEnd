@@ -1,5 +1,5 @@
 <div class="errors-container">
-    <div class="message"
+    <div class="message {{theme}}"
          *ngFor="let err of errors; let i = index"
          [ngClass]="err.messageClass">
         <div class="text-message">
@@ -8,7 +8,7 @@
 
         <div class="snackbar-close-button-container {{err.messageClass}}">
             <p
-                (click)="closeSnackbar(err, i)"
+                (click)="closeSnackbar(i)"
                 class="snackbar-close-button"
             >
                 {{'LNG_MULTIPLE_SNACKBAR_BUTTON_CLOSE' | translate}}
@@ -27,5 +27,10 @@
             {{'LNG_MULTIPLE_SNACKBAR_BUTTON_CLOSE_ALL' | translate}}
         </button>
     </div>
+</div>
 
+<div
+    *ngIf="html"
+    class="snackbar {{theme}}"
+    [innerHTML]="message">
 </div>

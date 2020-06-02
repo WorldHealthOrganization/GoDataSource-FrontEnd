@@ -47,9 +47,8 @@ export class SnackbarService implements OnDestroy {
         return this.i18nService
             .get(messageToken, translateData)
             .subscribe((message) => {
+                // show the translated message
                 if (!this.snackBarOpened) {
-
-                    // show the translated message
                     this.snackbar.openFromComponent(MultipleSnackbarComponent, {
                         panelClass: 'success',
                         data: {
@@ -60,10 +59,9 @@ export class SnackbarService implements OnDestroy {
                         horizontalPosition: 'center',
                         verticalPosition: 'top'
                     });
-
                     this.snackBarOpened = true;
                 }
-
+                // emit new message to snackbar component
                 setTimeout(() => {
                     this.snackbarHelperService.errorSubject.next({message: message, messageClass: 'success'});
                 });
@@ -86,7 +84,6 @@ export class SnackbarService implements OnDestroy {
         return this.i18nService
             .get(messageToken, translateData)
             .subscribe((message) => {
-                console.log(message);
                 // show the translated message
                 if (!this.snackBarOpened) {
                     this.snackbar.openFromComponent(MultipleSnackbarComponent, {
@@ -100,7 +97,7 @@ export class SnackbarService implements OnDestroy {
                     });
                     this.snackBarOpened = true;
                 }
-
+                // emit new message to snackbar component
                 setTimeout(() => {
                     this.snackbarHelperService.errorSubject.next({message: message, messageClass: 'error'});
                 });
@@ -136,6 +133,7 @@ export class SnackbarService implements OnDestroy {
                     this.snackBarOpened = true;
 
                 }
+                // emit new message to snackbar component
                 setTimeout(() => {
                     this.snackbarHelperService.errorSubject.next({message: message, messageClass: 'notice'});
                 });

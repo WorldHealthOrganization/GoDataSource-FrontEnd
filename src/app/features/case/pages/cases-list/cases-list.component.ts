@@ -1081,7 +1081,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.caseDataService
-                        .convertToContact(this.selectedOutbreak.id, '213123dwf123')
+                        .convertToContact(this.selectedOutbreak.id, caseModel.id)
                         .pipe(
                             catchError((err) => {
                                 this.snackbarService.showApiError(err);
@@ -1093,34 +1093,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                             // reload data
                             this.needsRefreshList(true);
                         });
-
-                    setTimeout(() => {this.outbreakDataService.getOutbreak('sdasdasd')
-                        .pipe(
-                            catchError((err) => {
-                                this.snackbarService.showApiError(err);
-                                return throwError(err);
-                            })
-                        )
-                        .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT_SUCCESS_MESSAGE');
-                            // reload data
-                            this.needsRefreshList(true);
-                        });}, 1000)
-
-
-                    setTimeout(() => {this.outbreakDataService.getOutbreak('sdasdasd')
-                        .pipe(
-                            catchError((err) => {
-                                this.snackbarService.showNotice('LNG_GENERIC_WARNING_NO_ACTIVE_OUTBREAK');
-                                return throwError(err);
-                            })
-                        )
-                        .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT_SUCCESS_MESSAGE');
-                            // reload data
-                            this.needsRefreshList(true);
-                        });}, 5000)
-
                 }
             });
     }
