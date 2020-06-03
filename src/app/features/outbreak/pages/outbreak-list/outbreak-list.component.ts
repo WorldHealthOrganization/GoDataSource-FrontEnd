@@ -61,6 +61,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
     userList$: Observable<UserModel[]>;
 
     geographicalLevelsList$: Observable<any[]>;
+    followUpsTeamAssignmentAlgorithm$: Observable<any[]>;
 
     // provide constants to template
     ReferenceDataCategory = ReferenceDataCategory;
@@ -251,6 +252,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
      */
     ngOnInit() {
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        this.followUpsTeamAssignmentAlgorithm$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM);
         this.activeOptionsList$ = this.genericDataService.getFilterYesNoOptions();
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
         this.geographicalLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL);
@@ -325,8 +328,28 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
                 label: 'LNG_OUTBREAK_FIELD_LABEL_ACTIVE'
             }),
             new VisibleColumnModel({
+                field: 'generateFollowUpsTeamAssignmentAlgorithm',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'generateFollowUpsOverwriteExisting',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'generateFollowUpsKeepTeamAssignment',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT',
+                visible: false
+            }),
+            new VisibleColumnModel({
                 field: 'isContactLabResultsActive',
                 label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_LAB_RESULTS_ACTIVE',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'isDateOfOnsetRequired',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED',
                 visible: false
             }),
             new VisibleColumnModel({

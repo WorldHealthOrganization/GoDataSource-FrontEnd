@@ -33,8 +33,7 @@
                     <button
                         *ngIf="CaseModel.canListPersonsWithoutRelationships(authUser)"
                         mat-menu-item
-                        [routerLink]="['/cases']"
-                        [queryParams]="{ applyListFilter: Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS }">
+                        (click)="navigateToCasesWithoutRelationships()">
                         {{'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON' | translate}}
                     </button>
 

@@ -30,6 +30,7 @@ import { RelationshipModel } from '../../../../core/models/entity-and-relationsh
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
 
 @Component({
     selector: 'app-events-list',
@@ -274,7 +275,8 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
         private genericDataService: GenericDataService,
         private i18nService: I18nService,
         private userDataService: UserDataService,
-        private entityHelperService: EntityHelperService
+        private entityHelperService: EntityHelperService,
+        private redirectService: RedirectService
     ) {
         super(listHelperService);
     }
@@ -628,6 +630,17 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
         this.entityHelperService.displayExposures(
             this.selectedOutbreak.id,
             entity
+        );
+    }
+
+    /**
+     * Navigate to Events without relationships
+     */
+    navigateToEventsWithoutRelationships() {
+        this.redirectService.to(
+            ['/events'], {
+                applyListFilter: Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS
+            }
         );
     }
 

@@ -40,11 +40,6 @@ export const EnglishUsLang = {
         'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER': 'Phone Number',
 
         /**
-         * uiCommonLabels
-         */
-        'LNG_COMMON_LABEL_SEARCH': 'Search',
-
-        /**
          * uiLabResultsListPage
          */
         'LNG_PAGE_LIST_LAB_RESULTS_EXPORT_BUTTON': 'Export lab result data',
@@ -90,11 +85,15 @@ export const EnglishUsLang = {
          * uiCreateContactPage
          */
         'LNG_PAGE_CREATE_CONTACT_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
+        'LNG_PAGE_CREATE_CONTACT_CANT_SET_FOLLOW_UP_TEAM_TITLE': '*You need Team - list permission to change contact follow-up team',
+        'LNG_PAGE_CREATE_CONTACT_SET_FOLLOW_UP_TEAM_INFO_TITLE': '*Follow-up Team should be set only if you want all generated follow-ups to be assigned to a specific team (instead of using the nearest location auto-assign system)',
 
         /**
          * uiModifyContactPage
          */
         'LNG_PAGE_MODIFY_CONTACT_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
+        'LNG_PAGE_MODIFY_CONTACT_CANT_SET_FOLLOW_UP_TEAM_TITLE': '*You need Team - list permission to change contact follow-up team',
+        'LNG_PAGE_MODIFY_CONTACT_SET_FOLLOW_UP_TEAM_INFO_TITLE': '*Follow-up Team should be set only if you want all generated follow-ups to be assigned to a specific team (instead of using the nearest location auto-assign system)',
 
         /**
          * uiContactMergeDuplicateRecordsPage
@@ -152,8 +151,10 @@ export const EnglishUsLang = {
 
 
         /**
-         *  REMOVE the tokens from below
+         * REMOVE the tokens from below
          */
         // LNG_PAGE_LIST_FOLLOW_UPS_MODIFY_FUTURE_FOLLOW_UPS
+        // LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_TAB_QUESTIONNAIRE_TITLE
+        // LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_CHANGES_FOR_SELECTED_FOLLOW_UPS_QUESTIONNAIRE
     }
 };

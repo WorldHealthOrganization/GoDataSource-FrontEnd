@@ -472,8 +472,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             }),
             new VisibleColumnModel({
                 field: 'team',
-                label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
-                visible: false
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM'
             }),
             new VisibleColumnModel({
                 field: 'statusId',
@@ -1011,60 +1010,90 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
      * Generate Follow Ups
      */
     generateFollowUps() {
-        if (this.selectedOutbreak) {
-            this.genericDataService
-                .getFilterYesNoOptions()
-                .subscribe((yesNoOptions: LabelValuePair[]) => {
-                    const yesNoOptionsFiltered: LabelValuePair[] = _.filter(yesNoOptions, (item: LabelValuePair) => _.isBoolean(item.value));
-                    this.dialogService
-                        .showInput(new DialogConfiguration({
-                            message: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TITLE',
-                            yesLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_YES_BUTTON',
-                            fieldsList: [
-                                new DialogField({
-                                    name: 'dates',
-                                    required: true,
-                                    value: {
-                                        startDate: moment().add(1, 'days').startOf('day').format(),
-                                        endDate: moment().add(1, 'days').endOf('day').format()
-                                    },
-                                    fieldType: DialogFieldType.DATE_RANGE
-                                }),
-                                new DialogField({
-                                    name: 'targeted',
-                                    placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TARGETED_LABEL',
-                                    inputOptions: yesNoOptionsFiltered,
-                                    inputOptionsClearable: false,
-                                    required: true,
-                                    value: true
-                                })
-                            ]
-                        }))
-                        .subscribe((answer: DialogAnswer) => {
-                            if (answer.button === DialogAnswerButton.Yes) {
-                                this.followUpsDataService
-                                    .generateFollowUps(
-                                        this.selectedOutbreak.id,
-                                        answer.inputValue.value.dates.startDate,
-                                        answer.inputValue.value.dates.endDate,
-                                        answer.inputValue.value.targeted
-                                    )
-                                    .pipe(
-                                        catchError((err) => {
-                                            this.snackbarService.showApiError(err);
-                                            return throwError(err);
-                                        })
-                                    )
-                                    .subscribe(() => {
-                                        this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
-
-                                        // reload data
-                                        this.needsRefreshList(true);
-                                    });
-                            }
-                        });
-                });
+        // must have outbreak
+        if (
+            !this.selectedOutbreak ||
+            !this.selectedOutbreak.id
+        ) {
+            return;
         }
+
+        // display dialog
+        this.genericDataService
+            .getFilterYesNoOptions()
+            .subscribe((yesNoOptions: LabelValuePair[]) => {
+                const yesNoOptionsFiltered: LabelValuePair[] = _.filter(yesNoOptions, (item: LabelValuePair) => _.isBoolean(item.value));
+                this.dialogService
+                    .showInput(new DialogConfiguration({
+                        message: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TITLE',
+                        yesLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_YES_BUTTON',
+                        fieldsList: [
+                            new DialogField({
+                                name: 'dates',
+                                required: true,
+                                value: {
+                                    startDate: moment().add(1, 'days').startOf('day').format(),
+                                    endDate: moment().add(1, 'days').endOf('day').format()
+                                },
+                                fieldType: DialogFieldType.DATE_RANGE
+                            }),
+                            new DialogField({
+                                name: 'targeted',
+                                placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TARGETED_LABEL',
+                                inputOptions: yesNoOptionsFiltered,
+                                inputOptionsClearable: false,
+                                required: true,
+                                value: true
+                            }),
+                            new DialogField({
+                                name: 'overwriteExistingFollowUps',
+                                placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_OVERWRITE_EXISTING_LABEL',
+                                description: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_OVERWRITE_EXISTING_LABEL_DESCRIPTION',
+                                inputOptions: yesNoOptionsFiltered,
+                                inputOptionsClearable: false,
+                                required: true,
+                                value: this.selectedOutbreak.generateFollowUpsOverwriteExisting
+                            }),
+                            new DialogField({
+                                name: 'keepTeamAssignment',
+                                placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_KEEP_TEAM_ASSIGNMENT_LABEL',
+                                description: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_KEEP_TEAM_ASSIGNMENT_LABEL_DESCRIPTION',
+                                inputOptions: yesNoOptionsFiltered,
+                                inputOptionsClearable: false,
+                                required: true,
+                                value: this.selectedOutbreak.generateFollowUpsKeepTeamAssignment,
+                                visible: (dialogFieldsValues: any): boolean => {
+                                    return !dialogFieldsValues.overwriteExistingFollowUps;
+                                }
+                            })
+                        ]
+                    }))
+                    .subscribe((answer: DialogAnswer) => {
+                        if (answer.button === DialogAnswerButton.Yes) {
+                            this.followUpsDataService
+                                .generateFollowUps(
+                                    this.selectedOutbreak.id,
+                                    answer.inputValue.value.dates.startDate,
+                                    answer.inputValue.value.dates.endDate,
+                                    answer.inputValue.value.targeted,
+                                    answer.inputValue.value.overwriteExistingFollowUps,
+                                    answer.inputValue.value.keepTeamAssignment
+                                )
+                                .pipe(
+                                    catchError((err) => {
+                                        this.snackbarService.showApiError(err);
+                                        return throwError(err);
+                                    })
+                                )
+                                .subscribe(() => {
+                                    this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
+
+                                    // reload data
+                                    this.needsRefreshList(true);
+                                });
+                        }
+                    });
+            });
     }
 
     /**

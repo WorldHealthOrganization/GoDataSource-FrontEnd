@@ -330,7 +330,10 @@ export class TransmissionChainDataService {
                             }
                             // date of onset
                         } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.DATE_OF_ONSET.value) {
-                            if (node.type === EntityType.CASE) {
+                            if (
+                                node.type === EntityType.CASE &&
+                                node.model.dateOfOnset
+                            ) {
                                 nodeData.label = moment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
                             } else {
                                 nodeData.label = '';

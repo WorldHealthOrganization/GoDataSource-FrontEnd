@@ -16,6 +16,14 @@
                 <!-- Personal Details section -->
                 <mat-card class="page-section">
                     <div fxLayout="column">
+                        <!-- Warnings -->
+                        <div
+                            *ngIf="TeamModel.canList(authUser)"
+                            class="warning-message"
+                            fxLayout="row">
+                            {{ 'LNG_PAGE_CREATE_CONTACT_SET_FOLLOW_UP_TEAM_INFO_TITLE' | translate }}
+                        </div>
+
                         <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="firstName"
@@ -118,7 +126,26 @@
                                 tooltip="LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION">
                             </app-form-slide-toggle>
 
-                            <div fxFlex><!-- placeholder --></div>
+                            <!-- Contact follow-up team -->
+                            <ng-container
+                                *ngIf="TeamModel.canList(authUser); else cantListTeams">
+                                <app-form-select
+                                    fxFlex
+                                    name="followUpTeamId"
+                                    [(ngModel)]="contactData.followUpTeamId"
+                                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID' | translate"
+                                    tooltip="LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID_DESCRIPTION"
+                                    [options]="teamList$ | async"
+                                    optionLabelKey="name"
+                                    optionValueKey="id">
+                                </app-form-select>
+                            </ng-container>
+                            <ng-template
+                                #cantListTeams>
+                                <div fxFlex>
+                                    {{ 'LNG_PAGE_CREATE_CONTACT_CANT_SET_FOLLOW_UP_TEAM_TITLE' | translate }}
+                                </div>
+                            </ng-template>
                         </div>
                     </div>
                 </mat-card>

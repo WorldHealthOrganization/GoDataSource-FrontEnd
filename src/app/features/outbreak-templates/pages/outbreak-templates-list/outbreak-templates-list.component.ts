@@ -20,6 +20,7 @@ import * as _ from 'lodash';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 
 @Component({
     selector: 'app-outbreak-templates-list',
@@ -39,6 +40,8 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
     outbreakTemplatesListCount$: Observable<IBasicCount>;
 
     diseasesList$: Observable<any[]>;
+    followUpsTeamAssignmentAlgorithm$: Observable<any[]>;
+    yesNoOptionsList$: Observable<any[]>;
 
     authUser: UserModel;
 
@@ -179,7 +182,8 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
         private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService,
         private outbreakTemplateDataService: OutbreakTemplateDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private genericDataService: GenericDataService
     ) {
         super(listHelperService);
     }
@@ -193,6 +197,8 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
 
         // get the lists for forms
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
+        this.followUpsTeamAssignmentAlgorithm$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM);
+        this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
@@ -225,6 +231,21 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
             new VisibleColumnModel({
                 field: 'disease',
                 label: 'LNG_OUTBREAK_FIELD_LABEL_DISEASE'
+            }),
+            new VisibleColumnModel({
+                field: 'generateFollowUpsTeamAssignmentAlgorithm',
+                label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'generateFollowUpsOverwriteExisting',
+                label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'generateFollowUpsKeepTeamAssignment',
+                label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT',
+                visible: false
             })
         ];
     }

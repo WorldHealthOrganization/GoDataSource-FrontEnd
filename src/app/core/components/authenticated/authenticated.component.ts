@@ -272,6 +272,12 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
      * Show loading spinner
      */
     showLoading() {
+        // as a precaution if previous dialog is still visible then we shouldn't open a new one
+        if (this.menuLoadingDialog) {
+            return;
+        }
+
+        // display dialog;
         this.menuLoadingDialog = this.dialogService.showLoadingDialog();
     }
 
