@@ -13,6 +13,10 @@ app-multiple-snackbar {
         min-width: 200px;
     }
 
+    .errors-container {
+        border-radius: 5px;
+    }
+
     .message {
         display: flex;
         justify-content: space-between;
@@ -20,9 +24,10 @@ app-multiple-snackbar {
         margin: 5px 0;
         color: white;
         border-radius: 5px;
+        box-shadow: 5px 3px 10px rgba(0, 0, 0, 0.5);
 
         .text-message {
-            padding: 10px;
+            padding: 5px 10px;
             display: flex;
             align-items: center;
         }
@@ -66,7 +71,7 @@ app-multiple-snackbar {
     .notice{
         background-color: #f4723c;
         max-width: 100% !important;
-        margin: 0px !important;
+        margin: 0 !important;
         align-items: stretch;
     }
 
@@ -74,6 +79,10 @@ app-multiple-snackbar {
         display: flex;
         justify-content: flex-end;
         margin-top: 10px;
+
+        .close-all-button {
+            box-shadow: 5px 3px 10px rgba(0, 0, 0, 0.5);
+        }
     }
 
 }
