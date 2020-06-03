@@ -105,7 +105,12 @@ export class TransmissionChainModel
                         }
                     } else {
                         this.casesMap[personId] = new CaseModel(nodesData[personId]);
-                        if (moment(nodesData[personId].dateOfOnset).isBefore(this.earliestDateOfOnset) || _.isEmpty(this.earliestDateOfOnset)) {
+                        if (
+                            nodesData[personId].dateOfOnset && (
+                                moment(nodesData[personId].dateOfOnset).isBefore(this.earliestDateOfOnset) ||
+                                _.isEmpty(this.earliestDateOfOnset)
+                            )
+                        ) {
                             this.earliestDateOfOnset = moment(nodesData[personId].dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
                             this.rootPerson = this.casesMap[personId];
                         }

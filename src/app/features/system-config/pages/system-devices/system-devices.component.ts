@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -16,6 +16,7 @@ import { catchError, share, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-system-devices-list',
@@ -23,7 +24,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
     templateUrl: './system-devices.component.html',
     styleUrls: ['./system-devices.component.less']
 })
-export class SystemDevicesComponent extends ListComponent implements OnInit {
+export class SystemDevicesComponent extends ListComponent implements OnInit, OnDestroy {
     // Breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_DEVICES_TITLE', '.', true)
@@ -123,15 +124,14 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private authDataService: AuthDataService,
         private deviceDataService: DeviceDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private dialogService: DialogService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**
@@ -149,6 +149,14 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
 
         // retrieve devices
         this.needsRefreshList(true);
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

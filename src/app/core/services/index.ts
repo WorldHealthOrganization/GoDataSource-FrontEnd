@@ -30,7 +30,6 @@ import { StorageService } from './helper/storage.service';
 import { LoggerService } from './helper/logger.service';
 import { SnackbarService } from './helper/snackbar.service';
 import { ModelHelperService } from './helper/model-helper.service';
-import { RouterHelperService } from './helper/router-helper.service';
 import { FormHelperService } from './helper/form-helper.service';
 import { I18nService } from './helper/i18n.service';
 import { CacheService } from './helper/cache.service';
@@ -49,6 +48,7 @@ import { SavedImportMappingService } from './data/saved-import-mapping.data.serv
 import { RedirectService } from './helper/redirect.service';
 import { EntityHelperService } from './helper/entity-helper.service';
 import { CaptchaDataService } from './data/captcha.data.service';
+import { ListHelperService } from './helper/list-helper.service';
 
 // export the list of services
 export const services: any[] = [
@@ -102,12 +102,12 @@ export const services: any[] = [
     LoggerService,
     SnackbarService,
     ModelHelperService,
-    RouterHelperService,
     FormHelperService,
     I18nService,
     CacheService,
     DialogService,
     DomService,
     RedirectService,
-    EntityHelperService
+    EntityHelperService,
+    ListHelperService
 ];

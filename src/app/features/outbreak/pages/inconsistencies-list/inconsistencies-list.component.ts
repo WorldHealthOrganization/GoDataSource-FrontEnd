@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -21,6 +21,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { catchError, share, tap } from 'rxjs/operators';
 import { HoverRowAction } from '../../../../shared/components';
 import { throwError } from 'rxjs/internal/observable/throwError';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-inconsistencies-list',
@@ -28,7 +29,7 @@ import { throwError } from 'rxjs/internal/observable/throwError';
     templateUrl: './inconsistencies-list.component.html',
     styleUrls: ['./inconsistencies-list.component.less']
 })
-export class InconsistenciesListComponent extends ListComponent implements OnInit {
+export class InconsistenciesListComponent extends ListComponent implements OnInit, OnDestroy {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -89,17 +90,16 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private authDataService: AuthDataService,
         private i18nService: I18nService,
-        protected route: ActivatedRoute,
+        private route: ActivatedRoute,
         private referenceDataDataService: ReferenceDataDataService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**
@@ -141,6 +141,14 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
                         this.needsRefreshList(true);
                     });
             });
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

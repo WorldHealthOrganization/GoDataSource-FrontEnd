@@ -59,6 +59,29 @@ const routes: Routes = [
         canDeactivate: [
             PageChangeConfirmationGuard
         ]
+    },
+
+    // Not Duplicates List - Cases
+    {
+        path: 'cases/:caseId/marked-not-duplicates',
+        component: fromPages.MarkedNotDuplicatesListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.CASE_LIST
+            ]
+        }
+    },
+    // Not Duplicates List - Contacts
+    {
+        path: 'contacts/:contactId/marked-not-duplicates',
+        component: fromPages.MarkedNotDuplicatesListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.CONTACT_LIST
+            ]
+        }
     }
 ];
 

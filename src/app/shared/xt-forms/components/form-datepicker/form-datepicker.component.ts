@@ -8,7 +8,7 @@ import {
     SkipSelf,
     HostBinding,
     Output,
-    EventEmitter
+    EventEmitter, OnDestroy
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { Constants } from '../../../../core/models/constants';
@@ -18,6 +18,7 @@ import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/materia
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { MatDatepicker } from '@angular/material';
 import { Moment } from '../../../../core/helperClasses/x-moment';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 // Define format to be used into datepicker
 export const DEFAULT_FORMAT = {
@@ -69,7 +70,7 @@ export const DEFAULT_FORMAT = {
         }
     ]
 })
-export class FormDatepickerComponent extends ElementBase<string> {
+export class FormDatepickerComponent extends ElementBase<string> implements OnDestroy {
     static identifier: number = 0;
 
     @HostBinding('class.form-element-host') isFormElement = true;
@@ -97,6 +98,12 @@ export class FormDatepickerComponent extends ElementBase<string> {
 
     @Output() optionChanged = new EventEmitter<any>();
 
+    // language subscription
+    private languageSubscription: Subscription;
+
+    /**
+     * Constructor
+     */
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
@@ -106,9 +113,19 @@ export class FormDatepickerComponent extends ElementBase<string> {
         super(controlContainer, validators, asyncValidators);
 
         // on language change..we need to translate again the token
-        this.i18nService.languageChangedEvent.subscribe(() => {
+        this.languageSubscription = this.i18nService.languageChangedEvent.subscribe(() => {
             this.tooltip = this._tooltipToken;
         });
+    }
+
+    /**
+     * Component destroyed
+     */
+    ngOnDestroy() {
+        if (this.languageSubscription) {
+            this.languageSubscription.unsubscribe();
+            this.languageSubscription = null;
+        }
     }
 
     /**

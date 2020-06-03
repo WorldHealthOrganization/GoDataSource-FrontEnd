@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -22,6 +22,8 @@ import { IAnswerData } from '../../../../core/models/question.model';
 import { catchError, share } from 'rxjs/operators';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
+import { Constants } from '../../../../core/models/constants';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { EntityType } from '../../../../core/models/entity-type';
 
@@ -37,8 +39,6 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
 
     // selected outbreak
     selectedOutbreak: OutbreakModel;
-    // form model
-    followUp = new FollowUpModel();
     // selected follow-ups ids
     selectedFollowUpsIds: string[];
     // selected follow-ups to be modified
@@ -50,21 +50,24 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
 
     // current dirty fields
     currentDirtyFields: {
-        questionnaireAnswers?: {
-            [variable: string]: IAnswerData[];
-        },
         [key: string]: any
     } = {};
 
     // dropdowns
     dailyStatusTypeOptions$: Observable<any[]>;
     teamsList$: Observable<TeamModel[]>;
+    yesNoOptionsList$: Observable<any[]>;
 
     // provide constants to template
     Object = Object;
+    Constants = Constants;
 
     // authenticated user
     authUser: UserModel;
+    futureFollowUps: boolean = false;
+
+    @ViewChild('targetedInput') targetedInput: any;
+    @ViewChild('teamInput') teamInput: any;
 
     /**
      * Constructor
@@ -79,7 +82,8 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
         private formHelper: FormHelperService,
         private referenceDataDataService: ReferenceDataDataService,
         private teamDataService: TeamDataService,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private genericDataService: GenericDataService
     ) {
         super();
     }
@@ -94,6 +98,7 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
         // dropdowns
         this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS).pipe(share());
         this.teamsList$ = this.teamDataService.getTeamsList().pipe(share());
+        this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions(true);
 
         // read route query params
         this.route.queryParams
@@ -175,6 +180,14 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
                 qb
             ).subscribe((followUps: FollowUpModel[]) => {
                 this.selectedFollowUps = followUps;
+
+                // check if we have future follow-ups
+                for (const followUp of this.selectedFollowUps) {
+                    if (Constants.isDateInTheFuture(followUp.date)) {
+                        this.futureFollowUps = true;
+                        break;
+                    }
+                }
             });
         }
     }
@@ -238,11 +251,9 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     /**
      * Change step
      */
-    onChangeStep(step: { selectedIndex: number }, stepForms: NgForm[]) {
-        if (step.selectedIndex === 2) {
-            // reload dirty fields to display the changes
-            this.currentDirtyFields = this.getFormDirtyFields(stepForms);
-        }
+    onChangeStep(stepForms: NgForm[]) {
+        // reload dirty fields to display the changes
+        this.currentDirtyFields = this.getFormDirtyFields(stepForms);
     }
 
     /**
@@ -262,39 +273,77 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
             return;
         }
 
-        // save follow-ups
-        // construct list of observables to save follow-ups
-        const observableList$: Observable<any>[] = [];
-        _.each(
-            this.selectedFollowUps,
-            (followUp: FollowUpModel) => {
-                // retrieve contact id
-                observableList$.push(
-                    this.followUpsDataService
-                        .modifyFollowUp(
-                            this.selectedOutbreak.id,
-                            followUp.personId,
-                            followUp.id,
-                            dirtyFields
-                        )
-                );
-            }
-        );
+        // get selected follow-ups ids to pass them to qb
+        const selectedFollowUpIds: string[] = this.selectedFollowUps.map((followUp: FollowUpModel) => {
+            return followUp.id;
+        });
 
-        // execute observables in parallel
-        forkJoin(observableList$)
+        const qb: RequestQueryBuilder = new RequestQueryBuilder();
+        qb.filter.where({
+            id: {
+                inq: selectedFollowUpIds
+            }
+        });
+
+        // start modifying follow-ups
+        const loadingDialog = this.dialogService.showLoadingDialog();
+        this.followUpsDataService
+            .bulkModifyFollowUps(
+                this.selectedOutbreak.id,
+                dirtyFields,
+                qb
+            )
             .pipe(
                 catchError((err) => {
+                    loadingDialog.close();
+
                     this.snackbarService.showApiError(err);
                     return throwError(err);
                 })
             )
             .subscribe(() => {
+                loadingDialog.close();
+
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE');
 
                 // navigate to listing page
                 this.disableDirtyConfirm();
                 this.router.navigate(['/contacts/follow-ups']);
             });
+    }
+
+    /**
+     * On changing value to 'None' set targetedInput as pristine
+     */
+    onTargetedChangeValue(value) {
+        // return if element is not initialized
+        if (!this.targetedInput) {
+            return;
+        }
+        // if option selected is 'None' mark input as pristine
+        if (!value) {
+            this.targetedInput.control.markAsPristine();
+        }
+    }
+
+    /**
+     * On changing value to 'None' set teamInput as pristine
+     */
+    onTeamChangeValue(value) {
+        // return if element is not initialized
+        if (!this.teamInput) {
+            return;
+        }
+        // if option selected is 'None' mark input as pristine
+        if (!value) {
+            this.teamInput.control.markAsPristine();
+        }
+    }
+
+    /**
+     * Check if there is nothing to change
+     */
+    nothingToChange(): boolean {
+        return _.isEmpty(this.currentDirtyFields);
     }
 }

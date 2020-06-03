@@ -40,7 +40,8 @@ export enum ReferenceDataCategory {
     VACCINES_STATUS = 'LNG_REFERENCE_DATA_CATEGORY_VACCINE_STATUS',
     PREGNANCY_STATUS = 'LNG_REFERENCE_DATA_CATEGORY_PREGNANCY_STATUS',
     INSTITUTION_NAME = 'LNG_REFERENCE_DATA_CATEGORY_INSTITUTION_NAME',
-    DATE_RANGE_CENTRE_NAME = 'LNG_REFERENCE_DATA_CATEGORY_CENTRE_NAME'
+    DATE_RANGE_CENTRE_NAME = 'LNG_REFERENCE_DATA_CATEGORY_CENTRE_NAME',
+    FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM = 'LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM'
 }
 
 export class ReferenceDataCategoryModel
@@ -109,6 +110,7 @@ export class ReferenceDataEntryModel
     id: string;
     categoryId: string;
     value: string;
+    code: string;
     description: string;
     readonly: boolean;
     active: boolean;
@@ -146,6 +148,7 @@ export class ReferenceDataEntryModel
         this.id = _.get(data, 'id');
         this.categoryId = _.get(data, 'categoryId');
         this.value = _.get(data, 'value');
+        this.code = _.get(data, 'code');
         this.description = _.get(data, 'description');
         this.readonly = _.get(data, 'readOnly', false);
         this.active = _.get(data, 'active', true);

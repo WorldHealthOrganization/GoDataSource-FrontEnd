@@ -6,7 +6,7 @@ import {
     Inject,
     Host,
     SkipSelf,
-    HostBinding, Output, EventEmitter, ViewChild
+    HostBinding, Output, EventEmitter, ViewChild, OnDestroy
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { ElementBase } from '../../core/index';
@@ -15,6 +15,7 @@ import { ChangeContext, Options } from 'ng5-slider';
 import { Constants } from '../../../../core/models/constants';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import * as momentOriginal from 'moment';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 /**
  * Handles filter range data
@@ -48,7 +49,7 @@ export class FormDateRangeSliderData {
         multi: true
     }]
 })
-export class FormDateRangeSliderComponent extends ElementBase<FormDateRangeSliderData> {
+export class FormDateRangeSliderComponent extends ElementBase<FormDateRangeSliderData> implements OnDestroy {
     /**
      * Component identifier
      */
@@ -228,6 +229,9 @@ export class FormDateRangeSliderComponent extends ElementBase<FormDateRangeSlide
         }
     };
 
+    // language subscription
+    private languageSubscription: Subscription;
+
     /**
      * Constructor
      */
@@ -240,7 +244,7 @@ export class FormDateRangeSliderComponent extends ElementBase<FormDateRangeSlide
         super(controlContainer, validators, asyncValidators);
 
         // on language change..we need to translate again the token
-        this.i18nService.languageChangedEvent.subscribe(() => {
+        this.languageSubscription = this.i18nService.languageChangedEvent.subscribe(() => {
             this.tooltip = this._tooltipToken;
         });
 
@@ -248,6 +252,16 @@ export class FormDateRangeSliderComponent extends ElementBase<FormDateRangeSlide
         this.registerOnChange(() => {
             this.determineSliderValue();
         });
+    }
+
+    /**
+     * Component destroyed
+     */
+    ngOnDestroy() {
+        if (this.languageSubscription) {
+            this.languageSubscription.unsubscribe();
+            this.languageSubscription = null;
+        }
     }
 
     /**

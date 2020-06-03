@@ -28,7 +28,8 @@ export enum UserSettings {
     SYNC_LOGS_FIELDS = 'syncLogsFields',
     REF_DATA_CAT_ENTRIES_FIELDS = 'refDataCatEntriesFields',
     SHARE_RELATIONSHIPS = 'shareRelationships',
-    USER_ROLE_FIELDS = 'userRoleFields'
+    USER_ROLE_FIELDS = 'userRoleFields',
+    ENTITY_NOT_DUPLICATES_FIELDS = 'entityNotDuplicatesFields'
 }
 
 export enum PhoneNumberType {
@@ -62,14 +63,15 @@ abstract class UserSettingsHandlers {
     static REF_DATA_CAT_ENTRIES_FIELDS = [];
     static SHARE_RELATIONSHIPS = [];
     static USER_ROLE_FIELDS = [];
+    static ENTITY_NOT_DUPLICATES_FIELDS = [];
 }
 
 export interface IPermissionExpressionAnd {
-    and: (PERMISSION | PermissionExpression)[];
+    and: (PERMISSION | PermissionExpression | ((UserModel) => boolean))[];
 }
 
 export interface IPermissionExpressionOr {
-    or: (PERMISSION | PermissionExpression)[];
+    or: (PERMISSION | PermissionExpression | ((UserModel) => boolean))[];
 }
 
 export class PermissionExpression {
@@ -79,7 +81,8 @@ export class PermissionExpression {
     constructor(
         public permission: PERMISSION |
             IPermissionExpressionAnd |
-            IPermissionExpressionOr
+            IPermissionExpressionOr |
+            ((UserModel) => boolean)
     ) {}
 
     /**
@@ -100,7 +103,13 @@ export class PermissionExpression {
                             return false;
                         }
 
-                        // check if user has this permission
+                    // check if condition is function
+                    } else if (typeof condition === 'function') {
+                        if (!condition(authUser)) {
+                            return false;
+                        }
+
+                    // check if user has this permission
                     } else if (!authUser.permissionIdsMapped[condition]) {
                         return false;
                     }
@@ -115,6 +124,12 @@ export class PermissionExpression {
                     // if complex expression then we need to check further
                     if (condition instanceof PermissionExpression) {
                         if (condition.allowed(authUser)) {
+                            return true;
+                        }
+
+                        // check if condition is function
+                    } else if (typeof condition === 'function') {
+                        if (condition(authUser)) {
                             return true;
                         }
 
@@ -133,7 +148,9 @@ export class PermissionExpression {
         }
 
         // simple permission
-        return !!authUser.permissionIdsMapped[this.permission];
+        return typeof this.permission === 'function' ?
+            this.permission(authUser) :
+            !!authUser.permissionIdsMapped[this.permission];
     }
 }
 
@@ -209,14 +226,33 @@ export class UserModel
     roleIds: string[];
     roles: UserRoleModel[] = [];
 
+    // used to determine if permissions changed from last time we used this key
+    private _permissionIdsHash: number;
+    get permissionIdsHash(): number {
+        return this._permissionIdsHash;
+    }
+
+    // list of permissions for current user
     private _permissionIds: PERMISSION[] = [];
     permissionIdsMapped: {
         [permissionId: string]: boolean
     } = {};
     set permissionIds(permissionIds: PERMISSION[]) {
+        // user permissions
         this._permissionIds = permissionIds;
+
+        // user permissions for easy access
+        this._permissionIdsHash = 0;
         this.permissionIdsMapped = _.transform(permissionIds, (a, v) => {
+            // map
             a[v] = true;
+
+            // concatenate to determine hash later
+            for (let i = 0; i < v.length; i++) {
+                const char = v.charCodeAt(i);
+                // tslint:disable-next-line:no-bitwise
+                this._permissionIdsHash = ((this._permissionIdsHash << 5) - this._permissionIdsHash) + char;
+            }
         }, {});
     }
     get permissionIds(): PERMISSION[] {
@@ -288,9 +324,12 @@ export class UserModel
     /**
      * Check if user has specific permissions
      */
-    hasPermissions(...permissionIds: (PERMISSION | PermissionExpression)[]): boolean {
+    hasPermissions(...permissionIds: (PERMISSION | PermissionExpression | ((UserModel) => boolean))[]): boolean {
         // do we have anything to check ?
-        if (permissionIds.length < 1) {
+        if (
+            !permissionIds ||
+            permissionIds.length < 1
+        ) {
             return true;
         }
 
@@ -301,6 +340,8 @@ export class UserModel
             const permission = permissionIds[0];
             if (permission instanceof PermissionExpression) {
                 return permission.allowed(this);
+            } else if (typeof permission === 'function') {
+                return permission(this);
             }
 
             // simple permissions
@@ -314,7 +355,11 @@ export class UserModel
                     permission instanceof PermissionExpression &&
                     !permission.allowed(this)
                 ) || (
+                    typeof permission === 'function' &&
+                    !permission(this)
+                ) || (
                     !(permission instanceof PermissionExpression) &&
+                    !(typeof permission === 'function') &&
                     !this.permissionIdsMapped[permission as PERMISSION]
                 )
             ) {
