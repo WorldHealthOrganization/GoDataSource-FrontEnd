@@ -123,7 +123,12 @@ export const EnglishUsLang = {
         /**
          * uiModifyFollowUpListPage
          */
-        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_MODIFY_DATA_IN_THE_FUTURE_LABEL': '*You can\'t modify some fields because at least one of the selected follow-ups is in the future'
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_MODIFY_DATA_IN_THE_FUTURE_LABEL': '*You can\'t modify some fields because at least one of the selected follow-ups is in the future',
+
+        /**
+         * uiFollowUpsListPage
+         */
+        'LNG_PAGE_LIST_FOLLOW_UPS_ADD_FOLLOW_UP': 'Add follow-up'
 
 
 
