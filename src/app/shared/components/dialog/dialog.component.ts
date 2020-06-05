@@ -374,9 +374,24 @@ export class DialogComponent {
         // determine parent max height
         const containerInstance = (this.dialogRef as any)._containerInstance._elementRef.nativeElement;
         const computedStyle = document.defaultView.getComputedStyle(containerInstance);
-        const maxContainerInstanceMaxHeight: number = parseInt(computedStyle.getPropertyValue('max-height'));
-        const maxContainerInstancePaddingTop: number = parseInt(computedStyle.getPropertyValue('padding-top'));
-        const maxContainerInstancePaddingBottom: number = parseInt(computedStyle.getPropertyValue('padding-bottom'));
+        let maxContainerInstanceMaxHeight: number;
+        try {
+            maxContainerInstanceMaxHeight = parseInt(computedStyle.getPropertyValue('max-height'));
+        } catch (e) {
+            maxContainerInstanceMaxHeight = 0;
+        }
+        let maxContainerInstancePaddingTop: number;
+        try {
+            maxContainerInstancePaddingTop = parseInt(computedStyle.getPropertyValue('padding-top'));
+        } catch (e) {
+            maxContainerInstancePaddingTop = 0;
+        }
+        let maxContainerInstancePaddingBottom: number;
+        try {
+            maxContainerInstancePaddingBottom = parseInt(computedStyle.getPropertyValue('padding-bottom'));
+        } catch (e) {
+            maxContainerInstancePaddingBottom = 0;
+        }
 
         // determine how much we should substract
         const dialogMainMsgHeight: number = this.dialogMainMsg && this.dialogMainMsg.nativeElement ?
