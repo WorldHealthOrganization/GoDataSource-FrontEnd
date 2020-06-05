@@ -308,8 +308,8 @@ export class DialogComponent {
         closeOnNavigation: true,
         disableClose: true,
         hasBackdrop: true,
-        width: '600px',
-        maxWidth: '600px',
+        width: 'calc(100% - 100px)',
+        maxWidth: '800px',
         data: undefined
     };
 
@@ -317,6 +317,11 @@ export class DialogComponent {
     dialogAnswerInputValue: DialogAnswerInputValue = new DialogAnswerInputValue();
 
     @ViewChild('form') form: NgForm;
+
+    // used to determine form size since we can't do it with flex without a min-height
+    @ViewChild('dialogMainMsg') dialogMainMsg: any;
+    @ViewChild('dialogAdditionalInfo') dialogAdditionalInfo: any;
+    @ViewChild('dialogButtons') dialogButtons: any;
 
     // constants
     DialogFieldType = DialogFieldType;
@@ -344,6 +349,53 @@ export class DialogComponent {
         // finished
         return configs;
 
+    }
+
+    /**
+     * Retrieve form max height
+     */
+    get formMaxHeight(): string {
+        // default max height
+        const defaultMaxHeight: string = '300px';
+
+        // can we determine the container max height ?
+        if (
+            !document ||
+            !document.defaultView ||
+            !document.defaultView.getComputedStyle ||
+            !this.dialogRef ||
+            !(this.dialogRef as any)._containerInstance ||
+            !(this.dialogRef as any)._containerInstance._elementRef ||
+            !(this.dialogRef as any)._containerInstance._elementRef.nativeElement
+        ) {
+            return defaultMaxHeight;
+        }
+
+        // determine parent max height
+        const containerInstance = (this.dialogRef as any)._containerInstance._elementRef.nativeElement;
+        const computedStyle = document.defaultView.getComputedStyle(containerInstance);
+        const maxContainerInstanceMaxHeight: number = parseInt(computedStyle.getPropertyValue('max-height'));
+        const maxContainerInstancePaddingTop: number = parseInt(computedStyle.getPropertyValue('padding-top'));
+        const maxContainerInstancePaddingBottom: number = parseInt(computedStyle.getPropertyValue('padding-bottom'));
+
+        // determine how much we should substract
+        const dialogMainMsgHeight: number = this.dialogMainMsg && this.dialogMainMsg.nativeElement ?
+            this.dialogMainMsg.nativeElement.offsetHeight :
+            0;
+        const dialogMainMsgMarginBottom: number = this.dialogMainMsg && this.dialogMainMsg.nativeElement ?
+            15 :
+            0;
+        const dialogAdditionalInfoHeight: number = this.dialogAdditionalInfo && this.dialogAdditionalInfo.nativeElement ?
+            this.dialogAdditionalInfo.nativeElement.offsetHeight :
+            0;
+        const dialogButtonsHeight: number = this.dialogButtons && this.dialogButtons.nativeElement ?
+            this.dialogButtons.nativeElement.offsetHeight :
+            0;
+
+        // do the math
+        const childrenHeight: number = dialogMainMsgHeight + dialogMainMsgMarginBottom + dialogAdditionalInfoHeight + dialogButtonsHeight;
+        const heightUsed: number = maxContainerInstancePaddingTop + maxContainerInstancePaddingBottom + childrenHeight;
+        return `${maxContainerInstanceMaxHeight - heightUsed}px`;
     }
 
     /**
