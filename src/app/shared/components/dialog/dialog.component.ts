@@ -531,19 +531,19 @@ export class DialogComponent implements OnDestroy {
         const computedStyle = document.defaultView.getComputedStyle(containerInstance);
         let maxContainerInstanceMaxHeight: number;
         try {
-            maxContainerInstanceMaxHeight = parseInt(computedStyle.getPropertyValue('max-height'));
+            maxContainerInstanceMaxHeight = _.parseInt(computedStyle.getPropertyValue('max-height'));
         } catch (e) {
             maxContainerInstanceMaxHeight = 0;
         }
         let maxContainerInstancePaddingTop: number;
         try {
-            maxContainerInstancePaddingTop = parseInt(computedStyle.getPropertyValue('padding-top'));
+            maxContainerInstancePaddingTop = _.parseInt(computedStyle.getPropertyValue('padding-top'));
         } catch (e) {
             maxContainerInstancePaddingTop = 0;
         }
         let maxContainerInstancePaddingBottom: number;
         try {
-            maxContainerInstancePaddingBottom = parseInt(computedStyle.getPropertyValue('padding-bottom'));
+            maxContainerInstancePaddingBottom = _.parseInt(computedStyle.getPropertyValue('padding-bottom'));
         } catch (e) {
             maxContainerInstancePaddingBottom = 0;
         }
