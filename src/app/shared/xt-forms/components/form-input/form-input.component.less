@@ -4,6 +4,10 @@
     .mat-form-field {
         width: 100%;
 
+        .mat-form-field-infix {
+            width: auto;
+        }
+
         &.display-filter-icon {
             .filter-icon {
                 position: absolute;
@@ -16,6 +20,7 @@
 
             .filter-icon-input {
                 padding-left: @position-helper;
+                max-width: ~'calc(100% -  @{position-helper})';
             }
 
             .mat-form-field-label {
