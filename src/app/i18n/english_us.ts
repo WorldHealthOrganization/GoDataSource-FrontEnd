@@ -12,6 +12,11 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
+        /**
+         * uiChainsOfTransmissionGraph
+         */
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_DATE_OF_ONSET_AND_EVENT_DATE': 'Date of onset/Event'
+
 
 
         /**
