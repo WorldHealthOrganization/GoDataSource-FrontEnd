@@ -163,6 +163,18 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
                     }
                 }),
 
+                // View Outbreak contact form
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE',
+                    click: (item: OutbreakModel) => {
+                        this.router.navigate(['/outbreaks', item.id, 'contact-questionnaire']);
+                    },
+                    visible: (item: OutbreakModel): boolean => {
+                        return !item.deleted &&
+                            OutbreakModel.canModifyContactQuestionnaire(this.authUser);
+                    }
+                }),
+
                 // View Outbreak contact follow-up form
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE',

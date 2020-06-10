@@ -127,6 +127,17 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
                     }
                 }),
 
+                // View Outbreak template contact form
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE',
+                    click: (item: OutbreakTemplateModel) => {
+                        this.router.navigate(['/outbreak-templates', item.id, 'contact-questionnaire']);
+                    },
+                    visible: (): boolean => {
+                        return OutbreakTemplateModel.canModifyContactQuestionnaire(this.authUser);
+                    }
+                }),
+
                 // View Outbreak template contact follow-up form
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE',
