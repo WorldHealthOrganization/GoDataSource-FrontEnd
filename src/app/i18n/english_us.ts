@@ -22,8 +22,27 @@ export const EnglishUsLang = {
          * uiAutomaticBackupFields
          */
         'LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION': 'Description',
-        'LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION_DESCRIPTION': ''
+        'LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION_DESCRIPTION': '',
 
+        /**
+         * uiOutbreakListPage
+         */
+        'LNG_PAGE_LIST_OUTBREAKS_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE': 'Contact form',
+
+        /**
+         * uiOutbreakTemplateListPage
+         */
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE': 'Contact form',
+
+        /**
+         * uiModifyOutbreakTemplateQuestionnairePage
+         */
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_QUESTIONNAIRE_CONTACT_TITLE': 'Contact investigation',
+
+        /**
+         * uiModifyOutbreakQuestionnairePage
+         */
+        'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_CONTACT_TITLE': 'Contact investigation'
 
 
 
