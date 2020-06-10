@@ -155,7 +155,12 @@ export const EnglishUsLang = {
         'LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_CONTACT_BUTTON': 'Merge contacts of contacts',
         'LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_ADDRESS_TITLE': 'Address',
         'LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_PERSONAL_TITLE': 'Personal',
-        'LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_TITLE': 'Contact of contact - merge duplicate records'
+        'LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_TITLE': 'Contact of contact - merge duplicate records',
+
+        /**
+         * uiBulkModifyContactsPage
+         */
+        'LNG_PAGE_BULK_MODIFY_CONTACT_OF_CONTACTS_TITLE': 'Bulk Modify Contact of Contacts'
 
 
 

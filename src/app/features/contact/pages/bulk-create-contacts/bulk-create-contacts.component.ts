@@ -21,7 +21,6 @@ import { Constants } from '../../../../core/models/constants';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { catchError, share } from 'rxjs/operators';
 import { catchError, map, share } from 'rxjs/operators';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { moment } from '../../../../core/helperClasses/x-moment';

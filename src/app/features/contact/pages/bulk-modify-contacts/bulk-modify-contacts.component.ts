@@ -87,9 +87,6 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
     // authenticated user details
     authUser: UserModel;
 
-    // // contacts
-    // contactIds: number[];
-
     // we need to know from what page we come from
     fromContactsOfContactsList: boolean;
     // ids of contacts we want to modify (Contact or Contact of Contact)
@@ -228,7 +225,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         // current page breadcrumb
         this.breadcrumbs.push(
             new BreadcrumbItemModel(
-                'LNG_PAGE_BULK_MODIFY_CONTACTS_TITLE',
+                this.fromContactsOfContactsList ? 'LNG_PAGE_BULK_MODIFY_CONTACT_OF_CONTACTS_TITLE' : 'LNG_PAGE_BULK_MODIFY_CONTACTS_TITLE',
                 '.',
                 true
             )
