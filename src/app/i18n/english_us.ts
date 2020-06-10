@@ -25,7 +25,12 @@ export const EnglishUsLang = {
         /**
          * uiModifyOutbreakTemplateQuestionnairePage
          */
-        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_QUESTIONNAIRE_CONTACT_TITLE': 'Contact investigation'
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_QUESTIONNAIRE_CONTACT_TITLE': 'Contact investigation',
+
+        /**
+         * uiModifyOutbreakQuestionnairePage
+         */
+        'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_CONTACT_TITLE': 'Contact investigation'
 
         /**
          * REMOVE the tokens from below
