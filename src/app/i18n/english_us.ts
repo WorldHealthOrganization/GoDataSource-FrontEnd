@@ -28,7 +28,6 @@ export const EnglishUsLang = {
          * uiOutbreakListPage
          */
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE': 'Contact form',
-        'LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION_DESCRIPTION': '',
 
         /**
          * uiOutbreakFields
