@@ -22,12 +22,15 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { catchError, share } from 'rxjs/operators';
+import { catchError, map, share } from 'rxjs/operators';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { HotTableWrapperComponent } from '../../../../shared/components/hot-table-wrapper/hot-table-wrapper.component';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
+import { TeamDataService } from '../../../../core/services/data/team.data.service';
+import { TeamModel } from '../../../../core/models/team.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
@@ -88,6 +91,9 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     // authenticated user details
     authUser: UserModel;
 
+    // teams
+    teamList$: Observable<TeamModel[]>;
+
     /**
      * Constructor
      */
@@ -101,7 +107,8 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         private referenceDataDataService: ReferenceDataDataService,
         private i18nService: I18nService,
         private dialogService: DialogService,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private teamDataService: TeamDataService
     ) {
         super();
     }
@@ -123,6 +130,14 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         this.exposureFrequencyOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_FREQUENCY).pipe(share());
         this.exposureDurationOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_DURATION).pipe(share());
         this.socialRelationshipOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION).pipe(share());
+
+        // teams
+        if (TeamModel.canList(this.authUser)) {
+            this.teamList$ = this.teamDataService.getTeamsListReduced().pipe(share());
+        }
+
+        // configure Sheet widget
+        this.configureSheetWidget();
 
         // retrieve query params
         this.route.queryParams
@@ -362,6 +377,30 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                 .setProperty('relationship.socialRelationshipTypeId')
                 .setOptions(this.socialRelationshipOptions$, this.i18nService)
         ];
+
+        // add assigned team if we have permissions to do that
+        if (TeamModel.canList(this.authUser)) {
+            this.sheetColumns.push(
+                new DropdownSheetColumn()
+                    .setTitle('LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID')
+                    .setProperty('contact.followUpTeamId')
+                    .setOptions(
+                        this.teamList$.pipe(
+                            map((teams: TeamModel[]) => {
+                                return teams.map((team) => {
+                                    return new LabelValuePair(
+                                        team.name,
+                                        team.id
+                                    );
+                                });
+                            }),
+                            share()
+                        ),
+                        this.i18nService,
+                        false
+                    )
+            );
+        }
 
         // configure the context menu
         this.sheetContextMenu = {

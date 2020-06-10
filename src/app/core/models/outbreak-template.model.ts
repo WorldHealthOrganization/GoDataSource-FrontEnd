@@ -3,6 +3,7 @@ import { QuestionModel } from './question.model';
 import { IPermissionBasic, IPermissionCloneable, IPermissionOutbreakTemplate, IPermissionQuestionnaire } from './permission.interface';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
+import { Constants } from './constants';
 
 export class OutbreakTemplateModel
     implements
@@ -27,6 +28,11 @@ export class OutbreakTemplateModel
     labResultsTemplate: QuestionModel[];
     isContactLabResultsActive: boolean;
     isContactsOfContactsActive: boolean;
+    isDateOfOnsetRequired: boolean;
+
+    generateFollowUpsOverwriteExisting: boolean;
+    generateFollowUpsKeepTeamAssignment: boolean;
+    generateFollowUpsTeamAssignmentAlgorithm: string;
 
     /**
      * Static Permissions - IPermissionBasic
@@ -72,6 +78,10 @@ export class OutbreakTemplateModel
         this.longPeriodsBetweenCaseOnset = _.get(data, 'longPeriodsBetweenCaseOnset');
         this.isContactLabResultsActive = _.get(data, 'isContactLabResultsActive', false);
         this.isContactsOfContactsActive = _.get(data, 'isContactsOfContactsActive', false);
+        this.isDateOfOnsetRequired = _.get(data, 'isDateOfOnsetRequired', true);
+        this.generateFollowUpsOverwriteExisting = _.get(data, 'generateFollowUpsOverwriteExisting', false);
+        this.generateFollowUpsKeepTeamAssignment = _.get(data, 'generateFollowUpsKeepTeamAssignment', true);
+        this.generateFollowUpsTeamAssignmentAlgorithm = _.get(data, 'generateFollowUpsTeamAssignmentAlgorithm', Constants.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM.ROUND_ROBIN_ALL_TEAMS.value);
 
         // CASE INVESTIGATION TEMPLATE
         this.caseInvestigationTemplate = _.map(

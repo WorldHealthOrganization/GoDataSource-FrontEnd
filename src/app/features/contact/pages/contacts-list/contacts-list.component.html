@@ -515,6 +515,36 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Follow-up assigned team -->
+        <ng-container matColumnDef="followUpTeamId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{ 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="followUpTeamIdFilter"
+                            [ngModel]="teamIdFilterValue"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="teamsListLoadedForHeaderSearch"
+                            (optionChanged)="filterByTeam($event)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true"
+                            [multiple]="false">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
+                {{ teamsListLoadedMap[item.followUpTeamId] ? teamsListLoadedMap[item.followUpTeamId].name : '' }}
+            </mat-cell>
+        </ng-container>
+
         <!-- Final Follow-up Status -->
         <ng-container matColumnDef="followUp.status">
             <mat-header-cell *matHeaderCellDef>

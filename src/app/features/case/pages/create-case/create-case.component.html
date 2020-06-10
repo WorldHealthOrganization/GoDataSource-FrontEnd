@@ -249,7 +249,7 @@
                                 tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_ONSET_DESCRIPTION"
                                 [maxDate]="serverToday"
                                 app-date-validator
-                                required="true"
+                                [required]="selectedOutbreak ? selectedOutbreak.isDateOfOnsetRequired : true"
                                 [dateSameOrBefore]="[
                                     serverToday,
                                     'dateOfOutcome'
@@ -314,8 +314,8 @@
                                 app-date-validator
                                 [dateSameOrBefore]="serverToday"
                                 [dateSameOrAfter]="[
-                                'dateOfOnset'
-                            ]">
+                                    'dateOfOnset'
+                                ]">
                             </app-form-datepicker>
 
                             <app-form-slide-toggle

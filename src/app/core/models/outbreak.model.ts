@@ -6,6 +6,7 @@ import { BaseModel } from './base.model';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { IPermissionBasic, IPermissionCloneable, IPermissionOutbreak, IPermissionQuestionnaire, IPermissionRestorable } from './permission.interface';
+import { Constants } from './constants';
 
 export class OutbreakModel
     extends BaseModel
@@ -48,6 +49,11 @@ export class OutbreakModel
     arcGisServers: MapServerModel[];
     isContactLabResultsActive: boolean;
     isContactsOfContactsActive: boolean;
+    isDateOfOnsetRequired: boolean;
+
+    generateFollowUpsOverwriteExisting: boolean;
+    generateFollowUpsKeepTeamAssignment: boolean;
+    generateFollowUpsTeamAssignmentAlgorithm: string;
 
     // used for displaying information when hovering an outbreak from topnav component
     // no need to save this one in the database
@@ -115,6 +121,10 @@ export class OutbreakModel
         this.longPeriodsBetweenCaseOnset = _.get(data, 'longPeriodsBetweenCaseOnset');
         this.isContactLabResultsActive = _.get(data, 'isContactLabResultsActive', false);
         this.isContactsOfContactsActive = _.get(data, 'isContactsOfContactsActive', false);
+        this.isDateOfOnsetRequired = _.get(data, 'isDateOfOnsetRequired', true);
+        this.generateFollowUpsOverwriteExisting = _.get(data, 'generateFollowUpsOverwriteExisting', false);
+        this.generateFollowUpsKeepTeamAssignment = _.get(data, 'generateFollowUpsKeepTeamAssignment', true);
+        this.generateFollowUpsTeamAssignmentAlgorithm = _.get(data, 'generateFollowUpsTeamAssignmentAlgorithm', Constants.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM.ROUND_ROBIN_ALL_TEAMS.value);
 
         // CASE INVESTIGATION TEMPLATE
         this.caseInvestigationTemplate = _.map(

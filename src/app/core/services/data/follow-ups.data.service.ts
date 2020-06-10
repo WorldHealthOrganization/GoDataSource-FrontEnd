@@ -33,15 +33,34 @@ export class FollowUpsDataService {
         outbreakId: string,
         startDate: any,
         endDate: any,
-        targeted: boolean
+        targeted: boolean,
+        overwriteExistingFollowUps: boolean,
+        keepTeamAssignment: boolean
     ): Observable<ContactFollowUpsModel> {
+        // construct generate options
+        const options: {
+            startDate: any,
+            endDate: any,
+            targeted: boolean,
+            overwriteExistingFollowUps: boolean,
+            keepTeamAssignment?: boolean
+        } = {
+            startDate: startDate,
+            endDate: endDate,
+            targeted: targeted,
+            overwriteExistingFollowUps: overwriteExistingFollowUps
+        };
+
+        // keepTeamAssignment is relevant only if overwriteExistingFollowUps is disabled
+        if (!overwriteExistingFollowUps) {
+            options.keepTeamAssignment = keepTeamAssignment;
+        }
+
+        // generate follow-ups
         return this.modelHelper.mapObservableToModel(
             this.http.post(
-                `outbreaks/${outbreakId}/generate-followups`, {
-                    startDate: startDate,
-                    endDate: endDate,
-                    targeted: targeted
-                }
+                `outbreaks/${outbreakId}/generate-followups`,
+                options
             ),
             ContactFollowUpsModel
         );
