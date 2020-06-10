@@ -124,6 +124,9 @@ export class OutbreakQuestionnaireComponent extends ConfirmOnFormChanges impleme
             case OutbreakQestionnaireTypeEnum.CASE:
                 questionnaireToken = 'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_CASE_TITLE';
                 break;
+            case OutbreakQestionnaireTypeEnum.CONTACT:
+                questionnaireToken = 'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_CONTACT_TITLE';
+                break;
             case OutbreakQestionnaireTypeEnum.FOLLOW_UP:
                 questionnaireToken = 'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_FOLLOW_UP_TITLE';
                 break;

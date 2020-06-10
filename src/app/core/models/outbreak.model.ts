@@ -183,6 +183,7 @@ export class OutbreakModel
      * Permissions - IPermissionQuestionnaire
      */
     canModifyCaseQuestionnaire(user: UserModel): boolean { return OutbreakModel.canModifyCaseQuestionnaire(user); }
+    canModifyContactQuestionnaire(user: UserModel): boolean { return OutbreakModel.canModifyContactQuestionnaire(user); }
     canModifyContactFollowUpQuestionnaire(user: UserModel): boolean { return OutbreakModel.canModifyContactFollowUpQuestionnaire(user); }
     canModifyCaseLabResultQuestionnaire(user: UserModel): boolean { return OutbreakModel.canModifyCaseLabResultQuestionnaire(user); }
 

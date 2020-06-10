@@ -25,6 +25,12 @@ export const EnglishUsLang = {
         'LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION_DESCRIPTION': '',
 
         /**
+         * uiOutbreakListPage
+         */
+        'LNG_PAGE_LIST_OUTBREAKS_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE': 'Contact form',
+        'LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION_DESCRIPTION': '',
+
+        /**
          * uiOutbreakFields
          */
         'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_OF_CONTACT_ACTIVE': 'Allow registration of contacts of contacts?',
@@ -160,9 +166,22 @@ export const EnglishUsLang = {
         /**
          * uiBulkModifyContactsPage
          */
-        'LNG_PAGE_BULK_MODIFY_CONTACT_OF_CONTACTS_TITLE': 'Bulk Modify Contact of Contacts'
+        'LNG_PAGE_BULK_MODIFY_CONTACT_OF_CONTACTS_TITLE': 'Bulk Modify Contact of Contacts',
 
+        /**
+         * uiOutbreakTemplateListPage
+         */
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE': 'Contact form',
 
+        /**
+         * uiModifyOutbreakTemplateQuestionnairePage
+         */
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_QUESTIONNAIRE_CONTACT_TITLE': 'Contact investigation',
+
+        /**
+         * uiModifyOutbreakQuestionnairePage
+         */
+        'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_CONTACT_TITLE': 'Contact investigation'
 
 
 

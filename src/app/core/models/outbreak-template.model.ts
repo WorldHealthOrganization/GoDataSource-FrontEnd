@@ -122,6 +122,7 @@ export class OutbreakTemplateModel
      * Permissions - IPermissionQuestionnaire
      */
     canModifyCaseQuestionnaire(user: UserModel): boolean { return OutbreakTemplateModel.canModifyCaseQuestionnaire(user); }
+    canModifyContactQuestionnaire(user: UserModel): boolean { return OutbreakTemplateModel.canModifyContactQuestionnaire(user); }
     canModifyContactFollowUpQuestionnaire(user: UserModel): boolean { return OutbreakTemplateModel.canModifyContactFollowUpQuestionnaire(user); }
     canModifyCaseLabResultQuestionnaire(user: UserModel): boolean { return OutbreakTemplateModel.canModifyCaseLabResultQuestionnaire(user); }
 
