@@ -12,6 +12,21 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
+        /**
+         * uiBackupFields
+         */
+        'LNG_BACKUP_FIELD_LABEL_DESCRIPTION': 'Description',
+        'LNG_BACKUP_FIELD_LABEL_DESCRIPTION_DESCRIPTION': '',
+
+        /**
+         * uiAutomaticBackupFields
+         */
+        'LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION': 'Description',
+        'LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION_DESCRIPTION': ''
+
+
+
+
 
 
         /**
