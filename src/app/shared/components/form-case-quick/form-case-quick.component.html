@@ -81,7 +81,7 @@
                     fxFlex
                     name="ageDob"
                     [(ngModel)]="case.age"
-                    (optionChanged)="onChange()"
+                    (changed)="onChange()"
                     ageButtonLabel="LNG_CASE_FIELD_LABEL_AGE_BUTTON"
                     dobButtonLabel="LNG_CASE_FIELD_LABEL_DATE_OF_BIRTH_BUTTON"
                     dobPlaceholder="LNG_CASE_FIELD_LABEL_DOB"
@@ -135,7 +135,7 @@
                     tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_ONSET_DESCRIPTION"
                     [maxDate]="currentDate"
                     app-date-validator
-                    required="true"
+                    [required]="selectedOutbreak ? selectedOutbreak.isDateOfOnsetRequired : true"
                     (optionChanged)="onChange()"
                     [dateSameOrBefore]="[
                         currentDate,

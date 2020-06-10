@@ -9,7 +9,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
@@ -24,13 +24,16 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
-import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { Constants } from '../../../../core/models/constants';
+import { TeamModel } from '../../../../core/models/team.model';
+import { TeamDataService } from '../../../../core/services/data/team.data.service';
 
 @Component({
     selector: 'app-create-contact',
@@ -56,6 +59,7 @@ export class CreateContactComponent
     occupationsList$: Observable<any[]>;
     pregnancyStatusList$: Observable<any[]>;
     riskLevelsList$: Observable<any[]>;
+    teamList$: Observable<TeamModel[]>;
 
     relatedEntityData: CaseModel | EventModel;
     relationship: RelationshipModel = new RelationshipModel();
@@ -70,6 +74,9 @@ export class CreateContactComponent
 
     // authenticated user details
     authUser: UserModel;
+
+    // constants
+    TeamModel = TeamModel;
 
     /**
      * Constructor
@@ -87,7 +94,8 @@ export class CreateContactComponent
         private dialogService: DialogService,
         private i18nService: I18nService,
         private redirectService: RedirectService,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private teamDataService: TeamDataService
     ) {
         super();
     }
@@ -104,6 +112,11 @@ export class CreateContactComponent
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
         this.pregnancyStatusList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PREGNANCY_STATUS);
         this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
+
+        // get teams only if we're allowed to
+        if (TeamModel.canList(this.authUser)) {
+            this.teamList$ = this.teamDataService.getTeamsListReduced();
+        }
 
         // by default, enforce Contact having an address
         this.contactData.addresses.push(new AddressModel());
@@ -302,6 +315,9 @@ export class CreateContactComponent
                     })
                 )
                 .subscribe((contactDuplicates: EntityDuplicatesModel) => {
+                    // items marked as not duplicates
+                    let itemsMarkedAsNotDuplicates: string[] = [];
+
                     // add the new Contact
                     const runCreateContact = () => {
                         // add the new Contact
@@ -343,35 +359,69 @@ export class CreateContactComponent
                                         })
                                     )
                                     .subscribe(() => {
-                                        this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
+                                        // called when we finished creating contact
+                                        const finishedCreatingContact = () => {
+                                            this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
 
-                                        // hide dialog
-                                        loadingDialog.close();
+                                            // hide dialog
+                                            loadingDialog.close();
 
-                                        // navigate to listing page
-                                        if (andAnotherOne) {
-                                            this.disableDirtyConfirm();
-                                            this.redirectService.to(
-                                                [`/contacts/create`],
-                                                {
-                                                    entityType: this.entityType,
-                                                    entityId: this.entityId
-                                                }
-                                            );
+                                            // navigate to listing page
+                                            if (andAnotherOne) {
+                                                this.disableDirtyConfirm();
+                                                this.redirectService.to(
+                                                    [`/contacts/create`],
+                                                    {
+                                                        entityType: this.entityType,
+                                                        entityId: this.entityId
+                                                    }
+                                                );
+                                            } else {
+                                                // navigate to proper page
+                                                // method handles disableDirtyConfirm too...
+                                                this.redirectToProperPageAfterCreate(
+                                                    this.router,
+                                                    this.redirectService,
+                                                    this.authUser,
+                                                    ContactModel,
+                                                    'contacts',
+                                                    contactData.id, {
+                                                        entityType: this.entityType,
+                                                        entityId: this.entityId
+                                                    }
+                                                );
+                                            }
+                                        };
+
+                                        // there are no records marked as NOT duplicates ?
+                                        if (
+                                            !itemsMarkedAsNotDuplicates ||
+                                            itemsMarkedAsNotDuplicates.length < 1
+                                        ) {
+                                            finishedCreatingContact();
                                         } else {
-                                            // navigate to proper page
-                                            // method handles disableDirtyConfirm too...
-                                            this.redirectToProperPageAfterCreate(
-                                                this.router,
-                                                this.redirectService,
-                                                this.authUser,
-                                                ContactModel,
-                                                'contacts',
-                                                contactData.id, {
-                                                    entityType: this.entityType,
-                                                    entityId: this.entityId
-                                                }
-                                            );
+                                            // mark records as not duplicates
+                                            this.entityDataService
+                                                .markPersonAsOrNotADuplicate(
+                                                    this.selectedOutbreak.id,
+                                                    EntityType.CONTACT,
+                                                    contactData.id,
+                                                    itemsMarkedAsNotDuplicates
+                                                )
+                                                .pipe(
+                                                    catchError((err) => {
+                                                        this.snackbarService.showApiError(err);
+
+                                                        // hide dialog
+                                                        loadingDialog.close();
+
+                                                        return throwError(err);
+                                                    })
+                                                )
+                                                .subscribe(() => {
+                                                    // finished
+                                                    finishedCreatingContact();
+                                                });
                                         }
                                     });
                             });
@@ -379,24 +429,46 @@ export class CreateContactComponent
 
                     // do we have duplicates ?
                     if (contactDuplicates.duplicates.length > 0) {
-                        // construct list of possible duplicates
-                        const possibleDuplicates: DialogField[] = [];
-                        _.each(contactDuplicates.duplicates, (duplicate: EntityModel, index: number) => {
+                        // construct list of items from which we can choose actions
+                        const fieldsList: DialogField[] = [];
+                        const fieldsListLayout: number[] = [];
+                        contactDuplicates.duplicates.forEach((duplicate: EntityModel, index: number) => {
                             // contact model
                             const contactData: ContactModel = duplicate.model as ContactModel;
 
-                            // add link
-                            possibleDuplicates.push(new DialogField({
-                                name: 'link',
-                                placeholder: (index + 1 ) + '. ' + EntityModel.getNameWithDOBAge(
-                                    contactData,
-                                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-                                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
-                                ),
-                                fieldType: DialogFieldType.LINK,
-                                routerLink: ['/contacts', contactData.id, 'view'],
-                                linkTarget: '_blank'
-                            }));
+                            // add row fields
+                            fieldsListLayout.push(60, 40);
+                            fieldsList.push(
+                                new DialogField({
+                                    name: `actions[${contactData.id}].label`,
+                                    placeholder: (index + 1) + '. ' + EntityModel.getNameWithDOBAge(
+                                        contactData,
+                                        this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+                                        this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+                                    ),
+                                    fieldType: DialogFieldType.LINK,
+                                    routerLink: ['/contacts', contactData.id, 'view'],
+                                    linkTarget: '_blank'
+                                }),
+                                new DialogField({
+                                    name: `actions[${contactData.id}].action`,
+                                    placeholder: 'LNG_DUPLICATES_DIALOG_ACTION',
+                                    description: 'LNG_DUPLICATES_DIALOG_ACTION_DESCRIPTION',
+                                    inputOptions: [
+                                        new LabelValuePair(
+                                            Constants.DUPLICATE_ACTION.NO_ACTION,
+                                            Constants.DUPLICATE_ACTION.NO_ACTION
+                                        ),
+                                        new LabelValuePair(
+                                            Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE,
+                                            Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE
+                                        )
+                                    ],
+                                    inputOptionsClearable: false,
+                                    required: true,
+                                    value: Constants.DUPLICATE_ACTION.NO_ACTION
+                                })
+                            );
                         });
 
                         // display dialog
@@ -404,10 +476,29 @@ export class CreateContactComponent
                             .showConfirm(new DialogConfiguration({
                                 message: 'LNG_PAGE_CREATE_CONTACT_DUPLICATES_DIALOG_CONFIRM_MSG',
                                 customInput: true,
-                                fieldsList: possibleDuplicates,
+                                fieldsListLayout: fieldsListLayout,
+                                fieldsList: fieldsList
                             }))
                             .subscribe((answer) => {
                                 if (answer.button === DialogAnswerButton.Yes) {
+                                    // determine number of items to mark as not duplicates
+                                    itemsMarkedAsNotDuplicates = [];
+                                    const actions: {
+                                        [id: string]: {
+                                            action: string
+                                        }
+                                    } = _.get(answer, 'inputValue.value.actions', {});
+                                    if (!_.isEmpty(actions)) {
+                                        _.each(actions, (data, id) => {
+                                            switch (data.action) {
+                                                case Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE:
+                                                    itemsMarkedAsNotDuplicates.push(id);
+                                                    break;
+                                            }
+                                        });
+                                    }
+
+                                    // create contact
                                     runCreateContact();
                                 } else {
                                     // hide dialog

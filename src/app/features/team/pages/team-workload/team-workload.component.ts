@@ -18,6 +18,7 @@ import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 interface ITeamMap {
     id: string;
@@ -67,16 +68,15 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private outbreakDataService: OutbreakDataService,
         private followUpsDataService: FollowUpsDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private i18nService: I18nService,
         private teamDataService: TeamDataService,
         private authDataService: AuthDataService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**
@@ -151,13 +151,13 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
      * Remove component resources
      */
     ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+
         if (this.getSelectedOutbreakSubject) {
             this.getSelectedOutbreakSubject.unsubscribe();
             this.getSelectedOutbreakSubject = null;
         }
-
-        // release resources
-        super.ngOnDestroy();
     }
 
     /**

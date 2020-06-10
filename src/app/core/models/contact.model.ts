@@ -76,6 +76,8 @@ export class ContactModel
 
     followUpHistory: IFollowUpHistory[];
 
+    followUpTeamId: string;
+
     dob: string;
     age: AgeModel;
 
@@ -242,6 +244,8 @@ export class ContactModel
         this.dateBecomeContact = _.get(data, 'dateBecomeContact');
         this.visualId = _.get(data, 'visualId', '');
 
+        this.followUpTeamId = _.get(data, 'followUpTeamId');
+
         this.followUp = _.get(data, 'followUp', {});
         this.followUpHistory = _.get(data, 'followUpHistory', []);
 
@@ -350,7 +354,8 @@ export class ContactModel
     get name(): string {
         const firstName = this.firstName ? this.firstName : '';
         const lastName = this.lastName ? this.lastName : '';
-        return _.trim(`${firstName} ${lastName}`);
+        const middleName = this.middleName ? this.middleName : '';
+        return _.trim(`${firstName} ${middleName} ${lastName}`);
     }
 
     /**

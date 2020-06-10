@@ -48,6 +48,7 @@ import { SavedImportMappingService } from './data/saved-import-mapping.data.serv
 import { RedirectService } from './helper/redirect.service';
 import { EntityHelperService } from './helper/entity-helper.service';
 import { CaptchaDataService } from './data/captcha.data.service';
+import { ListHelperService } from './helper/list-helper.service';
 
 // export the list of services
 export const services: any[] = [
@@ -107,5 +108,6 @@ export const services: any[] = [
     DialogService,
     DomService,
     RedirectService,
-    EntityHelperService
+    EntityHelperService,
+    ListHelperService
 ];
