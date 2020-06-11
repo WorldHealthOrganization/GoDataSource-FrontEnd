@@ -34,8 +34,7 @@
                             [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate"
                             tooltip="LNG_FOLLOW_UP_FIELD_LABEL_DATE_DESCRIPTION"
                             required="true"
-                            [disabled]="true"
-                            app-date-validator>
+                            [disabled]="true">
                         </app-form-datepicker>
 
                         <app-form-slide-toggle
@@ -52,7 +51,7 @@
                             [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID' | translate"
                             tooltip="LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID_DESCRIPTION"
                             [options]="dailyStatusTypeOptions$ | async"
-                            [disabled]="viewOnly"
+                            [disabled]="viewOnly || Constants.isDateInTheFuture(followUpData.date)"
                             [required]="true"
                             optionLabelKey="label"
                             optionValueKey="value">

@@ -36,6 +36,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { TeamModel } from '../../../../core/models/team.model';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -58,6 +59,9 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     // follow ups list
     followUpsList$: Observable<FollowUpModel[]>;
     followUpsListCount$: Observable<IBasicCount>;
+
+    // don't display pills by default
+    showCountPills: boolean = false;
 
     // Daily follow ups grouped by teams
     countedFollowUpsGroupedByTeams$: Observable<any>;
@@ -141,8 +145,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                     this.authUser &&
                     this.selectedOutbreak &&
                     this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                    FollowUpModel.canModify(this.authUser) &&
-                    !Constants.isDateInTheFuture(item.date);
+                    FollowUpModel.canModify(this.authUser);
             }
         }),
 
@@ -220,12 +223,13 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
      * Constructor
      */
     constructor(
-        protected snackbarService: SnackbarService,
+        protected listHelperService: ListHelperService,
         protected dialogService: DialogService,
         protected followUpsDataService: FollowUpsDataService,
         protected router: Router,
         protected i18nService: I18nService,
         protected teamDataService: TeamDataService,
+        private snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
@@ -235,7 +239,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         private userDataService: UserDataService
     ) {
         super(
-            snackbarService, dialogService, followUpsDataService,
+            listHelperService, dialogService, followUpsDataService,
             router, i18nService, teamDataService
         );
     }
@@ -342,6 +346,9 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
      * Component destroyed
      */
     ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();
@@ -465,8 +472,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             }),
             new VisibleColumnModel({
                 field: 'team',
-                label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
-                visible: false
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM'
             }),
             new VisibleColumnModel({
                 field: 'statusId',
@@ -479,6 +485,10 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             new VisibleColumnModel({
                 field: 'area',
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_AREA'
+            }),
+            new VisibleColumnModel({
+                field: 'phoneNumber',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER'
             }),
             new VisibleColumnModel({
                 field: 'contact.dateOfLastContact',
@@ -929,9 +939,6 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
      */
     refreshList(finishCallback: (records: any[]) => void) {
         if (this.selectedOutbreak) {
-            // refresh badges
-            this.getFollowUpsGroupedByTeams();
-
             // add case id
             if (this.caseId) {
                 this.queryBuilder.addChildQueryBuilder('case').filter.byEquality('id', this.caseId);
@@ -940,6 +947,9 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             // retrieve created user & modified user information
             this.queryBuilder.include('createdByUser', true);
             this.queryBuilder.include('updatedByUser', true);
+
+            // refresh badges
+            this.getFollowUpsGroupedByTeams();
 
             // retrieve the list of Follow Ups
             this.followUpsList$ = this.followUpsDataService
@@ -1000,60 +1010,90 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
      * Generate Follow Ups
      */
     generateFollowUps() {
-        if (this.selectedOutbreak) {
-            this.genericDataService
-                .getFilterYesNoOptions()
-                .subscribe((yesNoOptions: LabelValuePair[]) => {
-                    const yesNoOptionsFiltered: LabelValuePair[] = _.filter(yesNoOptions, (item: LabelValuePair) => _.isBoolean(item.value));
-                    this.dialogService
-                        .showInput(new DialogConfiguration({
-                            message: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TITLE',
-                            yesLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_YES_BUTTON',
-                            fieldsList: [
-                                new DialogField({
-                                    name: 'dates',
-                                    required: true,
-                                    value: {
-                                        startDate: moment().add(1, 'days').startOf('day').format(),
-                                        endDate: moment().add(1, 'days').endOf('day').format()
-                                    },
-                                    fieldType: DialogFieldType.DATE_RANGE
-                                }),
-                                new DialogField({
-                                    name: 'targeted',
-                                    placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TARGETED_LABEL',
-                                    inputOptions: yesNoOptionsFiltered,
-                                    inputOptionsClearable: false,
-                                    required: true,
-                                    value: true
-                                })
-                            ]
-                        }))
-                        .subscribe((answer: DialogAnswer) => {
-                            if (answer.button === DialogAnswerButton.Yes) {
-                                this.followUpsDataService
-                                    .generateFollowUps(
-                                        this.selectedOutbreak.id,
-                                        answer.inputValue.value.dates.startDate,
-                                        answer.inputValue.value.dates.endDate,
-                                        answer.inputValue.value.targeted
-                                    )
-                                    .pipe(
-                                        catchError((err) => {
-                                            this.snackbarService.showApiError(err);
-                                            return throwError(err);
-                                        })
-                                    )
-                                    .subscribe(() => {
-                                        this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
-
-                                        // reload data
-                                        this.needsRefreshList(true);
-                                    });
-                            }
-                        });
-                });
+        // must have outbreak
+        if (
+            !this.selectedOutbreak ||
+            !this.selectedOutbreak.id
+        ) {
+            return;
         }
+
+        // display dialog
+        this.genericDataService
+            .getFilterYesNoOptions()
+            .subscribe((yesNoOptions: LabelValuePair[]) => {
+                const yesNoOptionsFiltered: LabelValuePair[] = _.filter(yesNoOptions, (item: LabelValuePair) => _.isBoolean(item.value));
+                this.dialogService
+                    .showInput(new DialogConfiguration({
+                        message: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TITLE',
+                        yesLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_YES_BUTTON',
+                        fieldsList: [
+                            new DialogField({
+                                name: 'dates',
+                                required: true,
+                                value: {
+                                    startDate: moment().add(1, 'days').startOf('day').format(),
+                                    endDate: moment().add(1, 'days').endOf('day').format()
+                                },
+                                fieldType: DialogFieldType.DATE_RANGE
+                            }),
+                            new DialogField({
+                                name: 'targeted',
+                                placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TARGETED_LABEL',
+                                inputOptions: yesNoOptionsFiltered,
+                                inputOptionsClearable: false,
+                                required: true,
+                                value: true
+                            }),
+                            new DialogField({
+                                name: 'overwriteExistingFollowUps',
+                                placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_OVERWRITE_EXISTING_LABEL',
+                                description: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_OVERWRITE_EXISTING_LABEL_DESCRIPTION',
+                                inputOptions: yesNoOptionsFiltered,
+                                inputOptionsClearable: false,
+                                required: true,
+                                value: this.selectedOutbreak.generateFollowUpsOverwriteExisting
+                            }),
+                            new DialogField({
+                                name: 'keepTeamAssignment',
+                                placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_KEEP_TEAM_ASSIGNMENT_LABEL',
+                                description: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_KEEP_TEAM_ASSIGNMENT_LABEL_DESCRIPTION',
+                                inputOptions: yesNoOptionsFiltered,
+                                inputOptionsClearable: false,
+                                required: true,
+                                value: this.selectedOutbreak.generateFollowUpsKeepTeamAssignment,
+                                visible: (dialogFieldsValues: any): boolean => {
+                                    return !dialogFieldsValues.overwriteExistingFollowUps;
+                                }
+                            })
+                        ]
+                    }))
+                    .subscribe((answer: DialogAnswer) => {
+                        if (answer.button === DialogAnswerButton.Yes) {
+                            this.followUpsDataService
+                                .generateFollowUps(
+                                    this.selectedOutbreak.id,
+                                    answer.inputValue.value.dates.startDate,
+                                    answer.inputValue.value.dates.endDate,
+                                    answer.inputValue.value.targeted,
+                                    answer.inputValue.value.overwriteExistingFollowUps,
+                                    answer.inputValue.value.keepTeamAssignment
+                                )
+                                .pipe(
+                                    catchError((err) => {
+                                        this.snackbarService.showApiError(err);
+                                        return throwError(err);
+                                    })
+                                )
+                                .subscribe(() => {
+                                    this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
+
+                                    // reload data
+                                    this.needsRefreshList(true);
+                                });
+                        }
+                    });
+            });
     }
 
     /**
@@ -1091,19 +1131,33 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
      */
     getFollowUpsGroupedByTeams() {
         if (this.selectedOutbreak) {
+            // cleanup query
+            const clonedQB = _.cloneDeep(this.queryBuilder);
+            clonedQB.paginator.clear();
+            clonedQB.sort.clear();
+
+            // retrieve count
             this.countedFollowUpsGroupedByTeams$ = this.followUpsDataService
-                .getCountedFollowUpsGroupedByTeams(this.selectedOutbreak.id, this.queryBuilder)
+                .getCountedFollowUpsGroupedByTeams(this.selectedOutbreak.id, clonedQB)
                 .pipe(
                     map((data) => {
                         return _.map(data.team, (teamData) => {
                             return new CountedItemsListItem(
                                 teamData.count ? teamData.count : 0,
                                 teamData.team ? teamData.team.name : 'LNG_PAGE_LIST_FOLLOW_UPS_NO_TEAM_LABEL',
-                                teamData.team ? teamData.team.id : []
+                                teamData.team ? teamData.team._id : []
                             );
                         });
                     })
                 );
         }
+    }
+
+    /**
+     * Called after changeFollowUpTeam finished with success
+     */
+    changeFollowUpTeamFinishedWithSuccess() {
+        // refresh team count
+        this.getFollowUpsGroupedByTeams();
     }
 }

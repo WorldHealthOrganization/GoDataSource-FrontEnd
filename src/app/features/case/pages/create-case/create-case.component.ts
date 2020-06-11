@@ -27,6 +27,9 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
 import { UserModel } from '../../../../core/models/user.model';
+import { EntityDataService } from '../../../../core/services/data/entity.data.service';
+import { EntityType } from '../../../../core/models/entity-type';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
 
 @Component({
     selector: 'app-create-case',
@@ -82,7 +85,8 @@ export class CreateCaseComponent
         private dialogService: DialogService,
         private i18nService: I18nService,
         private redirectService: RedirectService,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private entityDataService: EntityDataService
     ) {
         super();
     }
@@ -219,6 +223,9 @@ export class CreateCaseComponent
                     })
                 )
                 .subscribe((caseDuplicates: EntityDuplicatesModel) => {
+                    // items marked as not duplicates
+                    let itemsMarkedAsNotDuplicates: string[] = [];
+
                     // add the new Case
                     const runCreateCase = () => {
                         this.caseDataService
@@ -234,44 +241,100 @@ export class CreateCaseComponent
                                 })
                             )
                             .subscribe((newCase: CaseModel) => {
-                                this.snackbarService.showSuccess('LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE');
+                                // called when we finished creating case
+                                const finishedCreatingCase = () => {
+                                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE');
 
-                                // hide dialog
-                                loadingDialog.close();
+                                    // hide dialog
+                                    loadingDialog.close();
 
-                                // navigate to proper page
-                                // method handles disableDirtyConfirm too...
-                                this.redirectToProperPageAfterCreate(
-                                    this.router,
-                                    this.redirectService,
-                                    this.authUser,
-                                    CaseModel,
-                                    'cases',
-                                    newCase.id
-                                );
+                                    // navigate to proper page
+                                    // method handles disableDirtyConfirm too...
+                                    this.redirectToProperPageAfterCreate(
+                                        this.router,
+                                        this.redirectService,
+                                        this.authUser,
+                                        CaseModel,
+                                        'cases',
+                                        newCase.id
+                                    );
+                                };
+
+                                // there are no records marked as NOT duplicates ?
+                                if (
+                                    !itemsMarkedAsNotDuplicates ||
+                                    itemsMarkedAsNotDuplicates.length < 1
+                                ) {
+                                    finishedCreatingCase();
+                                } else {
+                                    // mark records as not duplicates
+                                    this.entityDataService
+                                        .markPersonAsOrNotADuplicate(
+                                            this.selectedOutbreak.id,
+                                            EntityType.CASE,
+                                            newCase.id,
+                                            itemsMarkedAsNotDuplicates
+                                        )
+                                        .pipe(
+                                            catchError((err) => {
+                                                this.snackbarService.showApiError(err);
+
+                                                // hide dialog
+                                                loadingDialog.close();
+
+                                                return throwError(err);
+                                            })
+                                        )
+                                        .subscribe(() => {
+                                            // finished
+                                            finishedCreatingCase();
+                                        });
+                                }
                             });
                     };
 
                     // do we have duplicates ?
                     if (caseDuplicates.duplicates.length > 0) {
-                        // construct list of possible duplicates
-                        const possibleDuplicates: DialogField[] = [];
-                        _.each(caseDuplicates.duplicates, (duplicate: EntityModel, index: number) => {
+                        // construct list of items from which we can choose actions
+                        const fieldsList: DialogField[] = [];
+                        const fieldsListLayout: number[] = [];
+                        caseDuplicates.duplicates.forEach((duplicate: EntityModel, index: number) => {
                             // case model
                             const caseData: CaseModel = duplicate.model as CaseModel;
 
-                            // add link
-                            possibleDuplicates.push(new DialogField({
-                                name: 'link',
-                                placeholder: (index + 1) + '. ' + EntityModel.getNameWithDOBAge(
-                                    caseData,
-                                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-                                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
-                                ),
-                                fieldType: DialogFieldType.LINK,
-                                routerLink: ['/cases', caseData.id, 'view'],
-                                linkTarget: '_blank'
-                            }));
+                            // add row fields
+                            fieldsListLayout.push(60, 40);
+                            fieldsList.push(
+                                new DialogField({
+                                    name: `actions[${caseData.id}].label`,
+                                    placeholder: (index + 1) + '. ' + EntityModel.getNameWithDOBAge(
+                                        caseData,
+                                        this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+                                        this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+                                    ),
+                                    fieldType: DialogFieldType.LINK,
+                                    routerLink: ['/cases', caseData.id, 'view'],
+                                    linkTarget: '_blank'
+                                }),
+                                new DialogField({
+                                    name: `actions[${caseData.id}].action`,
+                                    placeholder: 'LNG_DUPLICATES_DIALOG_ACTION',
+                                    description: 'LNG_DUPLICATES_DIALOG_ACTION_DESCRIPTION',
+                                    inputOptions: [
+                                        new LabelValuePair(
+                                            Constants.DUPLICATE_ACTION.NO_ACTION,
+                                            Constants.DUPLICATE_ACTION.NO_ACTION
+                                        ),
+                                        new LabelValuePair(
+                                            Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE,
+                                            Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE
+                                        )
+                                    ],
+                                    inputOptionsClearable: false,
+                                    required: true,
+                                    value: Constants.DUPLICATE_ACTION.NO_ACTION
+                                })
+                            );
                         });
 
                         // display dialog
@@ -279,10 +342,29 @@ export class CreateCaseComponent
                             .showConfirm(new DialogConfiguration({
                                 message: 'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_CONFIRM_MSG',
                                 customInput: true,
-                                fieldsList: possibleDuplicates,
+                                fieldsListLayout: fieldsListLayout,
+                                fieldsList: fieldsList
                             }))
                             .subscribe((answer) => {
                                 if (answer.button === DialogAnswerButton.Yes) {
+                                    // determine number of items to mark as not duplicates
+                                    itemsMarkedAsNotDuplicates = [];
+                                    const actions: {
+                                        [id: string]: {
+                                            action: string
+                                        }
+                                    } = _.get(answer, 'inputValue.value.actions', {});
+                                    if (!_.isEmpty(actions)) {
+                                        _.each(actions, (data, id) => {
+                                            switch (data.action) {
+                                                case Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE:
+                                                    itemsMarkedAsNotDuplicates.push(id);
+                                                    break;
+                                            }
+                                        });
+                                    }
+
+                                    // create case
                                     runCreateCase();
                                 } else {
                                     // hide dialog

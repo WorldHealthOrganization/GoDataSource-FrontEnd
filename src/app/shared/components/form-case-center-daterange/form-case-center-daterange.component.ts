@@ -20,6 +20,7 @@ import { Moment } from '../../../core/helperClasses/x-moment';
 })
 export class FormCaseCenterDaterangeComponent extends GroupBase<CaseCenterDateRangeModel> implements OnInit, GroupFilteredValue<any> {
     dateTypeList$: Observable<any>;
+    dateRangeCentreNameList$: Observable<any>;
 
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
@@ -31,6 +32,9 @@ export class FormCaseCenterDaterangeComponent extends GroupBase<CaseCenterDateRa
     @Input() centerNameLabel: string;
     @Input() centerNameTooltip: string;
 
+    /**
+     * Constructor
+     */
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
@@ -47,6 +51,7 @@ export class FormCaseCenterDaterangeComponent extends GroupBase<CaseCenterDateRa
         // init value
         this.value = new CaseCenterDateRangeModel(this.value);
         this.dateTypeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PERSON_DATE_TYPE);
+        this.dateRangeCentreNameList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DATE_RANGE_CENTRE_NAME);
     }
 
     /**

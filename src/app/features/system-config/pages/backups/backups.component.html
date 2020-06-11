@@ -73,6 +73,31 @@
         ></app-hover-row-actions>
 
         <mat-table #table [dataSource]="backupsList$ | async" matSort (matSortChange)="sortBy($event)">
+            <!-- Description -->
+            <ng-container matColumnDef="description">
+                <mat-header-cell *matHeaderCellDef>
+                    <div class="table-header-cell">
+                        <div mat-sort-header class="column-header">{{'LNG_BACKUP_FIELD_LABEL_DESCRIPTION' | translate}}
+                        </div>
+                        <div class="column-filter">
+                            <app-form-input
+                                name="descriptionFilter"
+                                ngModel
+                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                (optionChanged)="filterByTextContainingField('description', $event)"
+                                app-reset-input-on-side-filter
+                                [displayFilterIcon]="true">
+                            </app-form-input>
+                        </div>
+                    </div>
+                </mat-header-cell>
+
+                <mat-cell
+                    *matCellDef="let item"
+                    class="cell-break-all">
+                    {{ item.description }}
+                </mat-cell>
+            </ng-container>
             <!-- Location -->
             <ng-container matColumnDef="location">
                 <mat-header-cell *matHeaderCellDef>
@@ -174,6 +199,24 @@
 
                 <mat-cell *matCellDef="let item">
                     {{ item.status | translate }}
+                </mat-cell>
+            </ng-container>
+
+            <!-- Size -->
+            <ng-container matColumnDef="fileSize">
+                <mat-header-cell *matHeaderCellDef>
+                    <div class="table-header-cell">
+                        <div mat-sort-header class="column-header">
+                            {{'LNG_BACKUP_FIELD_LABEL_FILE_SIZE' | translate}}
+                        </div>
+                        <div class="column-filter">
+                            <!--Placeholder-->
+                        </div>
+                    </div>
+                </mat-header-cell>
+
+                <mat-cell *matCellDef="let item">
+                    {{ item.sizeBytesHumanReadable }}
                 </mat-cell>
             </ng-container>
 

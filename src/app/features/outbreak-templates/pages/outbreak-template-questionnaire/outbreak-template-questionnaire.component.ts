@@ -10,8 +10,9 @@ import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
 import { throwError } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
-import { UserModel } from '../../../../core/models/user.model';
+import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 
 @Component({
     selector: 'app-outbreak-template-questionnaire',
@@ -23,11 +24,59 @@ export class OutbreakTemplateQuestionnaireComponent extends ConfirmOnFormChanges
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
+    // constants
+    UserSettings = UserSettings;
+
     // authenticated user
     authUser: UserModel;
 
     // outbreak to modify
     outbreakTemplate: OutbreakTemplateModel;
+
+    // List table visible columns
+    visibleTableColumns: {
+        [column: string]: boolean
+    } = {};
+
+    // List table columns
+    tableColumns: VisibleColumnModel[] = [
+        new VisibleColumnModel({
+            field: 'displayOrder',
+            label: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ORDER'
+        }),
+        new VisibleColumnModel({
+            field: 'text',
+            label: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT'
+        }),
+        new VisibleColumnModel({
+            field: 'answerType',
+            label: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE'
+        }),
+        new VisibleColumnModel({
+            field: 'variable',
+            label: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE'
+        }),
+        new VisibleColumnModel({
+            field: 'category',
+            label: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY'
+        }),
+        new VisibleColumnModel({
+            field: 'answersDisplay',
+            label: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWERS_DISPLAY'
+        }),
+        new VisibleColumnModel({
+            field: 'nestedQuestions',
+            label: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_NESTED_QUESTIONS'
+        }),
+        new VisibleColumnModel({
+            field: 'required',
+            label: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED'
+        }),
+        new VisibleColumnModel({
+            field: 'multiAnswer',
+            label: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_MULTI_ANSWER'
+        })
+    ];
 
     /**
      * Questionnaire
@@ -74,6 +123,9 @@ export class OutbreakTemplateQuestionnaireComponent extends ConfirmOnFormChanges
         switch (breadData.type) {
             case OutbreakQestionnaireTypeEnum.CASE:
                 questionnaireToken = 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_QUESTIONNAIRE_CASE_TITLE';
+                break;
+            case OutbreakQestionnaireTypeEnum.CONTACT:
+                questionnaireToken = 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_QUESTIONNAIRE_CONTACT_TITLE';
                 break;
             case OutbreakQestionnaireTypeEnum.FOLLOW_UP:
                 questionnaireToken = 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_QUESTIONNAIRE_FOLLOW_UP_TITLE';
@@ -167,5 +219,16 @@ export class OutbreakTemplateQuestionnaireComponent extends ConfirmOnFormChanges
                 questionnaireData.finishSubscriber.next(true);
                 questionnaireData.finishSubscriber.complete();
             });
+    }
+
+
+    /**
+     * Visible columns
+     */
+    applySideColumnsChanged(visibleColumns: string[]) {
+        this.visibleTableColumns = {};
+        (visibleColumns || []).forEach((column) => {
+            this.visibleTableColumns[column] = true;
+        });
     }
 }

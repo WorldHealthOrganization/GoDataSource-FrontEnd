@@ -17,6 +17,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Component({
     selector: 'app-create-outbreak-template',
@@ -33,8 +34,11 @@ export class CreateOutbreakTemplateComponent
     authUser: UserModel;
 
     diseasesList$: Observable<any[]>;
+    followUpsTeamAssignmentAlgorithm$: Observable<any[]>;
 
     newOutbreakTemplate: OutbreakTemplateModel = new OutbreakTemplateModel();
+
+    outbreakTemplateNameValidator$: Observable<boolean | IGeneralAsyncValidatorResponse>;
 
     /**
      * Constructor
@@ -61,6 +65,15 @@ export class CreateOutbreakTemplateComponent
 
         // get the lists for forms
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
+        this.followUpsTeamAssignmentAlgorithm$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM);
+
+        this.outbreakTemplateNameValidator$ = new Observable((observer) => {
+            this.outbreakTemplateDataService.checkOutbreakTemplateNameUniquenessValidity(this.newOutbreakTemplate.name)
+                .subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                    observer.next(isValid);
+                    observer.complete();
+                });
+        });
 
         // initialize breadcrumbs
         this.initializeBreadcrumbs();

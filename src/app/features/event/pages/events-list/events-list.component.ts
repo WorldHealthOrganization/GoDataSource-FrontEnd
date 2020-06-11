@@ -14,8 +14,7 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
@@ -24,13 +23,14 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { LoadingDialogModel } from '../../../../shared/components/loading-dialog/loading-dialog.component';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
 
 @Component({
     selector: 'app-events-list',
@@ -264,24 +264,20 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private eventDataService: EventDataService,
         private outbreakDataService: OutbreakDataService,
         private authDataService: AuthDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private dialogService: DialogService,
-        protected listFilterDataService: ListFilterDataService,
-        private route: ActivatedRoute,
         private genericDataService: GenericDataService,
         private i18nService: I18nService,
         private userDataService: UserDataService,
-        private entityHelperService: EntityHelperService
+        private entityHelperService: EntityHelperService,
+        private redirectService: RedirectService
     ) {
-        super(
-            snackbarService,
-            listFilterDataService,
-            route.queryParams
-        );
+        super(listHelperService);
     }
 
     /**
@@ -312,7 +308,13 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
         this.initializeSideTableColumns();
     }
 
+    /**
+     * Release resources
+     */
     ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();
@@ -399,15 +401,19 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             this.queryBuilder.include('createdByUser', true);
             this.queryBuilder.include('updatedByUser', true);
 
+            // since some flags can do damage to other endpoints called with the same flag, we should make sure we don't send it
+            // to do this, we clone the query filter before filtering by it
+            const clonedQB = _.cloneDeep(this.queryBuilder);
+
             // retrieve number of contacts & exposures for each record
-            this.queryBuilder.filter.flag(
+            clonedQB.filter.flag(
                 'countRelations',
                 true
             );
 
             // retrieve the list of Events
             this.eventsList$ = this.eventDataService
-                .getEventsList(this.selectedOutbreak.id, this.queryBuilder)
+                .getEventsList(this.selectedOutbreak.id, clonedQB)
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
@@ -471,29 +477,6 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                         });
                 }
             });
-    }
-
-    /**
-     * Filter by phone number
-     */
-    filterByPhoneNumber(value: string) {
-        // remove previous condition
-        this.queryBuilder.filter.remove('address.phoneNumber');
-
-        if (!_.isEmpty(value)) {
-            // add new condition
-            this.queryBuilder.filter.where({
-                'address.phoneNumber': {
-                        regex: RequestFilter.escapeStringForRegex(value)
-                            .replace(/%/g, '.*')
-                            .replace(/\\\?/g, '.'),
-                        $options: 'i'
-                }
-            });
-        }
-
-        // refresh list
-        this.needsRefreshList();
     }
 
     /**
@@ -646,6 +629,17 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
         this.entityHelperService.displayExposures(
             this.selectedOutbreak.id,
             entity
+        );
+    }
+
+    /**
+     * Navigate to Events without relationships
+     */
+    navigateToEventsWithoutRelationships() {
+        this.redirectService.to(
+            ['/events'], {
+                applyListFilter: Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS
+            }
         );
     }
 }

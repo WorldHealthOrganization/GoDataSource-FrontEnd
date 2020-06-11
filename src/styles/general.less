@@ -330,6 +330,16 @@ form.form-view-only {
 
 .page-content {
     margin-left: @page-left-margin;
+
+    .mat-expansion-panel {
+        margin: 5px 15px;
+
+        &.mat-expansion-panel-no-padding {
+            .mat-expansion-panel-body {
+                padding: 0;
+            }
+        }
+    }
 }
 
 .page-tabs-navbar {
@@ -363,6 +373,32 @@ form.form-view-only {
         }
     }
 
+}
+
+.button-with-spinner {
+    display: flex !important;
+    justify-content: space-around;
+    align-items: center;
+
+    .loading-chips {
+        @mat-spinner-width: 16px;
+        @mat-spinner-height: 16px;
+
+        float: left;
+        margin-right: 10px;
+        margin-top: 3px;
+
+        mat-spinner {
+            display: inline-block;
+            width: @mat-spinner-width !important;
+            height: @mat-spinner-height !important;
+
+            svg {
+                width: @mat-spinner-width !important;
+                height: @mat-spinner-height !important;
+            }
+        }
+    }
 }
 
 .text-right {
@@ -447,4 +483,25 @@ ng-select {
     padding: 7px 0px;
     color: #e74c3c;
     font-weight: bold;
+}
+
+a.xlink-button {
+    color: #0071e1;
+    margin: 3px;
+    font-weight: bold;
+    text-decoration: none;
+
+    &.margin-right-x {
+        margin-right: 20px;
+    }
+
+    &:active {
+        color: #0071e1;
+        text-decoration: none;
+    }
+
+    &:hover {
+        cursor: pointer;
+        text-decoration: underline;
+    }
 }

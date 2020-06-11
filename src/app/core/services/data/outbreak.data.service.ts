@@ -18,21 +18,23 @@ import { EntityType } from '../../models/entity-type';
 import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
 import { catchError, map, mergeMap, takeUntil, tap } from 'rxjs/operators';
 import { IBasicCount } from '../../models/basic-count.interface';
+import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache';
 
 @Injectable()
 export class OutbreakDataService {
-
     // hold the selected (current) Outbreak and emit it on demand
     selectedOutbreakSubject: BehaviorSubject<OutbreakModel> = new BehaviorSubject<OutbreakModel>(null);
 
+    /**
+     * Constructor
+     */
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService,
         private storageService: StorageService,
         private snackbarService: SnackbarService,
         private authDataService: AuthDataService
-    ) {
-    }
+    ) {}
 
     /**
      * Retrieve the list of Outbreaks
@@ -64,9 +66,15 @@ export class OutbreakDataService {
 
         // filter
         const filter = qb.buildQuery();
-        return this.modelHelper.mapObservableListToModel(
-            this.http.get(`outbreaks?filter=${filter}`),
-            OutbreakModel
+        return FilteredRequestCache.get(
+            'getOutbreaksListReduced',
+            filter,
+            () => {
+                return this.modelHelper.mapObservableListToModel(
+                    this.http.get(`outbreaks?filter=${filter}`),
+                    OutbreakModel
+                );
+            }
         );
     }
 
@@ -112,9 +120,10 @@ export class OutbreakDataService {
     /**
      * Create a new Outbreak
      * @param { OutbreakModel } outbreak
+     * @param { string } outbreakTemplateId
      */
-    createOutbreak(outbreak: OutbreakModel): Observable<any> {
-        return this.http.post('outbreaks', outbreak)
+    createOutbreak(outbreak: OutbreakModel, outbreakTemplateId?: string): Observable<any> {
+        return this.http.post(`outbreaks${outbreakTemplateId ? `?templateId=${outbreakTemplateId}` : '' }`, outbreak)
             .pipe(
                 mergeMap((res) => {
                     // re-determine the selected Outbreak

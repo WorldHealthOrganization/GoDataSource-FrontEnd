@@ -23,6 +23,7 @@ import {
     IPermissionRelatedRelationship,
     IPermissionRestorable
 } from './permission.interface';
+import { IAnswerData } from './question.model';
 
 export interface IFollowUpHistory {
     startDate: string;
@@ -75,11 +76,17 @@ export class ContactModel
 
     followUpHistory: IFollowUpHistory[];
 
+    followUpTeamId: string;
+
     dob: string;
     age: AgeModel;
 
     vaccinesReceived: VaccineModel[];
     pregnancyStatus: string;
+
+    questionnaireAnswers: {
+        [variable: string]: IAnswerData[];
+    };
 
     inconsistencies: InconsistencyModel[];
     relationship: any;
@@ -187,6 +194,7 @@ export class ContactModel
     static canDeleteLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_DELETE_LAB_RESULT) : false); }
     static canRestoreLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_RESTORE_LAB_RESULT) : false); }
     static canImportLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_IMPORT_LAB_RESULT) : false); }
+    static canExportLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_EXPORT_LAB_RESULT) : false); }
 
     /**
      * Constructor
@@ -226,6 +234,8 @@ export class ContactModel
         });
         this.pregnancyStatus = _.get(data, 'pregnancyStatus');
 
+        this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
+
         this.riskLevel = _.get(data, 'riskLevel');
         this.riskReason = _.get(data, 'riskReason');
         this.dateOfReporting = _.get(data, 'dateOfReporting');
@@ -233,6 +243,8 @@ export class ContactModel
         this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
         this.dateBecomeContact = _.get(data, 'dateBecomeContact');
         this.visualId = _.get(data, 'visualId', '');
+
+        this.followUpTeamId = _.get(data, 'followUpTeamId');
 
         this.followUp = _.get(data, 'followUp', {});
         this.followUpHistory = _.get(data, 'followUpHistory', []);
@@ -333,6 +345,7 @@ export class ContactModel
     canDeleteLabResult(user: UserModel): boolean { return ContactModel.canDeleteLabResult(user); }
     canRestoreLabResult(user: UserModel): boolean { return ContactModel.canRestoreLabResult(user); }
     canImportLabResult(user: UserModel): boolean { return ContactModel.canImportLabResult(user); }
+    canExportLabResult(user: UserModel): boolean { return ContactModel.canExportLabResult(user); }
 
     /**
      * Contact Name
@@ -341,7 +354,8 @@ export class ContactModel
     get name(): string {
         const firstName = this.firstName ? this.firstName : '';
         const lastName = this.lastName ? this.lastName : '';
-        return _.trim(`${firstName} ${lastName}`);
+        const middleName = this.middleName ? this.middleName : '';
+        return _.trim(`${firstName} ${middleName} ${lastName}`);
     }
 
     /**

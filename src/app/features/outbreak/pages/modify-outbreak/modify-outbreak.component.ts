@@ -50,6 +50,8 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
 
     outbreakNameValidator$: Observable<boolean | IGeneralAsyncValidatorResponse>;
 
+    followUpsTeamAssignmentAlgorithm$: Observable<any[]>;
+
     /**
      * Constructor
      */
@@ -75,6 +77,7 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
      * Component initialized
      */
     ngOnInit() {
+        this.followUpsTeamAssignmentAlgorithm$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM);
         this.geographicalLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL);
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
         this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY)

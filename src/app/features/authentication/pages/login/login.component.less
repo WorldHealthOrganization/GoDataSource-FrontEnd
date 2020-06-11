@@ -1,19 +1,37 @@
 @import '~styles/common';
 
+app-login {
+    .login-spinner {
+        width: 24px !important;
+        height: 24px !important;
+
+        svg {
+            width: 24px !important;
+            height: 24px !important;
+        }
+    }
+}
+
 .login-form {
+    .login-row-specific-height {
+        min-height: 67px;
+
+        .form-validation {
+            padding-bottom: 0;
+        }
+    }
 
     .password-input {
         min-width: 100%;
 
         input {
             box-sizing: border-box;
-            padding-right: 37px;
+            padding-right: 130px;
             width: ~'calc(100% - 24px)';
         }
     }
 
     .mat-raised-button {
-
         &.reset-pass-button {
             color: @color-accent-main;
             flex: none;
@@ -32,6 +50,32 @@
 
         .mat-button-wrapper {
             font-size: 13px;
+        }
+    }
+
+    .login-captcha-row {
+        height: 50px;
+        margin-bottom: 1.25em;
+
+        .login-captcha-row-svg {
+            width: 200px;
+
+            .login-captcha-row-svg-loading {
+                text-align: center;
+
+                @mat-spinner-width: 32px;
+                @mat-spinner-height: 32px;
+                mat-spinner {
+                    display: inline-block;
+                    width: @mat-spinner-width !important;
+                    height: @mat-spinner-height !important;
+
+                    svg {
+                        width: @mat-spinner-width !important;
+                        height: @mat-spinner-height !important;
+                    }
+                }
+            }
         }
     }
 }

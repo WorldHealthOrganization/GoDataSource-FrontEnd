@@ -4,6 +4,8 @@
     padding: 24px 9px 9px 24px;
     // add max-height in vh so the modal will not exceed the viewport making impossible to click on the buttons or see all content
     max-height: 95vh !important;
+    // handle scroll on children
+    overflow: hidden;
 }
 
 app-dialog {
@@ -13,7 +15,7 @@ app-dialog {
         color: #8e8e8e;
 
         .field-list-item:last-child {
-            padding-right: 20px;
+            margin-right: 20px;
         }
 
         .dialog-section-title {
@@ -22,6 +24,30 @@ app-dialog {
             margin-top: 10px;
             font-family: @font-roboto;
             color: #000;
+        }
+
+        .dialog-checkbox-list {
+            min-height: 40px;
+            max-height: 200px;
+            overflow: auto;
+
+            .dialog-checkbox-list-item {
+                .dialog-checkbox-list-item-checkbox {
+                    .form-checkbox-container {
+                        height: auto;
+                        justify-content: center;
+                        padding-bottom: 2px;
+                    }
+                }
+
+                .dialog-checkbox-list-item-action {
+                    padding-bottom: 2px;
+                }
+            }
+        }
+
+        .link-item-action {
+            padding-bottom: 2px;
         }
 
         a {
@@ -66,6 +92,10 @@ app-dialog {
             margin-bottom: 20px;
             max-width: 100%;
             max-height: 300px;
+            overflow: auto;
+        }
+
+        .dialog-main-form {
             overflow: auto;
         }
 

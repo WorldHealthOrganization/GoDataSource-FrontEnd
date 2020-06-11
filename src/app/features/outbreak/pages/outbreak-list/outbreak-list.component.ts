@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -25,6 +25,7 @@ import { catchError, map, share, switchMap, tap } from 'rxjs/operators';
 import { AnswerModel, QuestionModel } from '../../../../core/models/question.model';
 import { throwError } from 'rxjs';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-outbreak-list',
@@ -32,7 +33,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
     templateUrl: './outbreak-list.component.html',
     styleUrls: ['./outbreak-list.component.less']
 })
-export class OutbreakListComponent extends ListComponent implements OnInit {
+export class OutbreakListComponent extends ListComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAKS_TITLE', '.', true)
     ];
@@ -60,6 +61,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
     userList$: Observable<UserModel[]>;
 
     geographicalLevelsList$: Observable<any[]>;
+    followUpsTeamAssignmentAlgorithm$: Observable<any[]>;
 
     // provide constants to template
     ReferenceDataCategory = ReferenceDataCategory;
@@ -161,6 +163,18 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                     }
                 }),
 
+                // View Outbreak contact form
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE',
+                    click: (item: OutbreakModel) => {
+                        this.router.navigate(['/outbreaks', item.id, 'contact-questionnaire']);
+                    },
+                    visible: (item: OutbreakModel): boolean => {
+                        return !item.deleted &&
+                            OutbreakModel.canModifyContactQuestionnaire(this.authUser);
+                    }
+                }),
+
                 // View Outbreak contact follow-up form
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE',
@@ -231,19 +245,18 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private outbreakDataService: OutbreakDataService,
         private userDataService: UserDataService,
         private authDataService: AuthDataService,
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private dialogService: DialogService,
         private i18nService: I18nService,
         private router: Router
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**
@@ -251,6 +264,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
      */
     ngOnInit() {
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        this.followUpsTeamAssignmentAlgorithm$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM);
         this.activeOptionsList$ = this.genericDataService.getFilterYesNoOptions();
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
         this.geographicalLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL);
@@ -278,6 +293,14 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
 
         // refresh
         this.needsRefreshList(true);
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**
@@ -317,8 +340,28 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                 label: 'LNG_OUTBREAK_FIELD_LABEL_ACTIVE'
             }),
             new VisibleColumnModel({
+                field: 'generateFollowUpsTeamAssignmentAlgorithm',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'generateFollowUpsOverwriteExisting',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'generateFollowUpsKeepTeamAssignment',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT',
+                visible: false
+            }),
+            new VisibleColumnModel({
                 field: 'isContactLabResultsActive',
                 label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_LAB_RESULTS_ACTIVE',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'isDateOfOnsetRequired',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED',
                 visible: false
             }),
             new VisibleColumnModel({
@@ -540,9 +583,9 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
 
     /**
      * Clone an existing outbreak
-     * @param {OutbreakModel} outbreak
+     * @param {OutbreakModel} outbreakModel
      */
-    cloneOutbreak(outbreakModel: OutbreakModel) {
+     cloneOutbreak(outbreakModel: OutbreakModel) {
         // translate questionnaire questions
         const translateQuestionnaire = (questions: QuestionModel[]) => {
             _.each(questions, (question: QuestionModel) => {
@@ -621,7 +664,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                                         return this.i18nService.loadUserLanguage()
                                             .pipe(
                                                 catchError((err) => {
-                                                    this.snackbarService.showError(err.message);
+                                                    this.snackbarService.showApiError(err);
                                                     loadingDialog.close();
                                                     return throwError(err);
                                                 }),

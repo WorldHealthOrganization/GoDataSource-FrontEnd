@@ -298,7 +298,7 @@ export class ModifyLabResultComponent extends ViewModifyComponent implements OnI
             )
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err);
                     // hide loading
                     this.hideLoadingDialog();
                     return throwError(err);

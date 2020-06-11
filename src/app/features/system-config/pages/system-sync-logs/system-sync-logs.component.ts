@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -26,6 +26,7 @@ import { Router } from '@angular/router';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-system-sync-logs-list',
@@ -33,7 +34,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
     templateUrl: './system-sync-logs.component.html',
     styleUrls: ['./system-sync-logs.component.less']
 })
-export class SystemSyncLogsComponent extends ListComponent implements OnInit {
+export class SystemSyncLogsComponent extends ListComponent implements OnInit, OnDestroy {
     /**
      * Breadcrumbs
      */
@@ -111,9 +112,10 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private authDataService: AuthDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private dialogService: DialogService,
         private systemSyncLogDataService: SystemSyncLogDataService,
         private genericDataService: GenericDataService,
@@ -121,9 +123,7 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
         private systemSettingsDataService: SystemSettingsDataService,
         private i18nService: I18nService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**
@@ -193,6 +193,14 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
                 // ...and re-load the list
                 this.needsRefreshList(true);
             });
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**
@@ -349,7 +357,7 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
                         .deleteSyncLog(systemSyncLogModel.id)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )

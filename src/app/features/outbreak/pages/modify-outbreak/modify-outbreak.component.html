@@ -120,6 +120,41 @@
                 <mat-card class="page-section">
                     <div fxLayout="column">
                         <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-select
+                                name="generateFollowUpsTeamAssignmentAlgorithm"
+                                [(ngModel)]="outbreak.generateFollowUpsTeamAssignmentAlgorithm"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM' | translate"
+                                tooltip="LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_DESCRIPTION"
+                                optionTooltipKey="description"
+                                [options]="followUpsTeamAssignmentAlgorithm$ | async"
+                                [required]="true"
+                                [clearable]="false">
+                            </app-form-select>
+
+                            <app-form-slide-toggle
+                                name="generateFollowUpsOverwriteExisting"
+                                [(ngModel)]="outbreak.generateFollowUpsOverwriteExisting"
+                                [label]="'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING' | translate"
+                                tooltip="LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING_DESCRIPTION"
+                                (optionChanged)="outbreak.generateFollowUpsKeepTeamAssignment = $event ? false : outbreak.generateFollowUpsKeepTeamAssignment">
+                            </app-form-slide-toggle>
+
+                            <app-form-slide-toggle
+                                name="generateFollowUpsKeepTeamAssignment"
+                                [(ngModel)]="outbreak.generateFollowUpsKeepTeamAssignment"
+                                [label]="'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT' | translate"
+                                tooltip="LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT_DESCRIPTION"
+                                [disabled]="outbreak.generateFollowUpsOverwriteExisting">
+                            </app-form-slide-toggle>
+
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
+                    </div>
+                </mat-card>
+
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="periodOfFollowup"
                                 [(ngModel)]="outbreak.periodOfFollowup"
@@ -219,7 +254,14 @@
                                 [disabled]="viewOnly">
                             </app-form-slide-toggle>
 
-                            <div fxFlex><!-- placeholder --></div>
+                            <app-form-slide-toggle
+                                name="isDateOfOnsetRequired"
+                                [(ngModel)]="outbreak.isDateOfOnsetRequired"
+                                [label]="'LNG_OUTBREAK_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED' | translate"
+                                tooltip="LNG_OUTBREAK_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED_DESCRIPTION"
+                                [disabled]="viewOnly">
+                            </app-form-slide-toggle>
+
                             <div fxFlex><!-- placeholder --></div>
                         </div>
                     </div>
@@ -323,6 +365,14 @@
             type="button"
             [routerLink]="['/outbreaks', outbreakId, 'case-questionnaire']">
             {{ 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE' | translate }}
+        </button>
+
+        <button
+            *ngIf="OutbreakModel.canModifyContactQuestionnaire(authUser)"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/outbreaks', outbreakId, 'contact-questionnaire']">
+            {{ 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE' | translate }}
         </button>
 
         <button

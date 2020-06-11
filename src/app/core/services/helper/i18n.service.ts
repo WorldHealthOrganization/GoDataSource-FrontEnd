@@ -12,6 +12,7 @@ import * as _ from 'lodash';
 import { AuthModel } from '../../models/auth.model';
 import { moment } from '../../helperClasses/x-moment';
 import { throwError } from 'rxjs/internal/observable/throwError';
+import { of } from 'rxjs/internal/observable/of';
 
 @Injectable()
 export class I18nService {
@@ -20,6 +21,9 @@ export class I18nService {
     private languageLoadedEvent = new EventEmitter<void>();
     public languageChangedEvent = new EventEmitter<void>();
 
+    /**
+     * Constructor
+     */
     constructor(
         private translateService: TranslateService,
         private storageService: StorageService,
@@ -27,8 +31,7 @@ export class I18nService {
         private modelHelperService: ModelHelperService,
         private userDataService: UserDataService,
         private authDataService: AuthDataService
-    ) {
-    }
+    ) {}
 
     /**
      * Get the ID of the language selected by User in UI
@@ -100,9 +103,9 @@ export class I18nService {
     /**
      * Change the UI language and keep it in local storage
      * @param {LanguageModel} language
-     * @returns {Observable<void | AuthModel>}
+     * @returns {Observable<LanguageTokenDetails | AuthModel>}
      */
-    changeLanguage(language: LanguageModel): Observable<void | AuthModel> {
+    changeLanguage(language: LanguageModel): Observable<LanguageTokenDetails | AuthModel> {
         // save the selected language to local storage
         this.storageService.set(StorageKey.SELECTED_LANGUAGE_ID, language.id);
 
@@ -131,11 +134,22 @@ export class I18nService {
 
                         // trigger language change events
                         this.languageChangedEvent.emit();
+
+                        // if we're not authenticated then we can persist language
+                        // get the authenticated user
+                        const authUser = this.authDataService.getAuthenticatedUser();
+
+                        // if we're not authenticated then we don't have to set user language
+                        if (!authUser) {
+                            return of(tokenData);
+                        }
+
+                        // authenticated, change user settings
                         return this.persistUserLanguage(tokenData.languageId);
                     }
 
                     // NOTHING TO DO...finished with this map
-                    return;
+                    return of(tokenData);
                 })
             );
     }
@@ -152,6 +166,12 @@ export class I18nService {
         // get the authenticated user
         const authUser = this.authDataService.getAuthenticatedUser();
 
+        // if we're not authenticated then we don't have to set user language
+        if (!authUser) {
+            return;
+        }
+
+        // finished
         return this.userDataService
             .modifyUser(authUser.id, {languageId: languageId})
             .pipe(
@@ -245,6 +265,15 @@ export class I18nService {
      */
     public waitForLanguageInitialization(): Observable<void> {
         return this.languageLoadedEvent;
+    }
+
+    /**
+     * Remove all data from storage that is handled by this service
+     */
+    public clearStorage() {
+        // remove language data
+        this.storageService.remove(StorageKey.SELECTED_LANGUAGE_ID);
+        this.storageService.remove(StorageKey.LANGUAGE_UPDATE_LAST);
     }
 }
 

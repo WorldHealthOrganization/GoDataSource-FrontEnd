@@ -1,5 +1,4 @@
 import { ListComponent } from '../../../core/helperClasses/list-component';
-import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import { UserModel } from '../../../core/models/user.model';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { FollowUpModel } from '../../../core/models/follow-up.model';
@@ -14,15 +13,16 @@ import * as _ from 'lodash';
 import { Router } from '@angular/router';
 import { TeamModel } from '../../../core/models/team.model';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
-import { OnInit } from '@angular/core';
+import { OnDestroy, OnInit } from '@angular/core';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { Observable } from 'rxjs';
 import { TeamDataService } from '../../../core/services/data/team.data.service';
 import { throwError } from 'rxjs';
 import { catchError, share } from 'rxjs/operators';
 import { moment } from '../../../core/helperClasses/x-moment';
+import { ListHelperService } from '../../../core/services/helper/list-helper.service';
 
-export abstract class FollowUpsListComponent extends ListComponent implements OnInit {
+export abstract class FollowUpsListComponent extends ListComponent implements OnInit, OnDestroy {
     // authenticated user
     authUser: UserModel;
     // contacts outbreak
@@ -33,7 +33,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
     teamsListLoaded: TeamModel[];
     teamsListLoadedMap: {
         [teamId: string]: TeamModel
-    };
+    } = {};
     teamsListLoadedForHeaderSearch: LabelValuePair[];
     teamIdFilterValue: string = 'all';
 
@@ -72,16 +72,14 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
      * Constructor
      */
     constructor(
-        protected snackbarService: SnackbarService,
+        protected listHelperService: ListHelperService,
         protected dialogService: DialogService,
         protected followUpsDataService: FollowUpsDataService,
         protected router: Router,
         protected i18nService: I18nService,
         protected teamDataService: TeamDataService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**
@@ -128,6 +126,14 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
         });
     }
 
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+    }
+
     protected initializeFollowUpsPrint() {
         this.printFollowUpsUrl = null;
 
@@ -164,12 +170,12 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
                         .deleteFollowUp(this.selectedOutbreak.id, followUp.personId, followUp.id)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.listHelperService.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )
                         .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SUCCESS_MESSAGE');
+                            this.listHelperService.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                             // reload data
                             this.needsRefreshList(true);
@@ -212,7 +218,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
                                 // hide dialog
                                 loadingDialog.close();
 
-                                this.snackbarService.showApiError(err);
+                                this.listHelperService.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )
@@ -220,7 +226,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
                             // hide dialog
                             loadingDialog.close();
 
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
+                            this.listHelperService.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
 
                             this.needsRefreshList(true);
                         });
@@ -261,7 +267,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
                                 // hide dialog
                                 loadingDialog.close();
 
-                                this.snackbarService.showApiError(err);
+                                this.listHelperService.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )
@@ -269,7 +275,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
                             // hide dialog
                             loadingDialog.close();
 
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
+                            this.listHelperService.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
 
                             this.needsRefreshList(true);
                         });
@@ -291,12 +297,12 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
                         .restoreFollowUp(this.selectedOutbreak.id, followUp.personId, followUp.id)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.listHelperService.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )
                         .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SUCCESS_MESSAGE');
+                            this.listHelperService.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SUCCESS_MESSAGE');
 
                             // reload data
                             this.needsRefreshList(true);
@@ -312,30 +318,6 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
         // get list of selected ids
         const selectedRecords: false | string[] = this.validateCheckedRecords();
         if (!selectedRecords) {
-            return;
-        }
-
-        // check if we have future records
-        let hasFutureFollowUps: boolean = false;
-        _.each(
-            table.dataSource,
-            (item: FollowUpModel) => {
-                if (
-                    selectedRecords.indexOf(item.id) > -1 &&
-                    Constants.isDateInTheFuture(item.date)
-                ) {
-                    // found record that is in the future
-                    hasFutureFollowUps = true;
-
-                    // stop each
-                    return false;
-                }
-            }
-        );
-
-        // we aren't allowed to continue to modify follow-ups if in our list we have future follow-ups
-        if (hasFutureFollowUps) {
-            this.snackbarService.showError('LNG_PAGE_LIST_FOLLOW_UPS_MODIFY_FUTURE_FOLLOW_UPS');
             return;
         }
 
@@ -416,6 +398,13 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
     }
 
     /**
+     * Called after change follow-up finishes with success
+     */
+    changeFollowUpTeamFinishedWithSuccess() {
+        // Overwritten in Child Class
+    }
+
+    /**
      * Change FollowUp Team
      */
     changeFollowUpTeam(
@@ -433,7 +422,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
             )
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showApiError(err);
+                    this.listHelperService.snackbarService.showApiError(err);
                     return throwError(err);
                 })
             )
@@ -441,9 +430,12 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
                 // update loaded follow-up data
                 followUp.teamId = team ? team.id : null;
 
+                // call callback
+                this.changeFollowUpTeamFinishedWithSuccess();
+
                 // show success ?
                 // this might not be the best idea...maybe we can replace / remove it
-                this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_CHANGE_FOLLOW_UP_TEAM_SUCCESS_MESSAGE');
+                this.listHelperService.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_CHANGE_FOLLOW_UP_TEAM_SUCCESS_MESSAGE');
             });
     }
 
@@ -457,12 +449,12 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
             .modifyFollowUp(this.selectedOutbreak.id, followUp.personId, followUp.id, {targeted: targeted})
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.listHelperService.snackbarService.showApiError(err);
                     return throwError(err);
                 })
             )
             .subscribe(() => {
-                this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_CHANGE_TARGETED_STATUS_SUCCESS_MESSAGE');
+                this.listHelperService.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_CHANGE_TARGETED_STATUS_SUCCESS_MESSAGE');
             });
     }
 

@@ -166,6 +166,10 @@ export class Constants {
             label: 'LNG_APP_PAGE_CASE_LAB_RESULTS',
             value: 'LNG_APP_PAGE_CASE_LAB_RESULTS'
         },
+        CONTACT_LAB_RESULTS: {
+            label: 'LNG_APP_PAGE_CONTACT_LAB_RESULTS',
+            value: 'LNG_APP_PAGE_CONTACT_LAB_RESULTS'
+        },
         AVAILABLE_ENTITIES_FOR_RELATIONSHIPS: {
             label: 'LNG_APP_PAGE_AVAILABLE_ENTITIES_FOR_RELATIONSHIPS',
             value: 'LNG_APP_PAGE_AVAILABLE_ENTITIES_FOR_RELATIONSHIPS'
@@ -204,6 +208,20 @@ export class Constants {
         PENDING: {
             label: 'LNG_DEVICE_WIPE_STATUS_PENDING',
             value: 'LNG_DEVICE_WIPE_STATUS_PENDING'
+        }
+    };
+
+    /**
+     * Outbreak follow-up generation system
+     */
+    static FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM = {
+        ROUND_ROBIN_ALL_TEAMS: {
+            label: 'LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_ROUND_ROBIN_ALL_TEAMS',
+            value: 'LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_ROUND_ROBIN_ALL_TEAMS'
+        },
+        ROUND_ROBIN_NEAREST_FIT: {
+            label: 'LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_ROUND_ROBIN_NEAREST_FIT',
+            value: 'LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_ROUND_ROBIN_NEAREST_FIT'
         }
     };
 
@@ -264,6 +282,10 @@ export class Constants {
         CASE_LAB_DATA: {
             label: 'LNG_APP_PAGE_IMPORT_CASE_LAB_DATA',
             value: 'LNG_APP_PAGE_IMPORT_CASE_LAB_DATA'
+        },
+        CONTACT_LAB_DATA: {
+            label: 'LNG_APP_PAGE_IMPORT_CONTACT_LAB_DATA',
+            value: 'LNG_APP_PAGE_IMPORT_CONTACT_LAB_DATA'
         },
         REFERENCE_DATA: {
             label: 'LNG_APP_PAGE_IMPORT_REFERENCE_DATA',
@@ -401,6 +423,15 @@ export class Constants {
         LOW: 'LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL_1_LOW',
         MEDIUM: 'LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL_2_MEDIUM',
         HIGH: 'LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL_3_HIGH'
+    };
+
+    /**
+     * Used to determine action that we need to take when duplicates are detected ( create / modify - case / contact)
+     */
+    static DUPLICATE_ACTION = {
+        NO_ACTION: 'LNG_DUPLICATES_DIALOG_ACTION_NONE',
+        NOT_A_DUPLICATE: 'LNG_DUPLICATES_DIALOG_ACTION_MARK_AS_NOT_A_DUPLICATE',
+        MERGE: 'LNG_DUPLICATES_DIALOG_ACTION_MERGE_DUPLICATE'
     };
 
     /**
@@ -605,9 +636,9 @@ export class Constants {
             label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_AGE',
             value: 'age'
         },
-        DATE_OF_ONSET: {
-            label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
-            value: 'dateOfOnset'
+        DATE_OF_ONSET_AND_EVENT_DATE: {
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_DATE_OF_ONSET_AND_EVENT_DATE',
+            value: 'dateOfOnsetAndEventDate'
         },
         GENDER: {
             label: 'LNG_CASE_FIELD_LABEL_GENDER',
@@ -632,6 +663,10 @@ export class Constants {
         OCCUPATION: {
             label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
             value: 'occupation'
+        },
+        ID_AND_LOCATION: {
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_VISUAL_ID_AND_LOCATION',
+            value: 'visual_id_and_location'
         }
     };
 

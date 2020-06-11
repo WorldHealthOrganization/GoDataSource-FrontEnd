@@ -1,8 +1,9 @@
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, EventEmitter, Output, HostBinding, AfterViewInit } from '@angular/core';
+import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, EventEmitter, Output, HostBinding, AfterViewInit, OnDestroy } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { ElementBase } from '../../core/index';
 import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'app-form-select',
@@ -15,7 +16,9 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
         multi: true
     }]
 })
-export class FormSelectComponent extends ElementBase<string | string[]> implements AfterViewInit {
+export class FormSelectComponent
+    extends ElementBase<string | string[]>
+    implements AfterViewInit, OnDestroy {
     static identifier: number = 0;
 
     @HostBinding('class.form-element-host') isFormElement = true;
@@ -28,8 +31,14 @@ export class FormSelectComponent extends ElementBase<string | string[]> implemen
     @Input() multiple: boolean = false;
     private _options: any[];
     @Input() set options(options: any[]) {
+        // set all options
         this._options = options;
+
+        // init selected options
         this.initSelectedOptions();
+
+        // filter options
+        this.filterOptions();
     }
     get options(): any[] {
         return this._options;
@@ -44,7 +53,7 @@ export class FormSelectComponent extends ElementBase<string | string[]> implemen
     @Input() optionVisibleKey: string = 'visible';
     @Input() optionReadOnly: boolean = false;
     @Input() clearable: boolean = true;
-    @Input() compareWith: (o1: any, o2: any) => boolean = FormSelectComponent.compareWithDefault;
+    @Input() compareWith: (o1: any, o2: any) => boolean;
     @Input() allowSelectionOfDisabledItems: boolean = false;
     @Input() displayInvisibleItems: boolean = false;
 
@@ -69,10 +78,29 @@ export class FormSelectComponent extends ElementBase<string | string[]> implemen
 
     public identifier = `form-select-${FormSelectComponent.identifier++}`;
 
-    static compareWithDefault = (o1: any, o2: any) => {
-        return o1 === o2;
-    }
+    // filtered options used to be displayed
+    filteredOptions: any[];
 
+    // used to filter select items
+    searchedValue: string = '';
+
+    // filter configuration
+    private _filterTimeout: any;
+    @Input() enableFilterOptions: boolean = true;
+    @Input() filterOptionsPlaceholder: string = 'LNG_COMMON_LABEL_SEARCH';
+    @Input() filterOptionsDelayMs: number = 200;
+    @Input() filterOptionsIsCaseSensitive: boolean = false;
+    @Input() filterOptionsComparator: (
+        searchedValue: string,
+        optionLabel: string
+    ) => boolean;
+
+    // language subscription
+    private languageSubscription: Subscription;
+
+    /**
+     * Constructor
+     */
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
@@ -81,10 +109,35 @@ export class FormSelectComponent extends ElementBase<string | string[]> implemen
     ) {
         super(controlContainer, validators, asyncValidators);
 
+        // set default filter comparator
+        if (!this.filterOptionsComparator) {
+            this.filterOptionsComparator = (searchedValue: string, optionLabel: string): boolean => {
+                return optionLabel.indexOf(searchedValue) > -1;
+            };
+        }
+
+        // compare option items
+        if (!this.compareWith) {
+            this.compareWith = (o1: any, o2: any) => {
+                return o1 === o2;
+            };
+        }
+
         // on language change..we need to translate again the token
-        this.i18nService.languageChangedEvent.subscribe(() => {
-            this.tooltip = this._tooltipToken;
-        });
+        this.languageSubscription = this.i18nService.languageChangedEvent
+            .subscribe(() => {
+                this.tooltip = this._tooltipToken;
+            });
+    }
+
+    /**
+     * Component destroyed
+     */
+    ngOnDestroy() {
+        if (this.languageSubscription) {
+            this.languageSubscription.unsubscribe();
+            this.languageSubscription = null;
+        }
     }
 
     /**
@@ -158,6 +211,9 @@ export class FormSelectComponent extends ElementBase<string | string[]> implemen
         return this.optionChanged.emit(selectedOptions);
     }
 
+    /**
+     * After view initialized
+     */
     ngAfterViewInit() {
         // wait for the input object to be initialized
         // then trigger the initialized event
@@ -166,5 +222,74 @@ export class FormSelectComponent extends ElementBase<string | string[]> implemen
         });
 
         super.ngAfterViewInit();
+    }
+
+    /**
+     * Clear timeout callback
+     */
+    private clearFilterTimeoutCall() {
+        // clear
+        if (this._filterTimeout) {
+            clearTimeout(this._filterTimeout);
+        }
+
+        // nothing to call anymore
+        this._filterTimeout = undefined;
+    }
+
+    /**
+     * Filter options by text
+     */
+    filterOptions(byValue?: string) {
+        // nothing to filter ?
+        if (!this.options) {
+            this.filteredOptions = [];
+            return;
+        }
+
+        // filter options
+        if (
+            !this.enableFilterOptions ||
+            !byValue ||
+            !this.optionLabelKey
+        ) {
+            // all visible options
+            this.filteredOptions = this.displayInvisibleItems ?
+                this.options :
+                this.options.filter((item: any): boolean => {
+                    return this.optionVisibleKey &&
+                        item[this.optionVisibleKey] !== false;
+                });
+
+            // finished
+            return;
+        }
+
+        // clear timeout interval and filter
+        this.clearFilterTimeoutCall();
+        this._filterTimeout = setTimeout(() => {
+            // case sensitive
+            byValue = this.filterOptionsIsCaseSensitive ? byValue : byValue.toLowerCase();
+
+            // filter
+            this.filteredOptions = this.options.filter((item: any): boolean => {
+                // nothing to filter ?
+                if (
+                    !this.optionLabelKey ||
+                    !item[this.optionLabelKey] ||
+                    !this.optionVisibleKey ||
+                    item[this.optionVisibleKey] === false
+                ) {
+                    return false;
+                }
+
+                // prepare to filter
+                let translatedValue: string = this.i18nService.instant(item[this.optionLabelKey]);
+                translatedValue = this.filterOptionsIsCaseSensitive ? translatedValue : translatedValue.toLowerCase();
+
+                // filter
+                return this.filterOptionsComparator(byValue, translatedValue);
+            });
+        }, this.filterOptionsDelayMs);
     }
 }

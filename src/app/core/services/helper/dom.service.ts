@@ -45,6 +45,14 @@ export class DomService {
             // compute render size based on server page size and split factor
             // get graph svg container
             const graphContainer: any = document.querySelector(selector);
+
+            // nothing found ?
+            if (!graphContainer) {
+                observer.next(null);
+                observer.complete();
+                return;
+            }
+
             // get graph container dimensions
             const graphContainerSVGWidth = graphContainer.width.baseVal.value;
             const graphContainerSVGHeight = graphContainer.height.baseVal.value;

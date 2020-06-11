@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -21,6 +21,7 @@ import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { HoverRowActionsDirective } from '../../../../shared/directives/hover-row-actions/hover-row-actions.directive';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-upstream-servers-list',
@@ -28,7 +29,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
     templateUrl: './upstream-servers-list.component.html',
     styleUrls: ['./upstream-servers-list.component.less']
 })
-export class UpstreamServersListComponent extends ListComponent implements OnInit {
+export class UpstreamServersListComponent extends ListComponent implements OnInit, OnDestroy {
     // Breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_TITLE', '.', true)
@@ -119,17 +120,16 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private authDataService: AuthDataService,
         private systemSettingsDataService: SystemSettingsDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private dialogService: DialogService,
         private systemSyncDataService: SystemSyncDataService,
         private systemSyncLogDataService: SystemSyncLogDataService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**
@@ -147,6 +147,14 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
 
         // retrieve data
         this.needsRefreshList(true);
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**
@@ -252,7 +260,7 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
                         .getSystemSettings()
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )
@@ -304,7 +312,7 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
             .getSystemSettings()
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err);
                     return throwError(err);
                 })
             )

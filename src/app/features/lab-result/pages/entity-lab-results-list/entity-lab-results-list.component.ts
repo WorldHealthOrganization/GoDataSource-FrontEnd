@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
@@ -10,7 +10,7 @@ import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { Observable, throwError } from 'rxjs';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
@@ -21,7 +21,7 @@ import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { catchError, share, tap } from 'rxjs/operators';
 import { Constants } from '../../../../core/models/constants';
-import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
+import { HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
@@ -31,6 +31,8 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
+import { moment } from '../../../../core/helperClasses/x-moment';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-entity-lab-results-list',
@@ -38,7 +40,7 @@ import { ContactDataService } from '../../../../core/services/data/contact.data.
     templateUrl: './entity-lab-results-list.component.html',
     styleUrls: ['./entity-lab-results-list.component.less']
 })
-export class EntityLabResultsListComponent extends ListComponent implements OnInit {
+export class EntityLabResultsListComponent extends ListComponent implements OnInit, OnDestroy {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -50,6 +52,9 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
 
     // user list
     userList$: Observable<UserModel[]>;
+
+    // loading dialog handler
+    loadingDialog: LoadingDialogModel;
 
     // selected Outbreak
     selectedOutbreak: OutbreakModel;
@@ -64,23 +69,57 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
     labNamesList$: Observable<any[]>;
     yesNoOptionsList$: Observable<any[]>;
     caseClassificationsList$: Observable<any[]>;
+    progressOptionsList$: Observable<any[]>;
 
     // constants
     ReferenceDataCategory = ReferenceDataCategory;
-    UserSettings = UserSettings;
     CaseModel = CaseModel;
     ContactModel = ContactModel;
     EntityType = EntityType;
     EntityModel = EntityModel;
+    LabResultModel = LabResultModel;
 
     // available side filters
     availableSideFilters: FilterModel[];
     // values for side filter
-    savedFiltersType = Constants.APP_PAGE.CASE_LAB_RESULTS.value;
+    savedFiltersType;
+
+    // side filter
+    tableColumnsUserSettingsKey: UserSettings;
 
     // authenticated user
     authUser: UserModel;
 
+    // export outbreak lab results
+    exportLabResultsUrl: string;
+    exportLabResultsFileName: string;
+    allowedExportTypes: ExportDataExtension[] = [
+        ExportDataExtension.CSV,
+        ExportDataExtension.XLS,
+        ExportDataExtension.XLSX,
+        ExportDataExtension.XML,
+        ExportDataExtension.JSON,
+        ExportDataExtension.ODS,
+        ExportDataExtension.PDF
+    ];
+    anonymizeFields: LabelValuePair[] = [
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_ID', 'id'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID', 'sampleIdentifier'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN', 'dateSampleTaken'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED', 'dateSampleDelivered'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING', 'dateTesting'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT', 'dateOfResult'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME', 'labName'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE', 'sampleType'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE', 'testType'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_RESULT', 'result'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_NOTES', 'notes'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_STATUS', 'status'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT', 'quantitativeResult'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers')
+    ];
+
+    // actions
     recordActions: HoverRowAction[] = [
         // View Lab Results
         new HoverRowAction({
@@ -189,6 +228,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private authDataService: AuthDataService,
         private route: ActivatedRoute,
@@ -196,22 +236,23 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
         private caseDataService: CaseDataService,
         private contactDataService: ContactDataService,
         private labResultDataService: LabResultDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private dialogService: DialogService,
         private referenceDataDataService: ReferenceDataDataService,
         private genericDataService: GenericDataService,
         private userDataService: UserDataService,
         private i18nService: I18nService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**
      * Component initialized
      */
     ngOnInit() {
+        // progress options
+        this.progressOptionsList$ = this.genericDataService.getProgressOptionsList();
+
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
@@ -223,6 +264,16 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
             // set page person type
             this.personType = data.personType;
 
+            // determine saved filter key from person type ( case / contact lab results )
+            this.savedFiltersType = this.personType === EntityType.CONTACT ?
+                Constants.APP_PAGE.CONTACT_LAB_RESULTS.value :
+                Constants.APP_PAGE.CASE_LAB_RESULTS.value;
+
+            // determine side filter key
+            this.tableColumnsUserSettingsKey = this.personType === EntityType.CONTACT ?
+                UserSettings.CONTACT_LAB_FIELDS :
+                UserSettings.CASE_LAB_FIELDS;
+
             // retrieve entity information
             this.route.params.subscribe((params: { caseId?: string, contactId?: string }) => {
                 // get selected outbreak
@@ -231,6 +282,16 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
                     .subscribe((selectedOutbreak: OutbreakModel) => {
                         // selected outbreak
                         this.selectedOutbreak = selectedOutbreak;
+
+                        // export lab results url
+                        this.exportLabResultsUrl = null;
+                        if (
+                            this.selectedOutbreak &&
+                            this.selectedOutbreak.id
+                        ) {
+                            this.exportLabResultsUrl = `/outbreaks/${this.selectedOutbreak.id}/${EntityModel.getLinkForEntityType(this.personType)}/${this.personType === EntityType.CONTACT ? params.contactId : params.caseId}/lab-results/export`;
+                            this.exportLabResultsFileName = `${this.i18nService.instant(this.personType === EntityType.CONTACT ? 'LNG_PAGE_LIST_CONTACTS_TITLE' : 'LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD')}`;
+                        }
 
                         // initialize side filters
                         this.initializeSideFilters();
@@ -275,6 +336,14 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**
@@ -364,6 +433,10 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
             new VisibleColumnModel({
                 field: 'result',
                 label: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT'
+            }),
+            new VisibleColumnModel({
+                field: 'status',
+                label: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS'
             }),
             new VisibleColumnModel({
                 field: 'testedFor',
@@ -566,7 +639,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
                         .deleteLabResult(this.selectedOutbreak.id, labResult.id)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )
@@ -651,5 +724,22 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
                     }
                 }
             });
+    }
+
+    /**
+     * Display loading dialog
+     */
+    showLoadingDialog() {
+        this.loadingDialog = this.dialogService.showLoadingDialog();
+    }
+
+    /**
+     * Hide loading dialog
+     */
+    closeLoadingDialog() {
+        if (this.loadingDialog) {
+            this.loadingDialog.close();
+            this.loadingDialog = null;
+        }
     }
 }

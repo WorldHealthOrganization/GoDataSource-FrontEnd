@@ -17,7 +17,6 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import { AnswerModel, QuestionModel } from '../../../../core/models/question.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { UserModel } from '../../../../core/models/user.model';
@@ -44,6 +43,7 @@ export class CreateOutbreakComponent
     diseasesList$: Observable<LabelValuePair[]>;
     countriesList$: Observable<LabelValuePair[]>;
     geographicalLevelsList$: Observable<any[]>;
+    followUpsTeamAssignmentAlgorithm$: Observable<any[]>;
 
     newOutbreak: OutbreakModel = new OutbreakModel();
 
@@ -52,6 +52,8 @@ export class CreateOutbreakComponent
     outbreakNameValidator$: Observable<boolean | IGeneralAsyncValidatorResponse>;
 
     serverToday: Moment = moment();
+
+    outbreakTemplateId: string;
 
     /**
      * Constructor
@@ -79,6 +81,7 @@ export class CreateOutbreakComponent
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
+        this.followUpsTeamAssignmentAlgorithm$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM);
         this.geographicalLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL);
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
         this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY)
@@ -97,6 +100,7 @@ export class CreateOutbreakComponent
         this.route.queryParams
             .subscribe((queryParams: { outbreakTemplateId }) => {
                 if (queryParams.outbreakTemplateId) {
+                    this.outbreakTemplateId = queryParams.outbreakTemplateId;
                     this.outbreakTemplateDataService.getOutbreakTemplate(queryParams.outbreakTemplateId)
                         .subscribe((outbreakTemplate: OutbreakTemplateModel) => {
                             // delete the id of the outbreak template
@@ -104,40 +108,6 @@ export class CreateOutbreakComponent
 
                             // make the new outbreak which is merged with the outbreak template
                             this.newOutbreak = new OutbreakModel(outbreakTemplate);
-
-                            // translate questionnaire questions
-                            const translateQuestionnaire = (questions: QuestionModel[]) => {
-                                _.each(questions, (question: QuestionModel) => {
-                                    // translate question
-                                    question.text = this.i18nService.instant(question.text);
-
-                                    // translate answers & sub questions
-                                    _.each(question.answers, (answer: AnswerModel) => {
-                                        // translate answer
-                                        answer.label = this.i18nService.instant(answer.label);
-
-                                        // translate sub-question
-                                        if (!_.isEmpty(answer.additionalQuestions)) {
-                                            translateQuestionnaire(answer.additionalQuestions);
-                                        }
-                                    });
-                                });
-                            };
-
-                            // translate questionnaire questions - Case Form
-                            if (!_.isEmpty(this.newOutbreak.caseInvestigationTemplate)) {
-                                translateQuestionnaire(this.newOutbreak.caseInvestigationTemplate);
-                            }
-
-                            // translate questionnaire questions - Lab Results Form
-                            if (!_.isEmpty(this.newOutbreak.labResultsTemplate)) {
-                                translateQuestionnaire(this.newOutbreak.labResultsTemplate);
-                            }
-
-                            // translate questionnaire questions - Contact Follow-up
-                            if (!_.isEmpty(this.newOutbreak.contactFollowUpTemplate)) {
-                                translateQuestionnaire(this.newOutbreak.contactFollowUpTemplate);
-                            }
 
                             // creating clone, we need to keep data from the template
                             this.creatingOutbreakFromTemplate = true;
@@ -206,7 +176,7 @@ export class CreateOutbreakComponent
             const outbreakData = new OutbreakModel(dirtyFields);
             const loadingDialog = this.dialogService.showLoadingDialog();
             this.outbreakDataService
-                .createOutbreak(outbreakData)
+                .createOutbreak(outbreakData, this.creatingOutbreakFromTemplate ? this.outbreakTemplateId : '')
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);

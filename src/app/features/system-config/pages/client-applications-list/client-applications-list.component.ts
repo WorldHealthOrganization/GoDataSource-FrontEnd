@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -22,6 +22,7 @@ import { Router } from '@angular/router';
 import { HoverRowActionsDirective } from '../../../../shared/directives/hover-row-actions/hover-row-actions.directive';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-client-applications-list',
@@ -29,7 +30,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
     templateUrl: './client-applications-list.component.html',
     styleUrls: ['./client-applications-list.component.less']
 })
-export class ClientApplicationsListComponent extends ListComponent implements OnInit {
+export class ClientApplicationsListComponent extends ListComponent implements OnInit, OnDestroy {
     // Breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_TITLE', '.', true)
@@ -61,7 +62,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                 this.downloadConfFile(item);
             },
             visible: (item: SystemClientApplicationModel): boolean => {
-                return SystemClientApplicationModel.canDownloadConfFile(this.authUser);
+                return SystemClientApplicationModel.canDownloadConfFile(this.authUser) && item.active;
             }
         }),
 
@@ -127,17 +128,16 @@ export class ClientApplicationsListComponent extends ListComponent implements On
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private authDataService: AuthDataService,
         private systemSettingsDataService: SystemSettingsDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private dialogService: DialogService,
         private outbreakDataService: OutbreakDataService,
         private i18nService: I18nService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**
@@ -155,6 +155,14 @@ export class ClientApplicationsListComponent extends ListComponent implements On
 
         // retrieve backups
         this.needsRefreshList(true);
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**
@@ -279,7 +287,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                         .getSystemSettings()
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )
@@ -325,7 +333,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
             .getSystemSettings()
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err);
                     return throwError(err);
                 })
             )

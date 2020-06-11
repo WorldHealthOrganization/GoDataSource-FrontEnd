@@ -16,6 +16,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { throwError } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Component({
     selector: 'app-modify-reference-data-entry',
@@ -40,6 +41,9 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
     iconsList$: Observable<IconModel[]>;
 
     changeIcon: boolean = false;
+
+    // duplicate validator
+    codeDuplicateValidator$: Observable<boolean | IGeneralAsyncValidatorResponse>;
 
     /**
      * Constructor
@@ -72,6 +76,24 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
 
         // show loading
         this.showLoadingDialog(false);
+
+        // check for duplicate codes
+        this.codeDuplicateValidator$ = new Observable((observer) => {
+            // is there any point to validate ?
+            if (!this.entry.code) {
+                observer.next(true);
+                observer.complete();
+                return;
+            }
+
+            // validate
+            this.referenceDataDataService
+                .checkCodeUniqueness(this.entry.code, this.entry.id)
+                .subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                    observer.next(isValid);
+                    observer.complete();
+                });
+        });
 
         // get the route params
         this.route.params
@@ -168,7 +190,7 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
             )
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err);
                     // hide loading
                     this.hideLoadingDialog();
                     return throwError(err);
@@ -178,7 +200,7 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
                     return this.i18nService.loadUserLanguage()
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 // hide loading
                                 this.hideLoadingDialog();
                                 return throwError(err);

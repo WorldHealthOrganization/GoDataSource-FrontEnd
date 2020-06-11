@@ -202,7 +202,7 @@ export class EventMergeDuplicateRecordsComponent extends ConfirmOnFormChanges im
                     .pipe(
                         catchError((err) => {
                             this.displayLoading = false;
-                            this.snackbarService.showError(err.message);
+                            this.snackbarService.showApiError(err);
                             return throwError(err);
                         })
                     )

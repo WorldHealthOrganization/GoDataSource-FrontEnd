@@ -4,6 +4,7 @@ import { SheetCellType } from './sheet-cell-type';
 import { SheetCellValidationType } from './sheet-cell-validation-type';
 import { map } from 'rxjs/operators';
 import { Moment } from '../../helperClasses/x-moment';
+import { LabelValuePair } from '../label-value-pair';
 
 export type SheetColumnAsyncValidator = (value: string, callback: (result: boolean) => void) => void;
 
@@ -145,23 +146,41 @@ export class IntegerSheetColumn extends NumericSheetColumn {
  */
 export class DropdownSheetColumn extends AbstractSheetColumn {
     // list of options for dropdown
-    public options$: Observable<any>;
+    public options$: Observable<LabelValuePair[]>;
     // list of translated labels to be used as dropdown options ('handsontable' expects a list of strings)
     public optionLabels$: Observable<string[]>;
 
+    // applies for reference data, but if we send values that aren't taken from reference data then we need to map id to name
+    public idTranslatesToLabel: boolean = true;
+
+    /**
+     * Constructor
+     */
     constructor() {
         super(SheetCellType.DROPDOWN);
     }
 
-    setOptions(options$: Observable<any>, i18nService) {
+    /**
+     * Set Options
+     */
+    setOptions(
+        options$: Observable<LabelValuePair[]>,
+        i18nService,
+        idTranslatesToLabel: boolean = true
+    ) {
+        // applies for reference data, but if we send values that aren't taken from reference data then we need to map id to name
+        this.idTranslatesToLabel = idTranslatesToLabel;
+
         // keep the observable of LabelValue options
         this.options$ = options$;
+
         // get the list of string labels
         this.optionLabels$ = this.options$
             .pipe(
-                map((items) => items.map((item) => i18nService.instant(item.label)))
+                map((items) => items.map((item) => i18nService.instant(item.label).trim()))
             );
 
+        // finished
         return this;
     }
 }

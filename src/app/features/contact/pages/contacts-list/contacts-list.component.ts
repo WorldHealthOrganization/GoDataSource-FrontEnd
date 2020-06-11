@@ -15,8 +15,7 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
+import { Router } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
@@ -29,7 +28,6 @@ import { VisibleColumnModel } from '../../../../shared/components/side-columns/m
 import { RiskLevelModel } from '../../../../core/models/risk-level.model';
 import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.model';
 import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
-import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
@@ -40,6 +38,9 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { TeamModel } from '../../../../core/models/team.model';
+import { TeamDataService } from '../../../../core/services/data/team.data.service';
 
 @Component({
     selector: 'app-contacts-list',
@@ -64,6 +65,9 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
     contactsList$: Observable<ContactModel[]>;
     contactsListCount$: Observable<IBasicCount>;
 
+    // don't display pills by default
+    showCountPills: boolean = false;
+
     outbreakSubscriber: Subscription;
 
     // user list
@@ -82,6 +86,14 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
     riskLevelRefData$: Observable<ReferenceDataCategoryModel>;
     riskLevelsList$: Observable<any[]>;
     riskLevelsListMap: { [id: string]: ReferenceDataEntryModel };
+
+    // teams
+    teamsList$: Observable<TeamModel[]>;
+    teamsListLoadedMap: {
+        [teamId: string]: TeamModel
+    } = {};
+    teamsListLoadedForHeaderSearch: LabelValuePair[];
+    teamIdFilterValue: string = 'all';
 
     // final contact follow-up status
     finalFollowUpStatus$: Observable<any[]>;
@@ -291,6 +303,17 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                     }
                 }),
 
+                // See records detected by the system as duplicates but they were marked as not duplicates
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_SEE_RECORDS_NOT_DUPLICATES',
+                    click: (item: ContactModel) => {
+                        this.router.navigate(['/duplicated-records/contacts', item.id, 'marked-not-duplicates']);
+                    },
+                    visible: (item: ContactModel): boolean => {
+                        return !item.deleted;
+                    }
+                }),
+
                 // See contact lab results
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_SEE_LAB_RESULTS',
@@ -375,25 +398,21 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private contactDataService: ContactDataService,
         private authDataService: AuthDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
-        private route: ActivatedRoute,
         private dialogService: DialogService,
-        protected listFilterDataService: ListFilterDataService,
         private i18nService: I18nService,
         private userDataService: UserDataService,
-        private entityHelperService: EntityHelperService
+        private entityHelperService: EntityHelperService,
+        private teamDataService: TeamDataService
     ) {
-        super(
-            snackbarService,
-            listFilterDataService,
-            route.queryParams
-        );
+        super(listHelperService);
     }
 
     /**
@@ -463,6 +482,34 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         // yes / no
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
+        // retrieve teams
+        if (TeamModel.canList(this.authUser)) {
+            this.teamsList$ = this.teamDataService.getTeamsListReduced().pipe(share());
+            this.teamsList$
+                .subscribe((teamsList) => {
+                    // format search options
+                    this.teamsListLoadedMap = {};
+                    this.teamsListLoadedForHeaderSearch = [
+                        new LabelValuePair(
+                            'LNG_COMMON_LABEL_ALL',
+                            this.teamIdFilterValue
+                        )
+                    ];
+                    (teamsList || []).forEach((team: TeamModel) => {
+                        // map for easy access if we don't have access to write data to follow-ups
+                        this.teamsListLoadedMap[team.id] = team;
+
+                        // header search
+                        this.teamsListLoadedForHeaderSearch.push(
+                            new LabelValuePair(
+                                team.name,
+                                team.id
+                            )
+                        );
+                    });
+                });
+        }
+
         // subscribe to the Selected Outbreak
         this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
@@ -485,9 +532,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                     this.initializeSideFilters();
                 }
 
-                // get contacts grouped by risk level
-                this.getContactsGroupedByRiskLevel();
-
                 // initialize pagination
                 this.initPaginator();
                 // ...and re-load the list when the Selected Outbreak is changed
@@ -502,6 +546,9 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
      * Component destroyed
      */
     ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();
@@ -557,6 +604,14 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                 label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
             }),
             new VisibleColumnModel({
+                field: 'followUpTeamId',
+                label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
+                visible: false,
+                excludeFromDisplay: (): boolean => {
+                    return TeamModel.canList(this.authUser);
+                }
+            }),
+            new VisibleColumnModel({
                 field: 'followUp.endDate',
                 label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_END_DATE'
             }),
@@ -566,7 +621,8 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             }),
             new VisibleColumnModel({
                 field: 'wasCase',
-                label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE'
+                label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'numberOfContacts',
@@ -580,7 +636,8 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             }),
             new VisibleColumnModel({
                 field: 'deleted',
-                label: 'LNG_CONTACT_FIELD_LABEL_DELETED'
+                label: 'LNG_CONTACT_FIELD_LABEL_DELETED',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'createdBy',
@@ -696,6 +753,12 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                 sortable: true
             }),
             new FilterModel({
+                fieldName: 'questionnaireAnswers',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+                type: FilterType.QUESTIONNAIRE_ANSWERS,
+                questionnaireTemplate: this.selectedOutbreak.contactInvestigationTemplate
+            }),
+            new FilterModel({
                 fieldName: 'pregnancyStatus',
                 fieldLabel: 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
                 type: FilterType.SELECT,
@@ -719,6 +782,20 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                 type: FilterType.RANGE_DATE
             })
         ];
+
+        // allowed to filter by follow-up team ?
+        if (TeamModel.canList(this.authUser)) {
+            this.availableSideFilters.push(
+                new FilterModel({
+                    fieldName: 'followUpTeamId',
+                    fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
+                    type: FilterType.MULTISELECT,
+                    options$: this.teamsList$,
+                    optionsLabelKey: 'name',
+                    optionsValueKey: 'id'
+                })
+            );
+        }
 
         // Relation - Follow-up
         if (FollowUpModel.canList(this.authUser)) {
@@ -834,15 +911,19 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             // retrieve location list
             this.queryBuilder.include('locations', true);
 
+            // since some flags can do damage to other endpoints called with the same flag, we should make sure we don't send it
+            // to do this, we clone the query filter before filtering by it
+            const clonedQB = _.cloneDeep(this.queryBuilder);
+
             // retrieve number of contacts & exposures for each record
-            this.queryBuilder.filter.flag(
+            clonedQB.filter.flag(
                 'countRelations',
                 true
             );
 
             // retrieve the list of Contacts
             this.contactsList$ = this.contactDataService
-                .getContactsList(this.selectedOutbreak.id, this.queryBuilder)
+                .getContactsList(this.selectedOutbreak.id, clonedQB)
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
@@ -889,7 +970,16 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             const clonedQueryBuilder = _.cloneDeep(this.queryBuilder);
             clonedQueryBuilder.paginator.clear();
             clonedQueryBuilder.sort.clear();
-            clonedQueryBuilder.filter.removeFlag(`countRelations`);
+
+            // ugly hack so we don't have to change API in many place and test the entire project again ( if we changed api to replace regex to $regex many API request would be affected )
+            // #TODO - we need to address this issue later by changing all API requests that use convertLoopbackFilterToMongo ( WGD-2854 )
+            const addressPhoneCondition = clonedQueryBuilder.filter.get('addresses.phoneNumber');
+            if (addressPhoneCondition) {
+                const newCondition = JSON.parse(JSON.stringify(addressPhoneCondition).replace(/"regex"/gi, '"$regex"'));
+                clonedQueryBuilder.filter.where(newCondition, true);
+            }
+
+            // retrieve data
             this.countedContactsByRiskLevel$ = this.riskLevelRefData$
                 .pipe(
                     mergeMap((refRiskLevel: ReferenceDataCategoryModel) => {
@@ -902,7 +992,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                                         return new CountedItemsListItem(
                                             item.count,
                                             itemId as any,
-                                            item.contactIDs,
+                                            null,
                                             refItem ?
                                                 refItem.getColorCode() :
                                                 Constants.DEFAULT_COLOR_REF_DATA
@@ -943,7 +1033,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                         .deleteContact(this.selectedOutbreak.id, contact.id)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )
@@ -969,7 +1059,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                         .restoreContact(this.selectedOutbreak.id, contact.id)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )
@@ -994,7 +1084,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                         .convertContactToCase(this.selectedOutbreak.id, contactModel.id)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )
@@ -1193,33 +1283,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });
-    }
-
-    /**
-     * Filter by phone number
-     */
-    filterByPhoneNumber(value: string) {
-        // remove previous condition
-        this.queryBuilder.filter.remove('addresses');
-
-        if (!_.isEmpty(value)) {
-            // add new condition
-            this.queryBuilder.filter.where({
-                addresses: {
-                    elemMatch: {
-                        phoneNumber: {
-                            $regex: RequestFilter.escapeStringForRegex(value)
-                                .replace(/%/g, '.*')
-                                .replace(/\\\?/g, '.'),
-                            $options: 'i'
-                        }
-                    }
-                }
-            });
-        }
-
-        // refresh list
-        this.needsRefreshList();
     }
 
     /**
@@ -1422,5 +1485,30 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             this.selectedOutbreak.id,
             entity
         );
+    }
+
+    /**
+     * Filter by team
+     */
+    filterByTeam(data: LabelValuePair) {
+        // nothing to retrieve ?
+        if (!data) {
+            // no team
+            this.queryBuilder.filter.where({
+                followUpTeamId: {
+                    eq: null
+                }
+            });
+
+            // refresh list
+            this.needsRefreshList();
+        } else {
+            // retrieve everything?
+            if (data.value === this.teamIdFilterValue) {
+                this.filterBySelectField('followUpTeamId', []);
+            } else {
+                this.filterBySelectField('followUpTeamId', data);
+            }
+        }
     }
 }

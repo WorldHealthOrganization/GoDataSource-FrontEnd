@@ -33,8 +33,7 @@
                     <button
                         *ngIf="CaseModel.canListPersonsWithoutRelationships(authUser)"
                         mat-menu-item
-                        [routerLink]="['/cases']"
-                        [queryParams]="{ applyListFilter: Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS }">
+                        (click)="navigateToCasesWithoutRelationships()">
                         {{'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON' | translate}}
                     </button>
 
@@ -126,12 +125,22 @@
         [value]="(casesListCount$ | async)?.count">
     </app-total-number-of-records>
 
-    <app-counted-items-list
-        *ngIf="!appliedListFilter"
-        fxFlex
-        [items]="countedCasesGroupedByClassification$ | async"
-        (optionChanged)="filterBySelectField('id', $event.ids, null)">
-    </app-counted-items-list>
+    <!--Cases grouped by classification-->
+    <a
+        *ngIf="!appliedListFilter && !showCountPills; else countPills"
+        class="xlink-button margin-right-x"
+        (click)="showCountPills = true">
+        {{ 'LNG_PAGE_LIST_CASES_ACTION_SHOW_GROUP_BY_CLASSIFICATION_PILLS' | translate }}
+    </a>
+    <ng-template
+        #countPills>
+        <app-counted-items-list
+            *ngIf="!appliedListFilter"
+            fxFlex
+            [items]="countedCasesGroupedByClassification$ | async"
+            (optionChanged)="filterByEquality('classification', $event.label)">
+        </app-counted-items-list>
+    </ng-template>
 </div>
 
 <mat-card class="page-section page-content">
@@ -448,7 +457,7 @@
                             name="phoneNumberFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByPhoneNumber($event)"
+                            (optionChanged)="filterByPhoneNumber('addresses.phoneNumber', $event, '$regex')"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>

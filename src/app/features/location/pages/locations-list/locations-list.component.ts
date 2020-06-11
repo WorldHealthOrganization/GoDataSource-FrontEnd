@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -25,6 +25,7 @@ import { throwError } from 'rxjs';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-locations-list',
@@ -32,7 +33,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
     templateUrl: './locations-list.component.html',
     styleUrls: ['./locations-list.component.less']
 })
-export class LocationsListComponent extends ListComponent implements OnInit {
+export class LocationsListComponent extends ListComponent implements OnInit, OnDestroy {
     // breadcrumb header
     public breadcrumbs: BreadcrumbItemModel[] =  [
         new BreadcrumbItemModel(
@@ -148,20 +149,19 @@ export class LocationsListComponent extends ListComponent implements OnInit {
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private authDataService: AuthDataService,
         private locationDataService: LocationDataService,
         private genericDataService: GenericDataService,
         private route: ActivatedRoute,
         private dialogService: DialogService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private router: Router,
         private i18nService: I18nService,
         private referenceDataDataService: ReferenceDataDataService,
         private userDataService: UserDataService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**
@@ -197,6 +197,14 @@ export class LocationsListComponent extends ListComponent implements OnInit {
 
         // initialize side table columns
         this.initializeSideTableColumns();
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**
@@ -331,7 +339,7 @@ export class LocationsListComponent extends ListComponent implements OnInit {
                                 } else if (err.code === ErrorCodes.DELETE_PARENT_MODEL) {
                                     this.snackbarService.showError('LNG_DIALOG_CONFIRM_LOCATION_HAS_CHILDREN', location);
                                 } else {
-                                    this.snackbarService.showError(err.message);
+                                    this.snackbarService.showApiError(err);
                                 }
 
                                 return throwError(err);

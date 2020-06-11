@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
@@ -21,6 +21,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-backups',
@@ -28,7 +29,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
     templateUrl: './backups.component.html',
     styleUrls: ['./backups.component.less']
 })
-export class BackupsComponent extends ListComponent implements OnInit {
+export class BackupsComponent extends ListComponent implements OnInit, OnDestroy {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_SYSTEM_BACKUPS_TITLE', '.', true)
@@ -58,12 +59,14 @@ export class BackupsComponent extends ListComponent implements OnInit {
     loading: boolean = false;
 
     fixedTableColumns: string[] = [
+        'description',
         'location',
         'modules',
         'date',
         'status',
-        'error',
-        'user'
+        'fileSize',
+        'user',
+        'error'
     ];
 
     recordActions: HoverRowAction[] = [
@@ -118,18 +121,17 @@ export class BackupsComponent extends ListComponent implements OnInit {
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private authDataService: AuthDataService,
         private dialogService: DialogService,
         private systemSettingsDataService: SystemSettingsDataService,
         private systemBackupDataService: SystemBackupDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private genericDataService: GenericDataService,
         private userDataService: UserDataService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**
@@ -159,6 +161,14 @@ export class BackupsComponent extends ListComponent implements OnInit {
 
         // retrieve backups
         this.needsRefreshList(true);
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**
@@ -228,6 +238,15 @@ export class BackupsComponent extends ListComponent implements OnInit {
             message: 'LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_TITLE',
             yesLabel: 'LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_CREATE_BACKUP_BUTTON',
             fieldsList: [
+                // description
+                new DialogField({
+                    name: 'description',
+                    placeholder: 'LNG_BACKUP_FIELD_LABEL_DESCRIPTION',
+                    description: 'LNG_BACKUP_FIELD_LABEL_DESCRIPTION_DESCRIPTION',
+                    required: false,
+                    value: this.settings.dataBackup.description
+                }),
+
                 // location
                 new DialogField({
                     name: 'location',
@@ -288,7 +307,7 @@ export class BackupsComponent extends ListComponent implements OnInit {
                         .deleteBackup(item.id)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )
@@ -315,7 +334,7 @@ export class BackupsComponent extends ListComponent implements OnInit {
                 .restoreBackup(backupItemData.id)
                 .pipe(
                     catchError((err) => {
-                        this.snackbarService.showError(err.message);
+                        this.snackbarService.showApiError(err);
                         return throwError(err);
                     })
                 )
@@ -338,7 +357,7 @@ export class BackupsComponent extends ListComponent implements OnInit {
                         .getBackup(this.waitForBackupIdToBeReady)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
 
                                 // can't continue with the restore
                                 this.waitForBackupIdToBeReady = undefined;
@@ -400,7 +419,7 @@ export class BackupsComponent extends ListComponent implements OnInit {
                             .createBackup(answerBackup.inputValue.value)
                             .pipe(
                                 catchError((err) => {
-                                    this.snackbarService.showError(err.message);
+                                    this.snackbarService.showApiError(err);
                                     return throwError(err);
                                 })
                             )
@@ -437,6 +456,15 @@ export class BackupsComponent extends ListComponent implements OnInit {
             yesLabel: 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SAVE_BUTTON',
             infoExistingConfiguration: true,
             fieldsList: [
+                // description
+                new DialogField({
+                    name: 'description',
+                    placeholder: 'LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION',
+                    description: 'LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION_DESCRIPTION',
+                    required: false,
+                    value: this.settings.dataBackup.description
+                }),
+
                 // location
                 new DialogField({
                     name: 'location',

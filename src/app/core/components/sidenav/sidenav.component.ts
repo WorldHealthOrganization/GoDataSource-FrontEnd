@@ -3,11 +3,12 @@ import { AuthDataService } from '../../services/data/auth.data.service';
 import { PermissionExpression, UserModel } from '../../models/user.model';
 import { PERMISSION } from '../../models/permission.model';
 import * as _ from 'lodash';
-import { ChildNavItem, NavItem } from './nav-item.class';
+import { ChildNavItem, NavItem, SeparatorItem } from './nav-item.class';
 import { OutbreakDataService } from '../../services/data/outbreak.data.service';
 import { OutbreakModel } from '../../models/outbreak.model';
 import { SnackbarService } from '../../services/helper/snackbar.service';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { DashboardModel } from '../../models/dashboard.model';
 
 @Component({
     selector: 'app-sidenav',
@@ -65,13 +66,36 @@ export class SidenavComponent implements OnInit, OnDestroy {
             new ChildNavItem(
                 'saved-filters',
                 'LNG_LAYOUT_MENU_ITEM_SAVED_FILTERS_LABEL',
-                [],
+                new PermissionExpression({
+                    or: [
+                        PERMISSION.CASE_LIST,
+                        PERMISSION.FOLLOW_UP_LIST,
+                        PERMISSION.CONTACT_LIST,
+                        PERMISSION.CASE_LIST_LAB_RESULT,
+                        PERMISSION.CONTACT_LIST_LAB_RESULT,
+                        PERMISSION.LAB_RESULT_LIST,
+                        PERMISSION.CASE_CHANGE_SOURCE_RELATIONSHIP,
+                        PERMISSION.CONTACT_CHANGE_SOURCE_RELATIONSHIP,
+                        PERMISSION.EVENT_CHANGE_SOURCE_RELATIONSHIP,
+                        PERMISSION.RELATIONSHIP_CREATE,
+                        PERMISSION.RELATIONSHIP_SHARE
+                    ]
+                }),
                 '/saved-filters'
             ),
             new ChildNavItem(
                 'saved-import-mapping',
                 'LNG_LAYOUT_MENU_ITEM_SAVED_IMPORT_MAPPING_LABEL',
-                [],
+                new PermissionExpression({
+                    or: [
+                        PERMISSION.LOCATION_IMPORT,
+                        PERMISSION.REFERENCE_DATA_IMPORT,
+                        PERMISSION.CONTACT_IMPORT,
+                        PERMISSION.CONTACT_IMPORT_LAB_RESULT,
+                        PERMISSION.CASE_IMPORT,
+                        PERMISSION.CASE_IMPORT_LAB_RESULT
+                    ]
+                }),
                 '/saved-import-mapping'
             ),
             new ChildNavItem(
@@ -103,7 +127,9 @@ export class SidenavComponent implements OnInit, OnDestroy {
             'dashboard',
             'LNG_LAYOUT_MENU_ITEM_DASHBOARD_LABEL',
             'barChart',
-            [],
+            [
+                DashboardModel.canViewDashboard
+            ],
             [],
             '/dashboard'
         ),
@@ -299,9 +325,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
                 ),
             ]
         ),
-        {
-            separator: true
-        },
+        new SeparatorItem(),
         new NavItem(
             'help',
             'LNG_LAYOUT_MENU_ITEM_HELP',
@@ -488,10 +512,63 @@ export class SidenavComponent implements OnInit, OnDestroy {
     /**
      * Check if a Menu Item should be displayed, based on the configured permissions that the authenticated user should have
      */
-    shouldDisplayItem(item: NavItem | ChildNavItem) {
+    shouldDisplayItem(
+        item: NavItem | ChildNavItem | SeparatorItem,
+        itemParentArray?: (NavItem | ChildNavItem | SeparatorItem)[],
+        itemParentArrayIndex?: number
+    ): boolean {
         // do we need to check permissions ?
         if (!item.isVisible) {
             return false;
+        }
+
+        // do we have has permission cache, so we don't check that often, only if user permissions changed ?
+        let hasPermission: boolean;
+        if (
+            item.access.userPermissionsHash === this.authUser.permissionIdsHash && (
+                !this.selectedOutbreak ||
+                item.access.outbreakId === this.selectedOutbreak.id
+            )
+        ) {
+            return item.access.allowed;
+        }
+
+        // check if separator
+        if (item instanceof SeparatorItem) {
+            // determine if at least one item before this one is visible
+            let hasItemBefore: boolean = false;
+            for (let index = 0; index < itemParentArrayIndex; index++) {
+                if (this.shouldDisplayItem(itemParentArray[index])) {
+                    // found one item visible
+                    hasItemBefore = true;
+
+                    // stop
+                    break;
+                }
+            }
+
+            // determine if at least one item after this one is visible
+            let hasItemAfter: boolean = false;
+            for (let index = itemParentArrayIndex + 1; index < itemParentArray.length; index++) {
+                if (this.shouldDisplayItem(itemParentArray[index])) {
+                    // found one item visible
+                    hasItemAfter = true;
+
+                    // stop
+                    break;
+                }
+            }
+
+            // must have at least one item before and one after to display this item
+            hasPermission = hasItemBefore && hasItemAfter;
+
+            /// cache result
+            item.access.userPermissionsHash = this.authUser.permissionIdsHash;
+            item.access.allowed = hasPermission;
+            item.access.outbreakId = this.selectedOutbreak ? this.selectedOutbreak.id : null;
+
+            // finished
+            return hasPermission;
         }
 
         // check if this an expandable menu
@@ -501,7 +578,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
             item.children.length > 0
         ) {
             // check if there is at least one visible child
-            return !!_.find(item.children, (childItem) => {
+            hasPermission = !!_.find(item.children, (childItem) => {
                 return childItem.isVisible &&
                     (
                         _.isArray(childItem.permissions) ?
@@ -509,12 +586,29 @@ export class SidenavComponent implements OnInit, OnDestroy {
                             this.authUser.hasPermissions(...[childItem.permissions])
                     );
             });
+
+            /// cache result
+            item.access.userPermissionsHash = this.authUser.permissionIdsHash;
+            item.access.allowed = hasPermission;
+            item.access.outbreakId = this.selectedOutbreak ? this.selectedOutbreak.id : null;
+
+            // no permissions
+            return hasPermission;
         }
 
         // check parent permissions
-        return _.isArray(item.permissions) ?
+        // NavItem
+        hasPermission = _.isArray(item.permissions) ?
             this.authUser.hasPermissions(...item.permissions) :
             this.authUser.hasPermissions(...[item.permissions]);
+
+        /// cache result
+        item.access.userPermissionsHash = this.authUser.permissionIdsHash;
+        item.access.allowed = hasPermission;
+        item.access.outbreakId = this.selectedOutbreak ? this.selectedOutbreak.id : null;
+
+        // no permissions
+        return hasPermission;
     }
 
     /**
@@ -522,7 +616,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
      * @returns {boolean}
      */
     hasOutbreak(): boolean {
-        return this.selectedOutbreak && !_.isEmpty(this.selectedOutbreak.id);
+        return !!(this.selectedOutbreak && this.selectedOutbreak.id);
     }
 
 }

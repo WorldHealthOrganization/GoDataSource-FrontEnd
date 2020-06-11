@@ -41,6 +41,7 @@
                         [allowedExportTypes]="allowedExportTypes"
                         [displayEncrypt]="true"
                         [displayAnonymize]="true"
+                        [displayUseQuestionVariable]="true"
                         [anonymizeFields]="anonymizeFields"
                         [queryBuilder]="queryBuilder"
                         (exportStart)="showLoadingDialog()"
@@ -111,13 +112,23 @@
     <app-total-number-of-records
         [value]="(contactsListCount$ | async)?.count">
     </app-total-number-of-records>
+
     <!--Contacts grouped by risk level-->
-    <app-counted-items-list
-        *ngIf="!appliedListFilter"
-        fxFlex
-        [items]="countedContactsByRiskLevel$ | async"
-        (optionChanged)="filterBySelectField('id', $event.ids, null)">
-    </app-counted-items-list>
+    <a
+        *ngIf="!appliedListFilter && !showCountPills; else countPills"
+        class="xlink-button margin-right-x"
+        (click)="showCountPills = true">
+        {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_SHOW_GROUP_BY_RISK_PILLS' | translate }}
+    </a>
+    <ng-template
+        #countPills>
+        <app-counted-items-list
+            *ngIf="!appliedListFilter"
+            fxFlex
+            [items]="countedContactsByRiskLevel$ | async"
+            (optionChanged)="$event.label === 'LNG_REFERENCE_DATA_CATEGORY_RISK_LEVEL_UNCLASSIFIED' ? filterByBooleanField('riskLevel', false) : filterByEquality('riskLevel',  $event.label)">
+        </app-counted-items-list>
+    </ng-template>
 </div>
 
 <app-side-filters
@@ -406,7 +417,7 @@
                             name="phoneNumberFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByPhoneNumber($event)"
+                            (optionChanged)="filterByPhoneNumber('addresses.phoneNumber', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -501,6 +512,36 @@
                 class="has-date-range-filter"
                 [style.color]="getRiskColor(item)">
                 {{ item.followUp?.endDate | dateDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Follow-up assigned team -->
+        <ng-container matColumnDef="followUpTeamId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{ 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="followUpTeamIdFilter"
+                            [ngModel]="teamIdFilterValue"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="teamsListLoadedForHeaderSearch"
+                            (optionChanged)="filterByTeam($event)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true"
+                            [multiple]="false">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
+                {{ teamsListLoadedMap[item.followUpTeamId] ? teamsListLoadedMap[item.followUpTeamId].name : '' }}
             </mat-cell>
         </ng-container>
 

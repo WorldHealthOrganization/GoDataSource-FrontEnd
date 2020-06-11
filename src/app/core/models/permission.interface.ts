@@ -255,6 +255,11 @@ export interface IPermissionQuestionnaire {
     canModifyCaseQuestionnaire(user: UserModel): boolean;
 
     /**
+     * Has permission to modify contact questionnaire
+     */
+    canModifyContactQuestionnaire(user: UserModel): boolean;
+
+    /**
      * Has permission to modify contact follow-up questionnaire
      */
     canModifyContactFollowUpQuestionnaire(user: UserModel): boolean;
@@ -358,6 +363,11 @@ export interface IPermissionRelatedLabResult {
      * Has import permission ?
      */
     canImportLabResult(user: UserModel): boolean;
+
+    /**
+     * Has import permission ?
+     */
+    canExportLabResult(user: UserModel): boolean;
 }
 
 /**

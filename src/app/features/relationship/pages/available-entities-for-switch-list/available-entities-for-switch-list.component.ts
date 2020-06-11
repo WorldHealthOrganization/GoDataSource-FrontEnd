@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
@@ -27,13 +27,14 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { AddressType } from '../../../../core/models/address.model';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-available-entities-for-switch-list',
     templateUrl: './available-entities-for-switch-list.component.html',
     styleUrls: ['./available-entities-for-switch-list.component.less']
 })
-export class AvailableEntitiesForSwitchListComponent extends RelationshipsListComponent implements OnInit {
+export class AvailableEntitiesForSwitchListComponent extends RelationshipsListComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     entitiesList$: Observable<(CaseModel|ContactModel|EventModel)[]>;
@@ -67,20 +68,24 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
         'place'
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
-        protected snackbarService: SnackbarService,
+        protected listHelperService: ListHelperService,
         protected router: Router,
         protected route: ActivatedRoute,
         protected authDataService: AuthDataService,
         protected outbreakDataService: OutbreakDataService,
         protected entityDataService: EntityDataService,
+        private snackbarService: SnackbarService,
         private relationshipDataService: RelationshipDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService
     ) {
         // parent
         super(
-            snackbarService, router, route,
+            listHelperService, router, route,
             authDataService, outbreakDataService, entityDataService
         );
 
@@ -88,6 +93,9 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
         this.checkedIsMultiSelect = false;
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         super.ngOnInit();
 
@@ -115,6 +123,14 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
 
         // side filters
         this.generateSideFilters();
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**
@@ -331,7 +347,6 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
 
         // display loading
         const loadingDialog = this.dialogService.showLoadingDialog();
-
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_CHANGE_SOURCE')
             .subscribe((answer: DialogAnswer) => {
                   if (answer.button === DialogAnswerButton.Yes) {
@@ -353,11 +368,15 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
                               // hide dialog
                               loadingDialog.close();
 
+                              // saved
                               this.snackbarService.showSuccess('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_ACTION_SET_SOURCE_SUCCESS_MESSAGE');
 
+                              // redirect
                               this.router.navigate(['/relationships', this.entityType, selectedRecordId, 'contacts']);
-
                           });
+                  } else {
+                      // hide dialog
+                      loadingDialog.close();
                   }
             });
     }

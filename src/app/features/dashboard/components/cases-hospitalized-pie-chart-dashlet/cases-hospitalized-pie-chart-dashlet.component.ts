@@ -262,7 +262,7 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
             )
                 .pipe(
                     catchError((err) => {
-                        this.snackbarService.showError(err.message);
+                        this.snackbarService.showApiError(err);
                         return throwError(err);
                     })
                 )

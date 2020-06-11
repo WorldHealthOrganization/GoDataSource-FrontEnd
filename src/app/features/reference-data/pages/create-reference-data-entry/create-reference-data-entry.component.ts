@@ -16,6 +16,7 @@ import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-co
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Component({
     selector: 'app-create-reference-data-entry',
@@ -41,6 +42,9 @@ export class CreateReferenceDataEntryComponent
 
     // authenticated user details
     authUser: UserModel;
+
+    // duplicate validator
+    codeDuplicateValidator$: Observable<boolean | IGeneralAsyncValidatorResponse>;
 
     /**
      * Constructor
@@ -68,6 +72,24 @@ export class CreateReferenceDataEntryComponent
 
         // icons data
         this.iconsList$ = this.iconDataService.getIconsList();
+
+        // check for duplicate codes
+        this.codeDuplicateValidator$ = new Observable((observer) => {
+            // is there any point to validate ?
+            if (!this.entry.code) {
+                observer.next(true);
+                observer.complete();
+                return;
+            }
+
+            // validate
+            this.referenceDataDataService
+                .checkCodeUniqueness(this.entry.code)
+                .subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                    observer.next(isValid);
+                    observer.complete();
+                });
+        });
 
         // get the route params
         this.route.params
@@ -147,7 +169,7 @@ export class CreateReferenceDataEntryComponent
             .createEntry(dirtyFields)
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err);
                     return throwError(err);
                 }),
                 switchMap((newReferenceDataEntry) => {

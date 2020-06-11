@@ -189,13 +189,25 @@ export class AddressModel {
         // construct search pattern
         const numberPattern: string = RequestFilter.getPhoneNumberPattern(phoneNumber);
 
-        // nothing provided ?
-        if (!numberPattern) {
-            return null;
-        }
-
         // initialize query builder
         const qb = new RequestQueryBuilder();
+
+        // nothing provided ?
+        if (!numberPattern) {
+            // filter by invalid value ?
+            if (phoneNumber) {
+                // add invalid condition
+                qb.filter.where({
+                    [property]: 'INVALID PHONE'
+                }, false);
+
+                // finished
+                return qb;
+            }
+
+            // finished
+            return null;
+        }
 
         // construct query accordingly to property type ( array of objects / single object )
         if (propertyIsArray) {

@@ -195,7 +195,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
                 .getEntity(this.entityType, this.selectedOutbreak.id, this.entityId)
                 .pipe(
                     catchError((err) => {
-                        this.snackbarService.showError(err.message);
+                        this.snackbarService.showApiError(err);
 
                         // Entity not found; navigate back to Entities list
                         this.router.navigate([this.entityMap[this.entityType].link]);
@@ -226,7 +226,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
                 .getEntityRelationship(this.selectedOutbreak.id, this.entityType, this.entityId, this.relationshipId)
                 .pipe(
                     catchError((err) => {
-                        this.snackbarService.showError(err.message);
+                        this.snackbarService.showApiError(err);
 
                         // Relationship not found; navigate back to Entity Relationships list
                         this.disableDirtyConfirm();
@@ -325,7 +325,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
             )
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err);
                     // hide loading
                     this.hideLoadingDialog();
                     return throwError(err);
