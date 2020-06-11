@@ -19,6 +19,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { CaseModel } from '../../../../core/models/case.model';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-report-cases-date-onset-list',
@@ -185,15 +186,14 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
         private relationshipDataService: RelationshipDataService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**
@@ -221,6 +221,9 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
      * Component destroyed
      */
     ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();

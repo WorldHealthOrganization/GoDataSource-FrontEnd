@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import { CaptchaConfigModel } from './captcha-config.model';
 
 export class SystemSettingsVersionModel {
     platform: string;
@@ -6,6 +7,8 @@ export class SystemSettingsVersionModel {
     build: string;
     arch: string;
     tokenTTL: number;
+    skipOldPasswordForUserModify: boolean;
+    captcha: CaptchaConfigModel;
 
     constructor(data = null) {
         this.platform = _.get(data, 'platform');
@@ -13,5 +16,7 @@ export class SystemSettingsVersionModel {
         this.build = _.get(data, 'build');
         this.arch = _.get(data, 'arch');
         this.tokenTTL = _.get(data, 'tokenTTL');
+        this.skipOldPasswordForUserModify = _.get(data, 'skipOldPasswordForUserModify');
+        this.captcha = new CaptchaConfigModel(_.get(data, 'captcha'));
     }
 }

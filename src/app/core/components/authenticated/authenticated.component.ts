@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { NavigationStart, Router } from '@angular/router';
+import { NavigationEnd, NavigationStart, RouteConfigLoadEnd, RouteConfigLoadStart, Router } from '@angular/router';
 import { AuthDataService } from '../../services/data/auth.data.service';
 import { UserModel } from '../../models/user.model';
 import { MatDialogRef, MatSidenav } from '@angular/material';
@@ -23,6 +23,7 @@ import { ITokenInfo } from '../../models/auth.model';
 import { Moment } from 'moment';
 import * as moment from 'moment';
 import { ConfirmOnFormChanges, PageChangeConfirmationGuard } from '../../services/guards/page-change-confirmation-guard.service';
+import { DashboardModel } from '../../models/dashboard.model';
 
 @Component({
     selector: 'app-authenticated',
@@ -50,11 +51,18 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
     // used to keep subscription and release it if we don't need it anymore
     tokenInfoSubjectSubscription: Subscription;
 
+    // router events subscription
+    routerEventsSubscriptionLoad: Subscription;
+    routerEventsSubscriptionRepetitive: Subscription;
+
     // help items for search
     contextSearchHelpItems: string[];
 
     // constants
     Constants = Constants;
+
+    // menu loading dialog
+    private menuLoadingDialog: LoadingDialogModel;
 
     // token expire data
     private lastRefreshUserTokenOrLogOut: Moment;
@@ -77,6 +85,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
                 // if user is active, then we need to refresh token
                 if (
                     this.lastInputTime &&
+                    this.tokenInfo &&
                     this.tokenInfo.approximatedExpireInSecondsReal > AuthenticatedComponent.NO_ACTIVITY_POPUP_SHOULD_APPEAR_WHEN_LESS_THAN_SECONDS &&
                     this.tokenInfo.approximatedExpireInSecondsReal < AuthenticatedComponent.NO_ACTIVITY_POPUP_SHOULD_REFRESH_TOKEN_IF_USER_ACTIVE &&
                     Math.floor(moment().diff(this.lastInputTime) / 1000) < AuthenticatedComponent.REFRESH_IF_USER_WAS_ACTIVE_IN_THE_LAST_SECONDS
@@ -110,21 +119,33 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
         private userDataService: UserDataService
     ) {
         // detect when the route is changed
-        this.router.events.subscribe(() => {
+        this.routerEventsSubscriptionLoad = this.router.events.subscribe((event) => {
+            // display loading spinner
+            if (event instanceof RouteConfigLoadStart) {
+                this.showLoading();
+            } else if (event instanceof RouteConfigLoadEnd) {
+                this.hideLoading();
+            }
+
+            // there is no point in continuing if not a nav start event since we need to execute close only one time
+            if (!(event instanceof NavigationStart)) {
+                return;
+            }
+
             // close the SideNav whenever the route is changed
             if (this.sideNav) {
                 this.sideNav.close();
             }
         });
-
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
     }
 
     /**
      * Component initialized
      */
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // check if user is authenticated
         if (!this.authUser) {
             // user is NOT authenticated; redirect to Login page
@@ -150,46 +171,70 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
         // cache reference data
         this.referenceDataDataService.getReferenceData().subscribe();
 
-        // redirect root to dashboard
-        const redirectRootToDashboard = () => {
+        // redirect root to landing page
+        const redirectRootToLandingPage = () => {
+            // determine to which page we should send this user
+            // #TODO - accordingly to user DEFAULT landing page and PERMISSIONS
+
             // redirect to default landing page
-            this.router.navigate(['/dashboard']);
+            if (DashboardModel.canViewDashboard(this.authUser)) {
+                this.router.navigate(['/dashboard']);
+            } else {
+                this.router.navigate(['/version']);
+            }
         };
 
         // subscribe to uri changes
-        this.router.events.subscribe((navStart: NavigationStart) => {
-            // redirect root to dashboard
-            if (navStart.url === '/') {
-                redirectRootToDashboard();
+        this.routerEventsSubscriptionRepetitive = this.router.events.subscribe((navStart: NavigationEnd) => {
+            // handle only final navigation events, since we need to retrieve data only after we get to that page ( guards, etc )
+            if (!(navStart instanceof NavigationEnd)) {
+                return;
             }
+
+            // redirect root to landing page
+            if (navStart.url === '/') {
+                return redirectRootToLandingPage();
+            }
+
             // check for context help
-            this.helpDataService.getContextHelpItems(this.router.url).subscribe((items) => {
+            if (
+                this.router.url &&
+                this.router.url !== '/'
+            ) {
+                this.helpDataService.getContextHelpItems(this.router.url)
+                    .subscribe((items) => {
+                        if (_.isEmpty(items)) {
+                            this.contextSearchHelpItems = null;
+                        } else {
+                            this.contextSearchHelpItems = _.map(items, 'id');
+                        }
+                    });
+            }
+        });
+
+        // redirect root to landing page
+        if (this.router.url === '/') {
+            return redirectRootToLandingPage();
+        }
+
+        //  help items
+        this.helpDataService.getContextHelpItems(this.router.url)
+            .subscribe((items) => {
                 if (_.isEmpty(items)) {
                     this.contextSearchHelpItems = null;
                 } else {
                     this.contextSearchHelpItems = _.map(items, 'id');
                 }
             });
-        });
-
-        // redirect root to dashboard
-        if (this.router.url === '/') {
-            redirectRootToDashboard();
-        }
-
-        this.helpDataService.getContextHelpItems(this.router.url).subscribe((items) => {
-            if (_.isEmpty(items)) {
-                this.contextSearchHelpItems = null;
-            } else {
-                this.contextSearchHelpItems = _.map(items, 'id');
-            }
-        });
     }
 
     /**
      * Component destroyed
      */
     ngOnDestroy(): void {
+        // hide loading in case it is still visible
+        this.hideLoading();
+
         // release token info subscription
         if (this.tokenInfoSubjectSubscription) {
             this.tokenInfoSubjectSubscription.unsubscribe();
@@ -202,12 +247,47 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
             this.tokenCheckIfLoggedOutCaller = null;
         }
 
+        // release
+        if (this.routerEventsSubscriptionLoad) {
+            this.routerEventsSubscriptionLoad.unsubscribe();
+            this.routerEventsSubscriptionLoad = null;
+        }
+
+        // release
+        if (this.routerEventsSubscriptionRepetitive) {
+            this.routerEventsSubscriptionRepetitive.unsubscribe();
+            this.routerEventsSubscriptionRepetitive = null;
+        }
+
         // remove idle handlers
         if (this.documentKeyUp) {
             document.removeEventListener('keyup', this.documentKeyUp);
         }
         if (this.documentMouseMove) {
             document.removeEventListener('mousemove', this.documentMouseMove);
+        }
+    }
+
+    /**
+     * Show loading spinner
+     */
+    showLoading() {
+        // as a precaution if previous dialog is still visible then we shouldn't open a new one
+        if (this.menuLoadingDialog) {
+            return;
+        }
+
+        // display dialog;
+        this.menuLoadingDialog = this.dialogService.showLoadingDialog();
+    }
+
+    /**
+     * hide loading
+     */
+    hideLoading() {
+        if (this.menuLoadingDialog) {
+            this.menuLoadingDialog.close();
+            this.menuLoadingDialog = null;
         }
     }
 

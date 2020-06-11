@@ -12,6 +12,8 @@ import { throwError } from 'rxjs';
 import { catchError, share } from 'rxjs/operators';
 import { SafeHtml } from '@angular/platform-browser';
 import { CaptchaDataFor, CaptchaDataService } from '../../../../core/services/data/captcha.data.service';
+import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
+import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 
 @Component({
     selector: 'app-reset-password-questions',
@@ -23,6 +25,11 @@ export class ResetPasswordQuestionsComponent implements OnInit {
     // captcha data
     captchaData$: Observable<SafeHtml>;
 
+    // loading data ?
+    loading = true;
+    displayCaptcha = false;
+
+    // data
     dataModel = {
         captcha: '',
         email: null,
@@ -39,7 +46,8 @@ export class ResetPasswordQuestionsComponent implements OnInit {
         private userDataService: UserDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private captchaDataService: CaptchaDataService
+        private captchaDataService: CaptchaDataService,
+        private systemSettingsDataService: SystemSettingsDataService
     ) {
         this.securityQuestionsList$ = this.userDataService.getSecurityQuestionsList().pipe(share());
     }
@@ -55,8 +63,22 @@ export class ResetPasswordQuestionsComponent implements OnInit {
             return;
         }
 
-        // generate captcha
-        this.refreshCaptcha();
+        // retrieve if we should display captcha or not
+        // display loading while determining if we should display captcha
+        this.loading = true;
+        this.systemSettingsDataService
+            .getAPIVersion()
+            .subscribe((versionData: SystemSettingsVersionModel) => {
+                // finished
+                this.loading = false;
+
+                // display captcha ?
+                this.displayCaptcha = versionData.captcha.resetPasswordQuestions;
+                if (this.displayCaptcha) {
+                    // generate captcha
+                    this.refreshCaptcha();
+                }
+            });
     }
 
     /**
@@ -64,17 +86,17 @@ export class ResetPasswordQuestionsComponent implements OnInit {
      */
     resetPassword(form: NgForm) {
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
-
         if (form.valid && !_.isEmpty(dirtyFields)) {
-
             // send request to get token
             this.userDataService
                 .resetPasswordQuestions(dirtyFields)
                 .pipe(
                     catchError((err) => {
                         // reset captcha no matter what...
-                        this.dataModel.captcha = '';
-                        this.refreshCaptcha();
+                        if (this.displayCaptcha) {
+                            this.dataModel.captcha = '';
+                            this.refreshCaptcha();
+                        }
 
                         // finish
                         this.snackbarService.showApiError(err);

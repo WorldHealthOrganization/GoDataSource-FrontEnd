@@ -13,6 +13,9 @@
     [importDataUrl]="importDataUrl"
     [model]="ImportServerModelNames.CONTACT"
     [fieldsWithoutTokens]="fieldsWithoutTokens"
+    [addressFields]="addressFields"
+    [useOutbreakLocations]="true"
     [requiredDestinationFields]="requiredDestinationFields"
+    [extraDataUsedToFormatData]="selectedOutbreak?.contactInvestigationTemplate"
     [savedImportPage]="Constants.APP_IMPORT_PAGE.CONTACT.value">
 </app-import-data>

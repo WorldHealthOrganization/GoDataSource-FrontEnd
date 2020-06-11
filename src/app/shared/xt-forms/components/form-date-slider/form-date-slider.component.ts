@@ -8,7 +8,7 @@ import {
     SkipSelf,
     HostBinding,
     Output,
-    EventEmitter
+    EventEmitter, OnDestroy
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { ElementBase } from '../../core/index';
@@ -17,6 +17,7 @@ import { MatSliderChange } from '@angular/material';
 import { Constants } from '../../../../core/models/constants';
 import * as momentOriginal from 'moment';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'app-form-date-slider',
@@ -29,7 +30,7 @@ import { moment, Moment } from '../../../../core/helperClasses/x-moment';
         multi: true
     }]
 })
-export class FormDateSliderComponent extends ElementBase<Moment> {
+export class FormDateSliderComponent extends ElementBase<Moment> implements OnDestroy {
     /**
      * Component identifier
      */
@@ -138,6 +139,9 @@ export class FormDateSliderComponent extends ElementBase<Moment> {
         date: string
     };
 
+    // language subscription
+    private languageSubscription: Subscription;
+
     /**
      * Constructor
      */
@@ -150,7 +154,7 @@ export class FormDateSliderComponent extends ElementBase<Moment> {
         super(controlContainer, validators, asyncValidators);
 
         // on language change..we need to translate again the token
-        this.i18nService.languageChangedEvent.subscribe(() => {
+        this.languageSubscription = this.i18nService.languageChangedEvent.subscribe(() => {
             this.tooltip = this._tooltipToken;
         });
 
@@ -158,6 +162,16 @@ export class FormDateSliderComponent extends ElementBase<Moment> {
         this.registerOnChange(() => {
             this.determineSliderValue();
         });
+    }
+
+    /**
+     * Component destroyed
+     */
+    ngOnDestroy() {
+        if (this.languageSubscription) {
+            this.languageSubscription.unsubscribe();
+            this.languageSubscription = null;
+        }
     }
 
     /**

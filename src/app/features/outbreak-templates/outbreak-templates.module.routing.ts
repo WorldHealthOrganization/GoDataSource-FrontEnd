@@ -80,6 +80,24 @@ const routes: Routes = [
         ]
     },
 
+    // Edit Outbreak Template Case Questionnaire
+    {
+        path: ':outbreakTemplateId/contact-questionnaire',
+        component: fromPages.OutbreakTemplateQuestionnaireComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.OUTBREAK_TEMPLATE_VIEW,
+                PERMISSION.OUTBREAK_TEMPLATE_MODIFY,
+                PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CONTACT_QUESTIONNAIRE
+            ],
+            questionnaire: OutbreakQestionnaireTypeEnum.CONTACT
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
+    },
+
     // Edit Outbreak Template Contact Follow-up Questionnaire
     {
         path: ':outbreakTemplateId/contact-follow-up-questionnaire',

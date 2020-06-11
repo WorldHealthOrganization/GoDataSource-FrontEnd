@@ -6,6 +6,7 @@ import { BaseModel } from './base.model';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { IPermissionBasic, IPermissionCloneable, IPermissionOutbreak, IPermissionQuestionnaire, IPermissionRestorable } from './permission.interface';
+import { Constants } from './constants';
 
 export class OutbreakModel
     extends BaseModel
@@ -30,6 +31,7 @@ export class OutbreakModel
     noLessContacts: number;
     noDaysNewContacts: number;
     caseInvestigationTemplate: QuestionModel[];
+    contactInvestigationTemplate: QuestionModel[];
     contactFollowUpTemplate: QuestionModel[];
     labResultsTemplate: QuestionModel[];
     // TODO - need to allow to set case classifications on outbreak
@@ -45,6 +47,11 @@ export class OutbreakModel
     reportingGeographicalLevelId: string;
     arcGisServers: MapServerModel[];
     isContactLabResultsActive: boolean;
+    isDateOfOnsetRequired: boolean;
+
+    generateFollowUpsOverwriteExisting: boolean;
+    generateFollowUpsKeepTeamAssignment: boolean;
+    generateFollowUpsTeamAssignmentAlgorithm: string;
 
     // used for displaying information when hovering an outbreak from topnav component
     // no need to save this one in the database
@@ -74,6 +81,7 @@ export class OutbreakModel
      * Static Permissions - IPermissionQuestionnaire
      */
     static canModifyCaseQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_MODIFY_CASE_QUESTIONNAIRE) : false; }
+    static canModifyContactQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_MODIFY_CONTACT_QUESTIONNAIRE) : false; }
     static canModifyContactFollowUpQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_MODIFY_CONTACT_FOLLOW_UP_QUESTIONNAIRE) : false; }
     static canModifyCaseLabResultQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE) : false; }
 
@@ -109,17 +117,30 @@ export class OutbreakModel
         this.contactIdMask = _.get(data, 'contactIdMask');
         this.longPeriodsBetweenCaseOnset = _.get(data, 'longPeriodsBetweenCaseOnset');
         this.isContactLabResultsActive = _.get(data, 'isContactLabResultsActive', false);
+        this.isDateOfOnsetRequired = _.get(data, 'isDateOfOnsetRequired', true);
+        this.generateFollowUpsOverwriteExisting = _.get(data, 'generateFollowUpsOverwriteExisting', false);
+        this.generateFollowUpsKeepTeamAssignment = _.get(data, 'generateFollowUpsKeepTeamAssignment', true);
+        this.generateFollowUpsTeamAssignmentAlgorithm = _.get(data, 'generateFollowUpsTeamAssignmentAlgorithm', Constants.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM.ROUND_ROBIN_ALL_TEAMS.value);
 
+        // CASE INVESTIGATION TEMPLATE
         this.caseInvestigationTemplate = _.map(
             _.get(data, 'caseInvestigationTemplate', []),
             (lData: any) => {
                return new QuestionModel(lData);
             });
+        // CONTACT INVESTIGATION TEMPLATE
+        this.contactInvestigationTemplate = _.map(
+            _.get(data, 'contactInvestigationTemplate', []),
+            (lData: any) => {
+                return new QuestionModel(lData);
+            });
+        // CONTACT FOLLOW_UP INVESTIGATIONS TEMPLATE
         this.contactFollowUpTemplate = _.map(
             _.get(data, 'contactFollowUpTemplate', []),
             (lData: any) => {
                 return new QuestionModel(lData);
             });
+        // LAB RESULT TEMPLATE
         this.labResultsTemplate = _.map(
             _.get(data, 'labResultsTemplate', []),
             (lData: any) => {
@@ -158,6 +179,7 @@ export class OutbreakModel
      * Permissions - IPermissionQuestionnaire
      */
     canModifyCaseQuestionnaire(user: UserModel): boolean { return OutbreakModel.canModifyCaseQuestionnaire(user); }
+    canModifyContactQuestionnaire(user: UserModel): boolean { return OutbreakModel.canModifyContactQuestionnaire(user); }
     canModifyContactFollowUpQuestionnaire(user: UserModel): boolean { return OutbreakModel.canModifyContactFollowUpQuestionnaire(user); }
     canModifyCaseLabResultQuestionnaire(user: UserModel): boolean { return OutbreakModel.canModifyCaseLabResultQuestionnaire(user); }
 

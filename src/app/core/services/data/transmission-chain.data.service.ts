@@ -196,6 +196,14 @@ export class TransmissionChainDataService {
             eventNodesWithoutDates: [],
             timelineDateCheckpoints: []
         };
+
+        const locationsListMap = {};
+        // build locations list map for further use
+        if (!_.isEmpty(locationsList)) {
+            locationsList.forEach((loc) => {
+                locationsListMap[loc.id] = loc;
+            });
+        }
         const selectedNodeIds: string[] = [];
         // get labels for years / months - age field
         const yearsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS');
@@ -320,12 +328,18 @@ export class TransmissionChainDataService {
                             } else {
                                 nodeData.label = '';
                             }
-                            // date of onset
-                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.DATE_OF_ONSET.value) {
-                            if (node.type === EntityType.CASE) {
+                            // date of onset and event date
+                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.DATE_OF_ONSET_AND_EVENT_DATE.value) {
+                            if (node.type === EntityType.EVENT &&
+                                node.model.date
+                            ) {
+                                nodeData.label = moment(node.model.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                            }
+                            if (
+                                node.type === EntityType.CASE &&
+                                node.model.dateOfOnset
+                            ) {
                                 nodeData.label = moment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-                            } else {
-                                nodeData.label = '';
                             }
                             // gender
                         } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.GENDER.value) {
@@ -346,13 +360,13 @@ export class TransmissionChainDataService {
                             nodeData.label = '';
                             if (node.type !== EntityType.EVENT) {
                                 const mainAddr = node.model.mainAddress;
-                                if (!_.isEmpty(mainAddr.locationId)) {
-                                    const location = _.find(locationsList, function (l) {
-                                        return l.id === mainAddr.locationId;
-                                    });
-                                    if (location) {
-                                        nodeData.label = location.name;
-                                    }
+                                if (
+                                    mainAddr &&
+                                    mainAddr.locationId &&
+                                    locationsListMap[mainAddr.locationId] &&
+                                    locationsListMap[mainAddr.locationId].name
+                                ) {
+                                    nodeData.label = locationsListMap[mainAddr.locationId].name;
                                 }
                             }
                             // initials
@@ -368,6 +382,24 @@ export class TransmissionChainDataService {
                         } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.VISUAL_ID.value) {
                             if (node.type !== EntityType.EVENT) {
                                 nodeData.label = node.model.visualId;
+                            } else {
+                                nodeData.label = '';
+                            }
+                            // visual id and location
+                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.ID_AND_LOCATION.value) {
+                            if (node.type !== EntityType.EVENT) {
+                                if (node.model.visualId) {
+                                    nodeData.label = node.model.visualId;
+                                }
+                                const mainAddr = node.model.mainAddress;
+                                if (
+                                    mainAddr &&
+                                    mainAddr.locationId &&
+                                    locationsListMap[mainAddr.locationId] &&
+                                    locationsListMap[mainAddr.locationId].name
+                                ) {
+                                    nodeData.label = (node.model.visualId ? nodeData.label + ' - ' : '') + locationsListMap[mainAddr.locationId].name;
+                                }
                             } else {
                                 nodeData.label = '';
                             }

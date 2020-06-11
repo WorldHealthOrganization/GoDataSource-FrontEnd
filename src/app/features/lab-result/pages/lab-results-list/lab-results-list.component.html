@@ -116,7 +116,7 @@
                             name="caseVisualIdFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('person.visualId', $event)"
+                            (optionChanged)="filterByRelation('person').byText('visualId', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -141,7 +141,7 @@
                             name="nameFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('person.lastName', $event)"
+                            (optionChanged)="filterByRelation('person').byText('lastName', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -166,7 +166,7 @@
                             name="nameFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('person.firstName', $event)"
+                            (optionChanged)="filterByRelation('person').byText('firstName', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -192,7 +192,7 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="caseClassificationsList$ | async"
-                            (optionChanged)="filterBySelectField('person.classification', $event, 'value')"
+                            (optionChanged)="filterByRelation('person').bySelect('classification', $event)"
                             multiple="true"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"

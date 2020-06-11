@@ -6,7 +6,16 @@
         {{ 'LNG_PAGE_LOGIN_WELCOME_MESSAGE' | translate }}
     </div>
 
-    <form #form="ngForm" (submit)="login(form)" class="login-form">
+    <mat-spinner
+        *ngIf="loading"
+        class="login-spinner">
+    </mat-spinner>
+
+    <form
+        *ngIf="!loading"
+        #form="ngForm"
+        (submit)="login(form)"
+        class="login-form">
         <div fxLayout="row" fxLayoutAlign="center" class="not-auth-content-limited">
             <div fxLayout="column" fxFlex>
                 <!-- Email input -->
@@ -48,6 +57,7 @@
 
                 <!-- Captcha input -->
                 <div
+                    *ngIf="displayCaptcha"
                     class="login-captcha-row"
                     fxLayout="row">
                     <!-- Captcha SVG -->

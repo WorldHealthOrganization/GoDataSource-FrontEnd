@@ -24,12 +24,14 @@ import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class CaseDataService {
+    /**
+     * Constructor
+     */
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService,
         private listFilterDataService: ListFilterDataService
-    ) {
-    }
+    ) {}
 
     /**
      * Retrieve the list of Cases for an Outbreak

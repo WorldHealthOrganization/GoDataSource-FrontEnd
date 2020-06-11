@@ -24,6 +24,8 @@ export class ImportContactDataComponent implements OnInit, OnDestroy {
 
     outbreakSubscriber: Subscription;
 
+    selectedOutbreak: OutbreakModel;
+
     Constants = Constants;
 
     authUser: UserModel;
@@ -45,6 +47,7 @@ export class ImportContactDataComponent implements OnInit, OnDestroy {
     ImportServerModelNames = ImportServerModelNames;
 
     fieldsWithoutTokens = {
+        questionnaireAnswers: 'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
         relationship: 'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP',
         'addresses[]': 'LNG_CONTACT_FIELD_LABEL_ADDRESSES',
         'documents[]': 'LNG_CONTACT_FIELD_LABEL_DOCUMENTS',
@@ -53,6 +56,10 @@ export class ImportContactDataComponent implements OnInit, OnDestroy {
 
         // !must be empty token - logic depends on it!
         'addresses[].geoLocation': ''
+    };
+
+    addressFields = {
+        'addresses[].locationId': true
     };
 
     requiredDestinationFields = [
@@ -88,6 +95,8 @@ export class ImportContactDataComponent implements OnInit, OnDestroy {
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak && selectedOutbreak.id) {
+                    // outbreak
+                    this.selectedOutbreak = selectedOutbreak;
                     // set URLs
                     this.importFileUrl = `outbreaks/${selectedOutbreak.id}/importable-files`;
                     this.importDataUrl = `outbreaks/${selectedOutbreak.id}/contacts/import-importable-file-using-map`;

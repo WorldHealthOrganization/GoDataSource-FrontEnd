@@ -9,6 +9,7 @@ export class BackupModel
         IPermissionRestorable,
         IPermissionBackup {
     id: string;
+    description: string;
     location: string;
     modules: string[];
     date: string;
@@ -16,6 +17,35 @@ export class BackupModel
     error: string;
     userId: string;
     user: UserModel;
+
+    // size in bytes
+    private _sizeBytes: number;
+    private _sizeBytesHumanReadable: string;
+    get sizeBytes(): number {
+        return this._sizeBytes;
+    }
+    set sizeBytes(sizeBytes: number) {
+        // set value
+        this._sizeBytes = sizeBytes;
+
+        // format human readable
+        if (this.sizeBytes) {
+            const k = 1024;
+            const dm = 2;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+            const i = Math.floor(Math.log(this.sizeBytes) / Math.log(k));
+            this._sizeBytesHumanReadable = parseFloat((this.sizeBytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        } else {
+            this._sizeBytesHumanReadable = '-';
+        }
+    }
+
+    /**
+     * Get Size in friendly form
+     */
+    get sizeBytesHumanReadable(): string {
+        return this._sizeBytesHumanReadable;
+    }
 
     /**
      * Static Permissions - IPermissionBasic
@@ -42,12 +72,14 @@ export class BackupModel
      */
     constructor(data = null) {
         this.id = _.get(data, 'id', _.get(data, 'backupId'));
+        this.description = _.get(data, 'description');
         this.location = _.get(data, 'location');
         this.modules = _.get(data, 'modules', []);
         this.date = _.get(data, 'date');
         this.status = _.get(data, 'status');
         this.error = _.get(data, 'error');
         this.userId = _.get(data, 'userId');
+        this.sizeBytes = _.get(data, 'sizeBytes', 0);
 
         this.user = _.get(data, 'user');
         if (!_.isEmpty(this.user)) {

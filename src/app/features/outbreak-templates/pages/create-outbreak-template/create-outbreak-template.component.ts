@@ -34,6 +34,7 @@ export class CreateOutbreakTemplateComponent
     authUser: UserModel;
 
     diseasesList$: Observable<any[]>;
+    followUpsTeamAssignmentAlgorithm$: Observable<any[]>;
 
     newOutbreakTemplate: OutbreakTemplateModel = new OutbreakTemplateModel();
 
@@ -64,6 +65,7 @@ export class CreateOutbreakTemplateComponent
 
         // get the lists for forms
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
+        this.followUpsTeamAssignmentAlgorithm$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM);
 
         this.outbreakTemplateNameValidator$ = new Observable((observer) => {
             this.outbreakTemplateDataService.checkOutbreakTemplateNameUniquenessValidity(this.newOutbreakTemplate.name)

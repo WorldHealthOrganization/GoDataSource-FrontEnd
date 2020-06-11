@@ -25,6 +25,7 @@ import {
     MatProgressSpinnerModule,
     MatPaginatorModule,
     MatRadioModule,
+    MatExpansionModule,
     MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS
 } from '@angular/material';
 
@@ -53,7 +54,8 @@ import {
         MatCheckboxModule,
         MatProgressSpinnerModule,
         MatPaginatorModule,
-        MatRadioModule
+        MatRadioModule,
+        MatExpansionModule
     ],
     providers: [
         {
@@ -88,7 +90,8 @@ import {
         MatCheckboxModule,
         MatProgressSpinnerModule,
         MatPaginatorModule,
-        MatRadioModule
+        MatRadioModule,
+        MatExpansionModule
     ]
 })
 export class AngularMaterialModule {

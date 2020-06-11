@@ -1,3 +1,4 @@
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ModelHelperService } from '../helper/model-helper.service';
@@ -19,12 +20,13 @@ import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class ContactDataService {
-
+    /**
+     * Constructor
+     */
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService
-    ) {
-    }
+    ) {}
 
     /**
      * Retrieve the list of Contacts for an Outbreak
@@ -312,6 +314,11 @@ export class ContactDataService {
                 map(
                     (listResult: any) => {
                         const results: MetricContactsFollowedUpReportModel[] = [];
+                        // if we don't have contacts to show chart creation is breaking so return
+                        if (listResult.report.totalContacts < 1) {
+                            return results;
+                        }
+
                         const listReport: any = listResult.report;
                         if (listReport.days) {
                             Object.keys(listReport.days).forEach((key) => {

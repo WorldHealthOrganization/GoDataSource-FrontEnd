@@ -32,7 +32,8 @@ export class RedirectComponent {
                 // redirect
                 this.router.navigate(
                     path, {
-                        queryParams: data
+                        queryParams: data,
+                        replaceUrl: true
                     }
                 );
             });

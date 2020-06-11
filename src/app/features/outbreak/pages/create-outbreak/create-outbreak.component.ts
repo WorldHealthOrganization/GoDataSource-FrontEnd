@@ -17,7 +17,6 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import { AnswerModel, QuestionModel } from '../../../../core/models/question.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { UserModel } from '../../../../core/models/user.model';
@@ -44,6 +43,7 @@ export class CreateOutbreakComponent
     diseasesList$: Observable<LabelValuePair[]>;
     countriesList$: Observable<LabelValuePair[]>;
     geographicalLevelsList$: Observable<any[]>;
+    followUpsTeamAssignmentAlgorithm$: Observable<any[]>;
 
     newOutbreak: OutbreakModel = new OutbreakModel();
 
@@ -81,6 +81,7 @@ export class CreateOutbreakComponent
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
+        this.followUpsTeamAssignmentAlgorithm$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM);
         this.geographicalLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL);
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
         this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY)

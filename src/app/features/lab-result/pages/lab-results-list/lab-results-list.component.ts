@@ -31,6 +31,7 @@ import { EntityModel } from '../../../../core/models/entity-and-relationship.mod
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-lab-results',
@@ -235,8 +236,9 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
         private labResultDataService: LabResultDataService,
@@ -246,7 +248,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
         private userDataService: UserDataService,
         private i18nService: I18nService
     ) {
-        super(snackbarService);
+        super(listHelperService);
     }
 
     /**
@@ -320,6 +322,9 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
      * Component destroyed
      */
     ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();
@@ -442,11 +447,6 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
 
         // init side filters
         this.availableSideFilters = [
-            new FilterModel({
-                fieldName: 'person.visualId',
-                fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON_ID',
-                type: FilterType.TEXT,
-            }),
             new FilterModel({
                 fieldName: 'sampleIdentifier',
                 fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID',
