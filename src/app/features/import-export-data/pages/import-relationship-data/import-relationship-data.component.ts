@@ -187,7 +187,7 @@ export class ImportRelationshipDataComponent implements OnInit, OnDestroy {
                 if (CaseModel.canList(this.authUser)) {
                     this.router.navigate(['/cases']);
                 } else {
-                    this.redirectService.to(['/import-export-data', 'relationships', 'import'],{
+                    this.redirectService.to(['/import-export-data', 'relationships', 'import'], {
                         queryParams: {
                             from: Constants.APP_PAGE.CASES.value
                         }
@@ -198,7 +198,7 @@ export class ImportRelationshipDataComponent implements OnInit, OnDestroy {
                 if (ContactModel.canList(this.authUser)) {
                     this.router.navigate(['/contacts']);
                 } else {
-                    this.redirectService.to(['/import-export-data', 'relationships', 'import'],{
+                    this.redirectService.to(['/import-export-data', 'relationships', 'import'], {
                         queryParams: {
                             from: Constants.APP_PAGE.CONTACTS.value
                         }
@@ -209,8 +209,7 @@ export class ImportRelationshipDataComponent implements OnInit, OnDestroy {
                 if (EventModel.canList(this.authUser)) {
                     this.router.navigate(['/events']);
                 } else {
-                    this.redirectService.to(['/import-export-data', 'relationships', 'import'],
-                        {
+                    this.redirectService.to(['/import-export-data', 'relationships', 'import'], {
                             queryParams: {
                                 from: Constants.APP_PAGE.EVENTS.value
                             }
