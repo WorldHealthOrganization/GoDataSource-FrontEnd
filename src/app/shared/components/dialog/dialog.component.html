@@ -151,33 +151,13 @@
                         </div>
 
                         <!-- Link -->
-                        <div
+                        <a
                             *ngIf="field.fieldType === DialogFieldType.LINK"
-                            fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
-                            <div
-                                fxFlex>
-                                <a
-                                    [routerLink]="field.routerLink"
-                                    [queryParams]="field.queryParams"
-                                    [target]="field.linkTarget">
-                                    {{ field.placeholder | translate }}
-                                </a>
-                            </div>
-                            <div
-                                *ngIf="field.linkActionButtonLabel"
-                                fxGrow="0"
-                                class="link-item-action">
-                                <button
-                                    type="button"
-                                    mat-button
-                                    color="accent"
-                                    [disabled]="field.disabled"
-                                    (click)="field.linkActionButtonAction(field)"
-                                    [matTooltip]="field.linkActionButtonActionTooltip | translate">
-                                    {{field.linkActionButtonLabel | translate}}
-                                </button>
-                            </div>
-                        </div>
+                            [routerLink]="field.routerLink"
+                            [queryParams]="field.queryParams"
+                            [target]="field.linkTarget">
+                            {{ field.placeholder | translate }}
+                        </a>
 
                         <!-- Url -->
                         <div
@@ -210,77 +190,23 @@
                             class="dialog-section-title">
                             {{ field.placeholder | translate }}
                         </div>
-
-                        <!-- Checkbox list -->
-                        <div
-                            *ngIf="field.fieldType === DialogFieldType.CHECKBOX_LIST">
-                            <!-- Title -->
-                            <div
-                                class="dialog-section-title">
-                                {{ field.placeholder | translate }}
-                            </div>
-
-                            <!-- Items -->
-                            <div
-                                class="dialog-checkbox-list">
-                                <div
-                                    *ngFor="let listItem of field.listItems"
-                                    fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px"
-                                    class="dialog-checkbox-list-item">
-                                    <!-- Checkbox -->
-                                    <div
-                                        fxGrow="0">
-                                        <app-form-checkbox
-                                            class="dialog-checkbox-list-item-checkbox"
-                                            [name]="field.name + '[' + listItem.itemData.value + ']'"
-                                            [ngModel]="listItem.checked"
-                                            [disabled]="field.disabled || listItem.disabled"
-                                            (optionChanged)="listItem.checked = $event">
-                                        </app-form-checkbox>
-                                    </div>
-
-                                    <!-- Label -->
-                                    <div
-                                        fxFlex>
-                                        {{listItem.itemData.label | translate}}
-                                    </div>
-
-                                    <!-- Action button -->
-                                    <div
-                                        *ngIf="listItem.actionButtonLabel"
-                                        fxGrow="0"
-                                        class="dialog-checkbox-list-item-action">
-                                        <button
-                                            type="button"
-                                            mat-button
-                                            color="accent"
-                                            [disabled]="field.disabled || (listItem.actionButtonDisableActionAlongWithItem && listItem.disabled)"
-                                            (click)="listItem.actionButtonAction(listItem)"
-                                            [matTooltip]="listItem.actionButtonActionTooltip | translate">
-                                            {{listItem.actionButtonLabel | translate}}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <div fxLayout="row" fxLayoutAlign="end">
+            <button
+                *ngFor="let dialogButton of confirmData?.buttons"
+                mat-button
+                type="button"
+                class="dialog-button"
+                [ngClass]="dialogButton.cssClass"
+                (click)="dialogButton.clickCallback(dialogRef, dialogAnswerInputValue)"
+                [disabled]="dialogButton.disabled()">
+                {{ dialogButton.label | translate:confirmData?.translateData }}
+            </button>
+        </div>
     </form>
 
-    <div
-        #dialogButtons
-        fxLayout="row" fxLayoutAlign="end">
-        <button
-            *ngFor="let dialogButton of confirmData?.buttons"
-            mat-button
-            type="button"
-            class="dialog-button"
-            [ngClass]="dialogButton.cssClass"
-            (click)="dialogButton.clickCallback(dialogRef, dialogAnswerInputValue)"
-            [disabled]="dialogButton.disabled()">
-            {{ dialogButton.label | translate:confirmData?.translateData }}
-        </button>
-    </div>
 </div>
