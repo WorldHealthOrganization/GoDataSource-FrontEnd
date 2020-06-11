@@ -158,7 +158,7 @@
 
                                                     <!-- Upload File -->
                                                     <div
-                                                        *ngIf="question.answerType === Constants.ANSWER_TYPES.FILE_UPLOAD.value && !question.inactive"
+                                                        *ngIf="question.answerType === Constants.ANSWER_TYPES.FILE_UPLOAD.value"
                                                         fxFlex fxLayout="row" fxLayoutGap="20px">
                                                         <input
                                                             hidden
@@ -186,7 +186,7 @@
                                                                     [alternativeName]="alternativeName + '[' + questionIndex + ']'"
                                                                     [placeholder]="'LNG_QUESTIONNAIRE_LABEL_CHOOSE_FILE' | translate"
                                                                     [ngModel]="answerData.value"
-                                                                    [required]="uploadersData[question.variable][(childValueIndex === undefined ? answerDataIndex : childValueIndex)].uploading || (!skipRequired && question.required)">
+                                                                    [required]="uploadersData[question.variable][(childValueIndex === undefined ? answerDataIndex : childValueIndex)].uploading || (!skipRequired && question.required) && !question.inactive">
                                                                 </app-form-hidden-input>
                                                             </div>
 
