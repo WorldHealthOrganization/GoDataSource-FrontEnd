@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import {BreadcrumbItemModel} from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import {CaseModel} from '../../../../core/models/case.model';
 import {OutbreakModel} from '../../../../core/models/outbreak.model';
@@ -19,7 +19,7 @@ import {EventModel} from '../../../../core/models/event.model';
     templateUrl: './import-relationship-data.component.html',
     styleUrls: ['./import-relationship-data.component.less']
 })
-export class ImportRelationshipDataComponent implements OnInit {
+export class ImportRelationshipDataComponent implements OnInit, OnDestroy {
 
     breadcrumbs: BreadcrumbItemModel[];
 
@@ -52,18 +52,14 @@ export class ImportRelationshipDataComponent implements OnInit {
 
     ImportServerModelNames = ImportServerModelNames;
 
-    fieldsWithoutTokens = {
-
-    };
-
     requiredDestinationFields = [
-        'firstName',
-        'contactDate',
-        'dateOfFirstContact',
         'contactDate',
         'certaintyLevelId'
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private route: ActivatedRoute,
         private router: Router,
@@ -73,6 +69,9 @@ export class ImportRelationshipDataComponent implements OnInit {
     ) {
     }
 
+    /**
+     * Initialize component elements
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -90,6 +89,12 @@ export class ImportRelationshipDataComponent implements OnInit {
 
                     // display import form
                     this.displayLoading = false;
+
+                    this.route.queryParams
+                        .subscribe((queryParams: {from: string}) => {
+                            // set the page that redirected to import relationship
+                            this.fromPage = queryParams.from;
+                        });
                 }
             });
 
@@ -104,71 +109,72 @@ export class ImportRelationshipDataComponent implements OnInit {
         // reset breadcrumbs
         this.breadcrumbs = [];
 
-        this.route.queryParams
-            .subscribe((queryParams: { from: string }) => {
-                // set the page that redirected to import relationship
-                this.fromPage = queryParams.from;
-                switch (this.fromPage) {
-                    // add breadcrumbs based on what page redirected to import relationship data
-                    case Constants.APP_PAGE.CASES.value:
-                        // update import title
-                        this.title = 'LNG_PAGE_IMPORT_CASE_RELATIONSHIP_DATA_TITLE';
-                        // add list breadcrumb only if we have permission
-                        if (CaseModel.canList(this.authUser)) {
-                            this.breadcrumbs.push(new BreadcrumbItemModel(
-                                'LNG_PAGE_LIST_CASES_TITLE',
-                                '/cases'
-                            ));
-                        }
-                        // import breadcrumb
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel(
-                                'LNG_PAGE_IMPORT_CASE_RELATIONSHIP_DATA_TITLE',
-                                '.',
-                                true
-                            )
-                        );
-                        break;
-                    case Constants.APP_PAGE.CONTACTS.value:
-                        // update import title
-                        this.title = 'LNG_PAGE_IMPORT_CONTACT_RELATIONSHIP_DATA_TITLE';
-                        // add list breadcrumb only if we have permission
-                        if (ContactModel.canList(this.authUser)) {
-                            this.breadcrumbs.push(new BreadcrumbItemModel(
-                                'LNG_PAGE_LIST_CONTACTS_TITLE',
-                                '/contacts'
-                            ));
-                        }
-                        // import breadcrumb
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel(
-                                'LNG_PAGE_IMPORT_CONTACT_RELATIONSHIP_DATA_TITLE',
-                                '.',
-                                true
-                            )
-                        );
-                        break;
-                    case Constants.APP_PAGE.EVENTS.value:
-                        // update import title
-                        this.title = 'LNG_PAGE_IMPORT_EVENT_RELATIONSHIP_DATA_TITLE';
-                        // add list breadcrumb only if we have permission
-                        if (EventModel.canList(this.authUser)) {
-                            this.breadcrumbs.push(new BreadcrumbItemModel(
-                                'LNG_PAGE_LIST_EVENTS_TITLE',
-                                '/events'
-                            ));
-                        }
-                        // import breadcrumb
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel(
-                                'LNG_PAGE_IMPORT_EVENT_RELATIONSHIP_DATA_TITLE',
-                                '.',
-                                true
-                            )
-                        );
-                        break;
+        // add breadcrumbs based on what page redirected to import relationship data
+        switch (this.fromPage) {
+            case Constants.APP_PAGE.CASES.value:
+                // update import title
+                this.title = 'LNG_PAGE_IMPORT_CASE_RELATIONSHIP_DATA_TITLE';
+
+                // add list breadcrumb only if we have permission
+                if (CaseModel.canList(this.authUser)) {
+                    this.breadcrumbs.push(new BreadcrumbItemModel(
+                        'LNG_PAGE_LIST_CASES_TITLE',
+                        '/cases'
+                    ));
                 }
-            });
+
+                // import breadcrumb
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(
+                        'LNG_PAGE_IMPORT_CASE_RELATIONSHIP_DATA_TITLE',
+                        '.',
+                        true
+                    )
+                );
+                break;
+            case Constants.APP_PAGE.CONTACTS.value:
+                // update import title
+                this.title = 'LNG_PAGE_IMPORT_CONTACT_RELATIONSHIP_DATA_TITLE';
+
+                // add list breadcrumb only if we have permission
+                if (ContactModel.canList(this.authUser)) {
+                    this.breadcrumbs.push(new BreadcrumbItemModel(
+                        'LNG_PAGE_LIST_CONTACTS_TITLE',
+                        '/contacts'
+                    ));
+                }
+
+                // import breadcrumb
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(
+                        'LNG_PAGE_IMPORT_CONTACT_RELATIONSHIP_DATA_TITLE',
+                        '.',
+                        true
+                    )
+                );
+                break;
+            case Constants.APP_PAGE.EVENTS.value:
+                // update import title
+                this.title = 'LNG_PAGE_IMPORT_EVENT_RELATIONSHIP_DATA_TITLE';
+
+                // add list breadcrumb only if we have permission
+                if (EventModel.canList(this.authUser)) {
+                    this.breadcrumbs.push(new BreadcrumbItemModel(
+                        'LNG_PAGE_LIST_EVENTS_TITLE',
+                        '/events'
+                    ));
+                }
+
+                // import breadcrumb
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(
+                        'LNG_PAGE_IMPORT_EVENT_RELATIONSHIP_DATA_TITLE',
+                        '.',
+                        true
+                    )
+                );
+                break;
+        }
     }
 
     /**
@@ -181,23 +187,43 @@ export class ImportRelationshipDataComponent implements OnInit {
                 if (CaseModel.canList(this.authUser)) {
                     this.router.navigate(['/cases']);
                 } else {
-                    this.redirectService.to(['/import-export-data', 'relationships', 'import']);
+                    this.redirectService.to(['/import-export-data', 'relationships', 'import'],{
+                        queryParams: {
+                            from: Constants.APP_PAGE.CASES.value
+                        }
+                    });
                 }
                 break;
             case Constants.APP_PAGE.CONTACTS.value:
                 if (ContactModel.canList(this.authUser)) {
                     this.router.navigate(['/contacts']);
                 } else {
-                    this.redirectService.to(['/import-export-data', 'relationships', 'import']);
+                    this.redirectService.to(['/import-export-data', 'relationships', 'import'],{
+                        queryParams: {
+                            from: Constants.APP_PAGE.CONTACTS.value
+                        }
+                    });
                 }
                 break;
             case Constants.APP_PAGE.EVENTS.value:
                 if (EventModel.canList(this.authUser)) {
                     this.router.navigate(['/events']);
                 } else {
-                    this.redirectService.to(['/import-export-data', 'relationships', 'import']);
+                    this.redirectService.to(['/import-export-data', 'relationships', 'import'],
+                        {
+                            queryParams: {
+                                from: Constants.APP_PAGE.EVENTS.value
+                            }
+                        });
                 }
                 break;
         }
+    }
+
+    /**
+     * Component destroyed
+     */
+    ngOnDestroy(): void {
+        this.outbreakSubscriber.unsubscribe();
     }
 }
