@@ -16,14 +16,6 @@
                 <!-- Personal Details section -->
                 <mat-card class="page-section">
                     <div fxLayout="column">
-                        <!-- Warnings -->
-                        <div
-                            *ngIf="TeamModel.canList(authUser)"
-                            class="warning-message"
-                            fxLayout="row">
-                            {{ 'LNG_PAGE_CREATE_CONTACT_SET_FOLLOW_UP_TEAM_INFO_TITLE' | translate }}
-                        </div>
-
                         <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="firstName"

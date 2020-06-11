@@ -644,9 +644,9 @@ export class Constants {
             label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_AGE',
             value: 'age'
         },
-        DATE_OF_ONSET: {
-            label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
-            value: 'dateOfOnset'
+        DATE_OF_ONSET_AND_EVENT_DATE: {
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_DATE_OF_ONSET_AND_EVENT_DATE',
+            value: 'dateOfOnsetAndEventDate'
         },
         GENDER: {
             label: 'LNG_CASE_FIELD_LABEL_GENDER',

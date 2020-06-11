@@ -221,6 +221,18 @@ export class ImportDataComponent implements OnInit {
     } = {};
 
     /**
+     * Address fields should use outbreak locations ?
+     */
+    @Input() useOutbreakLocations: boolean = false;
+
+    /**
+     * Address fields so we can use custom dropdowns
+     */
+    @Input() addressFields: {
+        [property: string]: boolean
+    } = {};
+
+    /**
      * Record properties that shouldn't be visible in destination dropdown
      */
     @Input() excludeDestinationProperties: {
