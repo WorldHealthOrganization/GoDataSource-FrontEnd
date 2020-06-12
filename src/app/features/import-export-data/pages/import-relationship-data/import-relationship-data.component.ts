@@ -76,6 +76,15 @@ export class ImportRelationshipDataComponent implements OnInit, OnDestroy {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
+        this.route.queryParams
+            .subscribe((queryParams: {from: string}) => {
+                // set the page that redirected to import relationship
+                this.fromPage = queryParams.from;
+
+                // update breadcrumbs and set the import title
+                this.initializeBreadcrumbs();
+            });
+
         this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
@@ -89,17 +98,15 @@ export class ImportRelationshipDataComponent implements OnInit, OnDestroy {
 
                     // display import form
                     this.displayLoading = false;
-
-                    this.route.queryParams
-                        .subscribe((queryParams: {from: string}) => {
-                            // set the page that redirected to import relationship
-                            this.fromPage = queryParams.from;
-                        });
                 }
             });
+    }
 
-        // update breadcrumbs and set the import title
-        this.initializeBreadcrumbs();
+    /**
+     * Component destroyed
+     */
+    ngOnDestroy(): void {
+        this.outbreakSubscriber.unsubscribe();
     }
 
     /**
@@ -217,12 +224,5 @@ export class ImportRelationshipDataComponent implements OnInit, OnDestroy {
                 }
                 break;
         }
-    }
-
-    /**
-     * Component destroyed
-     */
-    ngOnDestroy(): void {
-        this.outbreakSubscriber.unsubscribe();
     }
 }
