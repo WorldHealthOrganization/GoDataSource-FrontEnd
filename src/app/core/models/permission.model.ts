@@ -129,6 +129,7 @@ export enum PERMISSION {
     OUTBREAK_MODIFY_CONTACT_FOLLOW_UP_QUESTIONNAIRE = 'outbreak_modify_contact_follow_up_questionnaire',
     OUTBREAK_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE = 'outbreak_modify_case_lab_result_questionnaire',
     OUTBREAK_CREATE_CLONE = 'outbreak_create_clone',
+    OUTBREAK_IMPORT_RELATIONSHIP = 'relationship_import',
 
     // outbreak templates
     OUTBREAK_TEMPLATE_LIST = 'outbreak_template_list',
