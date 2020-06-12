@@ -26,7 +26,7 @@ export class EntityDataService {
             dataService: this.caseDataService,
             getMethod: 'getCase',
             deleteMethod: 'deleteCase',
-            modifyMethod: 'modifyCase'
+            modifyMethod: 'modifyCase',
             getRelationshipsCountMethod: 'getCaseRelationshipsCount'
         },
         [EntityType.CONTACT]: {
