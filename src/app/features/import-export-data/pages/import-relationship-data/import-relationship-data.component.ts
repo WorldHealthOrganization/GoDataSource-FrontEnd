@@ -106,7 +106,11 @@ export class ImportRelationshipDataComponent implements OnInit, OnDestroy {
      * Component destroyed
      */
     ngOnDestroy(): void {
-        this.outbreakSubscriber.unsubscribe();
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**
