@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -20,6 +20,7 @@ import { CacheKey, CacheService } from '../../../../core/services/helper/cache.s
 import { throwError } from 'rxjs';
 import * as _ from 'lodash';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-help-items-list',
@@ -27,7 +28,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
     templateUrl: './help-items-list.component.html',
     styleUrls: ['./help-items-list.component.less']
 })
-export class HelpItemsListComponent extends ListComponent implements OnInit {
+export class HelpItemsListComponent extends ListComponent implements OnInit, OnDestroy {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -105,18 +106,17 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private helpDataService: HelpDataService,
         private authDataService: AuthDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private dialogService: DialogService,
         private route: ActivatedRoute,
         private i18nService: I18nService,
         private cacheService: CacheService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**
@@ -148,6 +148,14 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
                     });
 
             });
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

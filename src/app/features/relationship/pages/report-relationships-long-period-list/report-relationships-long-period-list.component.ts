@@ -17,6 +17,7 @@ import { RelationshipModel, ReportDifferenceOnsetRelationshipModel } from '../..
 import { Subscription } from 'rxjs/internal/Subscription';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { CaseModel } from '../../../../core/models/case.model';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-report-relationships-long-period',
@@ -178,15 +179,14 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
         private relationshipDataService: RelationshipDataService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**
@@ -214,6 +214,9 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
      * Component destroyed
      */
     ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();

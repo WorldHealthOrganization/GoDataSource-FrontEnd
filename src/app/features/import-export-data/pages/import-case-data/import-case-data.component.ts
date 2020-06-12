@@ -57,12 +57,13 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
         'addresses[].geoLocation': ''
     };
 
-    requiredDestinationFields = [
-        'firstName',
-        'dateOfReporting',
-        'classification',
-        'dateOfOnset'
-    ];
+    addressFields = {
+        'addresses[].locationId': true,
+        'dateRanges[].locationId': true,
+        'burialLocationId': true
+    };
+
+    requiredDestinationFields;
 
     formatDataBeforeUse = QuestionModel.formatQuestionnaireImportDefs;
 
@@ -92,6 +93,18 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
                 if (selectedOutbreak && selectedOutbreak.id) {
                     // outbreak
                     this.selectedOutbreak = selectedOutbreak;
+
+                    // set default required fields
+                    this.requiredDestinationFields = [
+                        'firstName',
+                        'dateOfReporting',
+                        'classification'
+                    ];
+
+                    // is dateOfOnset required for this outbreak ?
+                    if (this.selectedOutbreak.isDateOfOnsetRequired) {
+                        this.requiredDestinationFields.push('dateOfOnset');
+                    }
 
                     // set URLs
                     this.importFileUrl = `outbreaks/${selectedOutbreak.id}/importable-files`;

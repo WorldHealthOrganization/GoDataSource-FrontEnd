@@ -39,6 +39,7 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
     diseasesList$: Observable<any[]>;
     // outbreak template name validator
     outbreakTemplateNameValidator$: Observable<boolean | IGeneralAsyncValidatorResponse>;
+    followUpsTeamAssignmentAlgorithm$: Observable<any[]>;
 
     /**
      * Constructor
@@ -67,6 +68,7 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
 
         // get the lists for form
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
+        this.followUpsTeamAssignmentAlgorithm$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM);
 
         // show loading
         this.showLoadingDialog(false);

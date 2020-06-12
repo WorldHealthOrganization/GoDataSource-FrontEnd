@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SavedImportMappingService } from '../../../../core/services/data/saved-import-mapping.data.service';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -15,13 +15,14 @@ import { Constants } from '../../../../core/models/constants';
 import { throwError } from 'rxjs';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-saved-import-mapping',
     templateUrl: './saved-import-mapping.component.html',
     styleUrls: ['./saved-import-mapping.component.less']
 })
-export class SavedImportMappingComponent extends ListComponent implements OnInit {
+export class SavedImportMappingComponent extends ListComponent implements OnInit, OnDestroy {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_TITLE', '.', true)
@@ -67,14 +68,13 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
      * Constructor
      */
     constructor(
-        protected snackbarService: SnackbarService,
+        protected listHelperService: ListHelperService,
+        private snackbarService: SnackbarService,
         private savedImportMappingService: SavedImportMappingService,
         private dialogService: DialogService,
         private genericDataService: GenericDataService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**
@@ -87,6 +87,14 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
         this.initPaginator();
         // ...and re-load the list
         this.needsRefreshList(true);
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

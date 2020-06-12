@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -15,6 +15,7 @@ import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/
 import { throwError } from 'rxjs';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-saved-filters',
@@ -22,7 +23,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
     templateUrl: './saved-filters.component.html',
     styleUrls: ['./saved-filters.component.less']
 })
-export class SavedFiltersComponent extends ListComponent implements OnInit {
+export class SavedFiltersComponent extends ListComponent implements OnInit, OnDestroy {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_SAVED_FILTERS_TITLE', '.', true)
@@ -68,14 +69,13 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private savedFiltersService: SavedFiltersService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private genericDataService: GenericDataService,
         private dialogService: DialogService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**
@@ -88,6 +88,14 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
         this.initPaginator();
         // ...and re-load the list
         this.needsRefreshList(true);
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

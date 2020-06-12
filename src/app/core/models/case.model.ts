@@ -390,7 +390,8 @@ export class CaseModel
     get name(): string {
         const firstName = this.firstName ? this.firstName : '';
         const lastName = this.lastName ? this.lastName : '';
-        return _.trim(`${firstName} ${lastName}`);
+        const middleName = this.middleName ? this.middleName : '';
+        return _.trim(`${firstName} ${middleName} ${lastName}`);
     }
 
     /**

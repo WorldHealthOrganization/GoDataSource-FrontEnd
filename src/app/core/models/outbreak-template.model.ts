@@ -3,6 +3,7 @@ import { QuestionModel } from './question.model';
 import { IPermissionBasic, IPermissionCloneable, IPermissionOutbreakTemplate, IPermissionQuestionnaire } from './permission.interface';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
+import { Constants } from './constants';
 
 export class OutbreakTemplateModel
     implements
@@ -26,6 +27,11 @@ export class OutbreakTemplateModel
     contactFollowUpTemplate: QuestionModel[];
     labResultsTemplate: QuestionModel[];
     isContactLabResultsActive: boolean;
+    isDateOfOnsetRequired: boolean;
+
+    generateFollowUpsOverwriteExisting: boolean;
+    generateFollowUpsKeepTeamAssignment: boolean;
+    generateFollowUpsTeamAssignmentAlgorithm: string;
 
     /**
      * Static Permissions - IPermissionBasic
@@ -70,6 +76,10 @@ export class OutbreakTemplateModel
         this.noDaysNewContacts = _.get(data, 'noDaysNewContacts', 1);
         this.longPeriodsBetweenCaseOnset = _.get(data, 'longPeriodsBetweenCaseOnset');
         this.isContactLabResultsActive = _.get(data, 'isContactLabResultsActive', false);
+        this.isDateOfOnsetRequired = _.get(data, 'isDateOfOnsetRequired', true);
+        this.generateFollowUpsOverwriteExisting = _.get(data, 'generateFollowUpsOverwriteExisting', false);
+        this.generateFollowUpsKeepTeamAssignment = _.get(data, 'generateFollowUpsKeepTeamAssignment', true);
+        this.generateFollowUpsTeamAssignmentAlgorithm = _.get(data, 'generateFollowUpsTeamAssignmentAlgorithm', Constants.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM.ROUND_ROBIN_ALL_TEAMS.value);
 
         // CASE INVESTIGATION TEMPLATE
         this.caseInvestigationTemplate = _.map(
@@ -110,6 +120,7 @@ export class OutbreakTemplateModel
      * Permissions - IPermissionQuestionnaire
      */
     canModifyCaseQuestionnaire(user: UserModel): boolean { return OutbreakTemplateModel.canModifyCaseQuestionnaire(user); }
+    canModifyContactQuestionnaire(user: UserModel): boolean { return OutbreakTemplateModel.canModifyContactQuestionnaire(user); }
     canModifyContactFollowUpQuestionnaire(user: UserModel): boolean { return OutbreakTemplateModel.canModifyContactFollowUpQuestionnaire(user); }
     canModifyCaseLabResultQuestionnaire(user: UserModel): boolean { return OutbreakTemplateModel.canModifyCaseLabResultQuestionnaire(user); }
 

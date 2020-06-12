@@ -45,30 +45,38 @@ export class DebounceTimeCaller {
             // call
             this.subscriber.next();
         } else {
-            if (
-                this.type === DebounceTimeCallerType.RESET_AND_WAIT_FOR_NEXT || (
-                    this.type === DebounceTimeCallerType.DONT_RESET_AND_WAIT &&
-                    !this.refreshTimeoutID
-                )
-            ) {
-                // stop previous request
-                this.clearRefreshTimeout();
+            this.callAfterMs(this.time);
+        }
+    }
 
-                // wait for debounce time
-                // make new request
-                this.refreshTimeoutID = setTimeout(() => {
-                    // no subscriber ?
-                    if (!this.subscriber) {
-                        return;
-                    }
+    /**
+     * Call after a specific number of ms
+     * @param waitForMs Number of ms to wait before calling subscriber
+     */
+    callAfterMs(waitForMs: number) {
+        if (
+            this.type === DebounceTimeCallerType.RESET_AND_WAIT_FOR_NEXT || (
+                this.type === DebounceTimeCallerType.DONT_RESET_AND_WAIT &&
+                !this.refreshTimeoutID
+            )
+        ) {
+            // stop previous request
+            this.clearRefreshTimeout();
 
-                    // timeout executed - clear
-                    this.refreshTimeoutID = null;
+            // wait for debounce time
+            // make new request
+            this.refreshTimeoutID = setTimeout(() => {
+                // no subscriber ?
+                if (!this.subscriber) {
+                    return;
+                }
 
-                    // call
-                    this.subscriber.next();
-                }, this.time);
-            }
+                // timeout executed - clear
+                this.refreshTimeoutID = null;
+
+                // call
+                this.subscriber.next();
+            }, waitForMs);
         }
     }
 

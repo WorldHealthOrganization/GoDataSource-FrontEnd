@@ -136,7 +136,8 @@ const routes: Routes = [
                             PERMISSION.CONTACT_IMPORT,
                             PERMISSION.CONTACT_IMPORT_LAB_RESULT,
                             PERMISSION.CASE_IMPORT,
-                            PERMISSION.CASE_IMPORT_LAB_RESULT
+                            PERMISSION.CASE_IMPORT_LAB_RESULT,
+                            PERMISSION.OUTBREAK_IMPORT_RELATIONSHIP
                         ]
                     })
                 }
@@ -333,7 +334,9 @@ const routes: Routes = [
                             PERMISSION.DUPLICATE_LIST,
                             PERMISSION.DUPLICATE_MERGE_CASES,
                             PERMISSION.DUPLICATE_MERGE_CONTACTS,
-                            PERMISSION.DUPLICATE_MERGE_EVENTS
+                            PERMISSION.DUPLICATE_MERGE_EVENTS,
+                            PERMISSION.CASE_LIST,
+                            PERMISSION.CONTACT_LIST
                         ]
                     })
                 }
@@ -521,7 +524,8 @@ const routes: Routes = [
                             PERMISSION.CONTACT_IMPORT,
                             PERMISSION.CONTACT_IMPORT_LAB_RESULT,
                             PERMISSION.CASE_IMPORT,
-                            PERMISSION.CASE_IMPORT_LAB_RESULT
+                            PERMISSION.CASE_IMPORT_LAB_RESULT,
+                            PERMISSION.OUTBREAK_IMPORT_RELATIONSHIP
                         ]
                     })
                 }
