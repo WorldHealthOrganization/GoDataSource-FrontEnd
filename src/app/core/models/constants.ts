@@ -197,6 +197,10 @@ export class Constants {
         CONTACTS: {
             label: 'LNG_APP_PAGE_CONTACTS',
             value: 'LNG_APP_PAGE_CONTACTS'
+        },
+        EVENTS: {
+            label: 'LNG_APP_PAGE_EVENTS',
+            value: 'LNG_APP_PAGE_EVENTS'
         }
     };
 
@@ -294,6 +298,10 @@ export class Constants {
         LOCATION_DATA: {
             label: 'LNG_APP_PAGE_IMPORT_LOCATION_DATA',
             value: 'LNG_APP_PAGE_IMPORT_LOCATION_DATA'
+        },
+        RELATIONSHIP_DATA: {
+            label: 'LNG_APP_PAGE_IMPORT_RELATIONSHIP_DATA',
+            value: 'LNG_APP_PAGE_IMPORT_RELATIONSHIP_DATA'
         }
     };
 
