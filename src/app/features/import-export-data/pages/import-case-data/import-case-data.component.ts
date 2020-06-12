@@ -58,7 +58,9 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
     };
 
     addressFields = {
-        'addresses[].locationId': true
+        'addresses[].locationId': true,
+        'dateRanges[].locationId': true,
+        'burialLocationId': true
     };
 
     requiredDestinationFields;

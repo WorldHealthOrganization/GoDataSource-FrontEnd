@@ -123,6 +123,18 @@ const routes: Routes = [
                 PERMISSION.SYNC_IMPORT_PACKAGE
             ]
         }
+    },
+
+    // Import relationships data
+    {
+        path: 'relationships/import',
+        component: fromPages.ImportRelationshipDataComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.OUTBREAK_IMPORT_RELATIONSHIP
+            ]
+        }
     }
 ];
 

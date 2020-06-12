@@ -180,7 +180,37 @@ export const EnglishUsLang = {
         /**
          * uiModifyOutbreakQuestionnairePage
          */
-        'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_CONTACT_TITLE': 'Contact investigation'
+        'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_CONTACT_TITLE': 'Contact investigation',
+
+        /**
+         * uiChainsOfTransmissionGraph
+         */
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_DATE_OF_ONSET_AND_EVENT_DATE': 'Date of onset/Event',
+
+        /**
+         * uiCasesListPage
+         */
+        'LNG_PAGE_LIST_CASES_ACTION_IMPORT_CASES_RELATIONSHIPS' : 'Import case relationships',
+
+        /**
+         * uiContactsListPage
+         */
+        'LNG_PAGE_LIST_CONTACTS_ACTION_IMPORT_CONTACTS_RELATIONSHIPS': 'Import contact relationships',
+
+        /**
+         * uiEventsListPage
+         */
+        'LNG_PAGE_LIST_EVENTS_ACTION_IMPORT_EVENTS_RELATIONSHIPS': 'Import event relationships',
+
+        /**
+         * uiImportData
+         */
+        'LNG_PAGE_IMPORT_CASE_RELATIONSHIP_DATA_TITLE' : 'Import case relationships',
+        'LNG_PAGE_IMPORT_CONTACT_RELATIONSHIP_DATA_TITLE' : 'Import contact relationships',
+        'LNG_PAGE_IMPORT_EVENT_RELATIONSHIP_DATA_TITLE' : 'Import event relationships',
+
+
+
 
 
 

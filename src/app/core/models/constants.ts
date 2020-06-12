@@ -197,6 +197,10 @@ export class Constants {
         CONTACTS: {
             label: 'LNG_APP_PAGE_CONTACTS',
             value: 'LNG_APP_PAGE_CONTACTS'
+        },
+        EVENTS: {
+            label: 'LNG_APP_PAGE_EVENTS',
+            value: 'LNG_APP_PAGE_EVENTS'
         }
     };
 
@@ -298,6 +302,10 @@ export class Constants {
         LOCATION_DATA: {
             label: 'LNG_APP_PAGE_IMPORT_LOCATION_DATA',
             value: 'LNG_APP_PAGE_IMPORT_LOCATION_DATA'
+        },
+        RELATIONSHIP_DATA: {
+            label: 'LNG_APP_PAGE_IMPORT_RELATIONSHIP_DATA',
+            value: 'LNG_APP_PAGE_IMPORT_RELATIONSHIP_DATA'
         }
     };
 
@@ -640,9 +648,9 @@ export class Constants {
             label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_AGE',
             value: 'age'
         },
-        DATE_OF_ONSET: {
-            label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
-            value: 'dateOfOnset'
+        DATE_OF_ONSET_AND_EVENT_DATE: {
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_DATE_OF_ONSET_AND_EVENT_DATE',
+            value: 'dateOfOnsetAndEventDate'
         },
         GENDER: {
             label: 'LNG_CASE_FIELD_LABEL_GENDER',

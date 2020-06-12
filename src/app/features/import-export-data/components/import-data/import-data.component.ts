@@ -36,6 +36,7 @@ export enum ImportServerModelNames {
     REFERENCE_DATA = 'referenceData',
     LOCATION = 'location',
     OUTBREAK = 'outbreak',
+    RELATIONSHIPS = 'relationship',
     CASE = 'case',
     CONTACT = 'contact',
     CONTACT_OF_CONTACT = 'contactOfContact'

@@ -346,15 +346,18 @@ export class TransmissionChainDataService {
                             } else {
                                 nodeData.label = '';
                             }
-                            // date of onset
-                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.DATE_OF_ONSET.value) {
+                            // date of onset and event date
+                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.DATE_OF_ONSET_AND_EVENT_DATE.value) {
+                            if (node.type === EntityType.EVENT &&
+                                node.model.date
+                            ) {
+                                nodeData.label = moment(node.model.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                            }
                             if (
                                 node.type === EntityType.CASE &&
                                 node.model.dateOfOnset
                             ) {
                                 nodeData.label = moment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-                            } else {
-                                nodeData.label = '';
                             }
                             // gender
                         } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.GENDER.value) {

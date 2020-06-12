@@ -78,6 +78,7 @@ export class OutbreakModel
      */
     static canMakeOutbreakActive(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_MAKE_ACTIVE) : false; }
     static canSeeInconsistencies(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_SEE_INCONSISTENCIES) : false; }
+    static canImportRelationship(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_IMPORT_RELATIONSHIP) : false; }
 
     /**
      * Static Permissions - IPermissionQuestionnaire
@@ -178,6 +179,7 @@ export class OutbreakModel
      */
     canMakeOutbreakActive(user: UserModel): boolean { return OutbreakModel.canMakeOutbreakActive(user); }
     canSeeInconsistencies(user: UserModel): boolean { return OutbreakModel.canSeeInconsistencies(user); }
+    canImportRelationship(user: UserModel): boolean { return OutbreakModel.canSeeInconsistencies(user); }
 
     /**
      * Permissions - IPermissionQuestionnaire
