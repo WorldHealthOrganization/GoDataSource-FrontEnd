@@ -65,15 +65,6 @@ export class RequestFilter {
     }
 
     /**
-     * Exclude deleted records ( this is the default behaviour )
-     * @returns {RequestFilter}
-     */
-    excludeDeletedRecordsWhereField() {
-        this._deleted = undefined;
-        return this;
-    }
-
-    /**
      * Set flag
      * @param property
      * @param value

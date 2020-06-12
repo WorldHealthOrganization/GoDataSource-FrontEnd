@@ -718,39 +718,6 @@ export abstract class ListComponent implements OnDestroy {
     }
 
     /**
-     * Filter by deleted but with flag 'includeDeletedRecords' flag
-     * To be used when endpoint for count is not using filtered-count
-     * @param value
-     */
-    filterByDeletedWithIncludeDeletedRecordsFlag(value: boolean | null | undefined) {
-        // filter
-        if (value === false) {
-            this.queryBuilder.excludeDeleted();
-            this.queryBuilder.filter.remove('deleted');
-            // need to remove 'includeDeletedRecords' flag from filter
-            this.queryBuilder.filter.excludeDeletedRecordsWhereField();
-        } else {
-            this.queryBuilder.includeDeleted();
-            // need to remove 'includeDeletedRecords' flag from filter
-            this.queryBuilder.filter.excludeDeletedRecordsWhereField();
-            if (value === true) {
-                this.queryBuilder.filter.where({
-                    'deleted': {
-                        'eq': true
-                    }
-                }, true);
-            } else {
-                this.queryBuilder.filter.remove('deleted');
-                // include all records(deleted and not deleted)
-                this.queryBuilder.filter.includeDeletedRecordsWhereField();
-            }
-        }
-
-        // refresh list
-        this.needsRefreshList();
-    }
-
-    /**
      * Filter by relation
      * @param {string | string[]} relation
      * @returns {RequestFilter}
