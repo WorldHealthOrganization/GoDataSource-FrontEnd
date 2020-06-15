@@ -333,5 +333,13 @@ export class ContactDataService {
             );
     }
 
+    /**
+     * Get contact relationships count
+     * @param {string} outbreakId
+     * @param {string} contactId
+     */
+    getContactRelationshipsCount(outbreakId: string, contactId: string): Observable<any> {
+        return this.http.get(`outbreaks/${outbreakId}/contacts/${contactId}/relationships/filtered-count`);
+    }
 }
 
