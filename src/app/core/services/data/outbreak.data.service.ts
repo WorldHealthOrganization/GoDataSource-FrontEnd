@@ -83,6 +83,7 @@ export class OutbreakDataService {
      * @param {RequestQueryBuilder} queryBuilder
      */
     getOutbreaksCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<IBasicCount> {
+        // build where filter
         const whereFilter = queryBuilder.filter.generateCondition(true);
         return this.http.get(`outbreaks/count?where=${whereFilter}`);
     }
