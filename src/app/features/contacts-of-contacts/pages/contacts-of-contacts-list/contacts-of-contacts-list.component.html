@@ -42,7 +42,14 @@
                         *ngIf="ContactOfContactModel.canExportRelationships(authUser)"
                         mat-menu-item
                         (click)="exportFilteredContactsRelationships()">
-                        {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_EXPORT_CONTACTS_OF_CONTACTS_RELATIONSHIPS' | translate }}
+                        {{ 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_EXPORT_CONTACTS_OF_CONTACTS_RELATIONSHIPS' | translate }}
+                    </button>
+
+                    <button
+                        *ngIf="OutbreakModel.canImportRelationship(authUser)"
+                        mat-menu-item
+                        (click)="goToRelationshipImportPage()">
+                        {{ 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_IMPORT_CONTACTS_OF_CONTACTS_RELATIONSHIPS' | translate }}
                     </button>
                 </mat-menu>
             </div>

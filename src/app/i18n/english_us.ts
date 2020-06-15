@@ -70,7 +70,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_BUTTON': 'Export contacts of contacts data',
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_TITLE': 'Export contacts of contacts data',
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_IMPORT_BUTTON': 'Import contacts of contacts data',
-        'LNG_PAGE_LIST_CONTACTS_ACTION_EXPORT_CONTACTS_OF_CONTACTS_RELATIONSHIPS': 'Export contacts of contacts relationships',
+        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_EXPORT_CONTACTS_OF_CONTACTS_RELATIONSHIPS': 'Export contacts of contacts relationships',
+        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_IMPORT_CONTACTS_OF_CONTACTS_RELATIONSHIPS': 'Import contacts of contacts relationships',
 
         /**
          * uiContactsOfContactsFields
@@ -208,8 +209,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_CASE_RELATIONSHIP_DATA_TITLE' : 'Import case relationships',
         'LNG_PAGE_IMPORT_CONTACT_RELATIONSHIP_DATA_TITLE' : 'Import contact relationships',
         'LNG_PAGE_IMPORT_EVENT_RELATIONSHIP_DATA_TITLE' : 'Import event relationships',
-
-
+        'LNG_PAGE_IMPORT_CONTACT_OF_CONTACT_RELATIONSHIP_DATA_TITLE' : 'Import contact of contact relationships',
 
 
 

@@ -57,6 +57,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     // constants
     Constants = Constants;
     ContactOfContactModel = ContactOfContactModel;
+    OutbreakModel = OutbreakModel;
 
     // authenticated user
     authUser: UserModel;
@@ -944,5 +945,16 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             this.selectedOutbreak.id,
             entity
         );
+    }
+
+    /**
+     * Redirect to import relationship page
+     */
+    goToRelationshipImportPage() {
+        this.router.navigate(['/import-export-data', 'relationships', 'import'], {
+            queryParams: {
+                from: Constants.APP_PAGE.CONTACTS_OF_CONTACTS.value
+            }
+        });
     }
 }
