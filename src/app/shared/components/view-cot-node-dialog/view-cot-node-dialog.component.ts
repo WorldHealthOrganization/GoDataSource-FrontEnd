@@ -12,7 +12,8 @@ import { ContactOfContactModel } from '../../../core/models/contact-of-contact.m
 
 export class ViewCOTNodeData {
     constructor(
-        public entity: CaseModel | EventModel | ContactModel
+        public entity: CaseModel | EventModel | ContactModel,
+        public displayPersonalCotLink: boolean
     ) {}
 }
 
@@ -40,6 +41,9 @@ export class ViewCotNodeDialogComponent {
     // person information as key-value pairs
     entityInfo: LabelValuePair[] = [];
 
+    // check if entity have relationship
+    displayPersonChainOfTransmissionLink: boolean = false;
+
     loading: boolean = true;
 
     // provide constants to template
@@ -52,6 +56,7 @@ export class ViewCotNodeDialogComponent {
     ) {
         this.entity = this.data.entity;
         this.entityInfo = this.entityDataService.getLightObjectDisplay(this.entity);
+        this.displayPersonChainOfTransmissionLink = this.data.displayPersonalCotLink;
     }
 
     closeDialog() {

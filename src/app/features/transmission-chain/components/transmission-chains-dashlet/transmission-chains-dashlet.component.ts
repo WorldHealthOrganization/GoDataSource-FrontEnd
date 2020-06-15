@@ -344,6 +344,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             // add flags
             if (this.filters.showContacts) {
                 requestQueryBuilder.filter.flag('includeContacts', 1);
+                // add this flag only if the user is on a personal chain of transmission
+                if (this.personId) {
+                    requestQueryBuilder.filter.flag('noContactChains', false);
+                }
             }
 
             // this flag is working only if 'showContacts' is true

@@ -28,25 +28,29 @@ export class EntityDataService {
             dataService: this.caseDataService,
             getMethod: 'getCase',
             deleteMethod: 'deleteCase',
-            modifyMethod: 'modifyCase'
+            modifyMethod: 'modifyCase',
+            getRelationshipsCountMethod: 'getCaseRelationshipsCount'
         },
         [EntityType.CONTACT]: {
             dataService: this.contactDataService,
             getMethod: 'getContact',
             deleteMethod: 'deleteContact',
-            modifyMethod: 'modifyContact'
+            modifyMethod: 'modifyContact',
+            getRelationshipsCountMethod: 'getContactRelationshipsCount'
         },
         [EntityType.CONTACT_OF_CONTACT]: {
             dataService: this.contactsOfContactsDataService,
             getMethod: 'getContactOfContact',
             deleteMethod: 'deleteContactOfContact',
-            modifyMethod: 'modifyContactOfContact'
+            modifyMethod: 'modifyContactOfContact',
+            getRelationshipsCountMethod: 'getRelationshipsCountMethod'
         },
         [EntityType.EVENT]: {
-            dataService: this.evenDataService,
+            dataService: this.eventDataService,
             getMethod: 'getEvent',
             deleteMethod: 'deleteEvent',
-            modifyMethod: 'modifyEvent'
+            modifyMethod: 'modifyEvent',
+            getRelationshipsCountMethod: 'getEventRelationshipsCount'
         }
     };
 
@@ -58,7 +62,7 @@ export class EntityDataService {
         private caseDataService: CaseDataService,
         private contactDataService: ContactDataService,
         private contactsOfContactsDataService: ContactsOfContactsDataService,
-        private evenDataService: EventDataService,
+        private eventDataService: EventDataService,
         private i18nService: I18nService
     ) {}
 
@@ -435,5 +439,24 @@ export class EntityDataService {
                     removeRecords: removeRecords || []
                 }
             ) as Observable<string[]>;
+    }
+
+    /**
+     * Check if entity have relationships
+     * @param {string} outbreakId
+     * @param {EntityType} entityType
+     * @param {string} entityId
+     * @returns {Observable<any>}
+     */
+    checkEntityRelationshipsCount(
+        outbreakId: string,
+        entityType: EntityType,
+        entityId: string
+    ): Observable<any> {
+        // create data service and method
+        const dataService = this.entityMap[entityType].dataService;
+        const method = this.entityMap[entityType].getRelationshipsCountMethod;
+        // call the method based on entity type
+        return dataService[method](outbreakId, entityId);
     }
 }
