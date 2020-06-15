@@ -9,9 +9,10 @@
                         *ngIf="FollowUpModel.canCreate(authUser)"
                         mat-raised-button color="accent"
                         [routerLink]="['/contacts', contactData?.id, 'follow-ups', 'create']">
-                        {{'LNG_PAGE_LIST_FOLLOW_UPS_ADD_FOLLOW_UP' | translate}} <span class="xt-icon">addCircle</span>
+                        {{'LNG_COMMON_BUTTON_ADD ' | translate}} <span class="xt-icon">addCircle</span>
                     </button>
                 </ng-container>
+
                 <button
                     *ngIf="(!appliedListFilter && printFollowUpsUrl && FollowUpModel.canExportDailyForm(authUser)) || (!appliedListFilter && exportFollowUpsUrl && FollowUpModel.canExport(authUser))"
                     mat-raised-button
