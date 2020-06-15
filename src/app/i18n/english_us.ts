@@ -74,8 +74,6 @@ export const EnglishUsLang = {
         /**
          * uiAutomaticBackupFields
          */
-        'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_EXISTING_CONFIGURATION': 'Existing configuration',
-        'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_EXISTING_CONFIGURATION_DESCRIPTION': '',
         'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_EXISTING_CONFIGURATION_INFO':
             '<b>Existing configuration: </b>' +
             '<br>{{descriptionLabel}}: {{description}} ' +
