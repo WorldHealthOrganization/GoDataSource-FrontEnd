@@ -239,7 +239,7 @@ export class ImportRelationshipDataComponent implements OnInit, OnDestroy {
                 }
                 break;
             case Constants.APP_PAGE.CONTACTS_OF_CONTACTS.value:
-                if(ContactOfContactModel.canList(this.authUser)) {
+                if (ContactOfContactModel.canList(this.authUser)) {
                     this.router.navigate(['/contacts-of-contacts']);
                 } else {
                     this.redirectService.to(['/import-export-data', 'relationships', 'import'], {
