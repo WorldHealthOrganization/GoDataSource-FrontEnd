@@ -71,6 +71,17 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_CONTACT_RELATIONSHIP_DATA_TITLE' : 'Import contact relationships',
         'LNG_PAGE_IMPORT_EVENT_RELATIONSHIP_DATA_TITLE' : 'Import event relationships',
 
+        /**
+         * uiCreateOutbreakPage
+         */
+        'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_DESCRIPTION': 'Option specifying whether the round-robin team assignment should be done taking in consideration all teams activating in the contact\'s location (via that location or parents) or just the nearest teams. Default: round-robin of all teams activating in the contact\'s location. ' +
+            'Round-robin team assignment implies the following: after a pool of teams that can be assigned to the follow-up is created, for each follow-up that is generated, the team is chosen in order from the pool. After the assignment, the team is removed from the pool until the pool of teams is emptied. Then the pool resets with the original chosen teams so the process can start again.',
+
+        /**
+         * uiCreateOutbreakTemplatePage
+         */
+        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_DESCRIPTION': 'Option specifying whether the round-robin team assignment should be done taking in consideration all teams activating in the contact\'s location (via that location or parents) or just the nearest teams. Default: round-robin of all teams activating in the contact\'s location. ' +
+            'Round-robin team assignment implies the following: after a pool of teams that can be assigned to the follow-up is created, for each follow-up that is generated, the team is chosen in order from the pool. After the assignment, the team is removed from the pool until the pool of teams is emptied. Then the pool resets with the original chosen teams so the process can start again.',
 
 
 
