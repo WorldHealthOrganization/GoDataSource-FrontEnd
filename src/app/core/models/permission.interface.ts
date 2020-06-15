@@ -255,6 +255,11 @@ export interface IPermissionQuestionnaire {
     canModifyCaseQuestionnaire(user: UserModel): boolean;
 
     /**
+     * Has permission to modify contact questionnaire
+     */
+    canModifyContactQuestionnaire(user: UserModel): boolean;
+
+    /**
      * Has permission to modify contact follow-up questionnaire
      */
     canModifyContactFollowUpQuestionnaire(user: UserModel): boolean;
@@ -278,6 +283,11 @@ export interface IPermissionOutbreak {
      * Has permission to see inconsistencies in key dates
      */
     canSeeInconsistencies(user: UserModel): boolean;
+
+    /**
+     * Has permission to import relationships data
+     */
+    canImportRelationship(user: UserModel): boolean;
 }
 
 /**

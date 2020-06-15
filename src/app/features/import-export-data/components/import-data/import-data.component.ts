@@ -36,6 +36,7 @@ export enum ImportServerModelNames {
     REFERENCE_DATA = 'referenceData',
     LOCATION = 'location',
     OUTBREAK = 'outbreak',
+    RELATIONSHIPS = 'relationship',
     CASE = 'case',
     CONTACT = 'contact'
 }
@@ -217,6 +218,18 @@ export class ImportDataComponent implements OnInit {
      */
     @Input() fieldsWithoutTokens: {
         [property: string]: string
+    } = {};
+
+    /**
+     * Address fields should use outbreak locations ?
+     */
+    @Input() useOutbreakLocations: boolean = false;
+
+    /**
+     * Address fields so we can use custom dropdowns
+     */
+    @Input() addressFields: {
+        [property: string]: boolean
     } = {};
 
     /**
