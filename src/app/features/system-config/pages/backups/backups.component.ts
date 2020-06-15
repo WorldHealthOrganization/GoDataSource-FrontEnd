@@ -467,7 +467,7 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
                 dataRetentionIntervalLabel: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_RETENTION_INTERVAL'),
                 dataRetentionInterval: this.settings.dataBackup.dataRetentionInterval,
                 modulesLabel: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_MODULES'),
-                modules: this.settings.dataBackup.modules
+                modules: this.settings.dataBackup.modules ? this.settings.dataBackup.modules.join(', ') : ''
             } : {},
             fieldsList: [
                 // description
