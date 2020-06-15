@@ -71,6 +71,16 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_CONTACT_RELATIONSHIP_DATA_TITLE' : 'Import contact relationships',
         'LNG_PAGE_IMPORT_EVENT_RELATIONSHIP_DATA_TITLE' : 'Import event relationships',
 
+        /**
+         * uiAutomaticBackupFields
+         */
+        'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_EXISTING_CONFIGURATION_INFO':
+            '<b>Existing configuration: </b>' +
+            '<br>{{descriptionLabel}}: {{description}} ' +
+            '<br>{{locationLabel}}: {{location}} ' +
+            '<br>{{backupIntervalLabel}}: {{backupInterval}} ' +
+            '<br>{{dataRetentionIntervalLabel}}: {{dataRetentionInterval}} ' +
+            '<br>{{modulesLabel}}: {{modules}}'
 
 
 
