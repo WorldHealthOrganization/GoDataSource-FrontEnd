@@ -336,10 +336,10 @@ export class ContactDataService {
     /**
      * Get contact relationships count
      * @param {string} outbreakId
-     * @param {string} eventId
+     * @param {string} contactId
      */
-    getContactRelationshipsCount(outbreakId: string, eventId: string): Observable<any> {
-        return this.http.get(`outbreaks/${outbreakId}/contacts/${eventId}/relationships/filtered-count`);
+    getContactRelationshipsCount(outbreakId: string, contactId: string): Observable<any> {
+        return this.http.get(`outbreaks/${outbreakId}/contacts/${contactId}/relationships/filtered-count`);
     }
 }
 

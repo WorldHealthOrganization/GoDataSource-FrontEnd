@@ -392,8 +392,8 @@ export class EntityDataService {
     checkEntityRelationshipsCount(
         outbreakId: string,
         entityType: EntityType,
-        entityId: string, )
-        : Observable<any> {
+        entityId: string
+    ): Observable<any> {
         // create data service and method
         const dataService = this.entityMap[entityType].dataService;
         const method = this.entityMap[entityType].getRelationshipsCountMethod;
