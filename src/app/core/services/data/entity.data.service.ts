@@ -43,7 +43,7 @@ export class EntityDataService {
             getMethod: 'getContactOfContact',
             deleteMethod: 'deleteContactOfContact',
             modifyMethod: 'modifyContactOfContact',
-            getRelationshipsCountMethod: 'getRelationshipsCountMethod'
+            getRelationshipsCountMethod: ''
         },
         [EntityType.EVENT]: {
             dataService: this.eventDataService,

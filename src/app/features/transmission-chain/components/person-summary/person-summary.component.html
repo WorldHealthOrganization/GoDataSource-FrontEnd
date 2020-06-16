@@ -30,7 +30,7 @@
             </a>
 
             <a
-                *ngIf="(this.person.type === EntityType.CASE || this.person.type === EntityType.EVENT) && ContactModel.canCreate(authUser)"
+                *ngIf="this.person.type !== EntityType.CONTACT_OF_CONTACT && ContactModel.canCreate(authUser)"
                 mat-raised-button
                 color="accent"
                 (click)="onCreateContact()"

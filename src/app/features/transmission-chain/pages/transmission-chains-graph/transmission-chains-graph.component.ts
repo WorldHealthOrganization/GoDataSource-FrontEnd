@@ -35,6 +35,8 @@ import { SystemSettingsVersionModel } from '../../../../core/models/system-setti
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 
 enum NodeAction {
     MODIFY_PERSON = 'modify-person',
@@ -108,6 +110,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
         private formHelper: FormHelperService,
         private relationshipDataService: RelationshipDataService,
         private contactDataService: ContactDataService,
+        private contactsOfContactsDataService: ContactsOfContactsDataService,
         private domService: DomService,
         private systemSettingsDataService: SystemSettingsDataService
     ) {}
@@ -268,54 +271,85 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
                     return throwError(err);
                 })
             )
-            .subscribe((entityData: CaseModel | EventModel | ContactModel) => {
-                this.entityDataService
-                    .checkEntityRelationshipsCount(
-                        this.selectedOutbreak.id,
-                        entityData.type,
-                        entityData.id
-                    )
-                    .pipe(
-                        catchError((err) => {
-                            this.snackbarService.showApiError(err);
+            .subscribe((entityData: CaseModel | EventModel | ContactModel | ContactOfContactModel) => {
+                if (entityData.type !== EntityType.CONTACT_OF_CONTACT) {
+                    this.entityDataService
+                        .checkEntityRelationshipsCount(
+                            this.selectedOutbreak.id,
+                            entityData.type,
+                            entityData.id
+                        )
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                loadingDialog.close();
+                                return throwError(err);
+                            })
+                        )
+                        .subscribe((relationshipCount: { count: number }) => {
+                            // set the flag for displaying personal chain of transmission link
+                            this.displayPersonChainOfTransmissionLink = relationshipCount.count > 0;
+
+                            // hide loading dialog
                             loadingDialog.close();
-                            return throwError(err);
-                        })
-                    )
-                    .subscribe((relationshipCount: { count: number }) => {
-                        // set the flag for displaying personal chain of transmission link
-                        this.displayPersonChainOfTransmissionLink = relationshipCount.count > 0;
 
-                        // hide loading dialog
-                        loadingDialog.close();
+                            if (this.editMode) {
+                                this.selectedRelationship = undefined;
+                                // add node to selected persons list
+                                this.selectedNodes.addNode(entityData);
 
-                        if (this.editMode) {
-                            this.selectedRelationship = undefined;
-                            // add node to selected persons list
-                            this.selectedNodes.addNode(entityData);
-
-                            // focus boxes
-                            setTimeout(() => {
-                                this.domService.scrollItemIntoView(
-                                    '.selected-node-details'
-                                );
-                            });
-                        } else {
-                            // show node information
-                            this.dialogService.showCustomDialog(
-                                ViewCotNodeDialogComponent,
-                                {
-                                    ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
-                                    ...{
-                                        data: {
-                                            entity: entityData,
-                                            displayPersonalCotLink: this.displayPersonChainOfTransmissionLink
+                                // focus boxes
+                                setTimeout(() => {
+                                    this.domService.scrollItemIntoView(
+                                        '.selected-node-details'
+                                    );
+                                });
+                            } else {
+                                // show node information
+                                this.dialogService.showCustomDialog(
+                                    ViewCotNodeDialogComponent,
+                                    {
+                                        ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
+                                        ...{
+                                            data: {
+                                                entity: entityData,
+                                                displayPersonalCotLink: this.displayPersonChainOfTransmissionLink
+                                            }
                                         }
                                     }
-                                }
+                                );
+                            }
+                        });
+                } else {
+                    // hide loading dialog
+                    loadingDialog.close();
+
+                    if (this.editMode) {
+                        this.selectedRelationship = undefined;
+                        // add node to selected persons list
+                        this.selectedNodes.addNode(entityData);
+
+                        // focus boxes
+                        setTimeout(() => {
+                            this.domService.scrollItemIntoView(
+                                '.selected-node-details'
                             );
-                        }
-                    });
+                        });
+                    } else {
+                        // show node information
+                        this.dialogService.showCustomDialog(
+                            ViewCotNodeDialogComponent,
+                            {
+                                ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
+                                ...{
+                                    data: {
+                                        entity: entityData
+                                    }
+                                }
+                            }
+                        );
+                    }
+                }
             });
     }
 
@@ -494,8 +528,9 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     /**
      * Create a new Contact for a selected node (Case or Event)
      * @param form
+     * @param entityType
      */
-    createContact(form: NgForm) {
+    createContact(form: NgForm, entityType: EntityType) {
         // get forms fields
         const fields = this.formHelper.getFields(form);
 
@@ -510,9 +545,13 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
         // get source person
         const sourcePerson = this.selectedNodes.sourceNode;
 
+        // determine which method to call on create contact based on entity type
+        const dataService = entityType === EntityType.CONTACT ? 'contactDataService' : 'contactsOfContactsDataService';
+        const method = entityType === EntityType.CONTACT ? 'createContact' : 'createContactOfContact';
+
         // add the new Contact
-        this.contactDataService
-            .createContact(this.selectedOutbreak.id, contactFields)
+        this[dataService]
+            [method](this.selectedOutbreak.id, contactFields)
             .pipe(
                 switchMap((contactData: ContactModel) => {
                     relationshipFields.persons = [{
@@ -577,7 +616,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
         // get person being modified
-        const person: (CaseModel | ContactModel | EventModel) = this.selectedNodes.nodes[0];
+        const person: (CaseModel | ContactModel | EventModel | ContactOfContactModel) = this.selectedNodes.nodes[0];
 
         // modify person
         this.entityDataService

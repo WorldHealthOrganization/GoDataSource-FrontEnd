@@ -39,16 +39,18 @@
                 fxFlex="150px"
                 name="showContacts"
                 [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_LABEL' | translate"
-                [(ngModel)]="filters.showContacts">
+                [(ngModel)]="filters.showContacts"
+                (optionChanged)="updateShowContactsOfContactValue($event)">
             </app-form-checkbox>
 
             <!--  This checkbox is valid only if 'showContacts' is already enabled -->
             <app-form-checkbox
-                [disabled]="!filters.showContacts"
-                fxFlex="150px"
+                #showContactOfContacts
                 name="showContactOfContacts"
+                [disabled]="!filters.showContacts"
                 [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_OF_CONTACTS' | translate"
-                [(ngModel)]="filters.includeContactsOfContacts">
+                [(ngModel)]="filters.includeContactsOfContacts"
+                fxFlex="150px">
             </app-form-checkbox>
         </div>
 

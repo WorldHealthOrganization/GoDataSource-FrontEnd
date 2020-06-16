@@ -144,6 +144,12 @@
                 [ngModel]="selectedNodes.nodes[0]"
             ></app-form-event-quick>
 
+            <app-form-contact-of-contact-quick
+                *ngIf="selectedNodes.nodes[0].type === EntityType.CONTACT_OF_CONTACT"
+                name="person"
+                [ngModel]="selectedNodes.nodes[0]"
+            ></app-form-contact-of-contact-quick>
+
             <div fxLayout="row">
                 <button mat-raised-button color="accent" type="submit">
                     {{'LNG_COMMON_BUTTON_SAVE' | translate}}
@@ -174,7 +180,7 @@
         </form>
     </mat-card>
 
-    <!-- Create new Contact for Case/Event -->
+    <!-- Create new Contact for Case/Event/Contact -->
     <mat-card
         *ngIf="selectedNodes.canCreateContact && currentNodeAction === NodeAction.CREATE_CONTACT"
         class="page-section quick-action create-contact"
@@ -182,7 +188,7 @@
     >
         <h1>{{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_TITLE' | translate}}</h1>
 
-        <form #form="ngForm" (submit)="createContact(form)">
+        <form #form="ngForm" (submit)="createContact(form, selectedEntityType)">
 
             <div fxLayout="column" fxLayoutGap="10px">
 

@@ -36,6 +36,7 @@ import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 })
 export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     @ViewChild(CytoscapeGraphComponent) cytoscapeChild;
+    @ViewChild('showContactOfContacts') showContactOfContacts;
 
     @Input() sizeOfChainsFilter: string = null;
     @Input() personId: string = null;
@@ -673,6 +674,17 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             this.colorCriteria.edgeIconCriteria = Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.NONE.value;
         } else if (field === 'icon' && $event !== Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.NONE.value) {
             this.colorCriteria.edgeLabelCriteria = Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.NONE.value;
+        }
+    }
+
+    /**
+     * Update showContactsOfContacts value if showContacts is disabled because
+     * user can't see contactsOfContacts without Contacts
+     * @param value
+     */
+    updateShowContactsOfContactValue(value: boolean): void {
+        if (value === false) {
+            this.showContactOfContacts.value = false;
         }
     }
 }
