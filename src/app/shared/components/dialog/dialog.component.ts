@@ -1,4 +1,4 @@
-import { Component, Inject, ViewChild, ViewEncapsulation } from '@angular/core';
+import {Component, Inject, OnDestroy, ViewChild, ViewEncapsulation} from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import * as _ from 'lodash';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
@@ -301,15 +301,15 @@ export class DialogConfiguration {
     templateUrl: './dialog.component.html',
     styleUrls: ['./dialog.component.less']
 })
-export class DialogComponent {
+export class DialogComponent implements OnDestroy {
     // default settings for this type of dialog
     static DEFAULT_CONFIG = {
         autoFocus: false,
         closeOnNavigation: true,
         disableClose: true,
         hasBackdrop: true,
-        width: '600px',
-        maxWidth: '600px',
+        width: 'calc(100% - 100px)',
+        maxWidth: '800px',
         data: undefined
     };
 
@@ -318,9 +318,18 @@ export class DialogComponent {
 
     @ViewChild('form') form: NgForm;
 
+    // used to determine form size since we can't do it with flex without a min-height
+    @ViewChild('dialogMainMsg') dialogMainMsg: any;
+    @ViewChild('dialogAdditionalInfo') dialogAdditionalInfo: any;
+    @ViewChild('dialogButtons') dialogButtons: any;
+
     // constants
     DialogFieldType = DialogFieldType;
     Constants = Constants;
+
+    // form max height
+    private _timerHandler: any;
+    formMaxHeight: string;
 
     /**
      * Default configs with provided data
@@ -343,7 +352,6 @@ export class DialogComponent {
 
         // finished
         return configs;
-
     }
 
     /**
@@ -405,6 +413,16 @@ export class DialogComponent {
                 }
             });
         }
+
+        // init timer handler
+        this.initTimerHandler();
+    }
+
+    /**
+     * Component destroyed
+     */
+    ngOnDestroy() {
+        this.destroyTimerHandler();
     }
 
     /**
@@ -456,5 +474,97 @@ export class DialogComponent {
         value: Moment
     ) {
         this.dialogAnswerInputValue.value[fieldName] = value ? moment(value).toISOString() : value;
+    }
+
+    /**
+     * Destroy timer handler
+     */
+    destroyTimerHandler() {
+        // nothing to destroy ?
+        if (!this._timerHandler) {
+            return;
+        }
+
+        // destroy timer
+        clearTimeout(this._timerHandler);
+        this._timerHandler = null;
+    }
+
+    /**
+     * Init timer
+     */
+    initTimerHandler() {
+        // destroy timer
+        this.destroyTimerHandler();
+
+        // handle dialog changes
+        this._timerHandler = setTimeout(() => {
+            this.determineFormMaxHeight();
+        }, 400);
+    }
+
+    /**
+     * Determine form max height
+     */
+    determineFormMaxHeight() {
+        // prepare for next refresh
+        this.initTimerHandler();
+
+        // default max height
+        this.formMaxHeight = '300px';
+
+        // can we determine the container max height ?
+        if (
+            !document ||
+            !document.defaultView ||
+            !document.defaultView.getComputedStyle ||
+            !this.dialogRef ||
+            !(this.dialogRef as any)._containerInstance ||
+            !(this.dialogRef as any)._containerInstance._elementRef ||
+            !(this.dialogRef as any)._containerInstance._elementRef.nativeElement
+        ) {
+            return;
+        }
+
+        // determine parent max height
+        const containerInstance = (this.dialogRef as any)._containerInstance._elementRef.nativeElement;
+        const computedStyle = document.defaultView.getComputedStyle(containerInstance);
+        let maxContainerInstanceMaxHeight: number;
+        try {
+            maxContainerInstanceMaxHeight = _.parseInt(computedStyle.getPropertyValue('max-height'));
+        } catch (e) {
+            maxContainerInstanceMaxHeight = 0;
+        }
+        let maxContainerInstancePaddingTop: number;
+        try {
+            maxContainerInstancePaddingTop = _.parseInt(computedStyle.getPropertyValue('padding-top'));
+        } catch (e) {
+            maxContainerInstancePaddingTop = 0;
+        }
+        let maxContainerInstancePaddingBottom: number;
+        try {
+            maxContainerInstancePaddingBottom = _.parseInt(computedStyle.getPropertyValue('padding-bottom'));
+        } catch (e) {
+            maxContainerInstancePaddingBottom = 0;
+        }
+
+        // determine how much we should substract
+        const dialogMainMsgHeight: number = this.dialogMainMsg && this.dialogMainMsg.nativeElement ?
+            this.dialogMainMsg.nativeElement.offsetHeight :
+            0;
+        const dialogMainMsgMarginBottom: number = this.dialogMainMsg && this.dialogMainMsg.nativeElement ?
+            15 :
+            0;
+        const dialogAdditionalInfoHeight: number = this.dialogAdditionalInfo && this.dialogAdditionalInfo.nativeElement ?
+            this.dialogAdditionalInfo.nativeElement.offsetHeight :
+            0;
+        const dialogButtonsHeight: number = this.dialogButtons && this.dialogButtons.nativeElement ?
+            this.dialogButtons.nativeElement.offsetHeight :
+            0;
+
+        // do the math
+        const childrenHeight: number = dialogMainMsgHeight + dialogMainMsgMarginBottom + dialogAdditionalInfoHeight + dialogButtonsHeight;
+        const heightUsed: number = maxContainerInstancePaddingTop + maxContainerInstancePaddingBottom + childrenHeight;
+        this.formMaxHeight = `${maxContainerInstanceMaxHeight - heightUsed}px`;
     }
 }

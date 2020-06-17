@@ -83,7 +83,7 @@ export class I18nService {
             StorageKey.LANGUAGE_UPDATE_LAST, {
                 ...oldDates,
                 ...{
-                    [languageId]: lastUpdateDate
+                    [languageId]: lastUpdateDate ? lastUpdateDate : oldDates[languageId]
                 }
             }
         );

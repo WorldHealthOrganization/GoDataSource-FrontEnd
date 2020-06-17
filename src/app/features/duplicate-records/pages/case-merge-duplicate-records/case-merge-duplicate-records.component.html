@@ -230,7 +230,7 @@
                                     [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate"
                                     tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_ONSET_DESCRIPTION"
                                     [options]="uniqueOptions?.dateOfOnset.options"
-                                    required="true">
+                                    [required]="selectedOutbreak ? selectedOutbreak.isDateOfOnsetRequired : true">
                                 </app-form-select>
 
                                 <app-form-select

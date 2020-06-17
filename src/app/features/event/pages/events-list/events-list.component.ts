@@ -50,6 +50,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
     // constants
     EventModel = EventModel;
     RelationshipModel = RelationshipModel;
+    OutbreakModel = OutbreakModel;
 
     // user list
     userList$: Observable<UserModel[]>;
@@ -641,5 +642,16 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                 applyListFilter: Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS
             }
         );
+    }
+
+    /**
+     * Redirect to import relationship page
+     */
+    goToRelationshipImportPage() {
+        this.router.navigate(['/import-export-data', 'relationships', 'import'], {
+            queryParams: {
+                from: Constants.APP_PAGE.EVENTS.value
+            }
+        });
     }
 }

@@ -136,7 +136,8 @@ const routes: Routes = [
                             PERMISSION.CONTACT_IMPORT,
                             PERMISSION.CONTACT_IMPORT_LAB_RESULT,
                             PERMISSION.CASE_IMPORT,
-                            PERMISSION.CASE_IMPORT_LAB_RESULT
+                            PERMISSION.CASE_IMPORT_LAB_RESULT,
+                            PERMISSION.OUTBREAK_IMPORT_RELATIONSHIP
                         ]
                     })
                 }
@@ -523,7 +524,8 @@ const routes: Routes = [
                             PERMISSION.CONTACT_IMPORT,
                             PERMISSION.CONTACT_IMPORT_LAB_RESULT,
                             PERMISSION.CASE_IMPORT,
-                            PERMISSION.CASE_IMPORT_LAB_RESULT
+                            PERMISSION.CASE_IMPORT_LAB_RESULT,
+                            PERMISSION.OUTBREAK_IMPORT_RELATIONSHIP
                         ]
                     })
                 }

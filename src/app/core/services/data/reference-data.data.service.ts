@@ -130,6 +130,9 @@ export class ReferenceDataDataService {
             );
     }
 
+    /**
+     * Retrieve reference data entries
+     */
     getEntries(): Observable<ReferenceDataEntryModel[]> {
         // sort entries
         const qb = new RequestQueryBuilder();

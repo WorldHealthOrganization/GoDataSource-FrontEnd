@@ -102,6 +102,13 @@ export class RequestQueryBuilder {
     }
 
     /**
+     * Check if deleted is enabled
+     */
+    isDeletedEnabled(): boolean {
+        return this.deleted;
+    }
+
+    /**
      * Remove child query builder
      * @param qbFilterKey
      */

@@ -16,6 +16,8 @@ export class RequestFilter {
     private flags: { [key: string]: any } = {};
     // migrate conditions to first level
     private generateConditionsOnFirstLevel: boolean = false;
+    // flag to include all records (deleted and not deleted)
+    private _deleted: boolean;
 
     /**
      * Escape string
@@ -51,6 +53,15 @@ export class RequestFilter {
             // exclude last check, since we might want to display numbers that start with digits
             return digit + (index < digits.length - 1 ? '[^0-9]*' : '');
         }).join('');
+    }
+
+    /**
+     * Include deleted records
+     * @returns {RequestFilter}
+     */
+    includeDeletedRecordsWhereField() {
+        this._deleted = true;
+        return this;
     }
 
     /**
@@ -746,6 +757,11 @@ export class RequestFilter {
                 {
                     [this.operator]: this.conditions
                 };
+        }
+
+        // set includeDeletedRecords on filter if this._deleted has a value
+        if (this._deleted !== undefined) {
+            condition.includeDeletedRecords = this._deleted;
         }
 
         // append flags
