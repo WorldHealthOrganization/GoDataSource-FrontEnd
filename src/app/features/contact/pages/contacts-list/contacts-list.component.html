@@ -65,6 +65,15 @@
                         {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_EXPORT_CONTACTS_RELATIONSHIPS' | translate }}
                     </button>
 
+                    <ng-container *app-selected-outbreak-is-active>
+                        <button
+                            *ngIf="OutbreakModel.canImportRelationship(authUser)"
+                            mat-menu-item
+                            (click)="goToRelationshipImportPage()">
+                            {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_IMPORT_CONTACTS_RELATIONSHIPS' | translate }}
+                        </button>
+                    </ng-container>
+
                     <mat-divider
                         *ngIf="(exportContactsDailyFollowUpListUrl && ContactModel.canExportDailyFollowUpList(authUser)) || (exportContactsDailyFollowUpsFormUrl && ContactModel.canExportDailyFollowUpsForm(authUser))"></mat-divider>
 

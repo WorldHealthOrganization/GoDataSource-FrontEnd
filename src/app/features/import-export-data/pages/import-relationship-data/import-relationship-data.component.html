@@ -6,17 +6,12 @@
 
 <app-import-data
     [allowedExtensions]="allowedExtensions"
-    [title]="'LNG_PAGE_IMPORT_CASE_DATA_TITLE'"
+    [title]="title"
     [displayLoading]="displayLoading"
     (finished)="finished()"
     [importFileUrl]="importFileUrl"
     [importDataUrl]="importDataUrl"
-    [model]="ImportServerModelNames.CASE"
-    [fieldsWithoutTokens]="fieldsWithoutTokens"
-    [addressFields]="addressFields"
-    [useOutbreakLocations]="true"
+    [model]="ImportServerModelNames.RELATIONSHIPS"
     [requiredDestinationFields]="requiredDestinationFields"
-    [savedImportPage]="Constants.APP_IMPORT_PAGE.CASE.value"
-    [extraDataUsedToFormatData]="selectedOutbreak?.caseInvestigationTemplate"
-    [formatDataBeforeUse]="formatDataBeforeUse">
+    [savedImportPage]="Constants.APP_IMPORT_PAGE.RELATIONSHIP_DATA.value">
 </app-import-data>

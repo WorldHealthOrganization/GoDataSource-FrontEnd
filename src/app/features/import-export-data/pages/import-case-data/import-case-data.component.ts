@@ -57,6 +57,12 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
         'addresses[].geoLocation': ''
     };
 
+    addressFields = {
+        'addresses[].locationId': true,
+        'dateRanges[].locationId': true,
+        'burialLocationId': true
+    };
+
     requiredDestinationFields;
 
     formatDataBeforeUse = QuestionModel.formatQuestionnaireImportDefs;

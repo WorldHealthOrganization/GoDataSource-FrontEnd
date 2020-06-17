@@ -22,6 +22,7 @@ import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-backups',
@@ -59,6 +60,7 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
     loading: boolean = false;
 
     fixedTableColumns: string[] = [
+        'description',
         'location',
         'modules',
         'date',
@@ -128,7 +130,8 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
         private systemBackupDataService: SystemBackupDataService,
         private snackbarService: SnackbarService,
         private genericDataService: GenericDataService,
-        private userDataService: UserDataService
+        private userDataService: UserDataService,
+        private i18nService: I18nService
     ) {
         super(listHelperService);
     }
@@ -237,6 +240,15 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
             message: 'LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_TITLE',
             yesLabel: 'LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_CREATE_BACKUP_BUTTON',
             fieldsList: [
+                // description
+                new DialogField({
+                    name: 'description',
+                    placeholder: 'LNG_BACKUP_FIELD_LABEL_DESCRIPTION',
+                    description: 'LNG_BACKUP_FIELD_LABEL_DESCRIPTION_DESCRIPTION',
+                    required: false,
+                    value: this.settings.dataBackup.description
+                }),
+
                 // location
                 new DialogField({
                     name: 'location',
@@ -444,7 +456,29 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
         return this.dialogService.showInput(new DialogConfiguration({
             message: 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_TITLE',
             yesLabel: 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SAVE_BUTTON',
+            additionalInfo: this.settings.dataBackup ? 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_EXISTING_CONFIGURATION_INFO' : '',
+            translateData: this.settings.dataBackup ? {
+                descriptionLabel: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION'),
+                description: this.settings.dataBackup.description,
+                locationLabel: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_LOCATION'),
+                location: this.settings.dataBackup.location,
+                backupIntervalLabel: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_BACKUP_INTERVAL'),
+                backupInterval: this.settings.dataBackup.backupInterval,
+                dataRetentionIntervalLabel: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_RETENTION_INTERVAL'),
+                dataRetentionInterval: this.settings.dataBackup.dataRetentionInterval,
+                modulesLabel: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_MODULES'),
+                modules: this.settings.dataBackup.modules ? this.settings.dataBackup.modules.join(', ') : ''
+            } : {},
             fieldsList: [
+                // description
+                new DialogField({
+                    name: 'description',
+                    placeholder: 'LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION',
+                    description: 'LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION_DESCRIPTION',
+                    required: false,
+                    value: this.settings.dataBackup.description
+                }),
+
                 // location
                 new DialogField({
                     name: 'location',

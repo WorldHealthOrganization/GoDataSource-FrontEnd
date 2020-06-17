@@ -57,6 +57,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
     // constants
     Constants = Constants;
     ContactModel = ContactModel;
+    OutbreakModel = OutbreakModel;
 
     // authenticated user
     authUser: UserModel;
@@ -1510,5 +1511,16 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                 this.filterBySelectField('followUpTeamId', data);
             }
         }
+    }
+
+    /**
+     * Redirect to import relationship page
+     */
+    goToRelationshipImportPage() {
+        this.router.navigate(['/import-export-data', 'relationships', 'import'], {
+            queryParams: {
+                from: Constants.APP_PAGE.CONTACTS.value
+            }
+        });
     }
 }

@@ -68,6 +68,8 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     personId: string = null;
     // type of the selected person . event
     selectedEntityType: EntityType = null;
+    // should we display personal chain of transmission link?
+    displayPersonChainOfTransmissionLink: boolean = false;
 
     // nodes selected from graph
     selectedNodes: SelectedNodes = new SelectedNodes();
@@ -267,34 +269,53 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
                 })
             )
             .subscribe((entityData: CaseModel | EventModel | ContactModel) => {
-                // hide loading dialog
-                loadingDialog.close();
+                this.entityDataService
+                    .checkEntityRelationshipsCount(
+                        this.selectedOutbreak.id,
+                        entityData.type,
+                        entityData.id
+                    )
+                    .pipe(
+                        catchError((err) => {
+                            this.snackbarService.showApiError(err);
+                            loadingDialog.close();
+                            return throwError(err);
+                        })
+                    )
+                    .subscribe((relationshipCount: { count: number }) => {
+                        // set the flag for displaying personal chain of transmission link
+                        this.displayPersonChainOfTransmissionLink = relationshipCount.count > 0;
 
-                if (this.editMode) {
-                    this.selectedRelationship = undefined;
-                    // add node to selected persons list
-                    this.selectedNodes.addNode(entityData);
+                        // hide loading dialog
+                        loadingDialog.close();
 
-                    // focus boxes
-                    setTimeout(() => {
-                        this.domService.scrollItemIntoView(
-                            '.selected-node-details'
-                        );
-                    });
-                } else {
-                    // show node information
-                    this.dialogService.showCustomDialog(
-                        ViewCotNodeDialogComponent,
-                        {
-                            ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
-                            ...{
-                                data: {
-                                    entity: entityData
+                        if (this.editMode) {
+                            this.selectedRelationship = undefined;
+                            // add node to selected persons list
+                            this.selectedNodes.addNode(entityData);
+
+                            // focus boxes
+                            setTimeout(() => {
+                                this.domService.scrollItemIntoView(
+                                    '.selected-node-details'
+                                );
+                            });
+                        } else {
+                            // show node information
+                            this.dialogService.showCustomDialog(
+                                ViewCotNodeDialogComponent,
+                                {
+                                    ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
+                                    ...{
+                                        data: {
+                                            entity: entityData,
+                                            displayPersonalCotLink: this.displayPersonChainOfTransmissionLink
+                                        }
+                                    }
                                 }
-                            }
+                            );
                         }
-                    );
-                }
+                    });
             });
     }
 
