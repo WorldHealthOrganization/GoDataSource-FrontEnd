@@ -43,8 +43,6 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     selectedFollowUpsIds: string[];
     // selected follow-ups to be modified
     selectedFollowUps: FollowUpModel[] = [];
-    // we have followups for persons that are now cases?
-    personsNowCases: boolean = false;
     // persons to be displayed as info in selected contacts component
     personsToBeDisplayed: string;
 
@@ -202,7 +200,6 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
             .map((followUp: FollowUpModel) => {
                 if (followUp.person.type === EntityType.CASE) {
                     // need to know if we have follow-ups for persons that now are cases
-                    this.personsNowCases = true;
                     selectedContactsToFormat.push(followUp.person.name);
                 }
                 return followUp.person;

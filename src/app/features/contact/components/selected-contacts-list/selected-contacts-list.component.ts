@@ -11,7 +11,6 @@ import { EntityType } from '../../../../core/models/entity-type';
 })
 export class SelectedContactsListComponent {
     @Input() contacts: (ContactModel | CaseModel)[] = [];
-    @Input() personsAreCases: boolean = false;
     @Input() personsToBeDisplayed: string;
 
     // Constants for template

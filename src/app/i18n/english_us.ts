@@ -85,8 +85,8 @@ export const EnglishUsLang = {
         /**
          * uiModifyFollowUpPage
          */
+        'LNG_FOLLOW_UP_FIELD_LABEL_CASE' : 'Case:',
         'LNG_PAGE_MODIFY_FOLLOW_UP_FIELD_LABEL_FOLLOW_UP_WITH_INFO': '* This person is now a case and follow-up was performed at the time when \'{{ personName }}\' was registered as a contact"',
-        'LNG_FOLLOW_UP_FIELD_LABEL_CASE' : 'Case',
 
         /**
          * uiModifyFollowUpListPage

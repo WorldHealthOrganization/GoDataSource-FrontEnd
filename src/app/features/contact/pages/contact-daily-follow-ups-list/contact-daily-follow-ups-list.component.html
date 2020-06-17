@@ -309,7 +309,7 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
-                {{ item.contact?.visualId }}
+                {{ item.person?.visualId }}
             </mat-cell>
         </ng-container>
 
@@ -349,7 +349,7 @@
                 </div>
             </mat-header-cell>
             <mat-cell class="has-date-range-filter" *matCellDef="let item" [class.record-alert]="item.alerted">
-                {{ item.person?.followUp.endDate | dateDefault }}
+                {{ item.person?.followUp?.endDate | dateDefault }}
             </mat-cell>
         </ng-container>
 
