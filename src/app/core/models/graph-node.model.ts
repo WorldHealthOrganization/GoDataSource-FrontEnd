@@ -71,7 +71,7 @@ export class GraphNodeModel {
             case EntityType.CONTACT:
                 return 'pentagon';
             case EntityType.CONTACT_OF_CONTACT:
-                return 'pentagon';
+                return 'diamond';
             case EntityType.EVENT:
                 return 'star';
             default:

@@ -151,7 +151,7 @@ export class ContactDataService {
     }
 
     /**
-     * Add multiple Contacts for a Case or Event or Contact
+     * Add multiple Contacts for a Case or Event
      * @param outbreakId
      * @param sourceEntityType
      * @param sourceEntityId

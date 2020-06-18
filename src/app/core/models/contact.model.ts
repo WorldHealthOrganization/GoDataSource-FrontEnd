@@ -302,7 +302,7 @@ export class ContactModel
     /**
      * Permissions - IPermissionRelatedContactBulk
      */
-    canBulkCreateContact(user: UserModel): boolean {return ContactModel.canBulkCreateContact(user); }
+    canBulkCreateContact(user: UserModel): boolean { return ContactModel.canBulkCreateContact(user); }
 
     /**
      * Permissions - IPermissionRestorable

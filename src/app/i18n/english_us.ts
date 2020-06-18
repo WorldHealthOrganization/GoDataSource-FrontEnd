@@ -220,8 +220,23 @@ export const EnglishUsLang = {
             '<br>{{locationLabel}}: {{location}} ' +
             '<br>{{backupIntervalLabel}}: {{backupInterval}} ' +
             '<br>{{dataRetentionIntervalLabel}}: {{dataRetentionInterval}} ' +
-            '<br>{{modulesLabel}}: {{modules}}'
+            '<br>{{modulesLabel}}: {{modules}}',
 
+        /**
+         * uiSavedFiltersForPagesLabels
+         */
+        'LNG_APP_PAGE_CONTACTS_OF_CONTACTS': 'Contacts of contacts',
+
+        /**
+         * savedImportMappingsPages
+         */
+        'LNG_APP_PAGE_IMPORT_CONTACTS_OF_CONTACTS': 'Contacts of contacts',
+
+        /**
+         * referenceDataCategoryPersonType
+         */
+        'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_OF_CONTACT': 'Contact of Contact',
+        'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_OF_CONTACT_DESCRIPTION': ''
 
 
 

@@ -252,12 +252,9 @@ export abstract class RelationshipsListComponent extends ListComponent implement
      * Relationships list page title, based on relationship type (Exposures or Contacts?)
      */
     get relationshipsListPageTitle(): string {
-        switch (this.relationshipType) {
-            case RelationshipType.EXPOSURE:
-                return 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE';
-            case RelationshipType.CONTACT:
-                return 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE';
-        }
+        return this.relationshipType === RelationshipType.EXPOSURE ?
+            'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE' :
+            'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE';
     }
 
     /**
