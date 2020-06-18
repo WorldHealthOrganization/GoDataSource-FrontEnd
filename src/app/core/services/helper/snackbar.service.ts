@@ -7,27 +7,67 @@ import { forkJoin, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
 import { MultipleSnackbarComponent } from '../../../shared/components/multiple-snackbar/multiple-snackbar.component';
-import { SnackbarHelperService } from './snackbar-helper.service';
 
 @Injectable()
-export class SnackbarService implements OnDestroy {
+export class SnackbarService {
 
     // amount of time (in ms) to wait before automatically closing the snackbar
     static DURATION: number = 4500;
     static DURATION_LONG: number = 8000;
-
-    snackBarOpened: boolean = false;
-    private snackBarOpenedSubscription: Subscription;
+    static snackbarInstance: MultipleSnackbarComponent;
 
     constructor(
         private snackbar: MatSnackBar,
-        private i18nService: I18nService,
-        private snackbarHelperService: SnackbarHelperService
+        private i18nService: I18nService
     ) {
-        // subscribe to check if we have already an opened snackbar
-        this.snackBarOpenedSubscription = this.snackbarHelperService.snackbarsOpenedSubject.subscribe((value: boolean) => {
-            this.snackBarOpened = value;
-        });
+    }
+
+    /**
+     * Show an Error Snackbar displaying the translated error message corresponding to the API Error received
+     * @param err API error object
+     * @param {{}} translateData
+     * @param {number} duration
+     * @param html
+     * @returns {Subscription}
+     */
+    showApiError(
+        err,
+        translateData = {},
+        duration = SnackbarService.DURATION,
+        html: boolean = false
+    ) {
+        const defaultApiErrorCode = 'LNG_API_ERROR_CODE_UNKNOWN_ERROR';
+
+        // get the error message for the received API Error Code
+        let apiErrorCode = _.get(err, 'code', 'UNKNOWN_ERROR');
+        // add language token prefix for API Error codes
+        apiErrorCode = `LNG_API_ERROR_CODE_${apiErrorCode}`;
+
+        return this.i18nService
+            .get(apiErrorCode, translateData)
+            .subscribe((apiErrorMessage) => {
+                if (apiErrorMessage === apiErrorCode) {
+                    // translation not found; show default error message
+                    return this.i18nService
+                        .get(defaultApiErrorCode)
+                        .subscribe((defaultErrorMessage) => {
+                            this.showError(
+                                defaultErrorMessage,
+                                translateData,
+                                duration,
+                                html
+                            );
+                        });
+                } else {
+                    // show the error message
+                    this.showError(
+                        apiErrorMessage,
+                        translateData,
+                        duration,
+                        html
+                    );
+                }
+            });
     }
 
     /**
@@ -46,24 +86,7 @@ export class SnackbarService implements OnDestroy {
         return this.i18nService
             .get(messageToken, translateData)
             .subscribe((message) => {
-                // show the translated message
-                if (!this.snackBarOpened) {
-                    this.snackbar.openFromComponent(MultipleSnackbarComponent, {
-                        panelClass: 'success',
-                        data: {
-                            message: message,
-                            html: html
-                        },
-                        duration: duration,
-                        horizontalPosition: 'center',
-                        verticalPosition: 'top'
-                    });
-                    this.snackBarOpened = true;
-                }
-                // emit new message to snackbar component
-                setTimeout(() => {
-                    this.snackbarHelperService.errorSubject.next({message: message, messageClass: 'success'});
-                });
+                this.openSnackbar(message, 'success', html);
             });
     }
 
@@ -83,23 +106,7 @@ export class SnackbarService implements OnDestroy {
         return this.i18nService
             .get(messageToken, translateData)
             .subscribe((message) => {
-                // show the translated message
-                if (!this.snackBarOpened) {
-                    this.snackbar.openFromComponent(MultipleSnackbarComponent, {
-                        panelClass: 'error',
-                        data: {
-                            message: message,
-                            html: html
-                        },
-                        horizontalPosition: 'center',
-                        verticalPosition: 'top'
-                    });
-                    this.snackBarOpened = true;
-                }
-                // emit new message to snackbar component
-                setTimeout(() => {
-                    this.snackbarHelperService.errorSubject.next({message: message, messageClass: 'error'});
-                });
+                this.openSnackbar(message, 'error', html);
             });
     }
 
@@ -108,7 +115,6 @@ export class SnackbarService implements OnDestroy {
      * @param messageToken
      * @param translateData
      * @param html
-     * @returns {MatSnackBarRef<SnackbarComponent>}
      */
     showNotice(
         messageToken,
@@ -118,26 +124,41 @@ export class SnackbarService implements OnDestroy {
         return this.i18nService
             .get(messageToken, translateData)
             .subscribe((message) => {
-                if (!this.snackBarOpened) {
-                    // show the translated message
-                    this.snackbar.openFromComponent(MultipleSnackbarComponent, {
-                        panelClass: 'notice',
-                        data: {
-                            message: message,
-                            html: html
-                        },
-                        horizontalPosition: 'center',
-                        verticalPosition: 'top'
-                    });
-                    this.snackBarOpened = true;
-
-                }
-                // emit new message to snackbar component
-                setTimeout(() => {
-                    this.snackbarHelperService.errorSubject.next({message: message, messageClass: 'notice'});
-                });
-
+                this.openSnackbar(message, 'notice', html);
             });
+    }
+
+    /**
+     * Open snackbar component
+     */
+    private openSnackbar(
+        message: string,
+        messageClass: string,
+        html: boolean
+    ) {
+        if (!SnackbarService.snackbarInstance) {
+            // show the translated message
+            SnackbarService.snackbarInstance = this.snackbar.openFromComponent(MultipleSnackbarComponent, {
+                panelClass: 'error',
+                data: {
+                    html: html,
+                    dismissSnackbar: () => { this.dismissSnackbarCallback(); }
+                },
+                horizontalPosition: 'center',
+                verticalPosition: 'top'
+            }).instance;
+            SnackbarService.snackbarInstance.addMessage({message: message, messageClass: messageClass, html: html});
+        } else {
+            SnackbarService.snackbarInstance.addMessage({message: message, messageClass: messageClass, html: html});
+        }
+    }
+
+    /**
+     * Close snackbar
+     */
+    dismissSnackbarCallback() {
+        console.log('close snackbar from service');
+        SnackbarService.snackbarInstance = undefined;
     }
 
     /**
@@ -199,60 +220,8 @@ export class SnackbarService implements OnDestroy {
                 );
     }
 
-    /**
-     * Show an Error Snackbar displaying the translated error message corresponding to the API Error received
-     * @param err API error object
-     * @param {{}} translateData
-     * @param {number} duration
-     * @param html
-     * @returns {Subscription}
-     */
-    showApiError(
-        err,
-        translateData = {},
-        duration = SnackbarService.DURATION,
-        html: boolean = false
-    ) {
-        const defaultApiErrorCode = 'LNG_API_ERROR_CODE_UNKNOWN_ERROR';
-
-        // get the error message for the received API Error Code
-        let apiErrorCode = _.get(err, 'code', 'UNKNOWN_ERROR');
-        // add language token prefix for API Error codes
-        apiErrorCode = `LNG_API_ERROR_CODE_${apiErrorCode}`;
-
-        return this.i18nService
-            .get(apiErrorCode, translateData)
-            .subscribe((apiErrorMessage) => {
-                if (apiErrorMessage === apiErrorCode) {
-                    // translation not found; show default error message
-                    return this.i18nService
-                        .get(defaultApiErrorCode)
-                        .subscribe((defaultErrorMessage) => {
-                            this.showError(
-                                defaultErrorMessage,
-                                translateData,
-                                duration,
-                                html
-                            );
-                        });
-                } else {
-                    // show the error message
-                    this.showError(
-                        apiErrorMessage,
-                        translateData,
-                        duration,
-                        html
-                    );
-                }
-            });
-    }
-
     dismissAll() {
         this.snackbar.dismiss();
-    }
-
-    ngOnDestroy(): void {
-        this.snackBarOpenedSubscription.unsubscribe();
     }
 }
 

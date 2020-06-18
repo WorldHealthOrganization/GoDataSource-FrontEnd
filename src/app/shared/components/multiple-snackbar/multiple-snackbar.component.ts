@@ -1,8 +1,6 @@
-import { Component, Inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from '@angular/material';
-import { SnackbarHelperService } from '../../../core/services/helper/snackbar-helper.service';
 import * as _ from 'lodash';
-import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-multiple-snackbar',
@@ -10,35 +8,32 @@ import { Subscription } from 'rxjs';
     templateUrl: './multiple-snackbar.component.html',
     styleUrls: ['./multiple-snackbar.component.less']
 })
-export class MultipleSnackbarComponent implements OnInit, OnDestroy {
+export class MultipleSnackbarComponent {
 
     // error messages
-    errors: {message: string, messageClass: string}[] = [];
+    messages: {
+        message: string,
+        messageClass: string,
+        html: boolean
+    }[] = [];
 
     // available themes: 'success', 'error'
     theme: string;
-    message: string;
-    html: boolean;
 
-    private errorSubscription: Subscription;
-
+    /**
+     * Constructor
+     */
     constructor(
-        @Inject(MAT_SNACK_BAR_DATA) public data: any[],
-        public snackBarRef: MatSnackBarRef<MultipleSnackbarComponent>,
-        public snackbarHelperService: SnackbarHelperService
+        @Inject(MAT_SNACK_BAR_DATA) public data: any,
+        public snackBarRef: MatSnackBarRef<MultipleSnackbarComponent>
     ) {
         this.theme = _.get(data, 'theme');
-        this.message = _.get(data, 'message');
-        this.html = _.get(data, 'html');
     }
 
-    ngOnInit() {
-        // reset errors
-        this.errors = [];
-        // get message to display
-        this.errorSubscription = this.snackbarHelperService.errorSubject.subscribe((message) => {
-            this.errors.push(message);
-        });
+    addMessage(message) {
+        console.log('push message');
+        console.log(message);
+        this.messages.push(message);
     }
 
     /**
@@ -46,12 +41,12 @@ export class MultipleSnackbarComponent implements OnInit, OnDestroy {
      */
     closeSnackbar(ind) {
         // reset error messages collection and dismiss snackbar if there is only one message
-        if (this.errors.length === 1) {
+        if (this.messages.length === 1) {
             this.closeAllSnackbars();
         } else {
             // close message
-            this.errors = this.errors.filter((err, index) => {
-                return index !== ind ? err : '';
+            this.messages = this.messages.filter((msg, index) => {
+                return index !== ind ? msg : '';
             });
         }
     }
@@ -60,12 +55,8 @@ export class MultipleSnackbarComponent implements OnInit, OnDestroy {
      * Close all snackbars
      */
     closeAllSnackbars() {
-        this.errors = [];
+        this.messages = [];
+        this.data.dismissSnackbar();
         this.snackBarRef.dismiss();
-    }
-
-    ngOnDestroy(): void {
-        this.snackbarHelperService.snackbarsOpenedSubject.next(false);
-        this.errorSubscription.unsubscribe();
     }
 }
