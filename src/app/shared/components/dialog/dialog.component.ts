@@ -1,4 +1,4 @@
-import {Component, Inject, OnDestroy, ViewChild, ViewEncapsulation} from '@angular/core';
+import { Component, Inject, OnDestroy, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import * as _ from 'lodash';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
@@ -8,12 +8,18 @@ import { Observable } from 'rxjs';
 import { moment, Moment } from '../../../core/helperClasses/x-moment';
 import { SafeHtml } from '@angular/platform-browser';
 
+/**
+ * Dialog Answer Constant
+ */
 export enum DialogAnswerButton {
     Yes = 'Yes',
     Cancel = 'Cancel',
     Extra_1 = 'Extra_1'
 }
 
+/**
+ * Dialog Button
+ */
 export class DialogButton {
     // required
     label: string;
@@ -49,10 +55,16 @@ export class DialogButton {
     }
 }
 
+/**
+ * Dialog Answer Values
+ */
 export class DialogAnswerInputValue {
     constructor(public value?: any) {}
 }
 
+/**
+ * Dialog Answer
+ */
 export class DialogAnswer {
     constructor(
         public button: DialogAnswerButton,
@@ -60,6 +72,9 @@ export class DialogAnswer {
     ) {}
 }
 
+/**
+ * Dialog Field List item
+ */
 export class DialogFieldListItem {
     // data
     itemData: LabelValuePair;
@@ -93,6 +108,9 @@ export class DialogFieldListItem {
     }
 }
 
+/**
+ * Dialog Field Type
+ */
 export enum DialogFieldType {
     SELECT = 'select',
     TEXT = 'text',
@@ -106,6 +124,9 @@ export enum DialogFieldType {
     CHECKBOX_LIST = 'checkbox-list'
 }
 
+/**
+ * Dialog Field
+ */
 export class DialogField {
     public name: string;
     public placeholder: string;
@@ -147,6 +168,9 @@ export class DialogField {
     // items for lists ( e.g. checkbox list )
     listItems: DialogFieldListItem[] = [];
 
+    /**
+     * Constructor
+     */
     constructor(data: {
         name: string,
         placeholder?: string,
@@ -211,6 +235,9 @@ export class DialogField {
     }
 }
 
+/**
+ * Dialog Configuration
+ */
 export class DialogConfiguration {
     public message: string;
     public additionalInfo: string | SafeHtml;
@@ -249,6 +276,9 @@ export class DialogConfiguration {
         return this._fieldsListLayout;
     }
 
+    /**
+     * Constructor
+     */
     constructor(data: string | {
         message: string,
         additionalInfo?: string | SafeHtml,
@@ -310,26 +340,27 @@ export class DialogComponent implements OnDestroy {
         hasBackdrop: true,
         width: 'calc(100% - 100px)',
         maxWidth: '800px',
-        data: undefined
+        data: undefined,
+        panelClass: 'mat-dialog-main-panel'
     };
 
     confirmData: DialogConfiguration;
     dialogAnswerInputValue: DialogAnswerInputValue = new DialogAnswerInputValue();
 
+    // form
     @ViewChild('form') form: NgForm;
 
-    // used to determine form size since we can't do it with flex without a min-height
+    // used to determine data size since we can't do it with flex without a min-height
     @ViewChild('dialogMainMsg') dialogMainMsg: any;
-    @ViewChild('dialogAdditionalInfo') dialogAdditionalInfo: any;
     @ViewChild('dialogButtons') dialogButtons: any;
 
     // constants
     DialogFieldType = DialogFieldType;
     Constants = Constants;
 
-    // form max height
+    // dialog data max height
     private _timerHandler: any;
-    formMaxHeight: string;
+    dialogDataMaxHeight: string;
 
     /**
      * Default configs with provided data
@@ -499,19 +530,19 @@ export class DialogComponent implements OnDestroy {
 
         // handle dialog changes
         this._timerHandler = setTimeout(() => {
-            this.determineFormMaxHeight();
+            this.determineDataMaxHeight();
         }, 400);
     }
 
     /**
      * Determine form max height
      */
-    determineFormMaxHeight() {
+    determineDataMaxHeight() {
         // prepare for next refresh
         this.initTimerHandler();
 
         // default max height
-        this.formMaxHeight = '300px';
+        this.dialogDataMaxHeight = '300px';
 
         // can we determine the container max height ?
         if (
@@ -555,16 +586,13 @@ export class DialogComponent implements OnDestroy {
         const dialogMainMsgMarginBottom: number = this.dialogMainMsg && this.dialogMainMsg.nativeElement ?
             15 :
             0;
-        const dialogAdditionalInfoHeight: number = this.dialogAdditionalInfo && this.dialogAdditionalInfo.nativeElement ?
-            this.dialogAdditionalInfo.nativeElement.offsetHeight :
-            0;
         const dialogButtonsHeight: number = this.dialogButtons && this.dialogButtons.nativeElement ?
             this.dialogButtons.nativeElement.offsetHeight :
             0;
 
         // do the math
-        const childrenHeight: number = dialogMainMsgHeight + dialogMainMsgMarginBottom + dialogAdditionalInfoHeight + dialogButtonsHeight;
+        const childrenHeight: number = dialogMainMsgHeight + dialogMainMsgMarginBottom + dialogButtonsHeight;
         const heightUsed: number = maxContainerInstancePaddingTop + maxContainerInstancePaddingBottom + childrenHeight;
-        this.formMaxHeight = `${maxContainerInstanceMaxHeight - heightUsed}px`;
+        this.dialogDataMaxHeight = `${maxContainerInstanceMaxHeight - heightUsed}px`;
     }
 }
