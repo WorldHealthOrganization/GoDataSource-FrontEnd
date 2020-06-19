@@ -52,6 +52,34 @@ const routes: Routes = [
             PageChangeConfirmationGuard
         ]
     },
+    // Bulk Add Contacts of Contacts
+    {
+        path: 'create-bulk',
+        component: fromPages.BulkCreateContactsOfContactsComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.CONTACT_OF_CONTACT_BULK_CREATE
+            ]
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
+    },
+    // Bulk Modify Contacts of Contacts
+    {
+        path: 'modify-bulk',
+        component: fromPages.BulkModifyContactsOfContactsComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.CONTACT_OF_CONTACT_BULK_MODIFY
+            ]
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
+    },
     // View Contact movement
     {
         path: ':contactOfContactId/movement',

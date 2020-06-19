@@ -28,8 +28,6 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel } from '../../../../core/models/user.model';
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
-import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
-import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 
 @Component({
     selector: 'app-bulk-modify-contacts',
@@ -87,10 +85,9 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
     // authenticated user details
     authUser: UserModel;
 
-    // we need to know from what page we come from
-    fromContactsOfContactsList: boolean;
-    // ids of contacts we want to modify (Contact or Contact of Contact)
+    // contacts
     contactIds: string[];
+
     /**
      * Constructor
      */
@@ -98,7 +95,6 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         private router: Router,
         private route: ActivatedRoute,
         private contactDataService: ContactDataService,
-        private contactsOfContactsDataService: ContactsOfContactsDataService,
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
         private referenceDataDataService: ReferenceDataDataService,
@@ -140,14 +136,6 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                 });
             });
         }
-
-        // get the query params first because we need to build styleSheet depending on
-        // the type of entity we want to modify
-        this.route.queryParams
-            .subscribe((params: {contactIds, fromContactsOfContactsList}) => {
-                this.contactIds = params.contactIds;
-                this.fromContactsOfContactsList = JSON.parse(params.fromContactsOfContactsList);
-            });
 
         // init table columns
         this.configureSheetWidget();
@@ -207,16 +195,8 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         // reset
         this.breadcrumbs = [];
 
-        // contacts of contacts list page
-        if (
-            this.fromContactsOfContactsList &&
-            ContactOfContactModel.canList(this.authUser)
-        ) {
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE', '/contacts-of-contacts')
-            );
-            // contacts list page
-        } else if (ContactModel.canList(this.authUser)) {
+        // contacts list page
+        if (ContactModel.canList(this.authUser)) {
             this.breadcrumbs.push(
                 new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
             );
@@ -225,7 +205,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         // current page breadcrumb
         this.breadcrumbs.push(
             new BreadcrumbItemModel(
-                this.fromContactsOfContactsList ? 'LNG_PAGE_BULK_MODIFY_CONTACT_OF_CONTACTS_TITLE' : 'LNG_PAGE_BULK_MODIFY_CONTACTS_TITLE',
+                'LNG_PAGE_BULK_MODIFY_CONTACTS_TITLE',
                 '.',
                 true
             )
@@ -241,12 +221,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
             !this.contactIds ||
             this.contactIds.length < 1
         ) {
-            if (
-                this.fromContactsOfContactsList &&
-                ContactOfContactModel.canList(this.authUser)
-            ) {
-                this.router.navigate(['/contacts-of-contacts']);
-            } else if (ContactModel.canList(this.authUser)) {
+            if (ContactModel.canList(this.authUser)) {
                 this.router.navigate(['/contacts']);
             } else {
                 this.router.navigate(['/']);
@@ -278,13 +253,8 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         // retrieve contacts
         const loadingDialog = this.dialogService.showLoadingDialog();
         this.loadingData = true;
-
-        // first we need to build our service and method based on what type of entites we want to modify
-        const service = this.fromContactsOfContactsList ? 'contactsOfContactsDataService' : 'contactDataService';
-        const method = this.fromContactsOfContactsList ? 'getContactsOfContactsList' : 'getContactsList';
-
-        this[service]
-            [method](this.selectedOutbreak.id, qb)
+        this.contactDataService
+            .getContactsList(this.selectedOutbreak.id, qb)
             .pipe(catchError((err) => {
                 loadingDialog.close();
                 this.snackbarService.showApiError(err);
@@ -437,23 +407,18 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                 .setProperty('addresses.postalCode'),
             new TextSheetColumn()
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER')
-                .setProperty('addresses.phoneNumber')
-            ];
+                .setProperty('addresses.phoneNumber'),
+
             // Contact Document(s)
             // Can't edit since they are multiple
             // or we could implement something custom..like location to edit a list of items
 
-            // since contact of contact doesn't have follow-ups we have to remove follow-up column from table
-            if (this.fromContactsOfContactsList === false) {
-                this.sheetColumns = [
-                    ...this.sheetColumns,
-                    // only field available for update contact
-                    new DropdownSheetColumn()
-                        .setTitle('LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS')
-                        .setProperty('followUp.status')
-                        .setOptions(this.finalFollowUpStatus$, this.i18nService)
-                ];
-            }
+            // only field available for update contact
+            new DropdownSheetColumn()
+                .setTitle('LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS')
+                .setProperty('followUp.status')
+                .setOptions(this.finalFollowUpStatus$, this.i18nService)
+        ];
 
         // add assigned team if we have permissions to do that
         if (TeamModel.canList(this.authUser)) {
@@ -617,13 +582,9 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                                 }
                             });
 
-                            // we have to construct the service and method
-                            // depending on what we want to modify (contacts or contacts of contacts)
-                            const service = this.fromContactsOfContactsList ? 'contactsOfContactsDataService' : 'contactDataService';
-                            const method = this.fromContactsOfContactsList ? 'bulkModifyContactsOfContacts' : 'bulkModifyContacts';
                             // modify contacts
-                            this[service]
-                                [method](
+                            this.contactDataService
+                                .bulkModifyContacts(
                                     this.selectedOutbreak.id,
                                     dataResponse.data
                                 )
@@ -640,10 +601,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                                     // navigate to listing page
                                     this.disableDirtyConfirm();
                                     loadingDialog.close();
-                                    if (this.fromContactsOfContactsList &&
-                                        ContactOfContactModel.canList(this.authUser)) {
-                                        this.router.navigate(['/contacts-of-contacts']);
-                                    } else if (ContactModel.canList(this.authUser)) {
+                                    if (ContactModel.canList(this.authUser)) {
                                         this.router.navigate(['/contacts']);
                                     } else {
                                         this.router.navigate(['/']);

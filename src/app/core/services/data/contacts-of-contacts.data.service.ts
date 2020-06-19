@@ -143,14 +143,28 @@ export class ContactsOfContactsDataService {
     }
 
     /**
+     * Add multiple Contacts of Contacts for Contact
+     * @param outbreakId
+     * @param sourceEntityId
+     * @param contactsOfContactsData
+     */
+    bulkAddContactsOfContacts(
+        outbreakId: string,
+        sourceEntityId: string,
+        contactsOfContactsData: any[]
+    ): Observable<any> {
+        return this.http.post(`outbreaks/${outbreakId}/contacts/${sourceEntityId}/contacts-of-contacts`, contactsOfContactsData);
+    }
+
+    /**
      * Modify multiple contacts of contacts
      */
     bulkModifyContactsOfContacts(
         outbreakId: string,
-        contactsData: any) {
+        contactsOfContactsData: any) {
         return this.http.put(
-            `outbreaks/${outbreakId}/contacts-of-contacts/bulk `,
-            contactsData
+            `outbreaks/${outbreakId}/contacts-of-contacts/bulk`,
+            contactsOfContactsData
         );
     }
 

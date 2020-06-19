@@ -280,9 +280,8 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_BULK_ADD_CONTACTS',
                     click: (item: ContactModel) => {
-                        this.router.navigate(['/contacts', 'create-bulk'], {
+                        this.router.navigate(['/contacts-of-contacts', 'create-bulk'], {
                            queryParams: {
-                               entityType: EntityType.CONTACT,
                                entityId: item.id
                            }
                         });

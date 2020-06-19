@@ -236,11 +236,29 @@ export const EnglishUsLang = {
          * referenceDataCategoryPersonType
          */
         'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_OF_CONTACT': 'Contact of Contact',
-        'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_OF_CONTACT_DESCRIPTION': ''
+        'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_OF_CONTACT_DESCRIPTION': '',
 
+        /**
+         * uiBulkAddContactsOfContactsPage
+         */
+        'LNG_PAGE_BULK_ADD_CONTACTS_OF_CONTACTS_TITLE': 'Bulk Add Contacts of Contacts',
+        'LNG_PAGE_BULK_ADD_CONTACTS_OF_CONTACTS_LABEL_ERRORS': 'Validation errors',
+        'LNG_PAGE_BULK_ADD_CONTACTS_OF_CONTACTS_VISUAL_ID_INFO_LABEL': '\'Contact ID\' cell must follow this pattern: {{mask}}',
+        'LNG_PAGE_BULK_ADD_CONTACTS_OF_CONTACTS_LABEL_ERROR_MSG': '- row {{row}}, column(s) \'{{columns}}\' are invalid',
+        'LNG_PAGE_BULK_ADD_CONTACTS_OF_CONTACTS_WARNING_INVALID_FIELDS': 'Some fields are invalid',
+        'LNG_PAGE_BULK_ADD_CONTACTS_OF_CONTACTS_WARNING_NO_DATA': 'There is no data to be saved',
+        'LNG_PAGE_BULK_ADD_CONTACTS_OF_CONTACTS_LABEL_PARTIAL_ERROR_MSG': '- records that were created with success were removed from the spreadsheet so we don\'t create duplicates',
+        'LNG_PAGE_BULK_ADD_CONTACTS_OF_CONTACTS_LABEL_API_ERROR_MSG': ' - row {{row}} is invalid: {{err}}',
+        'LNG_PAGE_BULK_ADD_CONTACTS_OF_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE': 'Contacts of contacts created',
+        'LNG_PAGE_BULK_ADD_CONTACTS_OF_CONTACTS_WARNING_CONTACT_REQUIRED': 'You can only add a Contact of Contact though a Contact',
 
-
-
+        /**
+         * uiBulkModifyContactsOfContactsPage
+         */
+        'LNG_PAGE_BULK_MODIFY_CONTACTS_OF_CONTACTS_LABEL_ERRORS': 'Validation errors:',
+        'LNG_PAGE_BULK_MODIFY_CONTACTS_OF_CONTACTS_LABEL_ERROR_MSG': ' - row {{row}}, column(s) \'{{columns}}\' are invalid',
+        'LNG_PAGE_BULK_MODIFY_CONTACTS_OF_CONTACTS_WARNING_INVALID_FIELDS': 'Some fields are invalid',
+        'LNG_PAGE_BULK_MODIFY_CONTACTS_OF_CONTACTS_ACTION_MODIFY_CONTACTS_SUCCESS_MESSAGE': 'Contacts modified',
 
 
         /**
