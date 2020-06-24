@@ -355,17 +355,28 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                 field: 'address',
                 label: 'LNG_EVENT_FIELD_LABEL_ADDRESS',
                 visible: false
-            }),
-            new VisibleColumnModel({
-                field: 'numberOfContacts',
-                label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS',
-                visible: false
-            }),
-            new VisibleColumnModel({
-                field: 'numberOfExposures',
-                label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
-                visible: false
-            }),
+            })
+        ];
+
+        // number of contacts & exposures columns should be visible only on pages where we have relationships
+        // for cases without relationships we don't need these columns
+        if (this.appliedListFilter !== Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS) {
+            this.tableColumns.push(
+                new VisibleColumnModel({
+                    field: 'numberOfContacts',
+                    label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS',
+                    visible: false
+                }),
+                new VisibleColumnModel({
+                    field: 'numberOfExposures',
+                    label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+                    visible: false
+                })
+            );
+        }
+
+        // rest of columns :)
+        this.tableColumns.push(
             new VisibleColumnModel({
                 field: 'deleted',
                 label: 'LNG_EVENT_FIELD_LABEL_DELETED'
@@ -390,7 +401,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                 label: 'LNG_EVENT_FIELD_LABEL_UPDATED_AT',
                 visible: false
             })
-        ];
+        );
     }
 
     /**
@@ -407,10 +418,12 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             const clonedQB = _.cloneDeep(this.queryBuilder);
 
             // retrieve number of contacts & exposures for each record
-            clonedQB.filter.flag(
-                'countRelations',
-                true
-            );
+            if (this.appliedListFilter !== Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS) {
+                clonedQB.filter.flag(
+                    'countRelations',
+                    true
+                );
+            }
 
             // retrieve the list of Events
             this.eventsList$ = this.eventDataService

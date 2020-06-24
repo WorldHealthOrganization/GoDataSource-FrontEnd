@@ -10,9 +10,11 @@ export enum UserSettings {
     DASHBOARD = 'dashboard',
     CASE_FIELDS = 'caseFields',
     CASE_LAB_FIELDS = 'caseLabFields',
+    CASE_WITHOUT_RELATIONSHIPS_FIELDS = 'caseWithoutRelationshipsFields',
     CONTACT_LAB_FIELDS = 'contactLabFields',
     CONTACT_FIELDS = 'contactFields',
     EVENT_FIELDS = 'eventFields',
+    EVENT_WITHOUT_RELATIONSHIPS_FIELDS = 'eventWithoutRelationshipsFields',
     LOCATION_FIELDS= 'locationFields',
     LAB_RESULTS_FIELDS = 'labResults',
     RELATIONSHIP_FIELDS = 'relationshipFields',
@@ -44,9 +46,11 @@ abstract class UserSettingsHandlers {
     static DASHBOARD = UserSettingsDashboardModel;
     static CASE_FIELDS = [];
     static CASE_LAB_FIELDS = [];
+    static CASE_WITHOUT_RELATIONSHIPS_FIELDS = [];
     static CONTACT_LAB_FIELDS = [];
     static CONTACT_FIELDS = [];
     static EVENT_FIELDS = [];
+    static EVENT_WITHOUT_RELATIONSHIPS_FIELDS = [];
     static LOCATION_FIELDS = [];
     static LAB_RESULTS_FIELDS = [];
     static RELATIONSHIP_FIELDS = [];
