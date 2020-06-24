@@ -30,7 +30,7 @@
                                 </div>
 
                                 <a
-                                    *ngIf="!labResultData?.person?.deleted; else personDeleted"
+                                    *ngIf="!labResultData.person.deleted; else personDeleted"
                                     [routerLink]="[labResultData.person.type === EntityType.CASE ? '/cases' : '/contacts', labResultData.personId, 'view']">
                                     {{ labResultData.person.name}}
                                 </a>
