@@ -30,9 +30,16 @@
                                 </div>
 
                                 <a
+                                    *ngIf="!labResultData?.person?.deleted; else personDeleted"
                                     [routerLink]="[labResultData.person.type === EntityType.CASE ? '/cases' : '/contacts', labResultData.personId, 'view']">
                                     {{ labResultData.person.name}}
                                 </a>
+                                <ng-template
+                                    #personDeleted>
+                                    <div>
+                                        {{ labResultData.person.name}}
+                                    </div>
+                                </ng-template>
 
                                 <div
                                     *ngIf="labResultData.person.type === EntityType.CONTACT && labResultData.person.wasCase">
