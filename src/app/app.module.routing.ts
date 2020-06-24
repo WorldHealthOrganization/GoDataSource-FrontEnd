@@ -94,6 +94,7 @@ const routes: Routes = [
                             PERMISSION.CASE_LIST,
                             PERMISSION.FOLLOW_UP_LIST,
                             PERMISSION.CONTACT_LIST,
+                            PERMISSION.CONTACT_OF_CONTACT_LIST,
                             PERMISSION.CASE_LIST_LAB_RESULT,
                             PERMISSION.CONTACT_LIST_LAB_RESULT,
                             PERMISSION.LAB_RESULT_LIST,
@@ -363,9 +364,11 @@ const routes: Routes = [
                             PERMISSION.DUPLICATE_LIST,
                             PERMISSION.DUPLICATE_MERGE_CASES,
                             PERMISSION.DUPLICATE_MERGE_CONTACTS,
+                            PERMISSION.DUPLICATE_MERGE_CONTACTS_OF_CONTACTS,
                             PERMISSION.DUPLICATE_MERGE_EVENTS,
                             PERMISSION.CASE_LIST,
-                            PERMISSION.CONTACT_LIST
+                            PERMISSION.CONTACT_LIST,
+                            PERMISSION.CONTACT_OF_CONTACT_LIST
                         ]
                     })
                 }

@@ -13,8 +13,6 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable, throwError } from 'rxjs/index';
-import { CaseModel } from '../../../../core/models/case.model';
-import { EventModel } from '../../../../core/models/event.model';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
@@ -35,6 +33,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { Constants } from '../../../../core/models/constants';
+import { ContactModel } from '../../../../core/models/contact.model';
 
 @Component({
     selector: 'app-create-contact-of-contact',
@@ -59,7 +58,7 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
     pregnancyStatusList$: Observable<any[]>;
     riskLevelsList$: Observable<any[]>;
 
-    relatedEntityData: CaseModel | EventModel;
+    relatedEntityData: ContactModel;
     relationship: RelationshipModel = new RelationshipModel();
 
     serverToday: Moment = moment();
@@ -104,15 +103,11 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
 
         // retrieve query params
         this.route.queryParams
-            .subscribe((params: {entityType, entityId}) => {
-                this.entityType = _.get(params, 'entityType');
+            .subscribe((params: {entityId}) => {
                 this.entityId = _.get(params, 'entityId');
 
-                // check if we have proper values ( case or event ID )
-                if (
-                    !this.entityType ||
-                    !this.entityId
-                ) {
+                // check if we have proper value ( case or event ID )
+                if (!this.entityId) {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_WARNING_CASE_OR_EVENT_REQUIRED');
 
                     this.disableDirtyConfirm();
@@ -172,7 +167,7 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
                                     return throwError(err);
                                 })
                             )
-                            .subscribe((relatedEntityData: CaseModel|EventModel) => {
+                            .subscribe((relatedEntityData: ContactModel) => {
                                 // initialize Case/Event
                                 this.relatedEntityData = relatedEntityData;
 
@@ -298,14 +293,12 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
 
                                             // hide dialog
                                             loadingDialog.close();
-
                                             // navigate to listing page
                                             if (andAnotherOne) {
                                                 this.disableDirtyConfirm();
                                                 this.redirectService.to(
                                                     [`/contacts-of-contacts/create`],
                                                     {
-                                                        entityType: this.entityType,
                                                         entityId: this.entityId
                                                     }
                                                 );
@@ -319,7 +312,6 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
                                                     ContactOfContactModel,
                                                     'contacts-of-contacts',
                                                     contactOfContactData.id, {
-                                                        entityType: this.entityType,
                                                         entityId: this.entityId
                                                     }
                                                 );

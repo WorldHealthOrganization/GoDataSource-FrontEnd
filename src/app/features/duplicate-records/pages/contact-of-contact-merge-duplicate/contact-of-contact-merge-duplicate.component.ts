@@ -90,6 +90,9 @@ export class ContactOfContactMergeDuplicateComponent extends ConfirmOnFormChange
         }
     };
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private route: ActivatedRoute,
@@ -101,6 +104,9 @@ export class ContactOfContactMergeDuplicateComponent extends ConfirmOnFormChange
         super();
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get merge ids
         // retrieve query params
@@ -298,7 +304,7 @@ export class ContactOfContactMergeDuplicateComponent extends ConfirmOnFormChange
      * Create Contact of contact
      * @param {NgForm[]} stepForms
      */
-    createNewContact(stepForms: NgForm[]) {
+    createNewContactOfContact(stepForms: NgForm[]) {
         // get forms fields
         const dirtyFields: any = this.formHelper.mergeFields(stepForms);
 

@@ -96,7 +96,13 @@
                         </div>
                     </div>
 
-                    <button mat-raised-button color="primary" type="button" (click)="swapSelectedNodes()">
+                    <button
+                        *ngIf="canSwapRelationshipPersons"
+                        mat-raised-button
+                        color="primary"
+                        type="button"
+                        (click)="swapSelectedNodes()"
+                    >
                         <span class="xt-icon">swapVertical</span>
                     </button>
                 </div>

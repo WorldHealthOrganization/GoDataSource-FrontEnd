@@ -1,17 +1,17 @@
-import {Component, OnInit, ViewEncapsulation} from '@angular/core';
-import {BreadcrumbItemModel} from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import {ChronologyItem} from '../../../../shared/components/chronology/typings/chronology-item';
-import {UserModel} from '../../../../core/models/user.model';
-import {ContactOfContactModel} from '../../../../core/models/contact-of-contact.model';
-import {ActivatedRoute} from '@angular/router';
-import {ContactsOfContactsDataService} from '../../../../core/services/data/contacts-of-contacts.data.service';
-import {OutbreakDataService} from '../../../../core/services/data/outbreak.data.service';
-import {RelationshipDataService} from '../../../../core/services/data/relationship.data.service';
-import {I18nService} from '../../../../core/services/helper/i18n.service';
-import {AuthDataService} from '../../../../core/services/data/auth.data.service';
-import {OutbreakModel} from '../../../../core/models/outbreak.model';
-import {RequestQueryBuilder} from '../../../../core/helperClasses/request-query-builder';
-import {ContactOfContactChronology} from './typings/contact-of-contact-chronology';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
+import { ChronologyItem } from '../../../../shared/components/chronology/typings/chronology-item';
+import { UserModel } from '../../../../core/models/user.model';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { ActivatedRoute } from '@angular/router';
+import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { ContactOfContactChronology } from './typings/contact-of-contact-chronology';
 
 @Component({
     selector: 'app-view-chronology-contact-of-contact',
@@ -30,6 +30,9 @@ export class ViewChronologyContactOfContactComponent implements OnInit {
     // authenticated user details
     authUser: UserModel;
 
+    /**
+     * Constructor
+     */
     constructor(
         protected route: ActivatedRoute,
         private contactOfContactDataService: ContactsOfContactsDataService,
@@ -39,6 +42,9 @@ export class ViewChronologyContactOfContactComponent implements OnInit {
         private authDataService: AuthDataService,
     ) {}
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();

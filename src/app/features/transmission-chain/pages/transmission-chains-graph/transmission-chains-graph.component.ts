@@ -79,6 +79,8 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     selectedRelationship: RelationshipModel;
     // action to do on the selected node
     currentNodeAction: NodeAction = null;
+    // can we swap relationship persons?
+    canSwapRelationshipPersons: boolean;
 
     // Edit or View mode?
     editMode: boolean = false;
@@ -298,6 +300,9 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
                                 // add node to selected persons list
                                 this.selectedNodes.addNode(entityData);
 
+                                // check if we can swap nodes
+                                this.canSwapRelationshipPersons = this.canSwapSelectedNodes();
+
                                 // focus boxes
                                 setTimeout(() => {
                                     this.domService.scrollItemIntoView(
@@ -433,6 +438,17 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
         this.resetFormModels();
 
         this.currentNodeAction = NodeAction.CREATE_CONTACT;
+    }
+
+    /**
+     * Check if we can we swap selected nodes
+     */
+    canSwapSelectedNodes() {
+        return this.selectedNodes.nodes.length > 1 &&
+            (
+                this.selectedNodes.targetNode.type !== EntityType.CONTACT &&
+                this.selectedNodes.targetNode.type !== EntityType.CONTACT_OF_CONTACT
+            );
     }
 
     deleteSelectedPerson(person: (CaseModel | ContactModel | EventModel)) {

@@ -96,7 +96,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [
-                PERMISSION.CONTACT_IMPORT
+                PERMISSION.CONTACT_OF_CONTACT_IMPORT
             ]
         }
     },

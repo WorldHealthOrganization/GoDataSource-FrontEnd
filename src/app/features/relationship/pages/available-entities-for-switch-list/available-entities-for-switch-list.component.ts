@@ -25,6 +25,7 @@ import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/
 import { AddressType } from '../../../../core/models/address.model';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 
 @Component({
     selector: 'app-available-entities-for-switch-list',
@@ -78,7 +79,8 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
         private snackbarService: SnackbarService,
         private relationshipDataService: RelationshipDataService,
         private referenceDataDataService: ReferenceDataDataService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private genericDataService: GenericDataService
     ) {
         // parent
         super(
@@ -171,6 +173,25 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
     onPersonLoaded() {
         // (re)initialize breadcrumbs
         this.initializeBreadcrumbs();
+    }
+
+    /**
+     * @Overrides parent method
+     */
+    clearQueryBuilder() {
+        // clear query builder
+        this.queryBuilder.clear();
+        // retrieve only available entity types
+        const availableTypes: EntityType[] = this.genericDataService.getAvailableRelatedEntityTypes(
+            this.entityType,
+            this.relationshipType,
+            Constants.APP_PAGE.AVAILABLE_ENTITIES_FOR_SWITCH.value
+        );
+        this.queryBuilder.filter.where({
+            type: {
+                'inq': availableTypes
+            }
+        });
     }
 
     private initializeBreadcrumbs() {

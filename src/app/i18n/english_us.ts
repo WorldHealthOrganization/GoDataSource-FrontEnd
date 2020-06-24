@@ -36,7 +36,6 @@ export const EnglishUsLang = {
         'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_OF_CONTACT_ACTIVE_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_CONTACT_OF_CONTACT_ID_MASK': 'Contact of contact ID mask',
         'LNG_OUTBREAK_FIELD_LABEL_CONTACT_OF_CONTACT_ID_MASK_DESCRIPTION': '',
-        '': '',
 
         /**
          * uiOutbreakTemplateFields
@@ -55,11 +54,6 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_CONTACTS_OF_CONTACTS_LABEL': 'Contacts of contacts',
 
         /**
-         * uiCommonButtons
-         */
-        'LNG_COMMON_BUTTON_CONTACTS_OF_CONTACTS_TO': 'Contacts',
-
-        /**
          * uiEntityRelationshipsListPage
          */
         'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_OF_CONTACTS_TITLE': 'Contacts of contacts',
@@ -74,7 +68,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_IMPORT_CONTACTS_OF_CONTACTS_RELATIONSHIPS': 'Import contacts of contacts relationships',
 
         /**
-         * uiContactsOfContactsFields
+         * uiContactOfContactFields
          */
         'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS': 'Number of contacts',
         'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES': 'Number of exposures',
@@ -85,7 +79,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_ACTION_BULK_ADD_CONTACTS': 'Bulk add contacts',
 
         /**
-         * uiContactsOfContactsListPage
+         * NEW GROUP
+         * uiContactOfContactListPage
          */
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE': 'Contacts of contacts',
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_CONTACT_OF_CONTACT': 'View contact of contact',
@@ -104,6 +99,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_SEE_RECORDS_NOT_DUPLICATES': 'See records marked as not duplicates',
 
         /**
+         * NEW GROUP
          * uiCreateContactOfContactPage
          */
         'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_TAB_PERSONAL_TITLE': 'Personal',
@@ -120,6 +116,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_WARNING_CASE_OR_EVENT_REQUIRED': 'You can only add a contact of contact through a contact',
 
         /**
+         * NEW GROUP
          * uiModifyContactOfContactPage
          */
         'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_MODIFY_CONTACT_OF_CONTACT_SUCCESS_MESSAGE': 'Contact of contact saved',
@@ -139,11 +136,13 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE': 'Record Details',
 
         /**
+         * NEW GROUP
          * uiImportContactOfContactData
          */
         'LNG_PAGE_IMPORT_CONTACT_OF_CONTACT_DATA_TITLE': 'Import contact of contact data',
 
         /**
+         * NEW GROUP
          * uiMovementContactOfContactPage
          */
         'LNG_PAGE_VIEW_MOVEMENT_CONTACT_OF_CONTACT_TITLE': 'Contact of contact movement',
@@ -155,18 +154,14 @@ export const EnglishUsLang = {
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_OF_CONTACTS' : 'Show Contacts of Contacts',
 
         /**
-         * uiContactMergeDuplicateRecordsPage
+         * NEW GROUP
+         * uiContactOfContactMergeDuplicateRecordsPage
          */
         'LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_CONTACTS_SUCCESS_MESSAGE': 'Contacts of contacts merged',
         'LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_CONTACT_BUTTON': 'Merge contacts of contacts',
         'LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_ADDRESS_TITLE': 'Address',
         'LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_PERSONAL_TITLE': 'Personal',
         'LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_TITLE': 'Contact of contact - merge duplicate records',
-
-        /**
-         * uiBulkModifyContactsPage
-         */
-        'LNG_PAGE_BULK_MODIFY_CONTACT_OF_CONTACTS_TITLE': 'Bulk Modify Contact of Contacts',
 
         /**
          * uiOutbreakTemplateListPage
@@ -259,6 +254,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_BULK_MODIFY_CONTACTS_OF_CONTACTS_LABEL_ERROR_MSG': ' - row {{row}}, column(s) \'{{columns}}\' are invalid',
         'LNG_PAGE_BULK_MODIFY_CONTACTS_OF_CONTACTS_WARNING_INVALID_FIELDS': 'Some fields are invalid',
         'LNG_PAGE_BULK_MODIFY_CONTACTS_OF_CONTACTS_ACTION_MODIFY_CONTACTS_SUCCESS_MESSAGE': 'Contacts modified',
+        'LNG_PAGE_BULK_MODIFY_CONTACTS_OF_CONTACTS_TITLE': 'Bulk Modify Contact of Contacts',
+
 
 
         /**

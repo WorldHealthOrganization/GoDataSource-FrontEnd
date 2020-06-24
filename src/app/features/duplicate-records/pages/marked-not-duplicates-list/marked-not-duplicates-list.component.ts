@@ -328,6 +328,7 @@ export class MarkedNotDuplicatesListComponent
                     this.selectedOutbreak.id,
                     this.recordId
                 );
+                break;
         }
 
         // get case / contact data

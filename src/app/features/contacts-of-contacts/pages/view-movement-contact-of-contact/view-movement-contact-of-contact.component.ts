@@ -1,17 +1,16 @@
-import {Component, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
-import {BreadcrumbItemModel} from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import {AddressModel} from '../../../../core/models/address.model';
-import {WorldMapMovementComponent} from '../../../../common-modules/world-map-movement/components/world-map-movement/world-map-movement.component';
-import {UserModel} from '../../../../core/models/user.model';
-import {ContactOfContactModel} from '../../../../core/models/contact-of-contact.model';
-import {ActivatedRoute} from '@angular/router';
-import {ContactDataService} from '../../../../core/services/data/contact.data.service';
-import {OutbreakDataService} from '../../../../core/services/data/outbreak.data.service';
-import {AuthDataService} from '../../../../core/services/data/auth.data.service';
-import {OutbreakModel} from '../../../../core/models/outbreak.model';
-import {forkJoin} from 'rxjs';
-import {EntityType} from '../../../../core/models/entity-type';
-import {ContactsOfContactsDataService} from '../../../../core/services/data/contacts-of-contacts.data.service';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
+import { AddressModel } from '../../../../core/models/address.model';
+import { WorldMapMovementComponent } from '../../../../common-modules/world-map-movement/components/world-map-movement/world-map-movement.component';
+import { UserModel } from '../../../../core/models/user.model';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { ActivatedRoute } from '@angular/router';
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { forkJoin } from 'rxjs';
+import { EntityType } from '../../../../core/models/entity-type';
+import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 
 @Component({
     selector: 'app-view-movement-contact-of-contact',
@@ -35,6 +34,9 @@ export class ViewMovementContactOfContactComponent implements OnInit {
     // authenticated user details
     authUser: UserModel;
 
+    /**
+     * Constructor
+     */
     constructor(
         protected route: ActivatedRoute,
         private contactsOfContactsDataService: ContactsOfContactsDataService,
@@ -42,6 +44,9 @@ export class ViewMovementContactOfContactComponent implements OnInit {
         private authDataService: AuthDataService
     ) {}
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();

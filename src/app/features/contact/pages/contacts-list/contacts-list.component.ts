@@ -261,7 +261,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                     click: (item: ContactModel) => {
                         this.router.navigate(['/contacts-of-contacts', 'create'], {
                             queryParams: {
-                                entityType: item.type,
                                 entityId: item.id
                             }
                         });
@@ -1413,8 +1412,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         this.router.navigate(
             ['/contacts', 'modify-bulk'], {
                 queryParams: {
-                    contactIds: JSON.stringify(selectedRecords),
-                    fromContactsOfContactsList: false
+                    contactIds: JSON.stringify(selectedRecords)
                 }
             }
         );

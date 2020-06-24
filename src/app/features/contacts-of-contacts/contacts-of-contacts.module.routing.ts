@@ -1,11 +1,10 @@
-import {RouterModule, Routes} from '@angular/router';
-
+import { RouterModule, Routes } from '@angular/router';
 import * as fromPages from './pages';
-import {ModuleWithProviders} from '@angular/core';
-import {AuthGuard} from '../../core/services/guards/auth-guard.service';
-import {PERMISSION} from '../../core/models/permission.model';
-import {PageChangeConfirmationGuard} from '../../core/services/guards/page-change-confirmation-guard.service';
-import {ViewModifyComponentAction} from '../../core/helperClasses/view-modify-component';
+import { ModuleWithProviders } from '@angular/core';
+import { AuthGuard } from '../../core/services/guards/auth-guard.service';
+import { PERMISSION } from '../../core/models/permission.model';
+import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
+import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 
 const routes: Routes = [
     // Contacts of contacts list
@@ -19,7 +18,7 @@ const routes: Routes = [
         component: fromPages.CreateContactOfContactComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.CONTACT_CREATE]
+            permissions: [PERMISSION.CONTACT_OF_CONTACT_CREATE]
         },
         canDeactivate: [
             PageChangeConfirmationGuard
@@ -32,7 +31,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [
-                PERMISSION.CONTACT_VIEW
+                PERMISSION.CONTACT_OF_CONTACT_VIEW
             ],
             action: ViewModifyComponentAction.VIEW
         }
@@ -44,7 +43,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [
-                PERMISSION.CONTACT_MODIFY
+                PERMISSION.CONTACT_OF_CONTACT_MODIFY
             ],
             action: ViewModifyComponentAction.MODIFY
         },
@@ -80,25 +79,25 @@ const routes: Routes = [
             PageChangeConfirmationGuard
         ]
     },
-    // View Contact movement
+    // View Contact of contact movement
     {
         path: ':contactOfContactId/movement',
         component: fromPages.ViewMovementContactOfContactComponent,
         canActivate: [AuthGuard],
         data: {
             permissions: [
-                PERMISSION.CONTACT_VIEW_MOVEMENT_MAP
+                PERMISSION.CONTACT_OF_CONTACT_VIEW_MOVEMENT_MAP
             ]
         }
     },
-    // // View Contact chronology
+    // View Contact of contact  chronology
     {
         path: ':contactOfContactId/chronology',
         component: fromPages.ViewChronologyContactOfContactComponent,
         canActivate: [AuthGuard],
         data: {
             permissions: [
-                PERMISSION.CONTACT_VIEW_CHRONOLOGY_CHART
+                PERMISSION.CONTACT_OF_CONTACT_VIEW_CHRONOLOGY_CHART
             ]
         }
     },

@@ -54,18 +54,13 @@
                         <div fxLayout="row" fxLayoutGap="20px">
                             <div
                                 fxFlex fxLayout="row" fxLayoutGap="20px">
-                                <!-- Due to an angular bug => compose validators, we need this validator to be able to use the async general one... -->
-                                <!-- [maxlength]="255" -->
-                                <app-form-input
-                                    name="visualId"
-                                    [(ngModel)]="contactOfContactData.visualId"
-                                    [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID' | translate"
-                                    tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
-                                    [tooltipTranslateData]="visualIDTranslateData"
-                                    [maxlength]="255"
-                                    app-general-async-validator
-                                    [asyncValidatorObservable]="contactOfContactMaskValidator$">
-                                </app-form-input>
+                                <app-form-select
+                                    name="pregnancyStatus"
+                                    [(ngModel)]="contactOfContactData.pregnancyStatus"
+                                    [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS' | translate"
+                                    tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION"
+                                    [options]="pregnancyStatusList$ | async">
+                                </app-form-select>
 
                                 <app-form-select
                                     name="occupation"
@@ -89,14 +84,18 @@
                         </div>
 
                         <div fxLayout="row" fxLayoutGap="20px">
-
-                            <app-form-select
-                                name="pregnancyStatus"
-                                [(ngModel)]="contactOfContactData.pregnancyStatus"
-                                [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS' | translate"
-                                tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION"
-                                [options]="pregnancyStatusList$ | async">
-                            </app-form-select>
+                            <!-- Due to an angular bug => compose validators, we need this validator to be able to use the async general one... -->
+                            <!-- [maxlength]="255" -->
+                            <app-form-input
+                                name="visualId"
+                                [(ngModel)]="contactOfContactData.visualId"
+                                [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID' | translate"
+                                tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
+                                [tooltipTranslateData]="visualIDTranslateData"
+                                [maxlength]="255"
+                                app-general-async-validator
+                                [asyncValidatorObservable]="contactOfContactMaskValidator$">
+                            </app-form-input>
 
                             <app-form-datepicker
                                 fxFlex
@@ -129,7 +128,6 @@
                 </div>
                 <mat-card class="page-section">
                     <div fxLayout="column">
-
                         <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-select
                                 fxFlex

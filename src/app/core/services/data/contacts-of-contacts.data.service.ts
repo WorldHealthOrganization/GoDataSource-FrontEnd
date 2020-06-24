@@ -11,14 +11,17 @@ import { catchError, map } from 'rxjs/internal/operators';
 import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-id-error.model';
 import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
 import * as _ from 'lodash';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
-
 export class ContactsOfContactsDataService {
-
-    constructor(private http: HttpClient,
-                private modelHelper: ModelHelperService) {
-    }
+    /**
+     * Constructor
+     */
+    constructor(
+        private http: HttpClient,
+        private modelHelper: ModelHelperService
+    ) {}
 
     /**
      * Retrieve the list of Contacts of contacts for an Outbreak
@@ -41,11 +44,12 @@ export class ContactsOfContactsDataService {
      * Return total number of contacts of contacts
      * @param {string} outbreakId
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<any>}
+     * @returns {Observable<IBasicCount>}
      */
     getContactsOfContactsCount(
         outbreakId: string,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<IBasicCount> {
         const filter = queryBuilder.buildQuery();
         return this.http.get(`outbreaks/${outbreakId}/contacts-of-contacts/filtered-count?filter=${filter}`);
     }
@@ -109,9 +113,10 @@ export class ContactsOfContactsDataService {
      * @param outbreakId
      * @param contactOfContactData
      */
-    findDuplicates(outbreakId: string,
-                   contactOfContactData: any,
-                   queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    findDuplicates(
+        outbreakId: string,
+        contactOfContactData: any,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<EntityDuplicatesModel> {
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
@@ -131,10 +136,11 @@ export class ContactsOfContactsDataService {
      * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<ContactOfContactModel>}
      */
-    modifyContactOfContact(outbreakId: string,
-                  contactOfContactId: string,
-                  contactOfContactData,
-                  retrieveCreatedUpdatedBy?: boolean
+    modifyContactOfContact(
+        outbreakId: string,
+        contactOfContactId: string,
+        contactOfContactData,
+        retrieveCreatedUpdatedBy?: boolean
     ): Observable<ContactOfContactModel> {
         return this.modelHelper.mapObservableToModel(
             this.http.put(`outbreaks/${outbreakId}/contacts-of-contacts/${contactOfContactId}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`, contactOfContactData),
@@ -161,7 +167,8 @@ export class ContactsOfContactsDataService {
      */
     bulkModifyContactsOfContacts(
         outbreakId: string,
-        contactsOfContactsData: any) {
+        contactsOfContactsData: any
+    ) {
         return this.http.put(
             `outbreaks/${outbreakId}/contacts-of-contacts/bulk`,
             contactsOfContactsData

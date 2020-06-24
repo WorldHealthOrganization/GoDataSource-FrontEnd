@@ -174,7 +174,7 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
         // current page breadcrumb
         this.breadcrumbs.push(
             new BreadcrumbItemModel(
-                'LNG_PAGE_BULK_MODIFY_CONTACT_OF_CONTACTS_TITLE',
+                'LNG_PAGE_BULK_MODIFY_CONTACTS_OF_CONTACTS_TITLE',
                 '.',
                 true
             )

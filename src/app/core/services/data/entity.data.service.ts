@@ -299,7 +299,7 @@ export class EntityDataService {
             ));
         }
 
-        // entity type = Contact
+        // entity type = Contact Of Contact
         if (entity instanceof ContactOfContactModel) {
             lightObject.push(new LabelValuePair(
                 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME',

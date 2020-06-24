@@ -83,15 +83,20 @@ export class SelectedNodes {
         return (
             // do we have 2 selected nodes so we can create relationship between them?
             this.nodes.length === 2 &&
-            // cannot create relationship between 2 Contacts
-            (
-                this.sourceNode.type !== EntityType.CONTACT ||
-                this.targetNode.type !== EntityType.CONTACT
-            ) &&
-            // cannot create relationship between 2 Contacts of Contacts and Event/Case and Contact of Contact
-            (
-                (this.sourceNode.type !== EntityType.EVENT && this.sourceNode.type !== EntityType.CASE) && this.sourceNode.type !== EntityType.CONTACT_OF_CONTACT ||
-                this.targetNode.type !== EntityType.CONTACT_OF_CONTACT
+                // can't create relationship if Contact of Contact is source
+            this.sourceNode.type !== EntityType.CONTACT_OF_CONTACT && (
+                (
+                    // can't create relationship with Contact of Contact if source is Event/Case
+                    (
+                        this.sourceNode.type === EntityType.EVENT ||
+                        this.sourceNode.type === EntityType.CASE
+                    ) &&
+                    this.targetNode.type !== EntityType.CONTACT_OF_CONTACT
+                ) || (
+                    // can't create relationship between 2 Contacts of Contacts
+                    this.sourceNode.type === EntityType.CONTACT &&
+                    this.targetNode.type === EntityType.CONTACT_OF_CONTACT
+                )
             )
         );
     }
