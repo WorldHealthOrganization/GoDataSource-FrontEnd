@@ -36,7 +36,6 @@ import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 })
 export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     @ViewChild(CytoscapeGraphComponent) cytoscapeChild;
-    @ViewChild('showContactOfContacts') showContactOfContacts;
 
     @Input() sizeOfChainsFilter: string = null;
     @Input() personId: string = null;
@@ -194,6 +193,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     ngOnInit() {
         // init filters - only show cases and events first
         this.filters.showContacts = false;
+        this.filters.includeContactsOfContacts = false;
         this.filters.showEvents = true;
 
         const locationQueryBuilder = new RequestQueryBuilder();
@@ -349,11 +349,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 if (this.personId) {
                     requestQueryBuilder.filter.flag('noContactChains', false);
                 }
-            }
 
-            // this flag is working only if 'showContacts' is true
-            if (this.filters.includeContactsOfContacts && this.filters.showContacts) {
-                requestQueryBuilder.filter.flag('includeContactsOfContacts', 1);
+                // this flag is working only if 'showContacts' is true
+                if (this.filters.includeContactsOfContacts) {
+                    requestQueryBuilder.filter.flag('includeContactsOfContacts', 1);
+                }
             }
 
             // person query
@@ -684,7 +684,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      */
     updateShowContactsOfContactValue(value: boolean): void {
         if (value === false) {
-            this.showContactOfContacts.value = false;
+            this.filters.includeContactsOfContacts = false;
         }
     }
 }

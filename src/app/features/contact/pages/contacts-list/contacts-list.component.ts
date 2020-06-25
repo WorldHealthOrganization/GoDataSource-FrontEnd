@@ -360,6 +360,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                             ContactModel.canListRelationshipContacts(this.authUser);
                     }
                 }),
+
                 // Divider
                 new HoverRowAction({
                     type: HoverRowActionType.DIVIDER,

@@ -93,7 +93,7 @@ export class ContactOfContactModel
     static canView(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_VIEW) : false); }
     static canList(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_LIST) : false); }
     static canCreate(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_CREATE) : false); }
-    static canModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_VIEW, PERMISSION.CONTACT_MODIFY) : false); }
+    static canModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_VIEW, PERMISSION.CONTACT_OF_CONTACT_MODIFY) : false); }
     static canDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_DELETE) : false); }
 
     /**
@@ -171,6 +171,7 @@ export class ContactOfContactModel
     static canRestoreLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_RESTORE_LAB_RESULT) : false); }
     static canImportLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_IMPORT_LAB_RESULT) : false); }
     static canExportLabResult(user: UserModel): boolean { return false; }
+
     /**
      * Constructor
      */
@@ -312,6 +313,7 @@ export class ContactOfContactModel
     canRestoreLabResult(user: UserModel): boolean { return ContactOfContactModel.canRestoreLabResult(user); }
     canImportLabResult(user: UserModel): boolean { return ContactOfContactModel.canImportLabResult(user); }
     canExportLabResult(user: UserModel): boolean { return ContactOfContactModel.canExportLabResult(user); }
+
     /**
      * Contact Of Contact Name
      * @returns {string}
@@ -319,7 +321,8 @@ export class ContactOfContactModel
     get name(): string {
         const firstName = this.firstName ? this.firstName : '';
         const lastName = this.lastName ? this.lastName : '';
-        return _.trim(`${firstName} ${lastName}`);
+        const middleName = this.middleName ? this.middleName : '';
+        return _.trim(`${firstName} ${middleName} ${lastName}`);
     }
 
     /**

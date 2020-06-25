@@ -45,8 +45,7 @@
 
             <!--  This checkbox is valid only if 'showContacts' is already enabled -->
             <app-form-checkbox
-                #showContactOfContacts
-                name="showContactOfContacts"
+                name="includeContactsOfContacts "
                 [disabled]="!filters.showContacts"
                 [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_OF_CONTACTS' | translate"
                 [(ngModel)]="filters.includeContactsOfContacts"

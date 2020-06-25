@@ -34,7 +34,6 @@ export const EnglishUsLang = {
          */
         'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_OF_CONTACT_ACTIVE': 'Allow registration of contacts of contacts?',
         'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_OF_CONTACT_ACTIVE_DESCRIPTION': '',
-        'LNG_OUTBREAK_FIELD_LABEL_CONTACT_OF_CONTACT_ID_MASK': 'Contact of contact ID mask',
         'LNG_OUTBREAK_FIELD_LABEL_CONTACT_OF_CONTACT_ID_MASK_DESCRIPTION': '',
 
         /**
@@ -66,11 +65,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_IMPORT_BUTTON': 'Import contacts of contacts data',
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_EXPORT_CONTACTS_OF_CONTACTS_RELATIONSHIPS': 'Export contacts of contacts relationships',
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_IMPORT_CONTACTS_OF_CONTACTS_RELATIONSHIPS': 'Import contacts of contacts relationships',
+        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_SHOW_GROUP_BY_RISK_PILLS': 'Show contacts of contacts grouped by risk count',
 
         /**
          * uiContactOfContactFields
          */
-        'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS': 'Number of contacts',
         'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES': 'Number of exposures',
 
         /**
@@ -152,6 +151,12 @@ export const EnglishUsLang = {
          * uiChainsOfTransmissionGraph
          */
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_OF_CONTACTS' : 'Show Contacts of Contacts',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_OF_CONTACT_TITLE': 'Create Contact of Contact',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_OF_CONTACT_LABEL_CONTACT_FIELDS': 'Contact of contact info',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_OF_CONTACT_LABEL_RELATIONSHIP_FIELDS': 'Relationship info',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_OF_CONTACT_BUTTON': 'Create Contact of contact',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_OF_CONTACT_FOR_PERSON': 'Add contact',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_OF_CONTACT_SUCCESS_MESSAGE': 'Contact of Contact created',
 
         /**
          * NEW GROUP

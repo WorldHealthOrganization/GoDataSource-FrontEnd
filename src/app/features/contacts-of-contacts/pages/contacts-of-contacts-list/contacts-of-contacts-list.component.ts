@@ -18,8 +18,7 @@ import {
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
+import { Router } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
@@ -30,7 +29,6 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Constants } from '../../../../core/models/constants';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
-import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
@@ -65,6 +63,9 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     // list of existing contacts
     contactsOfContactsList$: Observable<ContactOfContactModel[]>;
     contactsOfContactsListCount$: Observable<any>;
+
+    // don't display pills by default
+    showCountPills: boolean = false;
 
     outbreakSubscriber: Subscription;
 
@@ -266,18 +267,19 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         protected listHelperService: ListHelperService,
         private router: Router,
         private contactsOfContactsDataService: ContactsOfContactsDataService,
         private authDataService: AuthDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
-        private route: ActivatedRoute,
         private dialogService: DialogService,
-        protected listFilterDataService: ListFilterDataService,
         private i18nService: I18nService,
         private userDataService: UserDataService,
         private entityHelperService: EntityHelperService
@@ -285,6 +287,9 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         super(listHelperService);
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // add page title
         this.contactsOfContactsDataExportFileName = this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE') +
@@ -352,7 +357,13 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         this.initializeSideTableColumns();
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();
@@ -835,33 +846,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });
-    }
-
-    /**
-     * Filter by phone number
-     */
-    filterByPhoneNumber(value: string) {
-        // remove previous condition
-        this.queryBuilder.filter.remove('addresses');
-
-        if (!_.isEmpty(value)) {
-            // add new condition
-            this.queryBuilder.filter.where({
-                addresses: {
-                    elemMatch: {
-                        phoneNumber: {
-                            $regex: RequestFilter.escapeStringForRegex(value)
-                                .replace(/%/g, '.*')
-                                .replace(/\\\?/g, '.'),
-                            $options: 'i'
-                        }
-                    }
-                }
-            });
-        }
-
-        // refresh list
-        this.needsRefreshList();
     }
 
     /**

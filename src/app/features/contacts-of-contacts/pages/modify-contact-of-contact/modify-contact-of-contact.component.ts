@@ -8,7 +8,7 @@ import { Observable, throwError } from 'rxjs/index';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { NgForm, NgModel } from '@angular/forms';
 import { EntityType } from '../../../../core/models/entity-type';
-import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
+import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -23,15 +23,13 @@ import * as _ from 'lodash';
 import { catchError } from 'rxjs/internal/operators';
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { MatDialogRef } from '@angular/material';
-import {
-    DialogAnswer, DialogAnswerButton, DialogButton,
-    DialogComponent, DialogConfiguration, DialogField
-} from '../../../../shared/components/dialog/dialog.component';
+import {DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components/dialog/dialog.component';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
+import { EntityDataService } from '../../../../core/services/data/entity.data.service';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-modify-contact-of-contact',
@@ -50,7 +48,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
     selectedOutbreak: OutbreakModel;
     contactExposure: RelationshipPersonModel;
 
-    contactOfContactData: ContactModel = new ContactModel();
+    contactOfContactData: ContactOfContactModel = new ContactOfContactModel();
 
     genderList$: Observable<any[]>;
     riskLevelsList$: Observable<any[]>;
@@ -60,6 +58,9 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
     // provide constants to template
     EntityType = EntityType;
     EntityModel = EntityModel;
+    ContactModel = ContactModel;
+    RelationshipModel = RelationshipModel;
+    ContactOfContactModel = ContactOfContactModel;
 
     serverToday: Moment = moment();
 
@@ -72,6 +73,9 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
     displayRefresh: boolean = false;
     @ViewChild('visualId') visualId: NgModel;
 
+    /**
+     * Constructor
+     */
     constructor(
         private referenceDataDataService: ReferenceDataDataService,
         protected route: ActivatedRoute,
@@ -83,11 +87,15 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
         private relationshipDataService: RelationshipDataService,
         private router: Router,
         protected dialogService: DialogService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private entityDataService: EntityDataService
     ) {
         super(route, dialogService);
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -186,6 +194,10 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
         }
     }
 
+    /**
+     * Modify contact of contact
+     * @param form
+     */
     modifyContactOfContact(form: NgForm) {
         // validate form
         if (!this.formHelper.validateForm(form)) {
@@ -220,6 +232,9 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
                 })
             )
             .subscribe((contactOfContactDuplicates: EntityDuplicatesModel) => {
+                // items marked as not duplicates
+                let itemsMarkedAsNotDuplicates: string[] = [];
+
                 // modify the contact of contact
                 const runModifyContactOfContact = (finishCallBack?: () => void) => {
                     // modify the contact of contact
@@ -237,93 +252,152 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
                                 return throwError(err);
                             })
                         )
-                        .subscribe((modifiedContact: ContactModel) => {
-                            // update model
-                            this.contactOfContactData = modifiedContact;
+                        .subscribe((modifiedContactOfContact: ContactOfContactModel) => {
+                            // called when we finish updating contact of contact data
+                            const finishedUpdatingContactOfContact = () => {
+                                // update model
+                                this.contactOfContactData = modifiedContactOfContact;
 
-                            // mark form as pristine
-                            form.form.markAsPristine();
+                                // mark form as pristine
+                                form.form.markAsPristine();
 
-                            // display message
-                            if (!finishCallBack) {
-                                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_MODIFY_CONTACT_OF_CONTACT_SUCCESS_MESSAGE');
+                                // display message
+                                if (!finishCallBack) {
+                                    this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_MODIFY_CONTACT_OF_CONTACT_SUCCESS_MESSAGE');
 
-                                // update breadcrumb
-                                this.createBreadcrumbs();
+                                    // update breadcrumb
+                                    this.createBreadcrumbs();
 
-                                // hide dialog
-                                loadingDialog.close();
+                                    // hide dialog
+                                    loadingDialog.close();
+                                } else {
+                                    // finished
+                                    finishCallBack();
+                                }
+                            };
+
+                            // there are no records marked as NOT duplicates ?
+                            if (
+                                !itemsMarkedAsNotDuplicates ||
+                                itemsMarkedAsNotDuplicates.length < 1
+                            ) {
+                                finishedUpdatingContactOfContact();
                             } else {
-                                // finished
-                                finishCallBack();
+                                // mark records as not duplicates
+                                this.entityDataService
+                                    .markPersonAsOrNotADuplicate(
+                                        this.selectedOutbreak.id,
+                                        EntityType.CONTACT,
+                                        this.contactOfContactId,
+                                        itemsMarkedAsNotDuplicates
+                                    )
+                                    .pipe(
+                                        catchError((err) => {
+                                            this.snackbarService.showApiError(err);
+
+                                            // hide loading
+                                            this.hideLoadingDialog();
+
+                                            return throwError(err);
+                                        })
+                                    )
+                                    .subscribe(() => {
+                                        // finished
+                                        finishedUpdatingContactOfContact();
+                                    });
                             }
                         });
                 };
 
                 // do we have duplicates ?
                 if (contactOfContactDuplicates.duplicates.length > 0) {
+                    // construct list of items from which we can choose actions
+                    const fieldsList: DialogField[] = [];
+                    const fieldsListLayout: number[] = [];
+                    contactOfContactDuplicates.duplicates.forEach((duplicate: EntityModel, index: number) => {
+                        // contact model
+                        const contactOfContactData: ContactOfContactModel = duplicate.model as ContactOfContactModel;
+
+                        // add row fields
+                        fieldsListLayout.push(60, 40);
+                        fieldsList.push(
+                            new DialogField({
+                                name: `actions[${contactOfContactData.id}].label`,
+                                placeholder: (index + 1) + '. ' + EntityModel.getNameWithDOBAge(
+                                    contactOfContactData,
+                                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+                                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+                                ),
+                                fieldType: DialogFieldType.LINK,
+                                routerLink: ['/contacts-of-contacts', contactOfContactData.id, 'view'],
+                                linkTarget: '_blank'
+                            }),
+                            new DialogField({
+                                name: `actions[${contactOfContactData.id}].action`,
+                                placeholder: 'LNG_DUPLICATES_DIALOG_ACTION',
+                                description: 'LNG_DUPLICATES_DIALOG_ACTION_DESCRIPTION',
+                                inputOptions: [
+                                    new LabelValuePair(
+                                        Constants.DUPLICATE_ACTION.NO_ACTION,
+                                        Constants.DUPLICATE_ACTION.NO_ACTION
+                                    ),
+                                    new LabelValuePair(
+                                        Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE,
+                                        Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE
+                                    ),
+                                    new LabelValuePair(
+                                        Constants.DUPLICATE_ACTION.MERGE,
+                                        Constants.DUPLICATE_ACTION.MERGE
+                                    )
+                                ],
+                                inputOptionsClearable: false,
+                                required: true,
+                                value: Constants.DUPLICATE_ACTION.NO_ACTION
+                            })
+                        );
+                    });
+
                     // display dialog
-                    const showDialog = () => {
-                        this.dialogService.showConfirm(new DialogConfiguration({
-                            message: 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_DUPLICATES_DIALOG_CONFIRM_MSG',
-                            yesLabel: 'LNG_COMMON_BUTTON_MERGE',
-                            customInput: true,
-                            fieldsList: [new DialogField({
-                                name: 'mergeWith',
-                                placeholder: 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_DUPLICATES_DIALOG_LABEL_MERGE_WITH',
-                                inputOptions: _.map(contactOfContactDuplicates.duplicates, (duplicate: EntityModel, index: number) => {
-                                    // contact model
-                                    const contactOfContactData: ContactOfContactModel = duplicate.model as ContactOfContactModel;
-
-                                    // map
-                                    return new LabelValuePair((index + 1) + '. ' +
-                                        EntityModel.getNameWithDOBAge(
-                                            contactOfContactData,
-                                            this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-                                            this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
-                                        ),
-                                        contactOfContactData.id
-                                    );
-                                }),
-                                inputOptionsMultiple: true,
-                                required: false
-                            })],
-                            addDefaultButtons: true,
-                            buttons: [
-                                new DialogButton({
-                                    label: 'LNG_COMMON_BUTTON_SAVE',
-                                    clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
-                                        dialogHandler.close(new DialogAnswer(DialogAnswerButton.Extra_1));
-                                    }
-                                })
-                            ]
-                        })).subscribe((answer) => {
-                            // just update ?
-                            if (answer.button === DialogAnswerButton.Yes) {
-                                // make sure we have at least two ids selected ( 1 is the current case )
-                                if (
-                                    !answer.inputValue.value.mergeWith
-                                ) {
-                                    // display need to select at least one record to merge with
-                                    this.snackbarService.showError('LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_DUPLICATES_DIALOG_ACTION_MERGE_AT_LEAST_ONE_ERROR_MESSAGE');
-
-                                    // display dialog again
-                                    showDialog();
-
-                                    // finished here
-                                    return;
+                    this.dialogService.showConfirm(new DialogConfiguration({
+                        message: 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_DUPLICATES_DIALOG_CONFIRM_MSG',
+                        yesLabel: 'LNG_COMMON_BUTTON_SAVE',
+                        customInput: true,
+                        fieldsListLayout: fieldsListLayout,
+                        fieldsList: fieldsList
+                    })).subscribe((answer) => {
+                        if (answer.button === DialogAnswerButton.Yes) {
+                            // determine number of items to merge / mark as not duplicates
+                            const itemsToMerge: string[] = [];
+                            itemsMarkedAsNotDuplicates = [];
+                            const actions: {
+                                [id: string]: {
+                                    action: string
                                 }
+                            } = _.get(answer, 'inputValue.value.actions', {});
+                            if (!_.isEmpty(actions)) {
+                                _.each(actions, (data, id) => {
+                                    switch (data.action) {
+                                        case Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE:
+                                            itemsMarkedAsNotDuplicates.push(id);
+                                            break;
+                                        case Constants.DUPLICATE_ACTION.MERGE:
+                                            itemsToMerge.push(id);
+                                            break;
+                                    }
+                                });
+                            }
 
-                                // save data first, followed by redirecting to merge
+                            // save data first, followed by redirecting to merge
+                            if (itemsToMerge.length > 0) {
                                 runModifyContactOfContact(() => {
                                     // construct list of ids
                                     const mergeIds: string[] = [
                                         this.contactOfContactId,
-                                        ...answer.inputValue.value.mergeWith
+                                        ...itemsToMerge
                                     ];
 
-                                    // hide dialog
-                                    loadingDialog.close();
+                                    // hide loading
+                                    this.hideLoadingDialog();
 
                                     // redirect to merge
                                     this.router.navigate(
@@ -334,17 +408,14 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
                                         }
                                     );
                                 });
-                            } else if (answer.button === DialogAnswerButton.Extra_1) {
-                                runModifyContactOfContact();
                             } else {
-                                // hide dialog
-                                loadingDialog.close();
+                                runModifyContactOfContact();
                             }
-                        });
-                    };
-
-                    // display dialog
-                    showDialog();
+                        } else {
+                            // hide loading
+                            this.hideLoadingDialog();
+                        }
+                    });
                 } else {
                     runModifyContactOfContact();
                 }
@@ -386,5 +457,4 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
             EntityModel.getPersonLink(contactExposure) :
             null;
     }
-
 }

@@ -8,6 +8,7 @@ import { EntityModel } from '../../../../core/models/entity-and-relationship.mod
 import { EntityType } from '../../../../core/models/entity-type';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
     selector: 'app-person-summary',
@@ -20,11 +21,13 @@ export class PersonSummaryComponent implements OnInit {
 
     // constants
     ContactModel = ContactModel;
+    ContactOfContactModel = ContactOfContactModel;
 
     @Output() remove = new EventEmitter<void>();
     @Output() modifyPerson = new EventEmitter<(CaseModel | ContactModel | EventModel)>();
     @Output() deletePerson = new EventEmitter<(CaseModel | ContactModel | EventModel)>();
     @Output() createContact = new EventEmitter<(CaseModel | ContactModel | EventModel)>();
+    @Output() createContactOfContact = new EventEmitter<(CaseModel | ContactModel | EventModel)>();
 
     // authenticated user
     authUser: UserModel;
@@ -71,6 +74,10 @@ export class PersonSummaryComponent implements OnInit {
 
     onCreateContact() {
         this.createContact.emit(this.person);
+    }
+
+    onCreateContactOfContact() {
+        this.createContactOfContact.emit(this.person);
     }
 
     onDeletePerson() {

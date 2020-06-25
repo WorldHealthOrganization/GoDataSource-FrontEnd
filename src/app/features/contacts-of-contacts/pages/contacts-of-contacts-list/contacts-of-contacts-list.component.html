@@ -36,7 +36,11 @@
                         {{'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_IMPORT_BUTTON' | translate}}
                     </button>
 
-                    <mat-divider></mat-divider>
+                    <mat-divider
+                        *ngIf="
+                            ContactOfContactModel.canExportRelationships(authUser) ||
+                            OutbreakModel.canImportRelationship(authUser)"
+                    ></mat-divider>
 
                     <button
                         *ngIf="ContactOfContactModel.canExportRelationships(authUser)"
@@ -59,7 +63,7 @@
 
 <!-- Side columns -->
 <app-side-columns
-    [tableColumnsUserSettingsKey]="UserSettings.CONTACT_FIELDS"
+    [tableColumnsUserSettingsKey]="UserSettings.CONTACT_OF_CONTACT_FIELDS"
     [tableColumns]="tableColumns"
     (visibleColumnsChanged)="applySideColumnsChanged($event)">
 </app-side-columns>
@@ -69,13 +73,23 @@
     <app-total-number-of-records
         [value]="(contactsOfContactsListCount$ | async)?.count">
     </app-total-number-of-records>
-    <!--Contacts grouped by risk level-->
-    <app-counted-items-list
-        *ngIf="!appliedListFilter"
-        fxFlex
-        [items]="countedContactsOfContactsByRiskLevel$ | async"
-        (optionChanged)="filterBySelectField('id', $event.ids, null)">
-    </app-counted-items-list>
+
+    <!--Contacts of Contacts grouped by risk level-->
+    <a
+        *ngIf="!appliedListFilter && !showCountPills; else countPills"
+        class="xlink-button margin-right-x"
+        (click)="showCountPills = true">
+        {{ 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_SHOW_GROUP_BY_RISK_PILLS' | translate }}
+    </a>
+    <ng-template
+        #countPills>
+        <app-counted-items-list
+            *ngIf="!appliedListFilter"
+            fxFlex
+            [items]="countedContactsOfContactsByRiskLevel$ | async"
+            (optionChanged)="filterBySelectField('id', $event.ids, null)">
+        </app-counted-items-list>
+    </ng-template>
 </div>
 
 <app-side-filters
@@ -362,7 +376,7 @@
                             name="phoneNumberFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByPhoneNumber($event)"
+                            (optionChanged)="filterByPhoneNumber('addresses.phoneNumber', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>

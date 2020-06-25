@@ -39,6 +39,9 @@ export class FormContactOfContactQuickComponent extends GroupBase<ContactOfConta
         mask: string
     };
 
+    /**
+     * Constructor
+     */
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,

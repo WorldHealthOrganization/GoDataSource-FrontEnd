@@ -52,6 +52,7 @@
                 (modifyPerson)="modifySelectedPerson($event)"
                 (deletePerson)="deleteSelectedPerson($event)"
                 (createContact)="createContactForSelectedPerson($event)"
+                (createContactOfContact)="createContactOfContactForSelectedPerson($event)"
             ></app-person-summary>
         </mat-card>
     </div>
@@ -186,7 +187,7 @@
         </form>
     </mat-card>
 
-    <!-- Create new Contact for Case/Event/Contact -->
+    <!-- Create new Contact for Case/Event -->
     <mat-card
         *ngIf="selectedNodes.canCreateContact && currentNodeAction === NodeAction.CREATE_CONTACT"
         class="page-section quick-action create-contact"
@@ -224,6 +225,46 @@
                 </div>
             </div>
 
+        </form>
+    </mat-card>
+
+    <!-- Create new Contact of Contact for Contact -->
+    <mat-card
+        *ngIf="selectedNodes.canCreateContactOfContact && currentNodeAction === NodeAction.CREATE_CONTACT_OF_CONTACT"
+        class="page-section quick-action create-contact"
+        fxFlex fxLayout="column"
+    >
+        <h1>{{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_OF_CONTACT_TITLE' | translate}}</h1>
+
+        <form #form="ngForm" (submit)="createContactOfContact(form)">
+
+            <div fxLayout="column" fxLayoutGap="10px">
+
+                <span class="section-title">
+                    {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_OF_CONTACT_LABEL_CONTACT_FIELDS' | translate}}
+                </span>
+
+                <app-form-contact-of-contact-quick
+                    name="contact"
+                    [ngModel]="newContact"
+                ></app-form-contact-of-contact-quick>
+
+                <span class="section-title">
+                    {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_OF_CONTACT_LABEL_RELATIONSHIP_FIELDS' | translate}}
+                </span>
+
+                <app-form-relationship-quick
+                    name="relationship"
+                    [ngModel]="newRelationship"
+                    required="true"
+                ></app-form-relationship-quick>
+
+                <div fxLayout="row">
+                    <button mat-raised-button color="accent" type="submit">
+                        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_OF_CONTACT_BUTTON' | translate}}
+                    </button>
+                </div>
+            </div>
         </form>
     </mat-card>
 </div>

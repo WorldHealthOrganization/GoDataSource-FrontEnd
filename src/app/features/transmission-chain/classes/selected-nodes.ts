@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import { ContactOfContactModel } from '../../../core/models/contact-of-contact.model';
 
 export class SelectedNodes {
-    nodes: (CaseModel|ContactModel|EventModel|ContactOfContactModel)[] = [];
+    nodes: (CaseModel | ContactModel | EventModel | ContactOfContactModel)[] = [];
 
     /**
      * Add node to selected nodes list
@@ -110,8 +110,18 @@ export class SelectedNodes {
             this.nodes.length === 1 &&
             // a Contact can be created only for a Case or an Event
             (
-                this.sourceNode.type !== EntityType.CONTACT_OF_CONTACT
+                this.sourceNode.type === EntityType.CASE ||
+                this.sourceNode.type === EntityType.EVENT
             )
+        );
+    }
+
+    get canCreateContactOfContact(): boolean {
+        return (
+            // do we have a single node selected?
+            this.nodes.length === 1 &&
+            // only a Contact entity can create a Contact of Contact
+            this.sourceNode.type === EntityType.CONTACT
         );
     }
 }

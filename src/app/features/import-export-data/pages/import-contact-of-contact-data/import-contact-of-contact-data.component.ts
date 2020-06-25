@@ -55,6 +55,10 @@ export class ImportContactOfContactDataComponent implements OnInit, OnDestroy {
         'addresses[].geoLocation': ''
     };
 
+    addressFields = {
+        'addresses[].locationId': true
+    };
+
     requiredDestinationFields = [
         'firstName',
         'dateOfReporting',

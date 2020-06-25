@@ -50,7 +50,6 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
 
     contactOfContactData: ContactOfContactModel = new ContactOfContactModel();
 
-    entityType: EntityType;
     entityId: string;
 
     genderList$: Observable<any[]>;
@@ -72,6 +71,9 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
     // authenticated user details
     authUser: UserModel;
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private route: ActivatedRoute,
@@ -89,6 +91,9 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
         super();
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
@@ -114,6 +119,7 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
                     // navigate to Contacts page
                     this.router.navigate(['/contacts']);
 
+                    return;
                 }
 
                 // get selected outbreak
@@ -188,17 +194,31 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
      * Initialize breadcrumbs
      */
     private initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
         if (this.relatedEntityData) {
-            this.breadcrumbs = [
-                new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
-                new BreadcrumbItemModel(this.relatedEntityData.name, `/contacts/${this.relatedEntityData.id}/view`),
-                new BreadcrumbItemModel('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_TITLE', '.', true)
-            ];
+            // Contacts list
+            if (ContactModel.canList(this.authUser)) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+                );
+            }
+            // view Contact
+            if (ContactModel.canView(this.authUser)) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(this.relatedEntityData.name, `/contacts/${this.relatedEntityData.id}/view`)
+                );
+            }
         }
+        // current page breadcrumb
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_TITLE', '.', true)
+        );
     }
 
     /**
-     * Create Contact
+     * Create Contact of contact
      * @param {NgForm[]} stepForms
      * @param {boolean} andAnotherOne
      */
@@ -222,7 +242,7 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
             delete dirtyFields.ageDob;
         }
 
-        // create relationship & contact
+        // create relationship & contact of contact
         if (
             this.formHelper.isFormsSetValid(stepForms) &&
             !_.isEmpty(dirtyFields) &&
@@ -246,9 +266,8 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
                     // items marked as not duplicates
                     let itemsMarkedAsNotDuplicates: string[] = [];
 
-                    // add the new Contact
+                    // add the new Contact of contact
                     const runCreateContactOfContact = () => {
-                        // add the new Contact
                         this.contactsOfContactsDataService
                             .createContactOfContact(this.selectedOutbreak.id, dirtyFields)
                             .pipe(
@@ -274,7 +293,7 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
                                             // display error message
                                             this.snackbarService.showApiError(err);
 
-                                            // remove contact
+                                            // remove contact of contact
                                             this.contactsOfContactsDataService
                                                 .deleteContactOfContact(this.selectedOutbreak.id, contactOfContactData.id)
                                                 .subscribe();
@@ -287,7 +306,7 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
                                         })
                                     )
                                     .subscribe(() => {
-                                        // called when we finished creating contact
+                                        // called when we finished creating contact of contact
                                         const finishedCreatingContactOfContact = () => {
                                             this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
 

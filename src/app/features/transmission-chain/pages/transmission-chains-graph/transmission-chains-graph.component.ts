@@ -41,6 +41,7 @@ import { ContactsOfContactsDataService } from '../../../../core/services/data/co
 enum NodeAction {
     MODIFY_PERSON = 'modify-person',
     CREATE_CONTACT = 'create-contact',
+    CREATE_CONTACT_OF_CONTACT = 'create-contact-of-contact',
     MODIFY_EDGE = 'modify-edge'
 }
 
@@ -329,6 +330,9 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
                     // hide loading dialog
                     loadingDialog.close();
 
+                    // reset relationship swap persons
+                    this.canSwapRelationshipPersons = false;
+
                     if (this.editMode) {
                         this.selectedRelationship = undefined;
                         // add node to selected persons list
@@ -440,15 +444,23 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
         this.currentNodeAction = NodeAction.CREATE_CONTACT;
     }
 
+    createContactOfContactForSelectedPerson(person: ContactModel) {
+        // remove other selected node(s) (if any)
+        this.selectedNodes.keepNode(person);
+
+        this.resetFormModels();
+
+        this.currentNodeAction = NodeAction.CREATE_CONTACT_OF_CONTACT;
+    }
+
     /**
      * Check if we can we swap selected nodes
      */
     canSwapSelectedNodes() {
-        return this.selectedNodes.nodes.length > 1 &&
-            (
-                this.selectedNodes.targetNode.type !== EntityType.CONTACT &&
-                this.selectedNodes.targetNode.type !== EntityType.CONTACT_OF_CONTACT
-            );
+        return this.selectedNodes.nodes.length > 1 && (
+            this.selectedNodes.targetNode.type !== EntityType.CONTACT &&
+            this.selectedNodes.targetNode.type !== EntityType.CONTACT_OF_CONTACT
+        );
     }
 
     deleteSelectedPerson(person: (CaseModel | ContactModel | EventModel)) {
@@ -546,7 +558,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
      * @param form
      * @param entityType
      */
-    createContact(form: NgForm, entityType: EntityType) {
+    createContact(form: NgForm) {
         // get forms fields
         const fields = this.formHelper.getFields(form);
 
@@ -561,13 +573,9 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
         // get source person
         const sourcePerson = this.selectedNodes.sourceNode;
 
-        // determine which method to call on create contact based on entity type
-        const dataService = entityType === EntityType.CONTACT ? 'contactDataService' : 'contactsOfContactsDataService';
-        const method = entityType === EntityType.CONTACT ? 'createContact' : 'createContactOfContact';
-
         // add the new Contact
-        this[dataService]
-            [method](this.selectedOutbreak.id, contactFields)
+        this.contactDataService
+            .createContact(this.selectedOutbreak.id, contactFields)
             .pipe(
                 switchMap((contactData: ContactModel) => {
                     relationshipFields.persons = [{
@@ -604,6 +612,75 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             )
             .subscribe(() => {
                 this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
+
+                // refresh graph
+                this.cotDashletChild.refreshChain();
+
+                // reset form
+                this.resetFormModels();
+
+                // reset selected nodes
+                this.resetNodes();
+
+                // reset node action
+                this.currentNodeAction = null;
+            });
+    }
+
+    createContactOfContact(form: NgForm) {
+        // get forms fields
+        const fields = this.formHelper.getFields(form);
+
+        if (!this.formHelper.validateForm(form)) {
+            return;
+        }
+
+        // contact of contact fields
+        const contactOfContactFields = fields.contact;
+        // relationship fields
+        const relationshipFields = fields.relationship;
+        // get source person
+        const sourcePerson = this.selectedNodes.sourceNode;
+
+        // add the new Contact of Contact
+        this.contactsOfContactsDataService
+            .createContactOfContact(this.selectedOutbreak.id, contactOfContactFields)
+            .pipe(
+                switchMap((contactOfContactData: ContactOfContactModel) => {
+                    relationshipFields.persons = [{
+                        id: contactOfContactData.id
+                    }];
+
+                    // create the relationship between the source person and the new contact of contact
+                    return this.relationshipDataService
+                        .createRelationship(
+                            this.selectedOutbreak.id,
+                            sourcePerson.type,
+                            sourcePerson.id,
+                            relationshipFields
+                        )
+                        .pipe(
+                            catchError((err) => {
+                                // display error message
+                                this.snackbarService.showApiError(err);
+
+                                // rollback - remove contact
+                                this.contactsOfContactsDataService
+                                    .deleteContactOfContact(this.selectedOutbreak.id, contactOfContactData.id)
+                                    .subscribe();
+
+                                // finished
+                                return throwError(err);
+                            })
+                        );
+                }),
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                })
+            )
+            .subscribe(() => {
+                this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_OF_CONTACT_SUCCESS_MESSAGE');
 
                 // refresh graph
                 this.cotDashletChild.refreshChain();
