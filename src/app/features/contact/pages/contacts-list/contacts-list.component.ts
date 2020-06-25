@@ -357,6 +357,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                     },
                     visible: (item: ContactModel): boolean => {
                         return !item.deleted &&
+                            this.selectedOutbreak.isContactsOfContactsActive &&
                             ContactModel.canListRelationshipContacts(this.authUser);
                     }
                 }),
