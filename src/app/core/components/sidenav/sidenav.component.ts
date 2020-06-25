@@ -634,6 +634,6 @@ export class SidenavComponent implements OnInit, OnDestroy {
      */
     hasOutbreakAndCoCEnabled(): boolean {
         return !!(this.selectedOutbreak && this.selectedOutbreak.id && this.selectedOutbreak.isContactsOfContactsActive);
-    };
+    }
 
 }
