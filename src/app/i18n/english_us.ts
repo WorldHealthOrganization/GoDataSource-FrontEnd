@@ -74,14 +74,24 @@ export const EnglishUsLang = {
         /**
          * uiCreateOutbreakPage
          */
-        'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_DESCRIPTION': 'Option specifying whether the round-robin team assignment should be done taking in consideration all teams activating in the contact\'s location (via that location or parents) or just the nearest teams. Default: round-robin of all teams activating in the contact\'s location. ' +
-            'Round-robin team assignment implies the following: after a pool of teams that can be assigned to the follow-up is created, for each follow-up that is generated, the team is chosen in order from the pool. After the assignment, the team is removed from the pool until the pool of teams is emptied. Then the pool resets with the original chosen teams so the process can start again.',
+        'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_DESCRIPTION': '[Option 1] - If Team1 has "Argentina" assigned and Team2 has "Buenos Aires" assigned (sublocation of Argentina).' +
+            ' Contact has "Buenos Aires" as the usual place of residence location. Only Team2 will be added to the assignment pool from where the choosing will be done.' +
+            ' [Option 2] - If Team1 has "Argentina" assigned and team2 has "Buenos Aires" assigned (sublocation of Argentina). Contact has "Buenos Aires" as the usual place of residence location.' +
+            ' Both Team1 and Team2 will be added to the assignment pool from where the choosing will be done.',
 
         /**
          * uiCreateOutbreakTemplatePage
          */
-        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_DESCRIPTION': 'Option specifying whether the round-robin team assignment should be done taking in consideration all teams activating in the contact\'s location (via that location or parents) or just the nearest teams. Default: round-robin of all teams activating in the contact\'s location. ' +
-            'Round-robin team assignment implies the following: after a pool of teams that can be assigned to the follow-up is created, for each follow-up that is generated, the team is chosen in order from the pool. After the assignment, the team is removed from the pool until the pool of teams is emptied. Then the pool resets with the original chosen teams so the process can start again.',
+        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_DESCRIPTION': '[Option 1] - If Team1 has "Argentina" assigned and Team2 has "Buenos Aires" assigned (sublocation of Argentina).' +
+            ' Contact has "Buenos Aires" as the usual place of residence location. Only Team2 will be added to the assignment pool from where the choosing will be done.' +
+            ' [Option 2] - If Team1 has "Argentina" assigned and team2 has "Buenos Aires" assigned (sublocation of Argentina). Contact has "Buenos Aires" as the usual place of residence location.' +
+            ' Both Team1 and Team2 will be added to the assignment pool from where the choosing will be done.',
+
+        /**
+         *referenceDataCategoryFollowupGenerationTeamAssignmentAlgorithm
+         */
+        'LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_ROUND_ROBIN_NEAREST_FIT': 'Option 1 - Assign team at the higher admin level',
+        'LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_ROUND_ROBIN_ALL_TEAMS': 'Option 2 - Assign team responsible for the location where contact resides'
 
 
 
