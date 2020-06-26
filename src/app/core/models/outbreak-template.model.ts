@@ -57,7 +57,7 @@ export class OutbreakTemplateModel
     static canGenerateOutbreak(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_CREATE, PERMISSION.OUTBREAK_TEMPLATE_VIEW, PERMISSION.OUTBREAK_TEMPLATE_GENERATE_OUTBREAK) : false; }
 
     /**
-     * Static Permissions - IPermissionsCloneable
+     * Static Permissions - IPermissionCloneable
      */
     static canClone(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_CREATE_CLONE) : false; }
 

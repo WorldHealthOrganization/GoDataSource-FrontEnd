@@ -13,7 +13,7 @@ import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
 import {
     IPermissionBasic,
-    IPermissionBasicBulk, IPermissionRelatedContactBulk,
+    IPermissionBasicBulk,
     IPermissionChronology,
     IPermissionContact,
     IPermissionExportable,
@@ -21,7 +21,9 @@ import {
     IPermissionMovement,
     IPermissionRelatedLabResult,
     IPermissionRelatedRelationship,
-    IPermissionRestorable
+    IPermissionRestorable,
+    IPermissionRelatedContactOfContactBulk,
+    IPermissionRelatedContactOfContact
 } from './permission.interface';
 import { IAnswerData } from './question.model';
 
@@ -37,13 +39,15 @@ export class ContactModel
         IPermissionBasic,
         IPermissionExportable,
         IPermissionImportable,
-        IPermissionBasicBulk, IPermissionRelatedContactBulk,
+        IPermissionBasicBulk,
+        IPermissionRelatedContactOfContactBulk,
         IPermissionRestorable,
         IPermissionRelatedRelationship,
         IPermissionMovement,
         IPermissionChronology,
         IPermissionContact,
-        IPermissionRelatedLabResult {
+        IPermissionRelatedLabResult,
+        IPermissionRelatedContactOfContact {
     id: string;
     firstName: string;
     middleName: string;
@@ -139,9 +143,9 @@ export class ContactModel
     static canBulkRestore(user: UserModel): boolean { return false; }
 
     /**
-     * Static Permissions - IPermissionRelatedContactBulk
+     * Static Permissions - IPermissionRelatedContactOfContactBulk
      */
-    static canBulkCreateContact(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_CREATE_BULK_CONTACT_OF_CONTACT) : false); }
+    static canBulkCreateContactOfContact(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_CREATE_BULK_CONTACT_OF_CONTACT) : false); }
 
     /**
      * Static Permissions - IPermissionRestorable
@@ -202,9 +206,9 @@ export class ContactModel
     static canExportLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_EXPORT_LAB_RESULT) : false); }
 
     /**
-     * Static Permissions - IPermissionsContactsOfContacts
+     * Static Permissions - IPermissionRelatedContactOfContact
      */
-    static canCreateContactOfContact(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_CREATE) : false); }
+    static canCreateContactOfContact(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_CREATE_CONTACT_OF_CONTACT) : false); }
 
     /**
      * Constructor
@@ -300,9 +304,9 @@ export class ContactModel
     canBulkRestore(user: UserModel): boolean { return ContactModel.canBulkRestore(user); }
 
     /**
-     * Permissions - IPermissionRelatedContactBulk
+     * Permissions - IPermissionRelatedContactOfContactBulk
      */
-    canBulkCreateContact(user: UserModel): boolean { return ContactModel.canBulkCreateContact(user); }
+    canBulkCreateContactOfContact(user: UserModel): boolean { return ContactModel.canBulkCreateContactOfContact(user); }
 
     /**
      * Permissions - IPermissionRestorable
@@ -361,6 +365,11 @@ export class ContactModel
     canRestoreLabResult(user: UserModel): boolean { return ContactModel.canRestoreLabResult(user); }
     canImportLabResult(user: UserModel): boolean { return ContactModel.canImportLabResult(user); }
     canExportLabResult(user: UserModel): boolean { return ContactModel.canExportLabResult(user); }
+
+    /**
+     * Permissions - IPermissionRelatedContactOfContact
+     */
+    canCreateContactOfContact(user: UserModel): boolean { return ContactModel.canCreateContactOfContact(user); }
 
     /**
      * Contact Name

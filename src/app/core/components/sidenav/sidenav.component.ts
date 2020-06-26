@@ -227,7 +227,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
                         PERMISSION.CONTACT_OF_CONTACT_LIST
                     ],
                     '/contacts-of-contacts',
-                    () => this.hasOutbreakAndCoCEnabled.apply(this)// provide context to keep this functionality
+                    () => this.hasOutbreakAndCoCEnabled.apply(this) // provide context to keep this functionality
                 ),
                 new ChildNavItem(
                     'contact-follow-ups',
@@ -633,7 +633,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
      * @returns {boolean}
      */
     hasOutbreakAndCoCEnabled(): boolean {
-        return !!(this.selectedOutbreak && this.selectedOutbreak.id && this.selectedOutbreak.isContactsOfContactsActive);
+        return this.hasOutbreak() &&
+            this.selectedOutbreak.isContactsOfContactsActive;
     }
-
 }

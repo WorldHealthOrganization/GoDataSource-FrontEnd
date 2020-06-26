@@ -15,11 +15,10 @@ import {
     IPermissionBasic,
     IPermissionBasicBulk,
     IPermissionChronology,
-    IPermissionContact,
+    IPermissionContactOfContacts,
     IPermissionExportable,
     IPermissionImportable,
     IPermissionMovement,
-    IPermissionRelatedLabResult,
     IPermissionRelatedRelationship,
     IPermissionRestorable
 } from './permission.interface';
@@ -35,8 +34,7 @@ export class ContactOfContactModel
         IPermissionRelatedRelationship,
         IPermissionMovement,
         IPermissionChronology,
-        IPermissionContact,
-        IPermissionRelatedLabResult {
+        IPermissionContactOfContacts {
     id: string;
     firstName: string;
     middleName: string;
@@ -152,25 +150,10 @@ export class ContactOfContactModel
     static canViewChronologyChart(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_VIEW_CHRONOLOGY_CHART) : false); }
 
     /**
-     * Static Permissions - IPermissionContact
+     * Static Permissions - IPermissionContactOfContacts
      */
     static canGenerateVisualId(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_GENERATE_VISUAL_ID) : false); }
-    static canConvertToCase(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_CONVERT_TO_CASE) : false); }
-    static canExportDailyFollowUpList(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_EXPORT_DAILY_FOLLOW_UP_LIST) : false); }
-    static canExportDailyFollowUpsForm(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_EXPORT_DAILY_FOLLOW_UP_FORM) : false); }
     static canExportDossier(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_EXPORT_DOSSIER) : false); }
-
-    /**
-     * Static Permissions - IPermissionRelatedLabResult
-     */
-    static canViewLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_VIEW_LAB_RESULT) : false); }
-    static canListLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_LIST_LAB_RESULT) : false); }
-    static canCreateLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_CREATE_LAB_RESULT) : false); }
-    static canModifyLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_MODIFY_LAB_RESULT) : false); }
-    static canDeleteLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_DELETE_LAB_RESULT) : false); }
-    static canRestoreLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_RESTORE_LAB_RESULT) : false); }
-    static canImportLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_IMPORT_LAB_RESULT) : false); }
-    static canExportLabResult(user: UserModel): boolean { return false; }
 
     /**
      * Constructor
@@ -294,25 +277,10 @@ export class ContactOfContactModel
     canViewChronologyChart(user: UserModel): boolean { return ContactOfContactModel.canViewChronologyChart(user); }
 
     /**
-     * Permissions - IPermissionContact
+     * Permissions - IPermissionContactOfContacts
      */
     canGenerateVisualId(user: UserModel): boolean { return ContactOfContactModel.canGenerateVisualId(user); }
-    canConvertToCase(user: UserModel): boolean { return ContactOfContactModel.canConvertToCase(user); }
-    canExportDailyFollowUpList(user: UserModel): boolean { return ContactOfContactModel.canExportDailyFollowUpList(user); }
-    canExportDailyFollowUpsForm(user: UserModel): boolean { return ContactOfContactModel.canExportDailyFollowUpsForm(user); }
     canExportDossier(user: UserModel): boolean { return ContactOfContactModel.canExportDossier(user); }
-
-    /**
-     * Permissions - IPermissionRelatedLabResult
-     */
-    canViewLabResult(user: UserModel): boolean { return ContactOfContactModel.canViewLabResult(user); }
-    canListLabResult(user: UserModel): boolean { return ContactOfContactModel.canListLabResult(user); }
-    canCreateLabResult(user: UserModel): boolean { return ContactOfContactModel.canCreateLabResult(user); }
-    canModifyLabResult(user: UserModel): boolean { return ContactOfContactModel.canModifyLabResult(user); }
-    canDeleteLabResult(user: UserModel): boolean { return ContactOfContactModel.canDeleteLabResult(user); }
-    canRestoreLabResult(user: UserModel): boolean { return ContactOfContactModel.canRestoreLabResult(user); }
-    canImportLabResult(user: UserModel): boolean { return ContactOfContactModel.canImportLabResult(user); }
-    canExportLabResult(user: UserModel): boolean { return ContactOfContactModel.canExportLabResult(user); }
 
     /**
      * Contact Of Contact Name

@@ -292,7 +292,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                             this.selectedOutbreak.isContactsOfContactsActive &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
                             ContactOfContactModel.canBulkCreate(this.authUser) &&
-                            ContactModel.canBulkCreateContact(this.authUser);
+                            ContactModel.canBulkCreateContactOfContact(this.authUser);
                     }
                 }),
 
