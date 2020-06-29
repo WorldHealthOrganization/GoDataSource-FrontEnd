@@ -278,6 +278,8 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
                 return PeoplePossibleDuplicateModel.canMergeContacts(this.authUser);
             case EntityType.EVENT:
                 return PeoplePossibleDuplicateModel.canMergeEvents(this.authUser);
+            case EntityType.CONTACT_OF_CONTACT:
+                return PeoplePossibleDuplicateModel.canMergeContacts(this.authUser);
             default:
                 // not supported
                 return false;

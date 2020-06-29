@@ -198,6 +198,10 @@ export class Constants {
             label: 'LNG_APP_PAGE_CONTACTS',
             value: 'LNG_APP_PAGE_CONTACTS'
         },
+        CONTACTS_OF_CONTACTS: {
+            label: 'LNG_APP_PAGE_CONTACTS_OF_CONTACTS',
+            value: 'LNG_APP_PAGE_CONTACTS_OF_CONTACTS'
+        },
         EVENTS: {
             label: 'LNG_APP_PAGE_EVENTS',
             value: 'LNG_APP_PAGE_EVENTS'
@@ -282,6 +286,10 @@ export class Constants {
         CONTACT: {
             label: 'LNG_APP_PAGE_IMPORT_CONTACTS',
             value: 'LNG_APP_PAGE_IMPORT_CONTACTS'
+        },
+        CONTACT_OF_CONTACT: {
+            label: 'LNG_APP_PAGE_IMPORT_CONTACTS_OF_CONTACTS',
+            value: 'LNG_APP_PAGE_IMPORT_CONTACTS_OF_CONTACTS'
         },
         CASE_LAB_DATA: {
             label: 'LNG_APP_PAGE_IMPORT_CASE_LAB_DATA',

@@ -241,9 +241,15 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
                 'nin': excludeEntityIds
             }
         });
-        // retrieve only available entity types
-        const targetRelationshipType = this.relationshipType === RelationshipType.EXPOSURE ? RelationshipType.CONTACT : RelationshipType.EXPOSURE;
-        const availableTypes: EntityType[] = this.genericDataService.getAvailableRelatedEntityTypes(this.entityType, targetRelationshipType);
+
+        // get available entities
+        const availableTypes: EntityType[] = this.genericDataService
+            .getAvailableRelatedEntityTypes(
+                this.entityType,
+                this.relationshipType,
+                Constants.APP_PAGE.PEOPLE_TO_SHARE_RELATIONSHIPS_WITH.value
+            );
+
         this.queryBuilder.filter.where({
             type: {
                 'inq': availableTypes

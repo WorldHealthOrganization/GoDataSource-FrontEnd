@@ -52,6 +52,7 @@ import { FormVaccinesListComponent } from './form-vaccines-list/form-vaccines-li
 import { HotTableWrapperComponent } from './hot-table-wrapper/hot-table-wrapper.component';
 import { LocationDialogComponent } from './location-dialog/location-dialog.component';
 import { TopnavUnauthenticatedComponent } from './topnav-unauthenticated/topnav-unauthenticated.component';
+import { FormContactOfContactQuickComponent } from './form-contact-of-contact-quick/form-contact-of-contact-quick.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -99,6 +100,7 @@ export const components: any[] = [
     FormAgeDobComponent,
     FormRelationshipQuickComponent,
     FormContactQuickComponent,
+    FormContactOfContactQuickComponent,
     FormCaseQuickComponent,
     FormEventQuickComponent,
     FormLocationIdentifierListComponent,

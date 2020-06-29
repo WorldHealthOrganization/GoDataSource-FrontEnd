@@ -9,6 +9,7 @@ import { EntityDataService } from '../../../core/services/data/entity.data.servi
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { EntityModel } from '../../../core/models/entity-and-relationship.model';
 import * as _ from 'lodash';
+import { ContactOfContactModel } from '../../../core/models/contact-of-contact.model';
 
 /**
  * Node Data
@@ -40,7 +41,7 @@ export class ViewCotNodeDialogComponent implements OnDestroy {
     };
 
     // person model
-    entity: CaseModel | ContactModel | EventModel;
+    entity: CaseModel | ContactModel | EventModel | ContactOfContactModel;
     // person information as key-value pairs
     entityInfo: LabelValuePair[] = [];
 

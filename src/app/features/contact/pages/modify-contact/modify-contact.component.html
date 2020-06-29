@@ -365,6 +365,16 @@
             {{ 'LNG_COMMON_BUTTON_EXPOSURES_TO' | translate }}
         </button>
 
+        <button *ngIf="
+                ContactModel.canListRelationshipContacts(authUser) &&
+                RelationshipModel.canList(authUser) &&
+                selectedOutbreak?.isContactsOfContactsActive"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/relationships', EntityType.CONTACT, contactId, 'contacts']">
+            {{ 'LNG_COMMON_BUTTON_EXPOSURES_FROM' | translate }}
+        </button>
+
         <div class="page-tabs-navbar-placeholder"></div>
 
         <button
