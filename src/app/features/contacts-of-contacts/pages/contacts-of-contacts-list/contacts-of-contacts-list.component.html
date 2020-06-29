@@ -301,7 +301,8 @@
                             (itemChanged)="filterByLocation($event)"
                             app-reset-location-on-side-filter
                             [fixedDropPanel]="true"
-                        ></app-form-location-dropdown>
+                            [useOutbreakLocations]="true">
+                        </app-form-location-dropdown>
                     </div>
                 </div>
             </mat-header-cell>

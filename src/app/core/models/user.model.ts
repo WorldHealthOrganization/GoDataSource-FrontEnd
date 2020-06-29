@@ -231,6 +231,7 @@ export class UserModel
     languageId: string;
     roleIds: string[];
     roles: UserRoleModel[] = [];
+    disregardGeographicRestrictions: boolean;
 
     // used to determine if permissions changed from last time we used this key
     private _permissionIdsHash: number;
@@ -307,6 +308,7 @@ export class UserModel
         this.availablePermissions = _.get(data, 'availablePermissions');
         this.institutionName = _.get(data, 'institutionName');
         this.telephoneNumbers = _.get(data, 'telephoneNumbers', {});
+        this.disregardGeographicRestrictions = _.get(data, 'disregardGeographicRestrictions', false);
 
         // initialize all settings
         this.initializeSettings(data);

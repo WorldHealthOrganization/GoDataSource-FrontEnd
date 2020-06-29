@@ -70,7 +70,12 @@
                                 [disabled]="newOutbreakTemplate.generateFollowUpsOverwriteExisting">
                             </app-form-slide-toggle>
 
-                            <div fxFlex><!-- placeholder --></div>
+                            <app-form-slide-toggle
+                                name="applyGeographicRestrictions"
+                                [(ngModel)]="newOutbreakTemplate.applyGeographicRestrictions"
+                                [label]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_APPLY_GEOGRAPHIC_RESTRICTIONS' | translate"
+                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_APPLY_GEOGRAPHIC_RESTRICTIONS_DESCRIPTION">
+                            </app-form-slide-toggle>
                         </div>
                     </div>
                 </mat-card>

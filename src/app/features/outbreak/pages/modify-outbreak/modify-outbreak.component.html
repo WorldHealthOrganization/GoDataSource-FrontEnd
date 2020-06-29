@@ -152,7 +152,8 @@
                                 optionTooltipKey="description"
                                 [options]="followUpsTeamAssignmentAlgorithm$ | async"
                                 [required]="true"
-                                [clearable]="false">
+                                [clearable]="false"
+                                [disabled]="viewOnly">
                             </app-form-select>
 
                             <app-form-slide-toggle
@@ -160,7 +161,8 @@
                                 [(ngModel)]="outbreak.generateFollowUpsOverwriteExisting"
                                 [label]="'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING' | translate"
                                 tooltip="LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING_DESCRIPTION"
-                                (optionChanged)="outbreak.generateFollowUpsKeepTeamAssignment = $event ? false : outbreak.generateFollowUpsKeepTeamAssignment">
+                                (optionChanged)="outbreak.generateFollowUpsKeepTeamAssignment = $event ? false : outbreak.generateFollowUpsKeepTeamAssignment"
+                                [disabled]="viewOnly">
                             </app-form-slide-toggle>
 
                             <app-form-slide-toggle
@@ -168,10 +170,16 @@
                                 [(ngModel)]="outbreak.generateFollowUpsKeepTeamAssignment"
                                 [label]="'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT' | translate"
                                 tooltip="LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT_DESCRIPTION"
-                                [disabled]="outbreak.generateFollowUpsOverwriteExisting">
+                                [disabled]="outbreak.generateFollowUpsOverwriteExisting || viewOnly">
                             </app-form-slide-toggle>
 
-                            <div fxFlex><!-- placeholder --></div>
+                            <app-form-slide-toggle
+                                name="applyGeographicRestrictions"
+                                [(ngModel)]="outbreak.applyGeographicRestrictions"
+                                [label]="'LNG_OUTBREAK_FIELD_LABEL_APPLY_GEOGRAPHIC_RESTRICTIONS' | translate"
+                                tooltip="LNG_OUTBREAK_FIELD_LABEL_APPLY_GEOGRAPHIC_RESTRICTIONS_DESCRIPTION"
+                                [disabled]="viewOnly">
+                            </app-form-slide-toggle>
                         </div>
                     </div>
                 </mat-card>
