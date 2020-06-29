@@ -14,6 +14,7 @@ import { EntityDataService } from '../../../core/services/data/entity.data.servi
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ListHelperService } from '../../../core/services/helper/list-helper.service';
+import { ContactOfContactModel } from '../../../core/models/contact-of-contact.model';
 
 export abstract class RelationshipsListComponent extends ListComponent implements OnInit, OnDestroy {
     // Entities Map for specific data
@@ -68,7 +69,7 @@ export abstract class RelationshipsListComponent extends ListComponent implement
                     modify: ContactModel.canModifyRelationshipContacts,
                     delete: ContactModel.canDeleteRelationshipContacts,
                     share: ContactModel.canShareRelationship,
-                    changeSource: () => false,
+                    changeSource: ContactModel.canChangeSource,
                     bulkDelete: ContactModel.canBulkDeleteRelationshipContacts
                 },
                 exposures: {
@@ -79,6 +80,21 @@ export abstract class RelationshipsListComponent extends ListComponent implement
                     share: ContactModel.canShareRelationship,
                     changeSource: ContactModel.canChangeSource,
                     bulkDelete: ContactModel.canBulkDeleteRelationshipExposures
+                }
+            }
+        },
+        [EntityType.CONTACT_OF_CONTACT]: {
+            label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
+            link: '/contacts-of-contacts',
+            can: {
+                exposures: {
+                    view: ContactOfContactModel.canViewRelationshipExposures,
+                    create: ContactOfContactModel.canCreateRelationshipExposures,
+                    modify: ContactOfContactModel.canModifyRelationshipExposures,
+                    delete: ContactOfContactModel.canDeleteRelationshipExposures,
+                    share: ContactOfContactModel.canShareRelationship,
+                    changeSource: ContactOfContactModel.canChangeSource,
+                    bulkDelete: ContactOfContactModel.canBulkDeleteRelationshipExposures
                 }
             }
         },

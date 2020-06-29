@@ -28,6 +28,7 @@ import { ClusterDataService } from '../../../../core/services/data/cluster.data.
 import { catchError, share } from 'rxjs/operators';
 import { throwError, forkJoin } from 'rxjs';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
     selector: 'app-create-entity-relationship',
@@ -64,7 +65,7 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
     relationshipType: RelationshipType;
 
     selectedEntityIds: string[];
-    selectedEntities: (CaseModel | ContactModel | EventModel)[];
+    selectedEntities: (CaseModel | ContactModel | EventModel | ContactOfContactModel)[];
 
     relationships: RelationshipModel[] = [];
     relationshipsIds: string[] = [];

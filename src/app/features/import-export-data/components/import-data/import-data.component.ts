@@ -38,7 +38,8 @@ export enum ImportServerModelNames {
     OUTBREAK = 'outbreak',
     RELATIONSHIPS = 'relationship',
     CASE = 'case',
-    CONTACT = 'contact'
+    CONTACT = 'contact',
+    CONTACT_OF_CONTACT = 'contactOfContact'
 }
 
 enum ImportServerErrorCodes {

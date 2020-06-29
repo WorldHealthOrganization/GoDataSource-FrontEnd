@@ -258,24 +258,25 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                             mask: ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask)
                         };
                         // set visual ID validator
-                        this.contactDataService.checkContactVisualIDValidity(
-                            this.selectedOutbreak.id,
-                            visualIDTranslateData.mask,
-                            value
-                        )
-                        .pipe(
-                            catchError((err) => {
-                                callback(false);
-                                return throwError(err);
-                            })
-                        )
-                        .subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
-                            if (isValid === true) {
-                                callback(true);
-                            } else {
-                                callback(false);
-                            }
-                        });
+                        this.contactDataService
+                            .checkContactVisualIDValidity(
+                                this.selectedOutbreak.id,
+                                visualIDTranslateData.mask,
+                                value
+                            )
+                            .pipe(
+                                catchError((err) => {
+                                    callback(false);
+                                    return throwError(err);
+                                })
+                            )
+                            .subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                                if (isValid === true) {
+                                    callback(true);
+                                } else {
+                                    callback(false);
+                                }
+                            });
                     }
                 }),
             new DropdownSheetColumn()

@@ -13,6 +13,7 @@ export enum UserSettings {
     CASE_WITHOUT_RELATIONSHIPS_FIELDS = 'caseWithoutRelationshipsFields',
     CONTACT_LAB_FIELDS = 'contactLabFields',
     CONTACT_FIELDS = 'contactFields',
+    CONTACT_OF_CONTACT_FIELDS = 'contactOfContactFields',
     EVENT_FIELDS = 'eventFields',
     EVENT_WITHOUT_RELATIONSHIPS_FIELDS = 'eventWithoutRelationshipsFields',
     LOCATION_FIELDS= 'locationFields',
@@ -49,6 +50,7 @@ abstract class UserSettingsHandlers {
     static CASE_WITHOUT_RELATIONSHIPS_FIELDS = [];
     static CONTACT_LAB_FIELDS = [];
     static CONTACT_FIELDS = [];
+    static CONTACT_OF_CONTACT_FIELDS = [];
     static EVENT_FIELDS = [];
     static EVENT_WITHOUT_RELATIONSHIPS_FIELDS = [];
     static LOCATION_FIELDS = [];

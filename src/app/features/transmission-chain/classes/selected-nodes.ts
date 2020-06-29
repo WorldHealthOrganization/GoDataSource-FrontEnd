@@ -3,15 +3,16 @@ import { ContactModel } from '../../../core/models/contact.model';
 import { EventModel } from '../../../core/models/event.model';
 import { EntityType } from '../../../core/models/entity-type';
 import * as _ from 'lodash';
+import { ContactOfContactModel } from '../../../core/models/contact-of-contact.model';
 
 export class SelectedNodes {
-    nodes: (CaseModel|ContactModel|EventModel)[] = [];
+    nodes: (CaseModel | ContactModel | EventModel | ContactOfContactModel)[] = [];
 
     /**
      * Add node to selected nodes list
      * @param node
      */
-    addNode(node: CaseModel | EventModel | ContactModel): void {
+    addNode(node: CaseModel | EventModel | ContactModel | ContactOfContactModel): void {
         // check if the node is already selected
         if (
             this.nodes.length > 0 &&
@@ -64,14 +65,14 @@ export class SelectedNodes {
     /**
      * Get the Source node (aka Exposure)
      */
-    get sourceNode(): (CaseModel | EventModel | ContactModel) {
+    get sourceNode(): (CaseModel | EventModel | ContactModel | ContactOfContactModel) {
         return this.nodes[0];
     }
 
     /**
      * Get the Target node (aka Contact)
      */
-    get targetNode(): (CaseModel | EventModel | ContactModel) {
+    get targetNode(): (CaseModel | EventModel | ContactModel | ContactOfContactModel) {
         return this.nodes[1];
     }
 
@@ -82,10 +83,20 @@ export class SelectedNodes {
         return (
             // do we have 2 selected nodes so we can create relationship between them?
             this.nodes.length === 2 &&
-            // cannot create relationship between 2 Contacts
-            (
-                this.sourceNode.type !== EntityType.CONTACT ||
-                this.targetNode.type !== EntityType.CONTACT
+                // can't create relationship if Contact of Contact is source
+            this.sourceNode.type !== EntityType.CONTACT_OF_CONTACT && (
+                (
+                    // can't create relationship with Contact of Contact if source is Event/Case
+                    (
+                        this.sourceNode.type === EntityType.EVENT ||
+                        this.sourceNode.type === EntityType.CASE
+                    ) &&
+                    this.targetNode.type !== EntityType.CONTACT_OF_CONTACT
+                ) || (
+                    // can't create relationship between 2 Contacts of Contacts
+                    this.sourceNode.type === EntityType.CONTACT &&
+                    this.targetNode.type === EntityType.CONTACT_OF_CONTACT
+                )
             )
         );
     }
@@ -102,6 +113,18 @@ export class SelectedNodes {
                 this.sourceNode.type === EntityType.CASE ||
                 this.sourceNode.type === EntityType.EVENT
             )
+        );
+    }
+
+    /**
+     * Check if we can create contact of contacts
+     */
+    get canCreateContactOfContact(): boolean {
+        return (
+            // do we have a single node selected?
+            this.nodes.length === 1 &&
+            // only a Contact entity can create a Contact of Contact
+            this.sourceNode.type === EntityType.CONTACT
         );
     }
 }

@@ -27,6 +27,7 @@ export class OutbreakTemplateModel
     contactFollowUpTemplate: QuestionModel[];
     labResultsTemplate: QuestionModel[];
     isContactLabResultsActive: boolean;
+    isContactsOfContactsActive: boolean;
     isDateOfOnsetRequired: boolean;
 
     generateFollowUpsOverwriteExisting: boolean;
@@ -56,7 +57,7 @@ export class OutbreakTemplateModel
     static canGenerateOutbreak(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_CREATE, PERMISSION.OUTBREAK_TEMPLATE_VIEW, PERMISSION.OUTBREAK_TEMPLATE_GENERATE_OUTBREAK) : false; }
 
     /**
-     * Static Permissions - IPermissionsCloneable
+     * Static Permissions - IPermissionCloneable
      */
     static canClone(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_CREATE_CLONE) : false; }
 
@@ -76,6 +77,7 @@ export class OutbreakTemplateModel
         this.noDaysNewContacts = _.get(data, 'noDaysNewContacts', 1);
         this.longPeriodsBetweenCaseOnset = _.get(data, 'longPeriodsBetweenCaseOnset');
         this.isContactLabResultsActive = _.get(data, 'isContactLabResultsActive', false);
+        this.isContactsOfContactsActive = _.get(data, 'isContactsOfContactsActive', false);
         this.isDateOfOnsetRequired = _.get(data, 'isDateOfOnsetRequired', true);
         this.generateFollowUpsOverwriteExisting = _.get(data, 'generateFollowUpsOverwriteExisting', false);
         this.generateFollowUpsKeepTeamAssignment = _.get(data, 'generateFollowUpsKeepTeamAssignment', true);

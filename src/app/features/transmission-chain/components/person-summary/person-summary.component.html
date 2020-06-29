@@ -30,12 +30,21 @@
             </a>
 
             <a
-                *ngIf="(this.person.type === EntityType.CASE || this.person.type === EntityType.EVENT) && ContactModel.canCreate(authUser)"
+                *ngIf="(this.person.type === EntityType.EVENT || this.person.type === EntityType.CASE) && ContactModel.canCreate(authUser)"
                 mat-raised-button
                 color="accent"
                 (click)="onCreateContact()"
             >
                 {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_FOR_PERSON' | translate}}
+            </a>
+
+            <a
+                *ngIf="this.person.type === EntityType.CONTACT && ContactOfContactModel.canCreate(authUser)"
+                mat-raised-button
+                color="accent"
+                (click)="onCreateContactOfContact()"
+            >
+                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_OF_CONTACT_FOR_PERSON' | translate}}
             </a>
 
             <a

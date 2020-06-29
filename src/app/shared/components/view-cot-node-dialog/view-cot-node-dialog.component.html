@@ -34,7 +34,7 @@
 
             <!-- Link to person chain -->
             <a
-                *ngIf="entity.type !== EntityType.CONTACT && this.displayPersonChainOfTransmissionLink"
+                *ngIf="entity.type !== EntityType.CONTACT_OF_CONTACT && this.displayPersonChainOfTransmissionLink"
                 [href]="personChainLink"
                 target="_blank">
                 {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_CHAIN_OF_TRANSMISSION' | translate}}

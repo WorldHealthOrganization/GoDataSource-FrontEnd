@@ -178,7 +178,14 @@
                                 [disabled]="viewOnly">
                             </app-form-slide-toggle>
 
-                            <div fxFlex><!-- placeholder --></div>
+                            <app-form-slide-toggle
+                                name="isContactsOfContactsActive"
+                                [(ngModel)]="outbreakTemplate.isContactsOfContactsActive"
+                                [label]="'LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_OF_CONTACT_ACTIVE' | translate"
+                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_OF_CONTACT_ACTIVE_DESCRIPTION"
+                                [disabled]="viewOnly">
+                            </app-form-slide-toggle>
+
                             <div fxFlex><!-- placeholder --></div>
                         </div>
                     </div>

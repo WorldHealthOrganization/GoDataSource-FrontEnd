@@ -6,6 +6,7 @@ import { EntityType } from './entity-type';
 import { IPermissionDuplicates } from './permission.interface';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
+import { ContactOfContactModel } from './contact-of-contact.model';
 
 export class PeoplePossibleDuplicateGroupModel {
     duplicateKey: string;
@@ -24,7 +25,7 @@ export class PeoplePossibleDuplicateModel
     implements
         IPermissionDuplicates {
     peopleMap: {
-        [id: string]: CaseModel | ContactModel | EventModel
+        [id: string]: CaseModel | ContactModel | EventModel | ContactOfContactModel
     };
     groups: PeoplePossibleDuplicateGroupModel[];
 
@@ -35,6 +36,7 @@ export class PeoplePossibleDuplicateModel
     static canMergeCases(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.DUPLICATE_MERGE_CASES) : false; }
     static canMergeContacts(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.DUPLICATE_MERGE_CONTACTS) : false; }
     static canMergeEvents(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.DUPLICATE_MERGE_EVENTS) : false; }
+    static canMergeContactsOfContacts(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.DUPLICATE_MERGE_CONTACTS_OF_CONTACTS) : false; }
 
     /**
      * Constructor
@@ -48,6 +50,9 @@ export class PeoplePossibleDuplicateModel
                     break;
                 case EntityType.CONTACT:
                     result[id] = new ContactModel(value);
+                    break;
+                case EntityType.CONTACT_OF_CONTACT:
+                    result[id] = new ContactOfContactModel(value);
                     break;
                 case EntityType.EVENT:
                     result[id] = new EventModel(value);
@@ -85,4 +90,5 @@ export class PeoplePossibleDuplicateModel
     canMergeCases(user: UserModel): boolean { return PeoplePossibleDuplicateModel.canMergeCases(user); }
     canMergeContacts(user: UserModel): boolean { return PeoplePossibleDuplicateModel.canMergeContacts(user); }
     canMergeEvents(user: UserModel): boolean { return PeoplePossibleDuplicateModel.canMergeEvents(user); }
+    canMergeContactsOfContacts(user: UserModel): boolean { return PeoplePossibleDuplicateModel.canMergeContactsOfContacts(user); }
 }
