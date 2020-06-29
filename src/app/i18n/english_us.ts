@@ -58,7 +58,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_OF_CONTACTS_TITLE': 'Contacts of contacts',
 
         /**
-         * uiContactsOfContactsPage
+         * NEW GROUP
+         * uiContactsOfContactsListPage
          */
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_BUTTON': 'Export contacts of contacts data',
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_TITLE': 'Export contacts of contacts data',

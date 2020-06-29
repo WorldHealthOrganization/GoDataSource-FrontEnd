@@ -39,6 +39,7 @@ import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.mo
 import { RiskLevelModel } from '../../../../core/models/risk-level.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
  import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+ import {IBasicCount} from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-contacts-of-contacts-list',
@@ -47,7 +48,7 @@ import { ContactOfContactModel } from '../../../../core/models/contact-of-contac
     styleUrls: ['./contacts-of-contacts-list.component.less']
 })
 export class ContactsOfContactsListComponent extends ListComponent implements OnInit, OnDestroy {
-
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE', '.', true)
     ];
@@ -62,7 +63,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
     // list of existing contacts
     contactsOfContactsList$: Observable<ContactOfContactModel[]>;
-    contactsOfContactsListCount$: Observable<any>;
+    contactsOfContactsListCount$: Observable<IBasicCount>;
 
     // don't display pills by default
     showCountPills: boolean = false;
@@ -707,7 +708,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         });
     }
 
-
     /**
      * Export contacts dossier
      */
@@ -895,9 +895,9 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     }
 
     /**
-     * Modify selected contacts
+     * Modify selected contact of contacts
      */
-    bulkModifyContacts() {
+    bulkModifyContactOfContacts() {
         // get list of contacts that we want to modify
         const selectedRecords: false | string[] = this.validateCheckedRecords();
         if (!selectedRecords) {

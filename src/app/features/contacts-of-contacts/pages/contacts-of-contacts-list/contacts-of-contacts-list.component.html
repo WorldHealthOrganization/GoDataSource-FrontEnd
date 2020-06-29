@@ -161,33 +161,34 @@
                             <mat-divider></mat-divider>
 
                             <button
-                                *ngIf="exportContactsOfContactsUrl"
+                                *ngIf="exportContactsOfContactsUrl && ContactOfContactModel.canExport(authUser)"
                                 mat-menu-item
                                 (click)="exportSelectedContactsOfContacts()">
                                 {{ 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS' | translate }}
                             </button>
 
                             <button
-                                *ngIf="ContactOfContactModel.canExportDossier(this.authUser)"
+                                *ngIf="ContactOfContactModel.canExportDossier(authUser)"
                                 mat-menu-item
                                 (click)="exportSelectedContactsOfContactsDossier()">
                                 {{ 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_DOSSIER' | translate }}
                             </button>
 
                             <button
+                                *ngIf="ContactOfContactModel.canExportRelationships(authUser)"
                                 mat-menu-item
                                 (click)="exportSelectedContactsOfContactsRelationship()">
                                 {{ 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_RELATIONSHIPS' | translate }}
                             </button>
 
-                            <ng-container *ngIf="ContactOfContactModel.canBulkModify(this.authUser)">
+                            <ng-container *ngIf="ContactOfContactModel.canBulkModify(authUser)">
                                 <ng-container
                                     *app-selected-outbreak-is-active>
                                     <mat-divider></mat-divider>
 
                                     <button
                                         mat-menu-item
-                                        (click)="bulkModifyContacts()">
+                                        (click)="bulkModifyContactOfContacts()">
                                         {{ 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_MODIFY_CONTACTS_OF_CONTACTS' | translate }}
                                     </button>
                                 </ng-container>

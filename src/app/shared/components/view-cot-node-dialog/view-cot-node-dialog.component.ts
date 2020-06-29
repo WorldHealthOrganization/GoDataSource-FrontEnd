@@ -127,10 +127,6 @@ export class ViewCotNodeDialogComponent implements OnDestroy {
         }, 400);
     }
 
-    getPersonChainLink(): string {
-        return `/transmission-chains?personId=${this.entity.id}&selectedEntityType=${this.entity.type}`;
-    }
-
     /**
      * Determine form max height
      */

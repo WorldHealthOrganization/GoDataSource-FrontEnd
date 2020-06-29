@@ -258,11 +258,12 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                             mask: ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask)
                         };
                         // set visual ID validator
-                        this.contactDataService.checkContactVisualIDValidity(
-                            this.selectedOutbreak.id,
-                            visualIDTranslateData.mask,
-                            value
-                        )
+                        this.contactDataService
+                            .checkContactVisualIDValidity(
+                                this.selectedOutbreak.id,
+                                visualIDTranslateData.mask,
+                                value
+                            )
                             .pipe(
                                 catchError((err) => {
                                     callback(false);

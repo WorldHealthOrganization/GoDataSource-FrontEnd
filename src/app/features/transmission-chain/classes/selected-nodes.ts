@@ -116,6 +116,9 @@ export class SelectedNodes {
         );
     }
 
+    /**
+     * Check if we can create contact of contacts
+     */
     get canCreateContactOfContact(): boolean {
         return (
             // do we have a single node selected?

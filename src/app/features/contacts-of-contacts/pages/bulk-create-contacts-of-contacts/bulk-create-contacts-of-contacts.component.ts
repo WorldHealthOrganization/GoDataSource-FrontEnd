@@ -11,12 +11,11 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
-import { catchError, map, share } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { Observable, Subscription, throwError } from 'rxjs';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { EntityType } from '../../../../core/models/entity-type';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { UserModel } from '../../../../core/models/user.model';
 import { DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, LocationSheetColumn, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
@@ -34,7 +33,6 @@ import { ContactsOfContactsDataService } from '../../../../core/services/data/co
     styleUrls: ['./bulk-create-contacts-of-contacts.component.less']
 })
 export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges implements OnInit, OnDestroy {
-
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -43,8 +41,6 @@ export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges 
 
     // selected outbreak
     selectedOutbreak: OutbreakModel;
-    // related entity always a Contact since Contact of Contact can have relationship only with a Contact
-    relatedEntityType: EntityType = EntityType.CONTACT;
     relatedEntityId: string;
 
     // contact options
@@ -182,6 +178,7 @@ export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges 
     initializeBreadcrumbs() {
         // reset
         this.breadcrumbs = [];
+
         // contact list
         if (ContactModel.canList(this.authUser)) {
             this.breadcrumbs.push(
@@ -385,7 +382,6 @@ export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges 
         if (
             this.selectedOutbreak &&
             this.selectedOutbreak.id &&
-            this.relatedEntityType &&
             this.relatedEntityId
         ) {
             // retrieve related person information
@@ -413,10 +409,7 @@ export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges 
      * Check that we have related Person Type and ID
      */
     private validateRelatedEntity() {
-        if (
-            this.relatedEntityId &&
-            this.relatedEntityType
-        ) {
+        if (this.relatedEntityId) {
             return true;
         }
 

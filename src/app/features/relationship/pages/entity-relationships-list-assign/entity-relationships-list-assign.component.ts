@@ -244,11 +244,11 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
 
         // get available entities
         const availableTypes: EntityType[] = this.genericDataService
-            .getAvailableRelatedEntityTypes
-                (this.entityType,
-                    this.relationshipType,
-                    Constants.APP_PAGE.PEOPLE_TO_SHARE_RELATIONSHIPS_WITH.value
-                );
+            .getAvailableRelatedEntityTypes(
+                this.entityType,
+                this.relationshipType,
+                Constants.APP_PAGE.PEOPLE_TO_SHARE_RELATIONSHIPS_WITH.value
+            );
 
         this.queryBuilder.filter.where({
             type: {

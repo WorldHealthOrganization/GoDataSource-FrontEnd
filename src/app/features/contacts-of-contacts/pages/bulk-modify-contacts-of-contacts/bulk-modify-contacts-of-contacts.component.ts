@@ -17,7 +17,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
-import { catchError, map, share } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
@@ -33,7 +33,6 @@ import * as Handsontable from 'handsontable';
     styleUrls: ['./bulk-modify-contacts-of-contacts.component.less']
 })
 export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges implements OnInit, OnDestroy {
-
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 

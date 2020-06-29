@@ -45,11 +45,11 @@ export class ImportContactOfContactDataComponent implements OnInit, OnDestroy {
     ImportServerModelNames = ImportServerModelNames;
 
     fieldsWithoutTokens = {
-        relationship: 'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP',
-        'addresses[]': 'LNG_CONTACT_FIELD_LABEL_ADDRESSES',
-        'documents[]': 'LNG_CONTACT_FIELD_LABEL_DOCUMENTS',
-        'relationship.persons[]': 'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP_PERSONS',
-        'vaccinesReceived[]': 'LNG_CONTACT_FIELD_LABEL_VACCINES_RECEIVED',
+        relationship: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RELATIONSHIP',
+        'addresses[]': 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES',
+        'documents[]': 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOCUMENTS',
+        'relationship.persons[]': 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RELATIONSHIP_PERSONS',
+        'vaccinesReceived[]': 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VACCINES_RECEIVED',
 
         // !must be empty token - logic depends on it!
         'addresses[].geoLocation': ''
