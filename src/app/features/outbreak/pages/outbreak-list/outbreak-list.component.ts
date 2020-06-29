@@ -440,6 +440,11 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
         countQueryBuilder.sort.clear();
+
+        // add includeDeletedRecords if deleted is enabled
+        if (this.queryBuilder.isDeletedEnabled()) {
+            countQueryBuilder.filter.includeDeletedRecordsWhereField();
+        }
         this.outbreaksListCount$ = this.outbreakDataService
             .getOutbreaksCount(countQueryBuilder)
             .pipe(

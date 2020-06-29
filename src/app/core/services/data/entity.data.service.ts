@@ -17,6 +17,8 @@ import { I18nService } from '../helper/i18n.service';
 import { map } from 'rxjs/operators';
 import { moment } from '../../helperClasses/x-moment';
 import { IBasicCount } from '../../models/basic-count.interface';
+import { ContactOfContactModel } from '../../models/contact-of-contact.model';
+import { ContactsOfContactsDataService } from './contacts-of-contacts.data.service';
 
 @Injectable()
 export class EntityDataService {
@@ -26,19 +28,29 @@ export class EntityDataService {
             dataService: this.caseDataService,
             getMethod: 'getCase',
             deleteMethod: 'deleteCase',
-            modifyMethod: 'modifyCase'
+            modifyMethod: 'modifyCase',
+            getRelationshipsCountMethod: 'getCaseRelationshipsCount'
         },
         [EntityType.CONTACT]: {
             dataService: this.contactDataService,
             getMethod: 'getContact',
             deleteMethod: 'deleteContact',
-            modifyMethod: 'modifyContact'
+            modifyMethod: 'modifyContact',
+            getRelationshipsCountMethod: 'getContactRelationshipsCount'
+        },
+        [EntityType.CONTACT_OF_CONTACT]: {
+            dataService: this.contactsOfContactsDataService,
+            getMethod: 'getContactOfContact',
+            deleteMethod: 'deleteContactOfContact',
+            modifyMethod: 'modifyContactOfContact',
+            getRelationshipsCountMethod: undefined
         },
         [EntityType.EVENT]: {
-            dataService: this.evenDataService,
+            dataService: this.eventDataService,
             getMethod: 'getEvent',
             deleteMethod: 'deleteEvent',
-            modifyMethod: 'modifyEvent'
+            modifyMethod: 'modifyEvent',
+            getRelationshipsCountMethod: 'getEventRelationshipsCount'
         }
     };
 
@@ -49,7 +61,8 @@ export class EntityDataService {
         private http: HttpClient,
         private caseDataService: CaseDataService,
         private contactDataService: ContactDataService,
-        private evenDataService: EventDataService,
+        private contactsOfContactsDataService: ContactsOfContactsDataService,
+        private eventDataService: EventDataService,
         private i18nService: I18nService
     ) {}
 
@@ -62,7 +75,7 @@ export class EntityDataService {
     getEntitiesList(
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<(CaseModel | ContactModel | EventModel)[]> {
+    ): Observable<(CaseModel | ContactModel | EventModel | ContactOfContactModel)[]> {
 
         const qb = new RequestQueryBuilder();
         // include relation for Events
@@ -109,11 +122,9 @@ export class EntityDataService {
         entityType: EntityType,
         outbreakId: string,
         entityId: string
-    ): Observable<CaseModel | ContactModel | EventModel> {
-
+    ): Observable<CaseModel | ContactModel | EventModel | ContactOfContactModel> {
         const dataService = this.entityMap[entityType].dataService;
         const method = this.entityMap[entityType].getMethod;
-
         return dataService[method](outbreakId, entityId);
     }
 
@@ -159,7 +170,7 @@ export class EntityDataService {
      * @returns {LabelValuePair[]}
      */
     getLightObjectDisplay(
-        entity: CaseModel | EventModel | ContactModel
+        entity: CaseModel | EventModel | ContactModel | ContactOfContactModel
     ): LabelValuePair[] {
 
         const lightObject = [];
@@ -288,6 +299,57 @@ export class EntityDataService {
             ));
         }
 
+        // entity type = Contact Of Contact
+        if (entity instanceof ContactOfContactModel) {
+            lightObject.push(new LabelValuePair(
+                'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME',
+                entity.firstName
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME',
+                entity.lastName
+            ));
+            // display age. decide between years and months
+            let ageUnit = this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS');
+            let ageValue = _.get(entity, 'age.years', 0);
+            const ageMonths = _.get(entity, 'age.months', 0);
+            if (ageMonths > 0) {
+                // show age in months
+                ageUnit = this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS');
+                ageValue = ageMonths;
+            }
+            lightObject.push(new LabelValuePair(
+                'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE',
+                `${ageValue} ${ageUnit}`
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER',
+                entity.gender
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION',
+                entity.occupation
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID',
+                entity.visualId
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
+                entity.dateOfReporting ?
+                    moment(entity.dateOfReporting).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                    ''
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL',
+                entity.riskLevel
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON',
+                entity.riskReason
+            ));
+        }
+
         // entity type = Event
         if (entity instanceof EventModel) {
             lightObject.push(new LabelValuePair(
@@ -327,7 +389,7 @@ export class EntityDataService {
         entityType: EntityType,
         entityId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<(CaseModel | ContactModel | EventModel)[]> {
+    ): Observable<(CaseModel | ContactModel | EventModel | ContactOfContactModel)[]> {
         const filter = queryBuilder.buildQuery();
         return this.http
             .get(`outbreaks/${outbreakId}/${EntityModel.getLinkForEntityType(entityType)}/${entityId}/duplicates/marked-as-not-duplicates?filter=${filter}`)
@@ -377,5 +439,24 @@ export class EntityDataService {
                     removeRecords: removeRecords || []
                 }
             ) as Observable<string[]>;
+    }
+
+    /**
+     * Check if entity have relationships
+     * @param {string} outbreakId
+     * @param {EntityType} entityType
+     * @param {string} entityId
+     * @returns {Observable<any>}
+     */
+    checkEntityRelationshipsCount(
+        outbreakId: string,
+        entityType: EntityType,
+        entityId: string
+    ): Observable<any> {
+        // create data service and method
+        const dataService = this.entityMap[entityType].dataService;
+        const method = this.entityMap[entityType].getRelationshipsCountMethod;
+        // call the method based on entity type
+        return dataService[method](outbreakId, entityId);
     }
 }

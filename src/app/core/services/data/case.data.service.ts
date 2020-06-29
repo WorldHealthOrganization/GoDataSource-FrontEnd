@@ -594,4 +594,12 @@ export class CaseDataService {
             );
     }
 
+    /**
+     * Get case relationships count
+     * @param {string} outbreakId
+     * @param {string} caseId
+     */
+    getCaseRelationshipsCount(outbreakId: string, caseId: string): Observable<any> {
+        return this.http.get(`outbreaks/${outbreakId}/cases/${caseId}/relationships/filtered-count`);
+    }
 }

@@ -13,6 +13,7 @@ import {Constants} from '../../../../core/models/constants';
 import {Subscription} from 'rxjs';
 import {ContactModel} from '../../../../core/models/contact.model';
 import {EventModel} from '../../../../core/models/event.model';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
     selector: 'app-import-relationship-data',
@@ -164,6 +165,27 @@ export class ImportRelationshipDataComponent implements OnInit, OnDestroy {
                     )
                 );
                 break;
+            case Constants.APP_PAGE.CONTACTS_OF_CONTACTS.value:
+                // update import title
+                this.title = 'LNG_PAGE_IMPORT_CONTACT_OF_CONTACT_RELATIONSHIP_DATA_TITLE';
+
+                // add list breadcrumb only if we have permission
+                if (ContactOfContactModel.canList(this.authUser)) {
+                    this.breadcrumbs.push(new BreadcrumbItemModel(
+                       'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
+                       'contacts-of-contacts'
+                    ));
+                }
+
+                // import breadcrumb
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(
+                        'LNG_PAGE_IMPORT_CONTACT_OF_CONTACT_RELATIONSHIP_DATA_TITLE',
+                        '.',
+                        true
+                    )
+                );
+                break;
             case Constants.APP_PAGE.EVENTS.value:
                 // update import title
                 this.title = 'LNG_PAGE_IMPORT_EVENT_RELATIONSHIP_DATA_TITLE';
@@ -212,6 +234,17 @@ export class ImportRelationshipDataComponent implements OnInit, OnDestroy {
                     this.redirectService.to(['/import-export-data', 'relationships', 'import'], {
                         queryParams: {
                             from: Constants.APP_PAGE.CONTACTS.value
+                        }
+                    });
+                }
+                break;
+            case Constants.APP_PAGE.CONTACTS_OF_CONTACTS.value:
+                if (ContactOfContactModel.canList(this.authUser)) {
+                    this.router.navigate(['/contacts-of-contacts']);
+                } else {
+                    this.redirectService.to(['/import-export-data', 'relationships', 'import'], {
+                        queryParams: {
+                            from: Constants.APP_PAGE.CONTACTS_OF_CONTACTS.value
                         }
                     });
                 }

@@ -18,6 +18,7 @@ import { EntityType } from '../../models/entity-type';
 import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
 import { catchError, map, mergeMap, takeUntil, tap } from 'rxjs/operators';
 import { IBasicCount } from '../../models/basic-count.interface';
+import { ContactOfContactModel } from '../../models/contact-of-contact.model';
 import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache';
 
 @Injectable()
@@ -83,6 +84,7 @@ export class OutbreakDataService {
      * @param {RequestQueryBuilder} queryBuilder
      */
     getOutbreaksCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<IBasicCount> {
+        // build where filter
         const whereFilter = queryBuilder.filter.generateCondition(true);
         return this.http.get(`outbreaks/count?where=${whereFilter}`);
     }
@@ -370,7 +372,7 @@ export class OutbreakDataService {
     getPeopleInconsistencies(
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<(CaseModel | ContactModel | EventModel)[]> {
+    ): Observable<(CaseModel | ContactModel | EventModel | ContactOfContactModel)[]> {
         const filter = queryBuilder.buildQuery();
         return this.http.get(`outbreaks/${outbreakId}/people/inconsistencies-in-key-dates?filter=${filter}`)
             .pipe(

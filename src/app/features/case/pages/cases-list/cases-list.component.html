@@ -116,7 +116,7 @@
 
 <!-- Side columns -->
 <app-side-columns
-    [tableColumnsUserSettingsKey]="UserSettings.CASE_FIELDS"
+    [tableColumnsUserSettingsKey]="appliedListFilter !== Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS ? UserSettings.CASE_FIELDS : UserSettings.CASE_WITHOUT_RELATIONSHIPS_FIELDS"
     [tableColumns]="tableColumns"
     (visibleColumnsChanged)="applySideColumnsChanged($event)">
 </app-side-columns>
@@ -342,7 +342,8 @@
                             (itemChanged)="filterByLocation($event)"
                             app-reset-location-on-side-filter
                             [fixedDropPanel]="true"
-                        ></app-form-location-dropdown>
+                            [useOutbreakLocations]="true">
+                        </app-form-location-dropdown>
                     </div>
                 </div>
             </mat-header-cell>

@@ -164,9 +164,12 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
     clearQueryBuilder() {
         // clear query builder
         this.queryBuilder.clear();
-
         // retrieve only available entity types
-        const availableTypes: EntityType[] = this.genericDataService.getAvailableRelatedEntityTypes(this.entityType, this.relationshipType);
+        const availableTypes: EntityType[] = this.genericDataService.getAvailableRelatedEntityTypes(
+            this.entityType,
+            this.relationshipType,
+            Constants.APP_PAGE.AVAILABLE_ENTITIES_FOR_RELATIONSHIPS.value
+        );
         this.queryBuilder.filter.where({
             type: {
                 'inq': availableTypes

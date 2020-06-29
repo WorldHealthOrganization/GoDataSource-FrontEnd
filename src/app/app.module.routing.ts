@@ -94,6 +94,7 @@ const routes: Routes = [
                             PERMISSION.CASE_LIST,
                             PERMISSION.FOLLOW_UP_LIST,
                             PERMISSION.CONTACT_LIST,
+                            PERMISSION.CONTACT_OF_CONTACT_LIST,
                             PERMISSION.CASE_LIST_LAB_RESULT,
                             PERMISSION.CONTACT_LIST_LAB_RESULT,
                             PERMISSION.LAB_RESULT_LIST,
@@ -137,7 +138,8 @@ const routes: Routes = [
                             PERMISSION.CONTACT_IMPORT_LAB_RESULT,
                             PERMISSION.CASE_IMPORT,
                             PERMISSION.CASE_IMPORT_LAB_RESULT,
-                            PERMISSION.OUTBREAK_IMPORT_RELATIONSHIP
+                            PERMISSION.OUTBREAK_IMPORT_RELATIONSHIP,
+                            PERMISSION.CONTACT_OF_CONTACT_IMPORT
                         ]
                     })
                 }
@@ -239,6 +241,34 @@ const routes: Routes = [
                     })
                 }
             },
+            // Contacts of contacts Module routes
+            {
+                path: ModulePath.ContactsOfContactsModule,
+                loadChildren: './features/contacts-of-contacts/contacts-of-contacts.module#ContactsOfContactsModule',
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
+                data: {
+                    permissions: new PermissionExpression({
+                        and: [
+                            PERMISSION.OUTBREAK_VIEW,
+                            new PermissionExpression({
+                                or: [
+                                    PERMISSION.CONTACT_OF_CONTACT_LIST,
+                                    PERMISSION.CONTACT_OF_CONTACT_CREATE,
+                                    PERMISSION.CONTACT_OF_CONTACT_VIEW,
+                                    PERMISSION.CONTACT_OF_CONTACT_MODIFY,
+                                    PERMISSION.CONTACT_OF_CONTACT_BULK_CREATE,
+                                    PERMISSION.CONTACT_OF_CONTACT_BULK_MODIFY,
+                                    PERMISSION.CONTACT_OF_CONTACT_VIEW_MOVEMENT_MAP,
+                                    PERMISSION.CONTACT_OF_CONTACT_VIEW_CHRONOLOGY_CHART,
+                                ]
+                            })
+                        ]
+                    })
+                }
+            },
             // Case Module routes
             {
                 path: ModulePath.CaseModule,
@@ -334,9 +364,11 @@ const routes: Routes = [
                             PERMISSION.DUPLICATE_LIST,
                             PERMISSION.DUPLICATE_MERGE_CASES,
                             PERMISSION.DUPLICATE_MERGE_CONTACTS,
+                            PERMISSION.DUPLICATE_MERGE_CONTACTS_OF_CONTACTS,
                             PERMISSION.DUPLICATE_MERGE_EVENTS,
                             PERMISSION.CASE_LIST,
-                            PERMISSION.CONTACT_LIST
+                            PERMISSION.CONTACT_LIST,
+                            PERMISSION.CONTACT_OF_CONTACT_LIST
                         ]
                     })
                 }
@@ -525,7 +557,8 @@ const routes: Routes = [
                             PERMISSION.CONTACT_IMPORT_LAB_RESULT,
                             PERMISSION.CASE_IMPORT,
                             PERMISSION.CASE_IMPORT_LAB_RESULT,
-                            PERMISSION.OUTBREAK_IMPORT_RELATIONSHIP
+                            PERMISSION.OUTBREAK_IMPORT_RELATIONSHIP,
+                            PERMISSION.CONTACT_OF_CONTACT_IMPORT
                         ]
                     })
                 }

@@ -58,7 +58,8 @@
                                 optionTooltipKey="description"
                                 [options]="followUpsTeamAssignmentAlgorithm$ | async"
                                 [required]="true"
-                                [clearable]="false">
+                                [clearable]="false"
+                                [disabled]="viewOnly">
                             </app-form-select>
 
                             <app-form-slide-toggle
@@ -66,7 +67,8 @@
                                 [(ngModel)]="outbreakTemplate.generateFollowUpsOverwriteExisting"
                                 [label]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING' | translate"
                                 tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING_DESCRIPTION"
-                                (optionChanged)="outbreakTemplate.generateFollowUpsKeepTeamAssignment = $event ? false : outbreakTemplate.generateFollowUpsKeepTeamAssignment">
+                                (optionChanged)="outbreakTemplate.generateFollowUpsKeepTeamAssignment = $event ? false : outbreakTemplate.generateFollowUpsKeepTeamAssignment"
+                                [disabled]="viewOnly">
                             </app-form-slide-toggle>
 
                             <app-form-slide-toggle
@@ -74,10 +76,16 @@
                                 [(ngModel)]="outbreakTemplate.generateFollowUpsKeepTeamAssignment"
                                 [label]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT' | translate"
                                 tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT_DESCRIPTION"
-                                [disabled]="outbreakTemplate.generateFollowUpsOverwriteExisting">
+                                [disabled]="outbreakTemplate.generateFollowUpsOverwriteExisting || viewOnly">
                             </app-form-slide-toggle>
 
-                            <div fxFlex><!-- placeholder --></div>
+                            <app-form-slide-toggle
+                                name="applyGeographicRestrictions"
+                                [(ngModel)]="outbreakTemplate.applyGeographicRestrictions"
+                                [label]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_APPLY_GEOGRAPHIC_RESTRICTIONS' | translate"
+                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_APPLY_GEOGRAPHIC_RESTRICTIONS_DESCRIPTION"
+                                [disabled]="viewOnly">
+                            </app-form-slide-toggle>
                         </div>
                     </div>
                 </mat-card>
@@ -178,7 +186,14 @@
                                 [disabled]="viewOnly">
                             </app-form-slide-toggle>
 
-                            <div fxFlex><!-- placeholder --></div>
+                            <app-form-slide-toggle
+                                name="isContactsOfContactsActive"
+                                [(ngModel)]="outbreakTemplate.isContactsOfContactsActive"
+                                [label]="'LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_OF_CONTACT_ACTIVE' | translate"
+                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_OF_CONTACT_ACTIVE_DESCRIPTION"
+                                [disabled]="viewOnly">
+                            </app-form-slide-toggle>
+
                             <div fxFlex><!-- placeholder --></div>
                         </div>
                     </div>

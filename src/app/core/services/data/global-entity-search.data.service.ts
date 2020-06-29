@@ -8,6 +8,7 @@ import { HttpClient } from '@angular/common/http';
 import * as _ from 'lodash';
 import { EntityModel } from '../../models/entity-and-relationship.model';
 import { map } from 'rxjs/operators';
+import { ContactOfContactModel } from '../../models/contact-of-contact.model';
 
 @Injectable()
 export class GlobalEntitySearchDataService {
@@ -27,7 +28,7 @@ export class GlobalEntitySearchDataService {
         outbreakId: string,
         globalSearchValue: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<(CaseModel | ContactModel | EventModel)[]> {
+    ): Observable<(CaseModel | ContactModel | EventModel | ContactOfContactModel)[]> {
 
         const qb = new RequestQueryBuilder();
 
