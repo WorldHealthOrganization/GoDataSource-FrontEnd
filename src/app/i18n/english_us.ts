@@ -262,6 +262,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_BULK_MODIFY_CONTACTS_OF_CONTACTS_ACTION_MODIFY_CONTACTS_SUCCESS_MESSAGE': 'Contacts modified',
         'LNG_PAGE_BULK_MODIFY_CONTACTS_OF_CONTACTS_TITLE': 'Bulk Modify Contact of Contacts',
 
+        /**
+         * uiFollowUpFields
+         */
+        'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL' : 'Risk level'
+
 
 
         /**
