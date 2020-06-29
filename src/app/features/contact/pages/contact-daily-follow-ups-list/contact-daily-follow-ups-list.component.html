@@ -473,6 +473,36 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Risk Level -->
+        <ng-container matColumnDef="riskLevel">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="riskLevelFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="riskLevelsList$ | async"
+                            (optionChanged)="filterByRelation('contact').bySelect('riskLevel', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.RISK_LEVEL"
+                    [value]="item.contact?.riskLevel">
+                </app-reference-data-label>
+            </mat-cell>
+        </ng-container>
+
         <!-- Status -->
         <ng-container matColumnDef="statusId">
             <mat-header-cell *matHeaderCellDef>

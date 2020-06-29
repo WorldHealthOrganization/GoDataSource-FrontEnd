@@ -80,7 +80,12 @@ export const EnglishUsLang = {
             '<br>{{locationLabel}}: {{location}} ' +
             '<br>{{backupIntervalLabel}}: {{backupInterval}} ' +
             '<br>{{dataRetentionIntervalLabel}}: {{dataRetentionInterval}} ' +
-            '<br>{{modulesLabel}}: {{modules}}'
+            '<br>{{modulesLabel}}: {{modules}}',
+
+        /**
+         * uiFollowUpFields
+         */
+        'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL' : 'Risk level'
 
 
 
