@@ -500,8 +500,9 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP'
             }),
             new VisibleColumnModel({
-                field: 'riskLevel',
-                label: 'LNG_FOLLOW_UP_FIELD_LABEL_RISK_LEVEL'
+                field: 'contact.riskLevel',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_RISK_LEVEL',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'index',

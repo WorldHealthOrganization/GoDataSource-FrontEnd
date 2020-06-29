@@ -249,7 +249,9 @@
         <ng-container matColumnDef="contact.lastName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column">
-                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_LAST_NAME' | translate }}</div>
+                    <div mat-sort-header class="column-header">
+                        {{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_LAST_NAME' | translate }}
+                    </div>
                     <div class="column-filter">
                         <app-form-input
                             name="contactLastName"
@@ -272,7 +274,9 @@
         <ng-container matColumnDef="contact.firstName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME' | translate }}</div>
+                    <div mat-sort-header class="column-header">
+                        {{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME' | translate }}
+                    </div>
                     <div class="column-filter">
                         <app-form-input
                             name="contactFirstName"
@@ -294,7 +298,9 @@
         <ng-container matColumnDef="contact.visualId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column">
-                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_VISUAL_ID' | translate }}</div>
+                    <div mat-sort-header class="column-header">
+                        {{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_VISUAL_ID' | translate }}
+                    </div>
                     <div class="column-filter">
                         <app-form-input
                             name="contactVisualId"
@@ -317,7 +323,9 @@
         <ng-container matColumnDef="contact.dateOfLastContact">
             <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT' | translate }}</div>
+                    <div mat-sort-header class="column-header">
+                        {{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT' | translate }}
+                    </div>
                     <div class="column-filter">
                         <app-form-daterange
                             name="dateFilter"
@@ -337,7 +345,8 @@
         <ng-container matColumnDef="contact.followUp.endDate">
             <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP' | translate }}</div>
+                    <div mat-sort-header class="column-header">
+                        {{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP' | translate }}</div>
                     <div class="column-filter">
                         <app-form-daterange
                             name="dateFilter"
@@ -353,11 +362,44 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Risk Level -->
+        <ng-container matColumnDef="contact.riskLevel">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="riskLevelFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="riskLevelsList$ | async"
+                            (optionChanged)="filterByRelation('contact').bySelect('riskLevel', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.RISK_LEVEL"
+                    [value]="item.contact?.riskLevel">
+                </app-reference-data-label>
+            </mat-cell>
+        </ng-container>
+
         <!-- Day of Follow-up -->
         <ng-container matColumnDef="index">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP' | translate }}</div>
+                    <div mat-sort-header class="column-header">
+                        {{ 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP' | translate }}
+                    </div>
                     <div class="column-filter">
                         <app-form-range
                             name="indexFilter"
@@ -378,7 +420,9 @@
         <ng-container matColumnDef="phoneNumber">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER' | translate }}</div>
+                    <div mat-sort-header class="column-header">
+                        {{ 'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER' | translate }}
+                    </div>
                     <div class="column-filter">
                         <app-form-input
                             name="phoneNumberFilter"
@@ -400,7 +444,9 @@
         <ng-container matColumnDef="area">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_AREA' | translate }}</div>
+                    <div class="column-header">
+                        {{ 'LNG_FOLLOW_UP_FIELD_LABEL_AREA' | translate }}
+                    </div>
                     <div class="column-filter location-drop-down-column-header-container">
                         <app-form-location-dropdown
                             name="locationFilter"
@@ -423,7 +469,9 @@
         <ng-container matColumnDef="fullAddress">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS' | translate }}</div>
+                    <div class="column-header">
+                        {{ 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS' | translate }}
+                    </div>
                     <div class="column-filter">
                         <!-- placeholder -->
                     </div>
@@ -438,7 +486,9 @@
         <ng-container matColumnDef="team">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM' | translate }}</div>
+                    <div class="column-header">
+                        {{ 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM' | translate }}
+                    </div>
                     <div class="column-filter">
                         <app-form-select
                             name="teamIdFilter"
@@ -473,41 +523,12 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Risk Level -->
-        <ng-container matColumnDef="riskLevel">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL' | translate }}
-                    </div>
-                    <div class="column-filter">
-                        <app-form-select
-                            name="riskLevelFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="riskLevelsList$ | async"
-                            (optionChanged)="filterByRelation('contact').bySelect('riskLevel', $event)"
-                            multiple="true"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true">
-                        </app-form-select>
-                    </div>
-                </div>
-            </mat-header-cell>
-            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
-                <app-reference-data-label
-                    [category]="ReferenceDataCategory.RISK_LEVEL"
-                    [value]="item.contact?.riskLevel">
-                </app-reference-data-label>
-            </mat-cell>
-        </ng-container>
-
         <!-- Status -->
         <ng-container matColumnDef="statusId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID' | translate }}
+                    <div mat-sort-header class="column-header">
+                        {{ 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID' | translate }}
                     </div>
                     <div class="column-filter">
                         <app-form-select
@@ -537,7 +558,8 @@
         <ng-container matColumnDef="targeted">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate }}
+                    <div mat-sort-header class="column-header">
+                        {{ 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate }}
                     </div>
                     <div class="column-filter">
                         <app-form-select
@@ -576,7 +598,8 @@
         <ng-container matColumnDef="deleted">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED' | translate }}
+                    <div mat-sort-header class="column-header">
+                        {{ 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED' | translate }}
                     </div>
                     <div class="column-filter">
                         <app-form-select
