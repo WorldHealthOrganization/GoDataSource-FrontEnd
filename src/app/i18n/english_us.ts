@@ -265,7 +265,30 @@ export const EnglishUsLang = {
         /**
          * uiFollowUpFields
          */
-        'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL' : 'Risk level'
+        'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL' : 'Risk level',
+
+        /**
+         * uiCreateOutbreakPage
+         */
+        'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_DESCRIPTION': '[Option 1] - If Team1 has "Argentina" assigned and Team2 has "Buenos Aires" assigned (sublocation of Argentina).' +
+            ' Contact has "Buenos Aires" as the usual place of residence location. Only Team2 will be added to the assignment pool from where the choosing will be done.' +
+            ' [Option 2] - If Team1 has "Argentina" assigned and team2 has "Buenos Aires" assigned (sublocation of Argentina). Contact has "Buenos Aires" as the usual place of residence location.' +
+            ' Both Team1 and Team2 will be added to the assignment pool from where the choosing will be done.',
+
+        /**
+         * uiCreateOutbreakTemplatePage
+         */
+        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_DESCRIPTION': '[Option 1] - If Team1 has "Argentina" assigned and Team2 has "Buenos Aires" assigned (sublocation of Argentina).' +
+            ' Contact has "Buenos Aires" as the usual place of residence location. Only Team2 will be added to the assignment pool from where the choosing will be done.' +
+            ' [Option 2] - If Team1 has "Argentina" assigned and team2 has "Buenos Aires" assigned (sublocation of Argentina). Contact has "Buenos Aires" as the usual place of residence location.' +
+            ' Both Team1 and Team2 will be added to the assignment pool from where the choosing will be done.',
+
+        /**
+         *referenceDataCategoryFollowupGenerationTeamAssignmentAlgorithm
+         */
+        'LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_ROUND_ROBIN_NEAREST_FIT': 'Option 1 - Assign team at the higher admin level',
+        'LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_ROUND_ROBIN_ALL_TEAMS': 'Option 2 - Assign team responsible for the location where contact resides'
+
 
 
 
