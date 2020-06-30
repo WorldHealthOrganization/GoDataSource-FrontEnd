@@ -76,7 +76,7 @@ export const EnglishUsLang = {
         /**
          * uiContactsListPage
          */
-        'LNG_PAGE_LIST_CONTACTS_ACTION_BULK_ADD_CONTACTS': 'Bulk add contact of contacts',
+        'LNG_PAGE_LIST_CONTACTS_ACTION_BULK_ADD_CONTACTS': 'Bulk add contacts of contacts',
 
         /**
          * NEW GROUP
