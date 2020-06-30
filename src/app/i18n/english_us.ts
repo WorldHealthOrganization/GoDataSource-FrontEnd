@@ -287,7 +287,9 @@ export const EnglishUsLang = {
          *referenceDataCategoryFollowupGenerationTeamAssignmentAlgorithm
          */
         'LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_ROUND_ROBIN_NEAREST_FIT': 'Option 1 - Assign team at the higher admin level',
-        'LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_ROUND_ROBIN_ALL_TEAMS': 'Option 2 - Assign team responsible for the location where contact resides'
+        'LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_ROUND_ROBIN_NEAREST_FIT_DESCRIPTION': 'Option 1 - Assign team at the higher admin level',
+        'LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_ROUND_ROBIN_ALL_TEAMS': 'Option 2 - Assign team responsible for the location where contact resides',
+        'LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_ROUND_ROBIN_ALL_TEAMS_DESCRIPTION': 'Option 2 - Assign team responsible for the location where contact resides'
 
 
 
