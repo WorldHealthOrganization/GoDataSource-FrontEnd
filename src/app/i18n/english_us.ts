@@ -43,9 +43,9 @@ export const EnglishUsLang = {
         'LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_OF_CONTACT_ACTIVE_DESCRIPTION': '',
 
         /**
-         * uiContactFields
+         * uiContactsListPage
          */
-        'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_CONTACT_OF_CONTACT': 'Add contact',
+        'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_CONTACT_OF_CONTACT': 'Add contact of contact',
 
         /**
          * uiGenericLayout
@@ -76,7 +76,7 @@ export const EnglishUsLang = {
         /**
          * uiContactsListPage
          */
-        'LNG_PAGE_LIST_CONTACTS_ACTION_BULK_ADD_CONTACTS': 'Bulk add contacts',
+        'LNG_PAGE_LIST_CONTACTS_ACTION_BULK_ADD_CONTACTS': 'Bulk add contact of contacts',
 
         /**
          * NEW GROUP
