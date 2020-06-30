@@ -287,7 +287,11 @@ export const EnglishUsLang = {
          *referenceDataCategoryFollowupGenerationTeamAssignmentAlgorithm
          */
         'LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_ROUND_ROBIN_NEAREST_FIT': 'Option 1 - Assign team at the higher admin level',
-        'LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_ROUND_ROBIN_ALL_TEAMS': 'Option 2 - Assign team responsible for the location where contact resides'
+        'LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_ROUND_ROBIN_NEAREST_FIT_DESCRIPTION': 'If Team1 has "Argentina" assigned and Team2 has "Buenos Aires" assigned (sublocation of Argentina).' +
+            ' Contact has "Buenos Aires" as the usual place of residence location. Only Team2 will be added to the assignment pool from where the choosing will be done.',
+        'LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_ROUND_ROBIN_ALL_TEAMS': 'Option 2 - Assign team responsible for the location where contact resides',
+        'LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_ROUND_ROBIN_ALL_TEAMS_DESCRIPTION': 'If Team1 has "Argentina" assigned and team2 has "Buenos Aires" assigned (sublocation of Argentina). Contact has "Buenos Aires" as the usual place of residence location.' +
+            ' Both Team1 and Team2 will be added to the assignment pool from where the choosing will be done.'
 
 
 
