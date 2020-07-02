@@ -89,10 +89,10 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_MOVEMENT': 'View movement',
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_CHRONOLOGY': 'View chronology',
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_RESTORE_CONTACT': 'Restore contact of contact',
-        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS': 'Export selected contacts',
-        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_DOSSIER': 'Export dossier for selected contacts',
-        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_RELATIONSHIPS': 'Export selected contacts relationships',
-        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_MODIFY_CONTACTS_OF_CONTACTS': 'Modify selected contacts',
+        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS': 'Export selected contacts of contacts',
+        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_DOSSIER': 'Export dossier for selected contacts of contacts',
+        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_RELATIONSHIPS': 'Export selected contacts of contacts relationships',
+        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_MODIFY_CONTACTS_OF_CONTACTS': 'Modify selected contacts of contacts',
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_RELATIONSHIPS_TITLE': 'Export contact of contact relationships',
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_DOSSIER_DIALOG_TITLE': 'Contacts of contacts dossier',
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME': 'Contacts of contacts relationships',
@@ -146,7 +146,12 @@ export const EnglishUsLang = {
          * uiMovementContactOfContactPage
          */
         'LNG_PAGE_VIEW_MOVEMENT_CONTACT_OF_CONTACT_TITLE': 'Contact of contact movement',
-        'LNG_PAGE_VIEW_MOVEMENT_CONTACT_OF_CONTACT_EXPORT': '"Export contact of contact movement Map',
+        'LNG_PAGE_VIEW_MOVEMENT_CONTACT_OF_CONTACT_EXPORT': 'Export contact of contact movement Map',
+
+        /**
+         * uiChronologyContactOfContactPage
+         */
+        'LNG_PAGE_VIEW_CHRONOLOGY_CONTACT_OF_CONTACT_TITLE': 'Contact of contact chronology',
 
         /**
          * uiChainsOfTransmissionGraph
@@ -244,7 +249,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_BULK_ADD_CONTACTS_OF_CONTACTS_TITLE': 'Bulk Add Contacts of Contacts',
         'LNG_PAGE_BULK_ADD_CONTACTS_OF_CONTACTS_LABEL_ERRORS': 'Validation errors',
-        'LNG_PAGE_BULK_ADD_CONTACTS_OF_CONTACTS_VISUAL_ID_INFO_LABEL': '\'Contact ID\' cell must follow this pattern: {{mask}}',
+        'LNG_PAGE_BULK_ADD_CONTACTS_OF_CONTACTS_VISUAL_ID_INFO_LABEL': '\'Contact Of Contact ID\' cell must follow this pattern: {{mask}}',
         'LNG_PAGE_BULK_ADD_CONTACTS_OF_CONTACTS_LABEL_ERROR_MSG': '- row {{row}}, column(s) \'{{columns}}\' are invalid',
         'LNG_PAGE_BULK_ADD_CONTACTS_OF_CONTACTS_WARNING_INVALID_FIELDS': 'Some fields are invalid',
         'LNG_PAGE_BULK_ADD_CONTACTS_OF_CONTACTS_WARNING_NO_DATA': 'There is no data to be saved',

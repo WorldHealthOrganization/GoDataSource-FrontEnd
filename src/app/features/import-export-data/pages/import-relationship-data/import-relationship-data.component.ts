@@ -173,7 +173,7 @@ export class ImportRelationshipDataComponent implements OnInit, OnDestroy {
                 if (ContactOfContactModel.canList(this.authUser)) {
                     this.breadcrumbs.push(new BreadcrumbItemModel(
                        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
-                       'contacts-of-contacts'
+                       '/contacts-of-contacts'
                     ));
                 }
 
