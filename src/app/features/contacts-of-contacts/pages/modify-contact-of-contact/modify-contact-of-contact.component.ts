@@ -214,8 +214,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
             delete dirtyFields.ageDob;
         }
 
-        // check for duplicates
-        const loadingDialog = this.dialogService.showLoadingDialog();
+        this.showLoadingDialog();
         this.contactsOfContactsDataService
             .findDuplicates(this.selectedOutbreak.id, {
                 ...this.contactOfContactData,
@@ -226,7 +225,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
                     this.snackbarService.showApiError(err);
 
                     // hide dialog
-                    loadingDialog.close();
+                    this.hideLoadingDialog();
 
                     return throwError(err);
                 })
@@ -248,7 +247,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
                         .pipe(
                             catchError((err) => {
                                 this.snackbarService.showApiError(err);
-                                loadingDialog.close();
+                                this.hideLoadingDialog();
                                 return throwError(err);
                             })
                         )
@@ -269,7 +268,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
                                     this.createBreadcrumbs();
 
                                     // hide dialog
-                                    loadingDialog.close();
+                                    this.hideLoadingDialog();
                                 } else {
                                     // finished
                                     finishCallBack();
@@ -287,7 +286,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
                                 this.entityDataService
                                     .markPersonAsOrNotADuplicate(
                                         this.selectedOutbreak.id,
-                                        EntityType.CONTACT,
+                                        EntityType.CONTACT_OF_CONTACT,
                                         this.contactOfContactId,
                                         itemsMarkedAsNotDuplicates
                                     )

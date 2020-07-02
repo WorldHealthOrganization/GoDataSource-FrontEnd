@@ -34,6 +34,7 @@ import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-co
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { Constants } from '../../../../core/models/constants';
 import { ContactModel } from '../../../../core/models/contact.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
     selector: 'app-create-contact-of-contact',
@@ -80,6 +81,7 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
         private contactsOfContactsDataService: ContactsOfContactsDataService,
         private entityDataService: EntityDataService,
         private outbreakDataService: OutbreakDataService,
+        private authDataService: AuthDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private relationshipDataService: RelationshipDataService,
@@ -95,6 +97,9 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
      * Component initialized
      */
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
