@@ -296,6 +296,13 @@
             {{ 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_VIEW_EXPOSURE' | translate }}
         </button>
 
+        <button
+            *ngIf="ContactOfContactModel.canList(authUser)"
+            mat-raised-button type="button"
+            [routerLink]="['/duplicated-records/contacts-of-contacts', contactOfContactId, 'marked-not-duplicates']">
+            {{'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_SEE_RECORDS_NOT_DUPLICATES' | translate}}
+        </button>
+
         <div class="page-tabs-navbar-placeholder"></div>
 
         <button
