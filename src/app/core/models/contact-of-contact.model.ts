@@ -51,7 +51,6 @@ export class ContactOfContactModel
     isDateOfReportingApproximate: boolean;
     outbreakId: string;
     dateBecomeContact: string;
-    wasCase: boolean;
     visualId: string;
 
     numberOfExposures: number;
@@ -169,7 +168,6 @@ export class ContactOfContactModel
         this.occupation = _.get(data, 'occupation');
         this.outbreakId = _.get(data, 'outbreakId');
         this.documents = _.get(data, 'documents', []);
-        this.wasCase = _.get(data, 'wasCase', false);
 
         this.dob = _.get(data, 'dob');
         this.age = new AgeModel(_.get(data, 'age'));
