@@ -117,6 +117,8 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
         avoidOverlap: true,
         unconstrIter: 10,
         userConstIter: 20,
+        // disable animation since fit doesn't work properly with async anim
+        animate: false,
         stop: () => {
             this.showLoading = false;
             if (this.cy) {
@@ -139,6 +141,8 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
         edgeSep: 10, // the separation between adjacent edges in the same rank
         rankSep: 50, // the separation between adjacent nodes in the same rank
         rankDir: 'TB', // 'TB' for top to bottom flow, 'LR' for left to right,
+        // disable animation since fit doesn't work properly with async anim
+        animate: false,
         stop: () => {
             this.showLoading = false;
             if (this.cy) {
@@ -155,6 +159,8 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
         name: 'preset',
         fit: true,
         padding: 30,
+        // disable animation since fit doesn't work properly with async anim
+        animate: false,
         stop: () => {
             this.showLoading = false;
             if (this.cy) {
@@ -291,6 +297,9 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
     // selected Outbreak
     selectedOutbreak: OutbreakModel;
 
+    // keep cytoscape object configs
+    private _cytoConf: any;
+
     /**
      * Constructor
      */
@@ -389,14 +398,29 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
             this.outbreakSubscriber.unsubscribe();
             this.outbreakSubscriber = null;
         }
+
+        // release cyto
+        this.destroyCytoscape();
     }
 
     /**
      * Component changes trigger
      */
-    public ngOnChanges(): any {
+    ngOnChanges() {
         // render cytoscape object
         this.render();
+    }
+
+    /**
+     * Release resources
+     */
+    destroyCytoscape() {
+        // release cyto
+        if (this.cy) {
+            this.cy.destroy();
+            this.cy = null;
+            this._cytoConf = undefined;
+        }
     }
 
     /**
@@ -416,37 +440,55 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
             // hide loading since we don't need to retrieve graph data
             this.showLoading = false;
 
+            // release cyto
+            this.destroyCytoscape();
+
             // finished
             return;
         }
 
-        // render graph element
-        const nativeElement = this.el.nativeElement;
-        const container = nativeElement.getElementsByClassName(this.container);
-
         // load the correct layout based on the view selected
         this.configureGraphViewType();
 
-        // initialize the cytoscape object
-        this.cy = cytoscape({
-            container: container[0],
+        // define new confs
+        const cytoConf = {
             layout: this.layout,
             style: this.style,
             elements: this.elements,
             minZoom: this.defaultZoom.min,
             maxZoom: this.defaultZoom.max,
-            wheelSensitivity: CytoscapeGraphComponent.wheelSensitivity,
-            // #TODO replace with new cytoscape version equivalent?
-            // ready: () => {
-            //     // show spinner when layout starts to draw
-            //     this.showLoading = true;
-            // }
-        });
+            wheelSensitivity: CytoscapeGraphComponent.wheelSensitivity
+        };
+
+        // check if confs are the same then there is no point in rendering again
+        if (_.isEqual(cytoConf, this._cytoConf)) {
+            return;
+        }
+
+        // release cyto
+        this.destroyCytoscape();
+
+        // use the new confs
+        this._cytoConf = cytoConf;
+
+        // render graph element
+        const nativeElement = this.el.nativeElement;
+        const container = nativeElement.getElementsByClassName(this.container);
+
+        // initialize the cytoscape object
+        this.cy = cytoscape(Object.assign(
+            {
+                container: container[0]
+            },
+            this._cytoConf
+        ));
+
         // add node tap event
         this.cy.on('tap', 'node', (evt) => {
             const node = evt.target;
             this.nodeTapped.emit(node.json().data);
         });
+
         // add edge tap event
         this.cy.on('tap', 'edge', (evt) => {
             const edge = evt.target;
