@@ -12,6 +12,7 @@ import * as _ from 'lodash';
 import { LabelValuePair } from '../../models/label-value-pair';
 import { map } from 'rxjs/operators';
 import { IBasicCount } from '../../models/basic-count.interface';
+import { ContactOfContactModel } from '../../models/contact-of-contact.model';
 
 @Injectable()
 export class ClusterDataService {
@@ -131,7 +132,7 @@ export class ClusterDataService {
         outbreakId: string,
         clusterId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<(CaseModel | ContactModel | EventModel)[]> {
+    ): Observable<(CaseModel | ContactModel | EventModel | ContactOfContactModel)[]> {
 
         const qb = new RequestQueryBuilder();
         // include relation for Events

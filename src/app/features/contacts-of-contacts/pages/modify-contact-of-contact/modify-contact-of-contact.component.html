@@ -1,0 +1,333 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<form
+    #form="ngForm"
+    class="page-content form-section"
+    [class.form-view-only]="viewOnly"
+    (submit)="modifyContactOfContact(form)">
+
+    <div class="form-content">
+        <mat-tab-group class="page-tabs-navbar">
+
+            <mat-tab [label]="'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_PERSONAL_TITLE' | translate">
+
+                <!-- Personal Details section -->
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-input
+                                name="firstName"
+                                [(ngModel)]="contactOfContactData.firstName"
+                                [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME'| translate"
+                                tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME_DESCRIPTION"
+                                required="true"
+                                maxlength="200"
+                                [disabled]="viewOnly">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="middleName"
+                                [(ngModel)]="contactOfContactData.middleName"
+                                [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME'| translate"
+                                tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION"
+                                maxlength="200"
+                                [disabled]="viewOnly">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="lastName"
+                                [(ngModel)]="contactOfContactData.lastName"
+                                [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME' | translate"
+                                tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME_DESCRIPTION"
+                                maxlength="200"
+                                [disabled]="viewOnly">
+                            </app-form-input>
+
+                            <app-form-select
+                                name="gender"
+                                [(ngModel)]="contactOfContactData.gender"
+                                [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER' | translate"
+                                tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER_DESCRIPTION"
+                                [options]="genderList$ | async"
+                                [disabled]="viewOnly">
+                            </app-form-select>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <div
+                                fxFlex fxLayout="row" fxLayoutGap="20px">
+                                <app-form-select
+                                    name="pregnancyStatus"
+                                    [(ngModel)]="contactOfContactData.pregnancyStatus"
+                                    [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS' | translate"
+                                    tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION"
+                                    [options]="pregnancyStatusList$ | async"
+                                    [disabled]="viewOnly">
+                                </app-form-select>
+
+                                <app-form-select
+                                    name="occupation"
+                                    [(ngModel)]="contactOfContactData.occupation"
+                                    [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION' | translate"
+                                    tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION_DESCRIPTION"
+                                    [options]="occupationsList$ | async"
+                                    [disabled]="viewOnly">
+                                </app-form-select>
+                            </div>
+
+                            <app-form-age-dob
+                                fxFlex
+                                name="ageDob"
+                                [(ngModel)]="contactOfContactData"
+                                [disabled]="viewOnly"
+                                ageButtonLabel="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE_BUTTON"
+                                dobButtonLabel="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_BIRTH_BUTTON"
+                                dobPlaceholder="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOB"
+                                dobTooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOB_DESCRIPTION"
+                                ageTooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE_DESCRIPTION">
+                            </app-form-age-dob>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <!-- Due to an angular bug => compose validators, we need this validator to be able to use the async general one... -->
+                            <!-- [maxlength]="255" -->
+                            <app-form-input
+                                name="visualId"
+                                #visualId="ngModel"
+                                [(ngModel)]="contactOfContactData.visualId"
+                                [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID' | translate"
+                                tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
+                                [tooltipTranslateData]="visualIDTranslateData"
+                                [displayRefresh]="displayRefresh"
+                                (refresh)="generateVisualId()"
+                                [maxlength]="255"
+                                [disabled]="viewOnly"
+                                app-general-async-validator
+                                [asyncValidatorObservable]="contactOfContactIdMaskValidator">
+                            </app-form-input>
+
+                            <app-form-datepicker
+                                fxFlex
+                                name="dateOfReporting"
+                                [(ngModel)]="contactOfContactData.dateOfReporting"
+                                [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING'| translate"
+                                tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION"
+                                required="true"
+                                [disabled]="viewOnly"
+                                [maxDate]="serverToday"
+                                app-date-validator
+                                [dateSameOrBefore]="serverToday">
+                            </app-form-datepicker>
+
+                            <app-form-slide-toggle
+                                fxFlex
+                                name="isDateOfReportingApproximate"
+                                [(ngModel)]="contactOfContactData.isDateOfReportingApproximate"
+                                [label]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate"
+                                tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION"
+                                [disabled]="viewOnly">
+                            </app-form-slide-toggle>
+
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
+                    </div>
+                </mat-card>
+
+                <!-- Flag contact section -->
+                <div class="section-title">
+                    {{ 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_PERSONAL_SECTION_FLAG_CONTACT_TITLE' | translate }}
+                </div>
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-select
+                                fxFlex
+                                name="riskLevel"
+                                [(ngModel)]="contactOfContactData.riskLevel"
+                                [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL' | translate"
+                                tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL_DESCRIPTION"
+                                [options]="riskLevelsList$ | async"
+                                [disabled]="viewOnly">
+                            </app-form-select>
+
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
+
+                        <div fxLayout="row">
+                            <app-form-textarea
+                                name="riskReason"
+                                [(ngModel)]="contactOfContactData.riskReason"
+                                [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON' | translate"
+                                tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON_DESCRIPTION"
+                                [disabled]="viewOnly">
+                            </app-form-textarea>
+                        </div>
+                    </div>
+                </mat-card>
+
+                <div class="section-title">{{'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VACCINES_RECEIVED_DETAILS' | translate}}</div>
+
+                <!--Vaccines received section-->
+                <app-form-vaccines-list
+                    name="vaccinesReceived"
+                    [(ngModel)]="contactOfContactData.vaccinesReceived"
+                    [disabled]="viewOnly"
+                    [required]="true">
+                </app-form-vaccines-list>
+
+                <!-- Documents section -->
+                <div class="section-title">{{'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_PERSONAL_DOCUMENTS_TITLE'| translate}}</div>
+                <app-form-document-list
+                    name="documents"
+                    [(ngModel)]="contactOfContactData.documents"
+                    [required]="true"
+                    [disabled]="viewOnly">
+                </app-form-document-list>
+
+                <!-- Create / update by user information section -->
+                <div class="section-title">
+                    {{ 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE' | translate }}
+                </div>
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-input
+                                name="createdByUser"
+                                [ngModel]="contactOfContactData.createdByUser?.name"
+                                [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_CREATED_BY'| translate"
+                                tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_CREATED_BY_DESCRIPTION"
+                                [disabled]="true">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="createdAt"
+                                [ngModel]="contactOfContactData.createdAt | dateTimeDefault"
+                                [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_CREATED_AT'| translate"
+                                tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_CREATED_AT_DESCRIPTION"
+                                [disabled]="true">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="updatedByUser"
+                                [ngModel]="contactOfContactData.updatedByUser?.name"
+                                [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_UPDATED_BY'| translate"
+                                tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_UPDATED_BY_DESCRIPTION"
+                                [disabled]="true">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="updatedAt"
+                                [ngModel]="contactOfContactData.updatedAt | dateTimeDefault"
+                                [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_UPDATED_AT'| translate"
+                                tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_UPDATED_AT_DESCRIPTION"
+                                [disabled]="true">
+                            </app-form-input>
+                        </div>
+                    </div>
+                </mat-card>
+            </mat-tab>
+
+            <mat-tab [label]="'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_ADDRESS_TITLE' | translate">
+                <app-form-address-list
+                    name="addresses"
+                    [(ngModel)]="contactOfContactData.addresses"
+                    [disabled]="viewOnly"
+                    [required]="true">
+                </app-form-address-list>
+            </mat-tab>
+
+        </mat-tab-group>
+    </div>
+
+    <div class="form-actions">
+        <div class="page-tabs-navbar-placeholder"></div>
+
+        <ng-container
+            *app-selected-outbreak-is-active
+        >
+            <ng-container *ngIf="!viewOnly">
+                <button
+                    [disabled]="form.pending"
+                    class="button-with-spinner"
+                    mat-raised-button color="accent">
+                    <div
+                        *ngIf="form.pending"
+                        class="loading-chips">
+                        <mat-spinner></mat-spinner>
+                    </div>
+                    {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+                </button>
+
+                <button type="button" [routerLink]="'/contacts-of-contacts'" mat-raised-button>
+                    {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
+                </button>
+
+                <div class="page-tabs-navbar-placeholder"></div>
+            </ng-container>
+
+            <ng-container
+                *ngIf="viewOnly">
+                <button
+                    mat-raised-button type="button" color="accent"
+                    [routerLink]="['/contacts-of-contacts', contactOfContactId, 'modify']"
+                >
+                    {{'LNG_COMMON_BUTTON_EDIT' | translate}}
+                </button>
+
+                <div class="page-tabs-navbar-placeholder"></div>
+            </ng-container>
+        </ng-container>
+
+        <button
+            [disabled]="!contactExposure && ContactModel.canView(authUser)"
+            type="button"
+            mat-raised-button
+            color="primary"
+            [routerLink]="[getPersonLink(contactExposure)]">
+            {{ 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_VIEW_EXPOSURE' | translate }}
+        </button>
+
+        <button
+            *ngIf="ContactOfContactModel.canList(authUser)"
+            mat-raised-button type="button"
+            [routerLink]="['/duplicated-records/contacts-of-contacts', contactOfContactId, 'marked-not-duplicates']">
+            {{'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_SEE_RECORDS_NOT_DUPLICATES' | translate}}
+        </button>
+
+        <div class="page-tabs-navbar-placeholder"></div>
+
+        <button
+            *ngIf="ContactOfContactModel.canListRelationshipExposures(authUser) && RelationshipModel.canList(authUser)"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/relationships', EntityType.CONTACT_OF_CONTACT, contactOfContactId, 'exposures']">
+            {{ 'LNG_COMMON_BUTTON_EXPOSURES_TO' | translate }}
+        </button>
+
+        <div class="page-tabs-navbar-placeholder"></div>
+
+        <button
+            *ngIf="ContactOfContactModel.canViewMovementMap(authUser)"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/contacts-of-contacts', contactOfContactId, 'movement']">
+            {{ 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_VIEW_MOVEMENT' | translate }}
+        </button>
+        <button
+            *ngIf="ContactOfContactModel.canViewChronologyChart(authUser)"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/contacts-of-contacts', contactOfContactId, 'chronology']">
+            {{ 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_VIEW_CHRONOLOGY' | translate }}
+        </button>
+    </div>
+</form>

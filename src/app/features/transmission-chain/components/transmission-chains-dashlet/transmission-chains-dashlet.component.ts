@@ -193,6 +193,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     ngOnInit() {
         // init filters - only show cases and events first
         this.filters.showContacts = false;
+        this.filters.includeContactsOfContacts = false;
         this.filters.showEvents = true;
 
         const locationQueryBuilder = new RequestQueryBuilder();
@@ -347,6 +348,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 // add this flag only if the user is on a personal chain of transmission
                 if (this.personId) {
                     requestQueryBuilder.filter.flag('noContactChains', false);
+                }
+
+                // this flag is working only if 'showContacts' is true
+                if (this.filters.includeContactsOfContacts) {
+                    requestQueryBuilder.filter.flag('includeContactsOfContacts', 1);
                 }
             }
 
@@ -668,6 +674,17 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             this.colorCriteria.edgeIconCriteria = Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.NONE.value;
         } else if (field === 'icon' && $event !== Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.NONE.value) {
             this.colorCriteria.edgeLabelCriteria = Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.NONE.value;
+        }
+    }
+
+    /**
+     * Update showContactsOfContacts value if showContacts is disabled because
+     * user can't see contactsOfContacts without Contacts
+     * @param value
+     */
+    updateShowContactsOfContactValue(value: boolean): void {
+        if (value === false) {
+            this.filters.includeContactsOfContacts = false;
         }
     }
 }

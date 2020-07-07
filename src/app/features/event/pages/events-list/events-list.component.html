@@ -53,7 +53,7 @@
 
 <!-- Side columns -->
 <app-side-columns
-    [tableColumnsUserSettingsKey]="UserSettings.EVENT_FIELDS"
+    [tableColumnsUserSettingsKey]="appliedListFilter !== Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS ? UserSettings.EVENT_FIELDS : UserSettings.EVENT_WITHOUT_RELATIONSHIPS_FIELDS"
     [tableColumns]="tableColumns"
     (visibleColumnsChanged)="applySideColumnsChanged($event)">
 </app-side-columns>

@@ -38,6 +38,7 @@ export class OutbreakModel
     // caseClassification: any | null;
     caseIdMask: string;
     contactIdMask: string;
+    contactOfContactIdMask: string;
     countries: {
         id: string
     }[];
@@ -47,7 +48,9 @@ export class OutbreakModel
     reportingGeographicalLevelId: string;
     arcGisServers: MapServerModel[];
     isContactLabResultsActive: boolean;
+    isContactsOfContactsActive: boolean;
     isDateOfOnsetRequired: boolean;
+    applyGeographicRestrictions: boolean;
 
     generateFollowUpsOverwriteExisting: boolean;
     generateFollowUpsKeepTeamAssignment: boolean;
@@ -116,9 +119,12 @@ export class OutbreakModel
         this.reportingGeographicalLevelId = _.get(data, 'reportingGeographicalLevelId', '');
         this.caseIdMask = _.get(data, 'caseIdMask');
         this.contactIdMask = _.get(data, 'contactIdMask');
+        this.contactOfContactIdMask = _.get(data, 'contactOfContactIdMask');
         this.longPeriodsBetweenCaseOnset = _.get(data, 'longPeriodsBetweenCaseOnset');
         this.isContactLabResultsActive = _.get(data, 'isContactLabResultsActive', false);
+        this.isContactsOfContactsActive = _.get(data, 'isContactsOfContactsActive', false);
         this.isDateOfOnsetRequired = _.get(data, 'isDateOfOnsetRequired', true);
+        this.applyGeographicRestrictions = _.get(data, 'applyGeographicRestrictions', false);
         this.generateFollowUpsOverwriteExisting = _.get(data, 'generateFollowUpsOverwriteExisting', false);
         this.generateFollowUpsKeepTeamAssignment = _.get(data, 'generateFollowUpsKeepTeamAssignment', true);
         this.generateFollowUpsTeamAssignmentAlgorithm = _.get(data, 'generateFollowUpsTeamAssignmentAlgorithm', Constants.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM.ROUND_ROBIN_ALL_TEAMS.value);

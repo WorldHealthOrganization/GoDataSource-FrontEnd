@@ -1,0 +1,650 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+                <button
+                    *ngIf="!appliedListFilter"
+                    mat-raised-button
+                    color="accent"
+                    [matMenuTriggerFor]="quickActionsMenu">
+                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
+                </button>
+
+                <mat-menu #quickActionsMenu="matMenu">
+                    <app-export-button
+                        *ngIf="exportContactsOfContactsUrl && ContactOfContactModel.canExport(authUser)"
+                        [menuItem]="true"
+                        [label]="'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_BUTTON' | translate"
+                        [message]="'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_TITLE' | translate"
+                        [url]="exportContactsOfContactsUrl"
+                        [fileName]="contactsOfContactsDataExportFileName"
+                        [allowedExportTypes]="allowedExportTypes"
+                        [displayEncrypt]="true"
+                        [displayAnonymize]="true"
+                        [anonymizeFields]="anonymizeFields"
+                        [queryBuilder]="queryBuilder"
+                        (exportStart)="showLoadingDialog()"
+                        (exportFinished)="closeLoadingDialog()">
+                    </app-export-button>
+
+                    <button
+                        *ngIf="ContactOfContactModel.canImport(authUser)"
+                        mat-menu-item
+                        [routerLink]="['/import-export-data', 'contact-of-contact-data', 'import']">
+                        {{'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_IMPORT_BUTTON' | translate}}
+                    </button>
+
+                    <mat-divider
+                        *ngIf="
+                            ContactOfContactModel.canExportRelationships(authUser) ||
+                            OutbreakModel.canImportRelationship(authUser)"
+                    ></mat-divider>
+
+                    <button
+                        *ngIf="ContactOfContactModel.canExportRelationships(authUser)"
+                        mat-menu-item
+                        (click)="exportFilteredContactsRelationships()">
+                        {{ 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_EXPORT_CONTACTS_OF_CONTACTS_RELATIONSHIPS' | translate }}
+                    </button>
+
+                    <button
+                        *ngIf="OutbreakModel.canImportRelationship(authUser)"
+                        mat-menu-item
+                        (click)="goToRelationshipImportPage()">
+                        {{ 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_IMPORT_CONTACTS_OF_CONTACTS_RELATIONSHIPS' | translate }}
+                    </button>
+                </mat-menu>
+            </div>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<!-- Side columns -->
+<app-side-columns
+    [tableColumnsUserSettingsKey]="UserSettings.CONTACT_OF_CONTACT_FIELDS"
+    [tableColumns]="tableColumns"
+    (visibleColumnsChanged)="applySideColumnsChanged($event)">
+</app-side-columns>
+
+<div fxLayout fxLayoutAlign="space-between end">
+    <!--Total number of records from the list-->
+    <app-total-number-of-records
+        [value]="(contactsOfContactsListCount$ | async)?.count">
+    </app-total-number-of-records>
+
+    <!--Contacts of Contacts grouped by risk level-->
+    <a
+        *ngIf="!appliedListFilter && !showCountPills; else countPills"
+        class="xlink-button margin-right-x"
+        (click)="showCountPills = true">
+        {{ 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_SHOW_GROUP_BY_RISK_PILLS' | translate }}
+    </a>
+    <ng-template
+        #countPills>
+        <app-counted-items-list
+            *ngIf="!appliedListFilter"
+            fxFlex
+            [items]="countedContactsOfContactsByRiskLevel$ | async"
+            (optionChanged)="filterBySelectField('id', $event.ids, null)">
+        </app-counted-items-list>
+    </ng-template>
+</div>
+
+<app-side-filters
+    [filterOptions]="availableSideFilters"
+    (filtersApplied)="applySideFilters($event)"
+    [savedFiltersType]="savedFiltersType">
+</app-side-filters>
+
+<mat-card class="page-section page-content">
+    <div class="reset-filters">
+        <!-- Reset Filters -->
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="resetFiltersToSideFilters()">
+            {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+        </button>
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="needsRefreshList(true)">
+            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+        </button>
+    </div>
+
+    <!-- Hover question effects / actions -->
+    <app-hover-row-actions
+        #hoverRow
+        [active]="!refreshingList"
+        leftSideClass="hover-row-actions-mat-table-left"
+    ></app-hover-row-actions>
+
+    <mat-table #table [dataSource]="contactsOfContactsList$ | async" matSort
+               (matSortChange)="sortBy($event, { age: [ 'years', 'months' ] })">
+        <!-- Checkbox -->
+        <ng-container matColumnDef="checkbox">
+            <mat-header-cell *matHeaderCellDef fxFlex="60px">
+                <div class="table-header-cell">
+                    <div>
+                        <button
+                            type="button"
+                            class="bulk-actions-button"
+                            mat-icon-button
+                            [disableRipple]="true"
+                            [matMenuTriggerFor]="actionsMenuMultipleRecords"
+                            color="accent"
+                            [matTooltip]="'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_TOOLTIP' | translate"
+                            [disabled]="isEmptyList"
+                        >
+                            <span class="xt-icon">arrowDropdownCircle</span>
+                        </button>
+
+                        <mat-menu #actionsMenuMultipleRecords="matMenu">
+                            <button
+                                *ngIf="!checkedAllRecords"
+                                mat-menu-item
+                                (click)="checkAllRecords()">
+                                {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL' | translate }}
+                            </button>
+                            <button
+                                *ngIf="checkedRecords.length > 0"
+                                mat-menu-item
+                                (click)="uncheckAllRecords()">
+                                {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}
+                            </button>
+
+                            <mat-divider></mat-divider>
+
+                            <button
+                                *ngIf="exportContactsOfContactsUrl && ContactOfContactModel.canExport(authUser)"
+                                mat-menu-item
+                                (click)="exportSelectedContactsOfContacts()">
+                                {{ 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS' | translate }}
+                            </button>
+
+                            <button
+                                *ngIf="ContactOfContactModel.canExportDossier(authUser)"
+                                mat-menu-item
+                                (click)="exportSelectedContactsOfContactsDossier()">
+                                {{ 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_DOSSIER' | translate }}
+                            </button>
+
+                            <button
+                                *ngIf="ContactOfContactModel.canExportRelationships(authUser)"
+                                mat-menu-item
+                                (click)="exportSelectedContactsOfContactsRelationship()">
+                                {{ 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_RELATIONSHIPS' | translate }}
+                            </button>
+
+                            <ng-container *ngIf="ContactOfContactModel.canBulkModify(authUser)">
+                                <ng-container
+                                    *app-selected-outbreak-is-active>
+                                    <mat-divider></mat-divider>
+
+                                    <button
+                                        mat-menu-item
+                                        (click)="bulkModifyContactOfContacts()">
+                                        {{ 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_MODIFY_CONTACTS_OF_CONTACTS' | translate }}
+                                    </button>
+                                </ng-container>
+                            </ng-container>
+                        </mat-menu>
+                    </div>
+                    <div class="column-filter">
+                        <!-- placeholder -->
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item;" fxFlex="60px">
+                <app-form-checkbox
+                    #listCheckedIndividual
+                    [name]="'listCheckedIndividual[' + item.id + ']'"
+                    class="table-checkbox"
+                    ngModel
+                    (optionChanged)="checkedRecord(item, $event)">
+                </app-form-checkbox>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Last Name -->
+        <ng-container matColumnDef="lastName">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell" fxLayout="column">
+                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="lastNameFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('lastName', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
+                {{ item.lastName }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- First Name -->
+        <ng-container matColumnDef="firstName">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{ "LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME" | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="firstNameFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('firstName', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
+                {{ item.firstName }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Visual ID -->
+        <ng-container matColumnDef="visualId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell" fxLayout="column">
+                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID' | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="visualIdFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('visualId', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
+                {{ item.visualId }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Location  -->
+        <ng-container matColumnDef="location">
+            <mat-header-cell *matHeaderCellDef
+                             class="location-drop-down-column-header">
+                <div class="table-header-cell" fxLayout="column">
+                    <div class="column-header">{{ 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_LOCATION' | translate }}</div>
+                    <div class="column-filter location-drop-down-column-header-container" >
+                        <app-form-location-dropdown
+                            fxFlex
+                            name="locationIds"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            multiple="true"
+                            (itemChanged)="filterByLocation($event)"
+                            app-reset-location-on-side-filter
+                            [fixedDropPanel]="true"
+                            [useOutbreakLocations]="true">
+                        </app-form-location-dropdown>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
+                {{ item.mainAddress?.location?.name }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Age -->
+        <ng-container matColumnDef="age">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-range
+                            name="ageFilter"
+                            ngModel
+                            (changed)="filterByAgeRangeField('age', $event)"
+                            app-reset-input-on-side-filter
+                            [min]="0"
+                            [max]="Constants.DEFAULT_AGE_MAX_YEARS"
+                            fromPlaceholder="LNG_AGE_FIELD_FILTER_LABEL_FROM"
+                            toPlaceholder="LNG_AGE_FIELD_FILTER_LABEL_TO">
+                        </app-form-range>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
+                <app-age-label [age]="item.age"></app-age-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Gender -->
+        <ng-container matColumnDef="gender">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{ "LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER" | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="genderFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="genderList$ | async"
+                            (optionChanged)="filterBySelectField('gender', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
+                {{ item.gender | translate }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Phone number -->
+        <ng-container matColumnDef="phoneNumber">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PHONE_NUMBER'| translate}}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="phoneNumberFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByPhoneNumber('addresses.phoneNumber', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
+                <ng-container *ngFor="let phoneNumber of item.phoneNumbers">
+                    {{phoneNumber}}<br/>
+                </ng-container>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Risk Level -->
+        <ng-container matColumnDef="riskLevel">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="riskLevelFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="riskLevelsList$ | async"
+                            (optionChanged)="filterBySelectField('riskLevel', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.RISK_LEVEL"
+                    [value]="item.riskLevel">
+                </app-reference-data-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Date of last contact -->
+        <ng-container matColumnDef="dateOfLastContact">
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{ 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-daterange
+                            name="dateOfLastContactFilter"
+                            ngModel
+                            (changed)="filterByDateRangeField('dateOfLastContact', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell
+                *matCellDef="let item"
+                class="has-date-range-filter"
+                [style.color]="getRiskColor(item)">
+                {{ item.dateOfLastContact | dateDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Deleted -->
+        <ng-container matColumnDef="deleted">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DELETED' | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="deletedFilter"
+                            [ngModel]="false"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="yesNoOptionsList$ | async"
+                            (optionChanged)="filterByDeletedField($event.value)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
+                <app-yes-no-label
+                    [value]="item.deleted">
+                </app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Number of Exposures -->
+        <ng-container matColumnDef="numberOfExposures">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{ 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <!-- placeholder -->
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)"
+                (click)="displayExposures(item)"
+                class="mat-table-number-column">
+                {{ item.numberOfExposures }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Created By -->
+        <ng-container matColumnDef="createdBy">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{ 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_CREATED_BY' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="createdByFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="userList$ | async"
+                            (optionChanged)="filterBySelectField('createdBy', $event, 'id')"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            optionLabelKey="name"
+                            optionValueKey="id"
+                            [multiple]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
+                {{ item.createdByUser?.name }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Created At -->
+        <ng-container matColumnDef="createdAt">
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{ 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_CREATED_AT' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-daterange
+                            name="createdAtFilter"
+                            ngModel
+                            (changed)="filterByDateRangeField('createdAt', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell
+                *matCellDef="let item"
+                class="has-date-range-filter"
+                [style.color]="getRiskColor(item)">
+                {{ item.createdAt | dateTimeDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Modified By -->
+        <ng-container matColumnDef="updatedBy">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{ 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_UPDATED_BY' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="updatedByFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="userList$ | async"
+                            (optionChanged)="filterBySelectField('updatedBy', $event, 'id')"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            optionLabelKey="name"
+                            optionValueKey="id"
+                            [multiple]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
+                {{ item.updatedByUser?.name }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Updated At -->
+        <ng-container matColumnDef="updatedAt">
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{ 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_UPDATED_AT' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-daterange
+                            name="updatedAtFilter"
+                            ngModel
+                            (changed)="filterByDateRangeField('updatedAt', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell
+                *matCellDef="let item"
+                class="has-date-range-filter"
+                [style.color]="getRiskColor(item)">
+                {{ item.updatedAt | dateTimeDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
+        <mat-row
+            *matRowDef="let item; columns: visibleTableColumns"
+            app-hover-row-actions
+            [hoverRowActionsComponent]="hoverRow"
+            [hoverRowActions]="recordActions"
+            [hoverRowActionData]="item"
+        ></mat-row>
+    </mat-table>
+
+    <div
+        *ngIf="refreshingList"
+        class="mat-table-loading-data">
+        <mat-spinner></mat-spinner>
+    </div>
+
+    <div
+        *ngIf="!refreshingList && isEmptyList"
+        class="mat-table"
+    >
+        <div class="mat-row">
+            <div class="mat-cell">
+                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+            </div>
+        </div>
+    </div>
+
+    <mat-paginator
+        [length]="(contactsOfContactsListCount$ | async)?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
+
+</mat-card>

@@ -1,35 +1,55 @@
-<div fxLayout="column" fxLayoutGap="10px">
+<div>
     <!-- Title -->
-    <div class="dialog-title">
+    <div
+        #dialogTitle
+        class="dialog-title">
         {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_TITLE' | translate:{type: entity ? (entity.type | translate) : ''} }}
     </div>
 
     <!-- Specific model fields -->
-    <div *ngFor="let info of entityInfo" class="label-value">
-        <span>{{info.label | translate}}</span>
-        <span>{{info.value | translate}}</span>
+    <div
+        class="dialog-data-content"
+        [style.maxHeight]="dialogDataMaxHeight">
+        <div
+            *ngFor="let info of entityInfo"
+            class="label-value">
+            <span>{{info.label | translate}}</span>
+            <span>{{info.value | translate}}</span>
+        </div>
     </div>
 
-    <!-- Link to person resource -->
-    <a [href]="getResourceViewPageLink()" target="_blank">
-        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_FULL_RESOURCE' | translate}}
-    </a>
+    <!-- Buttons and Links -->
+    <div
+        #dialogButtons
+        fxLayout="row" fxLayoutAlign="space-between">
+        <!-- Links -->
+        <div
+            fxLayout="row" fxLayoutGap="10px" fxGrow="0">
+            <!-- Link to person resource -->
+            <a
+                [href]="resourceViewPageLink"
+                target="_blank">
+                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_FULL_RESOURCE' | translate}}
+            </a>
 
-    <!-- Link to person chain -->
-    <a
-        *ngIf="entity.type !== EntityType.CONTACT && this.displayPersonChainOfTransmissionLink"
-        [href]="getPersonChainLink()"
-        target="_blank"
-    >
-        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_CHAIN_OF_TRANSMISSION' | translate}}
-    </a>
+            <!-- Link to person chain -->
+            <a
+                *ngIf="entity.type !== EntityType.CONTACT_OF_CONTACT && this.displayPersonChainOfTransmissionLink"
+                [href]="personChainLink"
+                target="_blank">
+                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_CHAIN_OF_TRANSMISSION' | translate}}
+            </a>
+        </div>
 
-    <div fxLayout="row" fxLayoutAlign="end">
-        <button
-            mat-button
-            (click)="closeDialog()"
-            type="button">
-            {{ 'LNG_COMMON_BUTTON_CANCEL' | translate | uppercase }}
-        </button>
+        <!-- Buttons -->
+        <div
+            fxFlex fxLayoutAlign="end">
+            <button
+                mat-button
+                (click)="closeDialog()"
+                type="button">
+                {{ 'LNG_COMMON_BUTTON_CANCEL' | translate | uppercase }}
+            </button>
+        </div>
     </div>
 </div>

@@ -43,6 +43,10 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
         [EntityType.EVENT]: {
             'label': 'LNG_PAGE_LIST_EVENTS_TITLE',
             'link': '/events'
+        },
+        [EntityType.CONTACT_OF_CONTACT]: {
+            'label': 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
+            'link': '/contacts-of-contacts'
         }
     };
 

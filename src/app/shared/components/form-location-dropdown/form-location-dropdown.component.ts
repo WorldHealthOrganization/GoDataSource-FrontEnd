@@ -79,7 +79,6 @@ export class FormLocationDropdownComponent
     get notFoundText(): string {
         return this._notFoundText;
     }
-    @Input() locationsForOutbrakId: string;
     @Input() useOutbreakLocations: boolean = false;
 
     // floatable drop panel
