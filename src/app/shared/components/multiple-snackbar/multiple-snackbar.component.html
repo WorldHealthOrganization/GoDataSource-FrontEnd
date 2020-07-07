@@ -1,24 +1,36 @@
-<div class="errors-container">
+<div
+    fxLayout="column"
+    class="messages-container">
     <div
-         *ngFor="let msg of messages; let i = index"
-         [ngClass]="msg.messageClass"
-         class="message {{theme}}"
+        *ngFor="let msg of messages; let i = index"
+        [ngClass]="msg.messageClass"
+        fxFlex fxLayoutAlign="space-between"
+        class="message {{theme}}"
     >
-        <div class="text-message">
+        <div
+            *ngIf="!msg.html"
+            fxFlex fxFlexAlign="center"
+            class="text-message">
             {{ msg.message }}
         </div>
 
-        <div class="snackbar-close-button-container {{msg.messageClass}}">
-            <p
-                (click)="closeSnackbar(i)"
-            >
-                {{'LNG_MULTIPLE_SNACKBAR_BUTTON_CLOSE' | translate}}
-            </p>
+        <div
+            *ngIf="msg.html"
+            class="text-message {{theme}}"
+            [innerHTML]="msg.message">
+        </div>
+
+        <div
+            (click)="closeSnackbar(i)"
+            fxLayoutAlign="center center"
+            class="snackbar-close-button-container {{msg.messageClass}}">
+            {{'LNG_MULTIPLE_SNACKBAR_BUTTON_CLOSE' | translate}}
         </div>
     </div>
-
+    <!-- CloseAll button -->
     <div
         *ngIf="messages.length > 1"
+        fxFlex fxFlexAlign="flex-end"
         class="close-all-button-container">
         <button
             (click)="closeAllSnackbars()"
@@ -28,9 +40,3 @@
         </button>
     </div>
 </div>
-
-<!--<div-->
-<!--    *ngIf="html"-->
-<!--    class="snackbar {{theme}}"-->
-<!--    [innerHTML]="message">-->
-<!--</div>-->

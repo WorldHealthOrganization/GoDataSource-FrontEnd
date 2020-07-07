@@ -1081,7 +1081,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.caseDataService
-                        .convertToContact(this.selectedOutbreak.id, 'caseModel.id')
+                        .convertToContact(this.selectedOutbreak.id, caseModel.id)
                         .pipe(
                             catchError((err) => {
                                 this.snackbarService.showApiError(err);

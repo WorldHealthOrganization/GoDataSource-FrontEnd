@@ -83,10 +83,10 @@ export class SnackbarService {
         duration = SnackbarService.DURATION,
         html: boolean = false
     ) {
-        return this.i18nService
+        this.i18nService
             .get(messageToken, translateData)
             .subscribe((message) => {
-                this.openSnackbar(message, 'success', html);
+                this.openSnackbar(message, 'success', html, duration);
             });
     }
 
@@ -103,7 +103,7 @@ export class SnackbarService {
         duration = SnackbarService.DURATION,
         html: boolean = false
     ) {
-        return this.i18nService
+        this.i18nService
             .get(messageToken, translateData)
             .subscribe((message) => {
                 this.openSnackbar(message, 'error', html);
@@ -121,7 +121,7 @@ export class SnackbarService {
         translateData = {},
         html: boolean = false
     ) {
-        return this.i18nService
+        this.i18nService
             .get(messageToken, translateData)
             .subscribe((message) => {
                 this.openSnackbar(message, 'notice', html);
@@ -134,7 +134,8 @@ export class SnackbarService {
     private openSnackbar(
         message: string,
         messageClass: string,
-        html: boolean
+        html: boolean,
+        duration?: number
     ) {
         if (!SnackbarService.snackbarInstance) {
             // show the translated message
@@ -147,9 +148,9 @@ export class SnackbarService {
                 horizontalPosition: 'center',
                 verticalPosition: 'top'
             }).instance;
-            SnackbarService.snackbarInstance.addMessage({message: message, messageClass: messageClass, html: html});
+            SnackbarService.snackbarInstance.addMessage({message: message, messageClass: messageClass, html: html, duration: duration});
         } else {
-            SnackbarService.snackbarInstance.addMessage({message: message, messageClass: messageClass, html: html});
+            SnackbarService.snackbarInstance.addMessage({message: message, messageClass: messageClass, html: html, duration: duration});
         }
     }
 
@@ -157,7 +158,6 @@ export class SnackbarService {
      * Close snackbar
      */
     dismissSnackbarCallback() {
-        console.log('close snackbar from service');
         SnackbarService.snackbarInstance = undefined;
     }
 
@@ -220,6 +220,9 @@ export class SnackbarService {
                 );
     }
 
+    /**
+     * Dismiss all snackbars
+     */
     dismissAll() {
         this.snackbar.dismiss();
     }

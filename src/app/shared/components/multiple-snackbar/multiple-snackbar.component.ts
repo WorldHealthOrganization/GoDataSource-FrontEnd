@@ -1,6 +1,8 @@
 import { Component, Inject, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from '@angular/material';
 import * as _ from 'lodash';
+import { DebounceTimeCaller } from '../../../core/helperClasses/debounce-time-caller';
+import { Subscriber } from 'rxjs';
 
 @Component({
     selector: 'app-multiple-snackbar',
@@ -10,11 +12,12 @@ import * as _ from 'lodash';
 })
 export class MultipleSnackbarComponent {
 
-    // error messages
+    // snackbar messages
     messages: {
         message: string,
         messageClass: string,
-        html: boolean
+        html: boolean,
+        duration: number
     }[] = [];
 
     // available themes: 'success', 'error'
@@ -30,17 +33,30 @@ export class MultipleSnackbarComponent {
         this.theme = _.get(data, 'theme');
     }
 
+    /**
+     * Add message
+     */
     addMessage(message) {
-        console.log('push message');
-        console.log(message);
+        // add message to be displayed
         this.messages.push(message);
+        // if message have duration time, trigger close function based on message duration
+        if (message.duration) {
+            // message index
+            const messageIndex = _.findIndex(this.messages, message);
+            // create trigger to close message for messages that have a duration do display them
+            const triggerCloseMessage = new DebounceTimeCaller(new Subscriber<void>(() => {
+                this.closeSnackbar(messageIndex);
+            }));
+            // call the closeTrigger
+            triggerCloseMessage.callAfterMs(message.duration);
+        }
     }
 
     /**
      * Close snackbar
      */
     closeSnackbar(ind) {
-        // reset error messages collection and dismiss snackbar if there is only one message
+        // reset messages collection and dismiss snackbar if there is only one message
         if (this.messages.length === 1) {
             this.closeAllSnackbars();
         } else {
