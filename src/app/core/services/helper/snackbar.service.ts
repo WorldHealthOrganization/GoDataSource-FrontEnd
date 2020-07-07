@@ -26,14 +26,12 @@ export class SnackbarService {
      * Show an Error Snackbar displaying the translated error message corresponding to the API Error received
      * @param err API error object
      * @param {{}} translateData
-     * @param {number} duration
      * @param html
      * @returns {Subscription}
      */
     showApiError(
         err,
         translateData = {},
-        duration = SnackbarService.DURATION,
         html: boolean = false
     ) {
         const defaultApiErrorCode = 'LNG_API_ERROR_CODE_UNKNOWN_ERROR';
@@ -54,7 +52,6 @@ export class SnackbarService {
                             this.showError(
                                 defaultErrorMessage,
                                 translateData,
-                                duration,
                                 html
                             );
                         });
@@ -63,7 +60,6 @@ export class SnackbarService {
                     this.showError(
                         apiErrorMessage,
                         translateData,
-                        duration,
                         html
                     );
                 }
@@ -94,13 +90,11 @@ export class SnackbarService {
      * Show an Error Snackbar
      * @param messageToken
      * @param translateData
-     * @param duration
      * @param html
      */
     showError(
         messageToken,
         translateData = {},
-        duration = SnackbarService.DURATION,
         html: boolean = false
     ) {
         this.i18nService
