@@ -136,15 +136,26 @@ export class SnackbarService {
             SnackbarService.snackbarInstance = this.snackbar.openFromComponent(MultipleSnackbarComponent, {
                 panelClass: 'error',
                 data: {
-                    html: html,
                     dismissSnackbar: () => { this.dismissSnackbarCallback(); }
                 },
                 horizontalPosition: 'center',
                 verticalPosition: 'top'
             }).instance;
-            SnackbarService.snackbarInstance.addMessage({message: message, messageClass: messageClass, html: html, duration: duration});
+            SnackbarService.snackbarInstance
+                .addMessage({
+                    message: message,
+                    messageClass: messageClass,
+                    html: html,
+                    duration: duration
+                });
         } else {
-            SnackbarService.snackbarInstance.addMessage({message: message, messageClass: messageClass, html: html, duration: duration});
+            SnackbarService.snackbarInstance
+                .addMessage({
+                    message: message,
+                    messageClass: messageClass,
+                    html: html,
+                    duration: duration
+                });
         }
     }
 
