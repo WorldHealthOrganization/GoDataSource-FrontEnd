@@ -72,17 +72,25 @@ export class SnackbarService {
      * @param translateData
      * @param duration
      * @param html
+     * @param messageId
      */
     showSuccess(
         messageToken,
         translateData = {},
         duration = SnackbarService.DURATION,
-        html: boolean = false
+        html: boolean = false,
+        messageId?: string
     ) {
         this.i18nService
             .get(messageToken, translateData)
             .subscribe((message) => {
-                this.openSnackbar(message, 'success', html, duration);
+                this.openSnackbar(
+                    message,
+                    'success',
+                    html,
+                    duration,
+                    messageId
+                );
             });
     }
 
@@ -91,16 +99,24 @@ export class SnackbarService {
      * @param messageToken
      * @param translateData
      * @param html
+     * @param messageId
      */
     showError(
         messageToken,
         translateData = {},
-        html: boolean = false
+        html: boolean = false,
+        messageId?: string
     ) {
         this.i18nService
             .get(messageToken, translateData)
             .subscribe((message) => {
-                this.openSnackbar(message, 'error', html);
+                this.openSnackbar(
+                    message,
+                    'error',
+                    html,
+                    null,
+                    messageId
+                );
             });
     }
 
@@ -109,16 +125,24 @@ export class SnackbarService {
      * @param messageToken
      * @param translateData
      * @param html
+     * @param messageId
      */
     showNotice(
         messageToken,
         translateData = {},
-        html: boolean = false
+        html: boolean = false,
+        messageId?: string
     ) {
         this.i18nService
             .get(messageToken, translateData)
             .subscribe((message) => {
-                this.openSnackbar(message, 'notice', html);
+                this.openSnackbar(
+                    message,
+                    'notice',
+                    html,
+                    null,
+                    messageId
+                );
             });
     }
 
@@ -129,8 +153,10 @@ export class SnackbarService {
         message: string,
         messageClass: string,
         html: boolean,
-        duration?: number
+        duration?: number,
+        messageId?: string
     ) {
+        // open snackbar if we haven't already opened it
         if (!SnackbarService.snackbarInstance) {
             // show the translated message
             SnackbarService.snackbarInstance = this.snackbar.openFromComponent(MultipleSnackbarComponent, {
@@ -141,22 +167,17 @@ export class SnackbarService {
                 horizontalPosition: 'center',
                 verticalPosition: 'top'
             }).instance;
-            SnackbarService.snackbarInstance
-                .addMessage({
-                    message: message,
-                    messageClass: messageClass,
-                    html: html,
-                    duration: duration
-                });
-        } else {
-            SnackbarService.snackbarInstance
-                .addMessage({
-                    message: message,
-                    messageClass: messageClass,
-                    html: html,
-                    duration: duration
-                });
         }
+
+        // add message to be displayed
+        SnackbarService.snackbarInstance
+            .addMessage({
+                message: message,
+                messageClass: messageClass,
+                html: html,
+                duration: duration,
+                id: messageId
+            });
     }
 
     /**
