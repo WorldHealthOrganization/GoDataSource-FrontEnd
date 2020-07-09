@@ -365,8 +365,6 @@ export class OutbreakDataService {
                                     AppMessages.APP_MESSAGE_UNRESPONSIVE_SELECTED_OUTBREAK_NOT_ACTIVE
                                 );
                             });
-                    } else {
-                        this.snackbarService.dismissAll();
                     }
                 }
             });
