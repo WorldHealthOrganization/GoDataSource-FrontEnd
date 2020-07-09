@@ -19,14 +19,20 @@ export class TransmissionChainModel
     implements
         IPermissionChainsOfTransmission {
     // all Cases from Chain, mapped by Case ID
-    casesMap: {}|{string: CaseModel} = {};
+    casesMap: {
+        [id: string]: CaseModel
+    } = {};
     // all events related to chain
-    eventsMap: {}|{string: EventModel} = {};
+    eventsMap: {
+        [id: string]: EventModel
+    } = {};
 
     // all relations between Cases
     chainRelations: TransmissionChainRelation[] = [];
     // all entities related to Chain (Cases, Contacts and Events)
-    nodes: {}|{string: EntityModel} = {};
+    nodes: {
+        [id: string]: EntityModel
+    } = {};
     // all relationships between Chain entities
     relationships: RelationshipModel[];
     // whether the Chain is active or inactive

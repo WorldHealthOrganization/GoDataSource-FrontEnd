@@ -19,7 +19,7 @@ export class RequestQueryBuilder {
     // Limit
     public limitResultsNumber: number;
     // Fields to retrieve
-    public fieldsInResponse: string[] = [];
+    private fieldsInResponse: string[] = [];
     // other custom query full query builders
     public childrenQueryBuilders: {
         [qbFilterKey: string]: RequestQueryBuilder
