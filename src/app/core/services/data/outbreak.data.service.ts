@@ -352,6 +352,10 @@ export class OutbreakDataService {
                         AppMessages.APP_MESSAGE_UNRESPONSIVE_NO_ACTIVE_OUTBREAK
                     );
                 } else {
+                    // hide message
+                    this.snackbarService.hideMessage(AppMessages.APP_MESSAGE_UNRESPONSIVE_NO_ACTIVE_OUTBREAK);
+
+                    // outbreak not active ?
                     if (authUser.activeOutbreakId !== selectedOutbreak.id) {
                         this.getOutbreak(authUser.activeOutbreakId)
                             .subscribe((outbreak) => {
@@ -365,6 +369,9 @@ export class OutbreakDataService {
                                     AppMessages.APP_MESSAGE_UNRESPONSIVE_SELECTED_OUTBREAK_NOT_ACTIVE
                                 );
                             });
+                    } else {
+                        // hide message
+                        this.snackbarService.hideMessage(AppMessages.APP_MESSAGE_UNRESPONSIVE_SELECTED_OUTBREAK_NOT_ACTIVE);
                     }
                 }
             });
