@@ -67,6 +67,17 @@ export class SnackbarService {
     }
 
     /**
+     * Hide message
+     */
+    hideMessage(
+        id: string
+    ) {
+        if (SnackbarService.snackbarInstance) {
+            SnackbarService.snackbarInstance.closeSnackbar(id);
+        }
+    }
+
+    /**
      * Show a Success Snackbar
      * @param messageToken
      * @param translateData
@@ -244,13 +255,6 @@ export class SnackbarService {
                         });
                     })
                 );
-    }
-
-    /**
-     * Dismiss all snackbars
-     */
-    dismissAll() {
-        this.snackbar.dismiss();
     }
 }
 
