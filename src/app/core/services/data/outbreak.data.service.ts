@@ -20,6 +20,7 @@ import { catchError, map, mergeMap, takeUntil, tap } from 'rxjs/operators';
 import { IBasicCount } from '../../models/basic-count.interface';
 import { ContactOfContactModel } from '../../models/contact-of-contact.model';
 import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache';
+import { AppMessages } from '../../enums/app-messages.enum';
 
 @Injectable()
 export class OutbreakDataService {
@@ -344,7 +345,12 @@ export class OutbreakDataService {
             .subscribe((selectedOutbreak) => {
                 const authUser = this.authDataService.getAuthenticatedUser();
                 if (!authUser.activeOutbreakId) {
-                    this.snackbarService.showNotice('LNG_GENERIC_WARNING_NO_ACTIVE_OUTBREAK');
+                    this.snackbarService.showNotice(
+                        'LNG_GENERIC_WARNING_NO_ACTIVE_OUTBREAK',
+                        undefined,
+                        false,
+                        AppMessages.APP_MESSAGE_UNRESPONSIVE_NO_ACTIVE_OUTBREAK
+                    );
                 } else {
                     if (authUser.activeOutbreakId !== selectedOutbreak.id) {
                         this.getOutbreak(authUser.activeOutbreakId)
@@ -354,7 +360,9 @@ export class OutbreakDataService {
                                     {
                                         activeOutbreakName: outbreak.name,
                                         selectedOutbreakName: selectedOutbreak.name
-                                    }
+                                    },
+                                    false,
+                                    AppMessages.APP_MESSAGE_UNRESPONSIVE_SELECTED_OUTBREAK_NOT_ACTIVE
                                 );
                             });
                     } else {

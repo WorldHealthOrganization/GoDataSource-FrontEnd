@@ -251,7 +251,6 @@ export class FormHelperService {
                 {
                     fields: fields
                 },
-                _.isEmpty(fields) ? SnackbarService.DURATION : SnackbarService.DURATION_LONG,
                 true
             );
 

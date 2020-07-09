@@ -1,5 +1,4 @@
 // import each component
-import { SnackbarComponent } from './snackbar/snackbar.component';
 import { TopnavComponent } from './topnav/topnav.component';
 import { BreadcrumbsComponent } from './breadcrumbs/breadcrumbs.component';
 import { FormAddressComponent } from './form-address/form-address.component';
@@ -53,9 +52,10 @@ import { HotTableWrapperComponent } from './hot-table-wrapper/hot-table-wrapper.
 import { LocationDialogComponent } from './location-dialog/location-dialog.component';
 import { TopnavUnauthenticatedComponent } from './topnav-unauthenticated/topnav-unauthenticated.component';
 import { FormContactOfContactQuickComponent } from './form-contact-of-contact-quick/form-contact-of-contact-quick.component';
+import { MultipleSnackbarComponent } from './multiple-snackbar/multiple-snackbar.component';
 
 // export necessary components individually
-export * from './snackbar/snackbar.component';
+export * from './multiple-snackbar/multiple-snackbar.component';
 export * from './dialog/dialog.component';
 export * from './modify-contact-follow-up-questionnaire-dialog/modify-contact-follow-up-questionnaire-dialog.component';
 export * from './loading-dialog/loading-dialog.component';
@@ -71,7 +71,7 @@ export * from './location-dialog/location-dialog.component';
 // export the list of all components
 export const components: any[] = [
     // popups
-    SnackbarComponent,
+    MultipleSnackbarComponent,
 
     // main layout
     TopnavComponent,
