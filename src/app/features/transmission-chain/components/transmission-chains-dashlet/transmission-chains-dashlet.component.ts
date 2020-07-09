@@ -197,7 +197,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         this.filters.showEvents = true;
 
         const locationQueryBuilder = new RequestQueryBuilder();
-        locationQueryBuilder.fieldsInResponse = ['id', 'name'];
+        locationQueryBuilder.fields('id', 'name');
         this.locationDataService.getLocationsList(locationQueryBuilder).subscribe((results) => {
             this.locationsList = results;
         });
@@ -290,7 +290,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                         }
 
                         // load chain
-                        this.displayChainsOfTransmission();
+                        this.displayChainsOfTransmission(true);
                     });
             });
     }
@@ -309,12 +309,59 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     /**
      * Display chains of transmission
      */
-    displayChainsOfTransmission() {
+    displayChainsOfTransmission(
+        reloadData: boolean
+    ) {
+        // format chart
         this.mapColorCriteria();
-        if (this.selectedOutbreak) {
+
+        // reload data
+        if (
+            reloadData &&
+            this.selectedOutbreak
+        ) {
             // create queryBuilder for filters
             const requestQueryBuilder = new RequestQueryBuilder();
             requestQueryBuilder.filter.firstLevelConditions();
+
+            // retrieve only specific fields so we don't retrieve huge amounts of data that won't be used since we don't have pagination here
+            requestQueryBuilder.fields(
+                // edges
+                'edges.id',
+                'edges.persons',
+                'edges.certaintyLevelId',
+                'edges.socialRelationshipTypeId',
+                'edges.socialRelationshipDetail',
+                'edges.exposureTypeId',
+                'edges.exposureFrequencyId',
+                'edges.exposureDurationId',
+                'edges.contactDate',
+                'edges.clusterId',
+
+                // nodes
+                'nodes.id',
+                'nodes.type',
+                'nodes.date',
+                'nodes.dateOfOnset',
+                'nodes.dateOfLastContact',
+                'nodes.dateOfReporting',
+                'nodes.classification',
+                'nodes.name',
+                'nodes.firstName',
+                'nodes.middleName',
+                'nodes.lastName',
+                'nodes.riskLevel',
+                'nodes.gender',
+                'nodes.occupation',
+                'nodes.outcomeId',
+                'nodes.age',
+                'nodes.dob',
+                'nodes.address',
+                'nodes.addresses',
+                'nodes.visualId',
+                'nodes.classification',
+                'nodes.isDateOfOnsetApproximate'
+            );
 
             // do we have chainIncludesPerson filters ?
             if (this.personId) {
@@ -391,16 +438,35 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
             // get chain data and convert to graph nodes
             this.transmissionChainDataService
-                .getIndependentTransmissionChainData(this.selectedOutbreak.id, requestQueryBuilder)
+                .getIndependentTransmissionChainData(
+                    this.selectedOutbreak.id,
+                    requestQueryBuilder
+                )
                 .subscribe((chains) => {
                     if (!_.isEmpty(chains)) {
                         this.chainElements = chains;
-                        this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters, this.legend, this.locationsList, this.selectedViewType);
+                        this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(
+                            _.cloneDeep(chains),
+                            this.filters,
+                            this.legend,
+                            this.locationsList,
+                            this.selectedViewType
+                        );
                     } else {
                         this.chainElements = [];
                         this.graphElements = {} as IConvertChainToGraphElements;
                     }
                 });
+        } else {
+            this.graphElements = this.chainElements && this.chainElements.length > 0 ?
+                this.transmissionChainDataService.convertChainToGraphElements(
+                    _.cloneDeep(this.chainElements),
+                    this.filters,
+                    this.legend,
+                    this.locationsList,
+                    this.selectedViewType
+                ) :
+                {} as IConvertChainToGraphElements;
         }
     }
 
@@ -445,7 +511,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      */
     refreshChain() {
         // refresh chart
-        this.displayChainsOfTransmission();
+        this.displayChainsOfTransmission(true);
 
         // close settings panel
         this.showSettings = false;
@@ -632,7 +698,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         this.selectedViewType = viewType.value;
 
         // refresh chain to load the new criteria
-        this.displayChainsOfTransmission();
+        this.displayChainsOfTransmission(false);
     }
 
     /**
@@ -648,9 +714,12 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      * Reload COT when global date changes
      */
     onChangeGlobalDate() {
-        this.displayChainsOfTransmission();
+        this.displayChainsOfTransmission(true);
     }
 
+    /**
+     * Edit mode
+     */
     onEditModeChange(editMode: boolean) {
         this.changeEditMode.emit(editMode);
     }
