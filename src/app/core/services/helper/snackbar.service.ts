@@ -10,17 +10,17 @@ import { MultipleSnackbarComponent } from '../../../shared/components/multiple-s
 
 @Injectable()
 export class SnackbarService {
-
     // amount of time (in ms) to wait before automatically closing the snackbar
     static DURATION: number = 4500;
-    static DURATION_LONG: number = 8000;
     static snackbarInstance: MultipleSnackbarComponent;
 
+    /**
+     * Constructor
+     */
     constructor(
         private snackbar: MatSnackBar,
         private i18nService: I18nService
-    ) {
-    }
+    ) {}
 
     /**
      * Show an Error Snackbar displaying the translated error message corresponding to the API Error received
@@ -172,11 +172,11 @@ export class SnackbarService {
         // add message to be displayed
         SnackbarService.snackbarInstance
             .addMessage({
+                id: messageId,
                 message: message,
                 messageClass: messageClass,
                 html: html,
-                duration: duration,
-                id: messageId
+                duration: duration
             });
     }
 

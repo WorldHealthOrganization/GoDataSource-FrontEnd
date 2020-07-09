@@ -4,6 +4,15 @@ import { DebounceTimeCaller } from '../../../core/helperClasses/debounce-time-ca
 import { Subscriber } from 'rxjs';
 import { v4 as uuid } from 'uuid';
 
+interface IAppMessage {
+    id?: string;
+    message: string;
+    messageClass: string;
+    html?: boolean;
+    duration?: number;
+    durationHandler?: DebounceTimeCaller;
+}
+
 @Component({
     selector: 'app-multiple-snackbar',
     encapsulation: ViewEncapsulation.None,
@@ -11,16 +20,8 @@ import { v4 as uuid } from 'uuid';
     styleUrls: ['./multiple-snackbar.component.less']
 })
 export class MultipleSnackbarComponent implements OnDestroy {
-
     // snackbar messages
-    messages: {
-        id?: string,
-        message: string,
-        messageClass: string,
-        html: boolean,
-        duration: number,
-        messageDurationHandler: DebounceTimeCaller
-    }[] = [];
+    messages: IAppMessage[] = [];
 
     /**
      * Constructor
@@ -33,11 +34,11 @@ export class MultipleSnackbarComponent implements OnDestroy {
     /**
      * Add message
      */
-    addMessage(message) {
+    addMessage(message: IAppMessage) {
         // if we've already pushed this static message, do not push again the message
         if (
             message.id &&
-            this.messages.find(msg => {
+            this.messages.find((msg: IAppMessage) => {
                 return msg.id === message.id;
             })
         ) {
@@ -45,19 +46,32 @@ export class MultipleSnackbarComponent implements OnDestroy {
         } else {
             // assign unique id to message if it doesn't have one
             if (!message.id) {
-                Object.assign(message, {id: uuid()});
+                message.id = uuid();
             }
-            // add message to be displayed
-            this.messages.push(message);
+
             // if message have duration time, trigger close function based on message duration
             if (message.duration) {
                 // create trigger to close message for messages that have a duration do display them
-                message.messageDurationHandler = new DebounceTimeCaller(new Subscriber<void>(() => {
+                message.durationHandler = new DebounceTimeCaller(new Subscriber<void>(() => {
                     this.closeSnackbar(message.id);
                 }));
+
                 // call the closeTrigger
-                message.messageDurationHandler.callAfterMs(message.duration);
+                message.durationHandler.callAfterMs(message.duration);
             }
+
+            // add message to be displayed
+            this.messages.push(message);
+        }
+    }
+
+    /**
+     * if there is a handler for this message, then we need to remove the subscription
+     */
+    unsubscribeMessageDurationHandler(message: IAppMessage) {
+        if (message.durationHandler) {
+            message.durationHandler.unsubscribe();
+            message.durationHandler = undefined;
         }
     }
 
@@ -69,10 +83,7 @@ export class MultipleSnackbarComponent implements OnDestroy {
         const index: number = this.messages.findIndex(msg => msg.id === id);
         if (index > -1) {
             // if message has duration unsubscribe debounce time caller
-            if (this.messages[index].messageDurationHandler) {
-                this.messages[index].messageDurationHandler.unsubscribe();
-                this.messages[index].messageDurationHandler = undefined;
-            }
+            this.unsubscribeMessageDurationHandler(this.messages[index]);
 
             // remove specific message
             this.messages = this.messages.filter((msg) => {
@@ -101,10 +112,7 @@ export class MultipleSnackbarComponent implements OnDestroy {
     ngOnDestroy(): void {
         // unsubscribe for each message if it has a duration handled
         this.messages.forEach((message) => {
-            if (message.messageDurationHandler) {
-                message.messageDurationHandler.unsubscribe();
-                message.messageDurationHandler = undefined;
-            }
+            this.unsubscribeMessageDurationHandler(message);
         });
     }
 }
