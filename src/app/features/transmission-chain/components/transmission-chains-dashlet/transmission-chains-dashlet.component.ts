@@ -195,7 +195,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     cy: any;
     transmissionChainViewTypes$: Observable<LabelValuePair[]>;
     timelineViewType: string = 'horizontal';
-    datesArray: string[] = [];
+    datesArrayMap: {
+        [key: string]: number
+    } = {};
     timelineDatesRanks: any = {};
     // show/hide legend?
     showLegend: boolean = true;
@@ -270,11 +272,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             // restrict position of the node on the x axis for the timeline view
             const nodeData = node.json().data;
             // calculate position on x axis based on the index of the date.
-            const datesIndex = _.findIndex(
-                this.datesArray,
-                function (o) {
-                    return o === nodeData.dateTimeline;
-                });
+            const datesIndex = this.datesArrayMap[nodeData.dateTimeline] !== undefined ?
+                this.datesArrayMap[nodeData.dateTimeline] :
+                -1;
             if (this.timelineViewType === 'horizontal') {
                 // using 150px as it looks fine
                 posX = datesIndex * 200;
@@ -1172,12 +1172,13 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      */
     calculateTimelineDates() {
         // empty the already set timeline and dates arrays
-        this.datesArray = [];
+        this.datesArrayMap = {};
         this.timelineDatesRanks = {};
         const nodes = this.graphElements ?
             _.sortBy(this.graphElements.nodes, 'data.dateTimeline') :
             [];
         // loop through all the nodes to set their position based on date and relations
+        let index: number = 0;
         _.forEach(nodes, (node, key) => {
             // check if the node has a date to be taken into consideration
             if (!_.isEmpty(node.data.dateTimeline)) {
@@ -1194,11 +1195,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 }
                 // check related nodes
                 this.setRelatedNodesRank(node);
-                this.datesArray.push(node.data.dateTimeline);
+                if (!this.datesArrayMap[node.data.dateTimeline]) {
+                    this.datesArrayMap[node.data.dateTimeline] = index++;
+                }
             }
         });
-        this.datesArray = _.uniq(this.datesArray);
-        this.datesArray = _.sortBy(this.datesArray);
     }
 
     /**
@@ -1365,7 +1366,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         this.transmissionChainViewType = $event.value;
 
         // refresh chain to load the new criteria
-        this.displayChainsOfTransmission(!this._dataLoaded);
+        setTimeout(() => {
+            this.displayChainsOfTransmission(!this._dataLoaded);
+        });
     }
 
     /**
