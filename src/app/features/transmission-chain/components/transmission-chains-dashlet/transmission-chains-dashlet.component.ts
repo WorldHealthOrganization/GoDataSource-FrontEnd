@@ -198,7 +198,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     datesArrayMap: {
         [key: string]: number
     } = {};
-    timelineDatesRanks: any = {};
+    timelineDatesRanks: {
+        [date: string]: {
+            [id: string]: number
+        }
+    } = {};
     // show/hide legend?
     showLegend: boolean = true;
     // toggle edit mode
@@ -1177,6 +1181,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         const nodes = this.graphElements ?
             _.sortBy(this.graphElements.nodes, 'data.dateTimeline') :
             [];
+
         // loop through all the nodes to set their position based on date and relations
         let index: number = 0;
         _.forEach(nodes, (node, key) => {
@@ -1185,14 +1190,17 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 // check if there is already a node added to that date
                 if (this.timelineDatesRanks[node.data.dateTimeline]) {
                     // check if the node was not already processed - rank / position set
-                    if (!this.timelineDatesRanks[node.data.dateTimeline][node.data.id] &&
-                        this.timelineDatesRanks[node.data.dateTimeline][node.data.id] !== 0) {
+                    if (
+                        !this.timelineDatesRanks[node.data.dateTimeline][node.data.id] &&
+                        this.timelineDatesRanks[node.data.dateTimeline][node.data.id] !== 0
+                    ) {
                         this.setNodeRankDate(node);
                     }
                 } else {
                     // the node is the first one on the date
                     this.setFirstNodeOnDate(node);
                 }
+
                 // check related nodes
                 this.setRelatedNodesRank(node);
                 if (!this.datesArrayMap[node.data.dateTimeline]) {
@@ -1285,6 +1293,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         } else {
             // get max rank for that date
             const maxRankDate = this.getMaxRankDate(this.timelineDatesRanks[node.data.dateTimeline]);
+
             // set rank to max +_1
             this.timelineDatesRanks[node.data.dateTimeline][node.data.id] = maxRankDate + 1;
         }
@@ -1295,7 +1304,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      * @param node
      */
     setFirstNodeOnDate(node) {
-        this.timelineDatesRanks[node.data.dateTimeline] = [];
+        this.timelineDatesRanks[node.data.dateTimeline] = {};
         if (node.data.nodeType === 'checkpoint') {
             this.timelineDatesRanks[node.data.dateTimeline][node.data.id] = -1;
         } else {
@@ -1319,8 +1328,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 let maxRankToBlock = -1;
                 if (this.timelineDatesRanks[relatedNode.data.dateTimeline]) {
                     // check if node rank was already calculated
-                    if (!this.timelineDatesRanks[relatedNode.data.dateTimeline][relatedNode.data.id]
-                        && this.timelineDatesRanks[relatedNode.data.dateTimeline][relatedNode.data.id] !== 0) {
+                    if (
+                        !this.timelineDatesRanks[relatedNode.data.dateTimeline][relatedNode.data.id] &&
+                        this.timelineDatesRanks[relatedNode.data.dateTimeline][relatedNode.data.id] !== 0
+                    ) {
                         if (relatedNode.data.nodeType === 'checkpoint') {
                             this.timelineDatesRanks[relatedNode.data.dateTimeline][relatedNode.data.id] = -1;
                         } else {
@@ -1336,7 +1347,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                         }
                     }
                 } else {
-                    this.timelineDatesRanks[relatedNode.data.dateTimeline] = [];
+                    this.timelineDatesRanks[relatedNode.data.dateTimeline] = {};
                     const maxRankRelatedNode = Math.max(maxRankPerParentNode, maxRankPerDateInterval);
                     // set the position to max position from its siblings + 1
                     this.timelineDatesRanks[relatedNode.data.dateTimeline][relatedNode.data.id] = maxRankRelatedNode + 1;
@@ -1350,7 +1361,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 while (startDate < endDate) {
                     startDate = startDate.add(1, 'days');
                     if (!this.timelineDatesRanks[startDate.format('YYYY-MM-DD')]) {
-                        this.timelineDatesRanks[startDate.format('YYYY-MM-DD')] = [];
+                        this.timelineDatesRanks[startDate.format('YYYY-MM-DD')] = {};
                     }
                     this.timelineDatesRanks[startDate.format('YYYY-MM-DD')]['maxRank'] = maxRankToBlock;
                 }
@@ -1384,9 +1395,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             cytoscape.use(dagre);
             this.layout = this.layoutDagre;
             this.style = this.defaultStyle;
-        } else if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
-            || this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
-            || this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value
+        } else if (
+            this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value ||
+            this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value ||
+            this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value
         ) {
             this.calculateTimelineDates();
             this.style = this.timelineStyle;
