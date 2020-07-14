@@ -663,7 +663,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                             })
                         )
                         .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_SUCCESS_MESSAGE');
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_RESTORE_SUCCESS_MESSAGE');
                             // reload data
                             this.needsRefreshList(true);
                         });
