@@ -171,7 +171,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
      * @returns {string|string}
      */
     get buttonText() {
-        return this.cotDashletChild.cytoscapeChild.transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value ?
+        return this.cotDashletChild.transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value ?
             'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT' :
             'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_EXPORT';
     }
@@ -179,7 +179,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
      *Export visualized map/graph seen in page
      */
     exportVisualizedMapOrGraph() {
-        if (this.cotDashletChild.cytoscapeChild.transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value) {
+        if (this.cotDashletChild.transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value) {
             this.exportChainsOfTransmission();
         } else {
             this.exportGeospatialMap();
@@ -233,8 +233,8 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
      */
     exportGeospatialMap() {
         const loadingDialog = this.dialogService.showLoadingDialog();
-        if (this.cotDashletChild.cytoscapeChild.worldMap) {
-            this.cotDashletChild.cytoscapeChild.worldMap
+        if (this.cotDashletChild.worldMap) {
+            this.cotDashletChild.worldMap
                 .printToBlob()
                 .subscribe((blob) => {
                     const fileName = this.i18nService.instant('LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_TITLE');
