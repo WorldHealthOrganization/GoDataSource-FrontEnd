@@ -58,6 +58,10 @@ export class ImportRelationshipDataComponent implements OnInit, OnDestroy {
         'certaintyLevelId'
     ];
 
+    fieldsWithoutTokens = {
+        'persons[]': 'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP_PERSONS'
+    };
+
     /**
      * Constructor
      */
