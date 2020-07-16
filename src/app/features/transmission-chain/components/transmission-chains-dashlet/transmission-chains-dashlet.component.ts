@@ -21,7 +21,7 @@ import { LocationDataService } from '../../../../core/services/data/location.dat
 import { EntityType } from '../../../../core/models/entity-type';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { ActivatedRoute } from '@angular/router';
-import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
+import { TransmissionChainGroupModel, TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 import { TransmissionChainFilters } from '../transmission-chains-filters/transmission-chains-filters.component';
 import { catchError, map, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
@@ -65,7 +65,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     WorldMapMarkerLayer = WorldMapMarkerLayer;
 
     selectedOutbreak: OutbreakModel;
-    chainElements: TransmissionChainModel[];
+    chainGroup: TransmissionChainGroupModel;
     graphElements: IConvertChainToGraphElements;
     showSettings: boolean = false;
     filters: any | TransmissionChainFilters = {};
@@ -744,20 +744,16 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                         return throwError(err);
                     })
                 )
-                .subscribe((chains) => {
-                    if (!_.isEmpty(chains)) {
-                        this.chainElements = chains;
-                        this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(
-                            _.cloneDeep(chains),
-                            this.filters,
-                            this.legend,
-                            this.locationsList,
-                            this.transmissionChainViewType
-                        );
-                    } else {
-                        this.chainElements = [];
-                        this.graphElements = {} as IConvertChainToGraphElements;
-                    }
+                .subscribe((chainGroup) => {
+                    // keep original chains
+                    this.chainGroup = chainGroup;
+                    this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(
+                        this.chainGroup.clone(),
+                        this.filters,
+                        this.legend,
+                        this.locationsList,
+                        this.transmissionChainViewType
+                    );
 
                     // finished
                     loadingDialog.close();
@@ -771,15 +767,13 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                     this.renderGraph();
                 });
         } else {
-            this.graphElements = this.chainElements && this.chainElements.length > 0 ?
-                this.transmissionChainDataService.convertChainToGraphElements(
-                    _.cloneDeep(this.chainElements),
-                    this.filters,
-                    this.legend,
-                    this.locationsList,
-                    this.transmissionChainViewType
-                ) :
-                {} as IConvertChainToGraphElements;
+            this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(
+                this.chainGroup.clone(),
+                this.filters,
+                this.legend,
+                this.locationsList,
+                this.transmissionChainViewType
+            );
 
             // configure geo map
             if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value) {
@@ -1635,7 +1629,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
         // we don't need to continue if we don't have data
         if (
-            _.isEmpty(this.chainElements) ||
+            _.isEmpty(this.chainGroup) ||
             _.isEmpty(this.graphElements) ||
             !this.selectedOutbreak ||
             !this.selectedOutbreak.id
@@ -1756,10 +1750,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             };
 
             // go through nodes that are rendered on COT graph and determine what we can render on geo-map
-            const firstChain: TransmissionChainModel = this.chainElements[0];
             _.each(this.graphElements.nodes, (gNode: { data: GraphNodeModel }) => {
                 // get case / contact / event ...
-                const entity: EntityModel = firstChain.nodes[gNode.data.id];
+                const entity: EntityModel = this.chainGroup.nodesMap[gNode.data.id];
                 if (!_.isEmpty(entity)) {
                     switch (entity.type) {
                         // events
@@ -1820,7 +1813,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             const relationshipMap: {
                 [idRelationship: string]: RelationshipModel
             } = {};
-            _.each(firstChain.relationships, (relationship: RelationshipModel) => {
+            _.each(this.chainGroup.relationships, (relationship: RelationshipModel) => {
                 relationshipMap[relationship.id] = relationship;
             });
 
