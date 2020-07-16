@@ -15,85 +15,6 @@ export class TransmissionChainRelation {
     ) {}
 }
 
-export class TransmissionChainGroupModel {
-    // all entities related to Chain (Cases, Contacts, Contact of Contacts and Events)
-    nodesMap: {
-        [id: string]: EntityModel
-    } = {};
-
-    // all relationships between Chain entities
-    relationships: RelationshipModel[] = [];
-
-    // chains
-    private originalChains = [];
-    chains: TransmissionChainModel[] = [];
-
-    /**
-     * Constructor
-     */
-    constructor(
-        nodes,
-        relationships,
-        chains
-    ) {
-        // map nodes
-        this.nodesMap = {};
-        _.each(nodes, (node) => {
-            const entity = new EntityModel(node);
-            this.nodesMap[entity.model.id] = entity;
-        });
-
-        // map relationships
-        this.relationships = [];
-        _.each(relationships, (relationship) => {
-            // invalid relationship ?
-            if (
-                !relationship.persons ||
-                relationship.persons.length < 2
-            ) {
-                return;
-            }
-
-            // init relationship
-            const relModel = new RelationshipModel(relationship);
-            this.relationships.push(relModel);
-        });
-
-        // map chains
-        this.originalChains = chains;
-        this.chains = (chains || []).map((chainData) => {
-            return new TransmissionChainModel(
-                chainData,
-                this.nodesMap
-            );
-        });
-    }
-
-    /**
-     * Create copy
-     */
-    clone(): TransmissionChainGroupModel {
-        // clone nodes
-        const nodes = [];
-        for (const nodeKey in this.nodesMap) {
-            nodes.push(this.nodesMap[nodeKey].model);
-        }
-
-        // clone relationships
-        const relationships = this.relationships.map((relModel) => {
-            return new RelationshipModel(relModel);
-        });
-
-        // create clone
-        return new TransmissionChainGroupModel(
-            nodes,
-            relationships,
-            // no need to clone this for now...
-            this.originalChains
-        );
-    }
-}
-
 export class TransmissionChainModel
     implements
         IPermissionChainsOfTransmission {
@@ -266,5 +187,84 @@ export class TransmissionChainModel
      */
     get noAliveCases() {
         return this.aliveCasesCount;
+    }
+}
+
+export class TransmissionChainGroupModel {
+    // all entities related to Chain (Cases, Contacts, Contact of Contacts and Events)
+    nodesMap: {
+        [id: string]: EntityModel
+    } = {};
+
+    // all relationships between Chain entities
+    relationships: RelationshipModel[] = [];
+
+    // chains
+    private originalChains = [];
+    chains: TransmissionChainModel[] = [];
+
+    /**
+     * Constructor
+     */
+    constructor(
+        nodes,
+        relationships,
+        chains
+    ) {
+        // map nodes
+        this.nodesMap = {};
+        _.each(nodes, (node) => {
+            const entity = new EntityModel(node);
+            this.nodesMap[entity.model.id] = entity;
+        });
+
+        // map relationships
+        this.relationships = [];
+        _.each(relationships, (relationship) => {
+            // invalid relationship ?
+            if (
+                !relationship.persons ||
+                relationship.persons.length < 2
+            ) {
+                return;
+            }
+
+            // init relationship
+            const relModel = new RelationshipModel(relationship);
+            this.relationships.push(relModel);
+        });
+
+        // map chains
+        this.originalChains = chains;
+        this.chains = (chains || []).map((chainData) => {
+            return new TransmissionChainModel(
+                chainData,
+                this.nodesMap
+            );
+        });
+    }
+
+    /**
+     * Create copy
+     */
+    clone(): TransmissionChainGroupModel {
+        // clone nodes
+        const nodes = [];
+        for (const nodeKey in this.nodesMap) {
+            nodes.push(this.nodesMap[nodeKey].model);
+        }
+
+        // clone relationships
+        const relationships = this.relationships.map((relModel) => {
+            return new RelationshipModel(relModel);
+        });
+
+        // create clone
+        return new TransmissionChainGroupModel(
+            nodes,
+            relationships,
+            // no need to clone this for now...
+            this.originalChains
+        );
     }
 }
