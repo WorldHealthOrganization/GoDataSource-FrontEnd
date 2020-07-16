@@ -459,7 +459,9 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
             additionalInfo: this.settings.dataBackup ? 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_EXISTING_CONFIGURATION_INFO' : '',
             translateData: this.settings.dataBackup ? {
                 descriptionLabel: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION'),
-                description: this.settings.dataBackup.description,
+                description: this.settings.dataBackup.description ?
+                    this.settings.dataBackup.description :
+                    '',
                 locationLabel: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_LOCATION'),
                 location: this.settings.dataBackup.location,
                 backupIntervalLabel: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_BACKUP_INTERVAL'),

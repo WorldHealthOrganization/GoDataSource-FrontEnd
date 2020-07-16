@@ -12,13 +12,6 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
-        /**
-         * uiMultipleSnackbar
-         */
-        'LNG_MULTIPLE_SNACKBAR_BUTTON_CLOSE': 'Close',
-        'LNG_MULTIPLE_SNACKBAR_BUTTON_CLOSE_ALL': 'Close all'
-
-
 
 
         /**

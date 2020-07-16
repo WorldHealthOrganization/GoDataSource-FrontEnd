@@ -15,26 +15,101 @@ export class TransmissionChainRelation {
     ) {}
 }
 
+export class TransmissionChainGroupModel {
+    // all entities related to Chain (Cases, Contacts, Contact of Contacts and Events)
+    nodesMap: {
+        [id: string]: EntityModel
+    } = {};
+
+    // all relationships between Chain entities
+    relationships: RelationshipModel[] = [];
+
+    // chains
+    private originalChains = [];
+    chains: TransmissionChainModel[] = [];
+
+    /**
+     * Constructor
+     */
+    constructor(
+        nodes,
+        relationships,
+        chains
+    ) {
+        // map nodes
+        this.nodesMap = {};
+        _.each(nodes, (node) => {
+            const entity = new EntityModel(node);
+            this.nodesMap[entity.model.id] = entity;
+        });
+
+        // map relationships
+        this.relationships = [];
+        _.each(relationships, (relationship) => {
+            // invalid relationship ?
+            if (
+                !relationship.persons ||
+                relationship.persons.length < 2
+            ) {
+                return;
+            }
+
+            // init relationship
+            const relModel = new RelationshipModel(relationship);
+            this.relationships.push(relModel);
+        });
+
+        // map chains
+        this.originalChains = chains;
+        this.chains = (chains || []).map((chainData) => {
+            return new TransmissionChainModel(
+                chainData,
+                this.nodesMap
+            );
+        });
+    }
+
+    /**
+     * Create copy
+     */
+    clone(): TransmissionChainGroupModel {
+        // clone nodes
+        const nodes = [];
+        for (const nodeKey in this.nodesMap) {
+            nodes.push(this.nodesMap[nodeKey].model);
+        }
+
+        // clone relationships
+        const relationships = this.relationships.map((relModel) => {
+            return new RelationshipModel(relModel);
+        });
+
+        // create clone
+        return new TransmissionChainGroupModel(
+            nodes,
+            relationships,
+            // no need to clone this for now...
+            this.originalChains
+        );
+    }
+}
+
 export class TransmissionChainModel
     implements
         IPermissionChainsOfTransmission {
     // all Cases from Chain, mapped by Case ID
-    casesMap: {
+    private casesMap: {
         [id: string]: CaseModel
     } = {};
+    private casesMapLength: number = 0;
+    private aliveCasesCount: number = 0;
     // all events related to chain
-    eventsMap: {
+    private eventsMap: {
         [id: string]: EventModel
     } = {};
 
     // all relations between Cases
     chainRelations: TransmissionChainRelation[] = [];
-    // all entities related to Chain (Cases, Contacts and Events)
-    nodes: {
-        [id: string]: EntityModel
-    } = {};
-    // all relationships between Chain entities
-    relationships: RelationshipModel[];
     // whether the Chain is active or inactive
     active: boolean;
     // duration of the chain ( no of days )
@@ -82,7 +157,12 @@ export class TransmissionChainModel
     /**
      * Constructor
      */
-    constructor(chainData = null, nodesData = {}, relationshipsData = []) {
+    constructor(
+        chainData,
+        entityMap: {
+            [id: string]: EntityModel
+        } = {}
+    ) {
         this.active = _.get(chainData, 'active', false);
         this.size = _.get(chainData, 'size', 0);
         this.contactsCount = _.get(chainData, 'contactsCount', 0);
@@ -92,33 +172,37 @@ export class TransmissionChainModel
 
         // go through all chain relations
         _.each(chainRelationsData, (relation: string[]) => {
-
             // go through all Person(case or event) IDs from relation
             _.each(relation, (personId) => {
                 if (
                     // if we didn't already collect this Case info
-                    _.isEmpty(this.casesMap[personId]) &&
-                    _.isEmpty(this.eventsMap[personId]) &&
+                    !this.casesMap[personId] &&
+                    !this.eventsMap[personId] &&
                     // and if we have Case info
-                    !_.isEmpty(nodesData[personId])
+                    entityMap[personId]
                 ) {
                     // collect Case or Event info, mapped by personID
-                    if (nodesData[personId].type === EntityType.EVENT) {
-                        this.eventsMap[personId] = new EventModel(nodesData[personId]);
-                        if (moment(nodesData[personId].date).isBefore(this.earliestDateOfOnset) || _.isEmpty(this.earliestDateOfOnset)) {
-                            this.earliestDateOfOnset = moment(nodesData[personId].date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-                            this.rootPerson = this.eventsMap[personId];
+                    if (entityMap[personId].type === EntityType.EVENT) {
+                        const eventModel: EventModel = entityMap[personId].model as EventModel;
+                        this.eventsMap[personId] = eventModel;
+                        if (
+                            !this.earliestDateOfOnset ||
+                            moment(eventModel.date).isBefore(this.earliestDateOfOnset)
+                        ) {
+                            this.earliestDateOfOnset = moment(eventModel.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                            this.rootPerson = eventModel;
                         }
                     } else {
-                        this.casesMap[personId] = new CaseModel(nodesData[personId]);
+                        const caseModel: CaseModel = entityMap[personId].model as CaseModel;
+                        this.casesMap[personId] = caseModel;
                         if (
-                            nodesData[personId].dateOfOnset && (
-                                moment(nodesData[personId].dateOfOnset).isBefore(this.earliestDateOfOnset) ||
-                                _.isEmpty(this.earliestDateOfOnset)
+                            caseModel.dateOfOnset && (
+                                moment(caseModel.dateOfOnset).isBefore(this.earliestDateOfOnset) ||
+                                !this.earliestDateOfOnset
                             )
                         ) {
-                            this.earliestDateOfOnset = moment(nodesData[personId].dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-                            this.rootPerson = this.casesMap[personId];
+                            this.earliestDateOfOnset = moment(caseModel.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                            this.rootPerson = caseModel;
                         }
                     }
                 }
@@ -128,14 +212,13 @@ export class TransmissionChainModel
             this.chainRelations.push(new TransmissionChainRelation(relation));
         });
 
-        // collect all entities from Chain
-        for (const entityId in nodesData) {
-            this.nodes[entityId] = new EntityModel(nodesData[entityId]);
-        }
-
-        // collect all relationships
-        this.relationships = _.map(relationshipsData, (relData) => {
-            return new RelationshipModel(relData);
+        // count cases
+        this.casesMapLength = Object.keys(this.casesMap).length;
+        this.aliveCasesCount = 0;
+        _.each(this.casesMap, (caseData) => {
+            if (caseData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED) {
+                this.aliveCasesCount++;
+            }
         });
     }
 
@@ -174,7 +257,7 @@ export class TransmissionChainModel
      * @returns {number}
      */
     get noCases() {
-        return Object.keys(this.casesMap).length;
+        return this.casesMapLength;
     }
 
     /**
@@ -182,8 +265,6 @@ export class TransmissionChainModel
      * @returns {any}
      */
     get noAliveCases() {
-        return _.filter(Object.values(this.casesMap), (caseData: CaseModel) => {
-            return caseData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
-        }).length;
+        return this.aliveCasesCount;
     }
 }
