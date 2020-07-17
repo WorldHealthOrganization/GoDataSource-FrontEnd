@@ -137,7 +137,21 @@ export class RelationshipModel
      * Source Person
      */
     get sourcePerson(): RelationshipPersonModel {
-        const data = _.find(this.persons, { source: true });
+        // determine source
+        let data;
+        if (
+            this.persons.length > 0 &&
+            this.persons[0].source
+        ) {
+            data = this.persons[0];
+        } else if (
+            this.persons.length > 1 &&
+            this.persons[1].source
+        ) {
+            data = this.persons[1];
+        }
+
+        // finished
         return data ? new RelationshipPersonModel(data) : data;
     }
 }

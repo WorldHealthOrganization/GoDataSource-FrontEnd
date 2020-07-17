@@ -13,7 +13,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { Subscription } from 'rxjs/internal/Subscription';
 import * as _ from 'lodash';
 import { throwError } from 'rxjs/internal/observable/throwError';
@@ -240,7 +240,16 @@ export class TransmissionChainsListComponent extends ListComponent implements On
             this.selectedOutbreak.id
         ) {
             if (this.appliedListFilter === ApplyListFilter.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES) {
-                this.transmissionChains$ = this.transmissionChainDataService.getTransmissionChainsFromContactsWhoBecameCasesList(this.selectedOutbreak.id, this.queryBuilder);
+                this.transmissionChains$ = this.transmissionChainDataService
+                    .getTransmissionChainsFromContactsWhoBecameCasesList(
+                        this.selectedOutbreak.id,
+                        this.queryBuilder
+                    )
+                    .pipe(
+                        map((data) => {
+                            return data.chains;
+                        })
+                    );
             } else {
                 const qb = new RequestQueryBuilder();
 
@@ -251,7 +260,16 @@ export class TransmissionChainsListComponent extends ListComponent implements On
 
                 qb.merge(this.queryBuilder);
 
-                this.transmissionChains$ = this.transmissionChainDataService.getIndependentTransmissionChainsList(this.selectedOutbreak.id, qb);
+                this.transmissionChains$ = this.transmissionChainDataService
+                    .getIndependentTransmissionChainData(
+                        this.selectedOutbreak.id,
+                        qb
+                    )
+                    .pipe(
+                        map((data) => {
+                            return data.chains;
+                        })
+                    );
             }
 
             this.transmissionChains$ = this.transmissionChains$

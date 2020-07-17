@@ -42,12 +42,17 @@
                 </div>
             </mat-card>
 
-            <button type="button" mat-icon-button (click)="delete(i)">
+            <button
+                *ngIf="!disabled"
+                type="button" mat-icon-button
+                (click)="delete(i)">
                 <span class="xt-icon">delete</span>
             </button>
         </div>
 
-        <div fxLayout="row">
+        <div
+            *ngIf="!disabled"
+            fxLayout="row">
             <button type="button" mat-button color="primary" (click)="add()">{{ 'LNG_INPUT_LABEL_ADD_ITEM' | translate }}</button>
         </div>
     </form>
