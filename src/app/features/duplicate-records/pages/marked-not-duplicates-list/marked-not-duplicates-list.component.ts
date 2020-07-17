@@ -342,11 +342,14 @@ export class MarkedNotDuplicatesListComponent
             observer$.subscribe((recordData) => {
                 // set data
                 this.recordData = recordData;
-            });
-        }
 
-        // update breadcrumbs
-        this.initializeBreadcrumbs();
+                // update breadcrumbs
+                this.initializeBreadcrumbs();
+            });
+        } else {
+            // update breadcrumbs
+            this.initializeBreadcrumbs();
+        }
     }
 
     /**

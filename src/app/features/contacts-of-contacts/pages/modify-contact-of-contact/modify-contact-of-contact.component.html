@@ -290,11 +290,9 @@
         <button
             [disabled]="
                 !contactExposure ||
-                (
-                    !ContactModel.canView(authUser) &&
-                    !ContactOfContactModel.canListRelationshipExposures(authUser) &&
-                    !RelationshipModel.canList(authUser)
-                )"
+                !ContactModel.canView(authUser) ||
+                !ContactOfContactModel.canListRelationshipExposures(authUser) ||
+                !RelationshipModel.canList(authUser)"
             type="button"
             mat-raised-button
             color="primary"

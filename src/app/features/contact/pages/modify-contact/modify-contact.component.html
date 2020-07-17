@@ -337,7 +337,10 @@
         </ng-container>
 
         <button
-            [disabled]="!canViewExposure()"
+            [disabled]="
+                !canViewExposure() ||
+                !ContactModel.canListRelationshipExposures(authUser) ||
+                !RelationshipModel.canList(authUser)"
             type="button"
             mat-raised-button
             color="primary"
