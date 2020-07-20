@@ -158,7 +158,7 @@ export class TransmissionChainFilters {
     styleUrls: ['./transmission-chains-filters.component.less']
 })
 export class TransmissionChainsFiltersComponent implements OnInit {
-    @Input() title: string;
+    @Input() titleName: string;
     @Input() filters: TransmissionChainFilters = new TransmissionChainFilters();
 
     @HostBinding('class.form-element-host') isFormElement = true;
