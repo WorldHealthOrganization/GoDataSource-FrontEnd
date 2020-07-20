@@ -134,7 +134,8 @@ export class FormLocationDropdownComponent
         methodKey: string,
         queryBuilder: RequestQueryBuilder,
         outbreakId: string,
-        service: LocationDataService | OutbreakDataService
+        service: LocationDataService | OutbreakDataService,
+        snackbarService: SnackbarService
     ): Observable<HierarchicalLocationModel[]> {
         // remove older cached items
         _.each(
@@ -193,7 +194,7 @@ export class FormLocationDropdownComponent
                                     catchError((err) => {
                                         observer.error(err);
                                         observer.complete();
-                                        this.snackbarService.showApiError(err);
+                                        snackbarService.showApiError(err);
                                         return throwError(err);
                                     })
                                 )
@@ -483,13 +484,15 @@ export class FormLocationDropdownComponent
                 'getOutbreakLocationsHierarchicalList',
                 this.queryBuilder,
                 this.outbreakId,
-                this.outbreakDataService
+                this.outbreakDataService,
+                this.snackbarService
             ) :
             FormLocationDropdownComponent.doRequestOrGetFromCache(
                 'getLocationsHierarchicalList',
                 this.queryBuilder,
                 undefined,
-                this.locationDataService
+                this.locationDataService,
+                this.snackbarService
             );
 
         // retrieve hierarchic location list
