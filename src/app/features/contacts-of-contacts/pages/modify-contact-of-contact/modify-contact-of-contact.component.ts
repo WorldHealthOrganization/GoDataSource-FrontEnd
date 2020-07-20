@@ -122,7 +122,9 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
                         this.retrieveContactOfContactData();
 
                         // get contact's exposure
-                        this.retrieveContactExposure();
+                        if (ContactOfContactModel.canListRelationshipExposures(this.authUser)) {
+                            this.retrieveContactExposure();
+                        }
                     });
             });
     }
@@ -442,7 +444,10 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
      * Generate visual ID for contact
      */
     generateVisualId() {
-        if (!_.isEmpty(this.selectedOutbreak.contactOfContactIdMask)) {
+        if (
+            !_.isEmpty(this.selectedOutbreak.contactOfContactIdMask) &&
+            ContactOfContactModel.canGenerateVisualId(this.authUser)
+        ) {
             this.contactOfContactData.visualId = ContactOfContactModel.generateContactOfContactIDMask(this.selectedOutbreak.contactOfContactIdMask);
             this.visualId.control.markAsDirty();
         }

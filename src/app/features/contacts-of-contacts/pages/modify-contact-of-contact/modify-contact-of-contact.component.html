@@ -275,7 +275,7 @@
             </ng-container>
 
             <ng-container
-                *ngIf="viewOnly">
+                *ngIf="viewOnly && ContactOfContactModel.canModify(authUser)">
                 <button
                     mat-raised-button type="button" color="accent"
                     [routerLink]="['/contacts-of-contacts', contactOfContactId, 'modify']"
@@ -288,7 +288,11 @@
         </ng-container>
 
         <button
-            [disabled]="!contactExposure && ContactModel.canView(authUser)"
+            [disabled]="
+                !contactExposure ||
+                !ContactModel.canView(authUser) ||
+                !ContactOfContactModel.canListRelationshipExposures(authUser) ||
+                !RelationshipModel.canList(authUser)"
             type="button"
             mat-raised-button
             color="primary"

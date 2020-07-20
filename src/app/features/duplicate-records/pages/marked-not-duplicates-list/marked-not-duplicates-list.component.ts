@@ -312,33 +312,44 @@ export class MarkedNotDuplicatesListComponent
         let observer$: Observable<CaseModel | ContactModel | ContactOfContactModel>;
         switch (this.recordType) {
             case EntityType.CASE:
-                observer$ = this.caseDataService.getCase(
-                    this.selectedOutbreak.id,
-                    this.recordId
-                );
+                if (CaseModel.canView(this.authUser)) {
+                    observer$ = this.caseDataService.getCase(
+                        this.selectedOutbreak.id,
+                        this.recordId
+                    );
+                }
                 break;
             case EntityType.CONTACT:
-                observer$ = this.contactDataService.getContact(
-                    this.selectedOutbreak.id,
-                    this.recordId
-                );
+                if (ContactModel.canView(this.authUser)) {
+                    observer$ = this.contactDataService.getContact(
+                        this.selectedOutbreak.id,
+                        this.recordId
+                    );
+                }
                 break;
             case EntityType.CONTACT_OF_CONTACT:
-                observer$ = this.contactOfContactDataService.getContactOfContact(
-                    this.selectedOutbreak.id,
-                    this.recordId
-                );
+                if (ContactOfContactModel.canView(this.authUser)) {
+                    observer$ = this.contactOfContactDataService.getContactOfContact(
+                        this.selectedOutbreak.id,
+                        this.recordId
+                    );
+                }
                 break;
         }
 
         // get case / contact data
-        observer$.subscribe((recordData) => {
-            // set data
-            this.recordData = recordData;
+        if (observer$) {
+            observer$.subscribe((recordData) => {
+                // set data
+                this.recordData = recordData;
 
+                // update breadcrumbs
+                this.initializeBreadcrumbs();
+            });
+        } else {
             // update breadcrumbs
             this.initializeBreadcrumbs();
-        });
+        }
     }
 
     /**
