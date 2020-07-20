@@ -135,7 +135,7 @@ export class FormLocationDropdownComponent
         queryBuilder: RequestQueryBuilder,
         outbreakId: string,
         service: LocationDataService | OutbreakDataService,
-        snackbarService?: SnackbarService
+        snackbarService: SnackbarService
     ): Observable<HierarchicalLocationModel[]> {
         // remove older cached items
         _.each(
