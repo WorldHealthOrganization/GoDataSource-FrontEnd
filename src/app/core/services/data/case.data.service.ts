@@ -602,4 +602,18 @@ export class CaseDataService {
     getCaseRelationshipsCount(outbreakId: string, caseId: string): Observable<any> {
         return this.http.get(`outbreaks/${outbreakId}/cases/${caseId}/relationships/filtered-count`);
     }
+
+    /**
+     * Retrieve the list of usual place of residences for cases that have geo location on the usual place of residence
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<{ lat: number, lng: number }[]>}
+     */
+    getCaseCountMapAddresses(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<{ lat: number, lng: number }[]> {
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+        return this.http.get(`outbreaks/${outbreakId}/cases/count-map?where=${whereFilter}`) as Observable<{ lat: number, lng: number }[]>;
+    }
 }
