@@ -408,7 +408,7 @@ export class TransmissionChainDataService {
                                 node.type !== EntityType.EVENT &&
                                 !(node.model instanceof EventModel)
                             ) {
-                                nodeData.label = node.model.visualId;
+                                nodeData.label = node.model.visualId ? node.model.visualId : '';
                             } else {
                                 nodeData.label = '';
                             }

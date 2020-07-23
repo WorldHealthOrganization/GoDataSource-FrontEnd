@@ -20,6 +20,7 @@ export class TransmissionChainFilters {
     locationId: string;
     age: AgeModel;
     date: Moment;
+    includeContactsOfContacts: boolean;
 
     /**
      * Constructor
@@ -34,7 +35,8 @@ export class TransmissionChainFilters {
         gender?: string,
         locationId?: string,
         age?: AgeModel,
-        date?: Moment
+        date?: Moment,
+        includeContactsOfContacts?: boolean
     } = {}) {
         // assign properties
         Object.assign(
@@ -124,7 +126,8 @@ export class TransmissionChainFilters {
                         type: {
                             inq: [
                                 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
-                                'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'
+                                'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT',
+                                this.includeContactsOfContacts && 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_OF_CONTACT'
                             ]
                         },
                         'addresses.parentLocationIdFilter': this.locationId
