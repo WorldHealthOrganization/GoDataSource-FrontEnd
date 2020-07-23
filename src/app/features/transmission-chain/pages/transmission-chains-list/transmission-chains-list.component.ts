@@ -270,6 +270,9 @@ export class TransmissionChainsListComponent extends ListComponent implements On
                 'nodes.lastName'
             );
 
+            // don't restrict relationships
+            qb.filter.flag('dontLimitRelationships', true);
+
             // construct request
             let transmissionChains$: Observable<TransmissionChainGroupModel>;
             if (this.appliedListFilter === ApplyListFilter.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES) {
