@@ -90,9 +90,7 @@ export class TransmissionChainDataService {
     ): Observable<TransmissionChainGroupModel> {
         const filter = queryBuilder.buildQuery();
         return this.http
-            .get(
-                `outbreaks/${outbreakId}/relationships/new-transmission-chains-from-registered-contacts-who-became-cases?filter=${filter}`
-            )
+            .get(`outbreaks/${outbreakId}/relationships/new-transmission-chains-from-registered-contacts-who-became-cases?filter=${filter}`)
             .pipe(
                 map(this.mapTransmissionChainDataToModel)
             );

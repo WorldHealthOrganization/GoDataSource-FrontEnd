@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
+import { TransmissionChainGroupModel, TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -13,11 +13,12 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { Subscription } from 'rxjs/internal/Subscription';
 import * as _ from 'lodash';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-transmission-chains-list',
@@ -40,7 +41,9 @@ export class TransmissionChainsListComponent extends ListComponent implements On
     selectedOutbreak: OutbreakModel;
 
     // list of transmission chains
-    transmissionChains$: Observable<TransmissionChainModel[]>;
+    transmissionChains: TransmissionChainModel[];
+    transmissionChainsAll: TransmissionChainModel[];
+    transmissionChainsCount: IBasicCount;
 
     // provide constants to template
     Constants = Constants;
@@ -91,6 +94,9 @@ export class TransmissionChainsListComponent extends ListComponent implements On
                 // init filters
                 this.resetFiltersAddDefault();
             });
+
+        // initialize pagination
+        this.initPaginator();
 
         // subscribe to the Selected Outbreak Subject stream
         this.outbreakSubscriber = this.outbreakDataService
@@ -235,57 +241,101 @@ export class TransmissionChainsListComponent extends ListComponent implements On
      * Re(load) the Transmission Chains list, based on the applied filter, sort criterias
      */
     refreshList(finishCallback: (records: any[]) => void) {
+        // reset items
+        this.transmissionChains = [];
+        this.transmissionChainsAll = [];
+
+        // retrieve data
         if (
             this.selectedOutbreak &&
             this.selectedOutbreak.id
         ) {
+            // retrieve only specific fields so we don't retrieve huge amounts of data that won't be used since we don't have pagination here
+            const qb = new RequestQueryBuilder();
+            qb.merge(this.queryBuilder);
+            qb.fields(
+                // edges
+                'edges.id',
+                'edges.persons',
+                'edges.contactDate',
+
+                // nodes
+                'nodes.id',
+                'nodes.type',
+                'nodes.date',
+                'nodes.dateOfOnset',
+                'nodes.name',
+                'nodes.firstName',
+                'nodes.middleName',
+                'nodes.lastName'
+            );
+
+            // construct request
+            let transmissionChains$: Observable<TransmissionChainGroupModel>;
             if (this.appliedListFilter === ApplyListFilter.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES) {
-                this.transmissionChains$ = this.transmissionChainDataService
+                transmissionChains$ = this.transmissionChainDataService
                     .getTransmissionChainsFromContactsWhoBecameCasesList(
                         this.selectedOutbreak.id,
-                        this.queryBuilder
-                    )
-                    .pipe(
-                        map((data) => {
-                            return data.chains;
-                        })
+                        qb
                     );
             } else {
-                const qb = new RequestQueryBuilder();
-
+                // attach extra filter conditions
                 qb.filter.flag(
                     'countContacts',
                     true
                 );
 
-                qb.merge(this.queryBuilder);
-
-                this.transmissionChains$ = this.transmissionChainDataService
+                // request
+                transmissionChains$ = this.transmissionChainDataService
                     .getIndependentTransmissionChainData(
                         this.selectedOutbreak.id,
                         qb
-                    )
-                    .pipe(
-                        map((data) => {
-                            return data.chains;
-                        })
                     );
             }
 
-            this.transmissionChains$ = this.transmissionChains$
+            // execute request
+            transmissionChains$
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
                         finishCallback([]);
                         return throwError(err);
-                    }),
-                    tap(this.checkEmptyList.bind(this)),
-                    tap((data: any[]) => {
-                        finishCallback(data);
                     })
-                );
+                )
+                .subscribe((data) => {
+                    // list of items
+                    this.transmissionChainsAll = data.chains;
+
+                    // display only items from this page
+                    if (this.queryBuilder.paginator) {
+                        this.transmissionChains = this.transmissionChainsAll.slice(
+                            this.queryBuilder.paginator.skip,
+                            this.queryBuilder.paginator.skip + this.queryBuilder.paginator.limit
+                        );
+                    }
+
+                    // refresh the total count
+                    this.refreshListCount();
+
+                    // flag if list is empty
+                    this.checkEmptyList(this.transmissionChains);
+
+                    // finished
+                    finishCallback(this.transmissionChains);
+                });
         } else {
             finishCallback([]);
         }
+    }
+
+    /**
+     * Get total number of items
+     */
+    refreshListCount() {
+        this.transmissionChainsCount = {
+            count: this.transmissionChainsAll ?
+                this.transmissionChainsAll.length :
+                0
+        };
     }
 }
