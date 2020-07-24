@@ -148,18 +148,20 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
                         mask: ContactOfContactModel.generateContactOfContactIDMask(this.selectedOutbreak.contactOfContactIdMask)
                     };
 
-                    // set visual ID validator
-                    this.contactOfContactIdMaskValidator = new Observable((observer) => {
-                        this.contactsOfContactsDataService.checkContactOfContactVisualIDValidity(
-                            this.selectedOutbreak.id,
-                            this.visualIDTranslateData.mask,
-                            this.contactOfContactData.visualId,
-                            this.contactOfContactData.id
-                        ).subscribe((isValid: boolean) => {
-                            observer.next(isValid);
-                            observer.complete();
+                    if (ContactOfContactModel.canGenerateVisualId(this.authUser)) {
+                        // set visual ID validator
+                        this.contactOfContactIdMaskValidator = new Observable((observer) => {
+                            this.contactsOfContactsDataService.checkContactOfContactVisualIDValidity(
+                                this.selectedOutbreak.id,
+                                this.visualIDTranslateData.mask,
+                                this.contactOfContactData.visualId,
+                                this.contactOfContactData.id
+                            ).subscribe((isValid: boolean) => {
+                                observer.next(isValid);
+                                observer.complete();
+                            });
                         });
-                    });
+                    }
 
                     this.createBreadcrumbs();
                 });
