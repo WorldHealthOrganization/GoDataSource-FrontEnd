@@ -87,7 +87,7 @@
             *ngIf="!appliedListFilter"
             fxFlex
             [items]="countedContactsOfContactsByRiskLevel$ | async"
-            (optionChanged)="filterBySelectField('id', $event.ids, null)">
+            (optionChanged)="$event.label === 'LNG_REFERENCE_DATA_CATEGORY_RISK_LEVEL_UNCLASSIFIED' ? filterByBooleanField('riskLevel', false) : filterByEquality('riskLevel',  $event.label)">
         </app-counted-items-list>
     </ng-template>
 </div>
