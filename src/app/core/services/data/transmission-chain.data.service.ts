@@ -552,7 +552,7 @@ export class TransmissionChainDataService {
                             // translate values
                             graphEdge.label = colorCriteria.edgeLabelContextTransmissionEntries[relationship.socialRelationshipTypeId];
                         } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_LEVEL.value) {
-                            graphEdge.label = relationship.socialRelationshipDetail;
+                            graphEdge.label = relationship.socialRelationshipDetail ? relationship.socialRelationshipDetail : '';
                         } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.CLUSTER_NAME.value) {
                             graphEdge.label = colorCriteria.clustersList[relationship.clusterId];
                         } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.DAYS_DAYE_ONSET_LAST_CONTACT.value) {

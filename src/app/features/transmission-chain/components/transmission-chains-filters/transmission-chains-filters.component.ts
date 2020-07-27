@@ -124,11 +124,16 @@ export class TransmissionChainFilters {
                         'address.parentLocationIdFilter': this.locationId
                     }, {
                         type: {
-                            inq: [
-                                'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
-                                'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT',
-                                this.includeContactsOfContacts && 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_OF_CONTACT'
-                            ]
+                            inq: !this.includeContactsOfContacts ?
+                                [
+                                    'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+                                    'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'
+                                ] :
+                                [
+                                    'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+                                    'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT',
+                                    'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_OF_CONTACT'
+                                ]
                         },
                         'addresses.parentLocationIdFilter': this.locationId
                     }
