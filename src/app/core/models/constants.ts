@@ -965,6 +965,21 @@ export class Constants {
         }
     };
 
+    static EPI_CURVE_WEEK_TYPES = {
+        ISO: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_WEEK_TYPE_ISO',
+            value: 'iso'
+        },
+        EPI: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_WEEK_TYPE_EPI',
+            value: 'epi'
+        },
+        SUNDAY: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_WEEK_TYPE_SUNDAY',
+            value: 'sunday'
+        }
+    };
+
     static GANTT_CHART_VIEW_TYPE = {
         DAY: {
             label: 'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_DAYS_LABEL',

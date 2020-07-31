@@ -8,10 +8,11 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
-import { Subscription ,  Subscriber } from 'rxjs';
+import { Subscription, Subscriber, Observable } from 'rxjs';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 
 @Component({
     selector: 'app-epi-curve-dashlet',
@@ -29,6 +30,9 @@ export class EpiCurveDashletComponent implements OnInit, OnDestroy {
 
     // constants
     Constants = Constants;
+
+    epiCurveWeekViewTypes$: Observable<any[]>;
+    epiCurveWeekViewType;
 
     // Global filters => Date
     private _globalFilterDate: Moment;
@@ -85,7 +89,8 @@ export class EpiCurveDashletComponent implements OnInit, OnDestroy {
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
         private referenceDataDataService: ReferenceDataDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private genericDataService: GenericDataService
     ) {}
 
     /**
@@ -121,6 +126,10 @@ export class EpiCurveDashletComponent implements OnInit, OnDestroy {
                         }
                     });
             });
+        // load epi curves week types
+        this.epiCurveWeekViewTypes$ = this.genericDataService.getEpiCurvesWeekTypes();
+        // set as default ISO as default option for week type
+        this.epiCurveWeekViewType = Constants.EPI_CURVE_WEEK_TYPES.ISO.value;
     }
 
     /**
@@ -202,7 +211,21 @@ export class EpiCurveDashletComponent implements OnInit, OnDestroy {
     changeView(viewType) {
         this.viewType = viewType;
 
+        // reset week type if epi view is not weekly anymore
+        if (viewType !== Constants.EPI_CURVE_VIEW_TYPE.WEEK.value) {
+            this.epiCurveWeekViewType = undefined;
+        } else {
+            this.epiCurveWeekViewType = Constants.EPI_CURVE_WEEK_TYPES.ISO.value;
+        }
+
         // re-render chart
+        this.refreshDataCaller.call();
+    }
+
+    /**
+     * Refresh the list after the week type has changed
+     */
+    changeWeekView() {
         this.refreshDataCaller.call();
     }
 
@@ -252,6 +275,12 @@ export class EpiCurveDashletComponent implements OnInit, OnDestroy {
                 'periodType',
                 this.viewType
             );
+
+            if (this.epiCurveWeekViewType) {
+                qb.filter.where({
+                    'weekType': this.epiCurveWeekViewType
+                });
+            }
 
             // exclude discarded cases
             qb.filter.where({

@@ -30,6 +30,19 @@
             (click)="changeView(Constants.EPI_CURVE_VIEW_TYPE.DAY.value)">
             {{Constants.EPI_CURVE_VIEW_TYPE.DAY.label | translate}}
         </button>
+
+        <div
+            *ngIf="viewType === Constants.EPI_CURVE_VIEW_TYPE.WEEK.value"
+            class="week-type">
+            <app-form-select
+                name="epiCurveWeekViewType"
+                [(ngModel)]="epiCurveWeekViewType"
+                required="true"
+                [options]="epiCurveWeekViewTypes$ | async"
+                [clearable]="false"
+                (optionChanged)="changeWeekView()">
+            </app-form-select>
+        </div>
     </div>
 </div>
 
