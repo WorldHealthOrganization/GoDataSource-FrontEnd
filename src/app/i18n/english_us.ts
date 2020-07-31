@@ -12,6 +12,16 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
+        /**
+         * uiDashboardPage
+         */
+        'LNG_PAGE_DASHBOARD_EPI_CURVE_WEEK_TYPE_ISO': 'Global Week',
+        'LNG_PAGE_DASHBOARD_EPI_CURVE_WEEK_TYPE_EPI': 'Epi Week',
+        'LNG_PAGE_DASHBOARD_EPI_CURVE_WEEK_TYPE_SUNDAY': 'Week starting on Sunday'
+
+
+
+
 
 
         /**

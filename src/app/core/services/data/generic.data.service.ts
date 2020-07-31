@@ -165,6 +165,14 @@ export class GenericDataService {
     }
 
     /**
+     * Retrieve the list of transmission chain week view type
+     * @returns {Observable<any[]>}
+     */
+    getEpiCurvesWeekTypes(): Observable<any[]> {
+        return of(Object.values(Constants.EPI_CURVE_WEEK_TYPES));
+    }
+
+    /**
      * Retrieve backup module list
      */
     getBackupModuleList(): Observable<any[]> {
