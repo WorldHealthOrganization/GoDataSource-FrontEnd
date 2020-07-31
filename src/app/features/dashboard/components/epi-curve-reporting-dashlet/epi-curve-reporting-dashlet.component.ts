@@ -25,6 +25,8 @@ export class EpiCurveReportingDashletComponent implements OnInit, OnDestroy {
     chartDataCategories: any = [];
     chartDataColumns: any = [];
     viewType = Constants.EPI_CURVE_VIEW_TYPE.WEEK.value;
+    // set as default ISO as default option for week type
+    epiCurveWeekViewType = Constants.EPI_CURVE_WEEK_TYPES.ISO.value;
     mapCaseClassifications: any = {};
     colorPattern: string[] = [];
 
@@ -32,7 +34,6 @@ export class EpiCurveReportingDashletComponent implements OnInit, OnDestroy {
     Constants = Constants;
 
     epiCurveWeekViewTypes$: Observable<any[]>;
-    epiCurveWeekViewType;
 
     // Global filters => Date
     private _globalFilterDate: Moment;
@@ -126,10 +127,9 @@ export class EpiCurveReportingDashletComponent implements OnInit, OnDestroy {
                         }
                     });
             });
+
         // load epi curves week types
         this.epiCurveWeekViewTypes$ = this.genericDataService.getEpiCurvesWeekTypes();
-        // set as default ISO as default option for week type
-        this.epiCurveWeekViewType = Constants.EPI_CURVE_WEEK_TYPES.ISO.value;
     }
 
     /**
