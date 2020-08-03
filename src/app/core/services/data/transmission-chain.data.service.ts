@@ -144,7 +144,7 @@ export class TransmissionChainDataService {
      * @param chainGroup
      * @param filters
      * @param colorCriteria
-     * @param locationsList
+     * @param locationsListMap
      * @param selectedViewType
      * @returns {any}
      */
@@ -152,7 +152,9 @@ export class TransmissionChainDataService {
         chainGroup: TransmissionChainGroupModel,
         filters: any,
         colorCriteria: any,
-        locationsList: LocationModel[],
+        locationsListMap: {
+            [idLocation: string]: LocationModel
+        },
         selectedViewType: string = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value
     ): IConvertChainToGraphElements {
         const graphData: IConvertChainToGraphElements = {
@@ -165,16 +167,10 @@ export class TransmissionChainDataService {
             timelineDateCheckpoints: []
         };
 
-        const locationsListMap = {};
-        // build locations list map for further use
-        if (!_.isEmpty(locationsList)) {
-            locationsList.forEach((loc) => {
-                locationsListMap[loc.id] = loc;
-            });
-        }
         const selectedNodeIds: {
             [idPerson: string]: true
         } = {};
+
         // get labels for years / months - age field
         const yearsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS');
         const monthsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS');

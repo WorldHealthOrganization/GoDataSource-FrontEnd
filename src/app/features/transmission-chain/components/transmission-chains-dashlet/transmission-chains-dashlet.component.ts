@@ -70,7 +70,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     showSettings: boolean = false;
     filters: any | TransmissionChainFilters = {};
     resetFiltersData: any;
-    locationsList: LocationModel[];
+    locationsListMap: {
+        [idLocation: string]: LocationModel
+    } = {};
     personName: string = '';
     dateGlobalFilter: string = moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
 
@@ -421,12 +423,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         this.filters.includeContactsOfContacts = false;
         this.filters.showEvents = true;
 
-        const locationQueryBuilder = new RequestQueryBuilder();
-        locationQueryBuilder.fields('id', 'name');
-        this.locationDataService.getLocationsList(locationQueryBuilder).subscribe((results) => {
-            this.locationsList = results;
-        });
-
         this.nodeColorCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeColorCriteriaOptions();
         this.edgeColorCriteriaOptions$ = this.genericDataService.getTransmissionChainEdgeColorCriteriaOptions();
         this.edgeLabelCriteriaOptions$ = this.genericDataService.getTransmissionChainEdgeLabelCriteriaOptions();
@@ -745,33 +741,102 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                     })
                 )
                 .subscribe((chainGroup) => {
-                    // keep original chains
-                    this.chainGroup = chainGroup;
-                    this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(
-                        this.chainGroup.clone(),
-                        this.filters,
-                        this.legend,
-                        this.locationsList,
-                        this.transmissionChainViewType
-                    );
+                    // determine locations that we need to retrieve
+                    let locationIdsToRetrieve: any = {};
+                    _.forEach(chainGroup.nodesMap, (node) => {
+                        // determine main address
+                        let mainAddress: AddressModel;
+                        if (node.type === EntityType.EVENT) {
+                            mainAddress = (node.model as EventModel).address;
+                        } else {
+                            mainAddress = (node.model as CaseModel | ContactModel | ContactOfContactModel).mainAddress;
+                        }
 
-                    // finished
-                    loadingDialog.close();
+                        // check if we have location
+                        if (
+                            mainAddress &&
+                            mainAddress.locationId
+                        ) {
+                            locationIdsToRetrieve[mainAddress.locationId] = true;
+                        }
+                    });
 
-                    // configure geo map
-                    if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value) {
-                        this.initGeospatialMap();
+                    // transform locations to array
+                    locationIdsToRetrieve = Object.keys(locationIdsToRetrieve);
+
+                    // do we need to retrieve locations ?
+                    if (locationIdsToRetrieve.length < 1) {
+                        // reset locations
+                        this.locationsListMap = {};
+
+                        // keep original chains
+                        this.chainGroup = chainGroup;
+                        this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(
+                            this.chainGroup.clone(),
+                            this.filters,
+                            this.legend,
+                            this.locationsListMap,
+                            this.transmissionChainViewType
+                        );
+
+                        // finished
+                        loadingDialog.close();
+
+                        // configure geo map
+                        if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value) {
+                            this.initGeospatialMap();
+                        }
+
+                        // render
+                        this.renderGraph();
+                    } else {
+                        // retrieve locations
+                        const locationQueryBuilder = new RequestQueryBuilder();
+                        locationQueryBuilder.fields('id', 'name');
+                        locationQueryBuilder.filter.bySelect(
+                            'id',
+                            locationIdsToRetrieve,
+                            false,
+                            null
+                        );
+                        this.locationDataService
+                            .getLocationsList(locationQueryBuilder)
+                            .subscribe((locations) => {
+                                // map locations
+                                this.locationsListMap = {};
+                                (locations || []).forEach((location) => {
+                                    this.locationsListMap[location.id] = location;
+                                });
+
+                                // keep original chains
+                                this.chainGroup = chainGroup;
+                                this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(
+                                    this.chainGroup.clone(),
+                                    this.filters,
+                                    this.legend,
+                                    this.locationsListMap,
+                                    this.transmissionChainViewType
+                                );
+
+                                // finished
+                                loadingDialog.close();
+
+                                // configure geo map
+                                if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value) {
+                                    this.initGeospatialMap();
+                                }
+
+                                // render
+                                this.renderGraph();
+                            });
                     }
-
-                    // render
-                    this.renderGraph();
                 });
         } else {
             this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(
                 this.chainGroup.clone(),
                 this.filters,
                 this.legend,
-                this.locationsList,
+                this.locationsListMap,
                 this.transmissionChainViewType
             );
 

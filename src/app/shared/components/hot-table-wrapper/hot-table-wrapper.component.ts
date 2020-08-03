@@ -545,16 +545,17 @@ export class HotTableWrapperComponent implements OnInit {
         }
 
         // determine if we have location ids in our data for our location columns
-        const locationIds: string[] = [];
+        let locationIds: any = {};
         locationColumns.forEach((columnIndex: number) => {
             this.data.forEach((data) => {
                 if (!_.isEmpty(data[columnIndex])) {
-                    locationIds.push(data[columnIndex]);
+                    locationIds[data[columnIndex]] = true;
                 }
             });
         });
 
         // check if we didn't retrieve location already
+        locationIds = Object.keys(locationIds);
         const locationIdsToRetrieve: string[] = _.filter(
             locationIds,
             (id: string) => {
@@ -562,7 +563,7 @@ export class HotTableWrapperComponent implements OnInit {
             }
         );
 
-        // there is nothign to retrieve ?
+        // there is nothing to retrieve ?
         if (_.isEmpty(locationIdsToRetrieve)) {
             return;
         }

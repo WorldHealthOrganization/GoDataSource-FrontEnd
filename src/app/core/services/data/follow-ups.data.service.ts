@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { ContactFollowUpsModel } from '../../models/contact-follow-ups.model';
 import { FollowUpModel } from '../../models/follow-up.model';
@@ -80,20 +80,51 @@ export class FollowUpsDataService {
     ): Observable<FollowUpModel[]> {
         // construct query
         const filter = queryBuilder.buildQuery();
-
-        // retrieve locations
-        return this.locationDataService
-            .getLocationsList()
+        return this.modelHelper
+            .mapObservableListToModel(
+                this.http.get(`outbreaks/${outbreakId}/follow-ups?filter=${filter}`),
+                FollowUpModel
+            )
             .pipe(
-                mergeMap((locations) => {
-                    // map names to id
-                    const locationsMapped = _.groupBy(locations, 'id');
-                    return this.modelHelper.mapObservableListToModel(
-                        this.http.get(`outbreaks/${outbreakId}/follow-ups?filter=${filter}`),
-                        FollowUpModel
-                    )
+                mergeMap((followUps) => {
+                    // determine locations that we need to retrieve
+                    let locationIdsToRetrieve: any = {};
+                    (followUps || []).forEach((followUp) => {
+                        if (
+                            followUp.address &&
+                            followUp.address.locationId
+                        ) {
+                            locationIdsToRetrieve[followUp.address.locationId] = true;
+                        }
+                    });
+
+                    // we don't need to retrieve locations ?
+                    locationIdsToRetrieve = Object.keys(locationIdsToRetrieve);
+                    if (locationIdsToRetrieve.length < 1) {
+                        return of(followUps);
+                    }
+
+                    // construct query builder
+                    const qb: RequestQueryBuilder = new RequestQueryBuilder();
+                    qb.filter.bySelect(
+                        'id',
+                        locationIdsToRetrieve,
+                        false,
+                        null
+                    );
+
+                    // retrieve locations
+                    return this.locationDataService
+                        .getLocationsList(qb)
                         .pipe(
-                            map((followUps) => {
+                            map((locations) => {
+                                // map locations
+                                const locationsMapped = {};
+                                (locations || []).forEach((location) => {
+                                    locationsMapped[location.id] = location;
+                                });
+
+                                // map names to id
                                 return _.map(followUps, (followUp: FollowUpModel) => {
                                     // map location
                                     if (
@@ -101,7 +132,7 @@ export class FollowUpsDataService {
                                         followUp.address.locationId
                                     ) {
                                         followUp.address.location = locationsMapped[followUp.address.locationId] ?
-                                            locationsMapped[followUp.address.locationId][0] :
+                                            locationsMapped[followUp.address.locationId] :
                                             null;
                                     }
 
@@ -112,6 +143,9 @@ export class FollowUpsDataService {
                         );
                 })
             );
+
+
+
     }
 
     /**
