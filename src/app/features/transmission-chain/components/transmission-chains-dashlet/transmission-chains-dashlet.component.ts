@@ -801,6 +801,16 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                         );
                         this.locationDataService
                             .getLocationsList(locationQueryBuilder)
+                            .pipe(
+                                catchError((err) => {
+                                    // display error message
+                                    this.snackbarService.showApiError(err);
+
+                                    // finished
+                                    loadingDialog.close();
+                                    return throwError(err);
+                                })
+                            )
                             .subscribe((locations) => {
                                 // map locations
                                 this.locationsListMap = {};

@@ -39,10 +39,11 @@ export class LocationDataService {
                 return of(locationsList);
             } else {
                 // get locations list from API
-                return this.modelHelper.mapObservableListToModel(
-                    this.locationList$,
-                    LocationModel
-                )
+                return this.modelHelper
+                    .mapObservableListToModel(
+                        this.locationList$,
+                        LocationModel
+                    )
                     .pipe(
                         tap((locations) => {
                             // cache the list
@@ -51,9 +52,11 @@ export class LocationDataService {
                     );
             }
         } else {
-            const filter = queryBuilder.buildQuery();
+            const filter = queryBuilder.buildQuery(false);
             return this.modelHelper.mapObservableListToModel(
-                this.http.get(`locations?filter=${filter}`),
+                this.http.post(`locations/filter`, {
+                    filter: filter
+                }),
                 LocationModel
             );
         }
