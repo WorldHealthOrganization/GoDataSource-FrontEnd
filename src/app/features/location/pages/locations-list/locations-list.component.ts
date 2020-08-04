@@ -274,7 +274,11 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
 
         // refresh
         this.locationsList$ = this.locationDataService
-            .getLocationsListByParent(this.parentId, this.queryBuilder)
+            .getLocationsListByParent(
+                this.parentId,
+                this.queryBuilder,
+                true
+            )
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showApiError(err);
