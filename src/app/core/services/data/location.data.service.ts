@@ -13,10 +13,12 @@ import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class LocationDataService {
-
     locationList$: Observable<any>;
     groupedLocations$: Observable<any>;
 
+    /**
+     * Constructor
+     */
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService,
@@ -28,17 +30,23 @@ export class LocationDataService {
 
     /**
      * Retrieve the list of Locations
+     * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<LocationModel[]>}
      */
-    getLocationsList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<LocationModel[]> {
+    getLocationsList(
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(),
+        retrieveCreatedUpdatedBy?: boolean
+    ): Observable<LocationModel[]> {
         // do we need to sort / filter by something? - in this case we don't need to use the cache
-        if (queryBuilder.isEmpty()) {
+        if (
+            queryBuilder.isEmpty() &&
+            !retrieveCreatedUpdatedBy
+        ) {
             // get locations list from cache
             const locationsList = this.cacheService.get(CacheKey.LOCATIONS);
             if (locationsList) {
                 return of(locationsList);
             } else {
-                // get locations list from API
                 return this.modelHelper
                     .mapObservableListToModel(
                         this.locationList$,
@@ -54,7 +62,7 @@ export class LocationDataService {
         } else {
             const filter = queryBuilder.buildQuery(false);
             return this.modelHelper.mapObservableListToModel(
-                this.http.post(`locations/filter`, {
+                this.http.post(`locations/filter${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`, {
                     filter: filter
                 }),
                 LocationModel
@@ -66,11 +74,13 @@ export class LocationDataService {
      * Get all locations that belong to a specific parent ( for top items, parentId can be empty ). Default behavior is to bring only the top records without a parent.
      * @param {string} parentId
      * @param {RequestQueryBuilder} queryBuilder
+     * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<LocationModel[]>}
      */
     getLocationsListByParent(
         parentId: string = null,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(),
+        retrieveCreatedUpdatedBy?: boolean
     ): Observable<LocationModel[]> {
 
         // define parent condition
@@ -90,7 +100,7 @@ export class LocationDataService {
         // are we using the cache or sending a request further ?
         if (qb.isEmpty()) {
             // retrieve locations from cache
-            return this.getLocationsList(qb)
+            return this.getLocationsList(qb, retrieveCreatedUpdatedBy)
                 .pipe(
                     map((locations: LocationModel[]) =>
                         _.filter(locations, (location: LocationModel) => {
@@ -104,7 +114,7 @@ export class LocationDataService {
         } else {
             // filter / sort locations on server
             qb.filter.where(parentCondition, true);
-            return this.getLocationsList(qb);
+            return this.getLocationsList(qb, retrieveCreatedUpdatedBy);
         }
     }
 
