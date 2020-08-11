@@ -30,6 +30,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { Constants } from '../../../../core/models/constants';
+import { TimerCache } from '../../../../core/helperClasses/timer-cache';
 
 @Component({
     selector: 'app-modify-contact-of-contact',
@@ -151,11 +152,21 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
                     if (ContactOfContactModel.canGenerateVisualId(this.authUser)) {
                         // set visual ID validator
                         this.contactOfContactIdMaskValidator = new Observable((observer) => {
-                            this.contactsOfContactsDataService.checkContactOfContactVisualIDValidity(
-                                this.selectedOutbreak.id,
-                                this.visualIDTranslateData.mask,
-                                this.contactOfContactData.visualId,
-                                this.contactOfContactData.id
+                            // construct cache key
+                            const cacheKey: string = 'MCC_' + this.selectedOutbreak.id +
+                                this.visualIDTranslateData.mask +
+                                this.contactOfContactData.visualId +
+                                this.contactOfContactData.id;
+
+                            // get data from cache or execute validator
+                            TimerCache.run(
+                                cacheKey,
+                                this.contactsOfContactsDataService.checkContactOfContactVisualIDValidity(
+                                    this.selectedOutbreak.id,
+                                    this.visualIDTranslateData.mask,
+                                    this.contactOfContactData.visualId,
+                                    this.contactOfContactData.id
+                                )
                             ).subscribe((isValid: boolean) => {
                                 observer.next(isValid);
                                 observer.complete();
