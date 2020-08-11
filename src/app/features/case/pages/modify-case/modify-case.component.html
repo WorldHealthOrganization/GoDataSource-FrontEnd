@@ -110,7 +110,8 @@
                                 [maxlength]="255"
                                 [disabled]="viewOnly"
                                 app-general-async-validator
-                                [asyncValidatorObservable]="viewOnly ? null : caseIdMaskValidator">
+                                [asyncValidatorObservable]="viewOnly ? null : caseIdMaskValidator"
+                                [validateOnlyWhenDirty]="true">
                             </app-form-input>
 
                             <app-form-datepicker

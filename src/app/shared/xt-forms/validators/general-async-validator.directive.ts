@@ -25,16 +25,23 @@ export interface IGeneralAsyncValidatorResponse {
     ]
 })
 export class GeneralAsyncValidatorDirective {
+    @Input() validateOnlyWhenDirty: boolean = false;
     @Input() asyncValidatorObservable: Observable<boolean | IGeneralAsyncValidatorResponse>;
     @Input() asyncValidatorErrMsg: string = 'LNG_FORM_VALIDATION_ERROR_GENERAL_ASYNC';
     @Input() asyncValidatorErrMsgTranslateData: {
         [key: string]: any
     };
 
+    /**
+     * Validate
+     */
     validate(control: AbstractControl): Observable<ValidationErrors | null> {
         if (
             !this.asyncValidatorObservable ||
-            _.isEmpty(control.value)
+            _.isEmpty(control.value) || (
+                this.validateOnlyWhenDirty &&
+                !control.dirty
+            )
         ) {
             return of(null);
         } else {

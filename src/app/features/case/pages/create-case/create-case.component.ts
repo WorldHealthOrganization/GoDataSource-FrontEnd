@@ -30,6 +30,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { TimerCache } from '../../../../core/helperClasses/timer-cache';
 
 @Component({
     selector: 'app-create-case',
@@ -139,16 +140,23 @@ export class CreateCaseComponent
 
                 // set visual ID validator
                 this.caseIdMaskValidator = new Observable((observer) => {
-                    this.caseDataService
-                        .checkCaseVisualIDValidity(
+                    // construct cache key
+                    const cacheKey: string = 'CCA_' + this.selectedOutbreak.id +
+                        this.visualIDTranslateData.mask +
+                        this.caseData.visualId;
+
+                    // get data from cache or execute validator
+                    TimerCache.run(
+                        cacheKey,
+                        this.caseDataService.checkCaseVisualIDValidity(
                             this.selectedOutbreak.id,
                             this.visualIDTranslateData.mask,
                             this.caseData.visualId
                         )
-                        .subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
-                            observer.next(isValid);
-                            observer.complete();
-                        });
+                    ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                        observer.next(isValid);
+                        observer.complete();
+                    });
                 });
             });
     }
