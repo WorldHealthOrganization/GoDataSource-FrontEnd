@@ -7,7 +7,7 @@ import { share } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
 
 export class TimerCache {
-    static readonly INVALIDATE_CACHE_AFTER_N_MS = 120000; // 2 minutes
+    static readonly INVALIDATE_CACHE_AFTER_N_MS = 60000; // 1 minute
     static CACHE: {
         [cacheKey: string]: {
             createdAt: Moment,

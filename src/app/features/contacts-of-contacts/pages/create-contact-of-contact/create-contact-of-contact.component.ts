@@ -35,6 +35,7 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { Constants } from '../../../../core/models/constants';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { TimerCache } from '../../../../core/helperClasses/timer-cache';
 
 @Component({
     selector: 'app-create-contact-of-contact',
@@ -154,10 +155,19 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
 
                         // set visual ID validator
                         this.contactOfContactMaskValidator$ = new Observable((observer) => {
-                            this.contactsOfContactsDataService.checkContactOfContactVisualIDValidity(
-                                selectedOutbreak.id,
-                                this.visualIDTranslateData.mask,
-                                this.contactOfContactData.visualId
+                            // construct cache key
+                            const cacheKey: string = 'CCC_' + selectedOutbreak.id +
+                                this.visualIDTranslateData.mask +
+                                this.contactOfContactData.visualId;
+
+                            // get data from cache or execute validator
+                            TimerCache.run(
+                                cacheKey,
+                                this.contactsOfContactsDataService.checkContactOfContactVisualIDValidity(
+                                    selectedOutbreak.id,
+                                    this.visualIDTranslateData.mask,
+                                    this.contactOfContactData.visualId
+                                )
                             ).subscribe((isValid: boolean) => {
                                 observer.next(isValid);
                                 observer.complete();

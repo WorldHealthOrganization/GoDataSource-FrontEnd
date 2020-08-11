@@ -108,7 +108,8 @@
                                 [maxlength]="255"
                                 [disabled]="viewOnly"
                                 app-general-async-validator
-                                [asyncValidatorObservable]="contactOfContactIdMaskValidator">
+                                [asyncValidatorObservable]="contactOfContactIdMaskValidator"
+                                [validateOnlyWhenDirty]="true">
                             </app-form-input>
 
                             <app-form-datepicker

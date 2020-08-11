@@ -96,7 +96,8 @@
                                 [tooltipTranslateData]="visualIDTranslateData"
                                 [maxlength]="255"
                                 app-general-async-validator
-                                [asyncValidatorObservable]="caseIdMaskValidator">
+                                [asyncValidatorObservable]="caseIdMaskValidator"
+                                [validateOnlyWhenDirty]="true">
                             </app-form-input>
 
                             <app-form-datepicker

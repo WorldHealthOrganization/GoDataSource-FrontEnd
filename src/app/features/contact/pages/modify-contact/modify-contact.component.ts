@@ -35,6 +35,7 @@ import { EntityDataService } from 'app/core/services/data/entity.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
+import { TimerCache } from '../../../../core/helperClasses/timer-cache';
 
 @Component({
     selector: 'app-modify-contact',
@@ -203,11 +204,21 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
 
                     // set visual ID validator
                     this.contactIdMaskValidator = new Observable((observer) => {
-                        this.contactDataService.checkContactVisualIDValidity(
-                            this.selectedOutbreak.id,
-                            this.visualIDTranslateData.mask,
-                            this.contactData.visualId,
-                            this.contactData.id
+                        // construct cache key
+                        const cacheKey: string = 'MCO_' + this.selectedOutbreak.id +
+                            this.visualIDTranslateData.mask +
+                            this.contactData.visualId +
+                            this.contactData.id;
+
+                        // get data from cache or execute validator
+                        TimerCache.run(
+                            cacheKey,
+                            this.contactDataService.checkContactVisualIDValidity(
+                                this.selectedOutbreak.id,
+                                this.visualIDTranslateData.mask,
+                                this.contactData.visualId,
+                                this.contactData.id
+                            )
                         ).subscribe((isValid: boolean) => {
                             observer.next(isValid);
                             observer.complete();
