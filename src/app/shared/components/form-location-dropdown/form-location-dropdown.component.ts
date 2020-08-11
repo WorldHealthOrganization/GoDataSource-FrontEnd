@@ -186,6 +186,7 @@ export class FormLocationDropdownComponent
                             // do we have data already ?
                             if (localCache[localMethodKey][localCacheKey].data !== null) {
                                 observer.next(localCache[localMethodKey][localCacheKey].data);
+                                return;
                             }
 
                             // load data
