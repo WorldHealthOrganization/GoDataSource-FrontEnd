@@ -131,7 +131,7 @@ export class EntityHelperService {
             // entities collection
             const entities: DialogField[] = [];
 
-            // add links to list relationship page only if we're alloed to view that page
+            // add links to list relationship page only if we're allowed to view that page
             const authUser: UserModel = this.authDataService.getAuthenticatedUser();
             if (
                 RelationshipModel.canList(authUser) && (
@@ -230,7 +230,10 @@ export class EntityHelperService {
                                 ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
                                 ...{
                                     data: {
-                                        relationship: item
+                                        relationship: item,
+                                        authUser: authUser,
+                                        entity: entity,
+                                        fromExposure: from === SentFromColumn.EXPOSURES
                                     }
                                 }
                             }

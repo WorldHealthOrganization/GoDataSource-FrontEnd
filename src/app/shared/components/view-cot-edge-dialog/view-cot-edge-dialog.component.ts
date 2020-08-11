@@ -5,13 +5,21 @@ import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { RelationshipDataService } from '../../../core/services/data/relationship.data.service';
 import { RelationshipModel } from '../../../core/models/entity-and-relationship.model';
 import * as _ from 'lodash';
+import { UserModel } from '../../../core/models/user.model';
+import { CaseModel } from '../../../core/models/case.model';
+import { EventModel } from '../../../core/models/event.model';
+import { ContactModel } from '../../../core/models/contact.model';
+import { ContactOfContactModel } from '../../../core/models/contact-of-contact.model';
 
 /**
  * Edge Data
  */
 export class ViewCOTEdgeData {
     constructor(
-        public relationship: RelationshipModel
+        public relationship: RelationshipModel,
+        public authUser: UserModel,
+        public entity: EventModel | CaseModel | ContactModel | ContactOfContactModel,
+        public fromExposure: boolean
     ) {}
 }
 
@@ -38,6 +46,10 @@ export class ViewCotEdgeDialogComponent implements OnDestroy {
     relationship: RelationshipModel;
     // relationship information as key-value pairs
     relationshipInfo: LabelValuePair[] = [];
+
+    entity: EventModel | CaseModel | ContactModel | ContactOfContactModel;
+    authUser: UserModel;
+    fromExposure: boolean;
 
     loading: boolean = true;
 
@@ -67,6 +79,10 @@ export class ViewCotEdgeDialogComponent implements OnDestroy {
         this.resourceViewPageLink = sourcePerson ?
             `/relationships/${sourcePerson.type}/${sourcePerson.id}/contacts/${this.relationship.id}/view` :
             null;
+
+        this.authUser = this.data.authUser;
+        this.entity = this.data.entity;
+        this.fromExposure = this.data.fromExposure;
 
         // init timer handler
         this.initTimerHandler();

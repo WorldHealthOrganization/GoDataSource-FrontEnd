@@ -30,6 +30,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ClusterModel } from '../../../../core/models/cluster.model';
 
 @Component({
     selector: 'app-entity-relationships-list',
@@ -146,7 +147,6 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
             listHelperService, router, route,
             authDataService, outbreakDataService, entityDataService
         );
-
         // set checkbox key ( id ) path for current list component
         this.checkedKeyPath = 'relationship.id';
     }
@@ -160,7 +160,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
         this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((outbreak: OutbreakModel) => {
-                if (outbreak) {
+                if (outbreak && ClusterModel.canList(this.authUser)) {
                     // update the selected outbreak
                     this.clusterOptions$ = this.clusterDataService.getClusterListAsLabelValue(outbreak.id).pipe(share());
                 }
@@ -294,11 +294,6 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                 visible: false
             }),
             new VisibleColumnModel({
-                field: 'clusterId',
-                label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
-                visible: false
-            }),
-            new VisibleColumnModel({
                 field: 'createdBy',
                 label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_BY',
                 visible: false
@@ -319,6 +314,18 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                 visible: false
             })
         ];
+
+        if (ClusterModel.canView(this.authUser)) {
+            this.tableColumns =
+                [
+                    ...this.tableColumns,
+                    new VisibleColumnModel({
+                        field: 'clusterId',
+                        label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+                        visible: false
+                    }),
+                ];
+        }
     }
 
     /**
