@@ -1,11 +1,9 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { throwError } from 'rxjs';
@@ -14,14 +12,16 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel } from '../../../../core/models/user.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
+import { ContactDataService } from '../../../../core/services/data/contact.data.service';
+import { ContactModel } from 'app/core/models/contact.model';
 
 @Component({
-    selector: 'app-modify-questionnaire-case',
+    selector: 'app-modify-questionnaire-contact',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './modify-questionnaire-case.component.html',
-    styleUrls: ['./modify-questionnaire-case.component.less']
+    templateUrl: './modify-questionnaire-contact.component.html',
+    styleUrls: ['./modify-questionnaire-contact.component.less']
 })
-export class ModifyQuestionnaireCaseComponent extends ViewModifyComponent implements OnInit {
+export class ModifyQuestionnaireContactComponent extends ViewModifyComponent implements OnInit {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -30,11 +30,11 @@ export class ModifyQuestionnaireCaseComponent extends ViewModifyComponent implem
 
     selectedOutbreak: OutbreakModel = new OutbreakModel();
 
-    caseId: string;
-    caseData: CaseModel = new CaseModel();
+    contactId: string;
+    contactData: ContactModel = new ContactModel();
 
     // constants
-    CaseModel = CaseModel;
+    ContactModel = ContactModel;
 
     /**
      * Constructor
@@ -42,7 +42,7 @@ export class ModifyQuestionnaireCaseComponent extends ViewModifyComponent implem
     constructor(
         protected route: ActivatedRoute,
         private authDataService: AuthDataService,
-        private caseDataService: CaseDataService,
+        private contactDataService: ContactDataService,
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
@@ -64,11 +64,11 @@ export class ModifyQuestionnaireCaseComponent extends ViewModifyComponent implem
         // show loading
         this.showLoadingDialog(false);
 
-        // retrieve case
+        // retrieve data
         this.route.params
-            .subscribe((params: { caseId }) => {
-                this.caseId = params.caseId;
-                this.retrieveCaseData();
+            .subscribe((params: { contactId }) => {
+                this.contactId = params.contactId;
+                this.retrieveContactData();
             });
 
         // retrieve outbreak
@@ -79,7 +79,7 @@ export class ModifyQuestionnaireCaseComponent extends ViewModifyComponent implem
                 this.selectedOutbreak = selectedOutbreak;
 
                 // breadcrumbs
-                this.retrieveCaseData();
+                this.retrieveContactData();
             });
     }
 
@@ -90,59 +90,64 @@ export class ModifyQuestionnaireCaseComponent extends ViewModifyComponent implem
         // reset
         this.breadcrumbs = [];
 
-        // case list page
-        if (CaseModel.canList(this.authUser)) {
+        // add list breadcrumb only if we have permission
+        if (ContactModel.canList(this.authUser)) {
             this.breadcrumbs.push(
-                new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
+                new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
             );
         }
 
-        // current page breadcrumb
-        if (this.caseData) {
+        // contact
+        if (
+            this.contactData &&
+            this.contactData.id
+        ) {
             // model bread
             this.breadcrumbs.push(
                 new BreadcrumbItemModel(
-                    this.caseData.name,
-                    `/cases/${this.caseData.id}/${this.viewOnly ? 'view' : 'modify'}`
+                    this.contactData.name,
+                    `/contacts/${this.contactData.id}/${this.viewOnly ? 'view' : 'modify'}`
                 )
             );
 
-            // current page title
+            // view / modify breadcrumb
             this.breadcrumbs.push(
                 new BreadcrumbItemModel(
-                    this.viewOnly ? 'LNG_PAGE_VIEW_CASE_TITLE' : 'LNG_PAGE_MODIFY_CASE_TITLE',
+                    this.viewOnly ?
+                        'LNG_PAGE_VIEW_CONTACT_TITLE' :
+                        'LNG_PAGE_MODIFY_CONTACT_TITLE',
                     '.',
                     true,
                     {},
-                    this.caseData
+                    this.contactData
                 )
             );
         }
     }
 
     /**
-     * Case data
+     * Retrieve contact information
      */
-    retrieveCaseData() {
-        // get case
+    private retrieveContactData() {
         if (
+            this.selectedOutbreak &&
             this.selectedOutbreak.id &&
-            this.caseId
+            this.contactId
         ) {
             // show loading
             this.showLoadingDialog(false);
 
-            // get case
-            this.caseDataService
-                .getCase(
+            this.contactDataService
+                .getContact(
                     this.selectedOutbreak.id,
-                    this.caseId
+                    this.contactId,
+                    true
                 )
-                .subscribe((caseData: CaseModel) => {
+                .subscribe((contactData) => {
                     // keep data
-                    this.caseData = caseData;
+                    this.contactData = contactData;
 
-                    // initialize breadcrumbs
+                    // update breadcrumb
                     this.initializeBreadcrumbs();
 
                     // hide loading
@@ -152,9 +157,9 @@ export class ModifyQuestionnaireCaseComponent extends ViewModifyComponent implem
     }
 
     /**
-     * Modify case
+     * Modify contact
      */
-    modifyCase(form: NgForm) {
+    modifyContact(form: NgForm) {
         // validate form
         if (!this.formHelper.validateForm(form)) {
             return;
@@ -166,11 +171,11 @@ export class ModifyQuestionnaireCaseComponent extends ViewModifyComponent implem
         // show loading
         this.showLoadingDialog();
 
-        // modify the Case
-        this.caseDataService
-            .modifyCase(
+        // modify
+        this.contactDataService
+            .modifyContact(
                 this.selectedOutbreak.id,
-                this.caseId,
+                this.contactId,
                 dirtyFields
             )
             .pipe(
@@ -184,16 +189,16 @@ export class ModifyQuestionnaireCaseComponent extends ViewModifyComponent implem
                 })
             )
             .subscribe(() => {
-                // update case data
-                this.retrieveCaseData();
+                // update data
+                this.retrieveContactData();
 
                 // mark form as pristine
                 form.form.markAsPristine();
 
                 // display message
-                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE');
+                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE');
 
-                // loading will be closed by retrieveCaseData() method
+                // loading will be closed by retrieveContactData() method
                 // NOTHING TO DO
             });
     }

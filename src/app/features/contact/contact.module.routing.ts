@@ -59,6 +59,33 @@ const routes: Routes = [
             PageChangeConfirmationGuard
         ]
     },
+    // Modify Contact Questionnaire
+    {
+        path: ':contactId/view-questionnaire',
+        component: fromPages.ModifyQuestionnaireContactComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.CONTACT_VIEW
+            ],
+            action: ViewModifyComponentAction.VIEW
+        }
+    },
+    // Modify Contact Questionnaire
+    {
+        path: ':contactId/modify-questionnaire',
+        component: fromPages.ModifyQuestionnaireContactComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.CONTACT_MODIFY
+            ],
+            action: ViewModifyComponentAction.MODIFY
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
+    },
     // Bulk Add Contacts
     {
         path: 'create-bulk',
