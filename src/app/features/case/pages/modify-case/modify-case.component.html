@@ -416,20 +416,8 @@
                     centerNameLabel="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME"
                     centerNameTooltip="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME_DESCRIPTION"
                     [dateOfOnset]="caseData.dateOfOnset"
-                    [maxDate]="serverToday"
-                ></app-form-case-center-daterange-list>
-
-            </mat-tab>
-
-            <mat-tab [label]="'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE' | translate">
-                <app-form-fill-questionnaire
-                    *ngIf="!!caseData?.id"
-                    name="questionnaireAnswers"
-                    [ngModel]="caseData.questionnaireAnswers"
-                    [questions]="selectedOutbreak.caseInvestigationTemplate"
-                    [disabled]="viewOnly"
-                    [componentTitle]="'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE' | translate">
-                </app-form-fill-questionnaire>
+                    [maxDate]="serverToday">
+                </app-form-case-center-daterange-list>
             </mat-tab>
         </mat-tab-group>
     </div>
@@ -483,6 +471,13 @@
 
                 <div class="page-tabs-navbar-placeholder"></div>
             </ng-container>
+
+            <button
+                type="button"
+                mat-raised-button
+                [routerLink]="['/cases', caseId, viewOnly || selectedOutbreak?.id !== authUser?.activeOutbreakId ? 'view-questionnaire' : 'modify-questionnaire']">
+                {{'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE' | translate}}
+            </button>
         </ng-container>
 
         <button

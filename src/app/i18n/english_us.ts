@@ -27,6 +27,6 @@ export const EnglishUsLang = {
         /**
          * REMOVE the tokens from below
          */
-        // ...
+        // 'LNG_PAGE_CREATE_CASE_TAB_QUESTIONNAIRE_TITLE'
     }
 };
