@@ -17,13 +17,14 @@ import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class FollowUpsDataService {
-
+    /**
+     * Constructor
+     */
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService,
         private locationDataService: LocationDataService
-    ) {
-    }
+    ) {}
 
     /**
      * Generate followups for contacts

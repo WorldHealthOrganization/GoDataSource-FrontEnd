@@ -161,7 +161,8 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
         if (
             this.contactId &&
             this.followUpId &&
-            this.selectedOutbreak
+            this.selectedOutbreak &&
+            this.selectedOutbreak.id
         ) {
             // show loading
             this.showLoadingDialog(false);
