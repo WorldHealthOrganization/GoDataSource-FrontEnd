@@ -12,16 +12,17 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel } from '../../../../core/models/user.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
-import { ContactDataService } from '../../../../core/services/data/contact.data.service';
-import { ContactModel } from 'app/core/models/contact.model';
+import { LabResultModel } from 'app/core/models/lab-result.model';
+import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
+import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 
 @Component({
-    selector: 'app-modify-questionnaire-contact',
+    selector: 'app-modify-questionnaire-lab-result',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './modify-questionnaire-contact.component.html',
-    styleUrls: ['./modify-questionnaire-contact.component.less']
+    templateUrl: './modify-questionnaire-lab-result.component.html',
+    styleUrls: ['./modify-questionnaire-lab-result.component.less']
 })
-export class ModifyQuestionnaireContactComponent extends ViewModifyComponent implements OnInit {
+export class ModifyQuestionnaireLabResultComponent extends ViewModifyComponent implements OnInit {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -30,11 +31,12 @@ export class ModifyQuestionnaireContactComponent extends ViewModifyComponent imp
 
     selectedOutbreak: OutbreakModel = new OutbreakModel();
 
-    contactId: string;
-    contactData: ContactModel = new ContactModel();
+    labResultId: string;
+    labResultData: LabResultModel = new LabResultModel();
 
     // constants
-    ContactModel = ContactModel;
+    LabResultModel = LabResultModel;
+    EntityModel = EntityModel;
 
     /**
      * Constructor
@@ -42,7 +44,7 @@ export class ModifyQuestionnaireContactComponent extends ViewModifyComponent imp
     constructor(
         protected route: ActivatedRoute,
         private authDataService: AuthDataService,
-        private contactDataService: ContactDataService,
+        private labResultDataService: LabResultDataService,
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
@@ -66,9 +68,9 @@ export class ModifyQuestionnaireContactComponent extends ViewModifyComponent imp
 
         // retrieve data
         this.route.params
-            .subscribe((params: { contactId }) => {
-                this.contactId = params.contactId;
-                this.retrieveContactData();
+            .subscribe((params: { labResultId }) => {
+                this.labResultId = params.labResultId;
+                this.retrieveLabResultData();
             });
 
         // retrieve outbreak
@@ -79,7 +81,7 @@ export class ModifyQuestionnaireContactComponent extends ViewModifyComponent imp
                 this.selectedOutbreak = selectedOutbreak;
 
                 // breadcrumbs
-                this.retrieveContactData();
+                this.retrieveLabResultData();
             });
     }
 
@@ -91,60 +93,57 @@ export class ModifyQuestionnaireContactComponent extends ViewModifyComponent imp
         this.breadcrumbs = [];
 
         // add list breadcrumb only if we have permission
-        if (ContactModel.canList(this.authUser)) {
+        if (LabResultModel.canList(this.authUser)) {
             this.breadcrumbs.push(
-                new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+                new BreadcrumbItemModel('LNG_PAGE_LIST_LAB_RESULTS_TITLE', '/lab-results')
             );
         }
 
-        // contact
+        // data
         if (
-            this.contactData &&
-            this.contactData.id
+            this.labResultData &&
+            this.labResultData.id
         ) {
             // model bread
             this.breadcrumbs.push(
                 new BreadcrumbItemModel(
-                    this.contactData.name,
-                    `/contacts/${this.contactData.id}/${this.viewOnly ? 'view' : 'modify'}`
+                    this.labResultData.dateSampleTaken,
+                    `/lab-results/${EntityModel.getLinkForEntityType(this.labResultData.personType)}/${this.labResultData.personId}/${this.labResultData.id}/${this.viewOnly ? 'view' : 'modify'}`
                 )
             );
 
             // view / modify breadcrumb
             this.breadcrumbs.push(
                 new BreadcrumbItemModel(
-                    this.viewOnly ?
-                        'LNG_PAGE_VIEW_CONTACT_TITLE' :
-                        'LNG_PAGE_MODIFY_CONTACT_TITLE',
-                    '.',
+                    this.viewOnly ? 'LNG_PAGE_VIEW_LAB_RESULT_TITLE' : 'LNG_PAGE_MODIFY_LAB_RESULT_TITLE',
+                    null,
                     true,
                     {},
-                    this.contactData
+                    this.labResultData
                 )
             );
         }
     }
 
     /**
-     * Retrieve contact information
+     * Retrieve information
      */
-    private retrieveContactData() {
+    private retrieveLabResultData() {
         if (
             this.selectedOutbreak &&
             this.selectedOutbreak.id &&
-            this.contactId
+            this.labResultId
         ) {
             // show loading
             this.showLoadingDialog(false);
-
-            this.contactDataService
-                .getContact(
+            this.labResultDataService
+                .getOutbreakLabResult(
                     this.selectedOutbreak.id,
-                    this.contactId
+                    this.labResultId
                 )
-                .subscribe((contactData) => {
+                .subscribe((labResultData) => {
                     // keep data
-                    this.contactData = contactData;
+                    this.labResultData = labResultData;
 
                     // update breadcrumb
                     this.initializeBreadcrumbs();
@@ -156,9 +155,9 @@ export class ModifyQuestionnaireContactComponent extends ViewModifyComponent imp
     }
 
     /**
-     * Modify contact
+     * Modify
      */
-    modifyContact(form: NgForm) {
+    modifyLabResult(form: NgForm) {
         // validate form
         if (!this.formHelper.validateForm(form)) {
             return;
@@ -171,10 +170,10 @@ export class ModifyQuestionnaireContactComponent extends ViewModifyComponent imp
         this.showLoadingDialog();
 
         // modify
-        this.contactDataService
-            .modifyContact(
+        this.labResultDataService
+            .modifyLabResult(
                 this.selectedOutbreak.id,
-                this.contactId,
+                this.labResultId,
                 dirtyFields
             )
             .pipe(
@@ -189,15 +188,15 @@ export class ModifyQuestionnaireContactComponent extends ViewModifyComponent imp
             )
             .subscribe(() => {
                 // update data
-                this.retrieveContactData();
+                this.retrieveLabResultData();
 
                 // mark form as pristine
                 form.form.markAsPristine();
 
                 // display message
-                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE');
+                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_LAB_RESULT_ACTION_MODIFY_LAB_RESULT_SUCCESS_MESSAGE');
 
-                // loading will be closed by retrieveContactData() method
+                // loading will be closed by retrieveLabResultData() method
                 // NOTHING TO DO
             });
     }

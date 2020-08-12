@@ -268,17 +268,6 @@
 
             </mat-tab>
 
-            <mat-tab [label]="'LNG_PAGE_MODIFY_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE' | translate">
-                <app-form-fill-questionnaire
-                    *ngIf="!!labResultData?.id"
-                    name="questionnaireAnswers"
-                    [ngModel]="labResultData.questionnaireAnswers"
-                    [questions]="selectedOutbreak.labResultsTemplate"
-                    [disabled]="viewOnly"
-                    [componentTitle]="'LNG_PAGE_MODIFY_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE' | translate">
-                </app-form-fill-questionnaire>
-            </mat-tab>
-
         </mat-tab-group>
     </div>
 
@@ -306,6 +295,14 @@
                     {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
                 </button>
             </ng-container>
+            <div class="page-tabs-navbar-placeholder"></div>
         </ng-container>
+
+        <button
+            type="button"
+            mat-raised-button
+            [routerLink]="['/lab-results', labResultData?.id, viewOnly || selectedOutbreak?.id !== authUser?.activeOutbreakId ? 'view-questionnaire' : 'modify-questionnaire']">
+            {{'LNG_PAGE_MODIFY_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE' | translate}}
+        </button>
     </div>
 </form>
