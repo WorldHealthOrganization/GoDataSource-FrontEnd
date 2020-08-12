@@ -282,16 +282,6 @@
                 </app-form-address-list>
             </mat-tab>
 
-            <mat-tab [label]="'LNG_PAGE_MODIFY_CONTACT_TAB_QUESTIONNAIRE_TITLE' | translate">
-                <app-form-fill-questionnaire
-                    name="questionnaireAnswers"
-                    [ngModel]="contactData.questionnaireAnswers"
-                    [questions]="selectedOutbreak?.contactInvestigationTemplate"
-                    [disabled]="viewOnly"
-                    [componentTitle]="'LNG_PAGE_MODIFY_CONTACT_TAB_QUESTIONNAIRE_TITLE' | translate">
-                </app-form-fill-questionnaire>
-            </mat-tab>
-
         </mat-tab-group>
     </div>
 
@@ -336,6 +326,13 @@
                 <div class="page-tabs-navbar-placeholder"></div>
             </ng-container>
         </ng-container>
+
+        <button
+            type="button"
+            mat-raised-button
+            [routerLink]="['/contacts', contactId, viewOnly || selectedOutbreak?.id !== authUser?.activeOutbreakId ? 'view-questionnaire' : 'modify-questionnaire']">
+            {{'LNG_PAGE_MODIFY_CONTACT_TAB_QUESTIONNAIRE_TITLE' | translate}}
+        </button>
 
         <button
             [disabled]="

@@ -87,6 +87,22 @@ export class LabResultDataService {
     }
 
     /**
+     * Get outbreak lab result
+     * @param {string} outbreakId
+     * @param {string} labResultId
+     * @returns {Observable<LabResultModel>}
+     */
+    getOutbreakLabResult(
+        outbreakId: string,
+        labResultId: string
+    ): Observable<any> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`outbreaks/${outbreakId}/lab-results/${labResultId}`),
+            LabResultModel
+        );
+    }
+
+    /**
      * Create Lab Result
      * @param {string} outbreakId
      * @param {string} entityPath

@@ -27,6 +27,9 @@ export const EnglishUsLang = {
         /**
          * REMOVE the tokens from below
          */
-        // ...
+        // LNG_PAGE_CREATE_CASE_TAB_QUESTIONNAIRE_TITLE
+        // LNG_PAGE_CREATE_CONTACT_TAB_QUESTIONNAIRE_TITLE
+        // LNG_PAGE_CREATE_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE
+        // LNG_PAGE_CREATE_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE
     }
 };
