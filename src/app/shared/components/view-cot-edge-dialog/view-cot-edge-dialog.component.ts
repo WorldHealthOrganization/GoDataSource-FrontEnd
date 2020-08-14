@@ -5,11 +5,6 @@ import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { RelationshipDataService } from '../../../core/services/data/relationship.data.service';
 import { RelationshipModel } from '../../../core/models/entity-and-relationship.model';
 import * as _ from 'lodash';
-import { UserModel } from '../../../core/models/user.model';
-import { CaseModel } from '../../../core/models/case.model';
-import { EventModel } from '../../../core/models/event.model';
-import { ContactModel } from '../../../core/models/contact.model';
-import { ContactOfContactModel } from '../../../core/models/contact-of-contact.model';
 
 /**
  * Edge Data
