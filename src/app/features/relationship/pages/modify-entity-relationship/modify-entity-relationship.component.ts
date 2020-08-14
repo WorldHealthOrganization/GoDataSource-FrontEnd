@@ -128,7 +128,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
     // route params
     entityType: EntityType;
     entityId: string;
-    entity: CaseModel | ContactModel | EventModel;
+    entity: CaseModel | ContactModel | EventModel | ContactOfContactModel;
     relationshipId: string;
     relationship: RelationshipModel = new RelationshipModel();
     // route data
@@ -217,7 +217,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
                         return throwError(err);
                     })
                 )
-                .subscribe((entityData: CaseModel | ContactModel | EventModel) => {
+                .subscribe((entityData: CaseModel | ContactModel | EventModel | ContactOfContactModel) => {
                     this.entity = entityData;
 
                     this.initializeBreadcrumbs();
