@@ -67,7 +67,8 @@
                                     [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS' | translate"
                                     tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION"
                                     [options]="pregnancyStatusList$ | async"
-                                    [disabled]="viewOnly">
+                                    [disabled]="viewOnly"
+                                    [clearable]="false">
                                 </app-form-select>
 
                                 <app-form-select
