@@ -59,7 +59,8 @@
                                     [(ngModel)]="contactData.pregnancyStatus"
                                     [placeholder]="'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS' | translate"
                                     tooltip="LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION"
-                                    [options]="pregnancyStatusList$ | async">
+                                    [options]="pregnancyStatusList$ | async"
+                                    [clearable]="false">
                                 </app-form-select>
 
                                 <app-form-select
