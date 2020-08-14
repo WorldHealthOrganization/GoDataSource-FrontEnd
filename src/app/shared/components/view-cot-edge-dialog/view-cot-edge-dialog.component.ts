@@ -17,9 +17,7 @@ import { ContactOfContactModel } from '../../../core/models/contact-of-contact.m
 export class ViewCOTEdgeData {
     constructor(
         public relationship: RelationshipModel,
-        public authUser: UserModel,
-        public entity: EventModel | CaseModel | ContactModel | ContactOfContactModel,
-        public fromExposure: boolean
+        public showResourceViewPageLink?: boolean
     ) {}
 }
 
@@ -46,10 +44,7 @@ export class ViewCotEdgeDialogComponent implements OnDestroy {
     relationship: RelationshipModel;
     // relationship information as key-value pairs
     relationshipInfo: LabelValuePair[] = [];
-
-    entity: EventModel | CaseModel | ContactModel | ContactOfContactModel;
-    authUser: UserModel;
-    fromExposure: boolean;
+    showResourceViewPageLink: boolean = true;
 
     loading: boolean = true;
 
@@ -80,9 +75,7 @@ export class ViewCotEdgeDialogComponent implements OnDestroy {
             `/relationships/${sourcePerson.type}/${sourcePerson.id}/contacts/${this.relationship.id}/view` :
             null;
 
-        this.authUser = this.data.authUser;
-        this.entity = this.data.entity;
-        this.fromExposure = this.data.fromExposure;
+        this.showResourceViewPageLink = this.data.showResourceViewPageLink;
 
         // init timer handler
         this.initTimerHandler();

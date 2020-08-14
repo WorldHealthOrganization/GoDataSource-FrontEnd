@@ -231,9 +231,10 @@ export class EntityHelperService {
                                 ...{
                                     data: {
                                         relationship: item,
-                                        authUser: authUser,
-                                        entity: entity,
-                                        fromExposure: from === SentFromColumn.EXPOSURES
+                                        showResourceViewPageLink:
+                                            from === SentFromColumn.EXPOSURES ?
+                                                relationshipData.model.canViewRelationshipExposures(authUser) :
+                                                relationshipData.model.canViewRelationshipContacts(authUser)
                                     }
                                 }
                             }

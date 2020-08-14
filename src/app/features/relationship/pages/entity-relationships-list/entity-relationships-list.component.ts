@@ -160,7 +160,10 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
         this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((outbreak: OutbreakModel) => {
-                if (outbreak && ClusterModel.canList(this.authUser)) {
+                if (
+                    outbreak &&
+                    ClusterModel.canList(this.authUser)
+                ) {
                     // update the selected outbreak
                     this.clusterOptions$ = this.clusterDataService.getClusterListAsLabelValue(outbreak.id).pipe(share());
                 }
@@ -292,7 +295,20 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                 field: 'socialRelationshipDetail',
                 label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL',
                 visible: false
-            }),
+            })
+        ];
+
+        if (ClusterModel.canList(this.authUser)) {
+            this.tableColumns.push(
+                new VisibleColumnModel({
+                    field: 'clusterId',
+                    label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+                    visible: false
+                })
+            );
+        }
+
+        this.tableColumns.push(
             new VisibleColumnModel({
                 field: 'createdBy',
                 label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_BY',
@@ -313,19 +329,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                 label: 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_AT',
                 visible: false
             })
-        ];
-
-        if (ClusterModel.canView(this.authUser)) {
-            this.tableColumns =
-                [
-                    ...this.tableColumns,
-                    new VisibleColumnModel({
-                        field: 'clusterId',
-                        label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
-                        visible: false
-                    }),
-                ];
-        }
+        );
     }
 
     /**
