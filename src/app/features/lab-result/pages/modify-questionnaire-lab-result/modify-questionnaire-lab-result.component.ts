@@ -15,6 +15,8 @@ import { catchError } from 'rxjs/operators';
 import { LabResultModel } from 'app/core/models/lab-result.model';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
+import { moment } from '../../../../core/helperClasses/x-moment';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-modify-questionnaire-lab-result',
@@ -33,6 +35,7 @@ export class ModifyQuestionnaireLabResultComponent extends ViewModifyComponent i
 
     labResultId: string;
     labResultData: LabResultModel = new LabResultModel();
+    personName: string;
 
     // constants
     LabResultModel = LabResultModel;
@@ -73,6 +76,11 @@ export class ModifyQuestionnaireLabResultComponent extends ViewModifyComponent i
                 this.retrieveLabResultData();
             });
 
+        this.route.queryParams
+            .subscribe((params: {name}) => {
+                this.personName = params.name;
+            });
+
         // retrieve outbreak
         this.outbreakDataService
             .getSelectedOutbreak()
@@ -104,10 +112,17 @@ export class ModifyQuestionnaireLabResultComponent extends ViewModifyComponent i
             this.labResultData &&
             this.labResultData.id
         ) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(
+                    this.personName,
+                    `${EntityModel.getLinkForEntityType(this.labResultData.personType)}/${this.labResultData.personId}/${this.labResultData.id}/${this.viewOnly ? 'view' : 'modify'}`
+                )
+            );
+
             // model bread
             this.breadcrumbs.push(
                 new BreadcrumbItemModel(
-                    this.labResultData.dateSampleTaken,
+                    moment(this.labResultData.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
                     `/lab-results/${EntityModel.getLinkForEntityType(this.labResultData.personType)}/${this.labResultData.personId}/${this.labResultData.id}/${this.viewOnly ? 'view' : 'modify'}`
                 )
             );

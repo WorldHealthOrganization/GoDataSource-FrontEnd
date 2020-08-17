@@ -36,6 +36,8 @@ export class ModifyQuestionnaireContactFollowUpComponent extends ViewModifyCompo
     followUpId: string;
     followUpData: FollowUpModel = new FollowUpModel();
 
+    rootPage: string;
+
     // constants
     FollowUpModel = FollowUpModel;
 
@@ -75,6 +77,10 @@ export class ModifyQuestionnaireContactFollowUpComponent extends ViewModifyCompo
                 this.retrieveFollowUpData();
             });
 
+        this.route.queryParams.subscribe((params: {rootPage}) => {
+            this.rootPage = params.rootPage;
+        });
+
         // retrieve outbreak
         this.outbreakDataService
             .getSelectedOutbreak()
@@ -107,6 +113,17 @@ export class ModifyQuestionnaireContactFollowUpComponent extends ViewModifyCompo
             if (ContactModel.canView(this.authUser)) {
                 this.breadcrumbs.push(
                     new BreadcrumbItemModel(this.followUpData.contact.name, `/contacts/${this.followUpData.contact.id}/view`)
+                );
+            }
+
+            if (FollowUpModel.canModify(this.authUser)) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(
+                        'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
+                        `/contacts/${this.followUpData.contact.id}/follow-ups/${this.followUpData.id}/modify`,
+                        false,
+                        {rootPage: this.rootPage}
+                    )
                 );
             }
         }

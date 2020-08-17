@@ -378,6 +378,18 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     }
                 }),
 
+                // See questionnaire
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE',
+                    click: (item: CaseModel) => {
+                        this.router.navigate(['/cases', item.id , 'view-questionnaire']);
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted &&
+                            CaseModel.canView(this.authUser);
+                    }
+                }),
+
                 // Divider
                 new HoverRowAction({
                     type: HoverRowActionType.DIVIDER,
