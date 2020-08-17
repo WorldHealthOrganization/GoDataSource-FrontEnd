@@ -924,6 +924,14 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 );
             }
 
+            // retrieve cases who were contacts
+            if (this.appliedListFilter === Constants.APPLY_LIST_FILTER.CONTACTS_BECOME_CASES) {
+                clonedQB.filter.byBoolean(
+                    'wasContact',
+                    true
+                );
+            }
+
             // refresh badges list with applied filter
             this.getCasesGroupedByClassification();
 
@@ -962,6 +970,15 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+
+            // retrieve cases who were contacts
+            if (this.appliedListFilter === Constants.APPLY_LIST_FILTER.CONTACTS_BECOME_CASES) {
+                countQueryBuilder.filter.byBoolean(
+                    'wasContact',
+                    true
+                );
+            }
+
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
             this.casesListCount$ = this.caseDataService
