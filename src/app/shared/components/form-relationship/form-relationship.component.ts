@@ -107,7 +107,7 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
                     // get clusters
                     if (
                         !this.clusterOptions$ &&
-                        ClusterModel.canView(authUser)
+                        ClusterModel.canList(authUser)
                     ) {
                         this.clusterOptions$ = this.clusterDataService.getClusterList(this.selectedOutbreak.id);
                     }
