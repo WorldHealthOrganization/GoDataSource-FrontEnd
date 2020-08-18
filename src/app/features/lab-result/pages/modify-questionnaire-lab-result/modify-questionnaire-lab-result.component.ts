@@ -15,6 +15,8 @@ import { catchError } from 'rxjs/operators';
 import { LabResultModel } from 'app/core/models/lab-result.model';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
+import { moment } from '../../../../core/helperClasses/x-moment';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-modify-questionnaire-lab-result',
@@ -107,7 +109,7 @@ export class ModifyQuestionnaireLabResultComponent extends ViewModifyComponent i
             // model bread
             this.breadcrumbs.push(
                 new BreadcrumbItemModel(
-                    this.labResultData.dateSampleTaken,
+                    moment(this.labResultData.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
                     `/lab-results/${EntityModel.getLinkForEntityType(this.labResultData.personType)}/${this.labResultData.personId}/${this.labResultData.id}/${this.viewOnly ? 'view' : 'modify'}`
                 )
             );

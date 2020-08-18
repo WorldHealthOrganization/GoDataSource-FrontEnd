@@ -195,7 +195,8 @@
         <button
             type="button"
             mat-raised-button
-            [routerLink]="['/contacts', contactId, 'follow-ups', followUpId, viewOnly || selectedOutbreak?.id !== authUser?.activeOutbreakId ? 'view-questionnaire' : 'modify-questionnaire']">
+            [routerLink]="['/contacts', contactId, 'follow-ups', followUpId, viewOnly || selectedOutbreak?.id !== authUser?.activeOutbreakId ? 'view-questionnaire' : 'modify-questionnaire']"
+            [queryParams]="{rootPage: rootPage}">
             {{'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE' | translate}}
         </button>
 
