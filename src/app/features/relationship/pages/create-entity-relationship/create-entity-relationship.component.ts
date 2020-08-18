@@ -52,6 +52,10 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
         [EntityType.EVENT]: {
             'label': 'LNG_PAGE_LIST_EVENTS_TITLE',
             'link': '/events'
+        },
+        [EntityType.CONTACT_OF_CONTACT]: {
+            'label': 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
+            'link': '/contacts-of-contacts'
         }
     };
 
@@ -60,7 +64,7 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
     // route params
     entityType: EntityType;
     entityId: string;
-    entity: CaseModel | ContactModel | EventModel;
+    entity: CaseModel | ContactModel | EventModel | ContactOfContactModel;
     // route data
     relationshipType: RelationshipType;
 
@@ -168,7 +172,7 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
                         return throwError(err);
                     })
                 )
-                .subscribe((entityData: CaseModel | ContactModel | EventModel) => {
+                .subscribe((entityData: CaseModel | ContactModel | EventModel | ContactOfContactModel) => {
                     this.entity = entityData;
 
                     this.initializeBreadcrumbs();

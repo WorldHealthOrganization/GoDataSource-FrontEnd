@@ -31,7 +31,7 @@ import { throwError } from 'rxjs';
 export class ContactOfContactMergeDuplicateComponent extends ConfirmOnFormChanges implements OnInit {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE', '/duplicate-records'),
+        new BreadcrumbItemModel('LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE', '/duplicated-records'),
         new BreadcrumbItemModel('LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_TITLE', '.', true)
     ];
 

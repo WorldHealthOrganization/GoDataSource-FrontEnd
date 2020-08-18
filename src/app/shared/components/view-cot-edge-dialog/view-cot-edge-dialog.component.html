@@ -27,7 +27,7 @@
             fxLayout="row" fxGrow="0">
             <!-- Link to resource -->
             <a
-                *ngIf="resourceViewPageLink"
+                *ngIf="resourceViewPageLink && showResourceViewPageLink"
                 [href]="resourceViewPageLink"
                 target="_blank">
                 {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_FULL_RESOURCE' | translate}}

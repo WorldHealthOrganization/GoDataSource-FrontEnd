@@ -11,7 +11,8 @@ import * as _ from 'lodash';
  */
 export class ViewCOTEdgeData {
     constructor(
-        public relationship: RelationshipModel
+        public relationship: RelationshipModel,
+        public showResourceViewPageLink?: boolean
     ) {}
 }
 
@@ -38,6 +39,7 @@ export class ViewCotEdgeDialogComponent implements OnDestroy {
     relationship: RelationshipModel;
     // relationship information as key-value pairs
     relationshipInfo: LabelValuePair[] = [];
+    showResourceViewPageLink: boolean = true;
 
     loading: boolean = true;
 
@@ -67,6 +69,8 @@ export class ViewCotEdgeDialogComponent implements OnDestroy {
         this.resourceViewPageLink = sourcePerson ?
             `/relationships/${sourcePerson.type}/${sourcePerson.id}/contacts/${this.relationship.id}/view` :
             null;
+
+        this.showResourceViewPageLink = this.data.showResourceViewPageLink;
 
         // init timer handler
         this.initTimerHandler();
