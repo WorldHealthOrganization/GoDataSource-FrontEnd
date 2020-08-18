@@ -12,24 +12,11 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
-        /**
-         * uiDashboardPage
-         */
-        'LNG_PAGE_DASHBOARD_EPI_CURVE_WEEK_TYPE_ISO': 'Global Week',
-        'LNG_PAGE_DASHBOARD_EPI_CURVE_WEEK_TYPE_EPI': 'Epi Week',
-        'LNG_PAGE_DASHBOARD_EPI_CURVE_WEEK_TYPE_SUNDAY': 'Week starting on Sunday'
-
-
-
-
 
 
         /**
          * REMOVE the tokens from below
          */
-        // LNG_PAGE_CREATE_CASE_TAB_QUESTIONNAIRE_TITLE
-        // LNG_PAGE_CREATE_CONTACT_TAB_QUESTIONNAIRE_TITLE
-        // LNG_PAGE_CREATE_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE
-        // LNG_PAGE_CREATE_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE
+        // ...
     }
 };
