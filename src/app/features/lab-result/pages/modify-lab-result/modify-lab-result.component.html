@@ -301,10 +301,7 @@
         <button
             type="button"
             mat-raised-button
-            [routerLink]="['/lab-results', labResultData?.id, viewOnly || selectedOutbreak?.id !== authUser?.activeOutbreakId ? 'view-questionnaire' : 'modify-questionnaire']"
-            [queryParams]="{
-                name: labResultData.person?.name
-            }">
+            [routerLink]="['/lab-results', labResultData?.id, viewOnly || selectedOutbreak?.id !== authUser?.activeOutbreakId ? 'view-questionnaire' : 'modify-questionnaire']">
             {{'LNG_PAGE_MODIFY_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE' | translate}}
         </button>
     </div>

@@ -35,7 +35,6 @@ export class ModifyQuestionnaireLabResultComponent extends ViewModifyComponent i
 
     labResultId: string;
     labResultData: LabResultModel = new LabResultModel();
-    personName: string;
 
     // constants
     LabResultModel = LabResultModel;
@@ -76,11 +75,6 @@ export class ModifyQuestionnaireLabResultComponent extends ViewModifyComponent i
                 this.retrieveLabResultData();
             });
 
-        this.route.queryParams
-            .subscribe((params: {name}) => {
-                this.personName = params.name;
-            });
-
         // retrieve outbreak
         this.outbreakDataService
             .getSelectedOutbreak()
@@ -112,13 +106,6 @@ export class ModifyQuestionnaireLabResultComponent extends ViewModifyComponent i
             this.labResultData &&
             this.labResultData.id
         ) {
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel(
-                    this.personName,
-                    `${EntityModel.getLinkForEntityType(this.labResultData.personType)}/${this.labResultData.personId}/${this.labResultData.id}/${this.viewOnly ? 'view' : 'modify'}`
-                )
-            );
-
             // model bread
             this.breadcrumbs.push(
                 new BreadcrumbItemModel(
