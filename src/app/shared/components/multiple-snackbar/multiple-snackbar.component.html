@@ -1,13 +1,10 @@
 <div fxLayout="column">
     <div
-        fxLayout="column"
         class="messages-container">
         <div
             *ngFor="let msg of messages; let i = index"
             [ngClass]="msg.messageClass"
-            fxFlex fxLayoutAlign="space-between"
-            class="message"
-        >
+            class="message">
             <div
                 *ngIf="!msg.html"
                 fxFlex fxFlexAlign="center"
