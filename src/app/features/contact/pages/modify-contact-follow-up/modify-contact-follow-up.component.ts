@@ -23,7 +23,7 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { CaseModel } from '../../../../core/models/case.model';
 import { catchError } from 'rxjs/operators';
 import { ContactModel } from '../../../../core/models/contact.model';
-import * as moment from 'moment';
+import { moment } from 'app/core/helperClasses/x-moment';
 import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
@@ -60,6 +60,7 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
     FollowUpModel = FollowUpModel;
     ContactModel = ContactModel;
     EntityType = EntityType;
+
     /**
      * Constructor
      */
@@ -162,7 +163,8 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
         if (
             this.contactId &&
             this.followUpId &&
-            this.selectedOutbreak
+            this.selectedOutbreak &&
+            this.selectedOutbreak.id
         ) {
             // show loading
             this.showLoadingDialog(false);

@@ -66,7 +66,8 @@
                                     [placeholder]="'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS' | translate"
                                     tooltip="LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION"
                                     [options]="pregnancyStatusList$ | async"
-                                    [disabled]="viewOnly">
+                                    [disabled]="viewOnly"
+                                    [clearable]="false">
                                 </app-form-select>
 
                                 <app-form-select
@@ -108,7 +109,8 @@
                                 [maxlength]="255"
                                 [disabled]="viewOnly"
                                 app-general-async-validator
-                                [asyncValidatorObservable]="viewOnly ? null : contactIdMaskValidator">
+                                [asyncValidatorObservable]="viewOnly ? null : contactIdMaskValidator"
+                                [validateOnlyWhenDirty]="true">
                             </app-form-input>
 
                             <app-form-datepicker
@@ -281,16 +283,6 @@
                 </app-form-address-list>
             </mat-tab>
 
-            <mat-tab [label]="'LNG_PAGE_MODIFY_CONTACT_TAB_QUESTIONNAIRE_TITLE' | translate">
-                <app-form-fill-questionnaire
-                    name="questionnaireAnswers"
-                    [ngModel]="contactData.questionnaireAnswers"
-                    [questions]="selectedOutbreak?.contactInvestigationTemplate"
-                    [disabled]="viewOnly"
-                    [componentTitle]="'LNG_PAGE_MODIFY_CONTACT_TAB_QUESTIONNAIRE_TITLE' | translate">
-                </app-form-fill-questionnaire>
-            </mat-tab>
-
         </mat-tab-group>
     </div>
 
@@ -337,7 +329,17 @@
         </ng-container>
 
         <button
-            [disabled]="!canViewExposure()"
+            type="button"
+            mat-raised-button
+            [routerLink]="['/contacts', contactId, viewOnly || selectedOutbreak?.id !== authUser?.activeOutbreakId ? 'view-questionnaire' : 'modify-questionnaire']">
+            {{'LNG_PAGE_MODIFY_CONTACT_TAB_QUESTIONNAIRE_TITLE' | translate}}
+        </button>
+
+        <button
+            [disabled]="
+                !canViewExposure() ||
+                !ContactModel.canListRelationshipExposures(authUser) ||
+                !RelationshipModel.canList(authUser)"
             type="button"
             mat-raised-button
             color="primary"
@@ -363,6 +365,16 @@
             type="button"
             [routerLink]="['/relationships', EntityType.CONTACT, contactId, 'exposures']">
             {{ 'LNG_COMMON_BUTTON_EXPOSURES_TO' | translate }}
+        </button>
+
+        <button *ngIf="
+                ContactModel.canListRelationshipContacts(authUser) &&
+                RelationshipModel.canList(authUser) &&
+                selectedOutbreak?.isContactsOfContactsActive"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/relationships', EntityType.CONTACT, contactId, 'contacts']">
+            {{ 'LNG_COMMON_BUTTON_EXPOSURES_FROM' | translate }}
         </button>
 
         <div class="page-tabs-navbar-placeholder"></div>

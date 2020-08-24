@@ -3,16 +3,26 @@
 .dialog-view-cot-node {
     .small-dialog;
 
+    .mat-dialog-container {
+        padding: 24px 24px 9px 24px;
+        // handle scroll on children
+        overflow: hidden;
+    }
+
     .dialog-title {
         font-size: 20px;
         font-weight: 700;
-        margin-bottom: 25px;
+        margin-bottom: 15px;
         font-family: @font-roboto;
         text-align: center;
     }
 
-    .label-value {
-        .dialog-label-value;
+    .dialog-data-content {
+        overflow: auto;
+
+        .label-value {
+            .dialog-label-value;
+        }
     }
 
     a {

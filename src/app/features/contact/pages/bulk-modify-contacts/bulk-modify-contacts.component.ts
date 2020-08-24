@@ -86,7 +86,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
     authUser: UserModel;
 
     // contacts
-    contactIds: number[];
+    contactIds: string[];
 
     /**
      * Constructor

@@ -59,7 +59,8 @@
                                     [(ngModel)]="contactData.pregnancyStatus"
                                     [placeholder]="'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS' | translate"
                                     tooltip="LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION"
-                                    [options]="pregnancyStatusList$ | async">
+                                    [options]="pregnancyStatusList$ | async"
+                                    [clearable]="false">
                                 </app-form-select>
 
                                 <app-form-select
@@ -95,7 +96,8 @@
                                 [tooltipTranslateData]="visualIDTranslateData"
                                 [maxlength]="255"
                                 app-general-async-validator
-                                [asyncValidatorObservable]="contactIdMaskValidator">
+                                [asyncValidatorObservable]="contactIdMaskValidator"
+                                [validateOnlyWhenDirty]="true">
                             </app-form-input>
 
                             <app-form-datepicker
@@ -243,37 +245,6 @@
             </form>
         </mat-step>
 
-        <!-- Questionnaire step -->
-        <mat-step [stepControl]="questionnaireForm">
-            <form #questionnaireForm="ngForm">
-                <ng-template matStepLabel>{{ 'LNG_PAGE_CREATE_CONTACT_TAB_QUESTIONNAIRE_TITLE' | translate }}</ng-template>
-
-                <!-- Questionnaire section -->
-                <app-form-fill-questionnaire
-                    name="questionnaireAnswers"
-                    [ngModel]="contactData.questionnaireAnswers"
-                    [questions]="selectedOutbreak.contactInvestigationTemplate">
-                </app-form-fill-questionnaire>
-
-                <div class="stepper-navigation-buttons">
-                    <button matStepperPrevious mat-raised-button type="button">{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                    <button
-                        [disabled]="questionnaireForm.pending"
-                        class="button-with-spinner"
-                        mat-raised-button color="accent" matStepperNext
-                    >
-                        <div
-                            *ngIf="questionnaireForm.pending"
-                            class="loading-chips">
-                            <mat-spinner></mat-spinner>
-                        </div>
-                        {{'LNG_STEPPER_BUTTON_NEXT'| translate}}
-                    </button>
-                </div>
-            </form>
-        </mat-step>
-
-
         <!-- Relationship step -->
         <mat-step [stepControl]="relationshipForm">
             <form #relationshipForm="ngForm">
@@ -319,11 +290,11 @@
             <div class="stepper-navigation-buttons">
                 <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
                 <button *app-selected-outbreak-is-active type="button" mat-raised-button color="accent"
-                        (click)="createNewContact([personalForm, addressForm, relationshipForm, questionnaireForm])">
+                        (click)="createNewContact([personalForm, addressForm, relationshipForm])">
                     {{'LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_BUTTON' | translate}}
                 </button>
                 <button *app-selected-outbreak-is-active type="button" mat-raised-button color="accent"
-                        (click)="createNewContact([personalForm, addressForm, relationshipForm, questionnaireForm], true)">
+                        (click)="createNewContact([personalForm, addressForm, relationshipForm], true)">
                     {{'LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_ANOTHER_CONTACT_BUTTON' | translate}}
                 </button>
             </div>

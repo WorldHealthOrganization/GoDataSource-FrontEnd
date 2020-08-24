@@ -21,6 +21,7 @@
     display: flex;
     font-family: @font-roboto;
     font-size: 16px;
+    padding: 3px 0px;
 
     >*:first-child {
         font-weight: 400;
@@ -36,9 +37,10 @@
 .dialog-simple-link() {
     font-family: @font-roboto;
     color: #0071e1;
-    margin: 3px;
     font-weight: bold;
     text-decoration: none;
+    white-space: nowrap;
+    padding-top: 10px;
 
     &:active {
         color: #0071e1;
@@ -53,6 +55,6 @@
 .small-dialog() {
     // add max-height in vh so the modal will not exceed the viewport making impossible to click on the buttons or see all content
     max-height: 95vh !important;
-    width: 500px !important;
+    width: 600px !important;
     max-width: 95vw !important;
 }

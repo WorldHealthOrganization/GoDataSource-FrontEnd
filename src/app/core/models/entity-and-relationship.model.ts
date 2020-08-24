@@ -15,6 +15,7 @@ import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
 import { IPermissionBasic, IPermissionBasicBulk, IPermissionExportable, IPermissionRelationship } from './permission.interface';
+import { ContactOfContactModel } from './contact-of-contact.model';
 
 export class RelationshipModel
     extends BaseModel
@@ -136,7 +137,21 @@ export class RelationshipModel
      * Source Person
      */
     get sourcePerson(): RelationshipPersonModel {
-        const data = _.find(this.persons, { source: true });
+        // determine source
+        let data;
+        if (
+            this.persons.length > 0 &&
+            this.persons[0].source
+        ) {
+            data = this.persons[0];
+        } else if (
+            this.persons.length > 1 &&
+            this.persons[1].source
+        ) {
+            data = this.persons[1];
+        }
+
+        // finished
         return data ? new RelationshipPersonModel(data) : data;
     }
 }
@@ -156,7 +171,7 @@ export class ReportDifferenceOnsetRelationshipModel extends RelationshipModel {
  */
 export class EntityModel {
     type: EntityType;
-    model: CaseModel | ContactModel | EventModel;
+    model: CaseModel | ContactModel | EventModel | ContactOfContactModel;
     relationship: RelationshipModel;
 
     /**
@@ -170,6 +185,8 @@ export class EntityModel {
                 return 'contacts';
             case EntityType.EVENT:
                 return 'events';
+            case EntityType.CONTACT_OF_CONTACT:
+                return 'contacts-of-contacts';
         }
 
         // finished
@@ -305,7 +322,7 @@ export class EntityModel {
      * @param model
      */
     static getNameWithDOBAge(
-        model: CaseModel | ContactModel,
+        model: CaseModel | ContactModel | ContactOfContactModel,
         yearsLabel: string,
         monthsLabel: string
     ) {
@@ -463,6 +480,10 @@ export class EntityModel {
 
             case EntityType.EVENT:
                 this.model = new EventModel(data);
+                break;
+
+            case EntityType.CONTACT_OF_CONTACT:
+                this.model = new ContactOfContactModel(data);
                 break;
         }
     }

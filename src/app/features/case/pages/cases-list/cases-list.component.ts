@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { Observable ,  Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -378,6 +378,18 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     }
                 }),
 
+                // See questionnaire
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE',
+                    click: (item: CaseModel) => {
+                        this.router.navigate(['/cases', item.id , 'view-questionnaire']);
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted &&
+                            CaseModel.canView(this.authUser);
+                    }
+                }),
+
                 // Divider
                 new HoverRowAction({
                     type: HoverRowActionType.DIVIDER,
@@ -631,15 +643,26 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 field: 'wasContact',
                 label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
                 visible: false
-            }),
-            new VisibleColumnModel({
-                field: 'numberOfContacts',
-                label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS'
-            }),
-            new VisibleColumnModel({
-                field: 'numberOfExposures',
-                label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES'
-            }),
+            })
+        ];
+
+        // number of contacts & exposures columns should be visible only on pages where we have relationships
+        // for cases without relationships we don't need these columns
+        if (this.appliedListFilter !== Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS) {
+            this.tableColumns.push(
+                new VisibleColumnModel({
+                    field: 'numberOfContacts',
+                    label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS'
+                }),
+                new VisibleColumnModel({
+                    field: 'numberOfExposures',
+                    label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES'
+                })
+            );
+        }
+
+        // rest of columns :)
+        this.tableColumns.push(
             new VisibleColumnModel({
                 field: 'deleted',
                 label: 'LNG_CASE_FIELD_LABEL_DELETED',
@@ -665,7 +688,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 label: 'LNG_CASE_FIELD_LABEL_UPDATED_AT',
                 visible: false
             })
-        ];
+        );
     }
 
     /**
@@ -906,10 +929,12 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             const clonedQB = _.cloneDeep(this.queryBuilder);
 
             // retrieve number of contacts & exposures for each record
-            clonedQB.filter.flag(
-                'countRelations',
-                true
-            );
+            if (this.appliedListFilter !== Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS) {
+                clonedQB.filter.flag(
+                    'countRelations',
+                    true
+                );
+            }
 
             // refresh badges list with applied filter
             this.getCasesGroupedByClassification();

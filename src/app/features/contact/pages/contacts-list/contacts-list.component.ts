@@ -38,6 +38,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
@@ -254,6 +255,61 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                     }
                 }),
 
+                // Add contact of contact
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_CONTACT_OF_CONTACT',
+                    click: (item: ContactModel) => {
+                        this.router.navigate(['/contacts-of-contacts', 'create'], {
+                            queryParams: {
+                                entityId: item.id
+                            }
+                        });
+                    },
+                    visible: (item: ContactModel): boolean => {
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.selectedOutbreak.isContactsOfContactsActive &&
+                            ContactModel.canCreateContactOfContact(this.authUser) &&
+                            ContactOfContactModel.canCreate(this.authUser);
+                    }
+                }),
+
+                // Bulk add contacts of contacts
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_BULK_ADD_CONTACTS',
+                    click: (item: ContactModel) => {
+                        this.router.navigate(['/contacts-of-contacts', 'create-bulk'], {
+                           queryParams: {
+                               entityId: item.id
+                           }
+                        });
+                    },
+                    visible: (item: ContactModel): boolean => {
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.selectedOutbreak.isContactsOfContactsActive &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            ContactOfContactModel.canBulkCreate(this.authUser) &&
+                            ContactModel.canBulkCreateContactOfContact(this.authUser);
+                    }
+                }),
+
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
+                    visible: (item: ContactModel): boolean => {
+                        // visible only if at least one of the first two items is visible
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.selectedOutbreak.isContactsOfContactsActive;
+                    }
+                }),
+
                 // Add Follow-up to Contact
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_FOLLOW_UP',
@@ -291,6 +347,19 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                     visible: (item: ContactModel): boolean => {
                         return !item.deleted &&
                             ContactModel.canListRelationshipExposures(this.authUser);
+                    }
+                }),
+
+                // See contact contacts of contacts
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM',
+                    click: (item: ContactModel) => {
+                        this.router.navigate([`/relationships`, EntityType.CONTACT, item.id, 'contacts']);
+                    },
+                    visible: (item: ContactModel): boolean => {
+                        return !item.deleted &&
+                            this.selectedOutbreak.isContactsOfContactsActive &&
+                            ContactModel.canListRelationshipContacts(this.authUser);
                     }
                 }),
 
@@ -339,6 +408,18 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                     visible: (item: ContactModel): boolean => {
                         return !item.deleted &&
                             FollowUpModel.canList(this.authUser);
+                    }
+                }),
+
+                // See questionnaire
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_MODIFY_CONTACT_TAB_QUESTIONNAIRE_TITLE',
+                    click: (item: ContactModel) => {
+                        this.router.navigate(['/contacts', item.id , 'view-questionnaire']);
+                    },
+                    visible: (item: ContactModel): boolean => {
+                        return !item.deleted &&
+                            ContactModel.canView(this.authUser);
                     }
                 }),
 

@@ -23,6 +23,7 @@ import { EventModel } from '../../../../core/models/event.model';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
     selector: 'app-clusters-people-list',
@@ -69,10 +70,10 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_ACTION_VIEW',
-            click: (item: CaseModel | ContactModel | EventModel) => {
+            click: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel) => {
                 this.router.navigateByUrl(this.getItemRouterLink(item, 'view'));
             },
-            visible: (item: CaseModel | ContactModel | EventModel): boolean => {
+            visible: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): boolean => {
                 return !item.deleted &&
                     item.canView(this.authUser);
             }
@@ -82,10 +83,10 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_ACTION_MODIFY',
-            click: (item: CaseModel | ContactModel | EventModel) => {
+            click: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel) => {
                 this.router.navigateByUrl(this.getItemRouterLink(item, 'modify'));
             },
-            visible: (item: CaseModel | ContactModel | EventModel): boolean => {
+            visible: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): boolean => {
                 return !item.deleted &&
                     this.authUser &&
                     this.selectedOutbreak &&
@@ -248,6 +249,8 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
                 return `/cases/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
             case EntityType.CONTACT:
                 return `/contacts/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
+            case EntityType.CONTACT_OF_CONTACT:
+                return `/contacts-of-contacts/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
             case EntityType.EVENT:
                 return `/events/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
         }

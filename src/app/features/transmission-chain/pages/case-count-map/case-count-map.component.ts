@@ -3,20 +3,19 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { CaseModel } from '../../../../core/models/case.model';
-import { AddressType } from '../../../../core/models/address.model';
 import { WorldMapComponent, WorldMapMarker, WorldMapMarkerLayer, WorldMapPoint } from '../../../../common-modules/world-map/components/world-map/world-map.component';
 import * as _ from 'lodash';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { Subscription } from 'rxjs';
+import { Subscription, throwError } from 'rxjs';
 import { TransmissionChainFilters } from '../../components/transmission-chains-filters/transmission-chains-filters.component';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as FileSaver from 'file-saver';
-import { Constants } from '../../../../core/models/constants';
 import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { catchError } from 'rxjs/operators';
+import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 
 @Component({
     selector: 'app-case-count-map',
@@ -43,7 +42,8 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
     // authenticated user
     authUser: UserModel;
 
-    showSettings: boolean = false;
+    showSettings: boolean = true;
+    firstLoaded: boolean = false;
     filters: TransmissionChainFilters = new TransmissionChainFilters();
 
     clusterDistance: number = 10;
@@ -61,7 +61,8 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
         private outbreakDataService: OutbreakDataService,
         private dialogService: DialogService,
         private i18nService: I18nService,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private snackbarService: SnackbarService
     ) {}
 
     /**
@@ -79,7 +80,9 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
                     this.outbreakId = selectedOutbreak.id;
 
                     // re-load the list when the Selected Outbreak is changed
-                    this.reloadCases();
+                    if (this.firstLoaded) {
+                        this.reloadCases();
+                    }
                 }
             });
     }
@@ -121,6 +124,7 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
         if (this.outbreakId) {
             // hide filters
             this.showSettings = false;
+            this.firstLoaded = true;
 
             // display loading
             this.displayLoading = true;
@@ -128,50 +132,35 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
             // configure case search criteria
             const qb = new RequestQueryBuilder();
 
-            // only address information is needed
-            qb.fields('addresses');
-
-            // only current addresses with geo location are relevant
-            qb.filter.where({
-                addresses: {
-                    elemMatch: {
-                        typeId: AddressType.CURRENT_ADDRESS,
-                        'geoLocation.coordinates': {
-                            $exists: true
-                        }
-                    }
-                }
-            });
-
-            // exclude discarded cases
-            qb.filter.where({
-                classification: {
-                    neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
-                }
-            });
-
             // add custom filters
             if (!_.isEmpty(this.filters)) {
                 this.filters.attachConditionsToRequestQueryBuilder(qb);
             }
 
-            // retrieve cases
+            // retrieve addresses
             this.caseDataService
-                .getCasesList(this.outbreakId, qb)
-                .subscribe((cases: CaseModel[]) => {
+                .getCaseCountMapAddresses(this.outbreakId, qb)
+                .pipe(
+                    catchError((err) => {
+                        // show error
+                        this.snackbarService.showApiError(err);
+
+                        // hide loading
+                        this.displayLoading = false;
+                        return throwError(err);
+                    })
+                )
+                .subscribe((geoPoints) => {
                     // reset data
                     this.markers = [];
 
                     // add markers
-                    _.each(cases, (caseData: CaseModel) => {
-                        // find current address
-                        const address = _.find(caseData.addresses, { typeId: AddressType.CURRENT_ADDRESS });
-
+                    (geoPoints || []).forEach((geoPoint) => {
                         // add marker
                         this.markers.push(new WorldMapMarker({
                             point: new WorldMapPoint(
-                                address.geoLocation.lat,
-                                address.geoLocation.lng
+                                geoPoint.lat,
+                                geoPoint.lng
                             ),
                             layer: WorldMapMarkerLayer.CLUSTER
                         }));

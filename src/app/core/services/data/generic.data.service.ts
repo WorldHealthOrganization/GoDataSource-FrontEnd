@@ -43,29 +43,106 @@ export class GenericDataService {
      * Retrieve the list of available Entity Types that, optionally, can be related to a given type (Case, Contact or Event)
      * @param {EntityType} forType
      * @param {RelationshipType} relationshipType
+     * @param {string} fromPage
      * @returns {EntityType[]}
      */
     getAvailableRelatedEntityTypes(
         forType: EntityType = null,
+        relationshipType: RelationshipType,
+        fromPage: string
+    ): EntityType[] {
+        switch (fromPage) {
+            case Constants.APP_PAGE.PEOPLE_TO_SHARE_RELATIONSHIPS_WITH.value:
+                return this.getAvailableTypesForShare(forType, relationshipType);
+            case Constants.APP_PAGE.AVAILABLE_ENTITIES_FOR_SWITCH.value:
+                return this.getAvailableTypesForSwitch(forType, relationshipType);
+            case Constants.APP_PAGE.AVAILABLE_ENTITIES_FOR_RELATIONSHIPS.value:
+                return this.getAvailableTypesForAssign(forType, relationshipType);
+        }
+    }
+
+    /**
+     * Get available entity types for share
+     * @param forType
+     * @param relationshipType
+     */
+    private getAvailableTypesForShare(
+        forType: EntityType = null,
         relationshipType: RelationshipType
     ): EntityType[] {
         let availableTypes = [];
+        // share for Event/Case
+        if (forType === EntityType.EVENT || forType === EntityType.CASE ) {
+            availableTypes = [EntityType.EVENT, EntityType.CASE, EntityType.CONTACT];
+            if (relationshipType === RelationshipType.CONTACT) {
+                availableTypes = [EntityType.EVENT, EntityType.CASE ];
+            }
+        }
+        // share for Contact
+        if (forType === EntityType.CONTACT) {
+            availableTypes = [EntityType.CONTACT];
+        }
+        // share for Contact of Contact
+        if (forType === EntityType.CONTACT_OF_CONTACT) {
+            availableTypes = [EntityType.CONTACT_OF_CONTACT];
+        }
 
-        switch (forType) {
-            case EntityType.CASE:
-            case EntityType.EVENT:
-                // all types can be related with a Case or an Event
-                availableTypes = [EntityType.CASE, EntityType.EVENT];
-                // a contact cannot be an exposure
-                if (relationshipType === RelationshipType.CONTACT) {
-                    availableTypes.push(EntityType.CONTACT);
-                }
-                break;
+        return availableTypes;
+    }
 
-            case EntityType.CONTACT:
-                // all types, except Contact, can be related with a Contact
-                availableTypes = [EntityType.CASE, EntityType.EVENT];
-                break;
+    /**
+     * Get available entity type for switch
+     * @param forType
+     * @param relationshipType
+     */
+    private getAvailableTypesForSwitch(
+        forType: EntityType = null,
+        relationshipType: RelationshipType
+    ): EntityType[] {
+        let availableTypes = [];
+        // switch for Event/Case
+        if (forType === EntityType.EVENT || forType === EntityType.CASE ) {
+            availableTypes = [EntityType.EVENT, EntityType.CASE];
+            if (relationshipType === RelationshipType.CONTACT) {
+                availableTypes = [EntityType.EVENT, EntityType.CASE];
+            }
+        }
+        // switch for Contact
+        if (forType === EntityType.CONTACT) {
+            availableTypes = [EntityType.CONTACT];
+        }
+
+        return availableTypes;
+    }
+
+    /**
+     * Get available entity types for assign
+     * @param forType
+     * @param relationshipType
+     */
+    private getAvailableTypesForAssign(
+        forType: EntityType = null,
+        relationshipType: RelationshipType
+    ): EntityType[] {
+        let availableTypes = [];
+        // add relationship for Event/Case
+        if (forType === EntityType.EVENT || forType === EntityType.CASE ) {
+            availableTypes = [EntityType.EVENT, EntityType.CASE];
+            if (relationshipType ===  RelationshipType.CONTACT) {
+                availableTypes = [EntityType.EVENT, EntityType.CASE, EntityType.CONTACT];
+
+            }
+        }
+        // add relationship for Contact
+        if (forType === EntityType.CONTACT) {
+            availableTypes = [EntityType.EVENT, EntityType.CASE];
+            if (relationshipType === RelationshipType.CONTACT) {
+                availableTypes = [EntityType.CONTACT_OF_CONTACT];
+            }
+        }
+        // add relationship for Contact of Contact
+        if (forType === EntityType.CONTACT_OF_CONTACT) {
+            availableTypes = [EntityType.CONTACT];
         }
 
         return availableTypes;
@@ -85,6 +162,14 @@ export class GenericDataService {
      */
     getEpiCurvesTypes(): Observable<any[]> {
         return of(Object.values(Constants.EPI_CURVE_TYPES));
+    }
+
+    /**
+     * Retrieve the list of transmission chain week view type
+     * @returns {Observable<any[]>}
+     */
+    getEpiCurvesWeekTypes(): Observable<any[]> {
+        return of(Object.values(Constants.EPI_CURVE_WEEK_TYPES));
     }
 
     /**

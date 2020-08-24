@@ -1,5 +1,5 @@
 import { ModuleWithProviders } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 import * as fromPages from './pages';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
@@ -46,6 +46,21 @@ const routes: Routes = [
         ]
     },
 
+    // Contact of contact - Merge
+    {
+        path: 'contacts-of-contacts/merge',
+        component: fromPages.ContactOfContactMergeDuplicateComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.DUPLICATE_MERGE_CONTACTS_OF_CONTACTS
+            ]
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
+    },
+
     // Event - Merge
     {
         path: 'events/merge',
@@ -80,6 +95,17 @@ const routes: Routes = [
         data: {
             permissions: [
                 PERMISSION.CONTACT_LIST
+            ]
+        }
+    },
+    // Not Duplicates List - Contacts of Contacts
+    {
+        path: 'contacts-of-contacts/:contactOfContactId/marked-not-duplicates',
+        component: fromPages.MarkedNotDuplicatesListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.CONTACT_OF_CONTACT_LIST
             ]
         }
     }

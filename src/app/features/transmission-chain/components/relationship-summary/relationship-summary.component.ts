@@ -13,6 +13,7 @@ import { RelationshipModel } from '../../../../core/models/entity-and-relationsh
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
+import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
 
 @Component({
     selector: 'app-relationship-summary',
@@ -100,8 +101,8 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
             const relationship: SimpleChange = changes.relationship;
             this.updateRelationshipData(relationship.currentValue);
 
-            // condition the reversing persons action if any of them is contact type
-            this.canReverseRelation = !_.find(this.relationship.persons, { type : EntityType.CONTACT });
+            // condition the reversing persons action if any of them is contact or contact of contact type
+            this.canReverseRelation = this.canReverseRelationships(this.relationship.persons);
         }
     }
 
@@ -121,6 +122,18 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
         this.relationshipLink = this.getRelationshipLink();
 
         this.updateRelationshipData(this.relationship);
+    }
+
+    /**
+     * Check if relationship can be reversed
+     * @param {RelationshipModel[]} persons
+     */
+    canReverseRelationships(persons: RelationshipPersonModel[]) {
+        // get the relationship target person
+        const targetPerson = persons.find(person => person.target === true);
+        // if target person is either Contact or Contact of Contact relationship can't
+        // be reversed since this entities can't be sources for a relationship
+        return !(targetPerson.type === EntityType.CONTACT || targetPerson.type === EntityType.CONTACT_OF_CONTACT);
     }
 
     private getRelationshipLink() {
@@ -179,7 +192,7 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
     }
 
     /**
-     * Check if we're allowed to view event / case / contact relationships
+     * Check if we're allowed to view event / case / contact / contact of contact relationships
      */
     get entityCanView(): boolean {
         return this.relationship &&
@@ -216,6 +229,8 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
      */
     get entityCanReverse(): boolean {
         return this.relationship &&
+            this.relationship.sourcePerson.type !== EntityType.CONTACT &&
+            this.relationship.sourcePerson.type !== EntityType.CONTACT_OF_CONTACT &&
             this.relationship.sourcePerson &&
             this.relationship.sourcePerson.type &&
             this.entityMap[this.relationship.sourcePerson.type] &&

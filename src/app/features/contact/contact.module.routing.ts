@@ -59,6 +59,33 @@ const routes: Routes = [
             PageChangeConfirmationGuard
         ]
     },
+    // View Contact Questionnaire
+    {
+        path: ':contactId/view-questionnaire',
+        component: fromPages.ModifyQuestionnaireContactComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.CONTACT_VIEW
+            ],
+            action: ViewModifyComponentAction.VIEW
+        }
+    },
+    // Modify Contact Questionnaire
+    {
+        path: ':contactId/modify-questionnaire',
+        component: fromPages.ModifyQuestionnaireContactComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.CONTACT_MODIFY
+            ],
+            action: ViewModifyComponentAction.MODIFY
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
+    },
     // Bulk Add Contacts
     {
         path: 'create-bulk',
@@ -186,6 +213,33 @@ const routes: Routes = [
     {
         path: ':contactId/follow-ups/:followUpId/modify',
         component: fromPages.ModifyContactFollowUpComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.FOLLOW_UP_MODIFY
+            ],
+            action: ViewModifyComponentAction.MODIFY
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
+    },
+    // View Contact Questionnaire
+    {
+        path: ':contactId/follow-ups/:followUpId/view-questionnaire',
+        component: fromPages.ModifyQuestionnaireContactFollowUpComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.FOLLOW_UP_VIEW
+            ],
+            action: ViewModifyComponentAction.VIEW
+        }
+    },
+    // Modify Contact Questionnaire
+    {
+        path: ':contactId/follow-ups/:followUpId/modify-questionnaire',
+        component: fromPages.ModifyQuestionnaireContactFollowUpComponent,
         canActivate: [AuthGuard],
         data: {
             permissions: [

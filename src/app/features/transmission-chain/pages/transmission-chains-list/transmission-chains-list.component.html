@@ -6,6 +6,11 @@
     </ng-container>
 </app-topnav>
 
+<!--Total number of records from the list-->
+<app-total-number-of-records
+    [value]="transmissionChainsCount?.count">
+</app-total-number-of-records>
+
 <mat-card class="page-section page-content">
     <!-- Reset Filters -->
     <div class="reset-filters">
@@ -18,14 +23,14 @@
         </button>
     </div>
 
-    <mat-table #table [dataSource]="transmissionChains$ | async">
+    <mat-table #table [dataSource]="transmissionChains">
 
         <!-- First Contact Date -->
         <ng-container matColumnDef="firstContactDate">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_EARLIEST_DATE_OF_ONSET' |
-                        translate}}
+                    <div class="column-header">
+                        {{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_EARLIEST_DATE_OF_ONSET' | translate}}
                     </div>
                 </div>
             </mat-header-cell>
@@ -39,7 +44,9 @@
         <ng-container matColumnDef="rootCase">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_ROOT_CASE' | translate}}</div>
+                    <div class="column-header">
+                        {{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_ROOT_CASE' | translate}}
+                    </div>
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
@@ -63,7 +70,9 @@
         <ng-container matColumnDef="noCases">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NO_CASES' | translate}}</div>
+                    <div class="column-header">
+                        {{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NO_CASES' | translate}}
+                    </div>
                 </div>
             </mat-header-cell>
 
@@ -76,7 +85,9 @@
         <ng-container matColumnDef="noAliveCases">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NO_CASES_ALIVE' | translate}}</div>
+                    <div class="column-header">
+                        {{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NO_CASES_ALIVE' | translate}}
+                    </div>
                 </div>
             </mat-header-cell>
 
@@ -89,7 +100,8 @@
         <ng-container matColumnDef="numberOfContacts">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NUMBER_OF_CONTACTS' | translate}}
+                    <div class="column-header">
+                        {{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NUMBER_OF_CONTACTS' | translate}}
                     </div>
                 </div>
             </mat-header-cell>
@@ -103,7 +115,9 @@
         <ng-container matColumnDef="duration">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_DURATION' | translate}}</div>
+                    <div class="column-header">
+                        {{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_DURATION' | translate}}
+                    </div>
                 </div>
             </mat-header-cell>
 
@@ -116,7 +130,9 @@
         <ng-container matColumnDef="active">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_ACTIVE' | translate}}</div>
+                    <div class="column-header">
+                        {{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_ACTIVE' | translate}}
+                    </div>
                 </div>
             </mat-header-cell>
 
@@ -137,8 +153,7 @@
 
     <div
         *ngIf="!refreshingList && isEmptyList"
-        class="mat-table"
-    >
+        class="mat-table">
         <div class="mat-row">
             <div class="mat-cell">
                 {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
@@ -146,5 +161,11 @@
         </div>
     </div>
 
+    <mat-paginator
+        [length]="transmissionChainsCount?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
 </mat-card>
 

@@ -198,6 +198,10 @@ export class Constants {
             label: 'LNG_APP_PAGE_CONTACTS',
             value: 'LNG_APP_PAGE_CONTACTS'
         },
+        CONTACTS_OF_CONTACTS: {
+            label: 'LNG_APP_PAGE_CONTACTS_OF_CONTACTS',
+            value: 'LNG_APP_PAGE_CONTACTS_OF_CONTACTS'
+        },
         EVENTS: {
             label: 'LNG_APP_PAGE_EVENTS',
             value: 'LNG_APP_PAGE_EVENTS'
@@ -282,6 +286,10 @@ export class Constants {
         CONTACT: {
             label: 'LNG_APP_PAGE_IMPORT_CONTACTS',
             value: 'LNG_APP_PAGE_IMPORT_CONTACTS'
+        },
+        CONTACT_OF_CONTACT: {
+            label: 'LNG_APP_PAGE_IMPORT_CONTACTS_OF_CONTACTS',
+            value: 'LNG_APP_PAGE_IMPORT_CONTACTS_OF_CONTACTS'
         },
         CASE_LAB_DATA: {
             label: 'LNG_APP_PAGE_IMPORT_CASE_LAB_DATA',
@@ -954,6 +962,21 @@ export class Constants {
         REPORTING: {
             label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORTING_TITLE',
             value: 'reporting'
+        }
+    };
+
+    static EPI_CURVE_WEEK_TYPES = {
+        ISO: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_WEEK_TYPE_ISO',
+            value: 'iso'
+        },
+        EPI: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_WEEK_TYPE_EPI',
+            value: 'epi'
+        },
+        SUNDAY: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_WEEK_TYPE_SUNDAY',
+            value: 'sunday'
         }
     };
 

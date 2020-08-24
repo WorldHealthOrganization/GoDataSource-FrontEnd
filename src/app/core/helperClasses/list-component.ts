@@ -1593,6 +1593,11 @@ export abstract class ListComponent implements OnDestroy {
 
             // refresh list on query params changes ( example browser back button was pressed )
             case Constants.APPLY_LIST_FILTER.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES:
+                // no extra filter
+                this.appliedListFilterQueryBuilder = null;
+                this.mergeListFilterToMainFilter();
+
+                // refresh list
                 this.needsRefreshList(true);
                 break;
 

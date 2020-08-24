@@ -23,6 +23,7 @@ import { EntityModel, RelationshipModel } from '../../../../core/models/entity-a
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
     selector: 'app-modify-entity-relationship',
@@ -86,6 +87,19 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
                 }
             }
         },
+        [EntityType.CONTACT_OF_CONTACT]: {
+            label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
+            link: '/contacts-of-contacts',
+            canList: ContactOfContactModel.canList,
+            canView: ContactOfContactModel.canView,
+            can: {
+                exposures: {
+                    modify: ContactOfContactModel.canModifyRelationshipExposures,
+                    reverse: ContactOfContactModel.canReverseRelationship,
+                    list: ContactOfContactModel.canListRelationshipExposures
+                }
+            }
+        },
         [EntityType.EVENT]: {
             label: 'LNG_PAGE_LIST_EVENTS_TITLE',
             link: '/events',
@@ -114,7 +128,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
     // route params
     entityType: EntityType;
     entityId: string;
-    entity: CaseModel | ContactModel | EventModel;
+    entity: CaseModel | ContactModel | EventModel | ContactOfContactModel;
     relationshipId: string;
     relationship: RelationshipModel = new RelationshipModel();
     // route data
@@ -203,7 +217,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
                         return throwError(err);
                     })
                 )
-                .subscribe((entityData: CaseModel | ContactModel | EventModel) => {
+                .subscribe((entityData: CaseModel | ContactModel | EventModel | ContactOfContactModel) => {
                     this.entity = entityData;
 
                     this.initializeBreadcrumbs();

@@ -34,6 +34,7 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { Constants } from '../../../../core/models/constants';
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
+import { TimerCache } from '../../../../core/helperClasses/timer-cache';
 
 @Component({
     selector: 'app-create-contact',
@@ -174,10 +175,19 @@ export class CreateContactComponent
 
                         // set visual ID validator
                         this.contactIdMaskValidator = new Observable((observer) => {
-                            this.contactDataService.checkContactVisualIDValidity(
-                                selectedOutbreak.id,
-                                this.visualIDTranslateData.mask,
-                                this.contactData.visualId
+                            // construct cache key
+                            const cacheKey: string = 'CCO_' + selectedOutbreak.id +
+                                this.visualIDTranslateData.mask +
+                                this.contactData.visualId;
+
+                            // get data from cache or execute validator
+                            TimerCache.run(
+                                cacheKey,
+                                this.contactDataService.checkContactVisualIDValidity(
+                                    selectedOutbreak.id,
+                                    this.visualIDTranslateData.mask,
+                                    this.contactData.visualId
+                                )
                             ).subscribe((isValid: boolean) => {
                                 observer.next(isValid);
                                 observer.complete();

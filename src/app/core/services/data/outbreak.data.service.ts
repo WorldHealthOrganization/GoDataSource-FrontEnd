@@ -18,7 +18,9 @@ import { EntityType } from '../../models/entity-type';
 import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
 import { catchError, map, mergeMap, takeUntil, tap } from 'rxjs/operators';
 import { IBasicCount } from '../../models/basic-count.interface';
+import { ContactOfContactModel } from '../../models/contact-of-contact.model';
 import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache';
+import { AppMessages } from '../../enums/app-messages.enum';
 
 @Injectable()
 export class OutbreakDataService {
@@ -343,8 +345,17 @@ export class OutbreakDataService {
             .subscribe((selectedOutbreak) => {
                 const authUser = this.authDataService.getAuthenticatedUser();
                 if (!authUser.activeOutbreakId) {
-                    this.snackbarService.showNotice('LNG_GENERIC_WARNING_NO_ACTIVE_OUTBREAK');
+                    this.snackbarService.showNotice(
+                        'LNG_GENERIC_WARNING_NO_ACTIVE_OUTBREAK',
+                        undefined,
+                        false,
+                        AppMessages.APP_MESSAGE_UNRESPONSIVE_NO_ACTIVE_OUTBREAK
+                    );
                 } else {
+                    // hide message
+                    this.snackbarService.hideMessage(AppMessages.APP_MESSAGE_UNRESPONSIVE_NO_ACTIVE_OUTBREAK);
+
+                    // outbreak not active ?
                     if (authUser.activeOutbreakId !== selectedOutbreak.id) {
                         this.getOutbreak(authUser.activeOutbreakId)
                             .subscribe((outbreak) => {
@@ -353,11 +364,14 @@ export class OutbreakDataService {
                                     {
                                         activeOutbreakName: outbreak.name,
                                         selectedOutbreakName: selectedOutbreak.name
-                                    }
+                                    },
+                                    false,
+                                    AppMessages.APP_MESSAGE_UNRESPONSIVE_SELECTED_OUTBREAK_NOT_ACTIVE
                                 );
                             });
                     } else {
-                        this.snackbarService.dismissAll();
+                        // hide message
+                        this.snackbarService.hideMessage(AppMessages.APP_MESSAGE_UNRESPONSIVE_SELECTED_OUTBREAK_NOT_ACTIVE);
                     }
                 }
             });
@@ -371,7 +385,7 @@ export class OutbreakDataService {
     getPeopleInconsistencies(
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<(CaseModel | ContactModel | EventModel)[]> {
+    ): Observable<(CaseModel | ContactModel | EventModel | ContactOfContactModel)[]> {
         const filter = queryBuilder.buildQuery();
         return this.http.get(`outbreaks/${outbreakId}/people/inconsistencies-in-key-dates?filter=${filter}`)
             .pipe(

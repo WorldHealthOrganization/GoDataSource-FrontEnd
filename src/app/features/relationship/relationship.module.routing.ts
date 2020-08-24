@@ -88,6 +88,7 @@ const relationshipTypeChildrenRoutes = [
                         or: [
                             PERMISSION.CASE_CHANGE_SOURCE_RELATIONSHIP,
                             PERMISSION.CONTACT_CHANGE_SOURCE_RELATIONSHIP,
+                            PERMISSION.CONTACT_OF_CONTACT_CHANGE_SOURCE_RELATIONSHIP,
                             PERMISSION.EVENT_CHANGE_SOURCE_RELATIONSHIP
                         ]
                     })

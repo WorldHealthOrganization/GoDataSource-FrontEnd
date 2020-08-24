@@ -6,6 +6,7 @@ export enum ModulePath {
     OutbreakModule = 'outbreaks',
     OutbreakTemplatesModule = 'outbreak-templates',
     ContactModule = 'contacts',
+    ContactsOfContactsModule = 'contacts-of-contacts',
     CaseModule = 'cases',
     EventModule = 'events',
     LabResultModule = 'lab-results',

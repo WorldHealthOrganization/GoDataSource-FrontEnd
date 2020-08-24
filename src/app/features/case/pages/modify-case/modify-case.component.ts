@@ -31,6 +31,7 @@ import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
+import { TimerCache } from '../../../../core/helperClasses/timer-cache';
 
 @Component({
     selector: 'app-modify-case',
@@ -300,11 +301,21 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
                     // set visual ID validator
                     this.caseIdMaskValidator = new Observable((observer) => {
-                        this.caseDataService.checkCaseVisualIDValidity(
-                            this.selectedOutbreak.id,
-                            this.visualIDTranslateData.mask,
-                            this.caseData.visualId,
-                            this.caseData.id
+                        // construct cache key
+                        const cacheKey: string = 'MCA_' + this.selectedOutbreak.id +
+                            this.visualIDTranslateData.mask +
+                            this.caseData.visualId +
+                            this.caseData.id;
+
+                        // get data from cache or execute validator
+                        TimerCache.run(
+                            cacheKey,
+                            this.caseDataService.checkCaseVisualIDValidity(
+                                this.selectedOutbreak.id,
+                                this.visualIDTranslateData.mask,
+                                this.caseData.visualId,
+                                this.caseData.id
+                            )
                         ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
                             observer.next(isValid);
                             observer.complete();

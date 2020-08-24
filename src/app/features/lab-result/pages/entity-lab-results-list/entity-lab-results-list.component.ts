@@ -197,6 +197,39 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
                     class: 'mat-menu-item-delete'
                 }),
 
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
+                    visible: (item: LabResultModel): boolean => {
+                        // visible only if at least one of the first two items is visible
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            LabResultModel.canDelete(this.authUser) && (
+                                (
+                                    item.personType === EntityType.CASE &&
+                                    CaseModel.canDeleteLabResult(this.authUser)
+                                ) || (
+                                    item.personType === EntityType.CONTACT &&
+                                    ContactModel.canDeleteLabResult(this.authUser)
+                                )
+                            );
+                    }
+                }),
+
+                // See questionnaire
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_MODIFY_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE',
+                    click: (item: LabResultModel) => {
+                        this.router.navigate(['/lab-results', item.id , 'view-questionnaire']);
+                    },
+                    visible: (item: LabResultModel): boolean => {
+                        return !item.deleted &&
+                            LabResultModel.canView(this.authUser);
+                    }
+                }),
+
                 // Restore a deleted Lab Results
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT',

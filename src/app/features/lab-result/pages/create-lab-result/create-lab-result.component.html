@@ -200,32 +200,13 @@
             </form>
         </mat-step>
 
-        <!-- Questionnaire step -->
-        <mat-step [stepControl]="questionnaireForm">
-            <form #questionnaireForm="ngForm">
-                <ng-template matStepLabel>{{ 'LNG_PAGE_CREATE_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE' | translate }}</ng-template>
-
-                <!-- Questionnaire section -->
-                <app-form-fill-questionnaire
-                    name="questionnaireAnswers"
-                    [ngModel]="labResultData.questionnaireAnswers"
-                    [questions]="selectedOutbreak.labResultsTemplate">
-                </app-form-fill-questionnaire>
-
-                <div class="stepper-navigation-buttons">
-                    <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
-                </div>
-            </form>
-        </mat-step>
-
         <!-- Final step -->
         <mat-step>
             <ng-template matStepLabel>{{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}</ng-template>
             {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
             <div class="stepper-navigation-buttons">
                 <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                <button *app-selected-outbreak-is-active type="button" mat-raised-button color="accent" (click)="createLabResult([detailsForm, questionnaireForm])">
+                <button *app-selected-outbreak-is-active type="button" mat-raised-button color="accent" (click)="createLabResult([detailsForm])">
                     {{'LNG_PAGE_CREATE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_BUTTON' | translate}}
                 </button>
             </div>
