@@ -40,6 +40,8 @@ export class ModifyQuestionnaireLabResultComponent extends ViewModifyComponent i
     LabResultModel = LabResultModel;
     EntityModel = EntityModel;
 
+    fromLabResultsList: boolean = false;
+
     /**
      * Constructor
      */
@@ -73,6 +75,12 @@ export class ModifyQuestionnaireLabResultComponent extends ViewModifyComponent i
             .subscribe((params: { labResultId }) => {
                 this.labResultId = params.labResultId;
                 this.retrieveLabResultData();
+            });
+
+        // retrieve queryParams data
+        this.route.queryParams
+            .subscribe((params: {fromLabResultsList}) => {
+                this.fromLabResultsList = JSON.parse(params.fromLabResultsList);
             });
 
         // retrieve outbreak
