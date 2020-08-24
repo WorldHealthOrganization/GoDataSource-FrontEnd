@@ -48,7 +48,8 @@
 
         <button
             type="button"
-            [routerLink]="['/lab-results', EntityModel.getLinkForEntityType(this.labResultData?.personType), labResultId, viewOnly ? 'view' : 'modify']"
+            [routerLink]="['/lab-results', EntityModel.getLinkForEntityType(this.labResultData?.personType), labResultData?.personId, labResultId, viewOnly ? 'view' : 'modify']"
+            [queryParams]="{fromLabResultsList: fromLabResultsList}"
             mat-raised-button>
             {{'LNG_COMMON_BUTTON_BACK' | translate}}
         </button>
