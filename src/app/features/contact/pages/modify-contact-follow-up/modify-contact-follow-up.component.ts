@@ -24,7 +24,7 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { ContactModel } from '../../../../core/models/contact.model';
-import * as moment from 'moment';
+import { moment } from 'app/core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-modify-follow-up',
@@ -161,7 +161,8 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
         if (
             this.contactId &&
             this.followUpId &&
-            this.selectedOutbreak
+            this.selectedOutbreak &&
+            this.selectedOutbreak.id
         ) {
             // show loading
             this.showLoadingDialog(false);

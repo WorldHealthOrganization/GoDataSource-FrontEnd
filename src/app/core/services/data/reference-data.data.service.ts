@@ -122,13 +122,17 @@ export class ReferenceDataDataService {
                             entry.id,
                             !entry.active,
                             entry.active,
-                            entry.iconUrl
+                            entry.iconUrl,
+                            entry.description
                         )
                     );
                 })
             );
     }
 
+    /**
+     * Retrieve reference data entries
+     */
     getEntries(): Observable<ReferenceDataEntryModel[]> {
         // sort entries
         const qb = new RequestQueryBuilder();

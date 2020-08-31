@@ -19,6 +19,7 @@ import { throwError } from 'rxjs/index';
 import { catchError } from 'rxjs/internal/operators';
 import { AuthDataService } from '../data/auth.data.service';
 import { UserModel } from '../../models/user.model';
+import { ContactOfContactModel } from '../../models/contact-of-contact.model';
 
 export enum SentFromColumn {
     CONTACTS = 'fromContacts',
@@ -44,7 +45,7 @@ export class EntityHelperService {
      */
     displayContacts(
         selectedOutbreakId: string,
-        entity: CaseModel | ContactModel | EventModel
+        entity: CaseModel | ContactModel | EventModel | ContactOfContactModel
     ) {
         // display loading
         const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
@@ -84,7 +85,7 @@ export class EntityHelperService {
      */
     displayExposures(
         selectedOutbreakId: string,
-        entity: CaseModel | ContactModel | EventModel
+        entity: CaseModel | ContactModel | EventModel | ContactOfContactModel
     ) {
         // display loading
         const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
@@ -122,7 +123,7 @@ export class EntityHelperService {
      */
     displayEntitiesAndRelationships(
         from: SentFromColumn,
-        entity: CaseModel | ContactModel | EventModel,
+        entity: CaseModel | ContactModel | EventModel | ContactOfContactModel,
         relationshipsData: EntityModel[]
     ) {
         if (!_.isEmpty(relationshipsData)) {
@@ -130,7 +131,7 @@ export class EntityHelperService {
             // entities collection
             const entities: DialogField[] = [];
 
-            // add links to list relationship page only if we're alloed to view that page
+            // add links to list relationship page only if we're allowed to view that page
             const authUser: UserModel = this.authDataService.getAuthenticatedUser();
             if (
                 RelationshipModel.canList(authUser) && (
@@ -229,7 +230,11 @@ export class EntityHelperService {
                                 ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
                                 ...{
                                     data: {
-                                        relationship: item
+                                        relationship: item,
+                                        showResourceViewPageLink:
+                                            from === SentFromColumn.EXPOSURES ?
+                                                relationshipData.model.canViewRelationshipExposures(authUser) :
+                                                relationshipData.model.canViewRelationshipContacts(authUser)
                                     }
                                 }
                             }

@@ -117,5 +117,14 @@ export class EventDataService {
     restoreEvent(outbreakId: string, eventId: string): Observable<any> {
         return this.http.post(`outbreaks/${outbreakId}/events/${eventId}/restore`, {});
     }
+
+    /**
+     * Get event relationships count
+     * @param {string} outbreakId
+     * @param {string} eventId
+     */
+    getEventRelationshipsCount(outbreakId: string, eventId: string): Observable<any> {
+        return this.http.get(`outbreaks/${outbreakId}/events/${eventId}/relationships/filtered-count`);
+    }
 }
 

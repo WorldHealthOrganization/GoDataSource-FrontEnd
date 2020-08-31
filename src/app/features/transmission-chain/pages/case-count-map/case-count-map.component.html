@@ -50,7 +50,7 @@
         >
             <!-- Filters -->
             <app-transmission-chain-filters
-                title="LNG_PAGE_CASE_COUNT_MAP_FILTERS_TITLE"
+                titleName="LNG_PAGE_CASE_COUNT_MAP_FILTERS_TITLE"
                 [filters]="filters">
             </app-transmission-chain-filters>
 
@@ -91,7 +91,7 @@
 
     <!-- Count map -->
     <app-world-map
-        *ngIf="markers.length > 0"
+        *ngIf="firstLoaded && (displayLoading || markers.length > 0)"
         #worldMap
         width="100%"
         height="500px"
@@ -105,7 +105,7 @@
 
     <!-- No data -->
     <div
-        *ngIf="markers.length < 1">
+        *ngIf="firstLoaded && !displayLoading && markers.length < 1">
         {{ 'LNG_PAGE_CASE_COUNT_MAP_NO_DATA' | translate }}
     </div>
 </mat-card>

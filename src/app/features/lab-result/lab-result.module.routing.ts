@@ -154,6 +154,33 @@ const routes: Routes = [
             PageChangeConfirmationGuard
         ]
     },
+    // Modify Questionnaire
+    {
+        path: ':labResultId/view-questionnaire',
+        component: fromPages.ModifyQuestionnaireLabResultComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.LAB_RESULT_VIEW
+            ],
+            action: ViewModifyComponentAction.VIEW
+        }
+    },
+    // Modify Questionnaire
+    {
+        path: ':labResultId/modify-questionnaire',
+        component: fromPages.ModifyQuestionnaireLabResultComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.LAB_RESULT_MODIFY
+            ],
+            action: ViewModifyComponentAction.MODIFY
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
+    }
 ];
 
 export const routing: ModuleWithProviders = RouterModule.forChild(routes);

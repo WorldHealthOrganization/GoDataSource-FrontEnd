@@ -20,6 +20,7 @@ import { EventModel } from '../../models/event.model';
 import { map } from 'rxjs/operators';
 import { moment } from '../../helperClasses/x-moment';
 import { IBasicCount } from '../../models/basic-count.interface';
+import { ContactOfContactModel } from '../../models/contact-of-contact.model';
 
 @Injectable()
 export class RelationshipDataService {
@@ -456,14 +457,14 @@ export class RelationshipDataService {
      * @param {EntityType} entityType
      * @param {string} entityId
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<(CaseModel | ContactModel | EventModel)[]>}
+     * @returns {Observable<(CaseModel | ContactModel | EventModel | ContactOfContactModel)[]>}
      */
     getEntityAvailablePeople(
         outbreakId: string,
         entityType: EntityType,
         entityId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<(CaseModel | ContactModel | EventModel)[]> {
+    ): Observable<(CaseModel | ContactModel | EventModel | ContactOfContactModel)[]> {
         const filter = queryBuilder.buildQuery();
         return this.http
             .get(`outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/available-people?filter=${filter}`)

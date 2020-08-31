@@ -21,6 +21,9 @@ export class I18nService {
     private languageLoadedEvent = new EventEmitter<void>();
     public languageChangedEvent = new EventEmitter<void>();
 
+    /**
+     * Constructor
+     */
     constructor(
         private translateService: TranslateService,
         private storageService: StorageService,
@@ -28,8 +31,7 @@ export class I18nService {
         private modelHelperService: ModelHelperService,
         private userDataService: UserDataService,
         private authDataService: AuthDataService
-    ) {
-    }
+    ) {}
 
     /**
      * Get the ID of the language selected by User in UI
@@ -81,7 +83,7 @@ export class I18nService {
             StorageKey.LANGUAGE_UPDATE_LAST, {
                 ...oldDates,
                 ...{
-                    [languageId]: lastUpdateDate
+                    [languageId]: lastUpdateDate ? lastUpdateDate : oldDates[languageId]
                 }
             }
         );

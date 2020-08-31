@@ -80,7 +80,14 @@
                                 [disabled]="viewOnly">
                             </app-form-input>
 
-                            <div fxFlex><!-- placeholder --></div>
+                            <app-form-slide-toggle
+                                name="disregardGeographicRestrictions"
+                                [(ngModel)]="user.disregardGeographicRestrictions"
+                                [label]="'LNG_USER_FIELD_LABEL_DISREGARD_GEOGRAPHIC_RESTRICTIONS' | translate"
+                                tooltip="LNG_USER_FIELD_LABEL_DISREGARD_GEOGRAPHIC_RESTRICTIONS_DESCRIPTION"
+                                [disabled]="viewOnly">
+                            </app-form-slide-toggle>
+
                             <div fxFlex><!-- placeholder --></div>
                         </div>
 

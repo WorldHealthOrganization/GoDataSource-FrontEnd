@@ -79,7 +79,6 @@ export class FormLocationDropdownComponent
     get notFoundText(): string {
         return this._notFoundText;
     }
-    @Input() locationsForOutbrakId: string;
     @Input() useOutbreakLocations: boolean = false;
 
     // floatable drop panel
@@ -120,6 +119,9 @@ export class FormLocationDropdownComponent
 
     outbreakSubscriber: Subscription;
 
+    // language subscription
+    private languageSubscription: Subscription;
+
     repositionTimer: any;
 
     /**
@@ -132,7 +134,8 @@ export class FormLocationDropdownComponent
         methodKey: string,
         queryBuilder: RequestQueryBuilder,
         outbreakId: string,
-        service: LocationDataService | OutbreakDataService
+        service: LocationDataService | OutbreakDataService,
+        snackbarService: SnackbarService
     ): Observable<HierarchicalLocationModel[]> {
         // remove older cached items
         _.each(
@@ -183,6 +186,7 @@ export class FormLocationDropdownComponent
                             // do we have data already ?
                             if (localCache[localMethodKey][localCacheKey].data !== null) {
                                 observer.next(localCache[localMethodKey][localCacheKey].data);
+                                return;
                             }
 
                             // load data
@@ -191,7 +195,7 @@ export class FormLocationDropdownComponent
                                     catchError((err) => {
                                         observer.error(err);
                                         observer.complete();
-                                        this.snackbarService.showApiError(err);
+                                        snackbarService.showApiError(err);
                                         return throwError(err);
                                     })
                                 )
@@ -230,9 +234,10 @@ export class FormLocationDropdownComponent
         super(controlContainer, validators, asyncValidators);
 
         // on language change..we need to translate again the token
-        this.i18nService.languageChangedEvent.subscribe(() => {
-            this.tooltip = this._tooltipToken;
-        });
+        this.languageSubscription = this.i18nService.languageChangedEvent
+            .subscribe(() => {
+                this.tooltip = this._tooltipToken;
+            });
     }
 
     /**
@@ -333,6 +338,11 @@ export class FormLocationDropdownComponent
         if (this.previousSubscription) {
             this.previousSubscription.unsubscribe();
             this.previousSubscription = null;
+        }
+
+        if (this.languageSubscription) {
+            this.languageSubscription.unsubscribe();
+            this.languageSubscription = null;
         }
 
         // remove reposition timer
@@ -475,13 +485,15 @@ export class FormLocationDropdownComponent
                 'getOutbreakLocationsHierarchicalList',
                 this.queryBuilder,
                 this.outbreakId,
-                this.outbreakDataService
+                this.outbreakDataService,
+                this.snackbarService
             ) :
             FormLocationDropdownComponent.doRequestOrGetFromCache(
                 'getLocationsHierarchicalList',
                 this.queryBuilder,
                 undefined,
-                this.locationDataService
+                this.locationDataService,
+                this.snackbarService
             );
 
         // retrieve hierarchic location list

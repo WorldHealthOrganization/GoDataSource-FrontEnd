@@ -118,25 +118,47 @@
                                 </mat-header-cell>
                                 <mat-cell *matCellDef="let item">
                                     <span
-                                        *ngIf="duplicatesList.peopleMap[item]?.type === EntityType.EVENT"
+                                        *ngIf="duplicatesList.peopleMap[item]?.type === EntityType.EVENT; else documentsTemplate"
                                         class="duplicate-records-label-not-applicable">
                                         {{ 'LNG_PAGE_LIST_DUPLICATE_RECORDS_LABEL_NOT_APPLICABLE' | translate }}
                                     </span>
-                                    <ng-container
-                                        *ngIf="duplicatesList.peopleMap[item]?.type !== EntityType.EVENT">
+                                    <ng-template
+                                        #documentsTemplate>
                                         <span
-                                            *ngIf="!duplicatesList.peopleMap[item]?.documents || duplicatesList.peopleMap[item]?.documents.length < 1"
+                                            *ngIf="!duplicatesList.peopleMap[item]?.documents || duplicatesList.peopleMap[item]?.documents.length < 1; else docChildTemplate"
                                             class="duplicate-records-label-none">
                                             {{ 'LNG_PAGE_LIST_DUPLICATE_RECORDS_LABEL_NONE' | translate }}
                                         </span>
-                                        <ng-container
-                                            *ngIf="duplicatesList.peopleMap[item]?.documents && duplicatesList.peopleMap[item]?.documents.length > 0">
+                                        <ng-template
+                                            #docChildTemplate>
                                             <span
                                                 *ngFor="let document of duplicatesList.peopleMap[item]?.documents; let first = first">
                                                 {{ document.number ? ( first ? '' : ' / ' ) + document.number : ('LNG_PAGE_LIST_DUPLICATE_RECORDS_LABEL_MISSING' | translate) }}
                                             </span>
-                                        </ng-container>
-                                    </ng-container>
+                                        </ng-template>
+                                    </ng-template>
+                                </mat-cell>
+                            </ng-container>
+
+                            <!-- Visual Id -->
+                            <ng-container matColumnDef="visualId">
+                                <mat-header-cell *matHeaderCellDef>
+                                    <div class="table-header-cell">
+                                        <div class="column-header">
+                                            {{'LNG_ENTITY_FIELD_LABEL_VISUAL_ID' | translate}}
+                                        </div>
+                                    </div>
+                                </mat-header-cell>
+                                <mat-cell *matCellDef="let item">
+                                    <span
+                                        *ngIf="duplicatesList.peopleMap[item]?.type === EntityType.EVENT; else visualIdTemplate"
+                                        class="duplicate-records-label-not-applicable">
+                                        {{ 'LNG_PAGE_LIST_DUPLICATE_RECORDS_LABEL_NOT_APPLICABLE' | translate }}
+                                    </span>
+                                    <ng-template
+                                        #visualIdTemplate>
+                                        {{duplicatesList.peopleMap[item]?.visualId}}
+                                    </ng-template>
                                 </mat-cell>
                             </ng-container>
 
@@ -149,14 +171,14 @@
                                 </mat-header-cell>
                                 <mat-cell *matCellDef="let item">
                                     <span
-                                        *ngIf="duplicatesList.peopleMap[item]?.type === EntityType.EVENT"
+                                        *ngIf="duplicatesList.peopleMap[item]?.type === EntityType.EVENT; else ageTemplate"
                                         class="duplicate-records-label-not-applicable">
                                         {{ 'LNG_PAGE_LIST_DUPLICATE_RECORDS_LABEL_NOT_APPLICABLE' | translate }}
                                     </span>
-                                    <ng-container
-                                        *ngIf="duplicatesList.peopleMap[item]?.type !== EntityType.EVENT">
+                                    <ng-template
+                                        #ageTemplate>
                                         <app-age-label [age]="duplicatesList.peopleMap[item]?.age"></app-age-label>
-                                    </ng-container>
+                                    </ng-template>
                                 </mat-cell>
                             </ng-container>
 

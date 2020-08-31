@@ -255,6 +255,11 @@ export interface IPermissionQuestionnaire {
     canModifyCaseQuestionnaire(user: UserModel): boolean;
 
     /**
+     * Has permission to modify contact questionnaire
+     */
+    canModifyContactQuestionnaire(user: UserModel): boolean;
+
+    /**
      * Has permission to modify contact follow-up questionnaire
      */
     canModifyContactFollowUpQuestionnaire(user: UserModel): boolean;
@@ -278,6 +283,11 @@ export interface IPermissionOutbreak {
      * Has permission to see inconsistencies in key dates
      */
     canSeeInconsistencies(user: UserModel): boolean;
+
+    /**
+     * Has permission to import relationships data
+     */
+    canImportRelationship(user: UserModel): boolean;
 }
 
 /**
@@ -366,6 +376,16 @@ export interface IPermissionRelatedLabResult {
 }
 
 /**
+ * Related contact of contacts ( used by contact )
+ */
+export interface IPermissionRelatedContactOfContact {
+    /**
+     * Has permission to create contact of contacts?
+     */
+    canCreateContactOfContact(user: UserModel): boolean;
+}
+
+/**
  * Contact Bulk
  */
 export interface IPermissionRelatedContactBulk {
@@ -373,6 +393,16 @@ export interface IPermissionRelatedContactBulk {
      * Has permission that allows user to create multiple contacts at the same time ?
      */
     canBulkCreateContact(user: UserModel): boolean;
+}
+
+/**
+ * Contact of Contact Bulk
+ */
+export interface IPermissionRelatedContactOfContactBulk {
+    /**
+     * Has permission that allows user to create multiple contact of contacts at the same time ?
+     */
+    canBulkCreateContactOfContact(user: UserModel): boolean;
 }
 
 /**
@@ -645,6 +675,11 @@ export interface IPermissionDuplicates {
     canMergeContacts(user: UserModel): boolean;
 
     /**
+     * Has permission to merge duplicate contacts of contacts records ?
+     */
+    canMergeContactsOfContacts(user: UserModel): boolean;
+
+    /**
      * Has permission to merge duplicate event records ?
      */
     canMergeEvents(user: UserModel): boolean;
@@ -723,6 +758,21 @@ export interface IPermissionContact {
      * Has permission to export daily follow-up form ?
      */
     canExportDailyFollowUpsForm(user: UserModel): boolean;
+
+    /**
+     * Has permission to export contact dossier ?
+     */
+    canExportDossier(user: UserModel): boolean;
+}
+
+/**
+ * Contact of Contacts
+ */
+export interface IPermissionContactOfContacts {
+    /**
+     * Has permission to generate visual id ?
+     */
+    canGenerateVisualId(user: UserModel): boolean;
 
     /**
      * Has permission to export contact dossier ?

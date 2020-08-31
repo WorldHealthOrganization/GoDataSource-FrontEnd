@@ -1,0 +1,41 @@
+<div fxLayout="column">
+    <div
+        class="messages-container">
+        <div
+            *ngFor="let msg of messages; let i = index"
+            [ngClass]="msg.messageClass"
+            class="message">
+            <div
+                *ngIf="!msg.html"
+                fxFlex fxFlexAlign="center"
+                class="text-message">
+                {{ msg.message }}
+            </div>
+
+            <div
+                *ngIf="msg.html"
+                class="text-message"
+                [innerHTML]="msg.message">
+            </div>
+
+            <div
+                (click)="closeSnackbar(msg.id)"
+                fxLayoutAlign="center center"
+                class="snackbar-close-button-container {{msg.messageClass}}">
+                {{'LNG_MULTIPLE_SNACKBAR_BUTTON_CLOSE' | translate}}
+            </div>
+        </div>
+    </div>
+    <!-- CloseAll button -->
+    <div
+        *ngIf="messages.length > 1"
+        fxFlex fxFlexAlign="flex-end"
+        class="close-all-button-container">
+        <button
+            (click)="closeAllSnackbars()"
+            class="close-all-button"
+            type="button" mat-raised-button color="primary">
+            {{'LNG_MULTIPLE_SNACKBAR_BUTTON_CLOSE_ALL' | translate}}
+        </button>
+    </div>
+</div>

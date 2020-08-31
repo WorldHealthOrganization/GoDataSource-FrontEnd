@@ -20,6 +20,7 @@ export class TransmissionChainFilters {
     locationId: string;
     age: AgeModel;
     date: Moment;
+    includeContactsOfContacts: boolean;
 
     /**
      * Constructor
@@ -34,7 +35,8 @@ export class TransmissionChainFilters {
         gender?: string,
         locationId?: string,
         age?: AgeModel,
-        date?: Moment
+        date?: Moment,
+        includeContactsOfContacts?: boolean
     } = {}) {
         // assign properties
         Object.assign(
@@ -122,10 +124,16 @@ export class TransmissionChainFilters {
                         'address.parentLocationIdFilter': this.locationId
                     }, {
                         type: {
-                            inq: [
-                                'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
-                                'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'
-                            ]
+                            inq: !this.includeContactsOfContacts ?
+                                [
+                                    'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+                                    'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'
+                                ] :
+                                [
+                                    'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+                                    'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT',
+                                    'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_OF_CONTACT'
+                                ]
                         },
                         'addresses.parentLocationIdFilter': this.locationId
                     }
@@ -158,7 +166,7 @@ export class TransmissionChainFilters {
     styleUrls: ['./transmission-chains-filters.component.less']
 })
 export class TransmissionChainsFiltersComponent implements OnInit {
-    @Input() title: string;
+    @Input() titleName: string;
     @Input() filters: TransmissionChainFilters = new TransmissionChainFilters();
 
     @HostBinding('class.form-element-host') isFormElement = true;

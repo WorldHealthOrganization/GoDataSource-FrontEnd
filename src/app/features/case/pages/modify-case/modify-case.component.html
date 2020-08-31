@@ -67,7 +67,8 @@
                                     [placeholder]="'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS' | translate"
                                     tooltip="LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION"
                                     [options]="pregnancyStatusList$ | async"
-                                    [disabled]="viewOnly">
+                                    [disabled]="viewOnly"
+                                    [clearable]="false">
                                 </app-form-select>
 
                                 <app-form-select
@@ -110,7 +111,8 @@
                                 [maxlength]="255"
                                 [disabled]="viewOnly"
                                 app-general-async-validator
-                                [asyncValidatorObservable]="viewOnly ? null : caseIdMaskValidator">
+                                [asyncValidatorObservable]="viewOnly ? null : caseIdMaskValidator"
+                                [validateOnlyWhenDirty]="true">
                             </app-form-input>
 
                             <app-form-datepicker
@@ -271,7 +273,7 @@
                                 [disabled]="viewOnly"
                                 [maxDate]="serverToday"
                                 app-date-validator
-                                required="true"
+                                [required]="selectedOutbreak ? selectedOutbreak.isDateOfOnsetRequired : true"
                                 [dateSameOrBefore]="[
                                     serverToday,
                                     'dateOfOutcome'
@@ -415,20 +417,8 @@
                     centerNameLabel="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME"
                     centerNameTooltip="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME_DESCRIPTION"
                     [dateOfOnset]="caseData.dateOfOnset"
-                    [maxDate]="serverToday"
-                ></app-form-case-center-daterange-list>
-
-            </mat-tab>
-
-            <mat-tab [label]="'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE' | translate">
-                <app-form-fill-questionnaire
-                    *ngIf="!!caseData?.id"
-                    name="questionnaireAnswers"
-                    [ngModel]="caseData.questionnaireAnswers"
-                    [questions]="selectedOutbreak.caseInvestigationTemplate"
-                    [disabled]="viewOnly"
-                    [componentTitle]="'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE' | translate">
-                </app-form-fill-questionnaire>
+                    [maxDate]="serverToday">
+                </app-form-case-center-daterange-list>
             </mat-tab>
         </mat-tab-group>
     </div>
@@ -447,7 +437,15 @@
             </button>
 
             <ng-container *ngIf="!viewOnly">
-                <button mat-raised-button color="accent">
+                <button
+                    [disabled]="form.pending"
+                    class="button-with-spinner"
+                    mat-raised-button color="accent">
+                    <div
+                        *ngIf="form.pending"
+                        class="loading-chips">
+                        <mat-spinner></mat-spinner>
+                    </div>
                     {{'LNG_COMMON_BUTTON_SAVE' | translate}}
                 </button>
 
@@ -474,7 +472,21 @@
 
                 <div class="page-tabs-navbar-placeholder"></div>
             </ng-container>
+
+            <button
+                type="button"
+                mat-raised-button
+                [routerLink]="['/cases', caseId, viewOnly || selectedOutbreak?.id !== authUser?.activeOutbreakId ? 'view-questionnaire' : 'modify-questionnaire']">
+                {{'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE' | translate}}
+            </button>
         </ng-container>
+
+        <button
+            *ngIf="CaseModel.canList(authUser)"
+            mat-raised-button type="button"
+            [routerLink]="['/duplicated-records/cases', caseId, 'marked-not-duplicates']">
+            {{'LNG_PAGE_MODIFY_CASE_ACTION_SEE_RECORDS_NOT_DUPLICATES' | translate}}
+        </button>
 
         <button
             *ngIf="CaseModel.canListRelationshipContacts(authUser)"

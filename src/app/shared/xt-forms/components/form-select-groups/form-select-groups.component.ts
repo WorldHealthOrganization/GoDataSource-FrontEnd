@@ -1,4 +1,4 @@
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, HostBinding, Output, EventEmitter, ViewChild, OnInit } from '@angular/core';
+import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, HostBinding, Output, EventEmitter, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { ElementBase } from '../../core/index';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -6,6 +6,7 @@ import { v4 as uuid } from 'uuid';
 import * as _ from 'lodash';
 import { MatOptionSelectionChange, MatSelect } from '@angular/material';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 /**
  * Used by events
@@ -81,7 +82,7 @@ export interface ISelectGroupOptionFormatResponse {
         multi: true
     }]
 })
-export class FormSelectGroupsComponent extends ElementBase<string[]> implements OnInit {
+export class FormSelectGroupsComponent extends ElementBase<string[]> implements OnInit, OnDestroy {
     // identifier
     static identifier: number = 0;
 
@@ -244,6 +245,9 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
      */
     @Output() groupOptionCheckStateChanged = new EventEmitter<IGroupOptionEventData>();
 
+    // language subscription
+    private languageSubscription: Subscription;
+
     /**
      * Constructor
      */
@@ -257,7 +261,7 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
         super(controlContainer, validators, asyncValidators);
 
         // on language change..we need to translate again the token
-        this.i18nService.languageChangedEvent.subscribe(() => {
+        this.languageSubscription = this.i18nService.languageChangedEvent.subscribe(() => {
             // trigger update
             this.tooltip = this._tooltipToken;
 
@@ -275,6 +279,16 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
     ngOnInit(): void {
         // hack for select scroll bug
         this.hackSelectForScrollBug();
+    }
+
+    /**
+     * Component destroyed
+     */
+    ngOnDestroy() {
+        if (this.languageSubscription) {
+            this.languageSubscription.unsubscribe();
+            this.languageSubscription = null;
+        }
     }
 
     /**

@@ -469,10 +469,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
             });
         });
 
+        // Update dashlets order based on authenticated user's settings
         this.refreshDashletsOrder();
-
-        // persist changes
-        this.persistUserDashboardSettings().subscribe();
     }
 
     /**

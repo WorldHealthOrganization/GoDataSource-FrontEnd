@@ -17,7 +17,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
-import { catchError, share } from 'rxjs/operators';
+import { catchError, map, share } from 'rxjs/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { HotTableWrapperComponent } from '../../../../shared/components/hot-table-wrapper/hot-table-wrapper.component';
 import { Constants } from '../../../../core/models/constants';
@@ -26,6 +26,8 @@ import { SheetCellType } from '../../../../core/models/sheet/sheet-cell-type';
 import * as Handsontable from 'handsontable';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
+import { TeamModel } from '../../../../core/models/team.model';
+import { TeamDataService } from '../../../../core/services/data/team.data.service';
 
 @Component({
     selector: 'app-bulk-modify-contacts',
@@ -49,6 +51,12 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
     riskLevelsList$: Observable<LabelValuePair[]>;
     finalFollowUpStatus$: Observable<LabelValuePair[]>;
 
+    // teams
+    teamList$: Observable<TeamModel[]>;
+    teamIdNameMap: {
+        [id: string]: string
+    };
+
     // sheet widget configuration
     sheetContextMenu = {};
     sheetColumns: AbstractSheetColumn[] = [];
@@ -62,17 +70,23 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         }
     }[] = [];
 
+    loadingData: boolean = false;
     data: any[][] = [];
     extraContactData: {
         id: string,
-        addresses: AddressModel[]
+        addresses: AddressModel[],
+        followUpTeamId: string
     }[];
 
     // subscribers
     outbreakSubscriber: Subscription;
+    queryParamsSubscriber: Subscription;
 
     // authenticated user details
     authUser: UserModel;
+
+    // contacts
+    contactIds: string[];
 
     /**
      * Constructor
@@ -86,7 +100,8 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         private referenceDataDataService: ReferenceDataDataService,
         private i18nService: I18nService,
         private dialogService: DialogService,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private teamDataService: TeamDataService
     ) {
         super();
     }
@@ -102,10 +117,34 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION).pipe(share());
         this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).pipe(share());
-        this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);
+        this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS).pipe(share());
+
+        // retrieve teams
+        if (TeamModel.canList(this.authUser)) {
+            this.teamList$ = this.teamDataService.getTeamsListReduced().pipe(share());
+            this.teamList$.subscribe((teams) => {
+                // map teams
+                this.teamIdNameMap = {};
+                teams.forEach((team) => {
+                    this.teamIdNameMap[team.id] = team.name;
+                });
+
+                // retrieve contacts information
+                // we should have contacts ids here it should load queryParams before receiving answer from api
+                setTimeout(() => {
+                    this.retrieveContacts();
+                });
+            });
+        }
 
         // init table columns
         this.configureSheetWidget();
+
+        // retrieve query params
+        this.queryParamsSubscriber = this.route.queryParams
+            .subscribe((params: { contactIds }) => {
+                this.contactIds = params.contactIds ? JSON.parse(params.contactIds) : [];
+            });
 
         // get selected outbreak
         this.outbreakSubscriber = this.outbreakDataService
@@ -121,14 +160,11 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                 // selected outbreak
                 this.selectedOutbreak = selectedOutbreak;
 
-                // retrieve query params
-                this.route.queryParams
-                    .subscribe((params: { contactIds }) => {
-                        // retrieve contacts information
-                        setTimeout(() => {
-                            this.retrieveContacts(params.contactIds ? JSON.parse(params.contactIds) : []);
-                        });
-                    });
+                // retrieve contacts information
+                // we should have contacts ids here it should load queryParams before receiving answer from api
+                setTimeout(() => {
+                    this.retrieveContacts();
+                });
             });
 
         // initialize page breadcrumbs
@@ -143,6 +179,12 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();
             this.outbreakSubscriber = null;
+        }
+
+        // unsubscribe
+        if (this.queryParamsSubscriber) {
+            this.queryParamsSubscriber.unsubscribe();
+            this.queryParamsSubscriber = null;
         }
     }
 
@@ -173,11 +215,11 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
     /**
      * Retrieve contacts
      */
-    private retrieveContacts(contactIds: number[]) {
+    private retrieveContacts() {
         // no contact ids ?
         if (
-            !contactIds ||
-            contactIds.length < 1
+            !this.contactIds ||
+            this.contactIds.length < 1
         ) {
             if (ContactModel.canList(this.authUser)) {
                 this.router.navigate(['/contacts']);
@@ -186,10 +228,15 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
             }
         }
 
+        // stop multiple requests
         // outbreak not retrieved ?
         if (
+            this.loadingData ||
             !this.selectedOutbreak ||
-            !this.selectedOutbreak.id
+            !this.selectedOutbreak.id || (
+                TeamModel.canList(this.authUser) &&
+                this.teamIdNameMap === undefined
+            )
         ) {
             return;
         }
@@ -198,13 +245,14 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         const qb = new RequestQueryBuilder();
         qb.filter.bySelect(
             'id',
-            contactIds,
+            this.contactIds,
             true,
             null
         );
 
         // retrieve contacts
         const loadingDialog = this.dialogService.showLoadingDialog();
+        this.loadingData = true;
         this.contactDataService
             .getContactsList(this.selectedOutbreak.id, qb)
             .pipe(catchError((err) => {
@@ -262,7 +310,15 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                                 // NOTHING
                                 break;
                             case SheetCellType.DROPDOWN:
-                                value = value ? this.i18nService.instant(value) : null;
+                                if ((column as DropdownSheetColumn).idTranslatesToLabel) {
+                                    value = value ? this.i18nService.instant(value) : null;
+                                } else {
+                                    switch (column.property) {
+                                        case 'followUpTeamId':
+                                            value = value && this.teamIdNameMap[value] ? this.teamIdNameMap[value] : null;
+                                            break;
+                                    }
+                                }
                                 break;
                         }
 
@@ -273,7 +329,8 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                     // return spreadsheet data
                     this.extraContactData.push({
                         id: contact.id,
-                        addresses: contact.addresses
+                        addresses: contact.addresses,
+                        followUpTeamId: contact.followUpTeamId
                     });
 
                     // finished
@@ -363,6 +420,30 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                 .setOptions(this.finalFollowUpStatus$, this.i18nService)
         ];
 
+        // add assigned team if we have permissions to do that
+        if (TeamModel.canList(this.authUser)) {
+            this.sheetColumns.push(
+                new DropdownSheetColumn()
+                    .setTitle('LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID')
+                    .setProperty('followUpTeamId')
+                    .setOptions(
+                        this.teamList$.pipe(
+                            map((teams: TeamModel[]) => {
+                                return teams.map((team) => {
+                                    return new LabelValuePair(
+                                        team.name,
+                                        team.id
+                                    );
+                                });
+                            }),
+                            share()
+                        ),
+                        this.i18nService,
+                        false
+                    )
+            );
+        }
+
         // configure the context menu
         this.sheetContextMenu = {
             items: {
@@ -426,6 +507,15 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                             (dataResponse.data || []).forEach((contactData, index: number) => {
                                 // set data
                                 contactData.id = this.extraContactData[index].id;
+
+                                // must reset follow-up team assign ?
+                                if (
+                                    TeamModel.canList(this.authUser) &&
+                                    this.extraContactData[index].followUpTeamId &&
+                                    !contactData.followUpTeamId
+                                ) {
+                                    contactData.followUpTeamId = null;
+                                }
 
                                 // create / modify address phone number
                                 if (contactData.addresses) {

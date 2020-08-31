@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -22,6 +22,8 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
     selector: 'app-clusters-people-list',
@@ -29,7 +31,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
     templateUrl: './clusters-people-list.component.html',
     styleUrls: ['./clusters-people-list.component.less']
 })
-export class ClustersPeopleListComponent extends ListComponent implements OnInit {
+export class ClustersPeopleListComponent extends ListComponent implements OnInit, OnDestroy {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -68,10 +70,10 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_ACTION_VIEW',
-            click: (item: CaseModel | ContactModel | EventModel) => {
+            click: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel) => {
                 this.router.navigateByUrl(this.getItemRouterLink(item, 'view'));
             },
-            visible: (item: CaseModel | ContactModel | EventModel): boolean => {
+            visible: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): boolean => {
                 return !item.deleted &&
                     item.canView(this.authUser);
             }
@@ -81,10 +83,10 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_ACTION_MODIFY',
-            click: (item: CaseModel | ContactModel | EventModel) => {
+            click: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel) => {
                 this.router.navigateByUrl(this.getItemRouterLink(item, 'modify'));
             },
-            visible: (item: CaseModel | ContactModel | EventModel): boolean => {
+            visible: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): boolean => {
                 return !item.deleted &&
                     this.authUser &&
                     this.selectedOutbreak &&
@@ -98,17 +100,16 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private route: ActivatedRoute,
         private outbreakDataService: OutbreakDataService,
         private clusterDataService: ClusterDataService,
         private authDataService: AuthDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private referenceDataDataService: ReferenceDataDataService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**
@@ -160,6 +161,14 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
 
         // initialize breadcrumbs
         this.initializeBreadcrumbs();
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**
@@ -240,6 +249,8 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
                 return `/cases/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
             case EntityType.CONTACT:
                 return `/contacts/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
+            case EntityType.CONTACT_OF_CONTACT:
+                return `/contacts-of-contacts/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
             case EntityType.EVENT:
                 return `/events/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
         }

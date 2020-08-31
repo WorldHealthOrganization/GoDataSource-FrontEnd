@@ -60,7 +60,8 @@
                                     [(ngModel)]="caseData.pregnancyStatus"
                                     [placeholder]="'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS' | translate"
                                     tooltip="LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION"
-                                    [options]="pregnancyStatusList$ | async">
+                                    [options]="pregnancyStatusList$ | async"
+                                    [clearable]="false">
                                 </app-form-select>
 
                                 <app-form-select
@@ -96,7 +97,8 @@
                                 [tooltipTranslateData]="visualIDTranslateData"
                                 [maxlength]="255"
                                 app-general-async-validator
-                                [asyncValidatorObservable]="caseIdMaskValidator">
+                                [asyncValidatorObservable]="caseIdMaskValidator"
+                                [validateOnlyWhenDirty]="true">
                             </app-form-input>
 
                             <app-form-datepicker
@@ -171,7 +173,18 @@
                 </app-form-document-list>
 
                 <div class="stepper-navigation-buttons">
-                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                    <button
+                        [disabled]="personalForm.pending"
+                        class="button-with-spinner"
+                        mat-raised-button color="accent" matStepperNext
+                    >
+                        <div
+                            *ngIf="personalForm.pending"
+                            class="loading-chips">
+                            <mat-spinner></mat-spinner>
+                        </div>
+                        {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
+                    </button>
                 </div>
             </form>
         </mat-step>
@@ -189,7 +202,18 @@
 
                 <div class="stepper-navigation-buttons">
                     <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                    <button
+                        [disabled]="addressForm.pending"
+                        class="button-with-spinner"
+                        mat-raised-button color="accent" matStepperNext
+                    >
+                        <div
+                            *ngIf="addressForm.pending"
+                            class="loading-chips">
+                            <mat-spinner></mat-spinner>
+                        </div>
+                        {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
+                    </button>
                 </div>
             </form>
         </mat-step>
@@ -227,7 +251,7 @@
                                 tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_ONSET_DESCRIPTION"
                                 [maxDate]="serverToday"
                                 app-date-validator
-                                required="true"
+                                [required]="selectedOutbreak ? selectedOutbreak.isDateOfOnsetRequired : true"
                                 [dateSameOrBefore]="[
                                     serverToday,
                                     'dateOfOutcome'
@@ -292,8 +316,8 @@
                                 app-date-validator
                                 [dateSameOrBefore]="serverToday"
                                 [dateSameOrAfter]="[
-                                'dateOfOnset'
-                            ]">
+                                    'dateOfOnset'
+                                ]">
                             </app-form-datepicker>
 
                             <app-form-slide-toggle
@@ -367,26 +391,18 @@
 
                 <div class="stepper-navigation-buttons">
                     <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
-                </div>
-            </form>
-        </mat-step>
-
-        <!-- Questionnaire step -->
-        <mat-step [stepControl]="questionnaireForm">
-            <form #questionnaireForm="ngForm">
-                <ng-template matStepLabel>{{ 'LNG_PAGE_CREATE_CASE_TAB_QUESTIONNAIRE_TITLE' | translate }}</ng-template>
-
-                <!-- Questionnaire section -->
-                <app-form-fill-questionnaire
-                    name="questionnaireAnswers"
-                    [ngModel]="caseData.questionnaireAnswers"
-                    [questions]="selectedOutbreak.caseInvestigationTemplate">
-                </app-form-fill-questionnaire>
-
-                <div class="stepper-navigation-buttons">
-                    <button matStepperPrevious mat-raised-button type="button">{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}</button>
+                    <button
+                        [disabled]="infectionForm.pending"
+                        class="button-with-spinner"
+                        mat-raised-button color="accent" matStepperNext
+                    >
+                        <div
+                            *ngIf="infectionForm.pending"
+                            class="loading-chips">
+                            <mat-spinner></mat-spinner>
+                        </div>
+                        {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
+                    </button>
                 </div>
             </form>
         </mat-step>
@@ -397,7 +413,7 @@
             {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
             <div class="stepper-navigation-buttons">
                 <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                <button *app-selected-outbreak-is-active type="button" mat-raised-button color="accent" (click)="createNewCase([personalForm, addressForm, infectionForm, questionnaireForm])">
+                <button *app-selected-outbreak-is-active type="button" mat-raised-button color="accent" (click)="createNewCase([personalForm, addressForm, infectionForm])">
                     {{'LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_BUTTON' | translate}}
                 </button>
             </div>

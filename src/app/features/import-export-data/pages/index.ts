@@ -9,6 +9,8 @@ import { ImportContactDataComponent } from './import-contact-data/import-contact
 import { ImportLocationDataComponent } from './import-location-data/import-location-data.component';
 import { ImportLanguageTokensComponent } from './import-language-tokens/import-language-tokens.component';
 import { ImportSyncPackageComponent } from './import-sync-package/import-sync-package.component';
+import { ImportRelationshipDataComponent } from './import-relationship-data/import-relationship-data.component';
+import { ImportContactOfContactDataComponent } from './import-contact-of-contact-data/import-contact-of-contact-data.component';
 
 // export each page component individually
 export * from './import-location-data/import-location-data.component';
@@ -21,6 +23,8 @@ export * from './import-case-data/import-case-data.component';
 export * from './import-contact-data/import-contact-data.component';
 export * from './import-language-tokens/import-language-tokens.component';
 export * from './import-sync-package/import-sync-package.component';
+export * from './import-relationship-data/import-relationship-data.component';
+export * from './import-contact-of-contact-data/import-contact-of-contact-data.component';
 
 // export the list of all page components
 export const pageComponents: any[] = [
@@ -31,7 +35,9 @@ export const pageComponents: any[] = [
     ImportReferenceDataComponent,
     ImportCaseDataComponent,
     ImportContactDataComponent,
+    ImportContactOfContactDataComponent,
     ImportLanguageTokensComponent,
     ImportSyncPackageComponent,
-    ImportContactLabDataComponent
+    ImportContactLabDataComponent,
+    ImportRelationshipDataComponent
 ];

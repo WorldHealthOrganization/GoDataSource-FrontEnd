@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserModel, UserRoleModel, PhoneNumberType } from '../../../../core/models/user.model';
@@ -20,6 +20,7 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-user-list',
@@ -27,7 +28,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
     templateUrl: './user-list.component.html',
     styleUrls: ['./user-list.component.less']
 })
-export class UserListComponent extends ListComponent implements OnInit {
+export class UserListComponent extends ListComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '.', true)
     ];
@@ -110,18 +111,17 @@ export class UserListComponent extends ListComponent implements OnInit {
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private userDataService: UserDataService,
         private authDataService: AuthDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private dialogService: DialogService,
         private outbreakDataService: OutbreakDataService,
         private userRoleDataService: UserRoleDataService,
         private referenceDataDataService: ReferenceDataDataService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**
@@ -134,20 +134,26 @@ export class UserListComponent extends ListComponent implements OnInit {
 
         this.institutionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.INSTITUTION_NAME);
 
-        this.outbreakDataService
+        this.outbreaksList$ = this.outbreakDataService
             .getOutbreaksListReduced()
-            .subscribe( (outbreaks) => {
-              _.forEach(outbreaks, (outbreak, key) => {
+            .pipe(tap((outbreaks) => {
+                (outbreaks || []).forEach((outbreak) => {
                     this.outbreaksListMap[outbreak.id] = outbreak;
                 });
-        });
-
-        this.outbreaksList$ = this.outbreakDataService.getOutbreaksListReduced();
+            }));
 
         // initialize pagination
         this.initPaginator();
         // ...and load the list of items
         this.needsRefreshList(true);
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

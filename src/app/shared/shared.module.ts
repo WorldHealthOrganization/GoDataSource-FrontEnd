@@ -56,7 +56,7 @@ import * as fromSharedPipes from './pipes';
         ...fromSharedComponents.components
     ],
     entryComponents: [
-        fromSharedComponents.SnackbarComponent,
+        fromSharedComponents.MultipleSnackbarComponent,
         fromSharedComponents.DialogComponent,
         fromSharedComponents.ModifyContactFollowUpQuestionnaireDialogComponent,
         fromSharedComponents.LoadingDialogComponent,

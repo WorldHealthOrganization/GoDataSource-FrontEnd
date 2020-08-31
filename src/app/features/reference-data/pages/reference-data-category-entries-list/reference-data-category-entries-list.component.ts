@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -17,6 +17,7 @@ import { throwError } from 'rxjs';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { IconModel } from '../../../../core/models/icon.model';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-reference-data-category-entries-list',
@@ -24,7 +25,7 @@ import { IconModel } from '../../../../core/models/icon.model';
     templateUrl: './reference-data-category-entries-list.component.html',
     styleUrls: ['./reference-data-category-entries-list.component.less']
 })
-export class ReferenceDataCategoryEntriesListComponent extends ListComponent implements OnInit {
+export class ReferenceDataCategoryEntriesListComponent extends ListComponent implements OnInit, OnDestroy {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -93,15 +94,16 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
-        protected route: ActivatedRoute,
+        private route: ActivatedRoute,
         private referenceDataDataService: ReferenceDataDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private dialogService: DialogService,
         private authDataService: AuthDataService,
         private i18nService: I18nService
     ) {
-        super(snackbarService);
+        super(listHelperService);
     }
 
     /**
@@ -136,6 +138,14 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

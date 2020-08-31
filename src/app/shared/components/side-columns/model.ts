@@ -10,6 +10,7 @@ export class VisibleColumnModel {
     required: boolean = false;
     visible: boolean = true;
     excludeFromSave: boolean = false;
+    excludeFromDisplay: (VisibleColumnModel) => boolean;
 
     /**
      * Constructor
@@ -23,7 +24,8 @@ export class VisibleColumnModel {
         label?: string,
         required?: boolean,
         visible?: boolean,
-        excludeFromSave?: boolean
+        excludeFromSave?: boolean,
+        excludeFromDisplay?: (VisibleColumnModel) => boolean
     }) {
         // assign properties
         Object.assign(

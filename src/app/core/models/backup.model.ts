@@ -9,6 +9,7 @@ export class BackupModel
         IPermissionRestorable,
         IPermissionBackup {
     id: string;
+    description: string;
     location: string;
     modules: string[];
     date: string;
@@ -71,6 +72,7 @@ export class BackupModel
      */
     constructor(data = null) {
         this.id = _.get(data, 'id', _.get(data, 'backupId'));
+        this.description = _.get(data, 'description');
         this.location = _.get(data, 'location');
         this.modules = _.get(data, 'modules', []);
         this.date = _.get(data, 'date');
