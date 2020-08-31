@@ -18,6 +18,7 @@ import { DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { FormLocationDropdownComponent } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
 
 @Component({
     selector: 'app-modify-team',
@@ -132,6 +133,11 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
 
         if (!this.formHelper.validateForm(form)) {
             return;
+        }
+
+        // if we've changed the location of the team, reset all location cache
+        if (dirtyFields.locationIds) {
+            FormLocationDropdownComponent.CACHE = {};
         }
 
         // show loading
