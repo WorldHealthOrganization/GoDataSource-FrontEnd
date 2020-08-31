@@ -197,6 +197,14 @@ export class Constants {
         CONTACTS: {
             label: 'LNG_APP_PAGE_CONTACTS',
             value: 'LNG_APP_PAGE_CONTACTS'
+        },
+        CONTACTS_OF_CONTACTS: {
+            label: 'LNG_APP_PAGE_CONTACTS_OF_CONTACTS',
+            value: 'LNG_APP_PAGE_CONTACTS_OF_CONTACTS'
+        },
+        EVENTS: {
+            label: 'LNG_APP_PAGE_EVENTS',
+            value: 'LNG_APP_PAGE_EVENTS'
         }
     };
 
@@ -208,6 +216,20 @@ export class Constants {
         PENDING: {
             label: 'LNG_DEVICE_WIPE_STATUS_PENDING',
             value: 'LNG_DEVICE_WIPE_STATUS_PENDING'
+        }
+    };
+
+    /**
+     * Outbreak follow-up generation system
+     */
+    static FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM = {
+        ROUND_ROBIN_ALL_TEAMS: {
+            label: 'LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_ROUND_ROBIN_ALL_TEAMS',
+            value: 'LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_ROUND_ROBIN_ALL_TEAMS'
+        },
+        ROUND_ROBIN_NEAREST_FIT: {
+            label: 'LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_ROUND_ROBIN_NEAREST_FIT',
+            value: 'LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_ROUND_ROBIN_NEAREST_FIT'
         }
     };
 
@@ -265,6 +287,10 @@ export class Constants {
             label: 'LNG_APP_PAGE_IMPORT_CONTACTS',
             value: 'LNG_APP_PAGE_IMPORT_CONTACTS'
         },
+        CONTACT_OF_CONTACT: {
+            label: 'LNG_APP_PAGE_IMPORT_CONTACTS_OF_CONTACTS',
+            value: 'LNG_APP_PAGE_IMPORT_CONTACTS_OF_CONTACTS'
+        },
         CASE_LAB_DATA: {
             label: 'LNG_APP_PAGE_IMPORT_CASE_LAB_DATA',
             value: 'LNG_APP_PAGE_IMPORT_CASE_LAB_DATA'
@@ -280,6 +306,10 @@ export class Constants {
         LOCATION_DATA: {
             label: 'LNG_APP_PAGE_IMPORT_LOCATION_DATA',
             value: 'LNG_APP_PAGE_IMPORT_LOCATION_DATA'
+        },
+        RELATIONSHIP_DATA: {
+            label: 'LNG_APP_PAGE_IMPORT_RELATIONSHIP_DATA',
+            value: 'LNG_APP_PAGE_IMPORT_RELATIONSHIP_DATA'
         }
     };
 
@@ -409,6 +439,15 @@ export class Constants {
         LOW: 'LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL_1_LOW',
         MEDIUM: 'LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL_2_MEDIUM',
         HIGH: 'LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL_3_HIGH'
+    };
+
+    /**
+     * Used to determine action that we need to take when duplicates are detected ( create / modify - case / contact)
+     */
+    static DUPLICATE_ACTION = {
+        NO_ACTION: 'LNG_DUPLICATES_DIALOG_ACTION_NONE',
+        NOT_A_DUPLICATE: 'LNG_DUPLICATES_DIALOG_ACTION_MARK_AS_NOT_A_DUPLICATE',
+        MERGE: 'LNG_DUPLICATES_DIALOG_ACTION_MERGE_DUPLICATE'
     };
 
     /**
@@ -613,9 +652,9 @@ export class Constants {
             label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_AGE',
             value: 'age'
         },
-        DATE_OF_ONSET: {
-            label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
-            value: 'dateOfOnset'
+        DATE_OF_ONSET_AND_EVENT_DATE: {
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_DATE_OF_ONSET_AND_EVENT_DATE',
+            value: 'dateOfOnsetAndEventDate'
         },
         GENDER: {
             label: 'LNG_CASE_FIELD_LABEL_GENDER',
@@ -923,6 +962,21 @@ export class Constants {
         REPORTING: {
             label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORTING_TITLE',
             value: 'reporting'
+        }
+    };
+
+    static EPI_CURVE_WEEK_TYPES = {
+        ISO: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_WEEK_TYPE_ISO',
+            value: 'iso'
+        },
+        EPI: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_WEEK_TYPE_EPI',
+            value: 'epi'
+        },
+        SUNDAY: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_WEEK_TYPE_SUNDAY',
+            value: 'sunday'
         }
     };
 

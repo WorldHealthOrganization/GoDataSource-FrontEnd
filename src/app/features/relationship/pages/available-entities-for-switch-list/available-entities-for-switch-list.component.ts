@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
@@ -16,10 +16,7 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { Constants } from '../../../../core/models/constants';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import {
-    ReferenceDataCategory, ReferenceDataCategoryModel,
-    ReferenceDataEntryModel
-} from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { EntityType } from '../../../../core/models/entity-type';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
@@ -27,13 +24,15 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { AddressType } from '../../../../core/models/address.model';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 
 @Component({
     selector: 'app-available-entities-for-switch-list',
     templateUrl: './available-entities-for-switch-list.component.html',
     styleUrls: ['./available-entities-for-switch-list.component.less']
 })
-export class AvailableEntitiesForSwitchListComponent extends RelationshipsListComponent implements OnInit {
+export class AvailableEntitiesForSwitchListComponent extends RelationshipsListComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     entitiesList$: Observable<(CaseModel|ContactModel|EventModel)[]>;
@@ -67,20 +66,25 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
         'place'
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
-        protected snackbarService: SnackbarService,
+        protected listHelperService: ListHelperService,
         protected router: Router,
         protected route: ActivatedRoute,
         protected authDataService: AuthDataService,
         protected outbreakDataService: OutbreakDataService,
         protected entityDataService: EntityDataService,
+        private snackbarService: SnackbarService,
         private relationshipDataService: RelationshipDataService,
         private referenceDataDataService: ReferenceDataDataService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private genericDataService: GenericDataService
     ) {
         // parent
         super(
-            snackbarService, router, route,
+            listHelperService, router, route,
             authDataService, outbreakDataService, entityDataService
         );
 
@@ -88,6 +92,9 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
         this.checkedIsMultiSelect = false;
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         super.ngOnInit();
 
@@ -115,6 +122,14 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
 
         // side filters
         this.generateSideFilters();
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**
@@ -158,6 +173,25 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
     onPersonLoaded() {
         // (re)initialize breadcrumbs
         this.initializeBreadcrumbs();
+    }
+
+    /**
+     * @Overrides parent method
+     */
+    clearQueryBuilder() {
+        // clear query builder
+        this.queryBuilder.clear();
+        // retrieve only available entity types
+        const availableTypes: EntityType[] = this.genericDataService.getAvailableRelatedEntityTypes(
+            this.entityType,
+            this.relationshipType,
+            Constants.APP_PAGE.AVAILABLE_ENTITIES_FOR_SWITCH.value
+        );
+        this.queryBuilder.filter.where({
+            type: {
+                'inq': availableTypes
+            }
+        });
     }
 
     private initializeBreadcrumbs() {

@@ -89,6 +89,18 @@ const routes: Routes = [
         }
     },
 
+    // Import contact of contact data
+    {
+      path: 'contact-of-contact-data/import',
+        component: fromPages.ImportContactOfContactDataComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.CONTACT_OF_CONTACT_IMPORT
+            ]
+        }
+    },
+
     // Import contact lab data
     {
         path: 'contact-lab-data/import',
@@ -109,6 +121,18 @@ const routes: Routes = [
         data: {
             permissions: [
                 PERMISSION.SYNC_IMPORT_PACKAGE
+            ]
+        }
+    },
+
+    // Import relationships data
+    {
+        path: 'relationships/import',
+        component: fromPages.ImportRelationshipDataComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.OUTBREAK_IMPORT_RELATIONSHIP
             ]
         }
     }

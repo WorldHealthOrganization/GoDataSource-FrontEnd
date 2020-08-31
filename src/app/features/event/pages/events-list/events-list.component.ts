@@ -14,8 +14,7 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
@@ -24,13 +23,14 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { LoadingDialogModel } from '../../../../shared/components/loading-dialog/loading-dialog.component';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
 
 @Component({
     selector: 'app-events-list',
@@ -50,6 +50,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
     // constants
     EventModel = EventModel;
     RelationshipModel = RelationshipModel;
+    OutbreakModel = OutbreakModel;
 
     // user list
     userList$: Observable<UserModel[]>;
@@ -264,24 +265,20 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private eventDataService: EventDataService,
         private outbreakDataService: OutbreakDataService,
         private authDataService: AuthDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private dialogService: DialogService,
-        protected listFilterDataService: ListFilterDataService,
-        private route: ActivatedRoute,
         private genericDataService: GenericDataService,
         private i18nService: I18nService,
         private userDataService: UserDataService,
-        private entityHelperService: EntityHelperService
+        private entityHelperService: EntityHelperService,
+        private redirectService: RedirectService
     ) {
-        super(
-            snackbarService,
-            listFilterDataService,
-            route.queryParams
-        );
+        super(listHelperService);
     }
 
     /**
@@ -312,7 +309,13 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
         this.initializeSideTableColumns();
     }
 
+    /**
+     * Release resources
+     */
     ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();
@@ -358,16 +361,27 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                 label: 'LNG_EVENT_FIELD_LABEL_EMAIL',
                 visible: false
             }),
-            new VisibleColumnModel({
-                field: 'numberOfContacts',
-                label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS',
-                visible: false
-            }),
-            new VisibleColumnModel({
-                field: 'numberOfExposures',
-                label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
-                visible: false
-            }),
+        ];
+
+        // number of contacts & exposures columns should be visible only on pages where we have relationships
+        // for cases without relationships we don't need these columns
+        if (this.appliedListFilter !== Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS) {
+            this.tableColumns.push(
+                new VisibleColumnModel({
+                    field: 'numberOfContacts',
+                    label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS',
+                    visible: false
+                }),
+                new VisibleColumnModel({
+                    field: 'numberOfExposures',
+                    label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+                    visible: false
+                })
+            );
+        }
+
+        // rest of columns :)
+        this.tableColumns.push(
             new VisibleColumnModel({
                 field: 'deleted',
                 label: 'LNG_EVENT_FIELD_LABEL_DELETED'
@@ -392,7 +406,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                 label: 'LNG_EVENT_FIELD_LABEL_UPDATED_AT',
                 visible: false
             })
-        ];
+        );
     }
 
     /**
@@ -409,10 +423,12 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             const clonedQB = _.cloneDeep(this.queryBuilder);
 
             // retrieve number of contacts & exposures for each record
-            clonedQB.filter.flag(
-                'countRelations',
-                true
-            );
+            if (this.appliedListFilter !== Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS) {
+                clonedQB.filter.flag(
+                    'countRelations',
+                    true
+                );
+            }
 
             // retrieve the list of Events
             this.eventsList$ = this.eventDataService
@@ -633,5 +649,27 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             this.selectedOutbreak.id,
             entity
         );
+    }
+
+    /**
+     * Navigate to Events without relationships
+     */
+    navigateToEventsWithoutRelationships() {
+        this.redirectService.to(
+            ['/events'], {
+                applyListFilter: Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS
+            }
+        );
+    }
+
+    /**
+     * Redirect to import relationship page
+     */
+    goToRelationshipImportPage() {
+        this.router.navigate(['/import-export-data', 'relationships', 'import'], {
+            queryParams: {
+                from: Constants.APP_PAGE.EVENTS.value
+            }
+        });
     }
 }

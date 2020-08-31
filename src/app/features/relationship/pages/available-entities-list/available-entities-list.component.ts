@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -24,6 +24,7 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { AddressType } from '../../../../core/models/address.model';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-available-entities-list',
@@ -31,7 +32,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
     templateUrl: './available-entities-list.component.html',
     styleUrls: ['./available-entities-list.component.less']
 })
-export class AvailableEntitiesListComponent extends RelationshipsListComponent implements OnInit {
+export class AvailableEntitiesListComponent extends RelationshipsListComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // entities list relationships
@@ -70,23 +71,30 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
         'address'
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
-        protected snackbarService: SnackbarService,
+        protected listHelperService: ListHelperService,
         protected router: Router,
         protected route: ActivatedRoute,
         protected authDataService: AuthDataService,
         protected outbreakDataService: OutbreakDataService,
         protected entityDataService: EntityDataService,
+        private snackbarService: SnackbarService,
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private relationshipDataService: RelationshipDataService
     ) {
         super(
-            snackbarService, router, route,
+            listHelperService, router, route,
             authDataService, outbreakDataService, entityDataService
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         super.ngOnInit();
 
@@ -119,6 +127,14 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
     }
 
     /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+    }
+
+    /**
      * @Overrides parent method
      */
     onDataInitialized() {
@@ -148,9 +164,12 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
     clearQueryBuilder() {
         // clear query builder
         this.queryBuilder.clear();
-
         // retrieve only available entity types
-        const availableTypes: EntityType[] = this.genericDataService.getAvailableRelatedEntityTypes(this.entityType, this.relationshipType);
+        const availableTypes: EntityType[] = this.genericDataService.getAvailableRelatedEntityTypes(
+            this.entityType,
+            this.relationshipType,
+            Constants.APP_PAGE.AVAILABLE_ENTITIES_FOR_RELATIONSHIPS.value
+        );
         this.queryBuilder.filter.where({
             type: {
                 'inq': availableTypes

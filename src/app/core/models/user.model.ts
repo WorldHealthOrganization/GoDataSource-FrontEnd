@@ -10,9 +10,12 @@ export enum UserSettings {
     DASHBOARD = 'dashboard',
     CASE_FIELDS = 'caseFields',
     CASE_LAB_FIELDS = 'caseLabFields',
+    CASE_WITHOUT_RELATIONSHIPS_FIELDS = 'caseWithoutRelationshipsFields',
     CONTACT_LAB_FIELDS = 'contactLabFields',
     CONTACT_FIELDS = 'contactFields',
+    CONTACT_OF_CONTACT_FIELDS = 'contactOfContactFields',
     EVENT_FIELDS = 'eventFields',
+    EVENT_WITHOUT_RELATIONSHIPS_FIELDS = 'eventWithoutRelationshipsFields',
     LOCATION_FIELDS= 'locationFields',
     LAB_RESULTS_FIELDS = 'labResults',
     RELATIONSHIP_FIELDS = 'relationshipFields',
@@ -28,7 +31,8 @@ export enum UserSettings {
     SYNC_LOGS_FIELDS = 'syncLogsFields',
     REF_DATA_CAT_ENTRIES_FIELDS = 'refDataCatEntriesFields',
     SHARE_RELATIONSHIPS = 'shareRelationships',
-    USER_ROLE_FIELDS = 'userRoleFields'
+    USER_ROLE_FIELDS = 'userRoleFields',
+    ENTITY_NOT_DUPLICATES_FIELDS = 'entityNotDuplicatesFields'
 }
 
 export enum PhoneNumberType {
@@ -43,9 +47,12 @@ abstract class UserSettingsHandlers {
     static DASHBOARD = UserSettingsDashboardModel;
     static CASE_FIELDS = [];
     static CASE_LAB_FIELDS = [];
+    static CASE_WITHOUT_RELATIONSHIPS_FIELDS = [];
     static CONTACT_LAB_FIELDS = [];
     static CONTACT_FIELDS = [];
+    static CONTACT_OF_CONTACT_FIELDS = [];
     static EVENT_FIELDS = [];
+    static EVENT_WITHOUT_RELATIONSHIPS_FIELDS = [];
     static LOCATION_FIELDS = [];
     static LAB_RESULTS_FIELDS = [];
     static RELATIONSHIP_FIELDS = [];
@@ -62,6 +69,7 @@ abstract class UserSettingsHandlers {
     static REF_DATA_CAT_ENTRIES_FIELDS = [];
     static SHARE_RELATIONSHIPS = [];
     static USER_ROLE_FIELDS = [];
+    static ENTITY_NOT_DUPLICATES_FIELDS = [];
 }
 
 export interface IPermissionExpressionAnd {
@@ -223,6 +231,7 @@ export class UserModel
     languageId: string;
     roleIds: string[];
     roles: UserRoleModel[] = [];
+    disregardGeographicRestrictions: boolean;
 
     // used to determine if permissions changed from last time we used this key
     private _permissionIdsHash: number;
@@ -299,6 +308,7 @@ export class UserModel
         this.availablePermissions = _.get(data, 'availablePermissions');
         this.institutionName = _.get(data, 'institutionName');
         this.telephoneNumbers = _.get(data, 'telephoneNumbers', {});
+        this.disregardGeographicRestrictions = _.get(data, 'disregardGeographicRestrictions', false);
 
         // initialize all settings
         this.initializeSettings(data);

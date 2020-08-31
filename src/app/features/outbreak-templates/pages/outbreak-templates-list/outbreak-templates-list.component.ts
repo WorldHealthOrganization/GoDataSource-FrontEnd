@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -19,6 +19,8 @@ import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 
 @Component({
     selector: 'app-outbreak-templates-list',
@@ -26,7 +28,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
     templateUrl: './outbreak-templates-list.component.html',
     styleUrls: ['./outbreak-templates-list.component.less']
 })
-export class OutbreakTemplatesListComponent extends ListComponent implements OnInit {
+export class OutbreakTemplatesListComponent extends ListComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE', '.', true)
     ];
@@ -38,6 +40,8 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
     outbreakTemplatesListCount$: Observable<IBasicCount>;
 
     diseasesList$: Observable<any[]>;
+    followUpsTeamAssignmentAlgorithm$: Observable<any[]>;
+    yesNoOptionsList$: Observable<any[]>;
 
     authUser: UserModel;
 
@@ -123,6 +127,17 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
                     }
                 }),
 
+                // View Outbreak template contact form
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE',
+                    click: (item: OutbreakTemplateModel) => {
+                        this.router.navigate(['/outbreak-templates', item.id, 'contact-questionnaire']);
+                    },
+                    visible: (): boolean => {
+                        return OutbreakTemplateModel.canModifyContactQuestionnaire(this.authUser);
+                    }
+                }),
+
                 // View Outbreak template contact follow-up form
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE',
@@ -171,17 +186,17 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService,
         private outbreakTemplateDataService: OutbreakTemplateDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private genericDataService: GenericDataService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**
@@ -193,6 +208,8 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
 
         // get the lists for forms
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
+        this.followUpsTeamAssignmentAlgorithm$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM);
+        this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
@@ -202,6 +219,14 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
 
         // ...and re-load the list when the Selected Outbreak is changed
         this.needsRefreshList(true);
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**
@@ -217,6 +242,21 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
             new VisibleColumnModel({
                 field: 'disease',
                 label: 'LNG_OUTBREAK_FIELD_LABEL_DISEASE'
+            }),
+            new VisibleColumnModel({
+                field: 'generateFollowUpsTeamAssignmentAlgorithm',
+                label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'generateFollowUpsOverwriteExisting',
+                label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'generateFollowUpsKeepTeamAssignment',
+                label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT',
+                visible: false
             })
         ];
     }

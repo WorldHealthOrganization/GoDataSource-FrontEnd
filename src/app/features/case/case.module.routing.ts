@@ -59,6 +59,33 @@ const routes: Routes = [
             PageChangeConfirmationGuard
         ]
     },
+    // Modify Case Questionnaire
+    {
+        path: ':caseId/view-questionnaire',
+        component: fromPages.ModifyQuestionnaireCaseComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.CASE_VIEW
+            ],
+            action: ViewModifyComponentAction.VIEW
+        }
+    },
+    // Modify Case Questionnaire
+    {
+        path: ':caseId/modify-questionnaire',
+        component: fromPages.ModifyQuestionnaireCaseComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.CASE_MODIFY
+            ],
+            action: ViewModifyComponentAction.MODIFY
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
+    },
     // View Case movement
     {
         path: ':caseId/movement',

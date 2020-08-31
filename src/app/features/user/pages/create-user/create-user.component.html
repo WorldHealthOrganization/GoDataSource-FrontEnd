@@ -70,7 +70,13 @@
                                 tooltip="LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS_DESCRIPTION">
                             </app-form-input>
 
-                            <div fxFlex><!-- placeholder --></div>
+                            <app-form-slide-toggle
+                                name="disregardGeographicRestrictions"
+                                [(ngModel)]="newUser.disregardGeographicRestrictions"
+                                [label]="'LNG_USER_FIELD_LABEL_DISREGARD_GEOGRAPHIC_RESTRICTIONS' | translate"
+                                tooltip="LNG_USER_FIELD_LABEL_DISREGARD_GEOGRAPHIC_RESTRICTIONS_DESCRIPTION">
+                            </app-form-slide-toggle>
+
                             <div fxFlex><!-- placeholder --></div>
                         </div>
 

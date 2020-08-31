@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@ang
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, throwError } from 'rxjs';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { Constants } from '../../../../core/models/constants';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
@@ -30,12 +30,12 @@ import { catchError, map, share, tap } from 'rxjs/operators';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { FollowUpsListComponent } from '../../helper-classes/follow-ups-list-component';
 import { FollowUpPage } from '../../typings/follow-up-page';
-import { throwError } from 'rxjs';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { TeamModel } from '../../../../core/models/team.model';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -74,6 +74,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     caseClassificationsList$: Observable<any[]>;
     yesNoOptionsWithoutAllList$: Observable<any[]>;
     outcomeList$: Observable<any[]>;
+    riskLevelsList$: Observable<any[]>;
 
     // provide constants to template
     Constants = Constants;
@@ -144,8 +145,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                     this.authUser &&
                     this.selectedOutbreak &&
                     this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                    FollowUpModel.canModify(this.authUser) &&
-                    !Constants.isDateInTheFuture(item.date);
+                    FollowUpModel.canModify(this.authUser);
             }
         }),
 
@@ -223,12 +223,13 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
      * Constructor
      */
     constructor(
-        protected snackbarService: SnackbarService,
+        protected listHelperService: ListHelperService,
         protected dialogService: DialogService,
         protected followUpsDataService: FollowUpsDataService,
         protected router: Router,
         protected i18nService: I18nService,
         protected teamDataService: TeamDataService,
+        private snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
@@ -238,7 +239,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         private userDataService: UserDataService
     ) {
         super(
-            snackbarService, dialogService, followUpsDataService,
+            listHelperService, dialogService, followUpsDataService,
             router, i18nService, teamDataService
         );
     }
@@ -255,6 +256,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         // dropdowns options
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
         this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
+        this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
 
         // retrieve users
         this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
@@ -345,6 +347,9 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
      * Component destroyed
      */
     ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();
@@ -468,8 +473,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             }),
             new VisibleColumnModel({
                 field: 'team',
-                label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
-                visible: false
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM'
             }),
             new VisibleColumnModel({
                 field: 'statusId',
@@ -498,6 +502,11 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             new VisibleColumnModel({
                 field: 'contact.followUp.endDate',
                 label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP'
+            }),
+            new VisibleColumnModel({
+                field: 'contact.riskLevel',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'index',
@@ -649,6 +658,14 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         fieldLabel: 'LNG_CONTACT_FIELD_LABEL_GENDER',
                         type: FilterType.MULTISELECT,
                         options$: this.genderOptionsList$,
+                        relationshipPath: ['contact'],
+                        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+                    }),
+                    new FilterModel({
+                        fieldName: 'riskLevel',
+                        fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL',
+                        type: FilterType.MULTISELECT,
+                        options$: this.riskLevelsList$,
                         relationshipPath: ['contact'],
                         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
                     }),
@@ -1011,60 +1028,90 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
      * Generate Follow Ups
      */
     generateFollowUps() {
-        if (this.selectedOutbreak) {
-            this.genericDataService
-                .getFilterYesNoOptions()
-                .subscribe((yesNoOptions: LabelValuePair[]) => {
-                    const yesNoOptionsFiltered: LabelValuePair[] = _.filter(yesNoOptions, (item: LabelValuePair) => _.isBoolean(item.value));
-                    this.dialogService
-                        .showInput(new DialogConfiguration({
-                            message: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TITLE',
-                            yesLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_YES_BUTTON',
-                            fieldsList: [
-                                new DialogField({
-                                    name: 'dates',
-                                    required: true,
-                                    value: {
-                                        startDate: moment().add(1, 'days').startOf('day').format(),
-                                        endDate: moment().add(1, 'days').endOf('day').format()
-                                    },
-                                    fieldType: DialogFieldType.DATE_RANGE
-                                }),
-                                new DialogField({
-                                    name: 'targeted',
-                                    placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TARGETED_LABEL',
-                                    inputOptions: yesNoOptionsFiltered,
-                                    inputOptionsClearable: false,
-                                    required: true,
-                                    value: true
-                                })
-                            ]
-                        }))
-                        .subscribe((answer: DialogAnswer) => {
-                            if (answer.button === DialogAnswerButton.Yes) {
-                                this.followUpsDataService
-                                    .generateFollowUps(
-                                        this.selectedOutbreak.id,
-                                        answer.inputValue.value.dates.startDate,
-                                        answer.inputValue.value.dates.endDate,
-                                        answer.inputValue.value.targeted
-                                    )
-                                    .pipe(
-                                        catchError((err) => {
-                                            this.snackbarService.showApiError(err);
-                                            return throwError(err);
-                                        })
-                                    )
-                                    .subscribe(() => {
-                                        this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
-
-                                        // reload data
-                                        this.needsRefreshList(true);
-                                    });
-                            }
-                        });
-                });
+        // must have outbreak
+        if (
+            !this.selectedOutbreak ||
+            !this.selectedOutbreak.id
+        ) {
+            return;
         }
+
+        // display dialog
+        this.genericDataService
+            .getFilterYesNoOptions()
+            .subscribe((yesNoOptions: LabelValuePair[]) => {
+                const yesNoOptionsFiltered: LabelValuePair[] = _.filter(yesNoOptions, (item: LabelValuePair) => _.isBoolean(item.value));
+                this.dialogService
+                    .showInput(new DialogConfiguration({
+                        message: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TITLE',
+                        yesLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_YES_BUTTON',
+                        fieldsList: [
+                            new DialogField({
+                                name: 'dates',
+                                required: true,
+                                value: {
+                                    startDate: moment().add(1, 'days').startOf('day').format(),
+                                    endDate: moment().add(1, 'days').endOf('day').format()
+                                },
+                                fieldType: DialogFieldType.DATE_RANGE
+                            }),
+                            new DialogField({
+                                name: 'targeted',
+                                placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TARGETED_LABEL',
+                                inputOptions: yesNoOptionsFiltered,
+                                inputOptionsClearable: false,
+                                required: true,
+                                value: true
+                            }),
+                            new DialogField({
+                                name: 'overwriteExistingFollowUps',
+                                placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_OVERWRITE_EXISTING_LABEL',
+                                description: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_OVERWRITE_EXISTING_LABEL_DESCRIPTION',
+                                inputOptions: yesNoOptionsFiltered,
+                                inputOptionsClearable: false,
+                                required: true,
+                                value: this.selectedOutbreak.generateFollowUpsOverwriteExisting
+                            }),
+                            new DialogField({
+                                name: 'keepTeamAssignment',
+                                placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_KEEP_TEAM_ASSIGNMENT_LABEL',
+                                description: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_KEEP_TEAM_ASSIGNMENT_LABEL_DESCRIPTION',
+                                inputOptions: yesNoOptionsFiltered,
+                                inputOptionsClearable: false,
+                                required: true,
+                                value: this.selectedOutbreak.generateFollowUpsKeepTeamAssignment,
+                                visible: (dialogFieldsValues: any): boolean => {
+                                    return !dialogFieldsValues.overwriteExistingFollowUps;
+                                }
+                            })
+                        ]
+                    }))
+                    .subscribe((answer: DialogAnswer) => {
+                        if (answer.button === DialogAnswerButton.Yes) {
+                            this.followUpsDataService
+                                .generateFollowUps(
+                                    this.selectedOutbreak.id,
+                                    answer.inputValue.value.dates.startDate,
+                                    answer.inputValue.value.dates.endDate,
+                                    answer.inputValue.value.targeted,
+                                    answer.inputValue.value.overwriteExistingFollowUps,
+                                    answer.inputValue.value.keepTeamAssignment
+                                )
+                                .pipe(
+                                    catchError((err) => {
+                                        this.snackbarService.showApiError(err);
+                                        return throwError(err);
+                                    })
+                                )
+                                .subscribe(() => {
+                                    this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
+
+                                    // reload data
+                                    this.needsRefreshList(true);
+                                });
+                        }
+                    });
+            });
     }
 
     /**

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
@@ -32,6 +32,7 @@ import { EntityModel } from '../../../../core/models/entity-and-relationship.mod
 import { EntityType } from '../../../../core/models/entity-type';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-entity-lab-results-list',
@@ -39,7 +40,7 @@ import { moment } from '../../../../core/helperClasses/x-moment';
     templateUrl: './entity-lab-results-list.component.html',
     styleUrls: ['./entity-lab-results-list.component.less']
 })
-export class EntityLabResultsListComponent extends ListComponent implements OnInit {
+export class EntityLabResultsListComponent extends ListComponent implements OnInit, OnDestroy {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -196,6 +197,39 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
                     class: 'mat-menu-item-delete'
                 }),
 
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
+                    visible: (item: LabResultModel): boolean => {
+                        // visible only if at least one of the first two items is visible
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            LabResultModel.canDelete(this.authUser) && (
+                                (
+                                    item.personType === EntityType.CASE &&
+                                    CaseModel.canDeleteLabResult(this.authUser)
+                                ) || (
+                                    item.personType === EntityType.CONTACT &&
+                                    ContactModel.canDeleteLabResult(this.authUser)
+                                )
+                            );
+                    }
+                }),
+
+                // See questionnaire
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_MODIFY_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE',
+                    click: (item: LabResultModel) => {
+                        this.router.navigate(['/lab-results', item.id , 'view-questionnaire']);
+                    },
+                    visible: (item: LabResultModel): boolean => {
+                        return !item.deleted &&
+                            LabResultModel.canView(this.authUser);
+                    }
+                }),
+
                 // Restore a deleted Lab Results
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT',
@@ -227,6 +261,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private authDataService: AuthDataService,
         private route: ActivatedRoute,
@@ -234,16 +269,14 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
         private caseDataService: CaseDataService,
         private contactDataService: ContactDataService,
         private labResultDataService: LabResultDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private dialogService: DialogService,
         private referenceDataDataService: ReferenceDataDataService,
         private genericDataService: GenericDataService,
         private userDataService: UserDataService,
         private i18nService: I18nService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**
@@ -336,6 +369,14 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

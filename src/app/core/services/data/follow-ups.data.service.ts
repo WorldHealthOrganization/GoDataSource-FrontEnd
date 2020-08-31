@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { ContactFollowUpsModel } from '../../models/contact-follow-ups.model';
 import { FollowUpModel } from '../../models/follow-up.model';
@@ -17,13 +17,14 @@ import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class FollowUpsDataService {
-
+    /**
+     * Constructor
+     */
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService,
         private locationDataService: LocationDataService
-    ) {
-    }
+    ) {}
 
     /**
      * Generate followups for contacts
@@ -33,15 +34,34 @@ export class FollowUpsDataService {
         outbreakId: string,
         startDate: any,
         endDate: any,
-        targeted: boolean
+        targeted: boolean,
+        overwriteExistingFollowUps: boolean,
+        keepTeamAssignment: boolean
     ): Observable<ContactFollowUpsModel> {
+        // construct generate options
+        const options: {
+            startDate: any,
+            endDate: any,
+            targeted: boolean,
+            overwriteExistingFollowUps: boolean,
+            keepTeamAssignment?: boolean
+        } = {
+            startDate: startDate,
+            endDate: endDate,
+            targeted: targeted,
+            overwriteExistingFollowUps: overwriteExistingFollowUps
+        };
+
+        // keepTeamAssignment is relevant only if overwriteExistingFollowUps is disabled
+        if (!overwriteExistingFollowUps) {
+            options.keepTeamAssignment = keepTeamAssignment;
+        }
+
+        // generate follow-ups
         return this.modelHelper.mapObservableToModel(
             this.http.post(
-                `outbreaks/${outbreakId}/generate-followups`, {
-                    startDate: startDate,
-                    endDate: endDate,
-                    targeted: targeted
-                }
+                `outbreaks/${outbreakId}/generate-followups`,
+                options
             ),
             ContactFollowUpsModel
         );
@@ -61,20 +81,51 @@ export class FollowUpsDataService {
     ): Observable<FollowUpModel[]> {
         // construct query
         const filter = queryBuilder.buildQuery();
-
-        // retrieve locations
-        return this.locationDataService
-            .getLocationsList()
+        return this.modelHelper
+            .mapObservableListToModel(
+                this.http.get(`outbreaks/${outbreakId}/follow-ups?filter=${filter}`),
+                FollowUpModel
+            )
             .pipe(
-                mergeMap((locations) => {
-                    // map names to id
-                    const locationsMapped = _.groupBy(locations, 'id');
-                    return this.modelHelper.mapObservableListToModel(
-                        this.http.get(`outbreaks/${outbreakId}/follow-ups?filter=${filter}`),
-                        FollowUpModel
-                    )
+                mergeMap((followUps) => {
+                    // determine locations that we need to retrieve
+                    let locationIdsToRetrieve: any = {};
+                    (followUps || []).forEach((followUp) => {
+                        if (
+                            followUp.address &&
+                            followUp.address.locationId
+                        ) {
+                            locationIdsToRetrieve[followUp.address.locationId] = true;
+                        }
+                    });
+
+                    // we don't need to retrieve locations ?
+                    locationIdsToRetrieve = Object.keys(locationIdsToRetrieve);
+                    if (locationIdsToRetrieve.length < 1) {
+                        return of(followUps);
+                    }
+
+                    // construct query builder
+                    const qb: RequestQueryBuilder = new RequestQueryBuilder();
+                    qb.filter.bySelect(
+                        'id',
+                        locationIdsToRetrieve,
+                        false,
+                        null
+                    );
+
+                    // retrieve locations
+                    return this.locationDataService
+                        .getLocationsList(qb)
                         .pipe(
-                            map((followUps) => {
+                            map((locations) => {
+                                // map locations
+                                const locationsMapped = {};
+                                (locations || []).forEach((location) => {
+                                    locationsMapped[location.id] = location;
+                                });
+
+                                // map names to id
                                 return _.map(followUps, (followUp: FollowUpModel) => {
                                     // map location
                                     if (
@@ -82,7 +133,7 @@ export class FollowUpsDataService {
                                         followUp.address.locationId
                                     ) {
                                         followUp.address.location = locationsMapped[followUp.address.locationId] ?
-                                            locationsMapped[followUp.address.locationId][0] :
+                                            locationsMapped[followUp.address.locationId] :
                                             null;
                                     }
 
@@ -93,6 +144,9 @@ export class FollowUpsDataService {
                         );
                 })
             );
+
+
+
     }
 
     /**
@@ -179,6 +233,23 @@ export class FollowUpsDataService {
         return this.modelHelper.mapObservableToModel(
             this.http.put(`outbreaks/${outbreakId}/contacts/${contactId}/follow-ups/${followUpId}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`, followUpData),
             FollowUpModel
+        );
+    }
+
+    /**
+     * Modify multiple follow-ups
+     * @param outbreakId
+     * @param followUpData
+     */
+    bulkModifyFollowUps(
+        outbreakId: string,
+        followUpData,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ) {
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+        return this.http.put(
+            `outbreaks/${outbreakId}/follow-ups/bulk?where=${whereFilter}`,
+            followUpData
         );
     }
 

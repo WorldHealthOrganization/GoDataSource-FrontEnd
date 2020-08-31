@@ -28,6 +28,7 @@ import { ClusterDataService } from '../../../../core/services/data/cluster.data.
 import { catchError, share } from 'rxjs/operators';
 import { throwError, forkJoin } from 'rxjs';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
     selector: 'app-create-entity-relationship',
@@ -51,6 +52,10 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
         [EntityType.EVENT]: {
             'label': 'LNG_PAGE_LIST_EVENTS_TITLE',
             'link': '/events'
+        },
+        [EntityType.CONTACT_OF_CONTACT]: {
+            'label': 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
+            'link': '/contacts-of-contacts'
         }
     };
 
@@ -59,12 +64,12 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
     // route params
     entityType: EntityType;
     entityId: string;
-    entity: CaseModel | ContactModel | EventModel;
+    entity: CaseModel | ContactModel | EventModel | ContactOfContactModel;
     // route data
     relationshipType: RelationshipType;
 
     selectedEntityIds: string[];
-    selectedEntities: (CaseModel | ContactModel | EventModel)[];
+    selectedEntities: (CaseModel | ContactModel | EventModel | ContactOfContactModel)[];
 
     relationships: RelationshipModel[] = [];
     relationshipsIds: string[] = [];
@@ -167,7 +172,7 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
                         return throwError(err);
                     })
                 )
-                .subscribe((entityData: CaseModel | ContactModel | EventModel) => {
+                .subscribe((entityData: CaseModel | ContactModel | EventModel | ContactOfContactModel) => {
                     this.entity = entityData;
 
                     this.initializeBreadcrumbs();

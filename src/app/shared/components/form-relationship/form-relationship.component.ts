@@ -15,6 +15,8 @@ import { share } from 'rxjs/operators';
 import { moment } from '../../../core/helperClasses/x-moment';
 import { RelationshipModel } from '../../../core/models/entity-and-relationship.model';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { ClusterModel } from '../../../core/models/cluster.model';
+import { AuthDataService } from '../../../core/services/data/auth.data.service';
 
 @Component({
     selector: 'app-form-relationship',
@@ -61,7 +63,8 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
         private clusterDataService: ClusterDataService,
         private outbreakDataService: OutbreakDataService,
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        private authDataService: AuthDataService
     ) {
         super(controlContainer, validators, asyncValidators);
     }
@@ -96,10 +99,16 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
                 if (this.selectedOutbreak) {
+                    // get authenticated user
+                    const authUser = this.authDataService.getAuthenticatedUser();
+
                     // get the minimum date of last contact
                     this.getMinimumDate();
                     // get clusters
-                    if (!this.clusterOptions$) {
+                    if (
+                        !this.clusterOptions$ &&
+                        ClusterModel.canList(authUser)
+                    ) {
                         this.clusterOptions$ = this.clusterDataService.getClusterList(this.selectedOutbreak.id);
                     }
                 }

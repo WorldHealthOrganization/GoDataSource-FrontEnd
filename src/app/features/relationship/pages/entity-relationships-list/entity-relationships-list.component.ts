@@ -29,6 +29,8 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { Subscription } from 'rxjs/internal/Subscription';
 import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ClusterModel } from '../../../../core/models/cluster.model';
 
 @Component({
     selector: 'app-entity-relationships-list',
@@ -127,12 +129,13 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
      * Constructor
      */
     constructor(
-        protected snackbarService: SnackbarService,
+        protected listHelperService: ListHelperService,
         protected router: Router,
         protected route: ActivatedRoute,
         protected authDataService: AuthDataService,
         protected outbreakDataService: OutbreakDataService,
         protected entityDataService: EntityDataService,
+        private snackbarService: SnackbarService,
         private relationshipDataService: RelationshipDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService,
@@ -141,10 +144,9 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     ) {
         // parent
         super(
-            snackbarService, router, route,
+            listHelperService, router, route,
             authDataService, outbreakDataService, entityDataService
         );
-
         // set checkbox key ( id ) path for current list component
         this.checkedKeyPath = 'relationship.id';
     }
@@ -158,7 +160,10 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
         this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((outbreak: OutbreakModel) => {
-                if (outbreak) {
+                if (
+                    outbreak &&
+                    ClusterModel.canList(this.authUser)
+                ) {
                     // update the selected outbreak
                     this.clusterOptions$ = this.clusterDataService.getClusterListAsLabelValue(outbreak.id).pipe(share());
                 }
@@ -187,7 +192,13 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
         this.initializeSideTableColumns();
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();
@@ -284,12 +295,20 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                 field: 'socialRelationshipDetail',
                 label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL',
                 visible: false
-            }),
-            new VisibleColumnModel({
-                field: 'clusterId',
-                label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
-                visible: false
-            }),
+            })
+        ];
+
+        if (ClusterModel.canList(this.authUser)) {
+            this.tableColumns.push(
+                new VisibleColumnModel({
+                    field: 'clusterId',
+                    label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+                    visible: false
+                })
+            );
+        }
+
+        this.tableColumns.push(
             new VisibleColumnModel({
                 field: 'createdBy',
                 label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_BY',
@@ -310,7 +329,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                 label: 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_AT',
                 visible: false
             })
-        ];
+        );
     }
 
     /**

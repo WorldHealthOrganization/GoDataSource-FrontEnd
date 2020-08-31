@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
-import { TransmissionChainModel } from '../../models/transmission-chain.model';
+import { TransmissionChainGroupModel } from '../../models/transmission-chain.model';
 import { MetricIndependentTransmissionChainsModel } from '../../models/metrics/metric-independent-transmission-chains.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { GraphNodeModel } from '../../models/graph-node.model';
@@ -15,6 +15,10 @@ import { LocationModel } from '../../models/location.model';
 import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache';
 import { map } from 'rxjs/operators';
 import { moment } from '../../helperClasses/x-moment';
+import { ContactModel } from '../../models/contact.model';
+import { ContactOfContactModel } from '../../models/contact-of-contact.model';
+import { EventModel } from '../../models/event.model';
+import { CaseModel } from '../../models/case.model';
 
 export interface IConvertChainToGraphElements {
     nodes: {
@@ -36,95 +40,59 @@ export class TransmissionChainDataService {
         private http: HttpClient,
         private modelHelper: ModelHelperService,
         private i18nService: I18nService
-    ) {
-    }
-
-    /**
-     * Map Transmission chain to Chain model
-     */
-    private mapTransmissionChainToModel(result) {
-        const nodes = _.get(result, 'nodes', {});
-        const edges = _.get(result, 'edges', {});
-        const transmissionChains = _.get(result, 'transmissionChains.chains', []);
-
-        return _.map(transmissionChains, (chain) => {
-            return new TransmissionChainModel(chain, nodes, Object.values(edges));
-        });
-    }
+    ) {}
 
     /**
      * Map Transmission chain data to Chain model - we need to return the nodes even if there is no chain found
      */
-    private mapTransmissionChainDataToModel(result) {
+    private mapTransmissionChainDataToModel(result): TransmissionChainGroupModel {
+        // retrieve chain data
         const nodes = _.get(result, 'nodes', {});
         const edges = _.get(result, 'edges', {});
         const transmissionChains = _.get(result, 'transmissionChains.chains', []);
 
-        if (_.isEmpty(transmissionChains)) {
-            return [new TransmissionChainModel({}, nodes, Object.values(edges))];
-        }
-
-        return _.map(transmissionChains, (chain) => {
-            return new TransmissionChainModel(chain, nodes, Object.values(edges));
-        });
+        // create chain group
+        return new TransmissionChainGroupModel(
+            nodes,
+            edges,
+            transmissionChains
+        );
     }
 
     /**
      * Retrieve the list of Independent Transmission Chains, nodes, edges
      * @param {string} outbreakId
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<TransmissionChainModel[]>}
+     * @returns {Observable<TransmissionChainGroupModel>}
      */
     getIndependentTransmissionChainData(
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<TransmissionChainModel[]> {
+    ): Observable<TransmissionChainGroupModel> {
         // generate filter
         const filter = queryBuilder.buildQuery();
-        return this.http.get(
-            `outbreaks/${outbreakId}/relationships/independent-transmission-chains?filter=${filter}`
-        )
+        return this.http
+            .get(`outbreaks/${outbreakId}/relationships/independent-transmission-chains?filter=${filter}`)
             .pipe(
-                map(this.mapTransmissionChainDataToModel)
+                map(this.mapTransmissionChainDataToModel),
             );
     }
-
-    /**
-     * Retrieve the list of Independent Transmission Chains
-     * @param {string} outbreakId
-     * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<TransmissionChainModel[]>}
-     */
-    getIndependentTransmissionChainsList(
-        outbreakId: string,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<TransmissionChainModel[]> {
-        const filter = queryBuilder.buildQuery();
-        return this.http.get(
-            `outbreaks/${outbreakId}/relationships/independent-transmission-chains?filter=${filter}`
-        )
-            .pipe(
-                map(this.mapTransmissionChainToModel)
-            );
-    }
-
 
     /**
      * Retrieve the list of New Transmission Chains from contacts who became cases
      * @param {string} outbreakId
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<TransmissionChainModel[]>}
+     * @returns {Observable<TransmissionChainGroupModel>}
      */
     getTransmissionChainsFromContactsWhoBecameCasesList(
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<TransmissionChainModel[]> {
+    ): Observable<TransmissionChainGroupModel> {
         const filter = queryBuilder.buildQuery();
-        return this.http.get(
-            `outbreaks/${outbreakId}/relationships/new-transmission-chains-from-registered-contacts-who-became-cases?filter=${filter}`
-        )
+        return this.http
+            .get(`outbreaks/${outbreakId}/relationships/new-transmission-chains-from-registered-contacts-who-became-cases?filter=${filter}`)
             .pipe(
-                map(this.mapTransmissionChainToModel)
+                map(this.mapTransmissionChainDataToModel)
             );
     }
 
@@ -172,19 +140,21 @@ export class TransmissionChainDataService {
     }
 
     /**
-     * convert transmission chain model to the format needed by the graph
-     * @param chains
+     * Convert transmission chain model to the format needed by the graph
+     * @param chainGroup
      * @param filters
      * @param colorCriteria
-     * @param locationsList
+     * @param locationsListMap
      * @param selectedViewType
      * @returns {any}
      */
     convertChainToGraphElements(
-        chains,
+        chainGroup: TransmissionChainGroupModel,
         filters: any,
         colorCriteria: any,
-        locationsList: LocationModel[],
+        locationsListMap: {
+            [idLocation: string]: LocationModel
+        },
         selectedViewType: string = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value
     ): IConvertChainToGraphElements {
         const graphData: IConvertChainToGraphElements = {
@@ -197,14 +167,10 @@ export class TransmissionChainDataService {
             timelineDateCheckpoints: []
         };
 
-        const locationsListMap = {};
-        // build locations list map for further use
-        if (!_.isEmpty(locationsList)) {
-            locationsList.forEach((loc) => {
-                locationsListMap[loc.id] = loc;
-            });
-        }
-        const selectedNodeIds: string[] = [];
+        const selectedNodeIds: {
+            [idPerson: string]: true
+        } = {};
+
         // get labels for years / months - age field
         const yearsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS');
         const monthsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS');
@@ -215,354 +181,447 @@ export class TransmissionChainDataService {
         const onsetLabel = this.i18nService.instant('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ONSET_LABEL');
         const onsetApproximateLabel = this.i18nService.instant('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ONSET_APRROXIMATE_LABEL');
 
-        if (!_.isEmpty(chains)) {
-            // will use firstChainData to load all the nodes
-            const firstChain = chains[0];
-            if (!_.isEmpty(firstChain.nodes)) {
-                _.forEach(firstChain.nodes, (node) => {
-                    let allowAdd = false;
-                    const nodeProps = node.model;
-                    // show nodes based on their type
-                    if (node.type === EntityType.CONTACT && filters.showContacts) {
-                        allowAdd = true;
-                        if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
-                            || selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value) {
-                            if (!_.isEmpty(node.model.dateOfLastContact)) {
-                                nodeProps.dateTimeline = node.model.dateOfLastContact;
-                            } else {
-                                graphData.contactNodesWithoutDates.push(node.model.id);
-                            }
-                        } else if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value) {
-                            if (!_.isEmpty(node.model.dateOfReporting)) {
-                                nodeProps.dateTimeline = node.model.dateOfReporting;
-                            } else {
-                                graphData.contactNodesWithoutDates.push(node.model.id);
-                            }
+        // will use firstChainData to load all the nodes
+        if (!_.isEmpty(chainGroup.nodesMap)) {
+            _.forEach(chainGroup.nodesMap, (node) => {
+                // prepare node
+                let allowAdd = false;
+                const nodeProps: any = node.model;
+
+                // show nodes based on their type
+                if (
+                    node.type === EntityType.CONTACT &&
+                    filters.showContacts
+                ) {
+                    const contactData: ContactModel = node.model as ContactModel;
+                    allowAdd = true;
+                    if (
+                        selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value ||
+                        selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
+                    ) {
+                        if (contactData.dateOfLastContact) {
+                            nodeProps.dateTimeline = contactData.dateOfLastContact;
                         } else {
-                            nodeProps.dateTimeline = null;
+                            graphData.contactNodesWithoutDates.push(contactData.id);
                         }
-                    } else if (node.type === EntityType.EVENT && filters.showEvents) {
-                        allowAdd = true;
-                        if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
-                            || selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value) {
-                            if (!_.isEmpty(node.model.date)) {
-                                nodeProps.dateTimeline = node.model.date;
-                            } else {
-                                graphData.eventNodesWithoutDates.push(node.model.id);
-                            }
-                        } else if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value) {
-                            if (!_.isEmpty(node.model.dateOfReporting)) {
-                                nodeProps.dateTimeline = node.model.dateOfReporting;
-                            } else {
-                                graphData.eventNodesWithoutDates.push(node.model.id);
-                            }
+                    } else if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value) {
+                        if (contactData.dateOfReporting) {
+                            nodeProps.dateTimeline = contactData.dateOfReporting;
                         } else {
-                            nodeProps.dateTimeline = null;
+                            graphData.contactNodesWithoutDates.push(contactData.id);
                         }
-                    } else if (node.type === EntityType.CASE) {
-                        allowAdd = true;
-                        if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value) {
-                            if (!_.isEmpty(node.model.dateOfOnset)) {
-                                nodeProps.dateTimeline = node.model.dateOfOnset;
-                            } else {
-                                graphData.caseNodesWithoutDates.push(node.model.id);
-                            }
-                        } else if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value) {
-                            if (!_.isEmpty(node.model.dateOfLastContact)) {
-                                nodeProps.dateTimeline = node.model.dateOfLastContact;
-                            } else {
-                                graphData.caseNodesWithoutDates.push(node.model.id);
-                            }
-                        } else if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value) {
-                            if (!_.isEmpty(node.model.dateOfReporting)) {
-                                nodeProps.dateTimeline = node.model.dateOfReporting;
-                            } else {
-                                graphData.caseNodesWithoutDates.push(node.model.id);
-                            }
+                    } else {
+                        nodeProps.dateTimeline = null;
+                    }
+                } else if (
+                    node.type === EntityType.CONTACT_OF_CONTACT &&
+                    filters.showContacts
+                ) {
+                    const contactOfContactData: ContactOfContactModel = node.model as ContactOfContactModel;
+                    allowAdd = true;
+                    if (
+                        selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value ||
+                        selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
+                    ) {
+                        if (contactOfContactData.dateOfLastContact) {
+                            nodeProps.dateTimeline = contactOfContactData.dateOfLastContact;
                         } else {
-                            nodeProps.dateTimeline = null;
+                            graphData.contactNodesWithoutDates.push(contactOfContactData.id);
+                        }
+                    } else if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value) {
+                        if (contactOfContactData.dateOfReporting) {
+                            nodeProps.dateTimeline = contactOfContactData.dateOfReporting;
+                        } else {
+                            graphData.contactNodesWithoutDates.push(contactOfContactData.id);
+                        }
+                    } else {
+                        nodeProps.dateTimeline = null;
+                    }
+                } else if (
+                    node.type === EntityType.EVENT &&
+                    filters.showEvents
+                ) {
+                    const eventData: EventModel = node.model as EventModel;
+                    allowAdd = true;
+                    if (
+                        selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value ||
+                        selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
+                    ) {
+                        if (eventData.date) {
+                            nodeProps.dateTimeline = eventData.date;
+                        } else {
+                            graphData.eventNodesWithoutDates.push(eventData.id);
+                        }
+                    } else if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value) {
+                        if (eventData.dateOfReporting) {
+                            nodeProps.dateTimeline = eventData.dateOfReporting;
+                        } else {
+                            graphData.eventNodesWithoutDates.push(eventData.id);
+                        }
+                    } else {
+                        nodeProps.dateTimeline = null;
+                    }
+                } else if (node.type === EntityType.CASE) {
+                    const caseData: CaseModel = node.model as CaseModel;
+                    allowAdd = true;
+                    if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value) {
+                        if (caseData.dateOfOnset) {
+                            nodeProps.dateTimeline = caseData.dateOfOnset;
+                        } else {
+                            graphData.caseNodesWithoutDates.push(caseData.id);
+                        }
+                    } else if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value) {
+                        if (caseData.dateOfLastContact) {
+                            nodeProps.dateTimeline = caseData.dateOfLastContact;
+                        } else {
+                            graphData.caseNodesWithoutDates.push(caseData.id);
+                        }
+                    } else if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value) {
+                        if (caseData.dateOfReporting) {
+                            nodeProps.dateTimeline = caseData.dateOfReporting;
+                        } else {
+                            graphData.caseNodesWithoutDates.push(caseData.id);
+                        }
+                    } else {
+                        nodeProps.dateTimeline = null;
+                    }
+                }
+
+                // can add ?
+                if (allowAdd) {
+                    const nodeData = new GraphNodeModel(nodeProps);
+                    nodeData.type = node.type;
+                    // set node color
+                    if (!_.isEmpty(colorCriteria.nodeColor)) {
+                        if (colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]]) {
+                            nodeData.nodeColor = colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]];
                         }
                     }
-                    if (allowAdd) {
-                        const nodeData = new GraphNodeModel(nodeProps);
-                        nodeData.type = node.type;
-                        // set node color
-                        if (!_.isEmpty(colorCriteria.nodeColor)) {
-                            if (colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]]) {
-                                nodeData.nodeColor = colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]];
-                            }
+                    // set node label color
+                    if (!_.isEmpty(colorCriteria.nodeNameColor)) {
+                        if (colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]]) {
+                            nodeData.nodeNameColor = colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]];
                         }
-                        // set node label color
-                        if (!_.isEmpty(colorCriteria.nodeNameColor)) {
-                            if (colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]]) {
-                                nodeData.nodeNameColor = colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]];
-                            }
+                    }
+                    // set node icon
+                    if (!_.isEmpty(colorCriteria.nodeIcon)) {
+                        if (colorCriteria.nodeIcon[node.model[colorCriteria.nodeIconField]]) {
+                            nodeData.picture = colorCriteria.nodeIcon[node.model[colorCriteria.nodeIconField]];
                         }
-                        // set node icon
-                        if (!_.isEmpty(colorCriteria.nodeIcon)) {
-                            if (colorCriteria.nodeIcon[node.model[colorCriteria.nodeIconField]]) {
-                                nodeData.picture = colorCriteria.nodeIcon[node.model[colorCriteria.nodeIconField]];
-                            }
+                    }
+                    // set node shape
+                    if (!_.isEmpty(colorCriteria.nodeShape)) {
+                        if (colorCriteria.nodeShapeField === Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.TYPE.value) {
+                            nodeData.setNodeShapeType(node);
+                        } else if (colorCriteria.nodeShapeField === Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.CLASSIFICATION.value) {
+                            nodeData.setNodeShapeClassification(node);
                         }
-                        // set node shape
-                        if (!_.isEmpty(colorCriteria.nodeShape)) {
-
-                            if (colorCriteria.nodeShapeField === Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.TYPE.value) {
-                                nodeData.setNodeShapeType(node);
-                            } else if (colorCriteria.nodeShapeField === Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.CLASSIFICATION.value) {
-                                nodeData.setNodeShapeClassification(node);
-                            }
-                        }
-                        // determine label
-                        // name
-                        if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.NAME.value) {
-                            nodeData.label = nodeData.name;
-                            // age
-                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.AGE.value) {
-                            if (node.type !== EntityType.EVENT && !_.isEmpty(node.model.age)) {
-                                if (node.model.age.months > 0) {
-                                    nodeData.label = node.model.age.months + ' ' + monthsLabel;
-                                } else {
-                                    nodeData.label = node.model.age.years + ' ' + yearsLabel;
-                                }
+                    }
+                    // determine label
+                    // name
+                    if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.NAME.value) {
+                        nodeData.label = nodeData.name;
+                        // age
+                    } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.AGE.value) {
+                        if (
+                            node.type !== EntityType.EVENT &&
+                            !(node.model instanceof EventModel) &&
+                            !_.isEmpty(node.model.age)
+                        ) {
+                            if (node.model.age.months > 0) {
+                                nodeData.label = node.model.age.months + ' ' + monthsLabel;
                             } else {
-                                nodeData.label = '';
+                                nodeData.label = node.model.age.years + ' ' + yearsLabel;
                             }
-                            // date of onset
-                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.DATE_OF_ONSET.value) {
-                            if (node.type === EntityType.CASE) {
-                                nodeData.label = moment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-                            } else {
-                                nodeData.label = '';
-                            }
-                            // gender
-                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.GENDER.value) {
-                            if (node.type !== EntityType.EVENT) {
-                                nodeData.label = colorCriteria.nodeLabelValues[node.model.gender];
-                            } else {
-                                nodeData.label = '';
-                            }
-                            // occupation
-                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.OCCUPATION.value) {
-                            if (node.type !== EntityType.EVENT) {
-                                nodeData.label = colorCriteria.nodeLabelValues[node.model.occupation];
-                            } else {
-                                nodeData.label = '';
-                            }
-                            // location
-                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.LOCATION.value) {
+                        } else {
                             nodeData.label = '';
-                            if (node.type !== EntityType.EVENT) {
-                                const mainAddr = node.model.mainAddress;
-                                if (
-                                    mainAddr &&
-                                    mainAddr.locationId &&
-                                    locationsListMap[mainAddr.locationId] &&
-                                    locationsListMap[mainAddr.locationId].name
-                                ) {
-                                    nodeData.label = locationsListMap[mainAddr.locationId].name;
-                                }
+                        }
+                        // date of onset and event date
+                    } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.DATE_OF_ONSET_AND_EVENT_DATE.value) {
+                        if (
+                            node.type === EntityType.EVENT &&
+                            node.model instanceof EventModel &&
+                            node.model.date
+                        ) {
+                            nodeData.label = moment(node.model.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                        }
+                        if (
+                            node.type === EntityType.CASE &&
+                            node.model instanceof CaseModel &&
+                            node.model.dateOfOnset
+                        ) {
+                            nodeData.label = moment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                        }
+                        // gender
+                    } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.GENDER.value) {
+                        if (
+                            node.type !== EntityType.EVENT &&
+                            !(node.model instanceof EventModel)
+                        ) {
+                            nodeData.label = colorCriteria.nodeLabelValues[node.model.gender];
+                        } else {
+                            nodeData.label = '';
+                        }
+                        // occupation
+                    } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.OCCUPATION.value) {
+                        if (
+                            node.type !== EntityType.EVENT &&
+                            !(node.model instanceof EventModel)
+                        ) {
+                            nodeData.label = colorCriteria.nodeLabelValues[node.model.occupation];
+                        } else {
+                            nodeData.label = '';
+                        }
+                        // location
+                    } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.LOCATION.value) {
+                        nodeData.label = '';
+                        if (node.type !== EntityType.EVENT) {
+                            const mainAddr = node.model.mainAddress;
+                            if (
+                                mainAddr &&
+                                mainAddr.locationId &&
+                                locationsListMap[mainAddr.locationId] &&
+                                locationsListMap[mainAddr.locationId].name
+                            ) {
+                                nodeData.label = locationsListMap[mainAddr.locationId].name;
                             }
-                            // initials
-                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.INITIALS.value) {
-                            if (node.type !== EntityType.EVENT) {
-                                const firstNameInitial = (!_.isEmpty(node.model.firstName)) ? node.model.firstName.slice(0, 1) : '';
-                                const lastNameInitial = (!_.isEmpty(node.model.lastName)) ? node.model.lastName.slice(0, 1) : '';
-                                nodeData.label = lastNameInitial + ' ' + firstNameInitial;
-                            } else {
-                                nodeData.label = '';
-                            }
-                            // visual id
-                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.VISUAL_ID.value) {
-                            if (node.type !== EntityType.EVENT) {
+                        }
+                        // initials
+                    } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.INITIALS.value) {
+                        if (node.type !== EntityType.EVENT) {
+                            const firstNameInitial = node.model.firstName && node.model.firstName.trim() ? node.model.firstName.trim().slice(0, 1) : '';
+                            const lastNameInitial = node.model.lastName && node.model.lastName.trim() ? node.model.lastName.trim().slice(0, 1) : '';
+                            nodeData.label = lastNameInitial + ' ' + firstNameInitial;
+                        } else {
+                            nodeData.label = '';
+                        }
+                        // visual id
+                    } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.VISUAL_ID.value) {
+                        if (
+                            node.type !== EntityType.EVENT &&
+                            !(node.model instanceof EventModel)
+                        ) {
+                            nodeData.label = node.model.visualId ? node.model.visualId : '';
+                        } else {
+                            nodeData.label = '';
+                        }
+                        // visual id and location
+                    } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.ID_AND_LOCATION.value) {
+                        if (
+                            node.type !== EntityType.EVENT &&
+                            !(node.model instanceof EventModel)
+                        ) {
+                            if (node.model.visualId) {
                                 nodeData.label = node.model.visualId;
-                            } else {
-                                nodeData.label = '';
                             }
-                            // visual id and location
-                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.ID_AND_LOCATION.value) {
-                            if (node.type !== EntityType.EVENT) {
-                                if (node.model.visualId) {
-                                    node.label = node.model.visualId;
-                                }
-                                const mainAddr = node.model.mainAddress;
-                                if (
-                                    mainAddr &&
-                                    mainAddr.locationId &&
-                                    locationsListMap[mainAddr.locationId] &&
-                                    locationsListMap[mainAddr.locationId].name
-                                ) {
-                                    nodeData.label = (node.model.visualId ? node.label + ' - ' : '') + locationsListMap[mainAddr.locationId].name;
-                                }
-                            } else {
-                                nodeData.label = '';
+                            const mainAddr = node.model.mainAddress;
+                            if (
+                                mainAddr &&
+                                mainAddr.locationId &&
+                                locationsListMap[mainAddr.locationId] &&
+                                locationsListMap[mainAddr.locationId].name
+                            ) {
+                                nodeData.label = (node.model.visualId ? nodeData.label + ' - ' : '') + locationsListMap[mainAddr.locationId].name;
                             }
-                            // concatenated details
-                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.CONCATENATED_DETAILS.value) {
-                            if (node.type !== EntityType.EVENT) {
-                                const lastName = node.model.lastName ? node.model.lastName : '';
-                                const firstName = node.model.firstName ? node.model.firstName : '';
-                                const gender = colorCriteria.genderValues[node.model.gender] ? colorCriteria.genderValues[node.model.gender] : '';
-                                const outcome = colorCriteria.outcomeValues[node.model.outcomeId] ? colorCriteria.outcomeValues[node.model.outcomeId] : '';
-                                const visualId = node.model.visualId ? '\n' + node.model.visualId : '';
-                                const age = !_.isEmpty(node.model.age) ?
-                                    node.model.age.months > 0 ?
-                                        node.model.age.months + ' ' + monthsLabel :
-                                        node.model.age.years + ' ' + yearsLabel
-                                    : '';
-                                const classification = colorCriteria.classificationValues[node.model.classification] && node.type === EntityType.CASE ?
+                        } else {
+                            nodeData.label = '';
+                        }
+                        // concatenated details
+                    } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.CONCATENATED_DETAILS.value) {
+                        if (
+                            node.type !== EntityType.EVENT &&
+                            !(node.model instanceof EventModel)
+                        ) {
+                            const lastName = node.model.lastName ? node.model.lastName : '';
+                            const firstName = node.model.firstName ? node.model.firstName : '';
+                            const gender = colorCriteria.genderValues[node.model.gender] ? colorCriteria.genderValues[node.model.gender] : '';
+                            let outcome: string = '';
+                            if (node.model instanceof CaseModel) {
+                                outcome = colorCriteria.outcomeValues[node.model.outcomeId] ? colorCriteria.outcomeValues[node.model.outcomeId] : '';
+                            }
+                            const visualId = node.model.visualId ? '\n' + node.model.visualId : '';
+                            const age = !_.isEmpty(node.model.age) ?
+                                node.model.age.months > 0 ?
+                                    node.model.age.months + ' ' + monthsLabel :
+                                    node.model.age.years + ' ' + yearsLabel
+                                : '';
+                            let classification = '';
+                            if (node.model instanceof CaseModel) {
+                                classification = colorCriteria.classificationValues[node.model.classification] ?
                                     '\n' + colorCriteria.classificationValues[node.model.classification] :
                                     '';
-                                const mainAddr = node.model.mainAddress;
-                                let locationName = '';
-                                if (!_.isEmpty(mainAddr.locationId)) {
-                                    const location = _.find(locationsList, function (l) {
-                                        return l.id === mainAddr.locationId;
-                                    });
-                                    if (location) {
-                                        locationName = '\n' + location.name;
-                                    }
+                            }
+                            const mainAddr = node.model.mainAddress;
+                            let locationName = '';
+                            if (mainAddr.locationId) {
+                                const location = locationsListMap[mainAddr.locationId];
+                                if (location) {
+                                    locationName = '\n' + location.name;
                                 }
-                                const onset = !_.isEmpty(node.model.dateOfOnset) && node.type === EntityType.CASE ?
+                            }
+                            let onset = '';
+                            if (node.model instanceof CaseModel) {
+                                onset = node.model.dateOfOnset ?
                                     '\n' + onsetLabel + ' ' + moment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) + (node.model.isDateOfOnsetApproximate ? onsetApproximateLabel : '') :
                                     '';
-                                // concatenate results
-                                nodeData.label = lastName + ' ' + firstName + visualId + '\n' + age + ' - ' + gender + classification + '\n' + outcome + locationName + onset;
-                            } else {
-                                nodeData.label = '';
                             }
-                        }
-
-                        // check min / max dates
-                        if (!_.isEmpty(nodeData.dateTimeline)) {
-                            if (moment(nodeData.dateTimeline).isAfter(maxTimelineDate) || _.isEmpty(maxTimelineDate)) {
-                                maxTimelineDate = nodeData.dateTimeline;
-                            }
-                            if (moment(nodeData.dateTimeline).isBefore(minTimelineDate) || _.isEmpty(minTimelineDate)) {
-                                minTimelineDate = nodeData.dateTimeline;
-                            }
-                        }
-                        graphData.nodes.push({data: nodeData});
-                        selectedNodeIds.push(nodeData.id);
-                    }
-                });
-
-                // generate checkpoint nodes
-                graphData.timelineDateCheckpoints = [];
-                const counterDate = moment(minTimelineDate);
-                counterDate.subtract(1, 'days');
-                graphData.timelineDateCheckpoints.push(counterDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
-                while (counterDate.isBefore(moment(maxTimelineDate))) {
-                    counterDate.add(1, 'days');
-                    const counterDateFormatted = counterDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-                    graphData.timelineDateCheckpoints.push(counterDateFormatted);
-                    // generate node
-                    const checkpointNode = new GraphNodeModel({
-                        dateTimeline: counterDateFormatted,
-                        id: counterDateFormatted,
-                        name: counterDateFormatted,
-                        nodeType: 'checkpoint'
-                    });
-                    graphData.nodes.push({data: checkpointNode});
-                }
-                graphData.timelineDateCheckpoints.push(counterDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
-            }
-
-            // generate edges based on the nodes included in the graph
-            if (!_.isEmpty(firstChain.relationships)) {
-                _.forEach(firstChain.relationships, (relationship, key) => {
-                    // add relation only if the nodes are in the selectedNodes array
-                    if (_.includes(selectedNodeIds, relationship.persons[0].id) && _.includes(selectedNodeIds, relationship.persons[1].id)) {
-                        const graphEdge = new GraphEdgeModel();
-                        graphEdge.id = relationship.id;
-                        if (relationship.persons[0].source) {
-                            graphEdge.source = relationship.persons[0].id;
-                            graphEdge.sourceType = relationship.persons[0].type;
-                            graphEdge.target = relationship.persons[1].id;
-                            graphEdge.targetType = relationship.persons[1].type;
+                            // concatenate results
+                            nodeData.label = lastName + ' ' + firstName + visualId + '\n' + age + ' - ' + gender + classification + '\n' + outcome + locationName + onset;
                         } else {
-                            graphEdge.source = relationship.persons[1].id;
-                            graphEdge.sourceType = relationship.persons[1].type;
-                            graphEdge.target = relationship.persons[0].id;
-                            graphEdge.targetType = relationship.persons[0].type;
+                            nodeData.label = '';
                         }
-                        // set colors
-                        if (!_.isEmpty(colorCriteria.edgeColor)) {
-                            if (colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]]) {
-                                graphEdge.edgeColor = colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]];
-                            }
-                        }
-                        // set edge style
-                        graphEdge.setEdgeStyle(relationship);
-
-                        // set edge label
-                        if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.NONE.value) {
-                            graphEdge.label = '';
-                        } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value) {
-                            // translate values
-                            graphEdge.label = colorCriteria.edgeLabelContextTransmissionEntries[relationship.socialRelationshipTypeId];
-                        } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_LEVEL.value) {
-                            graphEdge.label = relationship.socialRelationshipDetail;
-                        } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.CLUSTER_NAME.value) {
-                            graphEdge.label = colorCriteria.clustersList[relationship.clusterId];
-                        } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.DAYS_DAYE_ONSET_LAST_CONTACT.value) {
-                            // calculate difference in dates between the dates of onset or dates of onset and last contact.
-                            const sourceNode = firstChain.nodes[graphEdge.source];
-                            const targetNode = firstChain.nodes[graphEdge.target];
-                            let noDays = 0;
-                            let sourceDate = '';
-                            let targetDate = '';
-                            if (sourceNode.type === EntityType.CASE) {
-                                if (!_.isEmpty(sourceNode.model.dateOfOnset)) {
-                                    sourceDate = sourceNode.model.dateOfOnset;
-                                }
-                            } else if (sourceNode.type === EntityType.CONTACT) {
-                                if (!_.isEmpty(relationship.contactDate)) {
-                                    sourceDate = relationship.contactDate;
-                                }
-                            } else if (sourceNode.type === EntityType.EVENT) {
-                                if (!_.isEmpty(sourceNode.model.date)) {
-                                    sourceDate = sourceNode.model.date;
-                                }
-                            }
-
-                            if (targetNode.type === EntityType.CASE) {
-                                if (!_.isEmpty(targetNode.model.dateOfOnset)) {
-                                    targetDate = targetNode.model.dateOfOnset;
-                                }
-                            } else if (targetNode.type === EntityType.CONTACT) {
-                                if (!_.isEmpty(relationship.contactDate)) {
-                                    targetDate = relationship.contactDate;
-                                }
-                            } else if (targetNode.type === EntityType.EVENT) {
-                                if (!_.isEmpty(targetNode.model.date)) {
-                                    targetDate = targetNode.model.date;
-                                }
-                            }
-
-                            if (!_.isEmpty(sourceDate) && !_.isEmpty(targetDate)) {
-                                const momentTargetDate = moment(targetDate, Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-                                const momentSourceDate = moment(sourceDate, Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-                                noDays = Math.round(moment.duration(momentTargetDate.diff(momentSourceDate)).asDays());
-                                graphEdge.label = String(noDays);
-                            }
-                        }
-
-                        // set edge icon
-                        if (colorCriteria.edgeIconField === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value) {
-                            graphEdge.setEdgeIconContextOfTransmission(relationship);
-                            graphEdge.fontFamily = 'xtIcon';
-
-                        } else if (colorCriteria.edgeIconField === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.EXPOSURE_TYPE.value) {
-                            graphEdge.setEdgeIconExposureType(relationship);
-                            graphEdge.fontFamily = 'xtIcon';
-                        }
-
-                        graphData.edges.push({data: graphEdge});
                     }
+
+                    // check min / max dates
+                    if (nodeData.dateTimeline) {
+                        if (moment(nodeData.dateTimeline).isAfter(maxTimelineDate) || !maxTimelineDate) {
+                            maxTimelineDate = nodeData.dateTimeline;
+                        }
+                        if (moment(nodeData.dateTimeline).isBefore(minTimelineDate) || !minTimelineDate) {
+                            minTimelineDate = nodeData.dateTimeline;
+                        }
+                    }
+                    graphData.nodes.push({data: nodeData});
+                    selectedNodeIds[nodeData.id] = true;
+                }
+            });
+
+            // generate checkpoint nodes
+            graphData.timelineDateCheckpoints = [];
+            const counterDate = moment(minTimelineDate);
+            counterDate.subtract(1, 'days');
+            graphData.timelineDateCheckpoints.push(counterDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
+            const momentMaxTimelineDate = moment(maxTimelineDate);
+            while (counterDate.isBefore(momentMaxTimelineDate)) {
+                counterDate.add(1, 'days');
+                const counterDateFormatted = counterDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                graphData.timelineDateCheckpoints.push(counterDateFormatted);
+                // generate node
+                const checkpointNode = new GraphNodeModel({
+                    dateTimeline: counterDateFormatted,
+                    id: counterDateFormatted,
+                    name: counterDateFormatted,
+                    nodeType: 'checkpoint'
                 });
+                graphData.nodes.push({data: checkpointNode});
             }
+            graphData.timelineDateCheckpoints.push(counterDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
         }
+
+        // generate edges based on the nodes included in the graph
+        if (!_.isEmpty(chainGroup.relationships)) {
+            _.forEach(chainGroup.relationships, (relationship, key) => {
+                // add relation only if the nodes are in the selectedNodes array
+                if (
+                    selectedNodeIds[relationship.persons[0].id] &&
+                    selectedNodeIds[relationship.persons[1].id]
+                ) {
+                    const graphEdge = new GraphEdgeModel();
+                    graphEdge.id = relationship.id;
+                    if (relationship.persons[0].source) {
+                        graphEdge.source = relationship.persons[0].id;
+                        graphEdge.sourceType = relationship.persons[0].type;
+                        graphEdge.target = relationship.persons[1].id;
+                        graphEdge.targetType = relationship.persons[1].type;
+                    } else {
+                        graphEdge.source = relationship.persons[1].id;
+                        graphEdge.sourceType = relationship.persons[1].type;
+                        graphEdge.target = relationship.persons[0].id;
+                        graphEdge.targetType = relationship.persons[0].type;
+                    }
+                    // set colors
+                    if (!_.isEmpty(colorCriteria.edgeColor)) {
+                        if (colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]]) {
+                            graphEdge.edgeColor = colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]];
+                        }
+                    }
+                    // set edge style
+                    graphEdge.setEdgeStyle(relationship);
+
+                    // set edge label
+                    if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.NONE.value) {
+                        graphEdge.label = '';
+                    } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value) {
+                        // translate values
+                        graphEdge.label = colorCriteria.edgeLabelContextTransmissionEntries[relationship.socialRelationshipTypeId];
+                    } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_LEVEL.value) {
+                        graphEdge.label = relationship.socialRelationshipDetail ? relationship.socialRelationshipDetail : '';
+                    } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.CLUSTER_NAME.value) {
+                        graphEdge.label = colorCriteria.clustersList[relationship.clusterId];
+                    } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.DAYS_DAYE_ONSET_LAST_CONTACT.value) {
+                        // calculate difference in dates between the dates of onset or dates of onset and last contact.
+                        const sourceNode = chainGroup.nodesMap[graphEdge.source];
+                        const targetNode = chainGroup.nodesMap[graphEdge.target];
+                        let noDays = 0;
+                        let sourceDate = '';
+                        let targetDate = '';
+                        if (
+                            sourceNode.type === EntityType.CASE &&
+                            sourceNode.model instanceof CaseModel
+                        ) {
+                            if (sourceNode.model.dateOfOnset) {
+                                sourceDate = sourceNode.model.dateOfOnset;
+                            }
+                        } else if (sourceNode.type === EntityType.CONTACT) {
+                            if (relationship.contactDate) {
+                                sourceDate = relationship.contactDate;
+                            }
+                        } else if (
+                            sourceNode.type === EntityType.EVENT &&
+                            sourceNode.model instanceof EventModel
+                        ) {
+                            if (sourceNode.model.date) {
+                                sourceDate = sourceNode.model.date;
+                            }
+                        }
+
+                        if (
+                            targetNode.type === EntityType.CASE &&
+                            targetNode.model instanceof CaseModel
+                        ) {
+                            if (targetNode.model.dateOfOnset) {
+                                targetDate = targetNode.model.dateOfOnset;
+                            }
+                        } else if (targetNode.type === EntityType.CONTACT) {
+                            if (relationship.contactDate) {
+                                targetDate = relationship.contactDate;
+                            }
+                        } else if (
+                            targetNode.type === EntityType.EVENT &&
+                            targetNode.model instanceof EventModel
+                        ) {
+                            if (targetNode.model.date) {
+                                targetDate = targetNode.model.date;
+                            }
+                        }
+
+                        if (
+                            sourceDate &&
+                            targetDate
+                        ) {
+                            const momentTargetDate = moment(targetDate, Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                            const momentSourceDate = moment(sourceDate, Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                            noDays = Math.round(moment.duration(momentTargetDate.diff(momentSourceDate)).asDays());
+                            graphEdge.label = String(noDays);
+                        }
+                    }
+
+                    // set edge icon
+                    if (colorCriteria.edgeIconField === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value) {
+                        graphEdge.setEdgeIconContextOfTransmission(relationship);
+                        graphEdge.fontFamily = 'xtIcon';
+
+                    } else if (colorCriteria.edgeIconField === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.EXPOSURE_TYPE.value) {
+                        graphEdge.setEdgeIconExposureType(relationship);
+                        graphEdge.fontFamily = 'xtIcon';
+                    }
+
+                    graphData.edges.push({data: graphEdge});
+                }
+            });
+        }
+
+        // finished
         return graphData;
     }
 

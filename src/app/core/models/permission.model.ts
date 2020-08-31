@@ -129,6 +129,7 @@ export enum PERMISSION {
     OUTBREAK_MODIFY_CONTACT_FOLLOW_UP_QUESTIONNAIRE = 'outbreak_modify_contact_follow_up_questionnaire',
     OUTBREAK_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE = 'outbreak_modify_case_lab_result_questionnaire',
     OUTBREAK_CREATE_CLONE = 'outbreak_create_clone',
+    OUTBREAK_IMPORT_RELATIONSHIP = 'relationship_import',
 
     // outbreak templates
     OUTBREAK_TEMPLATE_LIST = 'outbreak_template_list',
@@ -198,6 +199,7 @@ export enum PERMISSION {
     CONTACT_IMPORT = 'contact_import',
     CONTACT_BULK_CREATE = 'contact_bulk_create',
     CONTACT_BULK_MODIFY = 'contact_bulk_modify',
+    CONTACT_CREATE_BULK_CONTACT_OF_CONTACT = 'contact_create_bulk_contact_of_contact',
     CONTACT_GENERATE_VISUAL_ID = 'contact_generate_visual_id',
     CONTACT_LIST_RELATIONSHIP_CONTACTS = 'contact_list_relationship_contacts',
     CONTACT_VIEW_RELATIONSHIP_CONTACTS = 'contact_view_relationship_contacts',
@@ -214,6 +216,7 @@ export enum PERMISSION {
     CONTACT_CHANGE_SOURCE_RELATIONSHIP = 'contact_change_source_relationships',
     CONTACT_CHANGE_TARGET_RELATIONSHIP = 'contact_change_target_relationships',
     CONTACT_BULK_DELETE_RELATIONSHIP_EXPOSURES = 'contact_bulk_delete_relationships_exposures',
+    CONTACT_BULK_DELETE_RELATIONSHIP_CONTACTS = 'contact_bulk_delete_relationships_contacts',
     CONTACT_VIEW_MOVEMENT_MAP = 'contact_view_movement_map',
     CONTACT_EXPORT_MOVEMENT_MAP = 'contact_export_movement_map',
     CONTACT_VIEW_CHRONOLOGY_CHART = 'contact_view_chronology_chart',
@@ -236,6 +239,34 @@ export enum PERMISSION {
     CONTACT_RESTORE_LAB_RESULT = 'contact_restore_lab_result',
     CONTACT_IMPORT_LAB_RESULT = 'contact_import_lab_result',
     CONTACT_EXPORT_LAB_RESULT = 'contact_export_lab_result',
+    CONTACT_CREATE_CONTACT_OF_CONTACT = 'contact_create_contact_of_contact',
+
+    // contacts of contact
+    CONTACT_OF_CONTACT_LIST = 'contact_of_contact_list',
+    CONTACT_OF_CONTACT_VIEW = 'contact_of_contact_view',
+    CONTACT_OF_CONTACT_CREATE = 'contact_of_contact_create',
+    CONTACT_OF_CONTACT_MODIFY = 'contact_of_contact_modify',
+    CONTACT_OF_CONTACT_DELETE = 'contact_of_contact_delete',
+    CONTACT_OF_CONTACT_RESTORE = 'contact_of_contact_restore',
+    CONTACT_OF_CONTACT_EXPORT = 'contact_of_contact_export',
+    CONTACT_OF_CONTACT_IMPORT = 'contact_of_contact_import',
+    CONTACT_OF_CONTACT_BULK_CREATE = 'contact_of_contact_bulk_create',
+    CONTACT_OF_CONTACT_BULK_MODIFY = 'contact_of_contact_bulk_modify',
+    CONTACT_OF_CONTACT_GENERATE_VISUAL_ID = 'contact_of_contact_generate_visual_id',
+    CONTACT_OF_CONTACT_LIST_RELATIONSHIP_EXPOSURES = 'contact_of_contact_list_relationship_exposures',
+    CONTACT_OF_CONTACT_VIEW_RELATIONSHIP_EXPOSURES = 'contact_of_contact_view_relationship_exposures',
+    CONTACT_OF_CONTACT_CREATE_RELATIONSHIP_EXPOSURES = 'contact_of_contact_create_relationship_exposures',
+    CONTACT_OF_CONTACT_MODIFY_RELATIONSHIP_EXPOSURES = 'contact_of_contact_modify_relationship_exposures',
+    CONTACT_OF_CONTACT_DELETE_RELATIONSHIP_EXPOSURES = 'contact_of_contact_delete_relationship_exposures',
+    CONTACT_OF_CONTACT_EXPORT_RELATIONSHIPS = 'contact_of_contact_export_relationships',
+    CONTACT_OF_CONTACT_SHARE_RELATIONSHIPS = 'contact_of_contact_share_relationships',
+    CONTACT_OF_CONTACT_CHANGE_SOURCE_RELATIONSHIP = 'contact_of_contact_change_source_relationships',
+    CONTACT_OF_CONTACT_CHANGE_TARGET_RELATIONSHIP = 'contact_of_contact_change_target_relationships',
+    CONTACT_OF_CONTACT_BULK_DELETE_RELATIONSHIP_EXPOSURES = 'contact_of_contact_bulk_delete_relationships_exposures',
+    CONTACT_OF_CONTACT_VIEW_MOVEMENT_MAP = 'contact_of_contact_view_movement_map',
+    CONTACT_OF_CONTACT_EXPORT_MOVEMENT_MAP = 'contact_of_contact_export_movement_map',
+    CONTACT_OF_CONTACT_VIEW_CHRONOLOGY_CHART = 'contact_of_contact_view_chronology_chart',
+    CONTACT_OF_CONTACT_EXPORT_DOSSIER = 'contact_of_contact_export_dossier',
 
     // case
     CASE_LIST = 'case_list',
@@ -366,6 +397,7 @@ export enum PERMISSION {
     DUPLICATE_MERGE_CASES = 'duplicate_merge_cases',
     DUPLICATE_MERGE_CONTACTS = 'duplicate_merge_contacts',
     DUPLICATE_MERGE_EVENTS = 'duplicate_merge_events',
+    DUPLICATE_MERGE_CONTACTS_OF_CONTACTS = 'duplicate_merge_contacts_of_contacts',
 
     // dashboard
     DASHBOARD_VIEW_CASE_SUMMARY_DASHLET = 'dashboard_view_case_summary_dashlet',

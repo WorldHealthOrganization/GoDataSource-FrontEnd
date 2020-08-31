@@ -34,8 +34,7 @@
                             [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate"
                             tooltip="LNG_FOLLOW_UP_FIELD_LABEL_DATE_DESCRIPTION"
                             required="true"
-                            [disabled]="true"
-                            app-date-validator>
+                            [disabled]="true">
                         </app-form-datepicker>
 
                         <app-form-slide-toggle
@@ -52,7 +51,7 @@
                             [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID' | translate"
                             tooltip="LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID_DESCRIPTION"
                             [options]="dailyStatusTypeOptions$ | async"
-                            [disabled]="viewOnly"
+                            [disabled]="viewOnly || Constants.isDateInTheFuture(followUpData.date)"
                             [required]="true"
                             optionLabelKey="label"
                             optionValueKey="value">
@@ -162,17 +161,6 @@
                 </mat-card>
             </mat-tab>
 
-            <mat-tab [label]="'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE' | translate">
-                <app-form-fill-questionnaire
-                    *ngIf="!!followUpData?.id"
-                    name="questionnaireAnswers"
-                    [ngModel]="followUpData.questionnaireAnswers"
-                    [questions]="selectedOutbreak?.contactFollowUpTemplate"
-                    [disabled]="viewOnly"
-                    [componentTitle]="'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE' | translate">
-                </app-form-fill-questionnaire>
-            </mat-tab>
-
         </mat-tab-group>
     </div>
 
@@ -203,6 +191,14 @@
         </ng-container>
 
         <div class="page-tabs-navbar-placeholder"></div>
+
+        <button
+            type="button"
+            mat-raised-button
+            [routerLink]="['/contacts', contactId, 'follow-ups', followUpId, viewOnly || selectedOutbreak?.id !== authUser?.activeOutbreakId ? 'view-questionnaire' : 'modify-questionnaire']"
+            [queryParams]="{rootPage: rootPage}">
+            {{'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE' | translate}}
+        </button>
 
         <button
             *ngIf="ContactModel.canView(authUser)"

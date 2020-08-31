@@ -31,6 +31,7 @@ import { EntityModel } from '../../../../core/models/entity-and-relationship.mod
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-lab-results',
@@ -204,6 +205,39 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
                     class: 'mat-menu-item-delete'
                 }),
 
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
+                    visible: (item: LabResultModel): boolean => {
+                        // visible only if at least one of the first two items is visible
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            LabResultModel.canDelete(this.authUser) && (
+                                (
+                                    item.personType === EntityType.CASE &&
+                                    CaseModel.canDeleteLabResult(this.authUser)
+                                ) || (
+                                    item.personType === EntityType.CONTACT &&
+                                    ContactModel.canDeleteLabResult(this.authUser)
+                                )
+                            );
+                    }
+                }),
+
+                // See questionnaire
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_MODIFY_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE',
+                    click: (item: LabResultModel) => {
+                        this.router.navigate(['/lab-results', item.id , 'view-questionnaire']);
+                    },
+                    visible: (item: LabResultModel): boolean => {
+                        return !item.deleted &&
+                            LabResultModel.canView(this.authUser);
+                    }
+                }),
+
                 // Restore a deleted Lab Results
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT',
@@ -235,8 +269,9 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
         private labResultDataService: LabResultDataService,
@@ -246,7 +281,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
         private userDataService: UserDataService,
         private i18nService: I18nService
     ) {
-        super(snackbarService);
+        super(listHelperService);
     }
 
     /**
@@ -320,6 +355,9 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
      * Component destroyed
      */
     ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();

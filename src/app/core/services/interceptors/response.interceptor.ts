@@ -9,6 +9,7 @@ import { SnackbarService } from '../helper/snackbar.service';
 import { catchError, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { AuthDataService } from '../data/auth.data.service';
+import { AppMessages } from '../../enums/app-messages.enum';
 
 @Injectable()
 export class ResponseInterceptor implements HttpInterceptor {
@@ -66,7 +67,12 @@ export class ResponseInterceptor implements HttpInterceptor {
                     // for 0 response status, ask user to restart the app (the server is unreachable)
                     if (error.status === 0) {
                         // we have to display a hardcoded message in this situation because we are not able to load the language
-                        this.snackbarService.showError('The application has become unresponsive. Please do a hard reload or restart Go.Data.', {}, 0);
+                        this.snackbarService.showError(
+                            'The application has become unresponsive. Please do a hard reload or restart Go.Data.',
+                            {},
+                            false,
+                            AppMessages.APP_MESSAGE_UNRESPONSIVE
+                        );
                     }
 
                     // for 401 response status, clear the Auth Data

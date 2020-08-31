@@ -1,4 +1,3 @@
-
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ModelHelperService } from '../helper/model-helper.service';
@@ -20,12 +19,13 @@ import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class ContactDataService {
-
+    /**
+     * Constructor
+     */
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService
-    ) {
-    }
+    ) {}
 
     /**
      * Retrieve the list of Contacts for an Outbreak
@@ -332,5 +332,13 @@ export class ContactDataService {
             );
     }
 
+    /**
+     * Get contact relationships count
+     * @param {string} outbreakId
+     * @param {string} contactId
+     */
+    getContactRelationshipsCount(outbreakId: string, contactId: string): Observable<any> {
+        return this.http.get(`outbreaks/${outbreakId}/contacts/${contactId}/relationships/filtered-count`);
+    }
 }
 
