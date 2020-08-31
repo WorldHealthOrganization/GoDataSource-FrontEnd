@@ -15,7 +15,7 @@ export const EnglishUsLang = {
         /**
          * uiDashboardPage
          */
-        'LNG_PAGE_DASHBOARD_KPIS_ELEMENTS_NOT_VISIBLE_ERROR_MSG': 'Please make sure that all KPIs are visible',
+        'LNG_PAGE_DASHBOARD_KPIS_ELEMENTS_NOT_VISIBLE_ERROR_MSG': 'Please make sure that all KPIs are visible'
 
 
         /**
