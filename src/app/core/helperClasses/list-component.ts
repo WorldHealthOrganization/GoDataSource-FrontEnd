@@ -1584,6 +1584,12 @@ export abstract class ListComponent implements OnDestroy {
                     }
                 });
 
+                // include was contact cases
+                this.appliedListFilterQueryBuilder.filter.byBoolean(
+                    'wasContact',
+                    true
+                );
+
                 // merge query builder
                 this.mergeListFilterToMainFilter();
 
