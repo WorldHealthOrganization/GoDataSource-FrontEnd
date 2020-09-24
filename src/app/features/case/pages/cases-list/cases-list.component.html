@@ -302,6 +302,28 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Middle Name -->
+        <ng-container matColumnDef="middleName">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_CASE_FIELD_LABEL_MIDDLE_NAME' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="middleNameFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('middleName', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" [style.color]="getCaseClassificationColor(item)" [class.record-alert]="item.alerted">
+                {{ item.middleName }}
+            </mat-cell>
+        </ng-container>
+
         <!-- Case Visual Id -->
         <ng-container matColumnDef="visualId">
             <mat-header-cell *matHeaderCellDef>
@@ -407,6 +429,26 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Outcome date -->
+        <ng-container matColumnDef="dateOfOutcome">
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME' | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-daterange
+                            name="dateOfOutcomeFilter"
+                            ngModel
+                            (changed)="filterByDateRangeField('dateOfOutcome', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell class="has-date-range-filter" *matCellDef="let item" [style.color]="getCaseClassificationColor(item)" [class.record-alert]="item.alerted">
+                {{ item.dateOfOutcome | dateDefault }}
+            </mat-cell>
+        </ng-container>
+
         <!-- Age -->
         <ng-container matColumnDef="age">
             <mat-header-cell *matHeaderCellDef>
@@ -498,6 +540,26 @@
             </mat-header-cell>
             <mat-cell class="has-date-range-filter" *matCellDef="let item" [style.color]="getCaseClassificationColor(item)" [class.record-alert]="item.alerted">
                 {{ item.dateOfOnset | dateDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Date of reporting -->
+        <ng-container matColumnDef="dateOfReporting">
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING' | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-daterange
+                            name="dateOfReportingFilter"
+                            ngModel
+                            (changed)="filterByDateRangeField('dateOfReporting', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell class="has-date-range-filter" *matCellDef="let item" [style.color]="getCaseClassificationColor(item)" [class.record-alert]="item.alerted">
+                {{ item.dateOfReporting | dateDefault }}
             </mat-cell>
         </ng-container>
 
