@@ -147,7 +147,8 @@
                                 tooltip="LNG_LAB_RESULT_FIELD_LABEL_RESULT_DESCRIPTION"
                                 [options]="resultTypesList$ | async"
                                 optionLabelKey="label"
-                                optionValueKey="value">
+                                optionValueKey="value"
+                                [required]="labResultData.status === Constants.PROGRESS_OPTIONS.COMPLETED.value">
                             </app-form-select>
 
                             <app-form-input
@@ -159,7 +160,7 @@
 
                             <app-form-select
                                 name="status"
-                                [ngModel]="labResultData.status"
+                                [(ngModel)]="labResultData.status"
                                 [placeholder]="'LNG_LAB_RESULT_FIELD_LABEL_STATUS' | translate"
                                 tooltip="LNG_LAB_RESULT_FIELD_LABEL_STATUS_DESCRIPTION"
                                 [options]="progressOptionsList$ | async"
