@@ -641,6 +641,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 label: 'LNG_CASE_FIELD_LABEL_ADDRESS_LOCATION'
             }),
             new VisibleColumnModel({
+                field: 'emailAddress',
+                label: 'LNG_CASE_FIELD_LABEL_EMAIL',
+                visible: false
+            }),
+            new VisibleColumnModel({
                 field: 'dateOfOnset',
                 label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET'
             }),

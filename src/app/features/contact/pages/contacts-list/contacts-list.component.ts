@@ -666,6 +666,11 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                 label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS_LOCATION'
             }),
             new VisibleColumnModel({
+                field: 'emailAddress',
+                label: 'LNG_CONTACT_FIELD_LABEL_EMAIL',
+                visible: false
+            }),
+            new VisibleColumnModel({
                 field: 'age',
                 label: 'LNG_CONTACT_FIELD_LABEL_AGE'
             }),

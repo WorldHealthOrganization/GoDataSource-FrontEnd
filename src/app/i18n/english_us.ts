@@ -12,6 +12,37 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
+        /**
+         * uiAddressFields
+         */
+        'LNG_ADDRESS_FIELD_LABEL_EMAIL': 'Email',
+        'LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS': '',
+
+        /**
+         * uiCaseFields
+         */
+        'LNG_CASE_FIELD_LABEL_EMAIL': 'Email',
+
+        /**
+         * uiContactFields
+         */
+        'LNG_CONTACT_FIELD_LABEL_EMAIL': 'Email',
+
+        /**
+         * uiEventFields
+         */
+        'LNG_EVENT_FIELD_LABEL_EMAIL': 'Email',
+
+
+        /**
+         * uiFollowUpFields
+         */
+        'LNG_FOLLOW_UP_FIELD_LABEL_EMAIL': 'Email'
+
+
+
+
+
 
 
         /**
