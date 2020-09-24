@@ -603,6 +603,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME'
             }),
             new VisibleColumnModel({
+                field: 'middleName',
+                label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
+                visible: false
+            }),
+            new VisibleColumnModel({
                 field: 'visualId',
                 label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID'
             }),
@@ -613,6 +618,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             new VisibleColumnModel({
                 field: 'outcome',
                 label: 'LNG_CASE_FIELD_LABEL_OUTCOME'
+            }),
+            new VisibleColumnModel({
+                field: 'dateOfOutcome',
+                label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'age',
@@ -637,6 +647,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             new VisibleColumnModel({
                 field: 'dateOfOnset',
                 label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET'
+            }),
+            new VisibleColumnModel({
+                field: 'dateOfReporting',
+                label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'notACase',

@@ -352,6 +352,9 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_SUCCESS_MESSAGE');
 
+                            // reset location cache after deleting a location
+                            FormLocationDropdownComponent.CACHE = {};
+
                             // reload data
                             this.needsRefreshList(true);
                         });
