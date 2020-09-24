@@ -24,6 +24,7 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
+import { Constants } from 'app/core/models/constants';
 
 @Component({
     selector: 'app-modify-lab-result',
@@ -49,6 +50,7 @@ export class ModifyLabResultComponent extends ViewModifyComponent implements OnI
     LabResultModel = LabResultModel;
     EntityType = EntityType;
     EntityModel = EntityModel;
+    Constants = Constants;
 
     // entity data
     personType: EntityType;
