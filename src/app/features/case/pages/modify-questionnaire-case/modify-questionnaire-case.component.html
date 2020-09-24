@@ -26,31 +26,33 @@
     </div>
 
     <div class="form-actions">
-        <div class="page-tabs-navbar-placeholder"></div>
+        <div class="form-actions-no-scroll">
+            <div class="page-tabs-navbar-placeholder"></div>
 
-        <ng-container
-            *app-selected-outbreak-is-active>
+            <ng-container
+                *app-selected-outbreak-is-active>
+                <button
+                    *ngIf="viewOnly && CaseModel.canModify(authUser)"
+                    type="button"
+                    mat-raised-button color="accent"
+                    [routerLink]="['/cases', caseId, 'modify-questionnaire']">
+                    {{'LNG_COMMON_BUTTON_EDIT' | translate}}
+                </button>
+
+                <button
+                    *ngIf="!viewOnly"
+                    class="button-with-spinner"
+                    mat-raised-button color="accent">
+                    {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+                </button>
+            </ng-container>
+
             <button
-                *ngIf="viewOnly && CaseModel.canModify(authUser)"
                 type="button"
-                mat-raised-button color="accent"
-                [routerLink]="['/cases', caseId, 'modify-questionnaire']">
-                {{'LNG_COMMON_BUTTON_EDIT' | translate}}
+                [routerLink]="['/cases', caseId, viewOnly ? 'view' : 'modify']"
+                mat-raised-button>
+                {{'LNG_COMMON_BUTTON_BACK' | translate}}
             </button>
-
-            <button
-                *ngIf="!viewOnly"
-                class="button-with-spinner"
-                mat-raised-button color="accent">
-                {{'LNG_COMMON_BUTTON_SAVE' | translate}}
-            </button>
-        </ng-container>
-
-        <button
-            type="button"
-            [routerLink]="['/cases', caseId, viewOnly ? 'view' : 'modify']"
-            mat-raised-button>
-            {{'LNG_COMMON_BUTTON_BACK' | translate}}
-        </button>
+        </div>
     </div>
 </form>
