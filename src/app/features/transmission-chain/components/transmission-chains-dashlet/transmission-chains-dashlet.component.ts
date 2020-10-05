@@ -40,6 +40,7 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { ClusterModel } from '../../../../core/models/cluster.model';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -182,6 +183,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         edgeColor: {},
         nodeLabel: 'name'
     };
+
+    // clusters
+    clusterOptions: ClusterModel[];
 
     // subscribers
     outbreakSubscriber: Subscription;
@@ -552,7 +556,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                             this.clusterDataService
                                 .getClusterList(this.selectedOutbreak.id)
                                 .subscribe((clusters) => {
-                                    this.legend.clustersList = [];
+                                    this.clusterOptions = clusters;
+
+                                    this.legend.clustersList = {};
                                     _.forEach(clusters, (cluster) => {
                                         this.legend.clustersList[cluster.id] = cluster.name;
                                     });

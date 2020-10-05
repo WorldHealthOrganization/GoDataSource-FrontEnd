@@ -46,12 +46,12 @@
         <!-- settings panel -->
         <div
             *ngIf="showSettings"
-            fxLayout="column"
-        >
+            fxLayout="column">
             <!-- Filters -->
             <app-transmission-chain-filters
                 titleName="LNG_PAGE_CASE_COUNT_MAP_FILTERS_TITLE"
-                [filters]="filters">
+                [filters]="filters"
+                [clusterOptions]="false">
             </app-transmission-chain-filters>
 
             <!-- Buttons -->
