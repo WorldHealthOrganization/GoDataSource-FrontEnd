@@ -62,10 +62,11 @@
 
         <!-- location -->
         <app-form-location-dropdown
-            name="locationId"
-            [(ngModel)]="filters.locationId"
+            name="locationIds"
+            [(ngModel)]="filters.locationIds"
             [useOutbreakLocations]="true"
-            [placeholder]="'LNG_ADDRESS_FIELD_LABEL_LOCATION' | translate">
+            [placeholder]="'LNG_ADDRESS_FIELD_LABEL_LOCATION' | translate"
+            [multiple]="true">
         </app-form-location-dropdown>
     </div>
 
