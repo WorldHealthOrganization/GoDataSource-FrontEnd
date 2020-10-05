@@ -68,7 +68,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     chainGroup: TransmissionChainGroupModel;
     graphElements: IConvertChainToGraphElements;
     showSettings: boolean = false;
-    filters: any | TransmissionChainFilters = {};
+    filters: TransmissionChainFilters = new TransmissionChainFilters();
     resetFiltersData: any;
     locationsListMap: {
         [idLocation: string]: LocationModel
@@ -506,7 +506,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
             // location
             if (global.locationId) {
-                this.filters.locationId = global.locationId;
+                this.filters.locationIds = [global.locationId];
             }
 
             // classification

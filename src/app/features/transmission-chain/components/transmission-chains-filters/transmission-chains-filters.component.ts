@@ -17,10 +17,13 @@ export class TransmissionChainFilters {
     firstName: string;
     lastName: string;
     gender: string;
-    locationId: string;
+    locationIds: string[];
     age: AgeModel;
     date: Moment;
     includeContactsOfContacts: boolean;
+
+    showContacts?: boolean;
+    showEvents?: boolean;
 
     /**
      * Constructor
@@ -33,7 +36,7 @@ export class TransmissionChainFilters {
         firstName?: string,
         lastName?: string,
         gender?: string,
-        locationId?: string,
+        locationIds?: string[],
         age?: AgeModel,
         date?: Moment,
         includeContactsOfContacts?: boolean
@@ -116,12 +119,14 @@ export class TransmissionChainFilters {
         }
 
         // location
-        if (!_.isEmpty(this.locationId)) {
+        if (!_.isEmpty(this.locationIds)) {
             qb.filter.where({
                 or: [
                     {
                         type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT',
-                        'address.parentLocationIdFilter': this.locationId
+                        'address.parentLocationIdFilter': {
+                            inq: this.locationIds
+                        }
                     }, {
                         type: {
                             inq: !this.includeContactsOfContacts ?
@@ -135,7 +140,9 @@ export class TransmissionChainFilters {
                                     'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_OF_CONTACT'
                                 ]
                         },
-                        'addresses.parentLocationIdFilter': this.locationId
+                        'addresses.parentLocationIdFilter': {
+                            inq: this.locationIds
+                        }
                     }
                 ]
             });
