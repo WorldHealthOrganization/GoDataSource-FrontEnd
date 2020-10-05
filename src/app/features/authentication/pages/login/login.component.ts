@@ -3,7 +3,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
-import { AuthModel } from '../../../../core/models/auth.model';
+import { AuthModel, IAuthTwoFactor } from '../../../../core/models/auth.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -33,6 +33,9 @@ export class LoginComponent implements OnInit {
     // loading data ?
     loading = true;
     displayCaptcha = false;
+
+    // display enter code ?
+    twoFA: boolean = false;
 
     /**
      * Constructor
@@ -91,7 +94,10 @@ export class LoginComponent implements OnInit {
 
             // try to authenticate the user
             this.authDataService
-                .login(dirtyFields)
+                .login(
+                    dirtyFields,
+                    this.twoFA
+                )
                 .pipe(
                     catchError((err) => {
                         // hide loading
@@ -108,10 +114,31 @@ export class LoginComponent implements OnInit {
                         return throwError(err);
                     })
                 )
-                .subscribe((auth: AuthModel) => {
+                .subscribe((auth: IAuthTwoFactor | AuthModel) => {
+                    // two factor authentication
+                    if ((auth as IAuthTwoFactor).twoFA) {
+                        // display message that 2FA is active
+                        this.snackbarService.showSuccess(
+                            'LNG_PAGE_LOGIN_ACTION_LOGIN_2FA_CODE_REQUIRED',
+                            {
+                                email: dirtyFields.email
+                            }
+                        );
+
+                        // must enter code before we can login
+                        this.twoFA = true;
+
+                        // hide loading
+                        loadingDialog.close();
+
+                        // finished
+                        return;
+                    }
+
                     // successfully authenticated;
                     // use authenticated user's preferred language
                     // invalidate language
+                    const authModel: AuthModel = auth as AuthModel;
                     this.i18nService.clearStorage();
                     this.i18nService
                         .loadUserLanguage()
@@ -130,7 +157,7 @@ export class LoginComponent implements OnInit {
                             this.snackbarService.showSuccess(
                                 'LNG_PAGE_LOGIN_ACTION_LOGIN_SUCCESS_MESSAGE',
                                 {
-                                    name: `${auth.user.firstName} ${auth.user.lastName}`
+                                    name: `${authModel.user.firstName} ${authModel.user.lastName}`
                                 }
                             );
 
@@ -139,7 +166,7 @@ export class LoginComponent implements OnInit {
 
                             // check if user needs to change password
                             if (
-                                auth.user.passwordChange &&
+                                authModel.user.passwordChange &&
                                 UserModel.canModifyOwnAccount(this.authDataService.getAuthenticatedUser())
                             ) {
                                 // user must change password
