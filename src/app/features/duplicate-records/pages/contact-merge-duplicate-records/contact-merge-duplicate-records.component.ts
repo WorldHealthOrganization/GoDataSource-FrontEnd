@@ -20,6 +20,8 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { VaccineModel } from '../../../../core/models/vaccine.model';
+import { TeamDataService } from '../../../../core/services/data/team.data.service';
 
 @Component({
     selector: 'app-contact-merge-duplicate-records',
@@ -47,6 +49,10 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
     mergeRecordIds: string[];
     mergeRecords: EntityModel[];
 
+    teamNameMap: {
+        [teamId: string]: string
+    };
+
     uniqueOptions: {
         firstName: {
             options: LabelValuePair[],
@@ -64,6 +70,10 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
             options: LabelValuePair[],
             value: any
         },
+        pregnancyStatus: {
+            options: LabelValuePair[],
+            value: any
+        },
         occupation: {
             options: LabelValuePair[],
             value: any
@@ -72,7 +82,19 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
             options: LabelValuePair[],
             value: any
         },
+        followUpTeamId: {
+            options: LabelValuePair[],
+            value: any
+        },
         visualId:  {
+            options: LabelValuePair[],
+            value: any
+        },
+        riskLevel:  {
+            options: LabelValuePair[],
+            value: any
+        },
+        riskReason: {
             options: LabelValuePair[],
             value: any
         },
@@ -103,7 +125,8 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private teamDataService: TeamDataService
     ) {
         super();
     }
@@ -140,14 +163,67 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
                                 // merge records
                                 this.mergeRecords = recordMerge;
 
-                                // determine unique values
-                                this.determineUniqueValues();
+                                // determine teams
+                                this.determineTeams(() => {
+                                    // determine unique values
+                                    this.determineUniqueValues();
 
-                                // finished
-                                this.displayLoading = false;
+                                    // finished
+                                    this.displayLoading = false;
+                                });
                             });
                     });
             });
+    }
+
+    /**
+     * Determine teams
+     */
+    determineTeams(finishedCallback: () => void) {
+        // determine teams for which we need to retrieve names
+        const teamIds: string[] = [];
+        _.each(this.mergeRecords, (ent: EntityModel) => {
+            if ((ent.model as ContactModel).followUpTeamId) {
+                teamIds.push((ent.model as ContactModel).followUpTeamId);
+            }
+        });
+
+        // retrieve teams
+        if (teamIds.length < 1) {
+            finishedCallback();
+        } else {
+            // construct query buuilder
+            const qb = new RequestQueryBuilder();
+            qb.fields(
+                'id',
+                'name'
+            ).filter.bySelect(
+                'id',
+                teamIds,
+                true,
+                null
+            );
+
+            // retrieve teams
+            this.teamDataService
+                .getTeamsList(qb)
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        return throwError(err);
+                    })
+                )
+                .subscribe((teams) => {
+                    // map teams
+                    this.teamNameMap = {};
+                    teams.forEach((team) => {
+                        this.teamNameMap[team.id] = team.name;
+                    });
+
+                    // finished
+                    finishedCallback();
+                });
+        }
     }
 
     /**
@@ -172,6 +248,10 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
                 options: [],
                 value: undefined
             },
+            pregnancyStatus: {
+                options: [],
+                value: undefined
+            },
             occupation: {
                 options: [],
                 value: undefined
@@ -180,7 +260,19 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
                 options: [],
                 value: undefined
             },
+            followUpTeamId: {
+                options: [],
+                value: undefined
+            },
             visualId: {
+                options: [],
+                value: undefined
+            },
+            riskLevel: {
+                options: [],
+                value: undefined
+            },
+            riskReason: {
                 options: [],
                 value: undefined
             },
@@ -208,15 +300,26 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
             this.uniqueOptions.middleName = EntityModel.uniqueStringOptions(this.mergeRecords, 'middleName');
             this.uniqueOptions.lastName = EntityModel.uniqueStringOptions(this.mergeRecords, 'lastName');
             this.uniqueOptions.gender = EntityModel.uniqueStringOptions(this.mergeRecords, 'gender');
+            this.uniqueOptions.pregnancyStatus = EntityModel.uniqueStringOptions(this.mergeRecords, 'pregnancyStatus');
             this.uniqueOptions.occupation = EntityModel.uniqueStringOptions(this.mergeRecords, 'occupation');
             this.uniqueOptions.ageDob = EntityModel.uniqueAgeDobOptions(
                 this.mergeRecords,
                 this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
                 this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
             );
+            this.uniqueOptions.followUpTeamId = EntityModel.uniqueStringOptions(
+                this.mergeRecords,
+                'followUpTeamId',
+                this.teamNameMap
+            );
             this.uniqueOptions.visualId = EntityModel.uniqueStringOptions(this.mergeRecords, 'visualId');
+            this.uniqueOptions.riskLevel = EntityModel.uniqueStringOptions(this.mergeRecords, 'riskLevel');
+            this.uniqueOptions.riskReason = EntityModel.uniqueStringOptions(this.mergeRecords, 'riskReason');
             this.uniqueOptions.dateOfReporting = EntityModel.uniqueDateOptions(this.mergeRecords, 'dateOfReporting');
             this.uniqueOptions.isDateOfReportingApproximate = EntityModel.uniqueBooleanOptions(this.mergeRecords, 'isDateOfReportingApproximate');
+
+            // merge all vaccines
+            this.determineVaccines();
 
             // merge all documents
             this.determineDocuments();
@@ -227,6 +330,21 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
             // determine questionnaire answers
             this.determineQuestionnaireAnswers();
         }
+    }
+
+    /**
+     * Determine vaccines
+     */
+    private determineVaccines() {
+        // merge all vaccines
+        this.contactData.vaccinesReceived = [];
+        _.each(this.mergeRecords, (ent: EntityModel) => {
+            _.each((ent.model as ContactModel).vaccinesReceived, (vac: VaccineModel) => {
+                if (vac.vaccine) {
+                    this.contactData.vaccinesReceived.push(vac);
+                }
+            });
+        });
     }
 
     /**

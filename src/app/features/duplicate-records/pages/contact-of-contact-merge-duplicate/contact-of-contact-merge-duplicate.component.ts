@@ -15,12 +15,12 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { DocumentModel } from '../../../../core/models/document.model';
 import * as _ from 'lodash';
 import { moment } from '../../../../core/helperClasses/x-moment';
-import { ContactModel } from '../../../../core/models/contact.model';
 import { Constants } from '../../../../core/models/constants';
 import { NgForm } from '@angular/forms';
 import { EntityType } from '../../../../core/models/entity-type';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { VaccineModel } from '../../../../core/models/vaccine.model';
 
 @Component({
     selector: 'app-contact-of-contact-merge-duplicate',
@@ -64,6 +64,10 @@ export class ContactOfContactMergeDuplicateComponent extends ConfirmOnFormChange
             options: LabelValuePair[],
             value: any
         },
+        pregnancyStatus: {
+            options: LabelValuePair[],
+            value: any
+        },
         occupation: {
             options: LabelValuePair[],
             value: any
@@ -73,6 +77,14 @@ export class ContactOfContactMergeDuplicateComponent extends ConfirmOnFormChange
             value: any
         },
         visualId: {
+            options: LabelValuePair[],
+            value: any
+        },
+        riskLevel:  {
+            options: LabelValuePair[],
+            value: any
+        },
+        riskReason: {
             options: LabelValuePair[],
             value: any
         },
@@ -167,6 +179,10 @@ export class ContactOfContactMergeDuplicateComponent extends ConfirmOnFormChange
                 options: [],
                 value: undefined
             },
+            pregnancyStatus: {
+                options: [],
+                value: undefined
+            },
             occupation: {
                 options: [],
                 value: undefined
@@ -176,6 +192,14 @@ export class ContactOfContactMergeDuplicateComponent extends ConfirmOnFormChange
                 value: undefined
             },
             visualId: {
+                options: [],
+                value: undefined
+            },
+            riskLevel: {
+                options: [],
+                value: undefined
+            },
+            riskReason: {
                 options: [],
                 value: undefined
             },
@@ -199,6 +223,7 @@ export class ContactOfContactMergeDuplicateComponent extends ConfirmOnFormChange
             this.uniqueOptions.middleName = EntityModel.uniqueStringOptions(this.mergeRecords, 'middleName');
             this.uniqueOptions.lastName = EntityModel.uniqueStringOptions(this.mergeRecords, 'lastName');
             this.uniqueOptions.gender = EntityModel.uniqueStringOptions(this.mergeRecords, 'gender');
+            this.uniqueOptions.pregnancyStatus = EntityModel.uniqueStringOptions(this.mergeRecords, 'pregnancyStatus');
             this.uniqueOptions.occupation = EntityModel.uniqueStringOptions(this.mergeRecords, 'occupation');
             this.uniqueOptions.ageDob = EntityModel.uniqueAgeDobOptions(
                 this.mergeRecords,
@@ -206,8 +231,13 @@ export class ContactOfContactMergeDuplicateComponent extends ConfirmOnFormChange
                 this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
             );
             this.uniqueOptions.visualId = EntityModel.uniqueStringOptions(this.mergeRecords, 'visualId');
+            this.uniqueOptions.riskLevel = EntityModel.uniqueStringOptions(this.mergeRecords, 'riskLevel');
+            this.uniqueOptions.riskReason = EntityModel.uniqueStringOptions(this.mergeRecords, 'riskReason');
             this.uniqueOptions.dateOfReporting = EntityModel.uniqueDateOptions(this.mergeRecords, 'dateOfReporting');
             this.uniqueOptions.isDateOfReportingApproximate = EntityModel.uniqueBooleanOptions(this.mergeRecords, 'isDateOfReportingApproximate');
+
+            // merge all vaccines
+            this.determineVaccines();
 
             // merge all documents
             this.determineDocuments();
@@ -215,6 +245,21 @@ export class ContactOfContactMergeDuplicateComponent extends ConfirmOnFormChange
             // merge all addresses, keep just one current address
             this.determineAddresses();
         }
+    }
+
+    /**
+     * Determine vaccines
+     */
+    private determineVaccines() {
+        // merge all vaccines
+        this.contactOfContactData.vaccinesReceived = [];
+        _.each(this.mergeRecords, (ent: EntityModel) => {
+            _.each((ent.model as ContactOfContactModel).vaccinesReceived, (vac: VaccineModel) => {
+                if (vac.vaccine) {
+                    this.contactOfContactData.vaccinesReceived.push(vac);
+                }
+            });
+        });
     }
 
     /**
@@ -240,7 +285,7 @@ export class ContactOfContactMergeDuplicateComponent extends ConfirmOnFormChange
         let currentAddress: AddressModel;
         this.contactOfContactData.addresses = [];
         _.each(this.mergeRecords, (ent: EntityModel) => {
-            _.each((ent.model as ContactModel).addresses, (address: AddressModel) => {
+            _.each((ent.model as ContactOfContactModel).addresses, (address: AddressModel) => {
                 if (
                     address.locationId ||
                     address.fullAddress
