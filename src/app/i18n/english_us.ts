@@ -47,7 +47,12 @@ export const EnglishUsLang = {
         /**
          * uiAPIErrors
          */
-        'LNG_API_ERROR_CODE_AUTHORIZATION_REQUIRED': 'Login failed'
+        'LNG_API_ERROR_CODE_AUTHORIZATION_REQUIRED': 'Login failed',
+
+        /**
+         * uiEntityFields
+         */
+        'LNG_ENTITY_FIELD_LABEL_NO_VACCINE': 'No vaccines'
 
 
 
