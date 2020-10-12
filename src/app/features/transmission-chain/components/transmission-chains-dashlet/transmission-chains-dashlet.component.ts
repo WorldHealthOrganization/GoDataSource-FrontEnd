@@ -725,6 +725,15 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                         ]
                     });
                 }
+
+                // attach cluster condition
+                if (!_.isEmpty(filterObject.clusterIds)) {
+                    requestQueryBuilder.filter.where({
+                        clusterId: {
+                            inq: filterObject.clusterIds
+                        }
+                    });
+                }
             }
 
             // display loading

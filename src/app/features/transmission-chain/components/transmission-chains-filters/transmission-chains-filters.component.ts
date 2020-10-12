@@ -189,7 +189,7 @@ export class TransmissionChainsFiltersComponent implements OnInit {
     genderList$: Observable<LabelValuePair[]>;
 
     // clusters
-    @Input() clusterOptions: ClusterModel[];
+    @Input() clusterOptions: ClusterModel[] | false;
 
     // constants
     ClusterModel = ClusterModel;
