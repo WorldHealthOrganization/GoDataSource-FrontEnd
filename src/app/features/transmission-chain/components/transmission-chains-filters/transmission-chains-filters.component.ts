@@ -9,6 +9,9 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { Moment } from '../../../../core/helperClasses/x-moment';
 import { map, share } from 'rxjs/operators';
 import { Constants } from '../../../../core/models/constants';
+import { ClusterModel } from '../../../../core/models/cluster.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 export class TransmissionChainFilters {
     classificationId: string[];
@@ -18,6 +21,7 @@ export class TransmissionChainFilters {
     lastName: string;
     gender: string;
     locationIds: string[];
+    clusterIds: string[];
     age: AgeModel;
     date: Moment;
     includeContactsOfContacts: boolean;
@@ -37,6 +41,7 @@ export class TransmissionChainFilters {
         lastName?: string,
         gender?: string,
         locationIds?: string[],
+        clusterIds?: string[],
         age?: AgeModel,
         date?: Moment,
         includeContactsOfContacts?: boolean
@@ -183,11 +188,30 @@ export class TransmissionChainsFiltersComponent implements OnInit {
     outcomeList$: Observable<LabelValuePair[]>;
     genderList$: Observable<LabelValuePair[]>;
 
+    // clusters
+    @Input() clusterOptions: ClusterModel[] | false;
+
+    // constants
+    ClusterModel = ClusterModel;
+
+    // authenticated user
+    authUser: UserModel;
+
+    /**
+     * Constructor
+     */
     constructor(
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        private authDataService: AuthDataService
     ) {}
 
+    /**
+     * Component initialized
+     */
     ngOnInit(): void {
+        // authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         this.caseClassificationsList$ = this.referenceDataDataService
             .getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION)
             .pipe(

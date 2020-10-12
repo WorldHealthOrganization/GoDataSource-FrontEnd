@@ -58,14 +58,14 @@
             <app-transmission-chain-filters
                 fxFlex
                 titleName="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTERS_TITLE"
-                [filters]="filters">
+                [filters]="filters"
+                [clusterOptions]="clusterOptions">
             </app-transmission-chain-filters>
 
             <!-- Right Side => Node Settings & Edge Settings -->
             <div
                 *ngIf="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value"
-                fxFlex fxLayout="column" fxLayoutGap="20px"
-            >
+                fxFlex fxLayout="column" fxLayoutGap="20px">
                 <!-- Node Settings -->
                 <mat-card fxLayout="column" fxLayoutGap="10px">
                     <div class="settings-container-title">
