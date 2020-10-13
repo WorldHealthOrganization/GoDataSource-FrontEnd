@@ -492,7 +492,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER'
             }),
             new VisibleColumnModel({
-                field: 'emailAddress',
+                field: 'address.emailAddress',
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_EMAIL',
                 visible: false
             }),

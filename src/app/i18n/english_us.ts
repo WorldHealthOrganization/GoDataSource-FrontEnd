@@ -13,12 +13,6 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
-         * uiAddressFields
-         */
-        'LNG_ADDRESS_FIELD_LABEL_EMAIL': 'Email',
-        'LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS': '',
-
-        /**
          * uiCaseFields
          */
         'LNG_CASE_FIELD_LABEL_EMAIL': 'Email',

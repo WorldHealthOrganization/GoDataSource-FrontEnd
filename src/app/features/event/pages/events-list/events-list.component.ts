@@ -357,7 +357,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                 visible: false
             }),
             new VisibleColumnModel({
-                field: 'emailAddress',
+                field: 'address.emailAddress',
                 label: 'LNG_EVENT_FIELD_LABEL_EMAIL',
                 visible: false
             }),

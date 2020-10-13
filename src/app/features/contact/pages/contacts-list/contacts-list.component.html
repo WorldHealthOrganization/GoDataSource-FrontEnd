@@ -444,10 +444,12 @@
         </ng-container>
 
         <!-- Email  -->
-        <ng-container matColumnDef="emailAddress">
+        <ng-container matColumnDef="addresses.emailAddress">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_CONTACT_FIELD_LABEL_EMAIL' | translate}}</div>
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_CONTACT_FIELD_LABEL_EMAIL' | translate}}
+                    </div>
                     <div class="column-filter">
                         <app-form-input
                             name="emailFilter"
