@@ -54,14 +54,18 @@
                         <div fxLayout="row" fxLayoutGap="20px">
                             <div
                                 fxFlex fxLayout="row" fxLayoutGap="20px">
-                                <app-form-select
-                                    name="pregnancyStatus"
-                                    [(ngModel)]="contactOfContactData.pregnancyStatus"
-                                    [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS' | translate"
-                                    tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION"
-                                    [options]="pregnancyStatusList$ | async"
-                                    [clearable]="false">
-                                </app-form-select>
+                                <div
+                                    fxFlex>
+                                    <app-form-select
+                                        *ngIf="contactOfContactData.gender !== Constants.GENDER_MALE"
+                                        name="pregnancyStatus"
+                                        [(ngModel)]="contactOfContactData.pregnancyStatus"
+                                        [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS' | translate"
+                                        tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION"
+                                        [options]="pregnancyStatusList$ | async"
+                                        [clearable]="false">
+                                    </app-form-select>
+                                </div>
 
                                 <app-form-select
                                     name="occupation"

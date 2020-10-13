@@ -116,6 +116,9 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
         }
     };
 
+    // constants
+    Constants = Constants;
+
     /**
      * Constructor
      */

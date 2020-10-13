@@ -45,6 +45,9 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
     // authenticated user
     authUser: UserModel;
 
+    // constants
+    Constants = Constants;
+
     contactOfContactId: string;
     selectedOutbreak: OutbreakModel;
     contactExposure: RelationshipPersonModel;

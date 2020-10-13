@@ -153,6 +153,9 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
         }
     };
 
+    // constants
+    Constants = Constants;
+
     /**
      * Constructor
      */
