@@ -32,11 +32,8 @@ export enum UserSettings {
     REF_DATA_CAT_ENTRIES_FIELDS = 'refDataCatEntriesFields',
     SHARE_RELATIONSHIPS = 'shareRelationships',
     USER_ROLE_FIELDS = 'userRoleFields',
-    ENTITY_NOT_DUPLICATES_FIELDS = 'entityNotDuplicatesFields'
-}
-
-export enum PhoneNumberType {
-    PRIMARY_PHONE_NUMBER = 'LNG_USER_FIELD_LABEL_PRIMARY_TELEPHONE'
+    ENTITY_NOT_DUPLICATES_FIELDS = 'entityNotDuplicatesFields',
+    USER_FIELDS = 'userFields',
 }
 
 /**
@@ -70,6 +67,11 @@ abstract class UserSettingsHandlers {
     static SHARE_RELATIONSHIPS = [];
     static USER_ROLE_FIELDS = [];
     static ENTITY_NOT_DUPLICATES_FIELDS = [];
+    static USER_FIELDS = [];
+}
+
+export enum PhoneNumberType {
+    PRIMARY_PHONE_NUMBER = 'LNG_USER_FIELD_LABEL_PRIMARY_TELEPHONE'
 }
 
 export interface IPermissionExpressionAnd {

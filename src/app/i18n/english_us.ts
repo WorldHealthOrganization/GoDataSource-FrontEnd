@@ -46,7 +46,12 @@ export const EnglishUsLang = {
         /**
          * uiEntityFields
          */
-        'LNG_ENTITY_FIELD_LABEL_NO_VACCINE': 'No vaccines'
+        'LNG_ENTITY_FIELD_LABEL_NO_VACCINE': 'No vaccines',
+
+        /**
+         * uiUserFields
+         */
+        'LNG_USER_FIELD_LABEL_TEAMS': 'Teams'
 
 
 
