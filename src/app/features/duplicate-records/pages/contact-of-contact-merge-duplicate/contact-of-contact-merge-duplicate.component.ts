@@ -102,6 +102,9 @@ export class ContactOfContactMergeDuplicateComponent extends ConfirmOnFormChange
         }
     };
 
+    // constants
+    Constants = Constants;
+
     /**
      * Constructor
      */

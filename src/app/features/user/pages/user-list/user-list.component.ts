@@ -56,6 +56,7 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
         'institutionName',
         'telephoneNumbers',
         'role',
+        'activeOutbreak',
         'availableOutbreaks'
     ];
 
@@ -136,11 +137,16 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
 
         this.outbreaksList$ = this.outbreakDataService
             .getOutbreaksListReduced()
-            .pipe(tap((outbreaks) => {
-                (outbreaks || []).forEach((outbreak) => {
-                    this.outbreaksListMap[outbreak.id] = outbreak;
-                });
-            }));
+            .pipe(
+                tap((outbreaks) => {
+                    (outbreaks || []).forEach((outbreak) => {
+                        this.outbreaksListMap[outbreak.id] = outbreak;
+                    });
+                }),
+
+                // share
+                share()
+            );
 
         // initialize pagination
         this.initPaginator();

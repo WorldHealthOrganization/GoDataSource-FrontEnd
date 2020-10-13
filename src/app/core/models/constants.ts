@@ -55,6 +55,9 @@ export class Constants {
     static DEFAULT_PAGE_SIZE = 25;
     static DEFAULT_USAGE_MAX_RECORDS_DISPLAYED = 10;
 
+    // static gender
+    static readonly GENDER_MALE = 'LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE';
+
     // dialog constants
     static DIALOG = {
         DATA_ITEM_TYPE: {

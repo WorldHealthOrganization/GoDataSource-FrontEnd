@@ -56,6 +56,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
     RelationshipModel = RelationshipModel;
     LabResultModel = LabResultModel;
     TeamModel = TeamModel;
+    Constants = Constants;
 
     contactId: string;
     selectedOutbreak: OutbreakModel;

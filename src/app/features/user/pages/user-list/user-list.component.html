@@ -241,11 +241,42 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Active outbreak -->
+        <ng-container matColumnDef="activeOutbreak">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="activeOutbreakFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="outbreaksList$ | async"
+                            multiple="true"
+                            (optionChanged)="filterBySelectField('activeOutbreakId', $event, 'id')"
+                            optionLabelKey="name"
+                            optionValueKey="id"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ outbreaksListMap[item.activeOutbreakId]?.name }}
+            </mat-cell>
+        </ng-container>
+
         <!-- Available outbreaks -->
         <ng-container matColumnDef="availableOutbreaks">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS' | translate}}</div>
+                    <div class="column-header">
+                        {{'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS' | translate}}
+                    </div>
                     <div class="column-filter">
                         <app-form-select
                             name="availableOutbreaksFilter"
