@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { UserModel, UserRoleModel, PhoneNumberType } from '../../../../core/models/user.model';
+import { UserModel, UserRoleModel, PhoneNumberType, UserSettings } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -21,6 +21,10 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
+import { TeamModel } from '../../../../core/models/team.model';
+import { TeamDataService } from '../../../../core/services/data/team.data.service';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-user-list',
@@ -39,26 +43,20 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
     // constants
     UserModel = UserModel;
     PhoneNumberType = PhoneNumberType;
+    UserSettings = UserSettings;
 
     // list of existing users
+    userTeamMap: {
+        [userId: string]: TeamModel[]
+    } = {};
     usersList$: Observable<UserModel[]>;
     usersListCount$: Observable<IBasicCount>;
+    teamsList$: Observable<TeamModel[]>;
 
     rolesList$: Observable<UserRoleModel[]>;
     outbreaksListMap: any = {};
     outbreaksList$: Observable<OutbreakModel[]>;
     institutionsList$: Observable<LabelValuePair[]>;
-
-    fixedTableColumns: string[] = [
-        'lastName',
-        'firstName',
-        'email',
-        'institutionName',
-        'telephoneNumbers',
-        'role',
-        'activeOutbreak',
-        'availableOutbreaks'
-    ];
 
     recordActions: HoverRowAction[] = [
         // View User
@@ -120,7 +118,8 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
         private dialogService: DialogService,
         private outbreakDataService: OutbreakDataService,
         private userRoleDataService: UserRoleDataService,
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        private teamDataService: TeamDataService
     ) {
         super(listHelperService);
     }
@@ -152,6 +151,14 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
         this.initPaginator();
         // ...and load the list of items
         this.needsRefreshList(true);
+
+        // initialize Side Table Columns
+        this.initializeSideTableColumns();
+
+        // retrieve teams
+        if (TeamModel.canList(this.authUser)) {
+            this.retrieveTeams();
+        }
     }
 
     /**
@@ -160,6 +167,55 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
     ngOnDestroy() {
         // release parent resources
         super.ngOnDestroy();
+    }
+
+    /**
+     * Initialize Side Table Columns
+     */
+    initializeSideTableColumns() {
+        // default table columns
+        this.tableColumns = [
+            new VisibleColumnModel({
+                field: 'lastName',
+                label: 'LNG_USER_FIELD_LABEL_LAST_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'firstName',
+                label: 'LNG_USER_FIELD_LABEL_FIRST_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'email',
+                label: 'LNG_USER_FIELD_LABEL_EMAIL'
+            }),
+            new VisibleColumnModel({
+                field: 'institutionName',
+                label: 'LNG_USER_FIELD_LABEL_INSTITUTION_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'telephoneNumbers',
+                label: 'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS'
+            }),
+            new VisibleColumnModel({
+                field: 'role',
+                label: 'LNG_USER_FIELD_LABEL_ROLES'
+            }),
+            new VisibleColumnModel({
+                field: 'activeOutbreak',
+                label: 'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK'
+            }),
+            new VisibleColumnModel({
+                field: 'availableOutbreaks',
+                label: 'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS'
+            })
+        ];
+
+        // can see teams ?
+        if (TeamModel.canList(this.authUser)) {
+            this.tableColumns.push(new VisibleColumnModel({
+                field: 'teams',
+                label: 'LNG_USER_FIELD_LABEL_TEAMS'
+            }));
+        }
     }
 
     /**
@@ -225,4 +281,69 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
             });
     }
 
+    /**
+     * Retrieve teams
+     */
+    retrieveTeams(): void {
+        // retrieve teams
+        const qb = new RequestQueryBuilder();
+        qb.fields(
+            'id',
+            'name',
+            'userIds'
+        );
+        this.teamsList$ = this.teamDataService
+            .getTeamsList(qb)
+            .pipe(
+                tap((teams) => {
+                    // go through each team and determine users
+                    this.userTeamMap = {};
+                    teams.forEach((team) => {
+                        // no need to continue ?
+                        // no really necessary since we do the above filter
+                        if (
+                            !team.userIds ||
+                            team.userIds.length < 1
+                        ) {
+                            return;
+                        }
+
+                        // go through users
+                        team.userIds.forEach((userId) => {
+                            // init array ?
+                            if (!this.userTeamMap[userId]) {
+                                this.userTeamMap[userId] = [];
+                            }
+
+                            // push team
+                            this.userTeamMap[userId].push(team);
+                        });
+                    });
+                })
+            );
+    }
+
+    /**
+     * Filter by team
+     */
+    filterTeamField(teams: TeamModel[]): void {
+        // determine list of users that we need to retrieve
+        const usersToRetrieve: {
+            [idUser: string]: true
+        } = {};
+        if (teams) {
+            teams.forEach((team) => {
+                (team.userIds || []).forEach((userId) => {
+                    usersToRetrieve[userId] = true;
+                });
+            });
+        }
+
+        // filter
+        this.filterBySelectField(
+            'id',
+            Object.keys(usersToRetrieve),
+            null
+        );
+    }
 }
