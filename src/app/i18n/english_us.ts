@@ -13,6 +13,17 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
+         * uiFollowUpFields
+         */
+        'LNG_FOLLOW_UP_FIELD_LABEL_CASE' : 'Case:',
+        'LNG_FOLLOW_UP_FIELD_LABEL_EMAIL': 'Email',
+
+        /**
+         * uiModifyFollowUpPage
+         */
+        'LNG_PAGE_MODIFY_FOLLOW_UP_FIELD_LABEL_FOLLOW_UP_WITH_INFO': '* This person is now a case and follow-up was performed at the time when \'{{ personName }}\' was registered as a contact"',
+
+        /**
          * uiCaseFields
          */
         'LNG_CASE_FIELD_LABEL_EMAIL': 'Email',
@@ -28,15 +39,14 @@ export const EnglishUsLang = {
         'LNG_EVENT_FIELD_LABEL_EMAIL': 'Email',
 
         /**
-         * uiFollowUpFields
+         * uiCommonFields
          */
-        'LNG_FOLLOW_UP_FIELD_LABEL_EMAIL': 'Email',
+        'LNG_COMMON_FIELD_LABEL_CODE': 'Code',
 
         /**
          * uiLoginPage
          */
         'LNG_PAGE_LOGIN_ACTION_LOGIN_2FA_CODE_REQUIRED': 'The code was sent to the following email "{{email}}"',
-        'LNG_COMMON_FIELD_LABEL_CODE': 'Code',
 
         /**
          * uiAPIErrors

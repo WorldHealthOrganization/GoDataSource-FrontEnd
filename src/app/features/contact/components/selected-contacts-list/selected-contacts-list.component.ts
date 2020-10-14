@@ -1,5 +1,7 @@
 import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { ContactModel } from '../../../../core/models/contact.model';
+import { CaseModel } from '../../../../core/models/case.model';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-selected-contacts-list',
@@ -8,5 +10,8 @@ import { ContactModel } from '../../../../core/models/contact.model';
     styleUrls: ['./selected-contacts-list.component.less']
 })
 export class SelectedContactsListComponent {
-    @Input() contacts: ContactModel[] = [];
+    @Input() persons: (ContactModel | CaseModel)[] = [];
+
+    // Constants for template
+    EntityType = EntityType;
 }

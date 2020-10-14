@@ -8,6 +8,8 @@ import { IPermissionBasic, IPermissionBasicBulk, IPermissionExportable, IPermiss
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
+import { EntityType } from './entity-type';
+import { CaseModel } from './case.model';
 
 export class FollowUpModel
     extends BaseModel
@@ -21,7 +23,7 @@ export class FollowUpModel
     date: string;
     address: AddressModel;
     personId: string;
-    contact: ContactModel;
+    person: ContactModel | CaseModel;
     targeted: boolean;
     questionnaireAnswers: {
         [variable: string]: IAnswerData[];
@@ -161,8 +163,12 @@ export class FollowUpModel
         this.fillLocation = _.isEmpty(this.fillLocation) ? undefined : new FillLocationModel(this.fillLocation);
 
         if (includeContact) {
-            this.contact = _.get(data, 'contact', {});
-            this.contact = new ContactModel(this.contact);
+            const person = _.get(data, 'contact', {});
+            if (person.type === EntityType.CASE) {
+                this.person = new CaseModel(person);
+            } else {
+                this.person = new ContactModel(person);
+            }
         }
 
         this.teamId = _.get(data, 'teamId');
