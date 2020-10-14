@@ -1,14 +1,12 @@
 <mat-card
     class="page-section page-content"
-    fxLayout="column"
->
+    fxLayout="column">
 
     <!-- Uploading / Saving data -->
     <div
         *ngIf="displayLoading"
         class="import-data-loading"
-        fxLayout="row" fxLayoutAlign="center"
-    >
+        fxLayout="row" fxLayoutAlign="center">
         <mat-spinner></mat-spinner>
         <span
             *ngIf="progress !== null"
@@ -21,8 +19,7 @@
     <div
         *ngIf="!displayLoading && !importableObject"
         fxLayout="column" fxLayoutGap="12px"
-        class="import-data"
-    >
+        class="import-data">
         <div fxLayout="column">
             <input
                 hidden
@@ -93,12 +90,10 @@
     <div
         *ngIf="!displayLoading && importableObject && !errMsgDetails"
         fxLayout="column" fxLayoutGap="30px"
-        class="import-data-map-fields"
-    >
+        class="import-data-map-fields">
         <div
             *ngIf="savedImportPage"
-            fxLayout="row" fxLayoutGap="20px"
-        >
+            fxLayout="row" fxLayoutGap="20px">
             <app-form-select
                 name="loadImportMapping"
                 [ngModel]="loadedImportMapping?.id"
@@ -129,8 +124,7 @@
         <form
             #form="ngForm"
             (submit)="importData(form)"
-            fxLayout="column"
-        >
+            fxLayout="column">
             <div
                 class="import-data-map-fields-header-columns"
                 fxLayout="row" fxLayoutGap="20px"
@@ -324,16 +318,14 @@
     <div
         *ngIf="!displayLoading && importableObject && errMsgDetails"
         fxLayout="column" fxLayoutGap="10px"
-        class="import-data-errors"
-    >
+        class="import-data-errors">
         <div class="import-data-errors-title">
             {{ 'LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED' | translate }}
         </div>
         <div
             *ngFor="let err of errMsgDetails.details && errMsgDetails.details.failed ? errMsgDetails.details.failed : []"
             class="import-data-errors-err"
-            fxLayout="column"
-        >
+            fxLayout="column">
             <div
                 fxLayout="row" fxLayoutGap="10px">
                 <!-- More details -->
