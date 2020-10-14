@@ -44,11 +44,14 @@ import { TimerCache } from '../../../../core/helperClasses/timer-cache';
     styleUrls: ['./create-contact-of-contact.component.less']
 })
 export class CreateContactOfContactComponent extends CreateConfirmOnChanges implements OnInit {
-
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // selected outbreak
     selectedOutbreak: OutbreakModel;
+
+    // constants
+    Constants = Constants;
 
     contactOfContactData: ContactOfContactModel = new ContactOfContactModel();
 

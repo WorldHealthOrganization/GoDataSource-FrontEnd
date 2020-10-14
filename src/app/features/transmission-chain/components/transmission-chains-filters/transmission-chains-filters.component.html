@@ -48,9 +48,7 @@
             [placeholder]="'LNG_CONTACT_FIELD_LABEL_LAST_NAME' | translate"
             maxlength="100">
         </app-form-input>
-    </div>
 
-    <div fxLayout="row" fxLayoutGap="20px">
         <!-- gender -->
         <app-form-select
             name="gender"
@@ -59,14 +57,29 @@
             [options]="genderList$ | async"
             multiple="true">
         </app-form-select>
+    </div>
 
+    <div fxLayout="row" fxLayoutGap="20px">
         <!-- location -->
         <app-form-location-dropdown
-            name="locationId"
-            [(ngModel)]="filters.locationId"
+            name="locationIds"
+            [(ngModel)]="filters.locationIds"
             [useOutbreakLocations]="true"
-            [placeholder]="'LNG_ADDRESS_FIELD_LABEL_LOCATION' | translate">
+            [placeholder]="'LNG_ADDRESS_FIELD_LABEL_LOCATION' | translate"
+            [multiple]="true">
         </app-form-location-dropdown>
+
+        <!-- cluster -->
+        <app-form-select
+            *ngIf="ClusterModel.canList(authUser) && clusterOptions !== false"
+            name="clusterIds"
+            [(ngModel)]="filters.clusterIds"
+            [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER' | translate"
+            [options]="clusterOptions"
+            multiple="true"
+            optionLabelKey="name"
+            optionValueKey="id">
+        </app-form-select>
     </div>
 
     <!-- Age -->

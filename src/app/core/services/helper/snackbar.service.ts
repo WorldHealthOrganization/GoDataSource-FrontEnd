@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
 import * as _ from 'lodash';
 import { I18nService } from './i18n.service';

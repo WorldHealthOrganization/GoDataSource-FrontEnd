@@ -11,6 +11,10 @@ export interface ITokenInfo {
     approximatedExpireInSecondsReal: number;
 }
 
+export class IAuthTwoFactor {
+    twoFA: boolean;
+}
+
 export class AuthModel {
     token: string;
     userId: string;

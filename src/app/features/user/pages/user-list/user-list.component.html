@@ -12,6 +12,13 @@
     </ng-container>
 </app-topnav>
 
+<!-- Side columns -->
+<app-side-columns
+    [tableColumnsUserSettingsKey]="UserSettings.USER_FIELDS"
+    [tableColumns]="tableColumns"
+    (visibleColumnsChanged)="applySideColumnsChanged($event)">
+</app-side-columns>
+
 <!--Total number of records from the list-->
 <app-total-number-of-records
     [value]="(usersListCount$ | async)?.count">
@@ -241,11 +248,42 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Active outbreak -->
+        <ng-container matColumnDef="activeOutbreak">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="activeOutbreakFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="outbreaksList$ | async"
+                            multiple="true"
+                            (optionChanged)="filterBySelectField('activeOutbreakId', $event, 'id')"
+                            optionLabelKey="name"
+                            optionValueKey="id"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ outbreaksListMap[item.activeOutbreakId]?.name }}
+            </mat-cell>
+        </ng-container>
+
         <!-- Available outbreaks -->
         <ng-container matColumnDef="availableOutbreaks">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS' | translate}}</div>
+                    <div class="column-header">
+                        {{'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS' | translate}}
+                    </div>
                     <div class="column-filter">
                         <app-form-select
                             name="availableOutbreaksFilter"
@@ -279,9 +317,45 @@
             </mat-cell>
         </ng-container>
 
-        <mat-header-row *matHeaderRowDef="fixedTableColumns"></mat-header-row>
+        <!-- Teams -->
+        <ng-container matColumnDef="teams">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{'LNG_USER_FIELD_LABEL_TEAMS' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="teamsFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="teamsList$ | async"
+                            multiple="true"
+                            (optionChanged)="filterTeamField($event)"
+                            optionLabelKey="name"
+                            optionValueKey="id"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                <mat-chip-list>
+                    <ng-container
+                        *ngFor="let team of userTeamMap[item.id]">
+                        <mat-chip>
+                            {{ team.name }}
+                        </mat-chip>
+                    </ng-container>
+                </mat-chip-list>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
         <mat-row
-            *matRowDef="let item; columns: fixedTableColumns"
+            *matRowDef="let item; columns: visibleTableColumns"
             app-hover-row-actions
             [hoverRowActionsComponent]="hoverRow"
             [hoverRowActions]="recordActions"

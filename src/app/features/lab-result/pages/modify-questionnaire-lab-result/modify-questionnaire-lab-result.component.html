@@ -26,32 +26,34 @@
     </div>
 
     <div class="form-actions">
-        <div class="page-tabs-navbar-placeholder"></div>
+        <div class="form-actions-no-scroll">
+            <div class="page-tabs-navbar-placeholder"></div>
 
-        <ng-container
-            *app-selected-outbreak-is-active>
+            <ng-container
+                *app-selected-outbreak-is-active>
+                <button
+                    *ngIf="viewOnly && LabResultModel.canModify(authUser)"
+                    type="button"
+                    mat-raised-button color="accent"
+                    [routerLink]="['/lab-results', labResultId, 'modify-questionnaire']">
+                    {{'LNG_COMMON_BUTTON_EDIT' | translate}}
+                </button>
+
+                <button
+                    *ngIf="!viewOnly"
+                    class="button-with-spinner"
+                    mat-raised-button color="accent">
+                    {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+                </button>
+            </ng-container>
+
             <button
-                *ngIf="viewOnly && LabResultModel.canModify(authUser)"
                 type="button"
-                mat-raised-button color="accent"
-                [routerLink]="['/lab-results', labResultId, 'modify-questionnaire']">
-                {{'LNG_COMMON_BUTTON_EDIT' | translate}}
+                [routerLink]="['/lab-results', EntityModel.getLinkForEntityType(this.labResultData?.personType), labResultData?.personId, labResultId, viewOnly ? 'view' : 'modify']"
+                [queryParams]="{fromLabResultsList: fromLabResultsList}"
+                mat-raised-button>
+                {{'LNG_COMMON_BUTTON_BACK' | translate}}
             </button>
-
-            <button
-                *ngIf="!viewOnly"
-                class="button-with-spinner"
-                mat-raised-button color="accent">
-                {{'LNG_COMMON_BUTTON_SAVE' | translate}}
-            </button>
-        </ng-container>
-
-        <button
-            type="button"
-            [routerLink]="['/lab-results', EntityModel.getLinkForEntityType(this.labResultData?.personType), labResultData?.personId, labResultId, viewOnly ? 'view' : 'modify']"
-            [queryParams]="{fromLabResultsList: fromLabResultsList}"
-            mat-raised-button>
-            {{'LNG_COMMON_BUTTON_BACK' | translate}}
-        </button>
+        </div>
     </div>
 </form>

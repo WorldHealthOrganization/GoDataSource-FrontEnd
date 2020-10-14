@@ -3,17 +3,13 @@
 
     <form
         #groupForm="ngForm"
-        fxLayout="column"
-    >
+        fxLayout="column">
         <div
             *ngFor="let vaccine of values; let i = index; trackBy: trackByIndex"
-            fxLayout="row" fxLayoutAlign="start center"
-        >
+            fxLayout="row" fxLayoutAlign="start center">
             <mat-card
                 class="page-section"
-                fxFlex fxLayout="row" fxLayoutGap="15px"
-
-            >
+                fxFlex fxLayout="row" fxLayoutGap="15px">
                 <!--Vaccine-->
                 <app-form-select
                     [name]="name + '[' + i + ']' + '[vaccine]'"
@@ -25,8 +21,7 @@
                     [disabled]="disabled"
                     optionLabelKey="label"
                     optionValueKey="value"
-                    (groupValidated)="validateGroup()"
-                >
+                    (optionChanged)="onChange(false)">
                 </app-form-select>
 
                 <!--Vaccine Date-->
@@ -52,7 +47,7 @@
                     [disabled]="disabled"
                     optionLabelKey="label"
                     optionValueKey="value"
-                    (groupValidated)="validateGroup()">
+                    (optionChanged)="onChange(false)">
                 </app-form-select>
 
             </mat-card>
@@ -68,6 +63,11 @@
             <button *ngIf="!disabled" type="button" mat-button color="primary" (click)="add()">
                 {{'LNG_COMMON_BUTTON_ADD_VACCINE' | translate}}
             </button>
+        </div>
+
+        <div
+            *ngIf="disabled && values?.length < 1">
+            {{'LNG_ENTITY_FIELD_LABEL_NO_VACCINE' | translate}}
         </div>
     </form>
 </div>

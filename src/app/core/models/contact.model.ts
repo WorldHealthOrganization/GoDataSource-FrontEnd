@@ -405,4 +405,16 @@ export class ContactModel
             return acc;
         }, []);
     }
+
+    /**
+     * Get email addresses
+     */
+    get emailAddresses(): string[] {
+        return this.addresses.reduce((acc: string[], address) => {
+            if (!_.isEmpty(address.emailAddress)) {
+                acc.push(address.emailAddress);
+            }
+            return acc;
+        }, []);
+    }
 }

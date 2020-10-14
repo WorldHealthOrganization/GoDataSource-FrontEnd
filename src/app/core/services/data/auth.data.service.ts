@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import * as _ from 'lodash';
 import { StorageKey, StorageService } from '../helper/storage.service';
 import { UserDataService } from './user.data.service';
-import { AuthModel, ITokenInfo } from '../../models/auth.model';
+import { AuthModel, IAuthTwoFactor, ITokenInfo } from '../../models/auth.model';
 import { UserModel, UserSettings } from '../../models/user.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { map, mergeMap, switchMap, tap } from 'rxjs/operators';
@@ -60,19 +60,26 @@ export class AuthDataService {
 
     /**
      * Authenticate with email and password
-     * @param user
-     * @returns {Observable<any>}
      */
-    login(user): Observable<AuthModel> {
+    login(
+        user,
+        twoFA?: boolean
+    ): Observable<AuthModel> {
         return this.http
             .post(
-                `users/login`,
+                twoFA ? 'users/two-factor-authentication-step-2' : 'users/login',
                 user, {
                     withCredentials: true
                 }
             )
             .pipe(
-                switchMap((authRes) => {
+                switchMap((authRes: IAuthTwoFactor | AuthModel) => {
+                    // must enter code ?
+                    if ((authRes as IAuthTwoFactor).twoFA) {
+                        // expecting code before we can continue
+                        return of(authRes);
+                    }
+
                     // keep auth info
                     const auth = this.modelHelperService.getModelInstance(AuthModel, authRes);
 

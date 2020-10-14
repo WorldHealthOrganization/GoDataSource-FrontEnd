@@ -78,6 +78,7 @@ export class CreateContactComponent
 
     // constants
     TeamModel = TeamModel;
+    Constants = Constants;
 
     /**
      * Constructor
