@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -29,6 +29,7 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { MatExpansionPanel } from '@angular/material';
 
 interface IKpiGroup {
     id: DashboardKpiGroup;
@@ -260,10 +261,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         [id: string]: IKpiGroup
     } = {};
 
-    visibleKpisGroup: {
-        [id: string]: boolean;
-    } = {};
-
     // authenticated user
     authUser: UserModel;
 
@@ -294,6 +291,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     globalFilterClassificationId: string[] = [];
 
     @ViewChild('kpiSection') private kpiSection: ElementRef;
+    @ViewChildren('kpiSectionGroup') private kpiSectionGroup: QueryList<MatExpansionPanel>;
 
     // subscribers
     outbreakSubscriber: Subscription;
@@ -332,8 +330,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.kpiGroupsMap = {};
         this.kpiGroups.forEach((group) => {
             this.kpiGroupsMap[group.id] = group;
-            // set the visibility of kpis as false on page init
-            this.visibleKpisGroup[group.id] = false;
         });
 
         this.caseClassificationsList$ = this.referenceDataDataService
@@ -547,18 +543,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     showAllDashlets(kpiGroup: string) {
         this.authUser.getSettings(UserSettings.DASHBOARD).showAllDashlets(kpiGroup);
-        // update KPI visibility for export check
-        this.setKpiGroupVisibility(kpiGroup);
         // persist changes
         this.persistUserDashboardSettings().subscribe();
-    }
-
-    /**
-     * Set KPI group visibility for dashboard to check them before export KPIs
-     * @param {string} kpiGroup
-     */
-    setKpiGroupVisibility(kpiGroup: string) {
-        this.visibleKpisGroup[kpiGroup] = !this.visibleKpisGroup[kpiGroup];
     }
 
     /**
@@ -613,13 +599,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
      * Generate KPIs report
      */
     generateKpisReport() {
-        this.showLoadingDialog();
-        if (!this.allKpisDisplayed()) {
+        // display error message if we try to render empty item
+        let atLeastOneIsExpanded: boolean = false;
+        this.kpiSectionGroup.forEach((item) => {
+            if (item.expanded) {
+                atLeastOneIsExpanded = true;
+            }
+        });
+        if (!atLeastOneIsExpanded) {
             this.snackbarService.showError('LNG_PAGE_DASHBOARD_KPIS_ELEMENTS_NOT_VISIBLE_ERROR_MSG');
-            this.closeLoadingDialog();
             return;
         }
 
+        // render
+        this.showLoadingDialog();
         (domtoimage as any).toPng(this.kpiSection.nativeElement)
             .then((dataUrl) => {
                 const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
@@ -790,21 +783,5 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
         // we don't have access
         return false;
-    }
-
-    /**
-     * Check if all KPIs are displayed to export them
-     */
-    allKpisDisplayed() {
-        let allKpisDisplayed: boolean;
-        for (const key of Object.keys(this.kpiGroupsMap)) {
-            if (this.visibleKpisGroup[key] === false) {
-                allKpisDisplayed = false;
-                return;
-            } else {
-                allKpisDisplayed = true;
-            }
-        }
-        return allKpisDisplayed;
     }
 }

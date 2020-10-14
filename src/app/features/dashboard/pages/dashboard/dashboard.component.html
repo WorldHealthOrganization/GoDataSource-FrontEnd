@@ -282,10 +282,10 @@
                 <ng-container
                     *ngFor="let group of kpiGroups">
                     <mat-expansion-panel
-                        *ngIf="group.hasAccess(authUser)">
+                        *ngIf="group.hasAccess(authUser)"
+                        #kpiSectionGroup>
                         <!-- Header -->
-                        <mat-expansion-panel-header
-                            (click)="setKpiGroupVisibility(group.id)">
+                        <mat-expansion-panel-header>
                             <!-- KPIs section header -->
                             <div class="dashlet-kpi-header dashlet-kpi-header-100" fxLayout="row" fxLayoutAlign="space-between center">
                                 <div>
