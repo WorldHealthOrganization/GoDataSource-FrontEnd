@@ -10,10 +10,8 @@ import { EntityType } from '../../../../core/models/entity-type';
     styleUrls: ['./selected-contacts-list.component.less']
 })
 export class SelectedContactsListComponent {
-    @Input() contacts: (ContactModel | CaseModel)[] = [];
-    @Input() personsToBeDisplayed: string;
+    @Input() persons: (ContactModel | CaseModel)[] = [];
 
     // Constants for template
     EntityType = EntityType;
-
 }

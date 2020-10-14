@@ -1,10 +1,10 @@
-<div *ngIf="personsToBeDisplayed.length > 1" class="info-container">{{'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_PERSON_FOLLOW_UP_INFO' | translate : {personsToBeDisplayed: personsToBeDisplayed} }}</div>
-<div>{{'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_SELECTED_CONTACTS' | translate}}</div>
+<div>
+    {{'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_SELECTED_CONTACTS' | translate}}
+</div>
 <div fxLayout="row wrap" fxLayoutGap="20px">
     <a
-        *ngFor="let contact of contacts"
-        [routerLink]="[contact.type === EntityType.CASE ? '/cases' :'/contacts', contact.id, 'view']"
-    >
-        {{ contact.name }}
+        *ngFor="let person of persons"
+        [routerLink]="[person.type === EntityType.CASE ? '/cases' :'/contacts', person.id, 'view']">
+        {{ person.name }}
     </a>
 </div>

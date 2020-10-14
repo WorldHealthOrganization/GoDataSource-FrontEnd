@@ -30,9 +30,8 @@
                     </div>
 
                     <app-selected-contacts-list
-                        [contacts]="selectedContacts"
-                        [personsToBeDisplayed]="personsToBeDisplayed"
-                    ></app-selected-contacts-list>
+                        [persons]="selectedContacts">
+                    </app-selected-contacts-list>
 
                     <app-selected-follow-up-dates
                         [followUpDates]="followUpDates">
@@ -105,9 +104,8 @@
                 </div>
 
                 <app-selected-contacts-list
-                    [contacts]="selectedContacts"
-                    [personsToBeDisplayed]="personsToBeDisplayed"
-                ></app-selected-contacts-list>
+                    [persons]="selectedContacts">
+                </app-selected-contacts-list>
 
                 <app-selected-follow-up-dates
                     [followUpDates]="followUpDates">

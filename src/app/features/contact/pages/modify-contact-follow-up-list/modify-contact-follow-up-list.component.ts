@@ -12,20 +12,19 @@ import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { forkJoin, Observable, throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { IAnswerData } from '../../../../core/models/question.model';
 import { catchError, share } from 'rxjs/operators';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { Constants } from '../../../../core/models/constants';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
-import { EntityType } from '../../../../core/models/entity-type';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-modify-contact-follow-ups-list',
@@ -43,8 +42,6 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     selectedFollowUpsIds: string[];
     // selected follow-ups to be modified
     selectedFollowUps: FollowUpModel[] = [];
-    // persons to be displayed as info in selected contacts component
-    personsToBeDisplayed: string;
 
     // current dirty fields
     currentDirtyFields: {
@@ -63,6 +60,12 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     // authenticated user
     authUser: UserModel;
     futureFollowUps: boolean = false;
+
+    // selected contacts
+    selectedContacts: (ContactModel | CaseModel)[] = [];
+
+    // follow-up dates
+    followUpDates: string[] = [];
 
     @ViewChild('targetedInput') targetedInput: any;
     @ViewChild('teamInput') teamInput: any;
@@ -177,53 +180,45 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
                 this.selectedOutbreak.id,
                 qb
             ).subscribe((followUps: FollowUpModel[]) => {
+                // follow-up data
                 this.selectedFollowUps = followUps;
 
                 // check if we have future follow-ups
+                // & determine selected contacts
+                // & determine selected follow-up dates
+                this.followUpDates = [];
+                this.selectedContacts = [];
                 for (const followUp of this.selectedFollowUps) {
+                    // add contact to list
+                    if (
+                        followUp.person &&
+                        followUp.person.id &&
+                        !this.selectedContacts.find((item) => item.id === followUp.person.id)
+                    ) {
+                        this.selectedContacts.push(followUp.person);
+                    }
+
+                    // add follow-up date
+                    if (followUp.date) {
+                        const date: string = moment(followUp.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                        if (!this.followUpDates.find((item) => item === date)) {
+                            this.followUpDates.push(date);
+                        }
+                    }
+
+                    // has future follow-ups ?
                     if (Constants.isDateInTheFuture(followUp.date)) {
                         this.futureFollowUps = true;
-                        break;
                     }
                 }
+
+                // sort dates
+                this.followUpDates = _.sortBy(
+                    this.followUpDates,
+                    (item1, item2) => moment(item1).diff(moment(item2))
+                );
             });
         }
-    }
-
-    /**
-     * Selected contacts
-     */
-    get selectedContacts(): (ContactModel | CaseModel)[]  {
-
-        const selectedContactsToFormat = [];
-        const selectedContacts = this.selectedFollowUps
-            .map((followUp: FollowUpModel) => {
-                if (followUp.person.type === EntityType.CASE) {
-                    // need to know if we have follow-ups for persons that now are cases
-                    selectedContactsToFormat.push(followUp.person.name);
-                }
-                return followUp.person;
-            })
-            .filter((contact, index, self) => {
-                // keep only unique contacts
-                return self.indexOf(contact) === index;
-            });
-        // persons to be displayed in the selected-contact-component
-        this.personsToBeDisplayed = selectedContactsToFormat.join(', ');
-
-        return selectedContacts;
-    }
-
-    /**
-     * Return follow up dates for selected follow-ups to be modified
-     */
-    get followUpDates(): string[] {
-        return _.sortBy(this.selectedFollowUps, 'date')
-            .map((followUp) => followUp.date )
-            .filter((date, index, self) => {
-                // keep only unique dates
-                return self.indexOf(date) === index;
-            });
     }
 
     /**

@@ -13,16 +13,15 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
-         * uiModifyFollowUpPage
+         * uiFollowUpFields
          */
         'LNG_FOLLOW_UP_FIELD_LABEL_CASE' : 'Case:',
-        'LNG_PAGE_MODIFY_FOLLOW_UP_FIELD_LABEL_FOLLOW_UP_WITH_INFO': '* This person is now a case and follow-up was performed at the time when \'{{ personName }}\' was registered as a contact"',
+        'LNG_FOLLOW_UP_FIELD_LABEL_EMAIL': 'Email',
 
         /**
-         * uiModifyFollowUpListPage
+         * uiModifyFollowUpPage
          */
-        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_PERSON_FOLLOW_UP_INFO': '* Persons that now are cases (the follow-ups were performed when they were contacts)  : {{ personsToBeDisplayed }}',
-        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_MODIFY_DATA_IN_THE_FUTURE_LABEL': '*You can\'t modify some fields because at least one of the selected follow-ups is in the future',
+        'LNG_PAGE_MODIFY_FOLLOW_UP_FIELD_LABEL_FOLLOW_UP_WITH_INFO': '* This person is now a case and follow-up was performed at the time when \'{{ personName }}\' was registered as a contact"',
 
         /**
          * uiCaseFields
@@ -40,15 +39,14 @@ export const EnglishUsLang = {
         'LNG_EVENT_FIELD_LABEL_EMAIL': 'Email',
 
         /**
-         * uiFollowUpFields
+         * uiCommonFields
          */
-        'LNG_FOLLOW_UP_FIELD_LABEL_EMAIL': 'Email',
+        'LNG_COMMON_FIELD_LABEL_CODE': 'Code',
 
         /**
          * uiLoginPage
          */
         'LNG_PAGE_LOGIN_ACTION_LOGIN_2FA_CODE_REQUIRED': 'The code was sent to the following email "{{email}}"',
-        'LNG_COMMON_FIELD_LABEL_CODE': 'Code',
 
         /**
          * uiAPIErrors

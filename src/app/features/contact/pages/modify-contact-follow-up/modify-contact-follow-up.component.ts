@@ -50,7 +50,7 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
     rootCaseData: CaseModel;
 
     followUpData: FollowUpModel = new FollowUpModel();
-    relatedPersonData: ContactModel | CaseModel = new ContactModel();
+    relatedPersonData: ContactModel | CaseModel;
 
     teamsList$: Observable<TeamModel[]>;
     dailyStatusTypeOptions$: Observable<any[]>;
@@ -189,7 +189,7 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
                 )
                 .subscribe((followUpData: FollowUpModel) => {
                     this.followUpData = new FollowUpModel(followUpData);
-                    this.relatedPersonData = followUpData.person.type === EntityType.CASE ? new CaseModel(followUpData.person) : new ContactModel(followUpData.person);
+                    this.relatedPersonData = followUpData.person;
 
                     this.initializeBreadcrumbs();
 
