@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -29,6 +29,7 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { MatExpansionPanel } from '@angular/material';
 
 interface IKpiGroup {
     id: DashboardKpiGroup;
@@ -290,6 +291,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     globalFilterClassificationId: string[] = [];
 
     @ViewChild('kpiSection') private kpiSection: ElementRef;
+    @ViewChildren('kpiSectionGroup') private kpiSectionGroup: QueryList<MatExpansionPanel>;
 
     // subscribers
     outbreakSubscriber: Subscription;
@@ -541,7 +543,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     showAllDashlets(kpiGroup: string) {
         this.authUser.getSettings(UserSettings.DASHBOARD).showAllDashlets(kpiGroup);
-
         // persist changes
         this.persistUserDashboardSettings().subscribe();
     }
@@ -598,6 +599,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
      * Generate KPIs report
      */
     generateKpisReport() {
+        // display error message if we try to render empty item
+        let atLeastOneIsExpanded: boolean = false;
+        this.kpiSectionGroup.forEach((item) => {
+            if (item.expanded) {
+                atLeastOneIsExpanded = true;
+            }
+        });
+        if (!atLeastOneIsExpanded) {
+            this.snackbarService.showError('LNG_PAGE_DASHBOARD_KPIS_ELEMENTS_NOT_VISIBLE_ERROR_MSG');
+            return;
+        }
+
+        // render
         this.showLoadingDialog();
         (domtoimage as any).toPng(this.kpiSection.nativeElement)
             .then((dataUrl) => {

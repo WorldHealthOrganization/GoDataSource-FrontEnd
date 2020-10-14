@@ -282,7 +282,8 @@
                 <ng-container
                     *ngFor="let group of kpiGroups">
                     <mat-expansion-panel
-                        *ngIf="group.hasAccess(authUser)">
+                        *ngIf="group.hasAccess(authUser)"
+                        #kpiSectionGroup>
                         <!-- Header -->
                         <mat-expansion-panel-header>
                             <!-- KPIs section header -->

@@ -13,6 +13,11 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
+         * uiDashboardPage
+         */
+        'LNG_PAGE_DASHBOARD_KPIS_ELEMENTS_NOT_VISIBLE_ERROR_MSG': 'Please make sure that at least one KPI dashlet is visible',
+
+        /**
          * uiFollowUpFields
          */
         'LNG_FOLLOW_UP_FIELD_LABEL_CASE' : 'Case:',
