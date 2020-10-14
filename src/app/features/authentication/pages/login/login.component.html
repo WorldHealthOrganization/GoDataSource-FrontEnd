@@ -34,6 +34,7 @@
 
                 <!-- Password input -->
                 <div
+                    *ngIf="!twoFA; else twoFACode"
                     class="login-row-specific-height"
                     fxLayout="row">
                     <app-form-input
@@ -54,6 +55,22 @@
                         {{ 'LNG_PAGE_LOGIN_FORGOT_PASSWORD_LABEL' | translate }}
                     </button>
                 </div>
+
+                <!-- Two Factor code -->
+                <ng-template
+                    #twoFACode>
+                    <div
+                        class="login-row-specific-height"
+                        fxLayout="row">
+                        <app-form-input
+                            [tabIndex]="2"
+                            name="code"
+                            [(ngModel)]="user.code"
+                            [placeholder]="'LNG_COMMON_FIELD_LABEL_CODE' | translate"
+                            required="true">
+                        </app-form-input>
+                    </div>
+                </ng-template>
 
                 <!-- Captcha input -->
                 <div

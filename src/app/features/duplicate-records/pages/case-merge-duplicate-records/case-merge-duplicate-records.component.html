@@ -61,15 +61,24 @@
 
                             <div fxLayout="row" fxLayoutGap="20px">
                                 <div
-                                    fxFlex fxLayout="row" fxLayoutGap="20px">
+                                    fxFlex>
                                     <app-form-select
-                                        name="occupation"
-                                        [(ngModel)]="uniqueOptions?.occupation.value"
-                                        [placeholder]="'LNG_CASE_FIELD_LABEL_OCCUPATION' | translate"
-                                        tooltip="LNG_CASE_FIELD_LABEL_OCCUPATION_DESCRIPTION"
-                                        [options]="uniqueOptions?.occupation.options">
+                                        *ngIf="uniqueOptions?.gender.value !== Constants.GENDER_MALE"
+                                        name="pregnancyStatus"
+                                        [(ngModel)]="uniqueOptions?.pregnancyStatus.value"
+                                        [placeholder]="'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS' | translate"
+                                        tooltip="LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION"
+                                        [options]="uniqueOptions?.pregnancyStatus.options">
                                     </app-form-select>
                                 </div>
+
+                                <app-form-select
+                                    name="occupation"
+                                    [(ngModel)]="uniqueOptions?.occupation.value"
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_OCCUPATION' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_OCCUPATION_DESCRIPTION"
+                                    [options]="uniqueOptions?.occupation.options">
+                                </app-form-select>
 
                                 <app-form-select
                                     name="ageDob"
@@ -86,8 +95,6 @@
                                     tooltip="LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
                                     [options]="uniqueOptions?.visualId.options">
                                 </app-form-select>
-
-                                <div fxFlex><!-- placeholder --></div>
 
                             </div>
 
@@ -144,6 +151,14 @@
                             </div>
                         </div>
                     </mat-card>
+
+                    <!--Vaccines received section-->
+                    <div class="section-title">{{'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED_DETAILS' | translate}}</div>
+                    <app-form-vaccines-list
+                        name="vaccinesReceived"
+                        [(ngModel)]="caseData.vaccinesReceived"
+                        [disabled]="true">
+                    </app-form-vaccines-list>
 
                     <!-- Documents section -->
                     <div class="section-title">{{ 'LNG_CASE_FIELD_LABEL_DOCUMENTS' | translate }}</div>

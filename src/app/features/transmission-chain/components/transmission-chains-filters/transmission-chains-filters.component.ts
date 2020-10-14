@@ -9,6 +9,9 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { Moment } from '../../../../core/helperClasses/x-moment';
 import { map, share } from 'rxjs/operators';
 import { Constants } from '../../../../core/models/constants';
+import { ClusterModel } from '../../../../core/models/cluster.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 export class TransmissionChainFilters {
     classificationId: string[];
@@ -17,10 +20,14 @@ export class TransmissionChainFilters {
     firstName: string;
     lastName: string;
     gender: string;
-    locationId: string;
+    locationIds: string[];
+    clusterIds: string[];
     age: AgeModel;
     date: Moment;
     includeContactsOfContacts: boolean;
+
+    showContacts?: boolean;
+    showEvents?: boolean;
 
     /**
      * Constructor
@@ -33,7 +40,8 @@ export class TransmissionChainFilters {
         firstName?: string,
         lastName?: string,
         gender?: string,
-        locationId?: string,
+        locationIds?: string[],
+        clusterIds?: string[],
         age?: AgeModel,
         date?: Moment,
         includeContactsOfContacts?: boolean
@@ -116,12 +124,14 @@ export class TransmissionChainFilters {
         }
 
         // location
-        if (!_.isEmpty(this.locationId)) {
+        if (!_.isEmpty(this.locationIds)) {
             qb.filter.where({
                 or: [
                     {
                         type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT',
-                        'address.parentLocationIdFilter': this.locationId
+                        'address.parentLocationIdFilter': {
+                            inq: this.locationIds
+                        }
                     }, {
                         type: {
                             inq: !this.includeContactsOfContacts ?
@@ -135,7 +145,9 @@ export class TransmissionChainFilters {
                                     'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_OF_CONTACT'
                                 ]
                         },
-                        'addresses.parentLocationIdFilter': this.locationId
+                        'addresses.parentLocationIdFilter': {
+                            inq: this.locationIds
+                        }
                     }
                 ]
             });
@@ -176,11 +188,30 @@ export class TransmissionChainsFiltersComponent implements OnInit {
     outcomeList$: Observable<LabelValuePair[]>;
     genderList$: Observable<LabelValuePair[]>;
 
+    // clusters
+    @Input() clusterOptions: ClusterModel[] | false;
+
+    // constants
+    ClusterModel = ClusterModel;
+
+    // authenticated user
+    authUser: UserModel;
+
+    /**
+     * Constructor
+     */
     constructor(
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        private authDataService: AuthDataService
     ) {}
 
+    /**
+     * Component initialized
+     */
     ngOnInit(): void {
+        // authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         this.caseClassificationsList$ = this.referenceDataDataService
             .getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION)
             .pipe(

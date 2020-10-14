@@ -31,6 +31,8 @@ import { TeamDataService } from '../../../../core/services/data/team.data.servic
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { CaseModel } from '../../../../core/models/case.model';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-contact-range-follow-ups-list',
@@ -55,7 +57,7 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
 
     // follow ups list
     followUpsGroupedByContact: {
-        contact: ContactModel,
+        person: ContactModel | CaseModel,
         followUps: {
             [date: string]: FollowUpModel[]
         }
@@ -85,6 +87,7 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
     ExportDataExtension = ExportDataExtension;
     ReferenceDataCategory = ReferenceDataCategory;
     FollowUpModel = FollowUpModel;
+    EntityType = EntityType;
 
     loadingDialog: LoadingDialogModel;
 
@@ -306,7 +309,7 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
 
                         // get grouped followups by contact & date
                         return {
-                            contact: data.contact,
+                            person: data.person,
                             followUps: _.chain(data.followUps)
                                 .groupBy((followUp: FollowUpModel) => {
                                     // determine min & max dates

@@ -228,13 +228,19 @@ export class EntityModel {
      */
     static uniqueStringOptions(
         records: EntityModel[],
-        path: string
+        path: string,
+        map?: {
+            [value: string]: string
+        }
     ): { options: LabelValuePair[], value: any } {
         return EntityModel.uniqueValueOptions(
             records,
             path,
             (value) => _.isString(value) ? value.toLowerCase() : value,
-            (value) => new LabelValuePair(value, value)
+            (value) => new LabelValuePair(
+                map && map[value] ? map[value] : value,
+                value
+            )
         );
     }
 

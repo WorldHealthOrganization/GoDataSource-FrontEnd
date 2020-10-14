@@ -266,8 +266,8 @@
                         fxFlex="270px"
                         class="follow-up-range-column-data follow-up-range-name-column-data follow-up-range-name-column-data-no-wrap">
                         <a
-                            [routerLink]="['/contacts', contactFollowUpData.contact.id, 'view' ]">
-                            {{ contactFollowUpData.contact.name + ( contactFollowUpData.contact.visualId ? ' ( ' + contactFollowUpData.contact.visualId + ' )' : '' ) }}
+                            [routerLink]="[contactFollowUpData.person.type === EntityType.CASE ? '/cases' : '/contacts', contactFollowUpData.person.id, 'view' ]">
+                            {{ contactFollowUpData.person.name + ( contactFollowUpData.person.visualId ? ' ( ' + contactFollowUpData.person.visualId + ' )' : '' ) }}
                         </a>
                     </div>
 
@@ -276,7 +276,7 @@
                         fxFlex="200px"
                         class="follow-up-range-column-data follow-up-range-name-column-data follow-up-range-name-column-data-no-wrap">
                         <span
-                            *ngIf="contactFollowUpData.contact.mainAddress?.location?.name; let locationName"
+                            *ngIf="contactFollowUpData.person.mainAddress?.location?.name; let locationName"
                             [matTooltip]="locationName">
                             {{ locationName }}
                         </span>
@@ -286,14 +286,14 @@
                     <div
                         fxFlex="100px"
                         class="follow-up-range-column-data follow-up-range-name-column-data">
-                        {{contactFollowUpData.contact.dateOfLastContact | dateDefault}}
+                        {{contactFollowUpData.person.dateOfLastContact | dateDefault}}
                     </div>
 
                     <!--Date of the end of the follow-up-->
                     <div
                         fxFlex="100px"
                         class="follow-up-range-column-data follow-up-range-name-column-data">
-                         {{contactFollowUpData.contact.followUp.endDate | dateDefault}}
+                         {{contactFollowUpData.person.followUp?.endDate | dateDefault}}
                     </div>
 
                     <!-- Statuses -->
@@ -308,8 +308,8 @@
                                 <div
                                     fxFlex fxLayout="column"
                                     class="follow-up-range-date-column-data-info"
-                                    [matTooltip]="'Contact: ' + contactFollowUpData.contact.name + ' / ' + 'Date: ' + date + ' / ' + (dailyStatuses[followUp.statusId]?.value | translate)"
-                                    [routerLink]="['/contacts', followUp.personId, 'follow-ups', followUp.id, 'view' ]"
+                                    [matTooltip]="'Person: ' + contactFollowUpData.person.name + ' / ' + 'Date: ' + date + ' / ' + (dailyStatuses[followUp.statusId]?.value | translate)"
+                                    [routerLink]="[contactFollowUpData.person.type === EntityType.CASE ? '/cases' : '/contacts', followUp.personId, 'follow-ups', followUp.id, 'view' ]"
                                     [queryParams]="{rootPage: rootPage}"
                                 >
 

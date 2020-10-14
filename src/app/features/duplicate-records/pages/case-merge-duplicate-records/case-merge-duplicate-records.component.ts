@@ -21,6 +21,7 @@ import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-da
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { VaccineModel } from '../../../../core/models/vaccine.model';
 
 @Component({
     selector: 'app-case-merge-duplicate-records',
@@ -63,6 +64,10 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
             value: any
         },
         gender: {
+            options: LabelValuePair[],
+            value: any
+        },
+        pregnancyStatus: {
             options: LabelValuePair[],
             value: any
         },
@@ -148,6 +153,9 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
         }
     };
 
+    // constants
+    Constants = Constants;
+
     /**
      * Constructor
      */
@@ -223,6 +231,10 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
                 value: undefined
             },
             gender: {
+                options: [],
+                value: undefined
+            },
+            pregnancyStatus: {
                 options: [],
                 value: undefined
             },
@@ -314,6 +326,7 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
             this.uniqueOptions.middleName = EntityModel.uniqueStringOptions(this.mergeRecords, 'middleName');
             this.uniqueOptions.lastName = EntityModel.uniqueStringOptions(this.mergeRecords, 'lastName');
             this.uniqueOptions.gender = EntityModel.uniqueStringOptions(this.mergeRecords, 'gender');
+            this.uniqueOptions.pregnancyStatus = EntityModel.uniqueStringOptions(this.mergeRecords, 'pregnancyStatus');
             this.uniqueOptions.occupation = EntityModel.uniqueStringOptions(this.mergeRecords, 'occupation');
             this.uniqueOptions.ageDob = EntityModel.uniqueAgeDobOptions(
                 this.mergeRecords,
@@ -336,6 +349,9 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
             this.uniqueOptions.dateOfBurial = EntityModel.uniqueDateOptions(this.mergeRecords, 'dateOfBurial');
             this.uniqueOptions.safeBurial = EntityModel.uniqueBooleanOptions(this.mergeRecords, 'safeBurial');
 
+            // merge all vaccines
+            this.determineVaccines();
+
             // merge all documents
             this.determineDocuments();
 
@@ -351,10 +367,25 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
     }
 
     /**
+     * Determine vaccines
+     */
+    private determineVaccines() {
+        // merge all documents
+        this.caseData.vaccinesReceived = [];
+        _.each(this.mergeRecords, (ent: EntityModel) => {
+            _.each((ent.model as CaseModel).vaccinesReceived, (vac: VaccineModel) => {
+                if (vac.vaccine) {
+                    this.caseData.vaccinesReceived.push(vac);
+                }
+            });
+        });
+    }
+
+    /**
      * Determine documents
      */
     private determineDocuments() {
-        // merge all documents
+        // merge all vaccines
         this.caseData.documents = [];
         _.each(this.mergeRecords, (ent: EntityModel) => {
             _.each((ent.model as CaseModel).documents, (doc: DocumentModel) => {

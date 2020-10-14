@@ -11,6 +11,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel } from '../../../../core/models/user.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { QuestionModel } from '../../../../core/models/question.model';
 
 @Component({
     selector: 'app-import-contact-data',
@@ -69,6 +70,8 @@ export class ImportContactDataComponent implements OnInit, OnDestroy {
         'relationship.contactDate',
         'relationship.certaintyLevelId'
     ];
+
+    formatDataBeforeUse = QuestionModel.formatQuestionnaireImportDefs;
 
     /**
      * Constructor

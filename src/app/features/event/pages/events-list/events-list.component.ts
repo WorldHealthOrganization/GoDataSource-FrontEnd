@@ -355,7 +355,12 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                 field: 'address',
                 label: 'LNG_EVENT_FIELD_LABEL_ADDRESS',
                 visible: false
-            })
+            }),
+            new VisibleColumnModel({
+                field: 'address.emailAddress',
+                label: 'LNG_EVENT_FIELD_LABEL_EMAIL',
+                visible: false
+            }),
         ];
 
         // number of contacts & exposures columns should be visible only on pages where we have relationships

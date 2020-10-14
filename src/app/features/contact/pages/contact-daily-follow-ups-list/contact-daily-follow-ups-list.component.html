@@ -266,7 +266,7 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
-                {{ item.contact?.lastName }}
+                {{ item.person?.lastName }}
             </mat-cell>
         </ng-container>
 
@@ -290,7 +290,7 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
-                {{ item.contact?.firstName }}
+                {{ item.person?.firstName }}
             </mat-cell>
         </ng-container>
 
@@ -315,7 +315,7 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
-                {{ item.contact?.visualId }}
+                {{ item.person?.visualId }}
             </mat-cell>
         </ng-container>
 
@@ -337,7 +337,7 @@
                 </div>
             </mat-header-cell>
             <mat-cell class="has-date-range-filter" *matCellDef="let item" [class.record-alert]="item.alerted">
-                {{ item.contact?.dateOfLastContact | dateDefault }}
+                {{ item.person?.dateOfLastContact | dateDefault }}
             </mat-cell>
         </ng-container>
 
@@ -358,7 +358,7 @@
                 </div>
             </mat-header-cell>
             <mat-cell class="has-date-range-filter" *matCellDef="let item" [class.record-alert]="item.alerted">
-                {{ item.contact?.followUp.endDate | dateDefault }}
+                {{ item.person?.followUp?.endDate | dateDefault }}
             </mat-cell>
         </ng-container>
 
@@ -463,6 +463,28 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.address?.location?.name }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Email  -->
+        <ng-container matColumnDef="address.emailAddress">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_FOLLOW_UP_FIELD_LABEL_EMAIL' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="emailFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('address.emailAddress', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
+                {{item.address.emailAddress}}
             </mat-cell>
         </ng-container>
 

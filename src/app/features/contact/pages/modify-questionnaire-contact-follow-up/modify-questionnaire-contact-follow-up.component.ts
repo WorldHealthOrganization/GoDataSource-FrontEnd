@@ -112,7 +112,7 @@ export class ModifyQuestionnaireContactFollowUpComponent extends ViewModifyCompo
             // contacts view page
             if (ContactModel.canView(this.authUser)) {
                 this.breadcrumbs.push(
-                    new BreadcrumbItemModel(this.followUpData.contact.name, `/contacts/${this.followUpData.contact.id}/view`)
+                    new BreadcrumbItemModel(this.followUpData.person.name, `/contacts/${this.followUpData.person.id}/view`)
                 );
             }
 
@@ -120,7 +120,7 @@ export class ModifyQuestionnaireContactFollowUpComponent extends ViewModifyCompo
                 this.breadcrumbs.push(
                     new BreadcrumbItemModel(
                         'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
-                        `/contacts/${this.followUpData.contact.id}/follow-ups/${this.followUpData.id}/modify`,
+                        `/contacts/${this.followUpData.person.id}/follow-ups/${this.followUpData.id}/modify`,
                         false,
                         {rootPage: this.rootPage}
                     )

@@ -162,7 +162,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
      */
     deleteFollowUp(followUp: FollowUpModel) {
         // show confirm dialog to confirm the action
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_FOLLOW_UP', new ContactModel(followUp.contact))
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_FOLLOW_UP', new ContactModel(followUp.person))
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     // delete follow up
@@ -289,7 +289,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
      */
     restoreFollowUp(followUp: FollowUpModel) {
         // show confirm dialog to confirm the action
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_FOLLOW_UP', new ContactModel(followUp.contact))
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_FOLLOW_UP', new ContactModel(followUp.person))
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     // delete follow up
