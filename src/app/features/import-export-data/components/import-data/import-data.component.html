@@ -88,7 +88,7 @@
 
     <!-- Map fields -->
     <div
-        *ngIf="!displayLoading && importableObject && !errMsgDetails"
+        *ngIf="areMapFieldVisible"
         fxLayout="column" fxLayoutGap="30px"
         class="import-data-map-fields">
         <div
@@ -121,7 +121,157 @@
             <div fxFlex><!-- placeholder --></div>
         </div>
 
+        <!-- Mapped Data -->
+        <div
+            #mappedDataTable
+            fxLayout="column">
+
+            <!-- Hover question effects / actions -->
+            <app-hover-row-actions
+                #hoverRow>
+            </app-hover-row-actions>
+
+            <!-- Headers -->
+            <div
+                fxLayout="row" fxLayoutGap="20px"
+                class="import-data-header-row">
+
+                <!-- Source -->
+                <div
+                    fxFlex="50%">
+                    {{ 'LNG_PAGE_IMPORT_DATA_LABEL_SOURCE_FILE_INFORMATION' | translate }}
+                </div>
+
+                <!-- Destination -->
+                <div
+                    fxFlex="50%">
+                    {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_INFORMATION' | translate }}
+                </div>
+            </div>
+
+            <!-- Data - scrollable -->
+            <div
+                fxLayout="column"
+                class="import-data-body-rows"
+                [style.maxHeight]="importDataBodyRowsMaxHeight">
+
+                <!-- Render each row -->
+                <div
+                    *ngFor="let item of mappedFields"
+                    class="import-data-body-row"
+                    fxLayout="column"
+                    app-hover-row-actions
+                    [hoverRowActionsComponent]="hoverRow"
+                    [hoverRowActions]="recordActions"
+                    [hoverRowActionData]="item">
+
+                    <!-- Table View -->
+                    <ng-container
+                        *ngIf="item !== elementInEditMode; else editMode">
+                        <!-- Basic Details -->
+                        <div
+                            fxLayout="row" fxLayoutGap="20px">
+
+                            <!-- Source -->
+                            <div
+                                fxFlex="50%">
+                                {{ item.sourceField }}
+                            </div>
+
+                            <!-- Destination -->
+                            <div
+                                fxFlex="50%">
+                                {{ importableObject.modelPropertiesKeyValueMap[item.destinationField] }}
+                            </div>
+
+                        </div>
+
+                        <!-- Extra Details -->
+                        <div
+                            *ngIf="
+                            importableObject.distinctFileColumnValuesKeyValue &&
+                            importableObject.distinctFileColumnValuesKeyValue[item.sourceFieldWithoutIndexes] && (
+                                !!importableObject.modelPropertyValuesMap[item.destinationField] ||
+                                addressFields[item.destinationField]
+                            )"
+                            class="import-data-body-row-extra-details"
+                            fxLayout="column">
+
+                            <!-- Render mapped options rows -->
+                            <div
+                                *ngFor="let mappedOpt of item.mappedOptions"
+                                fxLayout="row"
+                                class="import-data-body-row-extra-details-row">
+
+                                <!-- Option Source -->
+                                <div
+                                    fxFlex="50%">
+                                    {{ mappedOpt.sourceOption }}
+                                </div>
+
+                                <!-- Option Destination -->
+                                <div
+                                    fxFlex="50%">
+                                    {{ importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] }}
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </ng-container>
+
+                    <!-- Edit Mode View -->
+                    <ng-template
+                        #editMode>
+
+                        <!-- Basic Details -->
+                        <div
+                            fxLayout="row" fxLayoutGap="20px">
+
+                            <!-- Source -->
+                            <div
+                                fxFlex="50%">
+                                <app-form-select
+                                    [name]="'mapObject[' + item.id + '][source]'"
+                                    app-unique-validator="\]\[source\]$"
+                                    [valueReplacer]="formatSourceValueForDuplicatesCallback"
+                                    required="true"
+                                    [ngModel]="item.sourceField"
+                                    [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
+                                    [options]="importableObject.fileHeadersKeyValue"
+                                    (optionChanged)="setSourceDestinationValueAndDetermineOptions(item, 'sourceField', $event)">
+                                </app-form-select>
+                            </div>
+
+                            <!-- Destination -->
+                            <div
+                                fxFlex="50%">
+                                <app-form-select
+                                    [name]="'mapObject[' + item.id + '][destination]'"
+                                    required="true"
+                                    [ngModel]="item.destinationField"
+                                    [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
+                                    [options]="importableObject.modelPropertiesKeyValue"
+                                    (optionChanged)="setSourceDestinationValueAndDetermineOptions(item, 'destinationField', $event)"
+                                    [disabled]="item.readonly">
+                                </app-form-select>
+                            </div>
+
+                        </div>
+
+                    </ng-template>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
         <form
+            *ngIf="false"
             #form="ngForm"
             (submit)="importData(form)"
             fxLayout="column">

@@ -96,12 +96,40 @@ app-import-data {
     }
 
     .import-data-map-fields {
-        .import-data-map-fields-header-columns {
+        .import-data-header-row {
             font-weight: bold;
-            font-size: 20px;
+            font-size: 16px;
             border-bottom: 1px solid #CCC;
             margin-bottom: 10px;
             padding-bottom: 5px;
+
+            overflow-y: scroll;
+            &::-webkit-scrollbar {
+                background: transparent;
+            }
+        }
+
+        .import-data-body-rows {
+            overflow-y: scroll;
+            padding-right: 7px;
+
+            .import-data-body-row {
+                margin: 0;
+                padding: 10px 0;
+
+                border-bottom: 1px solid #CCC;
+
+                .import-data-body-row-extra-details {
+                    margin: 7px 0 7px 70px;
+
+                    .import-data-body-row-extra-details-row {
+                        margin: 0;
+                        padding: 10px 0;
+
+                        border-top: 1px solid #CCC;
+                    }
+                }
+            }
         }
 
         .import-data-map-fields-children {

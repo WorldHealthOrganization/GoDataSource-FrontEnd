@@ -53,12 +53,23 @@ export class ImportableFileModel {
     };
 
     modelProperties: ImportableFilePropertiesModel;
-    modelPropertiesKeyValue:  ImportableLabelValuePair[];
+    modelPropertiesKeyValue: ImportableLabelValuePair[];
+    modelPropertiesKeyValueMap: {
+        [value: string]: string
+    };
 
     modelPropertyValues: ImportableFilePropertyValuesModel;
     modelPropertyValuesMap: {
-        [modelProperty: string]: ImportableFilePropertyValuesModel
+        [modelProperty: string]: {
+            id: string;
+            label: string;
+        }[]
     } = {};
+    modelPropertyValuesMapChildMap: {
+        [modelProperty: string]: {
+            [value: string]: string
+        }
+    };
 
     distinctFileColumnValues: {
         [fileHeader: string]: string[]
@@ -239,6 +250,31 @@ export class ImportableFileModel {
             })
             .value() as ImportableLabelValuePair[];
 
+        // map modelPropertiesKeyValue for easy access
+        this.modelPropertiesKeyValueMap = {};
+        this.modelPropertiesKeyValue.forEach((item) => {
+            this.modelPropertiesKeyValueMap[item.value] = item.label;
+        });
+
+        // map modelPropertyValuesMap for easy access
+        this.modelPropertyValuesMapChildMap = {};
+        _.each(
+            this.modelPropertyValuesMap,
+            (items, modelProperty) => {
+                // no need to continue ?
+                if (!items) {
+                    return;
+                }
+
+                // init
+                this.modelPropertyValuesMapChildMap[modelProperty] = {};
+                items.forEach((item) => {
+                    this.modelPropertyValuesMapChildMap[modelProperty][item.id] = translate(item.label);
+                });
+            }
+        );
+
+        // distinct values
         this.distinctFileColumnValuesKeyValue = {};
         _.each(this.distinctFileColumnValues, (values: string[], property: string) => {
             // sanitize property

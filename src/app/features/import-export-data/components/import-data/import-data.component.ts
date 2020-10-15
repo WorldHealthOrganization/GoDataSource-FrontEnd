@@ -1,11 +1,11 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FileItem, FileLikeObject, FileUploader } from 'ng2-file-upload';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { environment } from '../../../../../environments/environment';
 import { IModelArrayProperties, ImportableFileModel, ImportableFilePropertiesModel, ImportableFilePropertyValuesModel, ImportableLabelValuePair, ImportableMapField, ImportDataExtension } from './model';
 import * as _ from 'lodash';
-import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
+import { DialogAnswer, DialogAnswerButton, HoverRowAction } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { NgForm, NgModel } from '@angular/forms';
@@ -29,6 +29,9 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { MatDialogRef } from '@angular/material';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { DomSanitizer } from '@angular/platform-browser';
+import { SafeStyle } from '@angular/platform-browser/src/security/dom_sanitization_service';
+import { HoverRowActionsDirective } from '../../../../shared/directives/hover-row-actions/hover-row-actions.directive';
 
 export enum ImportServerModelNames {
     CASE_LAB_RESULTS = 'labResult',
@@ -364,6 +367,47 @@ export class ImportDataComponent implements OnInit {
      */
     @Input() decryptPasswordAlias: string = 'decryptPassword';
 
+    // table data max height
+    importDataBodyRowsMaxHeight: SafeStyle = undefined;
+
+    // mapped data table element
+    @ViewChild('mappedDataTable') mappedDataTable: ElementRef;
+
+    // element that is editable now
+    elementInEditMode: ImportableMapField;
+    elementInEditModeHandler: HoverRowActionsDirective
+
+    // check if map fields are visible
+    get areMapFieldVisible(): boolean {
+        return !this.displayLoading &&
+            this.importableObject &&
+            !this.errMsgDetails;
+    }
+
+    // hover table row actions
+    recordActions: HoverRowAction[] = [
+        // Modify
+        new HoverRowAction({
+            icon: 'settings',
+            iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_MODIFY',
+            click: (
+                item: ImportableMapField,
+                handler: HoverRowActionsDirective
+            ) => {
+                // clear element in ediit mode
+                this.clearElementInEditMode();
+
+                // remember element in edit mode
+                this.elementInEditMode = item;
+                this.elementInEditModeHandler = handler;
+
+                // render row selection
+                handler.enabled = false;
+                handler.hoverRowActionsComponent.hideEverything();
+            }
+        })
+    ];
+
     /**
      * Constructor
      * @param snackbarService
@@ -380,7 +424,8 @@ export class ImportDataComponent implements OnInit {
         private i18nService: I18nService,
         private formHelper: FormHelperService,
         private importExportDataService: ImportExportDataService,
-        private savedImportMappingService: SavedImportMappingService
+        private savedImportMappingService: SavedImportMappingService,
+        private domSanitizer: DomSanitizer
     ) {
         // fix mime issue - browser not supporting some of the mimes, empty was provided to mime Type which wasn't allowing user to upload teh files
         if (!(FileLikeObject.prototype as any)._createFromObjectPrev) {
@@ -592,6 +637,9 @@ export class ImportDataComponent implements OnInit {
 
                     return;
                 }
+
+                // determine height of table rows ?
+                this.determineTableDataMaxHeight();
 
                 // required fields
                 const mapOfRequiredDestinationFields = this.requiredDestinationFieldsMap ? _.clone(this.requiredDestinationFieldsMap) : {};
@@ -1661,5 +1709,52 @@ export class ImportDataComponent implements OnInit {
 
         // validate control and mark for change detection
         sourceControl.validateAndMarkForCheck();
+    }
+
+    /**
+     * Determine import data max height
+     */
+    private determineTableDataMaxHeight(): void {
+        const findPos = (node) => {
+            let curtop = 0;
+            let curtopscroll = 0;
+            if (node.offsetParent) {
+                do {
+                    curtop += node.offsetTop;
+                    curtopscroll += node.offsetParent ? node.offsetParent.scrollTop : 0;
+                } while (node = node.offsetParent);
+            }
+
+            return curtop - curtopscroll;
+        };
+
+        // check if map fields are visible
+        // wait for mappedDataTable to be initialized
+        if (!this.areMapFieldVisible) {
+            // wait
+            setTimeout(() => {
+                this.determineTableDataMaxHeight();
+            });
+
+            // finished
+            return;
+        }
+
+        // determine data height
+        this.importDataBodyRowsMaxHeight = this.domSanitizer.bypassSecurityTrustStyle(`calc(100vh - (${this.mappedDataTable.nativeElement.getBoundingClientRect().top}px + 70px))`);
+    }
+
+    /**
+     * Clear element in edit mode
+     */
+    clearElementInEditMode(): void {
+        // enable back render
+        if (this.elementInEditModeHandler) {
+            this.elementInEditModeHandler.enabled = true;
+        }
+
+        // reset
+        this.elementInEditMode = undefined;
+        this.elementInEditModeHandler = undefined;
     }
 }

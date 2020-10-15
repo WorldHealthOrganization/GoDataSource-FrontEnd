@@ -66,7 +66,12 @@ export const EnglishUsLang = {
         /**
          * uiUserFields
          */
-        'LNG_USER_FIELD_LABEL_TEAMS': 'Teams'
+        'LNG_USER_FIELD_LABEL_TEAMS': 'Teams',
+
+        /**
+         * uiImportData
+         */
+        'LNG_PAGE_IMPORT_DATA_BUTTON_MODIFY': 'Modify'
 
 
 
