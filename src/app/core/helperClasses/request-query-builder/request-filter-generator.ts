@@ -49,19 +49,31 @@ export class RequestFilterGenerator {
 
     /**
      * Text starts with provided value ( case insensitive )
-     * @param value
      */
-    static textStartWith(value: string): any {
-        return {
-            regexp: '/^' +
-                RequestFilterGenerator.escapeStringForRegex(value)
-                    .replace(/%/g, '.*')
-                    .replace(/\\\?/g, '.')
-                    .replace(/&/g, '%26')
-                    .replace(/#/g, '%23')
-                    .replace(/\+/g, '%2B') +
-                '/i'
-        };
+    static textStartWith(
+        value: string,
+        useLike?: boolean
+    ): any {
+        return useLike ?
+            {
+                like: '^' +
+                    RequestFilterGenerator.escapeStringForRegex(value)
+                        .replace(/%/g, '.*')
+                        .replace(/\\\?/g, '.')
+                        .replace(/&/g, '%26')
+                        .replace(/#/g, '%23')
+                        .replace(/\+/g, '%2B'),
+                options: 'i'
+            } : {
+                regexp: '/^' +
+                    RequestFilterGenerator.escapeStringForRegex(value)
+                        .replace(/%/g, '.*')
+                        .replace(/\\\?/g, '.')
+                        .replace(/&/g, '%26')
+                        .replace(/#/g, '%23')
+                        .replace(/\+/g, '%2B') +
+                    '/i'
+            };
     }
 
     /**
