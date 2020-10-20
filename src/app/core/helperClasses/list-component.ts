@@ -11,10 +11,7 @@ import { SideFiltersComponent } from '../../shared/components/side-filters/side-
 import { DebounceTimeCaller } from './debounce-time-caller';
 import { MetricContactsSeenEachDays } from '../models/metrics/metric-contacts-seen-each-days.model';
 import { FormCheckboxComponent } from '../../shared/xt-forms/components/form-checkbox/form-checkbox.component';
-import {
-    ContactFollowedUp,
-    MetricContactsWithSuccessfulFollowUp
-} from '../models/metrics/metric.contacts-with-success-follow-up.model';
+import { ContactFollowedUp, MetricContactsWithSuccessfulFollowUp } from '../models/metrics/metric.contacts-with-success-follow-up.model';
 import { VisibleColumnModel } from '../../shared/components/side-columns/model';
 import { AddressType } from '../models/address.model';
 import { moment, Moment } from './x-moment';
@@ -502,8 +499,15 @@ export abstract class ListComponent implements OnDestroy {
     filterByTextField(
         property: string | string[],
         value: string,
-        operator: RequestFilterOperator = RequestFilterOperator.OR
+        operator?: RequestFilterOperator,
+        useLike?: boolean
     ) {
+        // default values
+        if (operator === undefined) {
+            operator = RequestFilterOperator.OR;
+        }
+
+        // filter
         if (_.isArray(property)) {
             this.queryBuilder.filter.byTextMultipleProperties(
                 property as string[],
@@ -514,7 +518,9 @@ export abstract class ListComponent implements OnDestroy {
         } else {
             this.queryBuilder.filter.byText(
                 property as string,
-                value
+                value,
+                true,
+                useLike
             );
         }
 

@@ -259,7 +259,7 @@
                             name="emailFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('address.emailAddress', $event)"
+                            (optionChanged)="filterByTextField('address.emailAddress', $event, undefined, true)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
