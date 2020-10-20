@@ -97,12 +97,14 @@ export class RequestFilter {
      * @param {string} property
      * @param {string} value
      * @param {boolean} replace
+     * @param {boolean} useLike
      * @returns {RequestFilter}
      */
     byText(
         property: string,
         value: string,
-        replace: boolean = true
+        replace: boolean = true,
+        useLike?: boolean
     ) {
         // do we need to remove condition ?
         if (_.isEmpty(value)) {
@@ -110,7 +112,10 @@ export class RequestFilter {
         } else {
             // filter with 'startsWith' criteria
             this.where({
-                [property]: RequestFilterGenerator.textStartWith(value)
+                [property]: RequestFilterGenerator.textStartWith(
+                    value,
+                    useLike
+                )
             }, replace);
         }
 
