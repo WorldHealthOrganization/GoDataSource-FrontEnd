@@ -554,6 +554,10 @@ export class Constants {
         EXPOSURE_DURATION: {
             label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
             value: 'exposureDurationId'
+        },
+        CLUSTER: {
+            label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+            value: 'clusterId'
         }
     };
 
@@ -594,6 +598,10 @@ export class Constants {
         EXPOSURE_TYPE: {
             label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
             value: 'exposureTypeId'
+        },
+        CLUSTER: {
+            label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+            value: 'clusterId'
         }
     };
 

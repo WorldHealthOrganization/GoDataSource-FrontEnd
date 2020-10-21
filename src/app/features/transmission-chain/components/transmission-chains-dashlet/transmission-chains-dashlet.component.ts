@@ -64,6 +64,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     // constants
     Constants = Constants;
     WorldMapMarkerLayer = WorldMapMarkerLayer;
+    ClusterModel = ClusterModel;
 
     selectedOutbreak: OutbreakModel;
     chainGroup: TransmissionChainGroupModel;
@@ -563,10 +564,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                                         this.legend.clustersList[cluster.id] = cluster.name;
                                     });
                                 });
-                        }
 
-                        // load chain
-                        this.displayChainsOfTransmission(true);
+                            // load chain
+                            this.displayChainsOfTransmission(true);
+                        }
                     });
             });
     }
@@ -941,8 +942,13 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         // set legend labels
         this.legend.nodeColorLabel = this.referenceDataLabelMap[this.colorCriteria.nodeColorCriteria].label;
         this.legend.nodeNameColorLabel = this.referenceDataLabelMap[this.colorCriteria.nodeNameColorCriteria].label;
-        this.legend.edgeColorLabel = this.referenceDataLabelMap[this.colorCriteria.edgeColorCriteria].label;
-        this.legend.edgeIconLabel = (this.referenceDataLabelMap[this.colorCriteria.edgeIconCriteria]) ? this.referenceDataLabelMap[this.colorCriteria.edgeIconCriteria].label : '';
+        this.legend.edgeColorLabel = this.colorCriteria.edgeColorCriteria === 'clusterId' ? 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER' : this.referenceDataLabelMap[this.colorCriteria.edgeColorCriteria].label;
+        this.legend.edgeIconLabel = this.colorCriteria.edgeIconCriteria === 'clusterId' ?
+            'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER' : (
+                this.referenceDataLabelMap[this.colorCriteria.edgeIconCriteria] ?
+                    this.referenceDataLabelMap[this.colorCriteria.edgeIconCriteria].label :
+                    ''
+            );
         this.legend.nodeIconLabel = (this.referenceDataLabelMap[this.colorCriteria.nodeIconCriteria]) ? this.referenceDataLabelMap[this.colorCriteria.nodeIconCriteria].label : '';
         this.legend.nodeShapeLabel = (this.referenceDataLabelMap[this.colorCriteria.nodeShapeCriteria]) ? this.referenceDataLabelMap[this.colorCriteria.nodeShapeCriteria].label : '';
         // re-initialize legend entries
@@ -969,24 +975,51 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             this.legend.nodeNameColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
         });
         this.legend.nodeNameColorKeys = Object.keys(this.legend.nodeNameColor);
-        const edgeColorReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.edgeColorCriteria].refDataCateg], 'entries', []);
-        _.forEach(edgeColorReferenceDataEntries, (value) => {
-            this.legend.edgeColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
-        });
-        this.legend.edgeColorKeys = Object.keys(this.legend.edgeColor);
-        if (this.colorCriteria.edgeIconCriteria !== Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.NONE.value) {
-            const edgeIconReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.edgeIconCriteria].refDataCateg], 'entries', []);
-            // get edge icons based on the selected criteria
-            let getEdgeIconFunc: (criteriaKey: any) => string;
-            if (this.colorCriteria.edgeIconCriteria === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value) {
-                getEdgeIconFunc = GraphEdgeModel.getEdgeIconContextOfTransmission;
-            } else if (this.colorCriteria.edgeIconCriteria === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.EXPOSURE_TYPE.value) {
-                getEdgeIconFunc = GraphEdgeModel.getEdgeIconExposureType;
-            }
-            _.forEach(edgeIconReferenceDataEntries, (value) => {
-                this.legend.edgeIcon[value.value] = getEdgeIconFunc(value.value);
+
+        if (this.colorCriteria.edgeColorCriteria === 'clusterId') {
+            // we should check if we have this information, if not we must wait for it to be retrieved
+            // #TODO
+            // must refactor this entire function :)
+            (this.clusterOptions || []).forEach((item) => {
+                this.legend.edgeColor[item.id] = item.colorCode ? item.colorCode : Constants.DEFAULT_COLOR_CHAINS;
             });
-            this.legend.edgeIconKeys = Object.keys(this.legend.edgeIcon);
+            this.legend.edgeColorKeys = Object.keys(this.legend.edgeColor);
+        } else {
+            const edgeColorReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.edgeColorCriteria].refDataCateg], 'entries', []);
+            _.forEach(edgeColorReferenceDataEntries, (value) => {
+                this.legend.edgeColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
+            });
+            this.legend.edgeColorKeys = Object.keys(this.legend.edgeColor);
+        }
+
+        if (this.colorCriteria.edgeIconCriteria !== Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.NONE.value) {
+            if (this.colorCriteria.edgeIconCriteria === 'clusterId') {
+                // we should check if we have this information, if not we must wait for it to be retrieved
+                // #TODO
+                // must refactor this entire function :)
+                (this.clusterOptions || []).forEach((item) => {
+                    this.legend.edgeIcon[item.id] = {
+                        isUrl: true,
+                        url: item.iconUrl
+                    };
+                });
+                this.legend.edgeIconKeys = Object.keys(this.legend.edgeIcon);
+            } else {
+                const edgeIconReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.edgeIconCriteria].refDataCateg], 'entries', []);
+                // get edge icons based on the selected criteria
+                let getEdgeIconFunc: (criteriaKey: any) => string;
+                if (this.colorCriteria.edgeIconCriteria === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value) {
+                    getEdgeIconFunc = GraphEdgeModel.getEdgeIconContextOfTransmission;
+                } else if (this.colorCriteria.edgeIconCriteria === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.EXPOSURE_TYPE.value) {
+                    getEdgeIconFunc = GraphEdgeModel.getEdgeIconExposureType;
+                }
+                _.forEach(edgeIconReferenceDataEntries, (value) => {
+                    this.legend.edgeIcon[value.value] = {
+                        icon: getEdgeIconFunc(value.value)
+                    };
+                });
+                this.legend.edgeIconKeys = Object.keys(this.legend.edgeIcon);
+            }
         }
         if (this.colorCriteria.nodeIconCriteria !== Constants.TRANSMISSION_CHAIN_NODE_ICON_CRITERIA_OPTIONS.NONE.value) {
             const nodeIconReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.nodeIconCriteria].refDataCateg], 'entries', []);

@@ -13,7 +13,7 @@
             <form #detailsForm="ngForm">
                 <ng-template matStepLabel>{{'LNG_PAGE_CREATE_CLUSTER_TAB_DETAILS_TITLE' | translate}}</ng-template>
 
-                <mat-card class="page-section">
+                <mat-card class="page-section fit-color-picker">
                     <div fxLayout="column">
                         <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
@@ -30,13 +30,86 @@
                             <div fxFlex><!-- placeholder --></div>
                         </div>
 
-                        <div fxLayout="column">
+                        <div fxLayout="row">
                             <app-form-textarea
                                 name="description"
                                 [ngModel]="clusterData.description"
                                 [placeholder]="'LNG_CLUSTER_FIELD_LABEL_DESCRIPTION' | translate"
                                 tooltip="LNG_CLUSTER_FIELD_LABEL_DESCRIPTION_DESCRIPTION">
                             </app-form-textarea>
+                        </div>
+
+                        <div
+                            fxFlex fxLayout="row" fxLayoutGap="20px">
+                            <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
+                                <div>
+                                    {{ 'LNG_CLUSTER_FIELD_LABEL_COLOR' | translate }}
+                                    <span
+                                        *ngIf="'LNG_CLUSTER_FIELD_LABEL_COLOR_DESCRIPTION' | translate"
+                                        [matTooltip]="'LNG_CLUSTER_FIELD_LABEL_COLOR_DESCRIPTION' | translate"
+                                        class="xt-icon form-icon">help</span>
+                                </div>
+
+                                <input
+                                    #colorPickerInput="ngModel"
+                                    fxFlex="132px"
+                                    class="cluster-color-picker"
+                                    [style.background]="clusterData.colorCode"
+                                    name="colorCode"
+                                    [ngModel]="clusterData.colorCode"
+                                    type="text"
+                                    [readonly]="true"
+                                    [required]="false"
+                                    [colorPicker]="clusterData.colorCode"
+                                    cpOutputFormat="hex"
+                                    (colorPickerChange)="clusterData.colorCode = $event; colorPickerInput.control.markAsDirty();"
+                                    (click)="$event.target.select()"/>
+                            </div>
+
+                            <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
+                                <!-- View Icon  -->
+                                <div
+                                    *ngIf="!changeIcon"
+                                    fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
+
+                                    <!-- Label -->
+                                    <div>
+                                        {{ 'LNG_CLUSTER_FIELD_LABEL_ICON' | translate }}
+                                    </div>
+
+                                    <!-- Image -->
+                                    <img
+                                        *ngIf="clusterData.iconId"
+                                        [src]="clusterData.iconUrl"/>
+                                    <div
+                                        *ngIf="!clusterData.iconId">
+                                        {{ 'LNG_PAGE_CREATE_CLUSTER_LABEL_NO_ICON' | translate }}
+                                    </div>
+
+                                    <!-- Change -->
+                                    <div>
+                                        <button
+                                            type="button"
+                                            mat-raised-button
+                                            (click)="changeIcon = true;">
+                                            {{'LNG_COMMON_BUTTON_CHANGE' | translate}}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Change Icon -->
+                                <app-form-select
+                                    *ngIf="changeIcon"
+                                    name="iconId"
+                                    [ngModel]="clusterData.iconId"
+                                    [placeholder]="'LNG_CLUSTER_FIELD_LABEL_ICON' | translate"
+                                    tooltip="LNG_CLUSTER_FIELD_LABEL_ICON_DESCRIPTION"
+                                    [options]="iconsList$ | async"
+                                    optionLabelKey="name"
+                                    optionValueKey="id"
+                                    optionLabelImgKey="url">
+                                </app-form-select>
+                            </div>
                         </div>
                     </div>
                 </mat-card>

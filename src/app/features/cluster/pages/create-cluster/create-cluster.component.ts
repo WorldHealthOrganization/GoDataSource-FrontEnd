@@ -10,12 +10,14 @@ import * as _ from 'lodash';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { IconModel } from '../../../../core/models/icon.model';
+import { IconDataService } from '../../../../core/services/data/icon.data.service';
 
 @Component({
     selector: 'app-create-cluster',
@@ -29,6 +31,10 @@ export class CreateClusterComponent
 
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
+
+    // change icon ?
+    changeIcon: boolean = false;
+    iconsList$: Observable<IconModel[]>;
 
     // authenticated user details
     authUser: UserModel;
@@ -48,7 +54,8 @@ export class CreateClusterComponent
         private formHelper: FormHelperService,
         private dialogService: DialogService,
         private authDataService: AuthDataService,
-        private redirectService: RedirectService
+        private redirectService: RedirectService,
+        private iconDataService: IconDataService
     ) {
         super();
     }
@@ -59,6 +66,9 @@ export class CreateClusterComponent
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // icons data
+        this.iconsList$ = this.iconDataService.getIconsList();
 
         // get selected outbreak
         this.outbreakDataService
