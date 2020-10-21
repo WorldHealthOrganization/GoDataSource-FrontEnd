@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import { IPermissionBasic, IPermissionCluster } from './permission.interface';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
+import { environment } from '../../../environments/environment';
 
 export class ClusterModel
     implements
@@ -11,6 +12,19 @@ export class ClusterModel
     id: string;
     name: string;
     description: string;
+    colorCode: string;
+
+    private _iconId: string;
+    iconUrl: string;
+    set iconId(iconId: string) {
+        this._iconId = iconId;
+        this.iconUrl = _.isEmpty(this.iconId) ?
+            undefined :
+            `${environment.apiUrl}/icons/${this.iconId}/download`;
+    }
+    get iconId(): string {
+        return this._iconId;
+    }
 
     /**
      * Static Permissions - IPermissionBasic
@@ -33,6 +47,8 @@ export class ClusterModel
         this.id = _.get(data, 'id');
         this.name = _.get(data, 'name');
         this.description = _.get(data, 'description');
+        this.colorCode = _.get(data, 'colorCode');
+        this.iconId = _.get(data, 'iconId');
     }
 
     /**

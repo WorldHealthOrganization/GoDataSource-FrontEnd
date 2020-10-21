@@ -68,11 +68,11 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
      * Component initialized
      */
     ngOnInit() {
-        // icons data
-        this.iconsList$ = this.iconDataService.getIconsList();
-
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // icons data
+        this.iconsList$ = this.iconDataService.getIconsList();
 
         // show loading
         this.showLoadingDialog(false);
