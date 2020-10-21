@@ -150,14 +150,15 @@
             </div>
 
             <!-- Data - scrollable -->
-            <div
+            <cdk-virtual-scroll-viewport
                 fxLayout="column"
                 class="import-data-body-rows"
-                [style.maxHeight]="importDataBodyRowsMaxHeight">
+                [style.height]="importDataBodyRowsMaxHeight"
+                autosize>
 
                 <!-- Render each row -->
                 <div
-                    *ngFor="let item of mappedFields"
+                    *cdkVirtualFor="let item of mappedFields"
                     class="import-data-body-row"
                     fxLayout="column"
                     app-hover-row-actions
@@ -262,7 +263,7 @@
 
                     </ng-template>
                 </div>
-            </div>
+            </cdk-virtual-scroll-viewport>
         </div>
 
 

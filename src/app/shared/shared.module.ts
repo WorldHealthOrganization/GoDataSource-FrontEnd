@@ -13,6 +13,8 @@ import { FileUploadModule } from 'ng2-file-upload';
 import { NgxWigModule } from 'ngx-wig';
 import { HotTableModule } from '@handsontable/angular';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import { ScrollingModule as ExperimentalScrollingModule } from '@angular/cdk-experimental/scrolling';
 
 // components
 import * as fromSharedComponents from './components';
@@ -33,7 +35,9 @@ import * as fromSharedPipes from './pipes';
         FileUploadModule,
         NgxWigModule,
         NgxMatSelectSearchModule,
-        HotTableModule.forRoot()
+        HotTableModule.forRoot(),
+        ScrollingModule,
+        ExperimentalScrollingModule
     ],
     declarations: [
         ...fromSharedComponents.components,
@@ -51,6 +55,8 @@ import * as fromSharedPipes from './pipes';
         XtFormsModule,
         AngularMaterialModule,
         MglTimelineModule,
+        ScrollingModule,
+        ExperimentalScrollingModule,
         ...fromSharedDirectives.directives,
         ...fromSharedPipes.pipes,
         ...fromSharedComponents.components
