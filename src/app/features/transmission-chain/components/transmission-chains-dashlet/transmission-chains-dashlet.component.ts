@@ -943,7 +943,12 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         this.legend.nodeColorLabel = this.referenceDataLabelMap[this.colorCriteria.nodeColorCriteria].label;
         this.legend.nodeNameColorLabel = this.referenceDataLabelMap[this.colorCriteria.nodeNameColorCriteria].label;
         this.legend.edgeColorLabel = this.colorCriteria.edgeColorCriteria === 'clusterId' ? 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER' : this.referenceDataLabelMap[this.colorCriteria.edgeColorCriteria].label;
-        this.legend.edgeIconLabel = this.colorCriteria.edgeIconCriteria === 'clusterId' ? 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER' : (this.referenceDataLabelMap[this.colorCriteria.edgeIconCriteria] ? this.referenceDataLabelMap[this.colorCriteria.edgeIconCriteria].label : '');
+        this.legend.edgeIconLabel = this.colorCriteria.edgeIconCriteria === 'clusterId' ?
+            'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER' : (
+                this.referenceDataLabelMap[this.colorCriteria.edgeIconCriteria] ?
+                    this.referenceDataLabelMap[this.colorCriteria.edgeIconCriteria].label :
+                    ''
+            );
         this.legend.nodeIconLabel = (this.referenceDataLabelMap[this.colorCriteria.nodeIconCriteria]) ? this.referenceDataLabelMap[this.colorCriteria.nodeIconCriteria].label : '';
         this.legend.nodeShapeLabel = (this.referenceDataLabelMap[this.colorCriteria.nodeShapeCriteria]) ? this.referenceDataLabelMap[this.colorCriteria.nodeShapeCriteria].label : '';
         // re-initialize legend entries
