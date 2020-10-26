@@ -402,7 +402,7 @@ export class ImportDataComponent implements OnInit {
                 item: ImportableMapField,
                 handler: HoverRowActionsDirective
             ) => {
-                // clear element in ediit mode
+                // clear element in edit mode
                 this.clearElementInEditMode();
 
                 // remember element in edit mode
@@ -1753,7 +1753,9 @@ export class ImportDataComponent implements OnInit {
 
         // update virtual scroll height
         setTimeout(() => {
-            this.virtualScrollViewport.checkViewportSize();
+            if (this.virtualScrollViewport) {
+                this.virtualScrollViewport.checkViewportSize();
+            }
         });
     }
 
