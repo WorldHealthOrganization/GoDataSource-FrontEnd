@@ -32,6 +32,7 @@ import { throwError } from 'rxjs';
 import { DomSanitizer } from '@angular/platform-browser';
 import { SafeStyle } from '@angular/platform-browser/src/security/dom_sanitization_service';
 import { HoverRowActionsDirective } from '../../../../shared/directives/hover-row-actions/hover-row-actions.directive';
+import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 
 export enum ImportServerModelNames {
     CASE_LAB_RESULTS = 'labResult',
@@ -367,6 +368,13 @@ export class ImportDataComponent implements OnInit {
      */
     @Input() decryptPasswordAlias: string = 'decryptPassword';
 
+
+
+
+
+    // scrollable viewport
+    @ViewChild('virtualScrollViewport') virtualScrollViewport: CdkVirtualScrollViewport;
+
     // table data max height
     importDataBodyRowsMaxHeight: SafeStyle = undefined;
 
@@ -375,7 +383,7 @@ export class ImportDataComponent implements OnInit {
 
     // element that is editable now
     elementInEditMode: ImportableMapField;
-    elementInEditModeHandler: HoverRowActionsDirective
+    elementInEditModeHandler: HoverRowActionsDirective;
 
     // check if map fields are visible
     get areMapFieldVisible(): boolean {
@@ -1742,6 +1750,11 @@ export class ImportDataComponent implements OnInit {
 
         // determine data height
         this.importDataBodyRowsMaxHeight = this.domSanitizer.bypassSecurityTrustStyle(`calc(100vh - (${this.mappedDataTable.nativeElement.getBoundingClientRect().top}px + 70px))`);
+
+        // update virtual scroll height
+        setTimeout(() => {
+            this.virtualScrollViewport.checkViewportSize();
+        });
     }
 
     /**
