@@ -297,6 +297,7 @@ export class ImportableFileModel {
 
 export interface IMappedOption {
     id: string;
+    parentId: string;
     sourceOption?: string;
     destinationOption?: string;
     readOnly?: boolean;

@@ -413,6 +413,69 @@ export class ImportDataComponent implements OnInit {
                 handler.enabled = false;
                 handler.hoverRowActionsComponent.hideEverything();
             }
+        }),
+
+        // Remove
+        new HoverRowAction({
+            icon: 'delete',
+            iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_REMOVE',
+            click: (
+                item: ImportableMapField | IMappedOption,
+                handler: HoverRowActionsDirective
+            ) => {
+                this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_IMPORT_FIELD_MAP')
+                    .subscribe((answer: DialogAnswer) => {
+                        if (answer.button === DialogAnswerButton.Yes) {
+                            // remove item
+                            if (item instanceof ImportableMapField) {
+                                // find & remove field map
+                                const index: number = this.mappedFields.indexOf(item);
+                                if (index > -1) {
+                                    // remove
+                                    this.mappedFields.splice(index, 1);
+
+                                    // force re-render
+                                    this.mappedFields = [...this.mappedFields];
+                                }
+
+                                // clear edit mode if item or parent was removed
+                                if (
+                                    this.elementInEditMode && (
+                                        item.id === this.elementInEditMode.id ||
+                                        (this.elementInEditMode as IMappedOption).parentId === item.id
+                                    )
+                                ) {
+                                    // clear edit mode
+                                    this.clearElementInEditMode();
+                                }
+                            } else {
+                                // find & remove field option map
+                                const parent: ImportableMapField = this.mappedFields.find((mf) => mf.id === item.parentId);
+                                if (parent) {
+                                    // determine index
+                                    const index: number = parent.mappedOptions.indexOf(item);
+                                    if (index > -1) {
+                                        // remove
+                                        parent.mappedOptions.splice(index, 1);
+
+                                        // force re-render
+                                        this.mappedFields = [...this.mappedFields];
+                                    }
+                                }
+
+                                // clear edit mode if item or parent was removed
+                                if (
+                                    this.elementInEditMode &&
+                                    item.id === this.elementInEditMode.id
+                                ) {
+                                    // clear edit mode
+                                    this.clearElementInEditMode();
+                                }
+                            }
+
+                        }
+                    });
+            }
         })
     ];
 
@@ -1092,12 +1155,9 @@ export class ImportDataComponent implements OnInit {
             }
 
             // create map option with source
-            const mapOpt: {
-                id: string;
-                sourceOption: string,
-                destinationOption?: string
-            } = {
+            const mapOpt: IMappedOption = {
                 id: uuid(),
+                parentId: importableItem.id,
                 sourceOption: distinctVal.value
             };
 
@@ -1288,6 +1348,7 @@ export class ImportDataComponent implements OnInit {
             mapField.mappedOptions = (option.options || []).map((item: SavedImportOption) => {
                 return {
                     id: uuid(),
+                    parentId: mapField.id,
                     sourceOption: item.source,
                     destinationOption: item.destination
                 };
@@ -1410,7 +1471,8 @@ export class ImportDataComponent implements OnInit {
     addNewOptionMap(indexMapField: number) {
         // add new item
         this.mappedFields[indexMapField].mappedOptions.push({
-            id: uuid()
+            id: uuid(),
+            parentId: this.mappedFields[indexMapField].id
         });
     }
 
