@@ -194,7 +194,11 @@
                         <!-- Basic Details -->
                         <div
                             class="import-data-body-row-edit-basic"
-                            fxLayout="row" fxLayoutGap="20px">
+                            fxLayout="row" fxLayoutGap="20px"
+                            app-hover-row-actions
+                            [hoverRowActionsComponent]="hoverRow"
+                            [hoverRowActions]="recordActions"
+                            [hoverRowActionData]="item">
 
                             <!-- Source -->
                             <div
@@ -271,7 +275,11 @@
                                 <!-- Basic Details -->
                                 <div
                                     class="import-data-body-row-edit-extra-details-row"
-                                    fxLayout="row" fxLayoutGap="20px">
+                                    fxLayout="row" fxLayoutGap="20px"
+                                    app-hover-row-actions
+                                    [hoverRowActionsComponent]="hoverRow"
+                                    [hoverRowActions]="recordActions"
+                                    [hoverRowActionData]="mappedOpt">
 
                                     <!-- Source Option -->
                                     <div

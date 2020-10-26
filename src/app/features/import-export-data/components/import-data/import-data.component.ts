@@ -431,6 +431,9 @@ export class ImportDataComponent implements OnInit {
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_MODIFY',
+            visible: (item: ImportableMapField | IMappedOption): boolean => {
+                return this.elementInEditMode !== item;
+            },
             click: (
                 item: ImportableMapField | IMappedOption,
                 handler: HoverRowActionsDirective
@@ -442,15 +445,31 @@ export class ImportDataComponent implements OnInit {
             }
         }),
 
+        // Cancel Modify
+        new HoverRowAction({
+            icon: 'close',
+            iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_CANCEL',
+            visible: (item: ImportableMapField | IMappedOption): boolean => {
+                return this.elementInEditMode === item;
+            },
+            click: (
+                item: ImportableMapField | IMappedOption,
+                handler: HoverRowActionsDirective
+            ) => {
+                // clear
+                this.clearElementInEditMode();
+
+                // force hover row rerender
+                handler.hoverRowActionsComponent.hideEverything();
+            }
+        }),
+
         // Remove
         new HoverRowAction({
             icon: 'delete',
             iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_REMOVE',
             class: 'icon-item-delete',
-            click: (
-                item: ImportableMapField | IMappedOption,
-                handler: HoverRowActionsDirective
-            ) => {
+            click: (item: ImportableMapField | IMappedOption) => {
                 this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_IMPORT_FIELD_MAP')
                     .subscribe((answer: DialogAnswer) => {
                         if (answer.button === DialogAnswerButton.Yes) {

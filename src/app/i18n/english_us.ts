@@ -73,6 +73,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_IMPORT_DATA_BUTTON_MODIFY': 'Modify',
         'LNG_PAGE_IMPORT_DATA_BUTTON_REMOVE': 'Remove',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_CANCEL': 'Cancel',
 
         /**
          * uiClustersListPage
