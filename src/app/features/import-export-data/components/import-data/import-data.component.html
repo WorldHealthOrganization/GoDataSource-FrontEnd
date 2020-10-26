@@ -161,18 +161,19 @@
                 <div
                     *cdkVirtualFor="let item of mappedFields"
                     class="import-data-body-row"
-                    fxLayout="column"
-                    app-hover-row-actions
-                    [hoverRowActionsComponent]="hoverRow"
-                    [hoverRowActions]="recordActions"
-                    [hoverRowActionData]="item">
+                    fxLayout="column">
 
                     <!-- Table View -->
                     <ng-container
                         *ngIf="item !== elementInEditMode; else editMode">
                         <!-- Basic Details -->
                         <div
-                            fxLayout="row" fxLayoutGap="20px">
+                            class="import-data-body-row-basic"
+                            fxLayout="row" fxLayoutGap="20px"
+                            app-hover-row-actions
+                            [hoverRowActionsComponent]="hoverRow"
+                            [hoverRowActions]="recordActions"
+                            [hoverRowActionData]="item">
 
                             <!-- Source -->
                             <div
@@ -229,6 +230,7 @@
 
                         <!-- Basic Details -->
                         <div
+                            class="import-data-body-row-edit-basic"
                             fxLayout="row" fxLayoutGap="20px">
 
                             <!-- Source -->
