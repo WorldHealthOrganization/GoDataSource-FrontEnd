@@ -71,7 +71,36 @@ export const EnglishUsLang = {
         /**
          * uiImportData
          */
-        'LNG_PAGE_IMPORT_DATA_BUTTON_MODIFY': 'Modify'
+        'LNG_PAGE_IMPORT_DATA_BUTTON_MODIFY': 'Modify',
+
+        /**
+         * uiClustersListPage
+         */
+        'LNG_PAGE_LIST_CLUSTERS_MANAGE_ICONS_BUTTON': 'Manage icons',
+
+        /**
+         * uiClusterFields
+         */
+        'LNG_CLUSTER_FIELD_LABEL_COLOR': 'Colour',
+        'LNG_CLUSTER_FIELD_LABEL_COLOR_DESCRIPTION': '',
+        'LNG_CLUSTER_FIELD_LABEL_ICON': 'Icon',
+        'LNG_CLUSTER_FIELD_LABEL_ICON_DESCRIPTION': '',
+
+        /**
+         * uiCreateClusterPage
+         */
+        'LNG_PAGE_CREATE_CLUSTER_LABEL_NO_ICON': 'No icon',
+
+        /**
+         * uiViewModifyClusterPage
+         */
+        'LNG_PAGE_MODIFY_CLUSTER_LABEL_NO_ICON': 'No icon',
+
+        /**
+         * uiClustersListPage
+         */
+        'LNG_PAGE_LIST_CLUSTERS_LABEL_NO_ICON': 'No icon',
+        'LNG_PAGE_LIST_CLUSTERS_LABEL_NO_COLOR': 'No colour'
 
 
 

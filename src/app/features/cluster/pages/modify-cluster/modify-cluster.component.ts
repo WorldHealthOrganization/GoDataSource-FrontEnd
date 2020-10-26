@@ -12,8 +12,10 @@ import { UserModel } from '../../../../core/models/user.model';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { IconModel } from '../../../../core/models/icon.model';
+import { IconDataService } from '../../../../core/services/data/icon.data.service';
 
 @Component({
     selector: 'app-modify-cluster',
@@ -24,6 +26,10 @@ import { catchError } from 'rxjs/operators';
 export class ModifyClusterComponent extends ViewModifyComponent implements OnInit {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
+
+    // change icon ?
+    changeIcon: boolean = false;
+    iconsList$: Observable<IconModel[]>;
 
     // constants
     ClusterModel = ClusterModel;
@@ -47,7 +53,8 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        protected dialogService: DialogService
+        protected dialogService: DialogService,
+        private iconDataService: IconDataService
     ) {
         super(
             route,
@@ -61,6 +68,9 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // icons data
+        this.iconsList$ = this.iconDataService.getIconsList();
 
         // show loading
         this.showLoadingDialog(false);

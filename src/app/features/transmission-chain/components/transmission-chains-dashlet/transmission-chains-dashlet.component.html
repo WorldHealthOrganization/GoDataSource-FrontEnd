@@ -296,7 +296,7 @@
                     [style.background-color]="legend.edgeColor[edgeColorItem]">
                 </div>
                 <div>
-                    {{edgeColorItem | translate}}
+                    {{legend.clustersList && legend.clustersList[edgeColorItem] ? legend.clustersList[edgeColorItem] : (edgeColorItem | translate)}}
                 </div>
             </div>
 
@@ -339,9 +339,19 @@
             </div>
             <div
                 *ngFor="let edgeIconItem of legend.edgeIconKeys" class="legend-item">
-                <span class="xt-icon">{{legend.edgeIcon[edgeIconItem]}}</span>
+                <span
+                    *ngIf="!legend.edgeIcon[edgeIconItem].isUrl; else notIcon"
+                    class="xt-icon">
+                    {{ legend.edgeIcon[edgeIconItem].icon }}
+                </span>
+                <ng-template
+                    #notIcon>
+                    <img
+                        *ngIf="legend.edgeIcon[edgeIconItem].url"
+                        [src]="legend.edgeIcon[edgeIconItem].url" />
+                </ng-template>
                 <div>
-                    {{edgeIconItem | translate}}
+                    {{legend.clustersList && legend.clustersList[edgeIconItem] ? legend.clustersList[edgeIconItem] : (edgeIconItem | translate)}}
                 </div>
             </div>
         </div>
