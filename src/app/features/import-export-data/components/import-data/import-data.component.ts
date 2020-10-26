@@ -383,7 +383,6 @@ export class ImportDataComponent implements OnInit {
 
     // element that is editable now
     elementInEditMode: ImportableMapField | IMappedOption;
-    elementInEditModeHandler: HoverRowActionsDirective;
 
     // check if map fields are visible
     get areMapFieldVisible(): boolean {
@@ -394,6 +393,40 @@ export class ImportDataComponent implements OnInit {
 
     // hover table row actions
     recordActions: HoverRowAction[] = [
+        // Add
+        new HoverRowAction({
+            icon: 'add',
+            iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD_OPTION',
+            visible: (item: ImportableMapField | IMappedOption): boolean => {
+                return (item instanceof ImportableMapField) &&
+                    this.importableObject.distinctFileColumnValuesKeyValue &&
+                    this.importableObject.distinctFileColumnValuesKeyValue[item.sourceFieldWithoutIndexes] && (
+                        !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
+                        this.addressFields[item.destinationField]
+                    ) &&
+                    item.mappedOptions.length < this.importableObject.distinctFileColumnValuesKeyValue[item.sourceFieldWithoutIndexes].length;
+            },
+            click: (
+                item: ImportableMapField,
+                handler: HoverRowActionsDirective
+            ) => {
+                // create new field option
+                const fieldOption: IMappedOption = {
+                    id: uuid(),
+                    parentId: item.id
+                };
+
+                // add field option
+                item.mappedOptions.push(fieldOption);
+
+                // start edit
+                this.editItem(
+                    fieldOption,
+                    handler
+                );
+            }
+        }),
+
         // Modify
         new HoverRowAction({
             icon: 'settings',
@@ -402,16 +435,10 @@ export class ImportDataComponent implements OnInit {
                 item: ImportableMapField | IMappedOption,
                 handler: HoverRowActionsDirective
             ) => {
-                // clear element in edit mode
-                this.clearElementInEditMode();
-
-                // remember element in edit mode
-                this.elementInEditMode = item;
-                this.elementInEditModeHandler = handler;
-
-                // render row selection
-                handler.enabled = false;
-                handler.hoverRowActionsComponent.hideEverything();
+                this.editItem(
+                    item,
+                    handler
+                );
             }
         }),
 
@@ -419,6 +446,7 @@ export class ImportDataComponent implements OnInit {
         new HoverRowAction({
             icon: 'delete',
             iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_REMOVE',
+            class: 'icon-item-delete',
             click: (
                 item: ImportableMapField | IMappedOption,
                 handler: HoverRowActionsDirective
@@ -1825,13 +1853,24 @@ export class ImportDataComponent implements OnInit {
      * Clear element in edit mode
      */
     clearElementInEditMode(): void {
-        // enable back render
-        if (this.elementInEditModeHandler) {
-            this.elementInEditModeHandler.enabled = true;
-        }
-
         // reset
         this.elementInEditMode = undefined;
-        this.elementInEditModeHandler = undefined;
+    }
+
+    /**
+     * Edit item
+     */
+    editItem(
+        item: ImportableMapField | IMappedOption,
+        handler: HoverRowActionsDirective
+    ): void {
+        // clear element in edit mode
+        this.clearElementInEditMode();
+
+        // remember element in edit mode
+        this.elementInEditMode = item;
+
+        // render row selection
+        handler.hoverRowActionsComponent.hideEverything();
     }
 }

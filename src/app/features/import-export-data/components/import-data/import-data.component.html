@@ -138,13 +138,13 @@
 
                 <!-- Source -->
                 <div
-                    fxFlex="50%">
+                    fxFlex="1 1">
                     {{ 'LNG_PAGE_IMPORT_DATA_LABEL_SOURCE_FILE_INFORMATION' | translate }}
                 </div>
 
                 <!-- Destination -->
                 <div
-                    fxFlex="50%">
+                    fxFlex="1 1">
                     {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_INFORMATION' | translate }}
                 </div>
             </div>
@@ -175,13 +175,13 @@
 
                         <!-- Source -->
                         <div
-                            fxFlex="50%">
+                            fxFlex="1 1">
                             {{ item.sourceField ? item.sourceField : '-' }}
                         </div>
 
                         <!-- Destination -->
                         <div
-                            fxFlex="50%">
+                            fxFlex="1 1">
                             {{ importableObject.modelPropertiesKeyValueMap[item.destinationField] }}
                         </div>
 
@@ -198,7 +198,7 @@
 
                             <!-- Source -->
                             <div
-                                fxFlex="50%">
+                                fxFlex="1 1">
                                 <app-form-select
                                     [name]="'mapObject[' + item.id + '][source]'"
                                     required="true"
@@ -211,7 +211,7 @@
 
                             <!-- Destination -->
                             <div
-                                fxFlex="50%">
+                                fxFlex="1 1">
                                 <app-form-select
                                     [name]="'mapObject[' + item.id + '][destination]'"
                                     required="true"
@@ -228,12 +228,11 @@
 
                     <!-- Render mapped options rows -->
                     <div
-                        *ngIf="
-                        importableObject.distinctFileColumnValuesKeyValue &&
-                        importableObject.distinctFileColumnValuesKeyValue[item.sourceFieldWithoutIndexes] && (
-                            !!importableObject.modelPropertyValuesMap[item.destinationField] ||
-                            addressFields[item.destinationField]
-                        )"
+                        *ngIf="importableObject.distinctFileColumnValuesKeyValue &&
+                            importableObject.distinctFileColumnValuesKeyValue[item.sourceFieldWithoutIndexes] && (
+                                !!importableObject.modelPropertyValuesMap[item.destinationField] ||
+                                addressFields[item.destinationField]
+                            )"
                         class="import-data-body-row-extra-details"
                         fxLayout="column">
 
@@ -253,13 +252,13 @@
 
                                 <!-- Option Source -->
                                 <div
-                                    fxFlex="50%">
+                                    fxFlex="1 1">
                                     {{ mappedOpt.sourceOption ? mappedOpt.sourceOption : '-' }}
                                 </div>
 
                                 <!-- Option Destination -->
                                 <div
-                                    fxFlex="50%">
+                                    fxFlex="1 1">
                                     {{ importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] }}
                                 </div>
 
@@ -276,7 +275,7 @@
 
                                     <!-- Source Option -->
                                     <div
-                                        fxFlex="50%">
+                                        fxFlex="1 1">
                                         <app-form-select
                                             [name]="'mapObject[' + item.id + '][options][' + mappedOpt.id + '][sourceOption]'"
                                             required="true"
@@ -289,7 +288,7 @@
 
                                     <!-- Destination Option -->
                                     <div
-                                        fxFlex="50%">
+                                        fxFlex="1 1">
                                         <app-form-select
                                             [name]="'mapObject[' + item.id + '][options][' + mappedOpt.id + '][destinationOption]'"
                                             required="true"
