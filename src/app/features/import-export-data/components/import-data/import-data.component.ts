@@ -3,7 +3,7 @@ import { FileItem, FileLikeObject, FileUploader } from 'ng2-file-upload';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { environment } from '../../../../../environments/environment';
-import { IModelArrayProperties, ImportableFileModel, ImportableFilePropertiesModel, ImportableFilePropertyValuesModel, ImportableLabelValuePair, ImportableMapField, ImportDataExtension } from './model';
+import { IMappedOption, IModelArrayProperties, ImportableFileModel, ImportableFilePropertiesModel, ImportableFilePropertyValuesModel, ImportableLabelValuePair, ImportableMapField, ImportDataExtension } from './model';
 import * as _ from 'lodash';
 import { DialogAnswer, DialogAnswerButton, HoverRowAction } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -382,7 +382,7 @@ export class ImportDataComponent implements OnInit {
     @ViewChild('mappedDataTable') mappedDataTable: ElementRef;
 
     // element that is editable now
-    elementInEditMode: ImportableMapField;
+    elementInEditMode: ImportableMapField | IMappedOption;
     elementInEditModeHandler: HoverRowActionsDirective;
 
     // check if map fields are visible
@@ -399,7 +399,7 @@ export class ImportDataComponent implements OnInit {
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_MODIFY',
             click: (
-                item: ImportableMapField,
+                item: ImportableMapField | IMappedOption,
                 handler: HoverRowActionsDirective
             ) => {
                 // clear element in edit mode
