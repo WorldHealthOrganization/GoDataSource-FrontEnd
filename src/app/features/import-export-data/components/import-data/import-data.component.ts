@@ -395,7 +395,7 @@ export class ImportDataComponent implements OnInit {
     recordActions: HoverRowAction[] = [
         // Add
         new HoverRowAction({
-            icon: 'add',
+            icon: 'addCircle',
             iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD_OPTION',
             visible: (item: ImportableMapField | IMappedOption): boolean => {
                 return (item instanceof ImportableMapField) &&
@@ -410,18 +410,8 @@ export class ImportDataComponent implements OnInit {
                 item: ImportableMapField,
                 handler: HoverRowActionsDirective
             ) => {
-                // create new field option
-                const fieldOption: IMappedOption = {
-                    id: uuid(),
-                    parentId: item.id
-                };
-
-                // add field option
-                item.mappedOptions.push(fieldOption);
-
-                // start edit
-                this.editItem(
-                    fieldOption,
+                this.addNewOptionMap(
+                    item,
                     handler
                 );
             }
@@ -439,27 +429,10 @@ export class ImportDataComponent implements OnInit {
                 handler: HoverRowActionsDirective,
                 index: number
             ) => {
-                // clone field item
-                // mapped options aren't cloneable
-                const clonedItem: ImportableMapField = new ImportableMapField(
-                    this.mappedFields[index].destinationField,
-                    this.mappedFields[index].sourceField
-                );
-
-                // insert item in table
-                this.mappedFields.splice(
-                    index + 1,
-                    0,
-                    clonedItem
-                );
-
-                // force rerender
-                this.forceRenderTable();
-
-                // start edit item
-                this.editItem(
-                    clonedItem,
-                    handler
+                this.cloneFieldMap(
+                    item,
+                    handler,
+                    index
                 );
             }
         }),
@@ -510,59 +483,15 @@ export class ImportDataComponent implements OnInit {
                 return !(item instanceof ImportableMapField) ||
                     !item.readonly;
             },
-            click: (item: ImportableMapField | IMappedOption) => {
-                this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_IMPORT_FIELD_MAP')
-                    .subscribe((answer: DialogAnswer) => {
-                        if (answer.button === DialogAnswerButton.Yes) {
-                            // remove item
-                            if (item instanceof ImportableMapField) {
-                                // find & remove field map
-                                const index: number = this.mappedFields.indexOf(item);
-                                if (index > -1) {
-                                    // remove
-                                    this.mappedFields.splice(index, 1);
-
-                                    // force re-render
-                                    this.forceRenderTable();
-                                }
-
-                                // clear edit mode if item or parent was removed
-                                if (
-                                    this.elementInEditMode && (
-                                        item.id === this.elementInEditMode.id ||
-                                        (this.elementInEditMode as IMappedOption).parentId === item.id
-                                    )
-                                ) {
-                                    // clear edit mode
-                                    this.clearElementInEditMode();
-                                }
-                            } else {
-                                // find & remove field option map
-                                const parent: ImportableMapField = this.mappedFields.find((mf) => mf.id === item.parentId);
-                                if (parent) {
-                                    // determine index
-                                    const index: number = parent.mappedOptions.indexOf(item);
-                                    if (index > -1) {
-                                        // remove
-                                        parent.mappedOptions.splice(index, 1);
-
-                                        // force re-render
-                                        this.forceRenderTable();
-                                    }
-                                }
-
-                                // clear edit mode if item or parent was removed
-                                if (
-                                    this.elementInEditMode &&
-                                    item.id === this.elementInEditMode.id
-                                ) {
-                                    // clear edit mode
-                                    this.clearElementInEditMode();
-                                }
-                            }
-
-                        }
-                    });
+            click: (
+                item: ImportableMapField | IMappedOption,
+                handler: HoverRowActionsDirective,
+                index: number
+            ) => {
+                this.removeItemMap(
+                    item,
+                    index
+                );
             }
         })
     ];
@@ -1546,25 +1475,6 @@ export class ImportDataComponent implements OnInit {
     }
 
     /**
-     * Add new field map
-     */
-    addNewFieldMap() {
-        // add new item
-        this.mappedFields.push(new ImportableMapField());
-    }
-
-    /**
-     * Add new field map option
-     */
-    addNewOptionMap(indexMapField: number) {
-        // add new item
-        this.mappedFields[indexMapField].mappedOptions.push({
-            id: uuid(),
-            parentId: this.mappedFields[indexMapField].id
-        });
-    }
-
-    /**
      * Format Value
      */
     private formatSourceValueForDuplicates(controlName: string, value: string): string {
@@ -1868,7 +1778,7 @@ export class ImportDataComponent implements OnInit {
         }
 
         // determine data height
-        this.importDataBodyRowsMaxHeight = this.domSanitizer.bypassSecurityTrustStyle(`calc(100vh - (${this.mappedDataTable.nativeElement.getBoundingClientRect().top}px + 70px))`);
+        this.importDataBodyRowsMaxHeight = this.domSanitizer.bypassSecurityTrustStyle(`calc(100vh - (${this.mappedDataTable.nativeElement.getBoundingClientRect().top}px + 90px))`);
 
         // update virtual scroll height
         setTimeout(() => {
@@ -1891,7 +1801,7 @@ export class ImportDataComponent implements OnInit {
      */
     private editItem(
         item: ImportableMapField | IMappedOption,
-        handler: HoverRowActionsDirective
+        handler?: HoverRowActionsDirective
     ): void {
         // clear element in edit mode
         this.clearElementInEditMode();
@@ -1900,7 +1810,9 @@ export class ImportDataComponent implements OnInit {
         this.elementInEditMode = item;
 
         // render row selection
-        handler.hoverRowActionsComponent.hideEverything();
+        if (handler) {
+            handler.hoverRowActionsComponent.hideEverything();
+        }
     }
 
     /**
@@ -1908,5 +1820,139 @@ export class ImportDataComponent implements OnInit {
      */
     private forceRenderTable(): void {
         this.mappedFields = [...this.mappedFields];
+    }
+
+    /**
+     * Add new field map
+     */
+    addNewFieldMap(): void {
+        // create the new item
+        const newItem: ImportableMapField = new ImportableMapField();
+
+        // add new item at the top
+        this.mappedFields = [
+            newItem,
+            ...this.mappedFields
+        ];
+
+        // edit item
+        this.editItem(newItem);
+
+        // scroll into view and make it visible
+        if (this.virtualScrollViewport) {
+            this.virtualScrollViewport.scrollToOffset(0);
+        }
+    }
+
+    /**
+     * Add new field option map
+     */
+    private addNewOptionMap(
+        item: ImportableMapField,
+        handler: HoverRowActionsDirective
+    ): void {
+        // create new field option
+        const fieldOption: IMappedOption = {
+            id: uuid(),
+            parentId: item.id
+        };
+
+        // add field option
+        item.mappedOptions.push(fieldOption);
+
+        // start edit
+        this.editItem(
+            fieldOption,
+            handler
+        );
+    }
+
+    /**
+     * Clone field option map
+     */
+    private cloneFieldMap(
+        item: ImportableMapField,
+        handler: HoverRowActionsDirective,
+        index: number
+    ): void {
+        // clone field item
+        // mapped options aren't cloneable
+        const clonedItem: ImportableMapField = new ImportableMapField(
+            item.destinationField,
+            item.sourceField
+        );
+
+        // insert item in table
+        this.mappedFields.splice(
+            index + 1,
+            0,
+            clonedItem
+        );
+
+        // force rerender
+        this.forceRenderTable();
+
+        // start edit item
+        this.editItem(
+            clonedItem,
+            handler
+        );
+    }
+
+    /**
+     * Remove item
+     */
+    private removeItemMap(
+        item: ImportableMapField | IMappedOption,
+        index: number
+    ): void {
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_IMPORT_FIELD_MAP')
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    // remove item
+                    if (item instanceof ImportableMapField) {
+                        // remove
+                        this.mappedFields.splice(index, 1);
+
+                        // force re-render
+                        this.forceRenderTable();
+
+                        // clear edit mode if item or parent was removed
+                        if (
+                            this.elementInEditMode && (
+                                item.id === this.elementInEditMode.id ||
+                                (this.elementInEditMode as IMappedOption).parentId === item.id
+                            )
+                        ) {
+                            // clear edit mode
+                            this.clearElementInEditMode();
+                        }
+                    } else {
+                        // find & remove field option map
+                        const parent: ImportableMapField = this.mappedFields.find((mf) => mf.id === item.parentId);
+                        if (parent) {
+                            // determine index
+                            const parentIndex: number = parent.mappedOptions.indexOf(item);
+                            if (parentIndex > -1) {
+                                // remove
+                                parent.mappedOptions.splice(parentIndex, 1);
+
+                                // force re-render
+                                this.forceRenderTable();
+                            }
+                        }
+
+                        // clear edit mode if item or parent was removed
+                        if (
+                            this.elementInEditMode &&
+                            item.id === this.elementInEditMode.id
+                        ) {
+                            // clear edit mode
+                            this.clearElementInEditMode();
+                        }
+                    }
+
+                }
+            });
     }
 }

@@ -138,7 +138,7 @@
 
                 <!-- Source -->
                 <div
-                    fxFlex="1 1">
+                    fxFlex="1 1" fxLayoutAlign="start end">
                     {{ 'LNG_PAGE_IMPORT_DATA_LABEL_SOURCE_FILE_INFORMATION' | translate }}
                 </div>
 
@@ -150,8 +150,20 @@
 
                 <!-- Destination -->
                 <div
-                    fxFlex="1 1">
+                    fxFlex="1 1" fxLayoutAlign="start end">
                     {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_INFORMATION' | translate }}
+                </div>
+
+                <!-- Actions -->
+                <div
+                    fxFlex="50px">
+                    <button
+                        type="button"
+                        mat-icon-button
+                        [title]="'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD' | translate"
+                        (click)="addNewFieldMap()">
+                        <span class="xt-icon">addCircle</span>
+                    </button>
                 </div>
             </div>
 
@@ -200,6 +212,12 @@
                             fxFlex="1 1" fxLayoutAlign="start center">
                             {{ importableObject.modelPropertiesKeyValueMap[item.destinationField] }}
                         </div>
+
+                        <!-- Actions -->
+                        <div
+                            fxFlex="50px">
+                            <!-- placeholder -->
+                        </div>
                     </div>
 
                     <!-- Source - destination - edit mode view -->
@@ -247,6 +265,12 @@
                                     (optionChanged)="setSourceDestinationValueAndDetermineOptions(item, 'destinationField', $event)"
                                     [disabled]="item.readonly">
                                 </app-form-select>
+                            </div>
+
+                            <!-- Actions -->
+                            <div
+                                fxFlex="50px">
+                                <!-- placeholder -->
                             </div>
 
                         </div>
@@ -504,7 +528,7 @@
                             *ngIf="item.mappedOptions.length < importableObject.distinctFileColumnValuesKeyValue[item.sourceFieldWithoutIndexes].length"
                             mat-raised-button
                             color="accent"
-                            (click)="addNewOptionMap(indexMapField)"
+                            (click)="DONEaddNewOptionMap(indexMapField)"
                             type="button">
                             <span class="xt-icon">addCircle</span>
                             {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD_OPTION' | translate }}
@@ -517,7 +541,7 @@
                 <button
                     mat-raised-button
                     color="accent"
-                    (click)="addNewFieldMap()"
+                    (click)="DONEaddNewFieldMap()"
                     type="button">
                     <span class="xt-icon">addCircle</span>
                     {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD' | translate }}
