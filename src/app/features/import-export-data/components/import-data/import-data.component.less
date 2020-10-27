@@ -103,6 +103,10 @@ app-import-data {
             margin-bottom: 10px;
             padding-bottom: 5px;
 
+            // hack to display it on top of hover actions
+            z-index: 1000;
+            background: white;
+
             // trick to have the same column width no matter of the browser used
             overflow-y: scroll;
             &::-webkit-scrollbar {

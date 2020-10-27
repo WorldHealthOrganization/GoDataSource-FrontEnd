@@ -28,7 +28,7 @@ export class HoverRowActionsDirective {
     @Input() hoverRowActionIndex: any;
 
     // render selection & actions
-    enabled: boolean = true;
+    @Input() hoverRowEnabled: boolean = true;
 
     /**
      * Previous event
@@ -114,7 +114,7 @@ export class HoverRowActionsDirective {
     private show(event) {
         // trigger show
         if (
-            this.enabled &&
+            this.hoverRowEnabled &&
             !this.disableShow &&
             this.hoverRowActionsComponent
         ) {
