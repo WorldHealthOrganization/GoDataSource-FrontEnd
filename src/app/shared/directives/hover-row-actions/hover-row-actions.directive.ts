@@ -22,6 +22,11 @@ export class HoverRowActionsDirective {
      */
     @Input() hoverRowActionData: any;
 
+    /**
+     * Record Index
+     */
+    @Input() hoverRowActionIndex: any;
+
     // render selection & actions
     enabled: boolean = true;
 
@@ -52,7 +57,10 @@ export class HoverRowActionsDirective {
             // action visible ?
             if (
                 action.visible !== undefined &&
-                !action.visible(this.hoverRowActionData)
+                !action.visible(
+                    this.hoverRowActionData,
+                    this.hoverRowActionIndex
+                )
             ) {
                 return;
             }
@@ -64,7 +72,10 @@ export class HoverRowActionsDirective {
                 // action visible ?
                 if (
                     menuOption.visible !== undefined &&
-                    !menuOption.visible(this.hoverRowActionData)
+                    !menuOption.visible(
+                        this.hoverRowActionData,
+                        this.hoverRowActionIndex
+                    )
                 ) {
                     return;
                 }
@@ -116,6 +127,7 @@ export class HoverRowActionsDirective {
                 this.elementRef,
                 this.getVisibleActions(),
                 this.hoverRowActionData,
+                this.hoverRowActionIndex,
                 event
             );
         }

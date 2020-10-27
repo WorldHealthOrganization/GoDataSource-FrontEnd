@@ -165,7 +165,7 @@
 
                 <!-- Render each row -->
                 <div
-                    *cdkVirtualFor="let item of mappedFields"
+                    *cdkVirtualFor="let item of mappedFields; let elementIndex = index"
                     class="import-data-body-row"
                     fxLayout="column">
 
@@ -177,7 +177,8 @@
                         app-hover-row-actions
                         [hoverRowActionsComponent]="hoverRow"
                         [hoverRowActions]="recordActions"
-                        [hoverRowActionData]="item">
+                        [hoverRowActionData]="item"
+                        [hoverRowActionIndex]="elementIndex">
 
                         <!-- Source -->
                         <div
@@ -212,7 +213,8 @@
                             app-hover-row-actions
                             [hoverRowActionsComponent]="hoverRow"
                             [hoverRowActions]="recordActions"
-                            [hoverRowActionData]="item">
+                            [hoverRowActionData]="item"
+                            [hoverRowActionIndex]="elementIndex">
 
                             <!-- Source -->
                             <div
@@ -263,7 +265,7 @@
 
                         <!-- Render each row -->
                         <div
-                            *ngFor="let mappedOpt of item.mappedOptions">
+                            *ngFor="let mappedOpt of item.mappedOptions; let optIndex = index">
 
                             <!-- Source - destination options - table view -->
                             <div
@@ -273,7 +275,8 @@
                                 app-hover-row-actions
                                 [hoverRowActionsComponent]="hoverRow"
                                 [hoverRowActions]="recordActions"
-                                [hoverRowActionData]="mappedOpt">
+                                [hoverRowActionData]="mappedOpt"
+                                [hoverRowActionIndex]="optIndex">
 
                                 <!-- Option Source -->
                                 <div
@@ -300,7 +303,8 @@
                                     app-hover-row-actions
                                     [hoverRowActionsComponent]="hoverRow"
                                     [hoverRowActions]="recordActions"
-                                    [hoverRowActionData]="mappedOpt">
+                                    [hoverRowActionData]="mappedOpt"
+                                    [hoverRowActionIndex]="optIndex">
 
                                     <!-- Source Option -->
                                     <div
@@ -418,7 +422,7 @@
                             <button
                                 mat-icon-button
                                 color="accent"
-                                (click)="cloneFieldMap(indexMapField)"
+                                (click)="DONEcloneFieldMap(indexMapField)"
                                 type="button">
                                 <span class="xt-icon">fileCopy</span>
                             </button>

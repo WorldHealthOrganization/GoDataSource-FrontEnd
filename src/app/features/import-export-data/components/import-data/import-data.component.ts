@@ -427,6 +427,43 @@ export class ImportDataComponent implements OnInit {
             }
         }),
 
+        // Clone
+        new HoverRowAction({
+            icon: 'fileCopy',
+            iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_CLONE',
+            visible: (item: ImportableMapField | IMappedOption): boolean => {
+                return item instanceof ImportableMapField;
+            },
+            click: (
+                item: ImportableMapField,
+                handler: HoverRowActionsDirective,
+                index: number
+            ) => {
+                // clone field item
+                // mapped options aren't cloneable
+                const clonedItem: ImportableMapField = new ImportableMapField(
+                    this.mappedFields[index].destinationField,
+                    this.mappedFields[index].sourceField
+                );
+
+                // insert item in table
+                this.mappedFields.splice(
+                    index + 1,
+                    0,
+                    clonedItem
+                );
+
+                // force rerender
+                this.forceRenderTable();
+
+                // start edit item
+                this.editItem(
+                    clonedItem,
+                    handler
+                );
+            }
+        }),
+
         // Modify
         new HoverRowAction({
             icon: 'settings',
@@ -1541,20 +1578,6 @@ export class ImportDataComponent implements OnInit {
     }
 
     /**
-     * Clone field map
-     */
-    cloneFieldMap(index: number) {
-        this.mappedFields.splice(
-            index + 1,
-            0,
-            new ImportableMapField(
-                this.mappedFields[index].destinationField,
-                this.mappedFields[index].sourceField
-            )
-        );
-    }
-
-    /**
      * Remove field map option
      */
     removeOptionMap(indexMapField: number, indexMapOption: number) {
@@ -1831,6 +1854,28 @@ export class ImportDataComponent implements OnInit {
         // validate control and mark for change detection
         sourceControl.validateAndMarkForCheck();
     }
+
+// ..................
+// ..................
+// ..................
+// ..................
+// ..................
+// ..................
+// ..................
+// ALL NEW METHODS
+// NEED TO CLEANUP ABOVE AFTER FINISH
+// ..................
+// ..................
+// ..................
+// ..................
+// ..................
+// ..................
+// ..................
+// + CLEANUP LNG_...nefolosite...
+// + CLEANUP LNG_...nefolosite...
+// + CLEANUP LNG_...nefolosite...
+// + CLEANUP LNG_...nefolosite...
+// + CLEANUP LNG_...nefolosite...
 
     /**
      * Determine import data max height

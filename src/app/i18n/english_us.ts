@@ -72,6 +72,7 @@ export const EnglishUsLang = {
          * uiImportData
          */
         'LNG_PAGE_IMPORT_DATA_BUTTON_MODIFY': 'Modify',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_CLONE': 'Clone',
         'LNG_PAGE_IMPORT_DATA_BUTTON_REMOVE': 'Remove',
         'LNG_PAGE_IMPORT_DATA_BUTTON_CANCEL': 'Cancel',
         'LNG_PAGE_IMPORT_DATA_INFO_REQUIRED': 'Field required',
