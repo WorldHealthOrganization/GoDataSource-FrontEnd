@@ -133,13 +133,19 @@
 
             <!-- Headers -->
             <div
-                fxLayout="row" fxLayoutGap="20px"
+                fxLayout="row" fxLayoutGap="10px"
                 class="import-data-header-row">
 
                 <!-- Source -->
                 <div
                     fxFlex="1 1">
                     {{ 'LNG_PAGE_IMPORT_DATA_LABEL_SOURCE_FILE_INFORMATION' | translate }}
+                </div>
+
+                <!-- Info -->
+                <div
+                    fxFlex="16px">
+                    <!-- placeholder -->
                 </div>
 
                 <!-- Destination -->
@@ -167,7 +173,7 @@
                     <div
                         *ngIf="item !== elementInEditMode; else editMode"
                         class="import-data-body-row-basic"
-                        fxLayout="row" fxLayoutGap="20px"
+                        fxLayout="row" fxLayoutGap="10px"
                         app-hover-row-actions
                         [hoverRowActionsComponent]="hoverRow"
                         [hoverRowActions]="recordActions"
@@ -175,16 +181,24 @@
 
                         <!-- Source -->
                         <div
-                            fxFlex="1 1">
+                            fxFlex="1 1" fxLayoutAlign="start center">
                             {{ item.sourceField ? item.sourceField : '-' }}
+                        </div>
+
+                        <!-- Info -->
+                        <div
+                            fxFlex="16px" fxLayoutAlign="center">
+                            <span
+                                *ngIf="item.readonly"
+                                [matTooltip]="'LNG_PAGE_IMPORT_DATA_INFO_REQUIRED' | translate"
+                                class="xt-icon import-data-body-row-basic-info">info</span>
                         </div>
 
                         <!-- Destination -->
                         <div
-                            fxFlex="1 1">
+                            fxFlex="1 1" fxLayoutAlign="start center">
                             {{ importableObject.modelPropertiesKeyValueMap[item.destinationField] }}
                         </div>
-
                     </div>
 
                     <!-- Source - destination - edit mode view -->
@@ -194,7 +208,7 @@
                         <!-- Basic Details -->
                         <div
                             class="import-data-body-row-edit-basic"
-                            fxLayout="row" fxLayoutGap="20px"
+                            fxLayout="row" fxLayoutGap="10px"
                             app-hover-row-actions
                             [hoverRowActionsComponent]="hoverRow"
                             [hoverRowActions]="recordActions"
@@ -213,6 +227,12 @@
                                 </app-form-select>
                             </div>
 
+                            <!-- Info -->
+                            <div
+                                fxFlex="16px" fxLayoutAlign="center">
+                                <!-- placeholder -->
+                            </div>
+
                             <!-- Destination -->
                             <div
                                 fxFlex="1 1">
@@ -222,7 +242,8 @@
                                     [ngModel]="item.destinationField"
                                     [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
                                     [options]="importableObject.modelPropertiesKeyValue"
-                                    (optionChanged)="setSourceDestinationValueAndDetermineOptions(item, 'destinationField', $event)">
+                                    (optionChanged)="setSourceDestinationValueAndDetermineOptions(item, 'destinationField', $event)"
+                                    [disabled]="item.readonly">
                                 </app-form-select>
                             </div>
 
@@ -247,7 +268,7 @@
                             <!-- Source - destination options - table view -->
                             <div
                                 *ngIf="mappedOpt !== elementInEditMode; else editModeOptions"
-                                fxLayout="row"
+                                fxLayout="row" fxLayoutGap="10px"
                                 class="import-data-body-row-extra-details-row"
                                 app-hover-row-actions
                                 [hoverRowActionsComponent]="hoverRow"
@@ -275,7 +296,7 @@
                                 <!-- Basic Details -->
                                 <div
                                     class="import-data-body-row-edit-extra-details-row"
-                                    fxLayout="row" fxLayoutGap="20px"
+                                    fxLayout="row" fxLayoutGap="10px"
                                     app-hover-row-actions
                                     [hoverRowActionsComponent]="hoverRow"
                                     [hoverRowActions]="recordActions"

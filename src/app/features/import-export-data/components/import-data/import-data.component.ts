@@ -469,6 +469,10 @@ export class ImportDataComponent implements OnInit {
             icon: 'delete',
             iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_REMOVE',
             class: 'icon-item-delete',
+            visible: (item: ImportableMapField | IMappedOption): boolean => {
+                return !(item instanceof ImportableMapField) ||
+                    !item.readonly;
+            },
             click: (item: ImportableMapField | IMappedOption) => {
                 this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_IMPORT_FIELD_MAP')
                     .subscribe((answer: DialogAnswer) => {
