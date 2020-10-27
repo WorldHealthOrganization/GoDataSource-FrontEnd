@@ -1565,32 +1565,6 @@ export class ImportDataComponent implements OnInit {
     }
 
     /**
-     * Remove field map
-     */
-    removeFieldMap(index: number) {
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_IMPORT_FIELD_MAP')
-            .subscribe((answer: DialogAnswer) => {
-                if (answer.button === DialogAnswerButton.Yes) {
-                    // remove item
-                    this.mappedFields.splice(index, 1);
-                }
-            });
-    }
-
-    /**
-     * Remove field map option
-     */
-    removeOptionMap(indexMapField: number, indexMapOption: number) {
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_IMPORT_FIELD_MAP')
-            .subscribe((answer: DialogAnswer) => {
-                if (answer.button === DialogAnswerButton.Yes) {
-                    // remove item
-                    this.mappedFields[indexMapField].mappedOptions.splice(indexMapOption, 1);
-                }
-            });
-    }
-
-    /**
      * Format Value
      */
     private formatSourceValueForDuplicates(controlName: string, value: string): string {
