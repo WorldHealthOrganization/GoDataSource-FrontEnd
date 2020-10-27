@@ -1858,7 +1858,10 @@ export class ImportDataComponent implements OnInit {
         };
 
         // add field option
-        item.mappedOptions.push(fieldOption);
+        item.mappedOptions = [
+            fieldOption,
+            ...item.mappedOptions
+        ];
 
         // start edit
         this.editItem(
