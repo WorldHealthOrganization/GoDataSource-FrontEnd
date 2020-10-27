@@ -482,7 +482,7 @@ export class ImportDataComponent implements OnInit {
                                     this.mappedFields.splice(index, 1);
 
                                     // force re-render
-                                    this.mappedFields = [...this.mappedFields];
+                                    this.forceRenderTable();
                                 }
 
                                 // clear edit mode if item or parent was removed
@@ -506,7 +506,7 @@ export class ImportDataComponent implements OnInit {
                                         parent.mappedOptions.splice(index, 1);
 
                                         // force re-render
-                                        this.mappedFields = [...this.mappedFields];
+                                        this.forceRenderTable();
                                     }
                                 }
 
@@ -1832,19 +1832,6 @@ export class ImportDataComponent implements OnInit {
      * Determine import data max height
      */
     private determineTableDataMaxHeight(): void {
-        const findPos = (node) => {
-            let curtop = 0;
-            let curtopscroll = 0;
-            if (node.offsetParent) {
-                do {
-                    curtop += node.offsetTop;
-                    curtopscroll += node.offsetParent ? node.offsetParent.scrollTop : 0;
-                } while (node = node.offsetParent);
-            }
-
-            return curtop - curtopscroll;
-        };
-
         // check if map fields are visible
         // wait for mappedDataTable to be initialized
         if (!this.areMapFieldVisible) {
@@ -1871,7 +1858,7 @@ export class ImportDataComponent implements OnInit {
     /**
      * Clear element in edit mode
      */
-    clearElementInEditMode(): void {
+    private clearElementInEditMode(): void {
         // reset
         this.elementInEditMode = undefined;
     }
@@ -1879,7 +1866,7 @@ export class ImportDataComponent implements OnInit {
     /**
      * Edit item
      */
-    editItem(
+    private editItem(
         item: ImportableMapField | IMappedOption,
         handler: HoverRowActionsDirective
     ): void {
@@ -1891,5 +1878,12 @@ export class ImportDataComponent implements OnInit {
 
         // render row selection
         handler.hoverRowActionsComponent.hideEverything();
+    }
+
+    /**
+     * Re-render form
+     */
+    private forceRenderTable(): void {
+        this.mappedFields = [...this.mappedFields];
     }
 }
