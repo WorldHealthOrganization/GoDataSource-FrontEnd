@@ -355,11 +355,6 @@ export class ImportDataComponent
     ImportServerErrorCodes = ImportServerErrorCodes;
 
     /**
-     * Format source value callback
-     */
-    formatSourceValueForDuplicatesCallback: (controlName: string, value: string) => string;
-
-    /**
      * Decrypt password
      */
     decryptPassword: string;
@@ -544,9 +539,6 @@ export class ImportDataComponent
                 });
             };
         }
-
-        // callbacks
-        this.formatSourceValueForDuplicatesCallback = this.formatSourceValueForDuplicates.bind(this);
     }
 
     /**
@@ -871,7 +863,7 @@ export class ImportDataComponent
                         foundModel = _.find(this.mappedFields, (mappedItem: ImportableMapField) => {
                             return mappedItem.destinationField === destination &&
                                 mappedItem.sourceField === source.value &&
-                                mappedItem.sourceDestinationLevel[0] === level;
+                                mappedItem.getSourceDestinationLevel(0) === level;
                         });
 
                         // ignore identical maps
@@ -899,10 +891,16 @@ export class ImportDataComponent
                         }
 
                         // check if we need to set levels
-                        importableItem.sourceDestinationLevel[0] = level;
-                        importableItem.sourceDestinationLevel[1] = source.subLevel !== undefined ?
-                            source.subLevel :
-                            0;
+                        importableItem.setSourceDestinationLevel(
+                            0,
+                            level
+                        );
+                        importableItem.setSourceDestinationLevel(
+                            1,
+                            source.subLevel !== undefined ?
+                                source.subLevel :
+                                0
+                        );
 
                         // add to list
                         this.mappedFields.push(importableItem);
@@ -1359,7 +1357,7 @@ export class ImportDataComponent
                 source: mappedField.sourceField,
                 destination: mappedField.destinationField,
                 options: mappedFiledOptions(mappedField.mappedOptions),
-                levels: mappedField.sourceDestinationLevel
+                levels: mappedField.getSourceDestinationLevels()
             }));
         });
 
@@ -1417,7 +1415,7 @@ export class ImportDataComponent
             }
 
             // map sub levels ( array indexes )
-            mapField.sourceDestinationLevel = option.levels;
+            mapField.setSourceDestinationLevels(option.levels);
 
             // required ?
             if (mapOfRequiredDestinationFields[mapField.destinationField]) {
@@ -1496,42 +1494,6 @@ export class ImportDataComponent
     }
 
     /**
-     * Format Value
-     */
-    private formatSourceValueForDuplicates(controlName: string, value: string): string {
-        // determine if this is a source item that we need to adapt for duplicates
-        if (
-            value &&
-            value.indexOf('[]') > -1
-        ) {
-            // determine id & item
-            const id: string = controlName.substring(controlName.indexOf('[') + 1, controlName.indexOf(']'));
-
-            // find item
-            const item = _.find(
-                this.mappedFields,
-                {
-                    id: id
-                }
-            );
-
-            // meanwhile in a different universe the item was destroyed, so there is no point in adding indexes
-            if (!item) {
-                return value;
-            }
-
-            // retrieve value with indexes
-            return this.addIndexesToArrays(
-                value,
-                item.sourceDestinationLevel
-            );
-        }
-
-        // not a source field
-        return value;
-    }
-
-    /**
      * do we have arrays? if so, add indexes
      * @param mapValue
      * @param itemLevels
@@ -1568,153 +1530,153 @@ export class ImportDataComponent
      * @param form
      */
     importData(form: NgForm) {
-        // do we have import data url ?
-        if (!this.importDataUrl) {
-            // we don't need to display an error since this is a developer issue, he forgot to include url, in normal conditions this shouldn't happen
-            return;
-        }
-
-        // display loading
-        const loadingDialog = this.dialogService.showLoadingDialog();
-
-        // validate items & import data
-        setTimeout(() => {
-            // validate item
-            _.each((form as any)._directives, (model: NgModel) => {
-                if (
-                    model.valueAccessor &&
-                    model.valueAccessor instanceof FormSelectChangeDetectionPushComponent
-                ) {
-                    // touch, validate & detect changes
-                    model.valueAccessor.touch();
-                    model.valueAccessor.control.updateValueAndValidity();
-                    model.valueAccessor.validateAndMarkForCheck();
-                }
-            });
-
-            // check valid fields & import data if we don't have any errors
-            setTimeout(() => {
-                // do we have invalid fields ?
-                if (!this.formHelper.validateForm(
-                    form,
-                    false
-                )) {
-                    // invalid form
-                    loadingDialog.close();
-                    return;
-                }
-
-                // import data
-                // display loading
-                const allFields: any = this.formHelper.getFields(form);
-                this._displayLoading = true;
-                this._displayLoadingLocked = true;
-                loadingDialog.close();
-                setTimeout(() => {
-                    // nothing to import - this is handled above, when we convert JSON to importable object
-                    // NO NEED for further checks
-
-                    // construct import JSON
-                    const importJSON = {
-                        fileId: this.importableObject.id,
-                        map: {},
-                        valuesMap: {}
-                    };
-                    _.each(
-                        allFields.mapObject,
-                        (item: {
-                            source: string,
-                            destination: string,
-                            sourceDestinationLevel?: number[],
-                            options: {
-                                sourceOption: string,
-                                destinationOption: string
-                            }[]
-                        }) => {
-                            // forge the almighty source & destination
-                            let source: string = item.source;
-                            let destination: string = item.destination;
-
-                            // add indexes to source arrays
-                            source = this.addIndexesToArrays(
-                                source,
-                                item.sourceDestinationLevel
-                            );
-
-                            // add indexes to destination arrays
-                            destination = this.addIndexesToArrays(
-                                destination,
-                                item.sourceDestinationLevel
-                            );
-
-                            // map main properties
-                            importJSON.map[source] = destination;
-
-                            // map drop-down values
-                            if (
-                                item.options &&
-                                !_.isEmpty(item.options)
-                            ) {
-                                // here we don't need to add indexes, so we keep the arrays just as they are
-                                // also, we need to merge value Maps with the previous ones
-                                const properSource = item.source.replace(/\[\d+\]/g, '[]');
-                                importJSON.valuesMap[properSource] = {
-                                    ...importJSON.valuesMap[properSource],
-                                    ..._.transform(
-                                        item.options,
-                                        (result, option: {
-                                            sourceOption: string,
-                                            destinationOption: string
-                                        }) => {
-                                            result[option.sourceOption] = option.destinationOption;
-                                        },
-                                        {}
-                                    )
-                                };
-                            }
-                        }
-                    );
-
-                    // import data
-                    this.progress = null;
-                    this.importExportDataService.importData(
-                        this.importDataUrl,
-                        importJSON
-                    )
-                        .pipe(
-                            catchError((err) => {
-                                // display error message
-                                if (err.code === 'IMPORT_PARTIAL_SUCCESS') {
-                                    // construct custom message
-                                    this.errMsgDetails = err;
-
-                                    // display error
-                                    this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
-                                } else {
-                                    this.snackbarService.showApiError(err);
-                                }
-
-                                // reset loading
-                                this._displayLoading = false;
-                                this._displayLoadingLocked = false;
-
-                                // propagate err
-                                return throwError(err);
-                            })
-                        )
-                        .subscribe(() => {
-                            // display success
-                            this.snackbarService.showSuccess(
-                                this.importSuccessMessage,
-                                this.translationData
-                            );
-
-                            // emit finished event - event should handle redirect
-                            this.finished.emit();
-                        });
-                });
-            });
-        });
+        // // do we have import data url ?
+        // if (!this.importDataUrl) {
+        //     // we don't need to display an error since this is a developer issue, he forgot to include url, in normal conditions this shouldn't happen
+        //     return;
+        // }
+        //
+        // // display loading
+        // const loadingDialog = this.dialogService.showLoadingDialog();
+        //
+        // // validate items & import data
+        // setTimeout(() => {
+        //     // validate item
+        //     _.each((form as any)._directives, (model: NgModel) => {
+        //         if (
+        //             model.valueAccessor &&
+        //             model.valueAccessor instanceof FormSelectChangeDetectionPushComponent
+        //         ) {
+        //             // touch, validate & detect changes
+        //             model.valueAccessor.touch();
+        //             model.valueAccessor.control.updateValueAndValidity();
+        //             model.valueAccessor.validateAndMarkForCheck();
+        //         }
+        //     });
+        //
+        //     // check valid fields & import data if we don't have any errors
+        //     setTimeout(() => {
+        //         // do we have invalid fields ?
+        //         if (!this.formHelper.validateForm(
+        //             form,
+        //             false
+        //         )) {
+        //             // invalid form
+        //             loadingDialog.close();
+        //             return;
+        //         }
+        //
+        //         // import data
+        //         // display loading
+        //         const allFields: any = this.formHelper.getFields(form);
+        //         this._displayLoading = true;
+        //         this._displayLoadingLocked = true;
+        //         loadingDialog.close();
+        //         setTimeout(() => {
+        //             // nothing to import - this is handled above, when we convert JSON to importable object
+        //             // NO NEED for further checks
+        //
+        //             // construct import JSON
+        //             const importJSON = {
+        //                 fileId: this.importableObject.id,
+        //                 map: {},
+        //                 valuesMap: {}
+        //             };
+        //             _.each(
+        //                 allFields.mapObject,
+        //                 (item: {
+        //                     source: string,
+        //                     destination: string,
+        //                     sourceDestinationLevel?: number[],
+        //                     options: {
+        //                         sourceOption: string,
+        //                         destinationOption: string
+        //                     }[]
+        //                 }) => {
+        //                     // forge the almighty source & destination
+        //                     let source: string = item.source;
+        //                     let destination: string = item.destination;
+        //
+        //                     // add indexes to source arrays
+        //                     source = this.addIndexesToArrays(
+        //                         source,
+        //                         item.sourceDestinationLevel
+        //                     );
+        //
+        //                     // add indexes to destination arrays
+        //                     destination = this.addIndexesToArrays(
+        //                         destination,
+        //                         item.sourceDestinationLevel
+        //                     );
+        //
+        //                     // map main properties
+        //                     importJSON.map[source] = destination;
+        //
+        //                     // map drop-down values
+        //                     if (
+        //                         item.options &&
+        //                         !_.isEmpty(item.options)
+        //                     ) {
+        //                         // here we don't need to add indexes, so we keep the arrays just as they are
+        //                         // also, we need to merge value Maps with the previous ones
+        //                         const properSource = item.source.replace(/\[\d+\]/g, '[]');
+        //                         importJSON.valuesMap[properSource] = {
+        //                             ...importJSON.valuesMap[properSource],
+        //                             ..._.transform(
+        //                                 item.options,
+        //                                 (result, option: {
+        //                                     sourceOption: string,
+        //                                     destinationOption: string
+        //                                 }) => {
+        //                                     result[option.sourceOption] = option.destinationOption;
+        //                                 },
+        //                                 {}
+        //                             )
+        //                         };
+        //                     }
+        //                 }
+        //             );
+        //
+        //             // import data
+        //             this.progress = null;
+        //             this.importExportDataService.importData(
+        //                 this.importDataUrl,
+        //                 importJSON
+        //             )
+        //                 .pipe(
+        //                     catchError((err) => {
+        //                         // display error message
+        //                         if (err.code === 'IMPORT_PARTIAL_SUCCESS') {
+        //                             // construct custom message
+        //                             this.errMsgDetails = err;
+        //
+        //                             // display error
+        //                             this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
+        //                         } else {
+        //                             this.snackbarService.showApiError(err);
+        //                         }
+        //
+        //                         // reset loading
+        //                         this._displayLoading = false;
+        //                         this._displayLoadingLocked = false;
+        //
+        //                         // propagate err
+        //                         return throwError(err);
+        //                     })
+        //                 )
+        //                 .subscribe(() => {
+        //                     // display success
+        //                     this.snackbarService.showSuccess(
+        //                         this.importSuccessMessage,
+        //                         this.translationData
+        //                     );
+        //
+        //                     // emit finished event - event should handle redirect
+        //                     this.finished.emit();
+        //                 });
+        //         });
+        //     });
+        // });
     }
 
     /**
@@ -1742,22 +1704,6 @@ export class ImportDataComponent
 
         // add options if necessary
         this.addMapOptionsIfNecessary(item);
-    }
-
-    /**
-     * Set destination level
-     */
-    setDestinationLevel(
-        item: ImportableMapField,
-        levelIndex: number,
-        value: any,
-        sourceControl: FormSelectChangeDetectionPushComponent
-    ) {
-        // set level
-        item.sourceDestinationLevel[levelIndex] = value ? value.value : value;
-
-        // validate control and mark for change detection
-        sourceControl.validateAndMarkForCheck();
     }
 
 // ..................
@@ -2029,15 +1975,15 @@ export class ImportDataComponent
 
             // determine source key
             let sourceKey: string = field.sourceField;
-            if (
-                (
-                    field.isSourceArray ||
-                    field.isDestinationArray
-                ) &&
-                field.sourceDestinationLevel
-            ) {
-                sourceKey += field.sourceDestinationLevel.join('');
-            }
+            // if (
+            //     (
+            //         field.isSourceArray ||
+            //         field.isDestinationArray
+            //     ) &&
+            //     field.sourceDestinationLevel
+            // ) {
+            //     sourceKey += field.sourceDestinationLevel.join('');
+            // }
 
             // count items
             usedSourceFields[sourceKey] = usedSourceFields[sourceKey] ? usedSourceFields[sourceKey] + 1 : 1;
@@ -2052,5 +1998,20 @@ export class ImportDataComponent
         this.scheduleJob = setTimeout(() => {
             this.runDataScheduleJob();
         }, 800);
+    }
+
+    /**
+     * Set destination level
+     */
+    setDestinationLevel(
+        item: ImportableMapField,
+        levelIndex: number,
+        value: any
+    ): void {
+        // set level
+        item.setSourceDestinationLevel(
+            levelIndex,
+            value ? value.value : value
+        );
     }
 }

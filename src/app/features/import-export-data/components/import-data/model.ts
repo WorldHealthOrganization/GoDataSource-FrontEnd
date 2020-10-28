@@ -351,7 +351,7 @@ export class ImportableMapField {
     readonly: boolean = false;
 
     // source & destination array indexes
-    sourceDestinationLevel: number[] = [0, 0, 0];
+    private _sourceDestinationLevel: number[] = [0, 0, 0];
 
     // used to know how many level selects to render (we need an array of string because we use *ngFor and not for(i=0; i<=numberOfMaxLevels))
     private _numberOfMaxLevels: string[] = [];
@@ -433,7 +433,7 @@ export class ImportableMapField {
     /**
      * Determine number of max levels (max(source & destination))
      */
-    private checkNumberOfMaxLevels() {
+    private checkNumberOfMaxLevels(): void {
         // source
         const sourceArray: any[] = this.sourceField ?
             ( this.sourceField.match(/\[\]/g) || [] ) :
@@ -451,7 +451,7 @@ export class ImportableMapField {
     /**
      * Get options
      */
-    public getOptionsForReadOnlySource(option: IMappedOption): LabelValuePair[] {
+    getOptionsForReadOnlySource(option: IMappedOption): LabelValuePair[] {
         // if not readonly, then there is no point in constructing a list of label / values since it should exist in the main dropdown options
         if (!option.readOnly) {
             return [];
@@ -472,5 +472,51 @@ export class ImportableMapField {
 
         // finished
         return this._readOnlyValues[option.id];
+    }
+
+    /**
+     * Format array of indexes
+     */
+    private formatArrayIndexes(): void {
+        // #TODO
+    }
+
+    /**
+     * Set source destination level
+     */
+    setSourceDestinationLevel(
+        index: number,
+        value: number
+    ): void {
+        // update value
+        this._sourceDestinationLevel[index] = value;
+
+        // format array of indexes
+        this.formatArrayIndexes();
+    }
+
+    /**
+     * Set source destination level
+     */
+    setSourceDestinationLevels(sourceDestinationLevel: number[]): void {
+        // update values
+        this._sourceDestinationLevel = sourceDestinationLevel;
+
+        // format array of indexes
+        this.formatArrayIndexes();
+    }
+
+    /**
+     * We should clone the result since the value should be immutable, since every change should go through setSourceDestinationLevel
+     */
+    getSourceDestinationLevels(): number[] {
+        return this._sourceDestinationLevel;
+    }
+
+    /**
+     * Implemented this way since _sourceDestinationLevel should be immutable
+     */
+    getSourceDestinationLevel(index: number): number {
+        return this._sourceDestinationLevel[index];
     }
 }

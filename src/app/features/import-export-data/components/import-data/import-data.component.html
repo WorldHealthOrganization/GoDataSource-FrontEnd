@@ -322,7 +322,22 @@
                             <!-- Array indexes -->
                             <div
                                 fxFlex="1 1">
-                                Levels...
+                                <div
+                                    *ngIf="item.isSourceArray || item.isDestinationArray"
+                                    fxFlex fxLayout="row" fxLayoutGap="10px">
+                                    <div
+                                        *ngFor="let levelMatch of item.numberOfMaxLevels; let levelIndex = index;"
+                                        fxFlex>
+                                        <app-form-select
+                                            [name]="'sourceDestinationLevel[' + levelIndex + ']'"
+                                            required="true"
+                                            [ngModel]="item.getSourceDestinationLevel(levelIndex)"
+                                            [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE_DESTINATION_LEVEL' | translate"
+                                            [options]="possibleSourceDestinationLevels"
+                                            (optionChanged)="setDestinationLevel(item, levelIndex, $event)">
+                                        </app-form-select>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Actions -->
@@ -486,7 +501,7 @@
                         #sourceControl
                         [name]="'mapObject[' + item.id + '][source]'"
                         app-unique-validator="\]\[source\]$"
-                        [valueReplacer]="formatSourceValueForDuplicatesCallback"
+                        [valueReplacer]="DONEformatSourceValueForDuplicatesCallback"
                         required="true"
                         [ngModel]="item.sourceField"
                         [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
@@ -516,7 +531,7 @@
                                 [ngModel]="item.sourceDestinationLevel[levelIndex]"
                                 [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE_DESTINATION_LEVEL' | translate"
                                 [options]="possibleSourceDestinationLevels"
-                                (optionChanged)="setDestinationLevel(item, levelIndex, $event, sourceControl)">
+                                (optionChanged)="DONEsetDestinationLevel(item, levelIndex, $event, sourceControl)">
                             </app-form-select-change-detection-push>
                         </div>
                     </div>
