@@ -151,7 +151,7 @@
                 <!-- Array indexes -->
                 <div
                     fxFlex="1 1" fxLayoutAlign="start end">
-                    {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_ARRAY_INDEX' | translate }}
+                    {{ 'LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX' | translate }}
                 </div>
 
                 <!-- Actions -->
@@ -253,7 +253,7 @@
                                 <span
                                     *ngIf="item.readonly"
                                     class="import-data-body-row-basic-validation-destination-required">
-                                    {{'LNG_PAGE_IMPORT_DATA_INFO_REQUIRED' | translate}}
+                                    {{'LNG_PAGE_IMPORT_DATA_REQUIRED' | translate}}
                                 </span>
 
                                 <!-- Invalid value ? -->
@@ -267,7 +267,13 @@
                             <!-- Array indexes -->
                             <div
                                 fxFlex="1 1">
-                                Levels...
+
+                                <!-- Invalid array indexes ? -->
+                                <span
+                                    *ngIf="!item.sourceDestinationLevelAreValid">
+                                    {{'LNG_PAGE_IMPORT_DATA_INVALID_ARRAY_INDEX' | translate}}
+                                </span>
+
                             </div>
 
                             <!-- Actions -->

@@ -370,6 +370,12 @@ export class ImportableMapField {
         return this._sourceDestinationLevelForDisplay;
     }
 
+    // source destination levels are valid ?
+    private _sourceDestinationLevelAreValid: boolean = true;
+    get sourceDestinationLevelAreValid(): boolean {
+        return this._sourceDestinationLevelAreValid;
+    }
+
     // source contains array indexes ?
     private _isSourceArray: boolean = false;
     get isSourceArray(): boolean {
@@ -502,6 +508,7 @@ export class ImportableMapField {
      */
     private formatArrayIndexes(): void {
         // no point in continuing ?
+        this._sourceDestinationLevelAreValid = true;
         this._sourceDestinationLevelForDisplay = '';
         this._sourceFieldWithSelectedIndexes = this.sourceField;
         if (
@@ -515,12 +522,29 @@ export class ImportableMapField {
 
         // add indexes
         this._numberOfMaxLevels.forEach((value, index) => {
+            // check level validity
+            if (
+                this._sourceDestinationLevel[index] === undefined ||
+                this._sourceDestinationLevel[index] === null
+            ) {
+                // invalid value
+                this._sourceDestinationLevelAreValid = false;
+
+                // there is no point in continuing since we have invalid value
+                return;
+            }
+
             // add to key
             this._sourceFieldWithSelectedIndexes += this._sourceDestinationLevel[index];
 
             // format array indexes
             this._sourceDestinationLevelForDisplay += `${this._sourceDestinationLevelForDisplay ? ' - ' : ''}${this._sourceDestinationLevel[index] + 1}`;
         });
+
+        // invalid ?
+        if (!this._sourceDestinationLevelAreValid) {
+            this._sourceDestinationLevelForDisplay = '-';
+        }
     }
 
     /**
