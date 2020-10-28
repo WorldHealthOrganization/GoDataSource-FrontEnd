@@ -295,6 +295,35 @@ export class ImportableFileModel {
     }
 }
 
+// ..................
+// ..................
+// ..................
+// ..................
+// ..................
+// ..................
+// ..................
+// ALL NEW METHODS
+// NEED TO CLEANUP ABOVE AFTER FINISH
+// ..................
+// ..................
+// ..................
+// ..................
+// ..................
+// ..................
+// ..................
+// + CLEANUP
+// + CLEANUP
+// + CLEANUP
+// + CLEANUP
+// + CLEANUP
+// + CLEANUP
+// + CLEANUP
+// + CLEANUP
+
+
+/**
+ * Import field option
+ */
 export interface IMappedOption {
     id: string;
     parentId: string;
@@ -303,76 +332,132 @@ export interface IMappedOption {
     readOnly?: boolean;
 }
 
+/**
+ * Import field
+ */
 export class ImportableMapField {
-    public mappedOptions: IMappedOption[] = [];
+    // unique identifier
+    id: string;
 
+    // mapped options
+    mappedOptions: IMappedOption[] = [];
+
+    // read-only values
     private _readOnlyValues: {
         [id: string]: LabelValuePair[]
     } = {};
 
-    public readonly: boolean = false;
+    // item is readonly (required fields) ?
+    readonly: boolean = false;
 
-    public sourceDestinationLevel: number[] = [0, 0, 0];
+    // source & destination array indexes
+    sourceDestinationLevel: number[] = [0, 0, 0];
 
-    public id: string;
+    // used to know how many level selects to render (we need an array of string because we use *ngFor and not for(i=0; i<=numberOfMaxLevels))
+    private _numberOfMaxLevels: string[] = [];
+    get numberOfMaxLevels(): string[] {
+        return this._numberOfMaxLevels;
+    }
 
-    public isSourceArray: boolean = false;
+    // source contains array indexes ?
+    private _isSourceArray: boolean = false;
+    get isSourceArray(): boolean {
+        return this._isSourceArray;
+    }
+
+    // destination contains array indexes ?
+    private _isDestinationArray: boolean = false;
+    get isDestinationArray(): boolean {
+        return this._isDestinationArray;
+    }
+
+    // remove any index data for easy match for distinct values
+    private _sourceFieldWithoutIndexes: string = null;
+    get sourceFieldWithoutIndexes(): string {
+        return this._sourceFieldWithoutIndexes;
+    }
+
+    // source field
     private _sourceField: string = null;
-    public sourceFieldWithoutIndexes = null;
     set sourceField(value: string) {
+        // set source value
         this._sourceField = value;
 
-        // strip [] from teh end since we shouldn't have this case
-        this.sourceFieldWithoutIndexes = this.sourceField ? this.sourceField.replace(/\[\d+]$/g, '') : null;
-        // replace array items with general ...
-        this.sourceFieldWithoutIndexes = this.sourceFieldWithoutIndexes ? this.sourceFieldWithoutIndexes.replace(/\[\d+\]/g, '[]') : this.sourceFieldWithoutIndexes;
+        // strip [] from the end since we shouldn't have this case
+        this._sourceFieldWithoutIndexes = this.sourceField ? this.sourceField.replace(/\[\d+]$/g, '') : null;
 
-        this.isSourceArray = this.sourceField ? this.sourceField.indexOf('[]') > -1 : false;
+        // replace array items with general ...
+        this._sourceFieldWithoutIndexes = this.sourceFieldWithoutIndexes ? this.sourceFieldWithoutIndexes.replace(/\[\d+\]/g, '[]') : this.sourceFieldWithoutIndexes;
+
+        // determine if source contains array index ?
+        this._isSourceArray = this.sourceField ? this.sourceField.indexOf('[]') > -1 : false;
+
+        // determine number of max levels
         this.checkNumberOfMaxLevels();
     }
     get sourceField(): string {
         return this._sourceField;
     }
 
-    public isDestinationArray: boolean = false;
+    // destination field
     private _destinationField: string = null;
     set destinationField(value: string) {
+        // set destination value
         this._destinationField = value;
-        this.isDestinationArray = this.destinationField ? this.destinationField.indexOf('[]') > -1 : false;
+
+        // determine if destination contains array index ?
+        this._isDestinationArray = this.destinationField ? this.destinationField.indexOf('[]') > -1 : false;
+
+        // determine number of max levels
         this.checkNumberOfMaxLevels();
     }
     get destinationField(): string {
         return this._destinationField;
     }
 
-    numberOfMaxLevels: any[] = [];
-
+    /**
+     * Constructor
+     */
     constructor(
         destinationField: string = null,
         sourceField: string = null
     ) {
+        // generate unique id
         this.id = uuid();
+
+        // set source & destination
         this.destinationField = destinationField;
         this.sourceField = sourceField;
     }
 
-    checkNumberOfMaxLevels() {
+    /**
+     * Determine number of max levels (max(source & destination))
+     */
+    private checkNumberOfMaxLevels() {
+        // source
         const sourceArray: any[] = this.sourceField ?
             ( this.sourceField.match(/\[\]/g) || [] ) :
             [];
+
+        // destination
         const destinationArray: any[] = this.destinationField ?
             ( this.destinationField.match(/\[\]/g) || [] ) :
             [];
-        this.numberOfMaxLevels = sourceArray.length < destinationArray.length ? destinationArray : sourceArray;
+
+        // determine number of max levels
+        this._numberOfMaxLevels = sourceArray.length < destinationArray.length ? destinationArray : sourceArray;
     }
 
+    /**
+     * Get options
+     */
     public getOptionsForReadOnlySource(option: IMappedOption): LabelValuePair[] {
         // if not readonly, then there is no point in constructing a list of label / values since it should exist in the main dropdown options
         if (!option.readOnly) {
             return [];
         }
 
-        // do we need to init / reinit the options ?
+        // do we need to init / re-init the options ?
         if (
             !this._readOnlyValues[option.id] ||
             this._readOnlyValues[option.id][0].value !== option.sourceOption

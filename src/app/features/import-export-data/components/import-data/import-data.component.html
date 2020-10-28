@@ -148,6 +148,12 @@
                     {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_INFORMATION' | translate }}
                 </div>
 
+                <!-- Array indexes -->
+                <div
+                    fxFlex="1 1" fxLayoutAlign="start end">
+                    {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_ARRAY_INDEX' | translate }}
+                </div>
+
                 <!-- Actions -->
                 <div
                     fxFlex="50px">
@@ -202,6 +208,12 @@
                                 {{ item.destinationField ? importableObject.modelPropertiesKeyValueMap[item.destinationField] : '-' }}
                             </div>
 
+                            <!-- Array indexes -->
+                            <div
+                                fxFlex="1 1">
+                                Levels...
+                            </div>
+
                             <!-- Actions -->
                             <div
                                 fxFlex="50px">
@@ -251,6 +263,12 @@
 
                             </div>
 
+                            <!-- Array indexes -->
+                            <div
+                                fxFlex="1 1">
+                                Levels...
+                            </div>
+
                             <!-- Actions -->
                             <div
                                 fxFlex="50px">
@@ -278,7 +296,7 @@
                             <div
                                 fxFlex="1 1">
                                 <app-form-select
-                                    [name]="'mapObject[' + item.id + '][source]'"
+                                    name="mapObjectSource"
                                     required="true"
                                     [ngModel]="item.sourceField"
                                     [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
@@ -291,7 +309,7 @@
                             <div
                                 fxFlex="1 1">
                                 <app-form-select
-                                    [name]="'mapObject[' + item.id + '][destination]'"
+                                    name="mapObjectDestination"
                                     required="true"
                                     [ngModel]="item.destinationField"
                                     [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
@@ -299,6 +317,12 @@
                                     (optionChanged)="setSourceDestinationValueAndDetermineOptions(item, 'destinationField', $event)"
                                     [disabled]="item.readonly">
                                 </app-form-select>
+                            </div>
+
+                            <!-- Array indexes -->
+                            <div
+                                fxFlex="1 1">
+                                Levels...
                             </div>
 
                             <!-- Actions -->
@@ -368,7 +392,7 @@
                                     <div
                                         fxFlex="1 1">
                                         <app-form-select
-                                            [name]="'mapObject[' + item.id + '][options][' + mappedOpt.id + '][sourceOption]'"
+                                            name="mapObjectOptionsSource"
                                             required="true"
                                             [ngModel]="mappedOpt.sourceOption"
                                             [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
@@ -381,7 +405,7 @@
                                     <div
                                         fxFlex="1 1">
                                         <app-form-select
-                                            [name]="'mapObject[' + item.id + '][options][' + mappedOpt.id + '][destinationOption]'"
+                                            name="mapObjectOptionsDestination"
                                             required="true"
                                             [ngModel]="mappedOpt.destinationOption"
                                             [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"

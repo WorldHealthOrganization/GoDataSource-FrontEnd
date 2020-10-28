@@ -76,6 +76,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_BUTTON_REMOVE': 'Remove',
         'LNG_PAGE_IMPORT_DATA_BUTTON_CANCEL': 'Cancel',
         'LNG_PAGE_IMPORT_DATA_INFO_REQUIRED': 'Field required',
+        'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_ARRAY_INDEX': 'Array indexes',
 
         /**
          * uiClustersListPage

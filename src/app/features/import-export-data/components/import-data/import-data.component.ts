@@ -1408,7 +1408,7 @@ export class ImportDataComponent
                 // filter out items that aren't mapped out
                 // make not match value appear but ignored when sent to server, this way we can save import mappings without loosing old values
                 _.each(mapField.mappedOptions, (
-                    item: { sourceOption?: string, readOnly?: boolean }
+                    item: IMappedOption
                 ) => {
                     if (item.sourceOption && !optionValuesMap[item.sourceOption]) {
                         item.readOnly = true;
