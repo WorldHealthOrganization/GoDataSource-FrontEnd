@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FileItem, FileLikeObject, FileUploader } from 'ng2-file-upload';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -61,7 +61,8 @@ enum ImportServerErrorCodes {
     templateUrl: './import-data.component.html',
     styleUrls: ['./import-data.component.less']
 })
-export class ImportDataComponent implements OnInit {
+export class ImportDataComponent
+    implements OnInit, OnDestroy {
     /**
      * Extension mapped to mimes
      */
@@ -496,6 +497,15 @@ export class ImportDataComponent implements OnInit {
         })
     ];
 
+    // job schedule handler
+    private scheduleJob: NodeJS.Timer;
+    private determineTableDataMaxHeightJob: NodeJS.Timer;
+
+    // used to determine duplicate selections
+    usedSourceFields: {
+        [source: string]: number
+    } = {};
+
     /**
      * Constructor
      * @param snackbarService
@@ -728,6 +738,9 @@ export class ImportDataComponent implements OnInit {
 
                 // determine height of table rows ?
                 this.determineTableDataMaxHeight();
+
+                // start schedule job
+                this.runDataScheduleJob();
 
                 // required fields
                 const mapOfRequiredDestinationFields = this.requiredDestinationFieldsMap ? _.clone(this.requiredDestinationFieldsMap) : {};
@@ -1104,6 +1117,14 @@ export class ImportDataComponent implements OnInit {
                 this.progress = null;
             }
         };
+    }
+
+    /**
+     * Component destroyed
+     */
+    ngOnDestroy() {
+        this.stopDataScheduleJob();
+        this.stopTableDataMaxHeight();
     }
 
     /**
@@ -1762,16 +1783,29 @@ export class ImportDataComponent implements OnInit {
 // + CLEANUP LNG_...nefolosite...
 
     /**
+     * Stop previous job
+     */
+    private stopTableDataMaxHeight(): void {
+        if (this.determineTableDataMaxHeightJob) {
+            clearTimeout(this.determineTableDataMaxHeightJob);
+            this.determineTableDataMaxHeightJob = undefined;
+        }
+    }
+
+    /**
      * Determine import data max height
      */
     private determineTableDataMaxHeight(): void {
+        // stop previous job
+        this.stopTableDataMaxHeight();
+
         // check if map fields are visible
         // wait for mappedDataTable to be initialized
         if (!this.areMapFieldVisible) {
             // wait
-            setTimeout(() => {
+            this.determineTableDataMaxHeightJob = setTimeout(() => {
                 this.determineTableDataMaxHeight();
-            });
+            }, 200);
 
             // finished
             return;
@@ -1957,5 +1991,66 @@ export class ImportDataComponent implements OnInit {
 
                 }
             });
+    }
+
+    /**
+     * Stop schedule job
+     */
+    private stopDataScheduleJob(): void {
+        if (this.scheduleJob) {
+            clearTimeout(this.scheduleJob);
+            this.scheduleJob = undefined;
+        }
+    }
+
+    /**
+     * Used to do periodic management of data (not perfect, but otherwise we would need to rethink most of the above logic)
+     */
+    private runDataScheduleJob(): void {
+        // stop previous job
+        this.stopDataScheduleJob();
+
+        //  no point in continuing ?
+        if (!this.areMapFieldVisible) {
+            this.scheduleJob = setTimeout(() => {
+                this.runDataScheduleJob();
+            }, 800);
+        }
+
+        // go through map fields and determine mapped sources
+        const usedSourceFields: {
+            [source: string]: number
+        } = {};
+        (this.mappedFields || []).forEach((field) => {
+            // no point in continuing if I don't have a source selected
+            if (!field.sourceField) {
+                return;
+            }
+
+            // determine source key
+            let sourceKey: string = field.sourceField;
+            if (
+                (
+                    field.isSourceArray ||
+                    field.isDestinationArray
+                ) &&
+                field.sourceDestinationLevel
+            ) {
+                sourceKey += field.sourceDestinationLevel.join('');
+            }
+
+            // count items
+            usedSourceFields[sourceKey] = usedSourceFields[sourceKey] ? usedSourceFields[sourceKey] + 1 : 1;
+        });
+
+        // change only if values are different so we don't trigger even more binding checks
+        if (!_.isEqual(this.usedSourceFields, usedSourceFields)) {
+            this.usedSourceFields = usedSourceFields;
+        }
+
+        // run again later
+        this.scheduleJob = setTimeout(() => {
+            this.runDataScheduleJob();
+        }, 800);
     }
 }

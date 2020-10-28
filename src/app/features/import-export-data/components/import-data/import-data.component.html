@@ -199,7 +199,7 @@
                             <!-- Destination -->
                             <div
                                 fxFlex="1 1" fxLayoutAlign="start end">
-                                {{ importableObject.modelPropertiesKeyValueMap[item.destinationField] }}
+                                {{ item.destinationField ? importableObject.modelPropertiesKeyValueMap[item.destinationField] : '-' }}
                             </div>
 
                             <!-- Actions -->
@@ -216,20 +216,39 @@
                             <!-- Source -->
                             <div
                                 class="import-data-body-row-basic-validation-source"
-                                fxFlex="1 1" fxLayoutAlign="start end">
-                                <!-- placeholder -->
+                                fxFlex="1 1" fxLayout="row" fxLayoutGap="20px">
+
+                                <!-- Invalid value ? -->
+                                <span
+                                    *ngIf="!item.sourceField">
+                                    {{'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate}}
+                                </span>
+
+                                <!-- Duplicate source ? -->
+                                <span
+                                    *ngIf="item.sourceField && usedSourceFields[item.sourceField] > 1">
+                                    {{'LNG_FORM_VALIDATION_ERROR_DUPLICATE_VALUE' | translate}}
+                                </span>
+
                             </div>
 
                             <!-- Destination -->
                             <div
                                 class="import-data-body-row-basic-validation-destination"
-                                fxFlex="1 1" fxLayoutAlign="start end">
+                                fxFlex="1 1" fxLayout="row" fxLayoutGap="20px">
 
                                 <!-- Required ? -->
                                 <span
                                     *ngIf="item.readonly">
                                     {{'LNG_PAGE_IMPORT_DATA_INFO_REQUIRED' | translate}}
                                 </span>
+
+                                <!-- Invalid value ? -->
+                                <span
+                                    *ngIf="!item.destinationField">
+                                    {{'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate}}
+                                </span>
+
                             </div>
 
                             <!-- Actions -->
@@ -266,12 +285,6 @@
                                     [options]="importableObject.fileHeadersKeyValue"
                                     (optionChanged)="setSourceDestinationValueAndDetermineOptions(item, 'sourceField', $event)">
                                 </app-form-select>
-                            </div>
-
-                            <!-- Info -->
-                            <div
-                                fxFlex="16px" fxLayoutAlign="center">
-                                <!-- placeholder -->
                             </div>
 
                             <!-- Destination -->
