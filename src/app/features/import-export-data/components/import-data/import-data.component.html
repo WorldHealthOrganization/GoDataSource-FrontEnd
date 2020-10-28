@@ -89,7 +89,7 @@
     <!-- Map fields -->
     <div
         *ngIf="areMapFieldVisible"
-        fxLayout="column" fxLayoutGap="30px"
+        fxLayout="column"
         class="import-data-map-fields">
         <div
             *ngIf="savedImportPage"
@@ -367,10 +367,33 @@
                     </div>
 
                 </div>
+
             </cdk-virtual-scroll-viewport>
+
         </div>
 
+        <!-- Action buttons -->
+        <div
+            class="import-data-action-buttons"
+            fxLayout="row" fxLayoutAlign="end" fxLayoutGap="10px">
+            <!-- Save import mapping -->
+            <button
+                *ngIf="savedImportPage"
+                (click)="saveImportMapping()"
+                type="button"
+                mat-raised-button
+                color="accent">
+                {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_SAVE_IMPORT_MAPPING' | translate }}
+            </button>
 
+            <!-- Map field sub-options / Import -->
+            <button
+                mat-raised-button
+                color="accent"
+                type="submit">
+                {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_IMPORT_FILE' | translate }}
+            </button>
+        </div>
 
 
 

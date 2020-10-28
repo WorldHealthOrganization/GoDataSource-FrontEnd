@@ -1778,7 +1778,7 @@ export class ImportDataComponent implements OnInit {
         }
 
         // determine data height
-        this.importDataBodyRowsMaxHeight = this.domSanitizer.bypassSecurityTrustStyle(`calc(100vh - (${this.mappedDataTable.nativeElement.getBoundingClientRect().top}px + 90px))`);
+        this.importDataBodyRowsMaxHeight = this.domSanitizer.bypassSecurityTrustStyle(`calc(100vh - (${this.mappedDataTable.nativeElement.getBoundingClientRect().top}px + 150px))`);
 
         // update virtual scroll height
         setTimeout(() => {

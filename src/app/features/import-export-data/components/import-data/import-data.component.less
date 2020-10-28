@@ -96,6 +96,8 @@ app-import-data {
     }
 
     .import-data-map-fields {
+        @hover-index: 1000;
+        @hover-bg-color: white;
         .import-data-header-row {
             font-weight: bold;
             font-size: 16px;
@@ -104,14 +106,22 @@ app-import-data {
             padding-bottom: 5px;
 
             // hack to display it on top of hover actions
-            z-index: 1000;
-            background: white;
+            z-index: @hover-index;
+            background: @hover-bg-color;
 
             // trick to have the same column width no matter of the browser used
             overflow-y: scroll;
             &::-webkit-scrollbar {
                 background: transparent;
             }
+        }
+
+        .import-data-action-buttons {
+            padding-top: 20px;
+
+            // hack to display it on top of hover actions
+            z-index: @hover-index;
+            background: @hover-bg-color;
         }
 
         .import-data-body-rows {
