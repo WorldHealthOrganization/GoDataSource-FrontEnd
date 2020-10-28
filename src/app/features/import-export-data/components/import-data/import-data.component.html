@@ -211,7 +211,7 @@
                             <!-- Array indexes -->
                             <div
                                 fxFlex="1 1">
-                                Levels...
+                                {{ item.sourceDestinationLevelForDisplay }}
                             </div>
 
                             <!-- Actions -->
@@ -251,7 +251,8 @@
 
                                 <!-- Required ? -->
                                 <span
-                                    *ngIf="item.readonly">
+                                    *ngIf="item.readonly"
+                                    class="import-data-body-row-basic-validation-destination-required">
                                     {{'LNG_PAGE_IMPORT_DATA_INFO_REQUIRED' | translate}}
                                 </span>
 

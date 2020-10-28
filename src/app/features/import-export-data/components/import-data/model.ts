@@ -23,7 +23,8 @@ export interface IFileArrayProperties {
 export class ImportableLabelValuePair {
     constructor(
         public label: string,
-        public value: string
+        public value: string,
+        public tooltip?: string
     ) {}
 }
 
@@ -175,6 +176,7 @@ export class ImportableFileModel {
             .map((value: string) => {
                 return new ImportableLabelValuePair(
                     value,
+                    value,
                     value
                 );
             })
@@ -204,6 +206,9 @@ export class ImportableFileModel {
                         this.modelPropertyValues,
                         impLVPair.value
                     );
+
+                    // add tooltip
+                    impLVPair.tooltip = impLVPair.label;
 
                     // add to list of filters to which we can push data
                     result.push(impLVPair);
@@ -359,6 +364,12 @@ export class ImportableMapField {
         return this._numberOfMaxLevels;
     }
 
+    // array indexes formatted for display
+    private _sourceDestinationLevelForDisplay: string;
+    get sourceDestinationLevelForDisplay(): string {
+        return this._sourceDestinationLevelForDisplay;
+    }
+
     // source contains array indexes ?
     private _isSourceArray: boolean = false;
     get isSourceArray(): boolean {
@@ -491,6 +502,7 @@ export class ImportableMapField {
      */
     private formatArrayIndexes(): void {
         // no point in continuing ?
+        this._sourceDestinationLevelForDisplay = '';
         this._sourceFieldWithSelectedIndexes = this.sourceField;
         if (
             !this.sourceField || (
@@ -503,7 +515,11 @@ export class ImportableMapField {
 
         // add indexes
         this._numberOfMaxLevels.forEach((value, index) => {
+            // add to key
             this._sourceFieldWithSelectedIndexes += this._sourceDestinationLevel[index];
+
+            // format array indexes
+            this._sourceDestinationLevelForDisplay += `${this._sourceDestinationLevelForDisplay ? ' - ' : ''}${this._sourceDestinationLevel[index] + 1}`;
         });
     }
 
