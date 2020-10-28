@@ -1974,16 +1974,7 @@ export class ImportDataComponent
             }
 
             // determine source key
-            let sourceKey: string = field.sourceField;
-            // if (
-            //     (
-            //         field.isSourceArray ||
-            //         field.isDestinationArray
-            //     ) &&
-            //     field.sourceDestinationLevel
-            // ) {
-            //     sourceKey += field.sourceDestinationLevel.join('');
-            // }
+            const sourceKey: string = field.sourceFieldWithSelectedIndexes;
 
             // count items
             usedSourceFields[sourceKey] = usedSourceFields[sourceKey] ? usedSourceFields[sourceKey] + 1 : 1;

@@ -377,6 +377,12 @@ export class ImportableMapField {
         return this._sourceFieldWithoutIndexes;
     }
 
+    // source with selected indexes
+    private _sourceFieldWithSelectedIndexes: string;
+    get sourceFieldWithSelectedIndexes(): string {
+        return this._sourceFieldWithSelectedIndexes;
+    }
+
     // source field
     private _sourceField: string = null;
     set sourceField(value: string) {
@@ -394,6 +400,9 @@ export class ImportableMapField {
 
         // determine number of max levels
         this.checkNumberOfMaxLevels();
+
+        // format array of indexes
+        this.formatArrayIndexes();
     }
     get sourceField(): string {
         return this._sourceField;
@@ -410,6 +419,9 @@ export class ImportableMapField {
 
         // determine number of max levels
         this.checkNumberOfMaxLevels();
+
+        // format array of indexes
+        this.formatArrayIndexes();
     }
     get destinationField(): string {
         return this._destinationField;
@@ -478,7 +490,21 @@ export class ImportableMapField {
      * Format array of indexes
      */
     private formatArrayIndexes(): void {
-        // #TODO
+        // no point in continuing ?
+        this._sourceFieldWithSelectedIndexes = this.sourceField;
+        if (
+            !this.sourceField || (
+                !this.isSourceArray &&
+                !this.isDestinationArray
+            )
+        ) {
+            return;
+        }
+
+        // add indexes
+        this._numberOfMaxLevels.forEach((value, index) => {
+            this._sourceFieldWithSelectedIndexes += this._sourceDestinationLevel[index];
+        });
     }
 
     /**
