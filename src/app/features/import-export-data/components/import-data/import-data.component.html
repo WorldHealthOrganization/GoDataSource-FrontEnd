@@ -142,12 +142,6 @@
                     {{ 'LNG_PAGE_IMPORT_DATA_LABEL_SOURCE_FILE_INFORMATION' | translate }}
                 </div>
 
-                <!-- Info -->
-                <div
-                    fxFlex="16px">
-                    <!-- placeholder -->
-                </div>
-
                 <!-- Destination -->
                 <div
                     fxFlex="1 1" fxLayoutAlign="start end">
@@ -185,38 +179,65 @@
                     <div
                         *ngIf="item !== elementInEditMode; else editMode"
                         class="import-data-body-row-basic"
-                        fxLayout="row" fxLayoutGap="10px"
+                        fxLayout="column"
                         app-hover-row-actions
                         [hoverRowActionsComponent]="hoverRow"
                         [hoverRowActions]="recordActions"
                         [hoverRowActionData]="item"
                         [hoverRowActionIndex]="elementIndex">
 
-                        <!-- Source -->
+                        <!-- Data -->
                         <div
-                            fxFlex="1 1" fxLayoutAlign="start center">
-                            {{ item.sourceField ? item.sourceField : '-' }}
+                            class="import-data-body-row-basic-data"
+                            fxLayout="row" fxLayoutGap="10px">
+                            <!-- Source -->
+                            <div
+                                fxFlex="1 1" fxLayoutAlign="start end">
+                                {{ item.sourceField ? item.sourceField : '-' }}
+                            </div>
+
+                            <!-- Destination -->
+                            <div
+                                fxFlex="1 1" fxLayoutAlign="start end">
+                                {{ importableObject.modelPropertiesKeyValueMap[item.destinationField] }}
+                            </div>
+
+                            <!-- Actions -->
+                            <div
+                                fxFlex="50px">
+                                <!-- placeholder -->
+                            </div>
                         </div>
 
-                        <!-- Info -->
+                        <!-- Validation Info -->
                         <div
-                            fxFlex="16px" fxLayoutAlign="center">
-                            <span
-                                *ngIf="item.readonly"
-                                [matTooltip]="'LNG_PAGE_IMPORT_DATA_INFO_REQUIRED' | translate"
-                                class="xt-icon import-data-body-row-basic-info">info</span>
-                        </div>
+                            class="import-data-body-row-basic-validation">
 
-                        <!-- Destination -->
-                        <div
-                            fxFlex="1 1" fxLayoutAlign="start center">
-                            {{ importableObject.modelPropertiesKeyValueMap[item.destinationField] }}
-                        </div>
+                            <!-- Source -->
+                            <div
+                                class="import-data-body-row-basic-validation-source"
+                                fxFlex="1 1" fxLayoutAlign="start end">
+                                <!-- placeholder -->
+                            </div>
 
-                        <!-- Actions -->
-                        <div
-                            fxFlex="50px">
-                            <!-- placeholder -->
+                            <!-- Destination -->
+                            <div
+                                class="import-data-body-row-basic-validation-destination"
+                                fxFlex="1 1" fxLayoutAlign="start end">
+
+                                <!-- Required ? -->
+                                <span
+                                    *ngIf="item.readonly">
+                                    {{'LNG_PAGE_IMPORT_DATA_INFO_REQUIRED' | translate}}
+                                </span>
+                            </div>
+
+                            <!-- Actions -->
+                            <div
+                                fxFlex="50px">
+                                <!-- placeholder -->
+                            </div>
+
                         </div>
                     </div>
 
@@ -382,7 +403,8 @@
                 (click)="saveImportMapping()"
                 type="button"
                 mat-raised-button
-                color="accent">
+                color="accent"
+                [disabled]="true">
                 {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_SAVE_IMPORT_MAPPING' | translate }}
             </button>
 
@@ -390,7 +412,8 @@
             <button
                 mat-raised-button
                 color="accent"
-                type="submit">
+                type="submit"
+                [disabled]="true">
                 {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_IMPORT_FILE' | translate }}
             </button>
         </div>

@@ -1,3 +1,5 @@
+@import '~styles/common';
+
 app-import-data {
     @app-import-data-height: 305px;
     .import-data-loading {
@@ -134,10 +136,27 @@ app-import-data {
                 border-bottom: 1px solid #CCC;
 
                 .import-data-body-row-basic {
-                    padding: 10px 0;
+                    padding: 0;
+                    margin: 0;
 
-                    .import-data-body-row-basic-info {
-                        font-size: 16px;
+                    .import-data-body-row-basic-data {
+                        margin-top: 7px;
+                    }
+
+                    .import-data-body-row-basic-validation {
+                        margin-top: 3px;
+                        margin-bottom: 10px;
+                        font-size: 12px;
+                        font-weight: bold;
+                        color: @color-error;
+
+                        .import-data-body-row-basic-validation-source {
+                            padding-left: 30px;
+                        }
+
+                        .import-data-body-row-basic-validation-destination {
+                            padding-left: 30px;
+                        }
                     }
                 }
 
