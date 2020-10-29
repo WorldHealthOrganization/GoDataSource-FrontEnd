@@ -500,87 +500,9 @@
             (submit)="importData(form)"
             fxLayout="column">
             <div
-                class="import-data-map-fields-header-columns"
-                fxLayout="row" fxLayoutGap="20px"
-            >
-                <div fxFlex>
-                    {{ 'LNG_PAGE_IMPORT_DATA_LABEL_SOURCE_FILE_INFORMATION' | translate }}
-                </div>
-                <div fxFlex>
-                    {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_INFORMATION' | translate }}
-                </div>
-                <div fxFlex="70px">
-                    <!-- placeholder -->
-                </div>
-            </div>
-            <div
                 *ngFor="let item of mappedFields; trackBy: trackByFieldID; let indexMapField = index;"
                 fxLayout="column"
             >
-                <div fxLayout="row" fxLayoutGap="20px">
-                    <app-form-select-change-detection-push
-                        #sourceControl
-                        [name]="'mapObject[' + item.id + '][source]'"
-                        app-unique-validator="\]\[source\]$"
-                        [valueReplacer]="DONEformatSourceValueForDuplicatesCallback"
-                        required="true"
-                        [ngModel]="item.sourceField"
-                        [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
-                        [options]="importableObject.fileHeadersKeyValue"
-                        (optionChanged)="setSourceDestinationValueAndDetermineOptions(item, 'sourceField', $event)">
-                    </app-form-select-change-detection-push>
-
-                    <app-form-select-change-detection-push
-                        [name]="'mapObject[' + item.id + '][destination]'"
-                        required="true"
-                        [ngModel]="item.destinationField"
-                        [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
-                        [options]="importableObject.modelPropertiesKeyValue"
-                        (optionChanged)="setSourceDestinationValueAndDetermineOptions(item, 'destinationField', $event)"
-                        [disabled]="item.readonly">
-                    </app-form-select-change-detection-push>
-
-                    <div
-                        *ngIf="item.isSourceArray || item.isDestinationArray"
-                        fxFlex fxLayout="row" fxLayoutGap="20px">
-                        <div
-                            *ngFor="let levelMatch of item.numberOfMaxLevels; let levelIndex = index;"
-                            fxFlex>
-                            <app-form-select-change-detection-push
-                                [name]="'mapObject[' + item.id + '][sourceDestinationLevel][' + levelIndex + ']'"
-                                required="true"
-                                [ngModel]="item.sourceDestinationLevel[levelIndex]"
-                                [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE_DESTINATION_LEVEL' | translate"
-                                [options]="possibleSourceDestinationLevels"
-                                (optionChanged)="DONEsetDestinationLevel(item, levelIndex, $event, sourceControl)">
-                            </app-form-select-change-detection-push>
-                        </div>
-                    </div>
-
-                    <div
-                        fxFlex="80px">
-                        <ng-container
-                            *ngIf="!item.readonly">
-                            <!-- Clone -->
-                            <button
-                                mat-icon-button
-                                color="accent"
-                                (click)="DONEcloneFieldMap(indexMapField)"
-                                type="button">
-                                <span class="xt-icon">fileCopy</span>
-                            </button>
-
-                            <!-- Delete -->
-                            <button
-                                mat-icon-button
-                                color="warn"
-                                (click)="DONEremoveFieldMap(indexMapField)"
-                                type="button">
-                                <span class="xt-icon">delete</span>
-                            </button>
-                        </ng-container>
-                    </div>
-                </div>
                 <div
                     *ngIf="
                         importableObject.distinctFileColumnValuesKeyValue &&
@@ -631,60 +553,11 @@
                             </app-form-location-dropdown>
                         </ng-template>
 
-                        <div fxFlex="70px">
-                            <button
-                                mat-icon-button
-                                color="warn"
-                                (click)="DONEremoveOptionMap(indexMapField, indexMapOption)"
-                                type="button">
-                                <span class="xt-icon">delete</span>
-                            </button>
-                        </div>
                     </div>
 
-                    <div fxLayout="row" fxLayoutAlign="center">
-                        <button
-                            *ngIf="item.mappedOptions.length < importableObject.distinctFileColumnValuesKeyValue[item.sourceFieldWithoutIndexes].length"
-                            mat-raised-button
-                            color="accent"
-                            (click)="DONEaddNewOptionMap(indexMapField)"
-                            type="button">
-                            <span class="xt-icon">addCircle</span>
-                            {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD_OPTION' | translate }}
-                        </button>
-                    </div>
                 </div>
             </div>
 
-            <div fxLayout="row" fxLayoutAlign="center">
-                <button
-                    mat-raised-button
-                    color="accent"
-                    (click)="DONEaddNewFieldMap()"
-                    type="button">
-                    <span class="xt-icon">addCircle</span>
-                    {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD' | translate }}
-                </button>
-            </div>
-
-            <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="10px">
-                <button
-                    *ngIf="savedImportPage"
-                    (click)="saveImportMapping()"
-                    type="button"
-                    mat-raised-button
-                    color="accent">
-                    {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_SAVE_IMPORT_MAPPING' | translate }}
-                </button>
-
-                <button
-                    mat-raised-button
-                    color="accent"
-                    type="submit">
-                    {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_IMPORT_FILE' | translate }}
-                </button>
-
-            </div>
         </form>
     </div>
 
