@@ -453,7 +453,7 @@ export class ImportDataComponent
         // Cancel Modify
         new HoverRowAction({
             icon: 'close',
-            iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_CANCEL',
+            iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_CLOSE_MODIFY',
             visible: (item: ImportableMapField | IMappedOption): boolean => {
                 return this.elementInEditMode === item;
             },
@@ -498,6 +498,11 @@ export class ImportDataComponent
     // used to determine duplicate selections
     usedSourceFields: {
         [source: string]: number
+    } = {};
+
+    // distinct values cache
+    distinctValuesCache: {
+        [fileHeader: string]: ImportableLabelValuePair[]
     } = {};
 
     /**
@@ -703,6 +708,7 @@ export class ImportDataComponent
                 }
 
                 // construct importable file object
+                this.distinctValuesCache = {};
                 this.importableObject = new ImportableFileModel(
                     jsonResponse,
                     (token: string): string => {
@@ -1682,6 +1688,7 @@ export class ImportDataComponent
      * Reset form & try again
      */
     tryAgain() {
+        this.distinctValuesCache = {};
         this.importableObject = null;
         this.errMsgDetails = null;
         this.uploader.clearQueue();
@@ -2003,5 +2010,42 @@ export class ImportDataComponent
             levelIndex,
             value ? value.value : value
         );
+    }
+
+    /**
+     * Retrieve distinct values used to map fields
+     */
+    retrieveDistinctValues(): void {
+        // determine file headers for which we need to retrieve distinct values
+        const distinctValuesForKeys: string[] = [];
+        this.mappedFields.forEach((field) => {
+            // there is no point in retrieving unique values for items that don't need mapping
+            // or already retrieved
+            if (
+                !field.sourceFieldWithoutIndexes || (
+                    !this.importableObject.modelPropertyValuesMap[field.destinationField] &&
+                    !this.addressFields[field.destinationField]
+                ) ||
+                this.distinctValuesCache[field.sourceFieldWithoutIndexes]
+            ) {
+                return;
+            }
+
+            // add to list of items to retrieve distinct values for
+            distinctValuesForKeys.push(field.sourceFieldWithoutIndexes);
+        });
+
+        // nothing to retrieve ?
+        if (distinctValuesForKeys.length < 1) {
+            return;
+        }
+
+        // show loading
+        // #TODO
+
+        // retrieve items
+        // #TODO
+        // this.distinctValuesCache[field.sourceFieldWithoutIndexes]
+        console.log(distinctValuesForKeys);
     }
 }

@@ -74,7 +74,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_BUTTON_MODIFY': 'Modify',
         'LNG_PAGE_IMPORT_DATA_BUTTON_CLONE': 'Clone',
         'LNG_PAGE_IMPORT_DATA_BUTTON_REMOVE': 'Remove',
-        'LNG_PAGE_IMPORT_DATA_BUTTON_CANCEL': 'Cancel',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_CLOSE_MODIFY': 'Hide modify',
         'LNG_PAGE_IMPORT_DATA_REQUIRED': 'Field required',
         'LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX': 'Array indexes',
         'LNG_PAGE_IMPORT_DATA_INVALID_ARRAY_INDEX': 'Invalid indexes',

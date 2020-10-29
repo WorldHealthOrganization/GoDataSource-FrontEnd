@@ -308,11 +308,6 @@ export class ImportableFileModel {
         this.distinctFileColumnValuesKeyValue = {};
         const distinctFileColumnValues = _.get(data, 'distinctFileColumnValues', {});
         _.each(distinctFileColumnValues, (values: string[], property: string) => {
-            // sanitize property
-            property = property.replace(/\[\d+]$/g, '');
-            property = property.replace(/\[\d+\]/g, '[]');
-
-            // set distinct values
             this.distinctFileColumnValuesKeyValue[property] = _.map(
                 values,
                 (value: string) => {

@@ -470,6 +470,16 @@
         <div
             class="import-data-action-buttons"
             fxLayout="row" fxLayoutAlign="end" fxLayoutGap="10px">
+            <!-- TEST -->
+            <button
+                (click)="retrieveDistinctValues()"
+                type="button"
+                mat-raised-button
+                color="accent">
+                TEST
+            </button>
+
+
             <!-- Save import mapping -->
             <button
                 *ngIf="savedImportPage"
