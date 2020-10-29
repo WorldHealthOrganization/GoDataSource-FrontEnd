@@ -1,6 +1,5 @@
 import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { ControlContainer } from '@angular/forms';
-import * as _ from 'lodash';
 import { ElementBaseFailure } from '../../core';
 
 @Component({

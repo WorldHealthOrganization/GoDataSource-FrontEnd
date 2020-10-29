@@ -41,45 +41,57 @@ export class ImportableFilePropertyValuesModel {
 
 
 export class ImportableFileModel {
-    id: string;
-    fileHeaders: string[] = [];
-    fileHeadersKeyValue: ImportableLabelValuePair[];
+    // file id
+    readonly id: string;
 
-    fileArrayHeaders: {
+    // file headers
+    readonly fileHeaders: string[] = [];
+
+    // file headers - label / value pair
+    readonly fileHeadersKeyValue: ImportableLabelValuePair[];
+
+    // file array headers - used to handle array headers
+    readonly fileArrayHeaders: {
         [headerPathName: string]: IFileArrayProperties
     };
 
-    suggestedFieldMapping: {
+    // API - suggested field mappings
+    readonly suggestedFieldMapping: {
         [fileHeader: string]: string
     };
 
-    modelProperties: ImportableFilePropertiesModel;
-    modelPropertiesKeyValue: ImportableLabelValuePair[];
-    modelPropertiesKeyValueMap: {
+    // model properties
+    readonly modelProperties: ImportableFilePropertiesModel;
+
+    // model properties - key value pair
+    readonly modelPropertiesKeyValue: ImportableLabelValuePair[];
+
+    // model properties - key value map
+    readonly modelPropertiesKeyValueMap: {
         [value: string]: string
     };
 
-    modelPropertyValues: ImportableFilePropertyValuesModel;
-    modelPropertyValuesMap: {
+    // model property values
+    readonly modelPropertyValues: ImportableFilePropertyValuesModel;
+    readonly modelPropertyValuesMap: {
         [modelProperty: string]: {
             id: string;
             label: string;
         }[]
     } = {};
-    modelPropertyValuesMapChildMap: {
+    readonly modelPropertyValuesMapChildMap: {
         [modelProperty: string]: {
             [value: string]: string
         }
     };
 
-    distinctFileColumnValues: {
-        [fileHeader: string]: string[]
-    };
-    distinctFileColumnValuesKeyValue: {
+    // distinct values
+    readonly distinctFileColumnValuesKeyValue: {
         [fileHeader: string]: ImportableLabelValuePair[]
     };
 
-    modelArrayProperties: {
+    // model array properties - questionnaires
+    readonly modelArrayProperties: {
         [propertyPath: string]: IModelArrayProperties
     };
 
@@ -120,6 +132,9 @@ export class ImportableFileModel {
         return object;
     }
 
+    /**
+     * Constructor
+     */
     constructor(
         data = null,
         translate: (string) => string,
@@ -147,15 +162,25 @@ export class ImportableFileModel {
             extraDataUsedToFormat: any
         ) => void
     ) {
+        // file id
         this.id = _.get(data, 'id');
-        this.fileHeaders = (_.get(data, 'fileHeaders', []) || []).map((value: any) => {
+
+        // file headers
+        this.fileHeaders = (_.get(data, 'fileHeaders') || []).map((value: any) => {
             return typeof value === 'string' ? value : value.toString();
         });
+
+        // file array headers
         this.fileArrayHeaders = _.get(data, 'fileArrayHeaders') || [];
+
+        // model properties
         this.modelProperties = _.get(data, 'modelProperties', {});
         this.modelPropertyValues = _.get(data, 'modelPropertyValues', {});
+
+        // suggested mappings
         this.suggestedFieldMapping = _.get(data, 'suggestedFieldMapping', {});
-        this.distinctFileColumnValues = _.get(data, 'distinctFileColumnValues', {});
+
+        // model array properties
         this.modelArrayProperties = _.get(data, 'modelArrayProperties', {});
 
         // format response
@@ -281,7 +306,8 @@ export class ImportableFileModel {
 
         // distinct values
         this.distinctFileColumnValuesKeyValue = {};
-        _.each(this.distinctFileColumnValues, (values: string[], property: string) => {
+        const distinctFileColumnValues = _.get(data, 'distinctFileColumnValues', {});
+        _.each(distinctFileColumnValues, (values: string[], property: string) => {
             // sanitize property
             property = property.replace(/\[\d+]$/g, '');
             property = property.replace(/\[\d+\]/g, '[]');
