@@ -2046,6 +2046,10 @@ export class ImportDataComponent
         // retrieve items
         // #TODO
         // this.distinctValuesCache[field.sourceFieldWithoutIndexes]
-        console.log(distinctValuesForKeys);
+        console.log(
+            distinctValuesForKeys.length,
+            this.mappedFields.length,
+            distinctValuesForKeys
+        );
     }
 }
