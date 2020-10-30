@@ -16,7 +16,7 @@ import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
     }]
 })
 export class FormSelectVscrollComponent
-    extends ElementBase<string> {
+    extends ElementBase<string | number> {
 
     // enable form element
     @HostBinding('class.form-element-host') isFormElement = true;
@@ -66,10 +66,6 @@ export class FormSelectVscrollComponent
     private _filterTimeout: any;
     @Input() filterOptionsPlaceholder: string = 'LNG_COMMON_LABEL_SEARCH';
     @Input() filterOptionsDelayMs: number = 200;
-    @Input() filterOptionsComparator: (
-        searchedValue: string,
-        optionLabel: string
-    ) => boolean;
 
     // selected option
     selectedOption: any;
@@ -89,13 +85,6 @@ export class FormSelectVscrollComponent
             validators,
             asyncValidators
         );
-
-        // set default filter comparator
-        if (!this.filterOptionsComparator) {
-            this.filterOptionsComparator = (searchedValue: string, optionLabel: string): boolean => {
-                return optionLabel.indexOf(searchedValue) > -1;
-            };
-        }
     }
 
     /**
@@ -109,7 +98,7 @@ export class FormSelectVscrollComponent
      * Set value from select option
      * @param {string} value
      */
-    writeValue(value: string) {
+    writeValue(value: string | number) {
         // save initial value
         super.writeValue(value);
 
@@ -136,6 +125,9 @@ export class FormSelectVscrollComponent
 
         // init selected options
         this.initSelectedOption();
+
+        // trigger event
+        return this.optionChanged.emit(this.selectedOption);
     }
 
     /**
@@ -192,7 +184,7 @@ export class FormSelectVscrollComponent
                 translatedValue = translatedValue.toLowerCase();
 
                 // filter
-                return this.filterOptionsComparator(byValue, translatedValue);
+                return translatedValue.indexOf(byValue) > -1;
             });
 
             // reset virtual scroll position
@@ -211,7 +203,10 @@ export class FormSelectVscrollComponent
             this.cdkVirtualScrollViewport &&
             opened
         ) {
-            const optionIndex: number = this.filteredOptions.findIndex((option) => option[this.optionValueKey] === this.value);
+            // scroll to specific position
+            const optionIndex: number = this.value ?
+                this.filteredOptions.findIndex((option) => option[this.optionValueKey] === this.value) :
+                0;
             if (optionIndex > -1) {
                 this.cdkVirtualScrollViewport.scrollToIndex(optionIndex);
             } else {

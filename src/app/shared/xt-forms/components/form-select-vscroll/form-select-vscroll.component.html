@@ -32,8 +32,10 @@
 
             <!-- vscroll -->
             <cdk-virtual-scroll-viewport
+                class="mat-select-virtual-scroll-viewport"
                 [itemSize]="48"
-                class="mat-select-virtual-scroll-viewport">
+                [minBufferPx]="240"
+                [maxBufferPx]="240">
 
                 <!-- Empty option used to select nothing -->
                 <mat-option
@@ -45,7 +47,7 @@
 
                 <!-- Options -->
                 <mat-option
-                    *cdkVirtualFor="let option of filteredOptions; let optionIndex = index"
+                    *cdkVirtualFor="let option of filteredOptions"
                     class="mat-option-vscroll"
                     [value]="option[optionValueKey]"
                     [matTooltip]="option[optionTooltipKey] | translate"
@@ -55,7 +57,7 @@
 
             </cdk-virtual-scroll-viewport>
 
-            <!-- Selected option -->
+            <!-- Selected option hack to handle not visible in virtual scroll options -->
             <mat-option
                 class="mat-option-vscroll-selected"
                 *ngIf="selectedOption"
