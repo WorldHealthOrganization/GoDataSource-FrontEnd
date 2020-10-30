@@ -1,0 +1,23 @@
+app-form-select-vscroll {
+    @position-helper: 24px;
+    .mat-form-field {
+        width: 100%;
+    }
+}
+
+@vscroll-mat-option-height: 48px;
+.mat-option-vscroll {
+    // for virtual scroll
+    height: @vscroll-mat-option-height !important;
+    min-height: @vscroll-mat-option-height !important;;
+    max-height: @vscroll-mat-option-height !important;;
+}
+
+.mat-option-vscroll-selected {
+    visibility: hidden;
+    position: absolute;
+}
+
+.mat-select-virtual-scroll-viewport {
+    height: 192px;
+}

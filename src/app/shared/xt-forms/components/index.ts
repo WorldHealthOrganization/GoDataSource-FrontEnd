@@ -12,12 +12,14 @@ import { FormDateSliderComponent } from './form-date-slider/form-date-slider.com
 import { FormDateRangeSliderComponent } from './form-date-range-slider/form-date-range-slider.component';
 import { FormHiddenInputComponent } from './form-hidden-input/form-hidden-input.component';
 import { FormSelectGroupsComponent } from './form-select-groups/form-select-groups.component';
+import { FormSelectVscrollComponent } from './form-select-vscroll/form-select-vscroll.component';
 
 export const components: any[] = [
     FormValidationComponent,
     FormInputComponent,
     FormTextareaComponent,
     FormSelectComponent,
+    FormSelectVscrollComponent,
     FormDatepickerComponent,
     FormSlideToggleComponent,
     FormCheckboxComponent,

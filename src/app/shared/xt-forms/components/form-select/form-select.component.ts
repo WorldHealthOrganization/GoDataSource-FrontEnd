@@ -81,9 +81,6 @@ export class FormSelectComponent
     // filtered options used to be displayed
     filteredOptions: any[];
 
-    // used to filter select items
-    searchedValue: string = '';
-
     // filter configuration
     private _filterTimeout: any;
     @Input() enableFilterOptions: boolean = true;

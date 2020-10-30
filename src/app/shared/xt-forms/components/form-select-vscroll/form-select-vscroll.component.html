@@ -1,0 +1,74 @@
+<div
+    class="form-element"
+    [ngClass]="{invalid: invalid}">
+
+    <mat-form-field
+        [class.clearable]="clearable && !disabled">
+
+        <mat-select
+            #selectElement="ngModel"
+            [ngModel]="value"
+            [attr.name]="name"
+            [required]="required"
+            [placeholder]="placeholder"
+            (blur)="onBlur()"
+            [disabled]="disabled"
+            (selectionChange)="onChange(selectElement.value)"
+            [disableOptionCentering]="true"
+            (openedChange)="openedChange($event)">
+
+            <!-- Option used to filter options -->
+            <mat-option>
+                <ngx-mat-select-search
+                    [placeholderLabel]="filterOptionsPlaceholder | translate"
+                    [noEntriesFoundLabel]="false"
+                    [clearSearchInput]="true"
+                    ngModel
+                    (ngModelChange)="filterOptions($event)"
+                    [disableScrollToActiveOnOptionsChanged]="true"
+                    [preventHomeEndKeyPropagation]="true">
+                </ngx-mat-select-search>
+            </mat-option>
+
+            <!-- vscroll -->
+            <cdk-virtual-scroll-viewport
+                [itemSize]="48"
+                class="mat-select-virtual-scroll-viewport">
+
+                <!-- Empty option used to select nothing -->
+                <mat-option
+                    *ngIf="clearable"
+                    class="mat-option-vscroll"
+                    [value]="null">
+                    {{ noneLabel | translate }}
+                </mat-option>
+
+                <!-- Options -->
+                <mat-option
+                    *cdkVirtualFor="let option of filteredOptions; let optionIndex = index"
+                    class="mat-option-vscroll"
+                    [value]="option[optionValueKey]"
+                    [matTooltip]="option[optionTooltipKey] | translate"
+                    [disabled]="option[optionDisabledKey]">
+                    {{option[optionLabelKey] | translate}}
+                </mat-option>
+
+            </cdk-virtual-scroll-viewport>
+
+            <!-- Selected option -->
+            <mat-option
+                class="mat-option-vscroll-selected"
+                *ngIf="selectedOption"
+                [value]="value">
+                {{selectedOption[optionLabelKey] | translate}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <app-form-validation
+        *ngIf="invalid"
+        [controlContainer]="controlContainer"
+        [controlName]="name"
+        [messages]="failures">
+    </app-form-validation>
+</div>

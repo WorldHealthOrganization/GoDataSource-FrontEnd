@@ -7,9 +7,9 @@ import { AngularMaterialModule } from '../angular-material/angular-material.modu
 import { TranslateModule } from '@ngx-translate/core';
 import { Ng5SliderModule } from 'ng5-slider';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
-
 import { components } from './components';
 import { validatorDirectives } from './validators';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 @NgModule({
     imports: [
@@ -19,7 +19,8 @@ import { validatorDirectives } from './validators';
         AngularMaterialModule,
         Ng5SliderModule,
         NgxMatSelectSearchModule,
-        TranslateModule
+        TranslateModule,
+        ScrollingModule
     ],
     declarations: [
         ...components,
@@ -32,6 +33,7 @@ import { validatorDirectives } from './validators';
         FlexLayoutModule,
         AngularMaterialModule,
         Ng5SliderModule,
+        ScrollingModule,
         ...components,
         ...validatorDirectives
     ]

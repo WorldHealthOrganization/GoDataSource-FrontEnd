@@ -303,14 +303,14 @@
                             <div
                                 fxFlex="1 1" fxLayout="column">
                                 <!-- input -->
-                                <app-form-select
+                                <app-form-select-vscroll
                                     name="mapObjectSource"
                                     required="true"
                                     [ngModel]="item.sourceField"
                                     [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
                                     [options]="importableObject.fileHeadersKeyValue"
                                     (optionChanged)="setSourceDestinationValueAndDetermineOptions(item, 'sourceField', $event)">
-                                </app-form-select>
+                                </app-form-select-vscroll>
 
                                 <!-- Duplicate source ? -->
                                 <div
@@ -329,7 +329,7 @@
                             <!-- Destination -->
                             <div
                                 fxFlex="1 1">
-                                <app-form-select
+                                <app-form-select-vscroll
                                     name="mapObjectDestination"
                                     required="true"
                                     [ngModel]="item.destinationField"
@@ -337,7 +337,7 @@
                                     [options]="importableObject.modelPropertiesKeyValue"
                                     (optionChanged)="setSourceDestinationValueAndDetermineOptions(item, 'destinationField', $event)"
                                     [disabled]="item.readonly">
-                                </app-form-select>
+                                </app-form-select-vscroll>
                             </div>
 
                             <!-- Array indexes -->
@@ -349,14 +349,14 @@
                                     <div
                                         *ngFor="let levelMatch of item.numberOfMaxLevels; let levelIndex = index;"
                                         fxFlex>
-                                        <app-form-select
+                                        <app-form-select-vscroll
                                             [name]="'sourceDestinationLevel[' + levelIndex + ']'"
                                             required="true"
                                             [ngModel]="item.getSourceDestinationLevel(levelIndex)"
                                             [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE_DESTINATION_LEVEL' | translate"
                                             [options]="possibleSourceDestinationLevels"
                                             (optionChanged)="setDestinationLevel(item, levelIndex, $event)">
-                                        </app-form-select>
+                                        </app-form-select-vscroll>
                                     </div>
                                 </div>
                             </div>
@@ -427,20 +427,20 @@
                                     <!-- Source Option -->
                                     <div
                                         fxFlex="1 1">
-                                        <app-form-select
+                                        <app-form-select-vscroll
                                             name="mapObjectOptionsSource"
                                             required="true"
                                             [ngModel]="mappedOpt.sourceOption"
                                             [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
                                             [options]="mappedOpt.readOnly ? item.getOptionsForReadOnlySource(mappedOpt) : importableObject.distinctFileColumnValuesKeyValue[item.sourceFieldWithoutIndexes]"
                                             (optionChanged)="mappedOpt.sourceOption = $event ? $event.value : $event;">
-                                        </app-form-select>
+                                        </app-form-select-vscroll>
                                     </div>
 
                                     <!-- Destination Option -->
                                     <div
                                         fxFlex="1 1">
-                                        <app-form-select
+                                        <app-form-select-vscroll
                                             name="mapObjectOptionsDestination"
                                             required="true"
                                             [ngModel]="mappedOpt.destinationOption"
@@ -448,7 +448,7 @@
                                             [options]="importableObject.modelPropertyValuesMap[item.destinationField]"
                                             optionValueKey="id"
                                             (optionChanged)="mappedOpt.destinationOption = $event ? $event.value : $event;">
-                                        </app-form-select>
+                                        </app-form-select-vscroll>
                                     </div>
 
                                 </div>
