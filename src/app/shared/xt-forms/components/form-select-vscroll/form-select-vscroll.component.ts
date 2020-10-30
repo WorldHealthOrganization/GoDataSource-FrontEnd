@@ -204,7 +204,7 @@ export class FormSelectVscrollComponent
             opened
         ) {
             // scroll to specific position
-            const optionIndex: number = this.value ?
+            const optionIndex: number = this.value !== undefined && this.value !== null ?
                 this.filteredOptions.findIndex((option) => option[this.optionValueKey] === this.value) :
                 0;
             if (optionIndex > -1) {
