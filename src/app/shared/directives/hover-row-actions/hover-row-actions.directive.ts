@@ -172,6 +172,11 @@ export class HoverRowActionsDirective {
     mouseMove(event) {
         // display actions
         if (this.hoverRowActionsComponent) {
+            // if not visible then we need to show it since move is triggered when inside
+            if (!this.hoverRowActionsComponent.visible) {
+                this.show(event);
+            }
+
             // keep an instance of the event
             this._previousEvent = event;
 
