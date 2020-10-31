@@ -93,7 +93,7 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
     /**
      * During this time actions are inactive
      */
-    static readonly ACTIONS_DEAD_TIME_SINCE_SHOWN_MS: number = 400;
+    static readonly ACTIONS_DEAD_TIME_SINCE_SHOWN_MS: number = 200;
 
     /**
      * Keep shown time
