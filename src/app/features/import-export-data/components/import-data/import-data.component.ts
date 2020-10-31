@@ -2022,6 +2022,7 @@ export class ImportDataComponent
             // there is no point in retrieving unique values for items that don't need mapping
             // or already retrieved
             if (
+                !field.destinationField ||
                 !field.sourceFieldWithoutIndexes || (
                     !this.importableObject.modelPropertyValuesMap[field.destinationField] &&
                     !this.addressFields[field.destinationField]
