@@ -212,6 +212,9 @@ export class FormSelectVscrollComponent
             } else {
                 this.cdkVirtualScrollViewport.scrollToIndex(0);
             }
+
+            // make sure we render
+            this.cdkVirtualScrollViewport.checkViewportSize();
         }
     }
 }

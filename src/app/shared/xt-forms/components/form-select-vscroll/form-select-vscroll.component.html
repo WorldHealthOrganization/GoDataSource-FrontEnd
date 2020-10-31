@@ -47,12 +47,15 @@
 
                 <!-- Options -->
                 <mat-option
-                    *cdkVirtualFor="let option of filteredOptions"
+                    *cdkVirtualFor="let option of filteredOptions; templateCacheSize: 0"
                     class="mat-option-vscroll"
                     [value]="option[optionValueKey]"
-                    [matTooltip]="option[optionTooltipKey] | translate"
                     [disabled]="option[optionDisabledKey]">
-                    {{option[optionLabelKey] | translate}}
+                    <!-- hack to fix matTooltip not working properly with cdkVirtualFor -->
+                    <div
+                        [matTooltip]="option[optionTooltipKey] | translate">
+                        {{option[optionLabelKey] | translate}}
+                    </div>
                 </mat-option>
 
             </cdk-virtual-scroll-viewport>

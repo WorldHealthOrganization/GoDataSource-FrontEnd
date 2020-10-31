@@ -177,7 +177,7 @@
 
                 <!-- Render each row -->
                 <div
-                    *cdkVirtualFor="let item of mappedFields; let elementIndex = index"
+                    *cdkVirtualFor="let item of mappedFields; let elementIndex = index; templateCacheSize: 0"
                     class="import-data-body-row"
                     fxLayout="column">
 
