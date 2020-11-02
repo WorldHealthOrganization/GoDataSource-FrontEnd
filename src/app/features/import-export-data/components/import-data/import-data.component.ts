@@ -502,6 +502,13 @@ export class ImportDataComponent
         [source: string]: number
     } = {};
 
+    // used to determine duplicate selections
+    usedSourceFieldOptions: {
+        [source: string]: {
+            [option: string]: number
+        }
+    } = {};
+
     // distinct values cache
     distinctValuesCache: {
         [fileHeader: string]: ImportableLabelValuePair[]
@@ -1762,7 +1769,10 @@ export class ImportDataComponent
         }
 
         // determine data height
-        this.importDataBodyRowsMaxHeight = this.domSanitizer.bypassSecurityTrustStyle(`calc(100vh - (${this.mappedDataTable.nativeElement.getBoundingClientRect().top}px + 170px))`);
+        const importDataBodyRowsMaxHeight: SafeStyle = this.domSanitizer.bypassSecurityTrustStyle(`calc(100vh - (${this.mappedDataTable.nativeElement.getBoundingClientRect().top}px + 170px))`);
+        if (this.importDataBodyRowsMaxHeight !== importDataBodyRowsMaxHeight) {
+            this.importDataBodyRowsMaxHeight = importDataBodyRowsMaxHeight;
+        }
 
         // update virtual scroll height
         setTimeout(() => {
@@ -1965,14 +1975,23 @@ export class ImportDataComponent
 
         //  no point in continuing ?
         if (!this.areMapFieldVisible) {
+            // call later
             this.scheduleJob = setTimeout(() => {
                 this.runDataScheduleJob();
-            }, 800);
+            }, 200);
+
+            // no point in continuing
+            return;
         }
 
         // go through map fields and determine mapped sources
         const usedSourceFields: {
             [source: string]: number
+        } = {};
+        const usedSourceFieldOptions: {
+            [source: string]: {
+                [option: string]: number
+            }
         } = {};
         (this.mappedFields || []).forEach((field) => {
             // no point in continuing if I don't have a source selected
@@ -1984,12 +2003,33 @@ export class ImportDataComponent
             const sourceKey: string = field.sourceFieldWithSelectedIndexes;
 
             // count items
-            usedSourceFields[sourceKey] = usedSourceFields[sourceKey] ? usedSourceFields[sourceKey] + 1 : 1;
+            usedSourceFields[sourceKey] = usedSourceFields[sourceKey] ?
+                usedSourceFields[sourceKey] + 1 :
+                1;
+
+            // count options too
+            usedSourceFieldOptions[sourceKey] = {};
+            (field.mappedOptions || []).forEach((fieldOpt) => {
+                // no point in continuing if I don't have a source selected
+                if (!fieldOpt.sourceOption) {
+                    return;
+                }
+
+                // count
+                usedSourceFieldOptions[sourceKey][fieldOpt.sourceOption] = usedSourceFieldOptions[sourceKey][fieldOpt.sourceOption] ?
+                    usedSourceFieldOptions[sourceKey][fieldOpt.sourceOption] + 1 :
+                    1;
+            });
         });
 
         // change only if values are different so we don't trigger even more binding checks
         if (!_.isEqual(this.usedSourceFields, usedSourceFields)) {
             this.usedSourceFields = usedSourceFields;
+        }
+
+        // change only if values are different so we don't trigger even more binding checks
+        if (!_.isEqual(this.usedSourceFieldOptions, usedSourceFieldOptions)) {
+            this.usedSourceFieldOptions = usedSourceFieldOptions;
         }
 
         // run again later

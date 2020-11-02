@@ -392,26 +392,70 @@
                                 <!-- Source - destination options - table view -->
                                 <div
                                     *ngIf="mappedOpt !== elementInEditMode; else editModeOptions"
-                                    fxLayout="row" fxLayoutGap="10px"
-                                    class="import-data-body-row-extra-details-row"
+                                    class="import-data-body-row-extra-details-row-basic"
+                                    fxLayout="column"
                                     app-hover-row-actions
                                     [hoverRowActionsComponent]="hoverRow"
                                     [hoverRowActions]="recordActions"
                                     [hoverRowActionData]="mappedOpt"
                                     [hoverRowActionIndex]="optIndex">
 
-                                    <!-- Option Source -->
+                                    <!-- Data -->
                                     <div
-                                        fxFlex="1 1">
-                                        {{ mappedOpt.sourceOption ? mappedOpt.sourceOption : '-' }}
+                                        class="import-data-body-row-extra-details-row"
+                                        fxLayout="row" fxLayoutGap="10px">
+
+                                        <!-- Option Source -->
+                                        <div
+                                            fxFlex="1 1">
+                                            {{ mappedOpt.sourceOption ? mappedOpt.sourceOption : '-' }}
+                                        </div>
+
+                                        <!-- Option Destination -->
+                                        <div
+                                            fxFlex="1 1">
+                                            {{ importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] }}
+                                        </div>
                                     </div>
 
-                                    <!-- Option Destination -->
+                                    <!-- Validation Info -->
                                     <div
-                                        fxFlex="1 1">
-                                        {{ importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] }}
-                                    </div>
+                                        class="import-data-body-row-extra-details-row-basic-validation">
 
+                                        <!-- Source -->
+                                        <div
+                                            class="import-data-body-row-extra-details-row-basic-validation-source"
+                                            fxFlex="1 1" fxLayout="row" fxLayoutGap="20px">
+
+                                            <!-- Invalid value ? -->
+                                            <span
+                                                *ngIf="!mappedOpt.sourceOption">
+                                                {{'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate}}
+                                            </span>
+
+                                            <!-- Duplicate source ? -->
+                                            <span
+                                                *ngIf="item.sourceFieldWithSelectedIndexes && mappedOpt.sourceOption && usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes]
+                                                    && usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes][mappedOpt.sourceOption] > 1">
+                                                {{'LNG_FORM_VALIDATION_ERROR_DUPLICATE_VALUE' | translate}}
+                                            </span>
+
+                                        </div>
+
+                                        <!-- Destination -->
+                                        <div
+                                            class="import-data-body-row-extra-details-row-basic-validation-destination"
+                                            fxFlex="1 1" fxLayout="row" fxLayoutGap="20px">
+
+                                            <!-- Invalid value ? -->
+                                            <span
+                                                *ngIf="!mappedOpt.destinationOption">
+                                                {{'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate}}
+                                            </span>
+
+                                        </div>
+
+                                    </div>
                                 </div>
 
                                 <!-- Source - destination - edit mode view -->
@@ -430,7 +474,7 @@
 
                                         <!-- Source Option -->
                                         <div
-                                            fxFlex="1 1">
+                                            fxFlex="1 1" fxLayout="column">
                                             <app-form-select-vscroll
                                                 name="mapObjectOptionsSource"
                                                 required="true"
@@ -439,6 +483,21 @@
                                                 [options]="mappedOpt.readOnly ? item.getOptionsForReadOnlySource(mappedOpt) : distinctValuesCache[item.sourceFieldWithoutIndexes]"
                                                 (optionChanged)="mappedOpt.sourceOption = $event ? $event.value : $event;">
                                             </app-form-select-vscroll>
+
+                                            <!-- Duplicate source ? -->
+                                            <div
+                                                class="import-data-body-row-edit-extra-details-row-validation-source"
+                                                fxFlex="1 1" fxLayout="row" fxLayoutGap="20px">
+
+                                                <!-- Duplicate source ? -->
+                                                <span
+                                                    *ngIf="item.sourceFieldWithSelectedIndexes && mappedOpt.sourceOption && usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes]
+                                                    && usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes][mappedOpt.sourceOption] > 1">
+                                                    {{'LNG_FORM_VALIDATION_ERROR_DUPLICATE_VALUE' | translate}}
+                                                </span>
+
+                                            </div>
+
                                         </div>
 
                                         <!-- Destination Option -->
