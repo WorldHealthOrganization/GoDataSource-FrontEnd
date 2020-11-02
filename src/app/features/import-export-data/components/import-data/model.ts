@@ -85,6 +85,13 @@ export class ImportableFileModel {
         }
     };
 
+    // index for easy access
+    readonly modelPropertyValuesMapIndex: {
+        [modelProperty: string]: {
+            [modelPropertyIndexKey: string]: string
+        }
+    } = {};
+
     // model array properties - questionnaires
     readonly modelArrayProperties: {
         [propertyPath: string]: IModelArrayProperties
@@ -206,6 +213,11 @@ export class ImportableFileModel {
             .value() as ImportableLabelValuePair[];
 
         // recursive add value pair
+        const modelPropertyValuesMapIndex: {
+            [modelProperty: string]: {
+                [modelPropertyIndexKey: string]: string
+            }
+        } = {};
         const createImportableLabelValuePair = (
             result: ImportableLabelValuePair[],
             impLVPair: ImportableLabelValuePair,
@@ -226,6 +238,22 @@ export class ImportableFileModel {
                         this.modelPropertyValues,
                         impLVPair.value
                     );
+
+                    // indexes
+                    modelPropertyValuesMapIndex[impLVPair.value] = {};
+                    _.each(this.modelPropertyValuesMap[impLVPair.value], (propValue) => {
+                        // label
+                        if (propValue.label) {
+                            // label translated
+                            modelPropertyValuesMapIndex[impLVPair.value][_.camelCase(translate(propValue.label)).toLowerCase()] = propValue.id;
+
+                            // label not translated (LNG key)
+                            modelPropertyValuesMapIndex[impLVPair.value][_.camelCase(propValue.label).toLowerCase()] = propValue.id;
+                        }
+
+                        // id
+                        modelPropertyValuesMapIndex[impLVPair.value][_.camelCase(propValue.id).toLowerCase()] = propValue.id;
+                    });
 
                     // add tooltip
                     impLVPair.tooltip = impLVPair.label;
@@ -298,6 +326,18 @@ export class ImportableFileModel {
                 });
             }
         );
+
+        // clean empty indexes
+        this.modelPropertyValuesMapIndex = {};
+        _.each(modelPropertyValuesMapIndex, (indexValues, indexKey) => {
+            // jump over ?
+            if (_.isEmpty(indexValues)) {
+                return;
+            }
+
+            // index it
+            this.modelPropertyValuesMapIndex[indexKey] = indexValues;
+        });
     }
 }
 

@@ -79,7 +79,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX': 'Array indexes',
         'LNG_PAGE_IMPORT_DATA_INVALID_ARRAY_INDEX': 'Invalid indexes',
         'LNG_PAGE_IMPORT_DATA_RETRIEVING_DATA': 'Retrieving data',
-        'LNG_PAGE_IMPORT_DATA_MAPPING_DATA': '{{index}} / {{total}}: Mapping {{key}}',
+        'LNG_PAGE_IMPORT_DATA_MAPPING_DATA': '{{index}} / {{total}}: Mapping "{{key}}"',
 
         /**
          * uiClustersListPage

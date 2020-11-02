@@ -1208,18 +1208,12 @@ export class ImportDataComponent
 
             // check if we can find a proper destination option
             const sourceOptReduced: string = _.camelCase(mapOpt.sourceOption).toLowerCase();
-            const modelPropertyValues = this.importableObject.modelPropertyValuesMap[importableItem.destinationField];
-            const destinationOpt: any = _.find(
-                modelPropertyValues,
-                (modelItem: { id: string, label: string }) => {
-                    return sourceOptReduced === _.camelCase(this.i18nService.instant(modelItem.label)).toLowerCase() ||
-                        sourceOptReduced === _.camelCase(modelItem.id).toLowerCase() ||
-                        sourceOptReduced === _.camelCase(modelItem.label).toLowerCase();
-                }
-            );
+            const destinationOpt: any = this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField] ?
+                this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField][sourceOptReduced] :
+                undefined;
 
             // found a possible destination field
-            if (destinationOpt !== undefined) {
+            if (destinationOpt) {
                 mapOpt.destinationOption = destinationOpt.id;
             }
 
@@ -1813,6 +1807,13 @@ export class ImportDataComponent
     }
 
     /**
+     * Re-render form
+     */
+    private forceRenderField(field: ImportableMapField): void {
+        field.mappedOptions = field.mappedOptions ? [...field.mappedOptions] : field.mappedOptions;
+    }
+
+    /**
      * Add new field map
      */
     addNewFieldMap(): void {
@@ -1924,15 +1925,11 @@ export class ImportDataComponent
                         // find & remove field option map
                         const parent: ImportableMapField = this.mappedFields.find((mf) => mf.id === item.parentId);
                         if (parent) {
-                            // determine index
-                            const parentIndex: number = parent.mappedOptions.indexOf(item);
-                            if (parentIndex > -1) {
-                                // remove
-                                parent.mappedOptions.splice(parentIndex, 1);
+                            // remove
+                            parent.mappedOptions.splice(index, 1);
 
-                                // force re-render
-                                this.forceRenderTable();
-                            }
+                            // force re-render
+                            this.forceRenderField(parent);
                         }
 
                         // clear edit mode if item or parent was removed
@@ -2094,7 +2091,7 @@ export class ImportDataComponent
                     this.distinctValuesCache[key] = [];
 
                     // const noItems = Math.floor(Math.random() * 10000) + 1;
-                    const noItems = 50000;
+                    const noItems = 2000;
                     for (let i = 0; i < noItems; i++) {
                         this.distinctValuesCache[key].push(new ImportableLabelValuePair(
                             i.toString(),
