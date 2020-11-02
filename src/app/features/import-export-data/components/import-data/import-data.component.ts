@@ -1762,7 +1762,7 @@ export class ImportDataComponent
         }
 
         // determine data height
-        this.importDataBodyRowsMaxHeight = this.domSanitizer.bypassSecurityTrustStyle(`calc(100vh - (${this.mappedDataTable.nativeElement.getBoundingClientRect().top}px + 150px))`);
+        this.importDataBodyRowsMaxHeight = this.domSanitizer.bypassSecurityTrustStyle(`calc(100vh - (${this.mappedDataTable.nativeElement.getBoundingClientRect().top}px + 170px))`);
 
         // update virtual scroll height
         setTimeout(() => {
@@ -2091,7 +2091,7 @@ export class ImportDataComponent
                     this.distinctValuesCache[key] = [];
 
                     // const noItems = Math.floor(Math.random() * 10000) + 1;
-                    const noItems = 2000;
+                    const noItems = 20000;
                     for (let i = 0; i < noItems; i++) {
                         this.distinctValuesCache[key].push(new ImportableLabelValuePair(
                             i.toString(),
