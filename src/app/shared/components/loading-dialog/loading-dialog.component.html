@@ -1,4 +1,13 @@
+<!-- Spinner -->
 <div
     class="app-loading-dialog">
     <mat-spinner></mat-spinner>
 </div>
+
+<!-- Message -->
+<div
+    *ngIf="data?.message"
+    class="app-loading-dialog-message">
+    {{ data.message | translate:data.messageData}}
+</div>
+

@@ -394,12 +394,14 @@ export class ImportDataComponent
             iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD_OPTION',
             visible: (item: ImportableMapField | IMappedOption): boolean => {
                 return (item instanceof ImportableMapField) &&
-                    this.importableObject.distinctFileColumnValuesKeyValue &&
-                    this.importableObject.distinctFileColumnValuesKeyValue[item.sourceFieldWithoutIndexes] && (
+                    item.sourceFieldWithoutIndexes &&
+                    item.destinationField &&
+                    this.distinctValuesCache &&
+                    this.distinctValuesCache[item.sourceFieldWithoutIndexes] && (
                         !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
                         this.addressFields[item.destinationField]
                     ) &&
-                    item.mappedOptions.length < this.importableObject.distinctFileColumnValuesKeyValue[item.sourceFieldWithoutIndexes].length;
+                    item.mappedOptions.length < this.distinctValuesCache[item.sourceFieldWithoutIndexes].length;
             },
             click: (
                 item: ImportableMapField,
@@ -1160,40 +1162,42 @@ export class ImportDataComponent
 
         // there is no point in setting mapped values if we  don't have to map something
         if (
-            !this.importableObject.distinctFileColumnValuesKeyValue ||
-            !this.importableObject.distinctFileColumnValuesKeyValue[importableItem.sourceFieldWithoutIndexes] ||
+            !importableItem.sourceFieldWithoutIndexes ||
+            !importableItem.destinationField ||
+            !this.distinctValuesCache ||
+            !this.distinctValuesCache[importableItem.sourceFieldWithoutIndexes] ||
             !this.importableObject.modelPropertyValuesMap[importableItem.destinationField]
         ) {
             return;
         }
 
         // we CAN'T use _.get because importableItem.sourceField contains special chars [ / ] / .
-        const distinctValues: ImportableLabelValuePair[] = this.importableObject.distinctFileColumnValuesKeyValue[importableItem.sourceFieldWithoutIndexes];
+        const distinctValues: ImportableLabelValuePair[] = this.distinctValuesCache[importableItem.sourceFieldWithoutIndexes];
         _.each(distinctValues, (distinctVal: ImportableLabelValuePair) => {
-            // check to see if we didn't map this value somewhere else already
-            if (_.find(
-                this.mappedFields,
-                (item: ImportableMapField): boolean => {
-                    if (
-                        item.sourceFieldWithoutIndexes !== importableItem.sourceFieldWithoutIndexes ||
-                        item.destinationField !== importableItem.destinationField
-                    ) {
-                        return false;
-                    } else {
-                        return !_.isEmpty(
-                            _.find(
-                                item.mappedOptions,
-                                (option: { sourceOption: string }): boolean => {
-                                    return option.sourceOption === distinctVal.value;
-                                }
-                            )
-                        );
-                    }
-                }
-            )) {
-                // no need to continue since this option is already mapped
-                return;
-            }
+            // // check to see if we didn't map this value somewhere else already
+            // if (_.find(
+            //     this.mappedFields,
+            //     (item: ImportableMapField): boolean => {
+            //         if (
+            //             item.sourceFieldWithoutIndexes !== importableItem.sourceFieldWithoutIndexes ||
+            //             item.destinationField !== importableItem.destinationField
+            //         ) {
+            //             return false;
+            //         } else {
+            //             return !_.isEmpty(
+            //                 _.find(
+            //                     item.mappedOptions,
+            //                     (option: { sourceOption: string }): boolean => {
+            //                         return option.sourceOption === distinctVal.value;
+            //                     }
+            //                 )
+            //             );
+            //         }
+            //     }
+            // )) {
+            //     // no need to continue since this option is already mapped
+            //     return;
+            // }
 
             // create map option with source
             const mapOpt: IMappedOption = {
@@ -1398,9 +1402,9 @@ export class ImportDataComponent
             // filter out for which source doesn't exist anymore
             if (!_.isEmpty(mapField.mappedOptions)) {
                 // map possible source options
-                const optionValuesMap = this.importableObject.distinctFileColumnValuesKeyValue ?
+                const optionValuesMap = this.distinctValuesCache ?
                     _.transform(
-                        this.importableObject.distinctFileColumnValuesKeyValue[mapField.sourceFieldWithoutIndexes],
+                        this.distinctValuesCache[mapField.sourceFieldWithoutIndexes],
                         (a, v) => {
                             a[v.value] = v;
                         },
@@ -2016,8 +2020,13 @@ export class ImportDataComponent
      * Retrieve distinct values used to map fields
      */
     retrieveDistinctValues(): void {
+        const start = window.performance.now();
+
         // determine file headers for which we need to retrieve distinct values
         const distinctValuesForKeys: string[] = [];
+        const distinctValuesForKeysMap: {
+            [sourceFieldWithoutIndexes: string]: ImportableMapField
+        } = {};
         this.mappedFields.forEach((field) => {
             // there is no point in retrieving unique values for items that don't need mapping
             // or already retrieved
@@ -2034,6 +2043,7 @@ export class ImportDataComponent
 
             // add to list of items to retrieve distinct values for
             distinctValuesForKeys.push(field.sourceFieldWithoutIndexes);
+            distinctValuesForKeysMap[field.sourceFieldWithoutIndexes] = field;
         });
 
         // nothing to retrieve ?
@@ -2041,16 +2051,102 @@ export class ImportDataComponent
             return;
         }
 
-        // show loading
-        // #TODO
+        // display loading
+        const loadingDialog = this.dialogService.showLoadingDialog({
+            widthPx: 400
+        });
+
+        // initializing message
+        loadingDialog.showMessage('LNG_PAGE_IMPORT_DATA_RETRIEVING_DATA');
 
         // retrieve items
         // #TODO
-        // this.distinctValuesCache[field.sourceFieldWithoutIndexes]
-        console.log(
-            distinctValuesForKeys.length,
-            this.mappedFields.length,
-            distinctValuesForKeys
-        );
+
+        // replicate data retrieval
+        let no: number = 0;
+        setTimeout(() => {
+            // format handler
+            const formattingHandler = (
+                index: number,
+                finishedCallback: () => void
+            ) => {
+                // finished ?
+                if (index >= distinctValuesForKeys.length) {
+                    finishedCallback();
+                    return;
+                }
+
+                // determine key
+                const key: string = distinctValuesForKeys[index];
+
+                // formatting message
+                loadingDialog.showMessage(
+                    'LNG_PAGE_IMPORT_DATA_MAPPING_DATA', {
+                        index: (index + 1).toString(),
+                        total: distinctValuesForKeys.length.toString(),
+                        key: key
+                    }
+                );
+
+                // process
+                setTimeout(() => {
+                    // initialize cache
+                    this.distinctValuesCache[key] = [];
+
+                    // const noItems = Math.floor(Math.random() * 10000) + 1;
+                    const noItems = 50000;
+                    for (let i = 0; i < noItems; i++) {
+                        this.distinctValuesCache[key].push(new ImportableLabelValuePair(
+                            i.toString(),
+                            i.toString(),
+                            i.toString()
+                        ));
+                        no++;
+                    }
+
+                    // map options
+                    this.addMapOptionsIfNecessary(distinctValuesForKeysMap[key]);
+
+                    // finished
+                    formattingHandler(
+                        index + 1,
+                        finishedCallback
+                    );
+                }, 50);
+            };
+
+            // format field options
+            formattingHandler(
+                0,
+                () => {
+                    console.log(
+                        distinctValuesForKeys.length,
+                        this.mappedFields.length,
+                        distinctValuesForKeys
+                    );
+                    console.log('Total no of items: ' + no);
+                    const end = window.performance.now();
+                    console.log(`Execution time: ${end - start} ms`);
+
+                    // hide loading
+                    loadingDialog.close();
+                }
+            );
+
+            // split into bulk requests
+            // retrieve n unique items, after that retrieve other n unique items...
+            // #TODO
+
+            // split into bulk requests
+            // retrieve n locations, after that retrieve other n locations
+            // #TODO
+
+            // before saving - on validation
+            // determine first 100 errors and display them or something in a format clear enough so user knows where to go, what list to check etc
+            // #TODO
+
+            // display mapped field options as field in vcroll...so we have only one scroll instead of one per field ?
+            // #TODO
+        }, 300);
     }
 }

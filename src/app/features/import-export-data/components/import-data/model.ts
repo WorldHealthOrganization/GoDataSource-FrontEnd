@@ -85,11 +85,6 @@ export class ImportableFileModel {
         }
     };
 
-    // distinct values
-    readonly distinctFileColumnValuesKeyValue: {
-        [fileHeader: string]: ImportableLabelValuePair[]
-    };
-
     // model array properties - questionnaires
     readonly modelArrayProperties: {
         [propertyPath: string]: IModelArrayProperties
@@ -303,21 +298,6 @@ export class ImportableFileModel {
                 });
             }
         );
-
-        // distinct values
-        this.distinctFileColumnValuesKeyValue = {};
-        const distinctFileColumnValues = _.get(data, 'distinctFileColumnValues', {});
-        _.each(distinctFileColumnValues, (values: string[], property: string) => {
-            this.distinctFileColumnValuesKeyValue[property] = _.map(
-                values,
-                (value: string) => {
-                    return new ImportableLabelValuePair(
-                        value,
-                        value
-                    );
-                }
-            );
-        });
     }
 }
 

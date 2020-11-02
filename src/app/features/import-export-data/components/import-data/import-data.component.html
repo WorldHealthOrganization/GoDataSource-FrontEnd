@@ -373,8 +373,8 @@
 
                     <!-- Render mapped options rows -->
                     <div
-                        *ngIf="importableObject.distinctFileColumnValuesKeyValue &&
-                            importableObject.distinctFileColumnValuesKeyValue[item.sourceFieldWithoutIndexes] && (
+                        *ngIf="distinctValuesCache &&
+                            distinctValuesCache[item.sourceFieldWithoutIndexes] && (
                                 !!importableObject.modelPropertyValuesMap[item.destinationField] ||
                                 addressFields[item.destinationField]
                             )"
@@ -382,81 +382,86 @@
                         fxLayout="column">
 
                         <!-- Render each row -->
-                        <div
-                            *ngFor="let mappedOpt of item.mappedOptions; let optIndex = index">
-
-                            <!-- Source - destination options - table view -->
+                        <cdk-virtual-scroll-viewport
+                            class="import-data-body-row-extra-details-vscroll"
+                            fxLayout="column"
+                            autosize>
                             <div
-                                *ngIf="mappedOpt !== elementInEditMode; else editModeOptions"
-                                fxLayout="row" fxLayoutGap="10px"
-                                class="import-data-body-row-extra-details-row"
-                                app-hover-row-actions
-                                [hoverRowActionsComponent]="hoverRow"
-                                [hoverRowActions]="recordActions"
-                                [hoverRowActionData]="mappedOpt"
-                                [hoverRowActionIndex]="optIndex">
+                                *cdkVirtualFor="let mappedOpt of item.mappedOptions; let optIndex = index; templateCacheSize: 0">
 
-                                <!-- Option Source -->
+                                <!-- Source - destination options - table view -->
                                 <div
-                                    fxFlex="1 1">
-                                    {{ mappedOpt.sourceOption ? mappedOpt.sourceOption : '-' }}
-                                </div>
-
-                                <!-- Option Destination -->
-                                <div
-                                    fxFlex="1 1">
-                                    {{ importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] }}
-                                </div>
-
-                            </div>
-
-                            <!-- Source - destination - edit mode view -->
-                            <ng-template
-                                #editModeOptions>
-
-                                <!-- Basic Details -->
-                                <div
-                                    class="import-data-body-row-edit-extra-details-row"
+                                    *ngIf="mappedOpt !== elementInEditMode; else editModeOptions"
                                     fxLayout="row" fxLayoutGap="10px"
+                                    class="import-data-body-row-extra-details-row"
                                     app-hover-row-actions
                                     [hoverRowActionsComponent]="hoverRow"
                                     [hoverRowActions]="recordActions"
                                     [hoverRowActionData]="mappedOpt"
                                     [hoverRowActionIndex]="optIndex">
 
-                                    <!-- Source Option -->
+                                    <!-- Option Source -->
                                     <div
                                         fxFlex="1 1">
-                                        <app-form-select-vscroll
-                                            name="mapObjectOptionsSource"
-                                            required="true"
-                                            [ngModel]="mappedOpt.sourceOption"
-                                            [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
-                                            [options]="mappedOpt.readOnly ? item.getOptionsForReadOnlySource(mappedOpt) : importableObject.distinctFileColumnValuesKeyValue[item.sourceFieldWithoutIndexes]"
-                                            (optionChanged)="mappedOpt.sourceOption = $event ? $event.value : $event;">
-                                        </app-form-select-vscroll>
+                                        {{ mappedOpt.sourceOption ? mappedOpt.sourceOption : '-' }}
                                     </div>
 
-                                    <!-- Destination Option -->
+                                    <!-- Option Destination -->
                                     <div
                                         fxFlex="1 1">
-                                        <app-form-select-vscroll
-                                            name="mapObjectOptionsDestination"
-                                            required="true"
-                                            [ngModel]="mappedOpt.destinationOption"
-                                            [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
-                                            [options]="importableObject.modelPropertyValuesMap[item.destinationField]"
-                                            optionValueKey="id"
-                                            (optionChanged)="mappedOpt.destinationOption = $event ? $event.value : $event;">
-                                        </app-form-select-vscroll>
+                                        {{ importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] }}
                                     </div>
 
                                 </div>
 
-                            </ng-template>
+                                <!-- Source - destination - edit mode view -->
+                                <ng-template
+                                    #editModeOptions>
 
-                        </div>
+                                    <!-- Basic Details -->
+                                    <div
+                                        class="import-data-body-row-edit-extra-details-row"
+                                        fxLayout="row" fxLayoutGap="10px"
+                                        app-hover-row-actions
+                                        [hoverRowActionsComponent]="hoverRow"
+                                        [hoverRowActions]="recordActions"
+                                        [hoverRowActionData]="mappedOpt"
+                                        [hoverRowActionIndex]="optIndex">
 
+                                        <!-- Source Option -->
+                                        <div
+                                            fxFlex="1 1">
+                                            <app-form-select-vscroll
+                                                name="mapObjectOptionsSource"
+                                                required="true"
+                                                [ngModel]="mappedOpt.sourceOption"
+                                                [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
+                                                [options]="mappedOpt.readOnly ? item.getOptionsForReadOnlySource(mappedOpt) : distinctValuesCache[item.sourceFieldWithoutIndexes]"
+                                                (optionChanged)="mappedOpt.sourceOption = $event ? $event.value : $event;">
+                                            </app-form-select-vscroll>
+                                        </div>
+
+                                        <!-- Destination Option -->
+                                        <div
+                                            fxFlex="1 1">
+                                            <app-form-select-vscroll
+                                                name="mapObjectOptionsDestination"
+                                                required="true"
+                                                [ngModel]="mappedOpt.destinationOption"
+                                                [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
+                                                [options]="importableObject.modelPropertyValuesMap[item.destinationField]"
+                                                optionValueKey="id"
+                                                (optionChanged)="mappedOpt.destinationOption = $event ? $event.value : $event;">
+                                            </app-form-select-vscroll>
+                                        </div>
+
+                                    </div>
+
+                                </ng-template>
+
+                            </div>
+
+                        </cdk-virtual-scroll-viewport>
 
                     </div>
 
@@ -510,18 +515,8 @@
             (submit)="importData(form)"
             fxLayout="column">
             <div
-                *ngFor="let item of mappedFields; trackBy: trackByFieldID; let indexMapField = index;"
-                fxLayout="column"
-            >
-                <div
-                    *ngIf="
-                        importableObject.distinctFileColumnValuesKeyValue &&
-                        importableObject.distinctFileColumnValuesKeyValue[item.sourceFieldWithoutIndexes] && (
-                            !!importableObject.modelPropertyValuesMap[item.destinationField] ||
-                            addressFields[item.destinationField]
-                        )"
-                    class="import-data-map-fields-children"
-                    fxLayout="column">
+                *ngFor="let item of mappedFields; trackBy: trackByFieldID"
+                fxLayout="column">
                     <div
                         *ngFor="let mappedOpt of item.mappedOptions; trackBy: trackByFieldID; let indexMapOption = index"
                         fxLayout="row" fxLayoutGap="20px"
@@ -564,8 +559,6 @@
                         </ng-template>
 
                     </div>
-
-                </div>
             </div>
 
         </form>

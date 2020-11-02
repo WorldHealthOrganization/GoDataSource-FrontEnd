@@ -12,7 +12,7 @@ import { ImportExportDataService } from '../data/import-export.data.service';
 import { SnackbarService } from './snackbar.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import * as FileSaver from 'file-saver';
-import { LoadingDialogComponent, LoadingDialogModel } from '../../../shared/components/loading-dialog/loading-dialog.component';
+import { LoadingDialogComponent, LoadingDialogDataModel, LoadingDialogModel } from '../../../shared/components/loading-dialog/loading-dialog.component';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 
@@ -372,11 +372,20 @@ export class DialogService {
     /**
      * Display loading dialog
      */
-    showLoadingDialog(): LoadingDialogModel {
+    showLoadingDialog(conf?: {
+        widthPx: number
+    }): LoadingDialogModel {
         // display dialog
+        const data: LoadingDialogDataModel = new LoadingDialogDataModel();
         const dialog: MatDialogRef<LoadingDialogComponent> = this.dialog.open(
             LoadingDialogComponent,
-            LoadingDialogComponent.DEFAULT_CONFIG
+            Object.assign(
+                {},
+                LoadingDialogComponent.DEFAULT_CONFIG, {
+                    data: data,
+                    width: conf && conf.widthPx ? `${conf.widthPx}px` : undefined
+                }
+            )
         );
 
         // finished creating dialog
@@ -384,7 +393,8 @@ export class DialogService {
             Subscriber.create(() => {
                 // close dialog
                 dialog.close();
-            })
+            }),
+            data
         );
     }
 }
