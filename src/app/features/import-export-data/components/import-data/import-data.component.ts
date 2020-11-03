@@ -8,7 +8,6 @@ import * as _ from 'lodash';
 import { DialogAnswer, DialogAnswerButton, HoverRowAction } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { v4 as uuid } from 'uuid';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
@@ -599,19 +598,12 @@ export class ImportDataComponent
 
     /**
      * Constructor
-     * @param snackbarService
-     * @param authDataService
-     * @param dialogService
-     * @param i18nService
-     * @param formHelper
-     * @param importExportDataService
      */
     constructor(
         private snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private dialogService: DialogService,
         private i18nService: I18nService,
-        private formHelper: FormHelperService,
         private importExportDataService: ImportExportDataService,
         private savedImportMappingService: SavedImportMappingService,
         private domSanitizer: DomSanitizer,
@@ -1671,130 +1663,92 @@ export class ImportDataComponent
                 return;
             }
 
+            // construct import JSON
+            const importJSON = {
+                fileId: this.importableObject.id,
+                map: {},
+                valuesMap: {}
+            };
 
+            // convert import data to what API is expecting
+            this.mappedFields.forEach((field) => {
+                // forge the almighty source & destination
+                let source: string = field.sourceField;
+                let destination: string = field.destinationField;
 
-            // // check valid fields & import data if we don't have any errors
-            // setTimeout(() => {
-            //     // do we have invalid fields ?
-            //     if (!this.formHelper.validateForm(
-            //         form,
-            //         false
-            //     )) {
-            //         // invalid form
-            //         loadingDialog.close();
-            //         return;
-            //     }
+                // add indexes to source arrays
+                source = this.addIndexesToArrays(
+                    source,
+                    field.getSourceDestinationLevels()
+                );
+
+                // add indexes to destination arrays
+                destination = this.addIndexesToArrays(
+                    destination,
+                    field.getSourceDestinationLevels()
+                );
+
+                // map main properties
+                importJSON.map[source] = destination;
+
+                // map field options
+                if (
+                    field.mappedOptions &&
+                    field.mappedOptions.length > 0
+                ) {
+                    // here we don't need to add indexes, so we keep the arrays just as they are
+                    // also, we need to merge value Maps with the previous ones
+                    const properSource = field.sourceFieldWithoutIndexes;
+                    if (!importJSON.valuesMap[properSource]) {
+                        importJSON.valuesMap[properSource] = {};
+                    }
+
+                    // add options
+                    field.mappedOptions.forEach((option) => {
+                        importJSON.valuesMap[properSource][option.sourceOption] = option.destinationOption;
+                    });
+                }
+            });
+
+            console.log(importJSON);
+
+            // // import data
+            // this.progress = null;
+            // this.importExportDataService.importData(
+            //     this.importDataUrl,
+            //     importJSON
+            // )
+            //     .pipe(
+            //         catchError((err) => {
+            //             // display error message
+            //             if (err.code === 'IMPORT_PARTIAL_SUCCESS') {
+            //                 // construct custom message
+            //                 this.errMsgDetails = err;
             //
-            //     // import data
-            //     // display loading
-            //     const allFields: any = this.formHelper.getFields(form);
-            //     this._displayLoading = true;
-            //     this._displayLoadingLocked = true;
-            //     loadingDialog.close();
-            //     setTimeout(() => {
-            //         // nothing to import - this is handled above, when we convert JSON to importable object
-            //         // NO NEED for further checks
-            //
-            //         // construct import JSON
-            //         const importJSON = {
-            //             fileId: this.importableObject.id,
-            //             map: {},
-            //             valuesMap: {}
-            //         };
-            //         _.each(
-            //             allFields.mapObject,
-            //             (item: {
-            //                 source: string,
-            //                 destination: string,
-            //                 sourceDestinationLevel?: number[],
-            //                 options: {
-            //                     sourceOption: string,
-            //                     destinationOption: string
-            //                 }[]
-            //             }) => {
-            //                 // forge the almighty source & destination
-            //                 let source: string = item.source;
-            //                 let destination: string = item.destination;
-            //
-            //                 // add indexes to source arrays
-            //                 source = this.addIndexesToArrays(
-            //                     source,
-            //                     item.sourceDestinationLevel
-            //                 );
-            //
-            //                 // add indexes to destination arrays
-            //                 destination = this.addIndexesToArrays(
-            //                     destination,
-            //                     item.sourceDestinationLevel
-            //                 );
-            //
-            //                 // map main properties
-            //                 importJSON.map[source] = destination;
-            //
-            //                 // map drop-down values
-            //                 if (
-            //                     item.options &&
-            //                     !_.isEmpty(item.options)
-            //                 ) {
-            //                     // here we don't need to add indexes, so we keep the arrays just as they are
-            //                     // also, we need to merge value Maps with the previous ones
-            //                     const properSource = item.source.replace(/\[\d+\]/g, '[]');
-            //                     importJSON.valuesMap[properSource] = {
-            //                         ...importJSON.valuesMap[properSource],
-            //                         ..._.transform(
-            //                             item.options,
-            //                             (result, option: {
-            //                                 sourceOption: string,
-            //                                 destinationOption: string
-            //                             }) => {
-            //                                 result[option.sourceOption] = option.destinationOption;
-            //                             },
-            //                             {}
-            //                         )
-            //                     };
-            //                 }
+            //                 // display error
+            //                 this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
+            //             } else {
+            //                 this.snackbarService.showApiError(err);
             //             }
+            //
+            //             // reset loading
+            //             this._displayLoading = false;
+            //             this._displayLoadingLocked = false;
+            //
+            //             // propagate err
+            //             return throwError(err);
+            //         })
+            //     )
+            //     .subscribe(() => {
+            //         // display success
+            //         this.snackbarService.showSuccess(
+            //             this.importSuccessMessage,
+            //             this.translationData
             //         );
             //
-            //         // import data
-            //         this.progress = null;
-            //         this.importExportDataService.importData(
-            //             this.importDataUrl,
-            //             importJSON
-            //         )
-            //             .pipe(
-            //                 catchError((err) => {
-            //                     // display error message
-            //                     if (err.code === 'IMPORT_PARTIAL_SUCCESS') {
-            //                         // construct custom message
-            //                         this.errMsgDetails = err;
-            //
-            //                         // display error
-            //                         this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
-            //                     } else {
-            //                         this.snackbarService.showApiError(err);
-            //                     }
-            //
-            //                     // reset loading
-            //                     this._displayLoading = false;
-            //                     this._displayLoadingLocked = false;
-            //
-            //                     // propagate err
-            //                     return throwError(err);
-            //                 })
-            //             )
-            //             .subscribe(() => {
-            //                 // display success
-            //                 this.snackbarService.showSuccess(
-            //                     this.importSuccessMessage,
-            //                     this.translationData
-            //                 );
-            //
-            //                 // emit finished event - event should handle redirect
-            //                 this.finished.emit();
-            //             });
+            //         // emit finished event - event should handle redirect
+            //         this.finished.emit();
             //     });
-            // });
         });
     }
 
