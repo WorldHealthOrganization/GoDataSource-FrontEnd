@@ -27,7 +27,8 @@
             (blur)="onBlur()"
             (focus)="touchAndTriggerSearch()"
             (change)="triggerItemChanged($event)"
-            [appendTo]="appendTo">
+            [appendTo]="appendTo"
+            [trackByFn]="trackByFn">
             <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
                 <span [app-ng-option-highlight]="search" [style.padding-left]="(item.level * 30) + 'px'">
                     {{ item.label }}

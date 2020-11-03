@@ -580,4 +580,15 @@ export class FormLocationDropdownComponent
             this.addLocationConditionAndRefresh();
         }
     }
+
+    /**
+     * Item track method
+     */
+    trackByFn(item: {
+        id: string
+    }) {
+        return item && item.id ?
+            item.id :
+            item;
+    }
 }
