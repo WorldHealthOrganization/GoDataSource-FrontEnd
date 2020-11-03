@@ -386,6 +386,7 @@ export class ImportableMapField {
 
     // mapped options
     mappedOptions: IMappedOption[] = [];
+    mappedOptionsCollapsed: boolean = true;
 
     // read-only values
     private _readOnlyValues: {

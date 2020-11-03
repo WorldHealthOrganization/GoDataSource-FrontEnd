@@ -414,23 +414,57 @@ export class ImportDataComponent
             }
         }),
 
-        // Clone
+        // Expand
         new HoverRowAction({
-            icon: 'fileCopy',
-            iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_CLONE',
+            icon: 'thinArrowDown',
+            iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_EXPAND_OPTIONS',
             visible: (item: ImportableMapField | IMappedOption): boolean => {
-                return item instanceof ImportableMapField;
+                return (item instanceof ImportableMapField) &&
+                    item.sourceFieldWithoutIndexes &&
+                    item.destinationField &&
+                    this.distinctValuesCache &&
+                    this.distinctValuesCache[item.sourceFieldWithoutIndexes] && (
+                        !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
+                        this.addressFields[item.destinationField]
+                    ) &&
+                    item.mappedOptionsCollapsed;
             },
             click: (
                 item: ImportableMapField,
-                handler: HoverRowActionsDirective,
-                index: number
+                handler: HoverRowActionsDirective
             ) => {
-                this.cloneFieldMap(
-                    item,
-                    handler,
-                    index
-                );
+                // expand
+                item.mappedOptionsCollapsed = false;
+
+                // render row selection
+                handler.hoverRowActionsComponent.hideEverything();
+            }
+        }),
+
+        // Collapse
+        new HoverRowAction({
+            icon: 'thinArrowRight',
+            iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_COLLAPSE_OPTIONS',
+            visible: (item: ImportableMapField | IMappedOption): boolean => {
+                return (item instanceof ImportableMapField) &&
+                    item.sourceFieldWithoutIndexes &&
+                    item.destinationField &&
+                    this.distinctValuesCache &&
+                    this.distinctValuesCache[item.sourceFieldWithoutIndexes] && (
+                        !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
+                        this.addressFields[item.destinationField]
+                    ) &&
+                    !item.mappedOptionsCollapsed;
+            },
+            click: (
+                item: ImportableMapField,
+                handler: HoverRowActionsDirective
+            ) => {
+                // collapse
+                item.mappedOptionsCollapsed = true;
+
+                // render row selection
+                handler.hoverRowActionsComponent.hideEverything();
             }
         }),
 
@@ -471,6 +505,26 @@ export class ImportDataComponent
             }
         }),
 
+        // Clone
+        new HoverRowAction({
+            icon: 'fileCopy',
+            iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_CLONE',
+            visible: (item: ImportableMapField | IMappedOption): boolean => {
+                return item instanceof ImportableMapField;
+            },
+            click: (
+                item: ImportableMapField,
+                handler: HoverRowActionsDirective,
+                index: number
+            ) => {
+                this.cloneFieldMap(
+                    item,
+                    handler,
+                    index
+                );
+            }
+        }),
+
         // Remove
         new HoverRowAction({
             icon: 'delete',
@@ -505,7 +559,10 @@ export class ImportDataComponent
     // used to determine duplicate selections
     usedSourceFieldOptions: {
         [source: string]: {
-            [option: string]: number
+            options: {
+                [option: string]: number
+            },
+            valid: boolean
         }
     } = {};
 
@@ -1992,7 +2049,10 @@ export class ImportDataComponent
         } = {};
         const usedSourceFieldOptions: {
             [source: string]: {
-                [option: string]: number
+                options: {
+                    [option: string]: number
+                },
+                valid: boolean
             }
         } = {};
         (this.mappedFields || []).forEach((field) => {
@@ -2010,17 +2070,33 @@ export class ImportDataComponent
                 1;
 
             // count options too
-            usedSourceFieldOptions[sourceKey] = {};
+            usedSourceFieldOptions[sourceKey] = {
+                options: {},
+                valid: true
+            };
             (field.mappedOptions || []).forEach((fieldOpt) => {
                 // no point in continuing if I don't have a source selected
                 if (!fieldOpt.sourceOption) {
+                    // invalid
+                    usedSourceFieldOptions[sourceKey].valid = false;
+
+                    // finished
                     return;
                 }
 
                 // count
-                usedSourceFieldOptions[sourceKey][fieldOpt.sourceOption] = usedSourceFieldOptions[sourceKey][fieldOpt.sourceOption] ?
-                    usedSourceFieldOptions[sourceKey][fieldOpt.sourceOption] + 1 :
+                usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] = usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] ?
+                    usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] + 1 :
                     1;
+
+                // validate
+                if (
+                    usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] > 1 ||
+                    !fieldOpt.destinationOption
+                ) {
+                    // invalid
+                    usedSourceFieldOptions[sourceKey].valid = false;
+                }
             });
         });
 

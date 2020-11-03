@@ -150,21 +150,37 @@
                     {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_INFORMATION' | translate }}
                 </div>
 
+                <!-- Mappings -->
+                <div
+                    fxFlex="120px" fxLayoutAlign="start end">
+                    {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS' | translate }}
+                </div>
+
                 <!-- Array indexes -->
                 <div
-                    fxFlex="1 1" fxLayoutAlign="start end">
-                    {{ 'LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX' | translate }}
+                    fxFlex="1 1" fxLayoutAlign="start end" fxLayout="row" fxLayoutGap="20px">
+                    <div
+                        fxFlex fxGrow="0">
+                        {{ 'LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX' | translate }}
+                    </div>
+                    <div
+                        fxFlex>
+                        <span
+                            class="xt-icon"
+                            [matTooltip]="'LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX_DESCRIPTION' | translate">info</span>
+                    </div>
                 </div>
 
                 <!-- Actions -->
                 <div
-                    fxFlex="50px">
+                    fxFlex="100px">
                     <button
+                        mat-raised-button
+                        color="accent"
                         type="button"
-                        mat-icon-button
-                        [title]="'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD' | translate"
+                        [matTooltip]="'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD' | translate"
                         (click)="addNewFieldMap()">
-                        <span class="xt-icon">addCircle</span>
+                        {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                     </button>
                 </div>
             </div>
@@ -210,6 +226,45 @@
                                 {{ item.destinationField && importableObject.modelPropertiesKeyValueMap[item.destinationField] ? importableObject.modelPropertiesKeyValueMap[item.destinationField] : '-' }}
                             </div>
 
+                            <!-- Mappings -->
+                            <div
+                                fxFlex="120px">
+                                <div
+                                    *ngIf="item.sourceFieldWithoutIndexes && item.destinationField && (
+                                        !!importableObject.modelPropertyValuesMap[item.destinationField] ||
+                                        addressFields[item.destinationField]
+                                    )">
+
+                                    <!-- Waiting for map ? -->
+                                    <div
+                                        *ngIf="!distinctValuesCache || !distinctValuesCache[item.sourceFieldWithoutIndexes]; else completeIncomplete"
+                                        [matTooltip]="'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_WAITING_DESCRIPTION' | translate"
+                                        class="import-data-body-row-basic-data-error">
+                                        {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_WAITING' | translate }}
+                                    </div>
+
+                                    <!-- Complete / Incomplete -->
+                                    <ng-template
+                                        #completeIncomplete>
+                                        <!-- Incomplete map ? -->
+                                        <div
+                                            *ngIf="!usedSourceFieldOptions[item.sourceFieldWithoutIndexes] || !usedSourceFieldOptions[item.sourceFieldWithoutIndexes].valid; else complete"
+                                            class="import-data-body-row-basic-data-error">
+                                            {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID' | translate }}
+                                        </div>
+
+                                        <!-- Complete map ? -->
+                                        <ng-template
+                                            #complete>
+                                            <div>
+                                                {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_VALID' | translate }}
+                                            </div>
+                                        </ng-template>
+                                    </ng-template>
+
+                                </div>
+                            </div>
+
                             <!-- Array indexes -->
                             <div
                                 fxFlex="1 1">
@@ -218,7 +273,7 @@
 
                             <!-- Actions -->
                             <div
-                                fxFlex="50px">
+                                fxFlex="100px">
                                 <!-- placeholder -->
                             </div>
                         </div>
@@ -266,6 +321,12 @@
 
                             </div>
 
+                            <!-- Mappings -->
+                            <div
+                                fxFlex="120px">
+                                <!-- placeholder -->
+                            </div>
+
                             <!-- Array indexes -->
                             <div
                                 fxFlex="1 1">
@@ -280,7 +341,7 @@
 
                             <!-- Actions -->
                             <div
-                                fxFlex="50px">
+                                fxFlex="100px">
                                 <!-- placeholder -->
                             </div>
 
@@ -342,6 +403,12 @@
                                 </app-form-select-vscroll>
                             </div>
 
+                            <!-- Mappings -->
+                            <div
+                                fxFlex="120px">
+                                <!-- placeholder -->
+                            </div>
+
                             <!-- Array indexes -->
                             <div
                                 fxFlex="1 1">
@@ -365,7 +432,7 @@
 
                             <!-- Actions -->
                             <div
-                                fxFlex="50px">
+                                fxFlex="100px">
                                 <!-- placeholder -->
                             </div>
 
@@ -375,8 +442,9 @@
 
                     <!-- Render mapped options rows -->
                     <div
-                        *ngIf="distinctValuesCache &&
-                            distinctValuesCache[item.sourceFieldWithoutIndexes] && (
+                        *ngIf="!item.mappedOptionsCollapsed &&
+                            item.sourceFieldWithoutIndexes && item.destinationField &&
+                            distinctValuesCache && distinctValuesCache[item.sourceFieldWithoutIndexes] && (
                                 !!importableObject.modelPropertyValuesMap[item.destinationField] ||
                                 addressFields[item.destinationField]
                             )"
@@ -416,7 +484,7 @@
                                         <!-- Option Destination -->
                                         <div
                                             fxFlex="1 1">
-                                            {{ item.destinationField && mappedOpt.destinationOption && importableObject.modelPropertyValuesMapChildMap[item.destinationField] &&
+                                            {{ mappedOpt.destinationOption && importableObject.modelPropertyValuesMapChildMap[item.destinationField] &&
                                                 importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] ? importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] : '-' }}
                                         </div>
                                     </div>
@@ -438,8 +506,8 @@
 
                                             <!-- Duplicate source ? -->
                                             <span
-                                                *ngIf="item.sourceFieldWithSelectedIndexes && mappedOpt.sourceOption && usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes]
-                                                    && usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes][mappedOpt.sourceOption] > 1">
+                                                *ngIf="mappedOpt.sourceOption && usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes]
+                                                    && usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes].options[mappedOpt.sourceOption] > 1">
                                                 {{'LNG_FORM_VALIDATION_ERROR_DUPLICATE_VALUE' | translate}}
                                             </span>
 
@@ -495,8 +563,8 @@
 
                                                 <!-- Duplicate source ? -->
                                                 <span
-                                                    *ngIf="item.sourceFieldWithSelectedIndexes && mappedOpt.sourceOption && usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes]
-                                                    && usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes][mappedOpt.sourceOption] > 1">
+                                                    *ngIf="mappedOpt.sourceOption && usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes]
+                                                        && usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes].options[mappedOpt.sourceOption] > 1">
                                                     {{'LNG_FORM_VALIDATION_ERROR_DUPLICATE_VALUE' | translate}}
                                                 </span>
 
