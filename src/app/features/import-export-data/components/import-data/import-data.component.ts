@@ -567,6 +567,10 @@ export class ImportDataComponent
             complete: {
                 no: number,
                 total: number
+            },
+            incomplete: {
+                no: number,
+                total: number
             }
         }
     } = {};
@@ -2066,6 +2070,10 @@ export class ImportDataComponent
                 complete: {
                     no: number,
                     total: number
+                },
+                incomplete: {
+                    no: number,
+                    total: number
                 }
             }
         } = {};
@@ -2092,30 +2100,43 @@ export class ImportDataComponent
                     total: this.distinctValuesCache && this.distinctValuesCache[field.sourceFieldWithoutIndexes] ?
                         this.distinctValuesCache[field.sourceFieldWithoutIndexes].length :
                         0
+                },
+                incomplete: {
+                    no: 0,
+                    total: (field.mappedOptions || []).length
                 }
             };
             (field.mappedOptions || []).forEach((fieldOpt) => {
                 // no point in continuing if I don't have a source selected
+                let optIsValid: boolean = true;
                 if (!fieldOpt.sourceOption) {
                     // invalid
                     usedSourceFieldOptions[sourceKey].valid = false;
 
-                    // finished
-                    return;
+                    // option isn't valid
+                    optIsValid = false;
+                } else {
+                    // count
+                    usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] = usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] ?
+                        usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] + 1 :
+                        1;
+
+                    // validate
+                    if (
+                        usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] > 1 ||
+                        !fieldOpt.destinationOption
+                    ) {
+                        // invalid
+                        usedSourceFieldOptions[sourceKey].valid = false;
+
+                        // option isn't valid
+                        optIsValid = false;
+                    }
                 }
 
-                // count
-                usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] = usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] ?
-                    usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] + 1 :
-                    1;
-
-                // validate
-                if (
-                    usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] > 1 ||
-                    !fieldOpt.destinationOption
-                ) {
-                    // invalid
-                    usedSourceFieldOptions[sourceKey].valid = false;
+                // count invalid options
+                if (!optIsValid) {
+                    usedSourceFieldOptions[sourceKey].incomplete.no++;
                 }
             });
         });
@@ -2260,19 +2281,13 @@ export class ImportDataComponent
                             index + 1,
                             finishedCallback
                         );
-                    }, 50);
+                    }, 20);
                 };
 
                 // format field options
                 formattingHandler(
                     0,
                     () => {
-                        console.log(
-                            distinctValuesForKeys.length,
-                            this.mappedFields.length,
-                            distinctValuesForKeys
-                        );
-
                         // hide loading
                         loadingDialog.close();
                     }

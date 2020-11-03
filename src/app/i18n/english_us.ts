@@ -87,6 +87,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_WAITING': 'Pending',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_WAITING_DESCRIPTION': 'Need to map sub-options',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID': 'Incomplete',
+        'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID_WITH_NO': 'Incomplete {{no}} / {{total}}',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_VALID': 'Complete {{no}} / {{total}}',
 
         /**

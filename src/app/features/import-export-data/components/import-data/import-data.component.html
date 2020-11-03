@@ -230,7 +230,7 @@
                             <div
                                 fxFlex="120px">
                                 <div
-                                    *ngIf="item.sourceFieldWithoutIndexes && item.destinationField && (
+                                    *ngIf="item.sourceFieldWithoutIndexes && item.destinationField && item.sourceFieldWithSelectedIndexes && (
                                         !!importableObject.modelPropertyValuesMap[item.destinationField] ||
                                         addressFields[item.destinationField]
                                     )">
@@ -248,16 +248,19 @@
                                         #completeIncomplete>
                                         <!-- Incomplete map ? -->
                                         <div
-                                            *ngIf="!usedSourceFieldOptions[item.sourceFieldWithoutIndexes] || !usedSourceFieldOptions[item.sourceFieldWithoutIndexes].valid; else complete"
+                                            *ngIf="!usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes] || !usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes].valid; else complete"
                                             class="import-data-body-row-basic-data-error">
-                                            {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID' | translate }}
+                                            {{ !usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes] ?
+                                                ('LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID' | translate) :
+                                                ('LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID_WITH_NO' | translate:usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes].incomplete)
+                                            }}
                                         </div>
 
                                         <!-- Complete map ? -->
                                         <ng-template
                                             #complete>
                                             <div>
-                                                {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_VALID' | translate:usedSourceFieldOptions[item.sourceFieldWithoutIndexes].complete }}
+                                                {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_VALID' | translate:usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes].complete }}
                                             </div>
                                         </ng-template>
                                     </ng-template>
