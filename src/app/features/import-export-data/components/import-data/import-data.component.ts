@@ -1172,8 +1172,10 @@ export class ImportDataComponent
             !importableItem.sourceFieldWithoutIndexes ||
             !importableItem.destinationField ||
             !this.distinctValuesCache ||
-            !this.distinctValuesCache[importableItem.sourceFieldWithoutIndexes] ||
-            !this.importableObject.modelPropertyValuesMap[importableItem.destinationField]
+            !this.distinctValuesCache[importableItem.sourceFieldWithoutIndexes] || (
+                !this.importableObject.modelPropertyValuesMap[importableItem.destinationField] &&
+                !this.addressFields[importableItem.destinationField]
+            )
         ) {
             return;
         }

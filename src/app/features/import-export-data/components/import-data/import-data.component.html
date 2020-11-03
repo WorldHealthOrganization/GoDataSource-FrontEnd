@@ -102,7 +102,8 @@
                 (optionChanged)="loadSavedImportMapping($event)"
                 optionLabelKey="name"
                 optionValueKey="id"
-                [clearable]="false">
+                [clearable]="false"
+                [disabled]="true">
             </app-form-select>
 
             <div
@@ -112,7 +113,8 @@
                     (click)="resetImportMapping()"
                     type="button"
                     mat-raised-button
-                    color="accent">
+                    color="accent"
+                    [disabled]="true">
                     {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_RESET_IMPORT_MAPPING' | translate }}
                 </button>
             </div>
@@ -205,7 +207,7 @@
                             <!-- Destination -->
                             <div
                                 fxFlex="1 1" fxLayoutAlign="start end">
-                                {{ item.destinationField ? importableObject.modelPropertiesKeyValueMap[item.destinationField] : '-' }}
+                                {{ item.destinationField && importableObject.modelPropertiesKeyValueMap[item.destinationField] ? importableObject.modelPropertiesKeyValueMap[item.destinationField] : '-' }}
                             </div>
 
                             <!-- Array indexes -->
@@ -414,7 +416,8 @@
                                         <!-- Option Destination -->
                                         <div
                                             fxFlex="1 1">
-                                            {{ importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] }}
+                                            {{ item.destinationField && mappedOpt.destinationOption && importableObject.modelPropertyValuesMapChildMap[item.destinationField] &&
+                                                importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] ? importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] : '-' }}
                                         </div>
                                     </div>
 
@@ -481,7 +484,8 @@
                                                 [ngModel]="mappedOpt.sourceOption"
                                                 [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
                                                 [options]="mappedOpt.readOnly ? item.getOptionsForReadOnlySource(mappedOpt) : distinctValuesCache[item.sourceFieldWithoutIndexes]"
-                                                (optionChanged)="mappedOpt.sourceOption = $event ? $event.value : $event;">
+                                                (optionChanged)="mappedOpt.sourceOption = $event ? $event.value : $event;"
+                                                [disabled]="mappedOpt.readOnly">
                                             </app-form-select-vscroll>
 
                                             <!-- Duplicate source ? -->
@@ -503,15 +507,33 @@
                                         <!-- Destination Option -->
                                         <div
                                             fxFlex="1 1">
+
+                                            <!-- Not location ? -->
                                             <app-form-select-vscroll
+                                                *ngIf="!addressFields || !addressFields[item.destinationField]; else addressLocation"
                                                 name="mapObjectOptionsDestination"
                                                 required="true"
                                                 [ngModel]="mappedOpt.destinationOption"
                                                 [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
                                                 [options]="importableObject.modelPropertyValuesMap[item.destinationField]"
                                                 optionValueKey="id"
-                                                (optionChanged)="mappedOpt.destinationOption = $event ? $event.value : $event;">
+                                                (optionChanged)="mappedOpt.destinationOption = $event ? $event.value : $event;"
+                                                [disabled]="mappedOpt.readOnly">
                                             </app-form-select-vscroll>
+
+                                            <!-- Location -->
+                                            <ng-template
+                                                #addressLocation>
+                                                <app-form-location-dropdown
+                                                    name="mapObjectOptionsDestination"
+                                                    required="true"
+                                                    [ngModel]="mappedOpt.destinationOption"
+                                                    [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
+                                                    [useOutbreakLocations]="useOutbreakLocations"
+                                                    [fixedDropPanel]="true"
+                                                    [disabled]="mappedOpt.readOnly">
+                                                </app-form-location-dropdown>
+                                            </ng-template>
                                         </div>
 
                                     </div>
