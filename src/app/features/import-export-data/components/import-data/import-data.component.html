@@ -488,7 +488,7 @@
                                         <div
                                             fxFlex="1 1">
                                             {{ addressFields[item.destinationField] && mappedOpt.destinationOption && locationCache[mappedOpt.destinationOption] ?
-                                                locationCache[mappedOpt.destinationOption] : (
+                                                locationCache[mappedOpt.destinationOption].label : (
                                                     mappedOpt.destinationOption && importableObject.modelPropertyValuesMapChildMap[item.destinationField] &&
                                                     importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] ?
                                                         importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] :

@@ -81,14 +81,18 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX': 'Level',
         'LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX_DESCRIPTION': 'When Go.Data stores multiple records for the same type of data – for example a case that has three addresses, then you can choose the ‘level’ here.  For example, if you have two addresses in your source file for the same case then you can import one as Level 1 and the second as Level 2 to create the two addresses within the system.',
         'LNG_PAGE_IMPORT_DATA_INVALID_ARRAY_INDEX': 'Invalid indexes',
-        'LNG_PAGE_IMPORT_DATA_RETRIEVING_DATA': 'Retrieving data',
-        'LNG_PAGE_IMPORT_DATA_MAPPING_DATA': '{{index}} / {{total}}: Mapping "{{key}}"',
+        'LNG_PAGE_IMPORT_DATA_RETRIEVING_UNIQUE_VALUES': 'Retrieving unique values',
+        'LNG_PAGE_IMPORT_DATA_RETRIEVING_LOCATIONS': 'Retrieving locations',
+        'LNG_PAGE_IMPORT_DATA_POPULATING_DISTINCT_CACHE': '{{index}} / {{total}}: Cache "{{key}}"',
+        'LNG_PAGE_IMPORT_DATA_MAPPING_RETRIEVING_LOCATIONS': '{{index}} / {{total}}: Retrieving locations',
+        'LNG_PAGE_IMPORT_DATA_MAPPING_RETRIEVING_RELABEL_LOCATIONS': 'Preparing locations cache',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS': 'Mapping',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_WAITING': 'Pending',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_WAITING_DESCRIPTION': 'Need to map sub-options',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID': 'Incomplete',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID_WITH_NO': 'Incomplete {{no}} / {{total}}',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_VALID': 'Complete {{no}} / {{total}}',
+        'LNG_PAGE_IMPORT_DATA_MAPPING_DATA': '{{index}} / {{total}}: Mapping "{{key}}"',
 
         /**
          * uiClustersListPage

@@ -33,6 +33,8 @@ import { SafeStyle } from '@angular/platform-browser/src/security/dom_sanitizati
 import { HoverRowActionsDirective } from '../../../../shared/directives/hover-row-actions/hover-row-actions.directive';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
+import { LocationDataService } from '../../../../core/services/data/location.data.service';
+import { LocationModel } from '../../../../core/models/location.model';
 
 export enum ImportServerModelNames {
     CASE_LAB_RESULTS = 'labResult',
@@ -582,7 +584,15 @@ export class ImportDataComponent
 
     // location cache for easy access
     locationCache: {
-        [locationId: string]: string
+        [locationId: string]: {
+            label: string,
+            shortLabel: string,
+            parentsLoaded: boolean,
+            parentId: string
+        }
+    } = {};
+    locationCacheIndex: {
+        [indexKey: string]: string[]
     } = {};
 
     /**
@@ -602,7 +612,8 @@ export class ImportDataComponent
         private formHelper: FormHelperService,
         private importExportDataService: ImportExportDataService,
         private savedImportMappingService: SavedImportMappingService,
-        private domSanitizer: DomSanitizer
+        private domSanitizer: DomSanitizer,
+        private locationDataService: LocationDataService
     ) {
         // fix mime issue - browser not supporting some of the mimes, empty was provided to mime Type which wasn't allowing user to upload teh files
         if (!(FileLikeObject.prototype as any)._createFromObjectPrev) {
@@ -789,6 +800,8 @@ export class ImportDataComponent
 
                 // construct importable file object
                 this.distinctValuesCache = {};
+                this.locationCache = {};
+                this.locationCacheIndex = {};
                 this.importableObject = new ImportableFileModel(
                     jsonResponse,
                     (token: string): string => {
@@ -1288,9 +1301,15 @@ export class ImportDataComponent
 
             // check if we can find a proper destination option
             const sourceOptReduced: string = _.camelCase(mapOpt.sourceOption).toLowerCase();
-            const destinationOpt: any = this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField] ?
-                this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField][sourceOptReduced] :
-                undefined;
+            const destinationOpt: string = this.addressFields[importableItem.destinationField] ? (
+                    this.locationCacheIndex[sourceOptReduced] && this.locationCacheIndex[sourceOptReduced].length === 1 ?
+                        this.locationCacheIndex[sourceOptReduced][0] :
+                        undefined
+                ) : (
+                    this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField] ?
+                        this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField][sourceOptReduced] :
+                        undefined
+                );
 
             // found a possible destination field
             if (destinationOpt) {
@@ -1758,6 +1777,8 @@ export class ImportDataComponent
      */
     tryAgain() {
         this.distinctValuesCache = {};
+        this.locationCache = {};
+        this.locationCacheIndex = {};
         this.importableObject = null;
         this.errMsgDetails = null;
         this.uploader.clearQueue();
@@ -2164,6 +2185,26 @@ export class ImportDataComponent
     }
 
     /**
+     * Index location for easy access
+     */
+    private indexLocation(
+        locationName: string,
+        locationId: string
+    ) {
+        // cache
+        const cacheKey: string = _.camelCase(locationName).toLowerCase();
+        if (this.locationCacheIndex[cacheKey]) {
+            if (!this.locationCacheIndex[cacheKey].includes(locationId)) {
+                this.locationCacheIndex[cacheKey].push(locationId);
+            }
+        } else {
+            this.locationCacheIndex[cacheKey] = [
+                locationId
+            ];
+        }
+    }
+
+    /**
      * Retrieve distinct values used to map fields
      */
     retrieveDistinctValues(): void {
@@ -2171,6 +2212,9 @@ export class ImportDataComponent
         const distinctValuesForKeys: string[] = [];
         const distinctValuesForKeysMap: {
             [sourceFieldWithoutIndexes: string]: ImportableMapField
+        } = {};
+        const mustRetrieveLocations: {
+            [sourceFieldWithoutIndexes: string]: true
         } = {};
         this.mappedFields.forEach((field) => {
             // there is no point in retrieving unique values for items that don't need mapping
@@ -2189,6 +2233,11 @@ export class ImportDataComponent
             // add to list of items to retrieve distinct values for
             distinctValuesForKeys.push(field.sourceFieldWithoutIndexes);
             distinctValuesForKeysMap[field.sourceFieldWithoutIndexes] = field;
+
+            // must retrieve locations ?
+            if (this.addressFields[field.destinationField]) {
+                mustRetrieveLocations[field.sourceFieldWithoutIndexes] = true;
+            }
         });
 
         // nothing to retrieve ?
@@ -2202,7 +2251,7 @@ export class ImportDataComponent
         });
 
         // initializing message
-        loadingDialog.showMessage('LNG_PAGE_IMPORT_DATA_RETRIEVING_DATA');
+        loadingDialog.showMessage('LNG_PAGE_IMPORT_DATA_RETRIEVING_UNIQUE_VALUES');
 
         // retrieve items
         this.importExportDataService
@@ -2237,7 +2286,7 @@ export class ImportDataComponent
 
                     // formatting message
                     loadingDialog.showMessage(
-                        'LNG_PAGE_IMPORT_DATA_MAPPING_DATA', {
+                        'LNG_PAGE_IMPORT_DATA_POPULATING_DISTINCT_CACHE', {
                             index: (index + 1).toString(),
                             total: distinctValuesForKeys.length.toString(),
                             key: key
@@ -2264,9 +2313,6 @@ export class ImportDataComponent
                             });
                         }
 
-                        // map options
-                        this.addMapOptionsIfNecessary(distinctValuesForKeysMap[key]);
-
                         // finished
                         formattingHandler(
                             index + 1,
@@ -2275,30 +2321,246 @@ export class ImportDataComponent
                     }, 20);
                 };
 
+                // retrieve locations
+                const retrieveLocations = (finishedCallback: () => void) => {
+                    // initializing message
+                    loadingDialog.showMessage('LNG_PAGE_IMPORT_DATA_RETRIEVING_LOCATIONS');
+
+                    // create array of location names that we need to retrieve
+                    const locationsToRetrieveMap: {
+                        [locationIdName: string]: true
+                    } = {};
+                    _.each(mustRetrieveLocations, (N, key: string) => {
+                        if (
+                            this.distinctValuesCache[key] &&
+                            this.distinctValuesCache[key].length > 0
+                        ) {
+                            this.distinctValuesCache[key].forEach((data) => {
+                                // jump over if label not relevant
+                                if (
+                                    !data.label ||
+                                    data.label.toLowerCase() === 'null'
+                                ) {
+                                    return;
+                                }
+
+                                // add to list of locations to retrieve
+                                locationsToRetrieveMap[data.label] = true;
+                            });
+                        }
+                    });
+
+                    // do we have locations to retrieve ?
+                    const locationsToRetrieve: string[] = Object.keys(locationsToRetrieveMap);
+                    if (locationsToRetrieve.length < 1) {
+                        // no locations to retrieve
+                        finishedCallback();
+                    } else {
+                        // retrieve locations
+                        const retrieveLocationsData = (locations): Observable<LocationModel[]> => {
+                            // configure search for current batch
+                            const qb = new RequestQueryBuilder();
+                            qb.filter.where({
+                                or: [
+                                    {
+                                        name: {
+                                            inq: locations
+                                        }
+                                    }, {
+                                        id: {
+                                            inq: locations
+                                        }
+                                    }
+                                ]
+                            });
+
+                            // retrieve locations
+                            return this.locationDataService
+                                .getLocationsList(qb)
+                                .pipe(
+                                    catchError((err) => {
+                                        // hide loading
+                                        loadingDialog.close();
+
+                                        // show error
+                                        this.snackbarService.showApiError(err);
+                                        return throwError(err);
+                                    })
+                                );
+                        };
+
+                        // retrieve locations batch
+                        const batchSize: number = 100;
+                        let totalSize: number = locationsToRetrieve.length;
+                        const retrieveLocationsBatch = (finishedBatchCallback: () => void) => {
+                            // finished ?
+                            if (locationsToRetrieve.length < 1) {
+                                return finishedBatchCallback();
+                            }
+
+                            // formatting message
+                            loadingDialog.showMessage(
+                                'LNG_PAGE_IMPORT_DATA_MAPPING_RETRIEVING_LOCATIONS', {
+                                    index: (totalSize - locationsToRetrieve.length).toString(),
+                                    total: totalSize.toString()
+                                }
+                            );
+
+                            // construct location batch
+                            const batchLocations: string[] = locationsToRetrieve.splice(0, Math.min(locationsToRetrieve.length, batchSize));
+                            retrieveLocationsData(batchLocations)
+                                .subscribe((locationData) => {
+                                    // cache locations
+                                    locationData.forEach((location) => {
+                                        // cache locations
+                                        this.locationCache[location.id] = {
+                                            label: location.name,
+                                            parentsLoaded: !location.parentLocationId,
+                                            shortLabel: location.name,
+                                            parentId: location.parentLocationId
+                                        };
+
+                                        // index it
+                                        this.indexLocation(
+                                            location.name,
+                                            location.id
+                                        );
+                                    });
+
+                                    // retrieve parents too
+                                    // must go again because we might've retrieved the location in the current request (cached above)
+                                    // cache locations
+                                    locationData.forEach((location) => {
+                                        if (
+                                            location.parentLocationId &&
+                                            !this.locationCache[location.parentLocationId] &&
+                                            !locationsToRetrieve.includes(location.parentLocationId)
+                                        ) {
+                                            // add to list
+                                            locationsToRetrieve.push(location.parentLocationId);
+                                            totalSize++;
+                                        }
+                                    });
+
+                                    // next batch
+                                    retrieveLocationsBatch(finishedBatchCallback);
+                                });
+                        };
+
+                        // retrieve locations in batches
+                        retrieveLocationsBatch(() => {
+                            // finished retrieving locations
+                            finishedCallback();
+                        });
+                    }
+                };
+
+                // relabel child locations
+                const relabelLocations = (finishedCallback: () => void) => {
+                    // display message
+                    loadingDialog.showMessage('LNG_PAGE_IMPORT_DATA_MAPPING_RETRIEVING_RELABEL_LOCATIONS');
+
+                    // wait for bindings to have effect
+                    setTimeout(() => {
+                        // go through each location and set the proper name
+                        _.each(this.locationCache, (locationCacheItem) => {
+                            // finished with this one
+                            if (locationCacheItem.parentsLoaded) {
+                                return;
+                            }
+
+                            // location handled
+                            locationCacheItem.parentsLoaded = true;
+
+                            // determine parents name
+                            let parent = locationCacheItem.parentId && this.locationCache[locationCacheItem.parentId] ?
+                                this.locationCache[locationCacheItem.parentId] :
+                                null;
+                            let parentNames: string = '';
+                            while (parent) {
+                                // determine parents names
+                                parentNames = `${parent.shortLabel}${parentNames ? ' => ' + parentNames : ''}`;
+
+                                // next parent
+                                parent = parent.parentId && this.locationCache[parent.parentId] ?
+                                    this.locationCache[parent.parentId] :
+                                    null;
+                            }
+
+                            // set the new name
+                            locationCacheItem.label = `${parentNames ? parentNames + ' => ' : ''}${locationCacheItem.shortLabel}`;
+                        });
+
+                        // finished
+                        finishedCallback();
+                    }, 50);
+                };
+
+                // remap options
+                const addMapOptions = (finishedCallback: () => void): void => {
+                    // add map options
+                    const addMapOptionsHandler = (
+                        index: number,
+                        finishedHandlerCallback: () => void
+                    ) => {
+                        // finished ?
+                        if (index >= distinctValuesForKeys.length) {
+                            finishedHandlerCallback();
+                            return;
+                        }
+
+                        // determine key
+                        const key: string = distinctValuesForKeys[index];
+
+                        // formatting message
+                        loadingDialog.showMessage(
+                            'LNG_PAGE_IMPORT_DATA_MAPPING_DATA', {
+                                index: (index + 1).toString(),
+                                total: distinctValuesForKeys.length.toString(),
+                                key: key
+                            }
+                        );
+
+                        // process
+                        setTimeout(() => {
+                            // map options
+                            this.addMapOptionsIfNecessary(distinctValuesForKeysMap[key]);
+
+                            // finished
+                            addMapOptionsHandler(
+                                index + 1,
+                                finishedHandlerCallback
+                            );
+                        }, 20);
+                    };
+
+                    // populate options
+                    addMapOptionsHandler(
+                        0,
+                        () => {
+                            finishedCallback();
+                        }
+                    );
+                };
+
                 // format field options
                 formattingHandler(
                     0,
                     () => {
-                        // hide loading
-                        loadingDialog.close();
+                        // retrieve locations
+                        retrieveLocations(() => {
+                            // relabel locations
+                            relabelLocations(() => {
+                                // remap locations
+                                addMapOptions(() => {
+                                    // hide loading
+                                    loadingDialog.close();
+                                });
+                            });
+                        });
                     }
                 );
             });
-
-        // split into bulk requests
-        // retrieve n unique items, after that retrieve other n unique items...
-        // #TODO
-
-        // split into bulk requests
-        // retrieve n locations, after that retrieve other n locations
-        // #TODO
-
-        // before saving - on validation
-        // determine first 100 errors and display them or something in a format clear enough so user knows where to go, what list to check etc
-        // #TODO
-
-        // display mapped field options as field in vcroll...so we have only one scroll instead of one per field ?
-        // #TODO
     }
 
     /**
@@ -2314,20 +2576,36 @@ export class ImportDataComponent
         }
 
         // cache location if necessary
-        if (!this.locationCache[locationAutoItem.id]) {
+        if (
+            !this.locationCache[locationAutoItem.id] ||
+            !this.locationCache[locationAutoItem.id].parentsLoaded
+        ) {
             // retrieve parents labels
             let parentNames: string = '';
             let parentLocation = locationAutoItem.parent();
             while (parentLocation) {
                 // add name
-                parentNames = `${parentNames ? parentNames + ' => ' : ''}${parentLocation.label}`;
+                parentNames = `${parentLocation.label}${parentNames ? ' => ' + parentNames : ''}`;
 
                 // next parent
                 parentLocation = parentLocation.parent();
             }
 
             // cache location
-            this.locationCache[locationAutoItem.id] = `${parentNames ? parentNames + ' => ' : ''}${locationAutoItem.label}`;
+            this.locationCache[locationAutoItem.id] = {
+                label: `${parentNames ? parentNames + ' => ' : ''}${locationAutoItem.label}`,
+                parentsLoaded: true,
+                shortLabel: locationAutoItem.label,
+                parentId: locationAutoItem.parent() ?
+                    locationAutoItem.parent().id :
+                    null
+            };
+
+            // index it
+            this.indexLocation(
+                locationAutoItem.label,
+                locationAutoItem.id
+            );
         }
 
         // set option value
