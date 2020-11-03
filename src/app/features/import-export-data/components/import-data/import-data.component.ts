@@ -32,6 +32,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { SafeStyle } from '@angular/platform-browser/src/security/dom_sanitization_service';
 import { HoverRowActionsDirective } from '../../../../shared/directives/hover-row-actions/hover-row-actions.directive';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+import { LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
 
 export enum ImportServerModelNames {
     CASE_LAB_RESULTS = 'labResult',
@@ -569,6 +570,11 @@ export class ImportDataComponent
     // distinct values cache
     distinctValuesCache: {
         [fileHeader: string]: ImportableLabelValuePair[]
+    } = {};
+
+    // location cache for easy access
+    locationCache: {
+        [locationId: string]: string
     } = {};
 
     /**
@@ -2263,5 +2269,38 @@ export class ImportDataComponent
             // display mapped field options as field in vcroll...so we have only one scroll instead of one per field ?
             // #TODO
         }, 300);
+    }
+
+    /**
+     * Mapped field option location changed handler
+     */
+    mappedOptionsLocationChanged(
+        mappedOpt: IMappedOption,
+        locationAutoItem: LocationAutoItem
+    ): void {
+        // nothing selected ?
+        if (!locationAutoItem) {
+            mappedOpt.destinationOption = null;
+        }
+
+        // cache location if necessary
+        if (!this.locationCache[locationAutoItem.id]) {
+            // retrieve parents labels
+            let parentNames: string = '';
+            let parentLocation = locationAutoItem.parent();
+            while (parentLocation) {
+                // add name
+                parentNames = `${parentNames ? parentNames + ' => ' : ''}${parentLocation.label}`;
+
+                // next parent
+                parentLocation = parentLocation.parent();
+            }
+
+            // cache location
+            this.locationCache[locationAutoItem.id] = `${parentNames ? parentNames + ' => ' : ''}${locationAutoItem.label}`;
+        }
+
+        // set option value
+        mappedOpt.destinationOption = locationAutoItem.id;
     }
 }

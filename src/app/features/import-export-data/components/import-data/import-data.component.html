@@ -484,8 +484,14 @@
                                         <!-- Option Destination -->
                                         <div
                                             fxFlex="1 1">
-                                            {{ mappedOpt.destinationOption && importableObject.modelPropertyValuesMapChildMap[item.destinationField] &&
-                                                importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] ? importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] : '-' }}
+                                            {{ addressFields[item.destinationField] && mappedOpt.destinationOption && locationCache[mappedOpt.destinationOption] ?
+                                                locationCache[mappedOpt.destinationOption] : (
+                                                    mappedOpt.destinationOption && importableObject.modelPropertyValuesMapChildMap[item.destinationField] &&
+                                                    importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] ?
+                                                        importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] :
+                                                        '-'
+                                                )
+                                            }}
                                         </div>
                                     </div>
 
@@ -592,14 +598,19 @@
                                             <!-- Location -->
                                             <ng-template
                                                 #addressLocation>
-                                                <app-form-location-dropdown
-                                                    name="mapObjectOptionsDestination"
-                                                    required="true"
-                                                    [ngModel]="mappedOpt.destinationOption"
-                                                    [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
-                                                    [useOutbreakLocations]="useOutbreakLocations"
-                                                    [disabled]="mappedOpt.readOnly">
-                                                </app-form-location-dropdown>
+                                                <div
+                                                    fxFlex
+                                                    class="import-data-body-row-edit-extra-details-row-location">
+                                                    <app-form-location-dropdown
+                                                        name="mapObjectOptionsDestination"
+                                                        required="true"
+                                                        [ngModel]="mappedOpt.destinationOption"
+                                                        [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
+                                                        [useOutbreakLocations]="useOutbreakLocations"
+                                                        [disabled]="mappedOpt.readOnly"
+                                                        (itemChanged)="mappedOptionsLocationChanged(mappedOpt, $event)">
+                                                    </app-form-location-dropdown>
+                                                </div>
                                             </ng-template>
                                         </div>
 

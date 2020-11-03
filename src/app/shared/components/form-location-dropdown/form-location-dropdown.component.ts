@@ -21,14 +21,15 @@ import { Subscriber } from 'rxjs/internal-compatibility';
 
 export class LocationAutoItem {
     constructor(
-        public id: string,
-        public label: string,
-        public level: number,
-        public disabled: boolean = false,
-        public geoLocation: {
+        public readonly id: string,
+        public readonly label: string,
+        public readonly level: number,
+        public readonly disabled: boolean = false,
+        public readonly geoLocation: {
             lat: number,
             lng: number
-        } = null
+        } = null,
+        public readonly parent: () => LocationAutoItem
     ) {}
 }
 
@@ -100,6 +101,9 @@ export class FormLocationDropdownComponent
     @ViewChild('locationHandler') locationHandler: NgSelectComponent;
 
     locationItems: LocationAutoItem[];
+    locationMap: {
+        [idLocation: string]: LocationAutoItem;
+    } = {};
 
     locationLoading: boolean = false;
     locationInput$: Subject<string> = new Subject<string>();
@@ -283,6 +287,7 @@ export class FormLocationDropdownComponent
                 // clear input
                 this.currentNotFoundText = this.notFoundText;
                 this.locationItems = [];
+                this.locationMap = {};
 
                 // don't search if we entered at least on character but less than minimum search
                 if (
@@ -416,6 +421,7 @@ export class FormLocationDropdownComponent
         const request = locationsList$
             .subscribe((hierarchicalLocation: HierarchicalLocationModel[]) => {
                 // list to check
+                this.locationMap = {};
                 const locationItems = [];
                 const listToCheck = _.clone(hierarchicalLocation);
                 const levels: { [locationId: string]: number } = {};
@@ -435,11 +441,17 @@ export class FormLocationDropdownComponent
                             levels[currentItem.location.parentLocationId] + 1 :
                             0,
                         !currentItem.location.active || currentItem.location.disabled,
-                        currentItem.location.geoLocation
+                        currentItem.location.geoLocation,
+                        () => {
+                            return currentItem.location.parentLocationId && this.locationMap[currentItem.location.parentLocationId] ?
+                                this.locationMap[currentItem.location.parentLocationId] :
+                                null;
+                        }
                     );
 
                     // add item to list
                     locationItems.push(locationAI);
+                    this.locationMap[locationAI.id] = locationAI;
 
                     // set level
                     levels[locationAI.id] = locationAI.level;
