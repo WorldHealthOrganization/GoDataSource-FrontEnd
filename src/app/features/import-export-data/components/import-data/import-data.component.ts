@@ -2211,7 +2211,7 @@ export class ImportDataComponent
         // determine file headers for which we need to retrieve distinct values
         const distinctValuesForKeys: string[] = [];
         const distinctValuesForKeysMap: {
-            [sourceFieldWithoutIndexes: string]: ImportableMapField
+            [sourceFieldWithoutIndexes: string]: ImportableMapField[]
         } = {};
         const mustRetrieveLocations: {
             [sourceFieldWithoutIndexes: string]: true
@@ -2230,13 +2230,21 @@ export class ImportDataComponent
                 return;
             }
 
-            // add to list of items to retrieve distinct values for
-            distinctValuesForKeys.push(field.sourceFieldWithoutIndexes);
-            distinctValuesForKeysMap[field.sourceFieldWithoutIndexes] = field;
+            // map for easy access later
+            if (!distinctValuesForKeysMap[field.sourceFieldWithoutIndexes]) {
+                distinctValuesForKeysMap[field.sourceFieldWithoutIndexes] = [field];
+            } else {
+                distinctValuesForKeysMap[field.sourceFieldWithoutIndexes].push(field);
+            }
 
             // must retrieve locations ?
             if (this.addressFields[field.destinationField]) {
                 mustRetrieveLocations[field.sourceFieldWithoutIndexes] = true;
+            }
+
+            // add to list of items to retrieve distinct values for
+            if (!distinctValuesForKeys.includes(field.sourceFieldWithoutIndexes)) {
+                distinctValuesForKeys.push(field.sourceFieldWithoutIndexes);
             }
         });
 
@@ -2524,7 +2532,9 @@ export class ImportDataComponent
                         // process
                         setTimeout(() => {
                             // map options
-                            this.addMapOptionsIfNecessary(distinctValuesForKeysMap[key]);
+                            distinctValuesForKeysMap[key].forEach((field) => {
+                                this.addMapOptionsIfNecessary(field);
+                            });
 
                             // finished
                             addMapOptionsHandler(
