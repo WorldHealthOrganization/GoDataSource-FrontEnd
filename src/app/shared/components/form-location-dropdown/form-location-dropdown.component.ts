@@ -67,6 +67,7 @@ export class FormLocationDropdownComponent
     @Input() loadingText: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_LOADING_TEXT';
     @Input() typeToSearchText: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_TYPE_TO_SEARCH_TEXT';
     @Input() minimumSearchLength: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_MINIMUM_SEARCH_LENGTH';
+    @Input() appendTo: string = 'body';
     private _notFoundText: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_NO_ITEMS_FOUND_TEXT';
     currentNotFoundText: string = this._notFoundText;
     notFoundTextData = {
@@ -80,9 +81,6 @@ export class FormLocationDropdownComponent
         return this._notFoundText;
     }
     @Input() useOutbreakLocations: boolean = false;
-
-    // floatable drop panel
-    @Input() fixedDropPanel: boolean = false;
 
     @Output() itemChanged = new EventEmitter<LocationAutoItem | undefined | LocationAutoItem[]>();
     @Output() locationsLoaded = new EventEmitter<LocationAutoItem[]>();
@@ -121,8 +119,6 @@ export class FormLocationDropdownComponent
 
     // language subscription
     private languageSubscription: Subscription;
-
-    repositionTimer: any;
 
     /**
      * Do a request or retrieve it from cache if it didn't expire
@@ -320,9 +316,6 @@ export class FormLocationDropdownComponent
                 // retrieve data
                 this.refreshLocationList();
             });
-
-        // init timer to reposition fixed dropdown panel
-        this.repositionDropDownPanel();
     }
 
     /**
@@ -344,83 +337,6 @@ export class FormLocationDropdownComponent
             this.languageSubscription.unsubscribe();
             this.languageSubscription = null;
         }
-
-        // remove reposition timer
-        this.clearRepositionDropDownPanel();
-    }
-
-    /**
-     * Clear reposition timer
-     */
-    clearRepositionDropDownPanel() {
-        if (this.repositionTimer) {
-            clearTimeout(this.repositionTimer);
-            this.repositionTimer = null;
-        }
-    }
-
-    /**
-     * Reposition dropdown timer & call again reposition after some time
-     */
-    repositionDropDownPanel() {
-        // clear reposition
-        this.clearRepositionDropDownPanel();
-
-        // do we need to reposition this dropdown
-        if (!this.fixedDropPanel) {
-            return;
-        }
-
-        // check if item is visible on screen
-        const checkVisible = (elm): boolean => {
-            const rect = elm.getBoundingClientRect();
-            const viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
-            return !(rect.bottom < 0 || rect.top - viewHeight >= 0);
-        };
-
-        // wait for debounce time
-        this.repositionTimer = setTimeout(() => {
-            // reposition dropdown
-            if (
-                this.locationHandler.isOpen &&
-                this.locationHandler.element
-            ) {
-                // retrieve involved items
-                const dropSelectContainer: any = this.locationHandler.element.querySelector('.ng-select-container');
-                const dropDownPanel: any = this.locationHandler.element.querySelector('.ng-dropdown-panel');
-                const isVisible: boolean = checkVisible(dropSelectContainer);
-                if (
-                    dropSelectContainer &&
-                    dropDownPanel &&
-                    isVisible
-                ) {
-                    // retrieve items
-                    const dropDownPanelItems: any = dropDownPanel.querySelector('.ng-dropdown-panel-items');
-                    const dropDownPanelItemsPosition = dropDownPanelItems ?
-                        dropDownPanelItems.getBoundingClientRect() :
-                        null;
-
-                    // determine position
-                    const dropSelectContainerPosition = dropSelectContainer.getBoundingClientRect();
-                    let top: number = dropSelectContainerPosition.top + dropSelectContainerPosition.height;
-                    if (
-                        dropDownPanelItemsPosition &&
-                        top + dropDownPanelItemsPosition.height > window.innerHeight
-                    ) {
-                        top = dropSelectContainerPosition.top - dropDownPanelItemsPosition.height;
-                    }
-
-                    // reposition item
-                    dropDownPanel.style.left = `${dropSelectContainerPosition.left}px`;
-                    dropDownPanel.style.top = `${top}px`;
-                } else if (!isVisible) {
-                    this.locationHandler.close();
-                }
-            }
-
-            // reposition again after some time
-            this.repositionDropDownPanel();
-        }, 100);
     }
 
     /**

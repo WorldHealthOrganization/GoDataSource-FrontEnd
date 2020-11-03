@@ -19,7 +19,6 @@
                     tooltip="LNG_ADDRESS_FIELD_LABEL_LOCATION_DESCRIPTION"
                     [required]="data?.required"
                     [useOutbreakLocations]="data?.useOutbreakLocations"
-                    [fixedDropPanel]="true"
                     (itemChanged)="locationChanged($event)"
                     (locationsLoaded)="locationsLoaded($event)">
                 </app-form-location-dropdown>
