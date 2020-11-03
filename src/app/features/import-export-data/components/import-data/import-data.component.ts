@@ -2313,6 +2313,17 @@ export class ImportDataComponent
                             response.distinctFileColumnValues[key].length > 0
                         ) {
                             response.distinctFileColumnValues[key].forEach((fileUniqueValue) => {
+                                // ignore empty values
+                                // for now we don't handle empty
+                                // #TODO - later we should allow user to map empty file value to a db value (we might want to map empty to LNG_REFERENCE_...NONE)
+                                if (
+                                    !fileUniqueValue ||
+                                    fileUniqueValue.toLowerCase() === 'null'
+                                ) {
+                                    return;
+                                }
+
+                                // cache item
                                 this.distinctValuesCache[key].push(new ImportableLabelValuePair(
                                     fileUniqueValue,
                                     fileUniqueValue,

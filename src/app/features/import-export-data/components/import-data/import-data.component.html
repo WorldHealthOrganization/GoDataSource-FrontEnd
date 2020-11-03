@@ -260,7 +260,11 @@
                                         <ng-template
                                             #complete>
                                             <div>
-                                                {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_VALID' | translate:usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes].complete }}
+                                                {{ usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes].complete.total < 1 ||
+                                                    usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes].complete.no === usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes].complete.total ?
+                                                    ('LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_VALID' | translate) :
+                                                    ('LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_VALID_WITH_NO' | translate:usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes].complete)
+                                                }}
                                             </div>
                                         </ng-template>
                                     </ng-template>
