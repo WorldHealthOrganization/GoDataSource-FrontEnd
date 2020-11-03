@@ -1710,45 +1710,45 @@ export class ImportDataComponent
                 }
             });
 
-            console.log(importJSON);
+            // import data
+            this.importExportDataService
+                .importData(
+                    this.importDataUrl,
+                    importJSON
+                )
+                .pipe(
+                    catchError((err) => {
+                        // display error message
+                        if (err.code === 'IMPORT_PARTIAL_SUCCESS') {
+                            // construct custom message
+                            this.errMsgDetails = err;
 
-            // // import data
-            // this.progress = null;
-            // this.importExportDataService.importData(
-            //     this.importDataUrl,
-            //     importJSON
-            // )
-            //     .pipe(
-            //         catchError((err) => {
-            //             // display error message
-            //             if (err.code === 'IMPORT_PARTIAL_SUCCESS') {
-            //                 // construct custom message
-            //                 this.errMsgDetails = err;
-            //
-            //                 // display error
-            //                 this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
-            //             } else {
-            //                 this.snackbarService.showApiError(err);
-            //             }
-            //
-            //             // reset loading
-            //             this._displayLoading = false;
-            //             this._displayLoadingLocked = false;
-            //
-            //             // propagate err
-            //             return throwError(err);
-            //         })
-            //     )
-            //     .subscribe(() => {
-            //         // display success
-            //         this.snackbarService.showSuccess(
-            //             this.importSuccessMessage,
-            //             this.translationData
-            //         );
-            //
-            //         // emit finished event - event should handle redirect
-            //         this.finished.emit();
-            //     });
+                            // display error
+                            this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
+                        } else {
+                            this.snackbarService.showApiError(err);
+                        }
+
+                        // hide loading
+                        loadingDialog.close();
+
+                        // propagate err
+                        return throwError(err);
+                    })
+                )
+                .subscribe(() => {
+                    // display success
+                    this.snackbarService.showSuccess(
+                        this.importSuccessMessage,
+                        this.translationData
+                    );
+
+                    // hide loading
+                    loadingDialog.close();
+
+                    // emit finished event - event should handle redirect
+                    this.finished.emit();
+                });
         });
     }
 
