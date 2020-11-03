@@ -39,6 +39,12 @@ export class ImportableFilePropertyValuesModel {
     } | ImportableFilePropertyValuesModel
 }
 
+export interface IImportableFileDistinctValues {
+    distinctFileColumnValues: {
+        [fileHeader: string]: string[]
+    };
+}
+
 
 export class ImportableFileModel {
     // file id

@@ -3,10 +3,13 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
+import { IImportableFileDistinctValues } from '../../../features/import-export-data/components/import-data/model';
 
 @Injectable()
 export class ImportExportDataService {
-
+    /**
+     * Constructor
+     */
     constructor(
         private http: HttpClient
     ) {}
@@ -134,7 +137,23 @@ export class ImportExportDataService {
      */
     exportImageToPdf( imageData: {image: string, responseType: string, splitFactor: number}): Observable<any> {
         const headers = new HttpHeaders({ 'Content-Type': 'application/pdf'});
-        return this.http.post(`/system-settings/image-to-pdf/`, imageData,  { headers, responseType: 'blob' });
+        return this.http.post('/system-settings/image-to-pdf/', imageData,  { headers, responseType: 'blob' });
+    }
+
+    /**
+     * Determine distinct values
+     * @param fileId
+     * @param headers
+     */
+    determineDistinctValues(
+        fileId: string,
+        headers: string[]
+    ): Observable<IImportableFileDistinctValues> {
+        return this.http.post(
+            `/importable-files/${fileId}/distinct-values-json`, {
+                headers: headers
+            }
+        ) as Observable<IImportableFileDistinctValues>;
     }
 }
 

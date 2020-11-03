@@ -563,7 +563,11 @@ export class ImportDataComponent
             options: {
                 [option: string]: number
             },
-            valid: boolean
+            valid: boolean,
+            complete: {
+                no: number,
+                total: number
+            }
         }
     } = {};
 
@@ -1286,7 +1290,7 @@ export class ImportDataComponent
 
             // found a possible destination field
             if (destinationOpt) {
-                mapOpt.destinationOption = destinationOpt.id;
+                mapOpt.destinationOption = destinationOpt;
             }
 
             // add option
@@ -2058,7 +2062,11 @@ export class ImportDataComponent
                 options: {
                     [option: string]: number
                 },
-                valid: boolean
+                valid: boolean,
+                complete: {
+                    no: number,
+                    total: number
+                }
             }
         } = {};
         (this.mappedFields || []).forEach((field) => {
@@ -2078,7 +2086,13 @@ export class ImportDataComponent
             // count options too
             usedSourceFieldOptions[sourceKey] = {
                 options: {},
-                valid: true
+                valid: true,
+                complete: {
+                    no: (field.mappedOptions || []).length,
+                    total: this.distinctValuesCache && this.distinctValuesCache[field.sourceFieldWithoutIndexes] ?
+                        this.distinctValuesCache[field.sourceFieldWithoutIndexes].length :
+                        0
+                }
             };
             (field.mappedOptions || []).forEach((fieldOpt) => {
                 // no point in continuing if I don't have a source selected
@@ -2141,8 +2155,6 @@ export class ImportDataComponent
      * Retrieve distinct values used to map fields
      */
     retrieveDistinctValues(): void {
-        const start = window.performance.now();
-
         // determine file headers for which we need to retrieve distinct values
         const distinctValuesForKeys: string[] = [];
         const distinctValuesForKeysMap: {
@@ -2181,94 +2193,106 @@ export class ImportDataComponent
         loadingDialog.showMessage('LNG_PAGE_IMPORT_DATA_RETRIEVING_DATA');
 
         // retrieve items
-        // #TODO
-
-        // replicate data retrieval
-        let no: number = 0;
-        setTimeout(() => {
-            // format handler
-            const formattingHandler = (
-                index: number,
-                finishedCallback: () => void
-            ) => {
-                // finished ?
-                if (index >= distinctValuesForKeys.length) {
-                    finishedCallback();
-                    return;
-                }
-
-                // determine key
-                const key: string = distinctValuesForKeys[index];
-
-                // formatting message
-                loadingDialog.showMessage(
-                    'LNG_PAGE_IMPORT_DATA_MAPPING_DATA', {
-                        index: (index + 1).toString(),
-                        total: distinctValuesForKeys.length.toString(),
-                        key: key
-                    }
-                );
-
-                // process
-                setTimeout(() => {
-                    // initialize cache
-                    this.distinctValuesCache[key] = [];
-
-                    // const noItems = Math.floor(Math.random() * 10000) + 1;
-                    const noItems = 20000;
-                    for (let i = 0; i < noItems; i++) {
-                        this.distinctValuesCache[key].push(new ImportableLabelValuePair(
-                            i.toString(),
-                            i.toString(),
-                            i.toString()
-                        ));
-                        no++;
-                    }
-
-                    // map options
-                    this.addMapOptionsIfNecessary(distinctValuesForKeysMap[key]);
-
-                    // finished
-                    formattingHandler(
-                        index + 1,
-                        finishedCallback
-                    );
-                }, 50);
-            };
-
-            // format field options
-            formattingHandler(
-                0,
-                () => {
-                    console.log(
-                        distinctValuesForKeys.length,
-                        this.mappedFields.length,
-                        distinctValuesForKeys
-                    );
-                    console.log('Total no of items: ' + no);
-                    const end = window.performance.now();
-                    console.log(`Execution time: ${end - start} ms`);
-
+        this.importExportDataService
+            .determineDistinctValues(
+                this.importableObject.id,
+                distinctValuesForKeys
+            )
+            .pipe(
+                catchError((err) => {
                     // hide loading
                     loadingDialog.close();
-                }
-            );
 
-            // split into bulk requests
-            // retrieve n unique items, after that retrieve other n unique items...
-            // #TODO
+                    // show error
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                })
+            )
+            .subscribe((response) => {
+                // format handler
+                const formattingHandler = (
+                    index: number,
+                    finishedCallback: () => void
+                ) => {
+                    // finished ?
+                    if (index >= distinctValuesForKeys.length) {
+                        finishedCallback();
+                        return;
+                    }
 
-            // split into bulk requests
-            // retrieve n locations, after that retrieve other n locations
-            // #TODO
+                    // determine key
+                    const key: string = distinctValuesForKeys[index];
 
-            // before saving - on validation
-            // determine first 100 errors and display them or something in a format clear enough so user knows where to go, what list to check etc
-            // #TODO
+                    // formatting message
+                    loadingDialog.showMessage(
+                        'LNG_PAGE_IMPORT_DATA_MAPPING_DATA', {
+                            index: (index + 1).toString(),
+                            total: distinctValuesForKeys.length.toString(),
+                            key: key
+                        }
+                    );
 
-            // display mapped field options as field in vcroll...so we have only one scroll instead of one per field ?
-            // #TODO
-        }, 300);
+                    // process
+                    setTimeout(() => {
+                        // initialize cache
+                        this.distinctValuesCache[key] = [];
+
+                        // add items to cache
+                        if (
+                            response.distinctFileColumnValues &&
+                            response.distinctFileColumnValues[key] &&
+                            response.distinctFileColumnValues[key].length > 0
+                        ) {
+                            response.distinctFileColumnValues[key].forEach((fileUniqueValue) => {
+                                this.distinctValuesCache[key].push(new ImportableLabelValuePair(
+                                    fileUniqueValue,
+                                    fileUniqueValue,
+                                    fileUniqueValue
+                                ));
+                            });
+                        }
+
+                        // map options
+                        this.addMapOptionsIfNecessary(distinctValuesForKeysMap[key]);
+
+                        // finished
+                        formattingHandler(
+                            index + 1,
+                            finishedCallback
+                        );
+                    }, 50);
+                };
+
+                // format field options
+                formattingHandler(
+                    0,
+                    () => {
+                        console.log(
+                            distinctValuesForKeys.length,
+                            this.mappedFields.length,
+                            distinctValuesForKeys
+                        );
+
+                        // hide loading
+                        loadingDialog.close();
+                    }
+                );
+            });
+
+        // split into bulk requests
+        // retrieve n unique items, after that retrieve other n unique items...
+        // #TODO
+
+        // split into bulk requests
+        // retrieve n locations, after that retrieve other n locations
+        // #TODO
+
+        // before saving - on validation
+        // determine first 100 errors and display them or something in a format clear enough so user knows where to go, what list to check etc
+        // #TODO
+
+        // display mapped field options as field in vcroll...so we have only one scroll instead of one per field ?
+        // #TODO
     }
 
     /**
