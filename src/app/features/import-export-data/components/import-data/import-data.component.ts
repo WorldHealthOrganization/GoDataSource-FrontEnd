@@ -1600,15 +1600,6 @@ export class ImportDataComponent
     }
 
     /**
-     * Track by mapped field / option
-     * @param index
-     * @param item
-     */
-    trackByFieldID(index: number, item: { id: string }): string {
-        return item.id;
-    }
-
-    /**
      * Import data
      * @param form
      */

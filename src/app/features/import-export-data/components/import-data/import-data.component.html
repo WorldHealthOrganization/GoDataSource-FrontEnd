@@ -668,61 +668,6 @@
             </button>
         </div>
 
-
-
-
-        <form
-            *ngIf="false"
-            #form="ngForm"
-            (submit)="importData(form)"
-            fxLayout="column">
-            <div
-                *ngFor="let item of mappedFields; trackBy: trackByFieldID"
-                fxLayout="column">
-                    <div
-                        *ngFor="let mappedOpt of item.mappedOptions; trackBy: trackByFieldID; let indexMapOption = index"
-                        fxLayout="row" fxLayoutGap="20px"
-                        [class]="mappedOpt.readOnly ? 'import-data-map-fields-children-source-readonly' : ''">
-                        <app-form-select-change-detection-push
-                            [name]="'mapObject[' + item.id + '][options][' + mappedOpt.id + '][sourceOption]'"
-                            app-unique-validator
-                            [appUniqueValidatorExpression]="'\\[' + item.id + '\\]\\[options\\]\\[[^\\]]+\\]\\[sourceOption\\]$'"
-                            required="true"
-                            [ngModel]="mappedOpt.sourceOption"
-                            [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
-                            [options]="mappedOpt.readOnly ? item.getOptionsForReadOnlySource(mappedOpt) : importableObject.distinctFileColumnValuesKeyValue[item.sourceFieldWithoutIndexes]"
-                            (optionChanged)="mappedOpt.sourceOption = $event ? $event.value : $event;"
-                            [disabled]="mappedOpt.readOnly">
-                        </app-form-select-change-detection-push>
-
-                        <app-form-select-change-detection-push
-                            *ngIf="!addressFields || !addressFields[item.destinationField]; else addressLocation"
-                            [name]="'mapObject[' + item.id + '][options][' + mappedOpt.id + '][destinationOption]'"
-                            required="true"
-                            [ngModel]="mappedOpt.destinationOption"
-                            [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
-                            [options]="importableObject.modelPropertyValuesMap[item.destinationField]"
-                            optionValueKey="id"
-                            (optionChanged)="mappedOpt.destinationOption = $event ? $event.value : $event;"
-                            [disabled]="mappedOpt.readOnly">
-                        </app-form-select-change-detection-push>
-
-                        <ng-template
-                            #addressLocation>
-                            <app-form-location-dropdown
-                                [name]="'mapObject[' + item.id + '][options][' + mappedOpt.id + '][destinationOption]'"
-                                required="true"
-                                [ngModel]="mappedOpt.destinationOption"
-                                [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
-                                [useOutbreakLocations]="useOutbreakLocations"
-                                [disabled]="mappedOpt.readOnly">
-                            </app-form-location-dropdown>
-                        </ng-template>
-
-                    </div>
-            </div>
-
-        </form>
     </div>
 
     <!-- Import failed errors -->
