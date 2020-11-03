@@ -138,6 +138,12 @@
                 fxLayout="row" fxLayoutGap="10px"
                 class="import-data-header-row">
 
+                <!-- Row No. -->
+                <div
+                    fxFlex="40px" fxLayoutAlign="start end">
+                    {{ 'LNG_PAGE_IMPORT_DATA_LABEL_ROW_NO' | translate }}
+                </div>
+
                 <!-- Source -->
                 <div
                     fxFlex="1 1" fxLayoutAlign="start end">
@@ -214,6 +220,12 @@
                         <div
                             class="import-data-body-row-basic-data"
                             fxLayout="row" fxLayoutGap="10px">
+                            <!-- Row No. -->
+                            <div
+                                fxFlex="40px" fxLayoutAlign="start end">
+                                {{ elementIndex + 1 }}
+                            </div>
+
                             <!-- Source -->
                             <div
                                 fxFlex="1 1" fxLayoutAlign="start end">
@@ -288,6 +300,12 @@
                         <!-- Validation Info -->
                         <div
                             class="import-data-body-row-basic-validation">
+
+                            <!-- Row No. -->
+                            <div
+                                fxFlex="40px">
+                                <!-- placeholder -->
+                            </div>
 
                             <!-- Source -->
                             <div
@@ -368,6 +386,12 @@
                             [hoverRowActions]="recordActions"
                             [hoverRowActionData]="item"
                             [hoverRowActionIndex]="elementIndex">
+
+                            <!-- Row No. -->
+                            <div
+                                fxFlex="40px">
+                                {{ elementIndex + 1 }}
+                            </div>
 
                             <!-- Source -->
                             <div
@@ -641,15 +665,6 @@
         <div
             class="import-data-action-buttons"
             fxLayout="row" fxLayoutAlign="end" fxLayoutGap="10px">
-            <!-- TEST -->
-            <button
-                (click)="retrieveDistinctValues()"
-                type="button"
-                mat-raised-button
-                color="accent">
-                TEST
-            </button>
-
 
             <!-- Save import mapping -->
             <button
@@ -662,14 +677,26 @@
                 {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_SAVE_IMPORT_MAPPING' | translate }}
             </button>
 
+            <!-- Map sub-options -->
+            <button
+                *ngIf="needToMapOptions"
+                (click)="retrieveDistinctValues()"
+                type="button"
+                mat-raised-button
+                color="accent">
+                {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_MAP_SUB_OPTIONS' | translate }}
+            </button>
+
             <!-- Map field sub-options / Import -->
             <button
+                *ngIf="!needToMapOptions"
                 mat-raised-button
                 color="accent"
-                type="submit"
-                [disabled]="true">
+                type="button"
+                (click)="importData()">
                 {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_IMPORT_FILE' | translate }}
             </button>
+
         </div>
 
     </div>

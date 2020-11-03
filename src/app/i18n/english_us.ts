@@ -77,6 +77,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_BUTTON_CLOSE_MODIFY': 'Hide modify',
         'LNG_PAGE_IMPORT_DATA_BUTTON_EXPAND_OPTIONS': 'Show sub-options',
         'LNG_PAGE_IMPORT_DATA_BUTTON_COLLAPSE_OPTIONS': 'Hide sub-options',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_MAP_SUB_OPTIONS': 'Map sub-options',
         'LNG_PAGE_IMPORT_DATA_REQUIRED': 'Field required',
         'LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX': 'Level',
         'LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX_DESCRIPTION': 'When Go.Data stores multiple records for the same type of data – for example a case that has three addresses, then you can choose the ‘level’ here.  For example, if you have two addresses in your source file for the same case then you can import one as Level 1 and the second as Level 2 to create the two addresses within the system.',
@@ -88,12 +89,15 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_MAPPING_RETRIEVING_RELABEL_LOCATIONS': 'Preparing locations cache',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS': 'Mapping',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_WAITING': 'Pending',
-        'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_WAITING_DESCRIPTION': 'Need to map sub-options',
+        'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_WAITING_DESCRIPTION': 'You need to map sub-options',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID': 'Incomplete',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID_WITH_NO': 'Incomplete {{no}} / {{total}}',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_VALID': 'Complete',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_VALID_WITH_NO': 'Complete {{no}} / {{total}}',
         'LNG_PAGE_IMPORT_DATA_MAPPING_DATA': '{{index}} / {{total}}: Mapping "{{key}}"',
+        'LNG_PAGE_IMPORT_DATA_MAPPING_FINISHED': 'Mapping of sub-options finished. Please check that all of them were mapped properly.',
+        'LNG_PAGE_IMPORT_DATA_LABEL_ROW_NO': 'No',
+        'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_ROWS': 'Invalid records: {{rows}}',
 
         /**
          * uiClustersListPage
