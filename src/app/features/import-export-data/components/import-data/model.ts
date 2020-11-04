@@ -115,8 +115,8 @@ export class ImportableFileModel {
     ): any {
         // validate input object
         if (
-            _.isEmpty(object) ||
-            _.isEmpty(path)
+            !object ||
+            !path
         ) {
             return undefined;
         }
@@ -144,7 +144,15 @@ export class ImportableFileModel {
      * Constructor
      */
     constructor(
-        data = null,
+        data: {
+            id: string,
+            fileHeaders: any,
+            fileArrayHeaders: any,
+            modelProperties: any,
+            modelPropertyValues: any,
+            suggestedFieldMapping: any,
+            modelArrayProperties: any
+        },
         translate: (string) => string,
         fileType: ImportDataExtension,
         fieldsWithoutTokens: {
@@ -171,25 +179,25 @@ export class ImportableFileModel {
         ) => void
     ) {
         // file id
-        this.id = _.get(data, 'id');
+        this.id = data.id;
 
         // file headers
-        this.fileHeaders = (_.get(data, 'fileHeaders') || []).map((value: any) => {
+        this.fileHeaders = (data.fileHeaders || []).map((value: any) => {
             return typeof value === 'string' ? value : value.toString();
         });
 
         // file array headers
-        this.fileArrayHeaders = _.get(data, 'fileArrayHeaders') || [];
+        this.fileArrayHeaders = data.fileArrayHeaders || [];
 
         // model properties
-        this.modelProperties = _.get(data, 'modelProperties', {});
-        this.modelPropertyValues = _.get(data, 'modelPropertyValues', {});
+        this.modelProperties = data.modelProperties || {};
+        this.modelPropertyValues = data.modelPropertyValues || {};
 
         // suggested mappings
-        this.suggestedFieldMapping = _.get(data, 'suggestedFieldMapping', {});
+        this.suggestedFieldMapping = data.suggestedFieldMapping || {};
 
         // model array properties
-        this.modelArrayProperties = _.get(data, 'modelArrayProperties', {});
+        this.modelArrayProperties = data.modelArrayProperties || {};
 
         // format response
         if (formatDataBeforeUse) {
@@ -205,7 +213,7 @@ export class ImportableFileModel {
         }
 
         // map file headers
-        this.fileHeadersKeyValue = _.chain(this.fileHeaders)
+        this.fileHeadersKeyValue = this.fileHeaders
             .map((value: string) => {
                 return new ImportableLabelValuePair(
                     value,
@@ -213,10 +221,12 @@ export class ImportableFileModel {
                     value
                 );
             })
-            .sortBy((item: { label: string }) => {
-                return item.label;
-            })
-            .value() as ImportableLabelValuePair[];
+            .sort((
+                item1: { label: string },
+                item2: { label: string }
+            ) => {
+                return item1.label.localeCompare(item2.label);
+            });
 
         // recursive add value pair
         const modelPropertyValuesMapIndex: {
@@ -230,7 +240,7 @@ export class ImportableFileModel {
             labelPrefix: string = ''
         ) => {
             // if this is a string property then we can push it as it is
-            if (_.isString(impLVPair.label)) {
+            if (typeof impLVPair.label === 'string') {
                 if (!excludeDestinationProperties[impLVPair.value]) {
                     // add parent prefix to child one
                     impLVPair.label = labelPrefix + translate(
@@ -268,7 +278,7 @@ export class ImportableFileModel {
                     result.push(impLVPair);
                 }
             // otherwise we need to map it to multiple values
-            } else if (_.isObject(impLVPair.label)) {
+            } else if (typeof impLVPair.label === 'object') {
                 // add as parent drop-down as well
                 // NO NEED FOR NOW, since back-end doesn't have this implementation anymore
 
