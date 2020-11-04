@@ -88,6 +88,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_MAPPING_RETRIEVING_LOCATIONS': '{{index}} / {{total}}: Retrieving locations',
         'LNG_PAGE_IMPORT_DATA_MAPPING_RETRIEVING_RELABEL_LOCATIONS': 'Preparing locations cache',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS': 'Mapping',
+        'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_DESCRIPTION': 'Pending: must "Map sub-options" - Complete no / total: "total" is the number of distinct values from the file, while "no" is the number of mapped sub-options, this information is useful if you decide not to map everything, or to make sure you don\'t missing something - Complete: all file options are mapped - Incomplete no / total: "total" is the number of mapped sub-options while "no" is the number of invalid options',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_WAITING': 'Pending',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_WAITING_DESCRIPTION': 'You need to map sub-options',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID': 'Incomplete',
@@ -99,6 +100,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_MAPPING_FINISHED': 'Mapping of sub-options finished. Please check that all of them were mapped properly.',
         'LNG_PAGE_IMPORT_DATA_LABEL_ROW_NO': 'No',
         'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_ROWS': 'Invalid records: {{rows}}',
+        'LNG_PAGE_IMPORT_DATA_LOAD_SAVED_MAPPING_CONFIRMATION': 'Are you sure you want to load "{{name}}"? It might take a while...',
 
         /**
          * uiClustersListPage

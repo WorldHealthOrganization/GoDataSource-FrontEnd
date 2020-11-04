@@ -5,7 +5,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { environment } from '../../../../../environments/environment';
 import { IMappedOption, IModelArrayProperties, ImportableFileModel, ImportableFilePropertiesModel, ImportableFilePropertyValuesModel, ImportableLabelValuePair, ImportableMapField, ImportDataExtension } from './model';
 import * as _ from 'lodash';
-import { DialogAnswer, DialogAnswerButton, HoverRowAction } from '../../../../shared/components';
+import { DialogAnswer, DialogAnswerButton, HoverRowAction, LoadingDialogModel } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
@@ -18,6 +18,7 @@ import {
     DialogFieldType
 } from '../../../../shared/components/dialog/dialog.component';
 import {
+    ISavedImportMappingModel,
     SavedImportField, SavedImportMappingModel,
     SavedImportOption
 } from '../../../../core/models/saved-import-mapping.model';
@@ -33,6 +34,7 @@ import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { LocationModel } from '../../../../core/models/location.model';
+import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 
 export enum ImportServerModelNames {
     CASE_LAB_RESULTS = 'labResult',
@@ -147,7 +149,7 @@ export class ImportDataComponent
     savedMappingsList$: Observable<SavedImportMappingModel[]>;
 
     // loaded saved import mapping
-    loadedImportMapping: SavedImportMappingModel;
+    loadedImportMapping: ISavedImportMappingModel = null;
 
     /**
      * File uploader
@@ -308,11 +310,6 @@ export class ImportDataComponent
      * Mapped fields
      */
     mappedFields: ImportableMapField[] = [];
-
-    /**
-     * Mapped fields for reset
-     */
-    initialImportMapping: ImportableMapField[] = [];
 
     /**
      * Keep err msg details
@@ -1218,9 +1215,6 @@ export class ImportDataComponent
             this.mappedFields.push(importableItem);
         });
 
-        // save initial import mapping
-        this.initialImportMapping = _.clone(this.mappedFields);
-
         // display form
         this._displayLoading = false;
         this._displayLoadingLocked = false;
@@ -1252,7 +1246,12 @@ export class ImportDataComponent
         // since mappingData could be really big we need to retrieve only what is used by the list followed by retrieving more data if we need it
         qb.fields(
             'id',
-            'name'
+            'name',
+            'readOnly',
+
+            // required by API - it should be added by api, but at the moment it doesn't work like this
+            // #TODO - changes on API
+            'userId'
         );
 
         // retrieve data
@@ -1272,7 +1271,10 @@ export class ImportDataComponent
      */
     addMapOptionsIfNecessary(
         importableItem: ImportableMapField,
-        reInitOptions: boolean = true
+        reInitOptions: boolean = true,
+        restrictTo?: {
+            [fieldOptionSource: string]: string[]
+        }
     ) {
         // add all distinct source as items that we need to map
         importableItem.mappedOptions = reInitOptions ? [] : (importableItem.mappedOptions || []);
@@ -1293,31 +1295,6 @@ export class ImportDataComponent
         // we CAN'T use _.get because importableItem.sourceField contains special chars [ / ] / .
         const distinctValues: ImportableLabelValuePair[] = this.distinctValuesCache[importableItem.sourceFieldWithoutIndexes];
         _.each(distinctValues, (distinctVal: ImportableLabelValuePair) => {
-            // // check to see if we didn't map this value somewhere else already
-            // if (_.find(
-            //     this.mappedFields,
-            //     (item: ImportableMapField): boolean => {
-            //         if (
-            //             item.sourceFieldWithoutIndexes !== importableItem.sourceFieldWithoutIndexes ||
-            //             item.destinationField !== importableItem.destinationField
-            //         ) {
-            //             return false;
-            //         } else {
-            //             return !_.isEmpty(
-            //                 _.find(
-            //                     item.mappedOptions,
-            //                     (option: { sourceOption: string }): boolean => {
-            //                         return option.sourceOption === distinctVal.value;
-            //                     }
-            //                 )
-            //             );
-            //         }
-            //     }
-            // )) {
-            //     // no need to continue since this option is already mapped
-            //     return;
-            // }
-
             // create map option with source
             const mapOpt: IMappedOption = {
                 id: uuid(),
@@ -1325,9 +1302,46 @@ export class ImportDataComponent
                 sourceOption: distinctVal.value
             };
 
-            // check if we can find a proper destination option
-            const sourceOptReduced: string = _.camelCase(mapOpt.sourceOption).toLowerCase();
-            const destinationOpt: string = this.addressFields[importableItem.destinationField] ? (
+            // do we need to restrict to specific options ?
+            let destinationOpt: string;
+            if (restrictTo) {
+                // ignore this one ?
+                if (!restrictTo[mapOpt.sourceOption]) {
+                    return;
+                }
+
+                // found a possible destination field
+                if (
+                    restrictTo[mapOpt.sourceOption] &&
+                    restrictTo[mapOpt.sourceOption].length === 1
+                ) {
+                    // get value
+                    const destinationValue: string = restrictTo[mapOpt.sourceOption][0];
+
+                    // determine destination option
+                    destinationOpt = this.addressFields[importableItem.destinationField] ? (
+                        this.locationCache[destinationValue] ?
+                            destinationValue :
+                            undefined
+                    ) : (
+                        this.importableObject.modelPropertyValuesMapChildMap[importableItem.destinationField] &&
+                            this.importableObject.modelPropertyValuesMapChildMap[importableItem.destinationField][destinationValue] !== undefined ?
+                                destinationValue :
+                                undefined
+                    );
+
+                    // found a possible destination field
+                    if (destinationOpt) {
+                        mapOpt.destinationOption = destinationOpt;
+                    }
+                }
+
+                // add option
+                importableItem.mappedOptions.push(mapOpt);
+            } else {
+                // check if we can find a proper destination option
+                const sourceOptReduced: string = _.camelCase(mapOpt.sourceOption).toLowerCase();
+                destinationOpt = this.addressFields[importableItem.destinationField] ? (
                     this.locationCacheIndex[sourceOptReduced] && this.locationCacheIndex[sourceOptReduced].length === 1 ?
                         this.locationCacheIndex[sourceOptReduced][0] :
                         undefined
@@ -1337,13 +1351,14 @@ export class ImportDataComponent
                         undefined
                 );
 
-            // found a possible destination field
-            if (destinationOpt) {
-                mapOpt.destinationOption = destinationOpt;
-            }
+                // found a possible destination field
+                if (destinationOpt) {
+                    mapOpt.destinationOption = destinationOpt;
+                }
 
-            // add option
-            importableItem.mappedOptions.push(mapOpt);
+                // add option
+                importableItem.mappedOptions.push(mapOpt);
+            }
         });
     }
 
@@ -1399,11 +1414,15 @@ export class ImportDataComponent
                                     return throwError(err);
                                 })
                             )
-                            .subscribe((data) => {
+                            .subscribe((data: SavedImportMappingModel) => {
                                 // refresh import mappings
                                 this.getImportMappings(() => {
                                     // update loading item
-                                    this.loadedImportMapping = new SavedImportMappingModel(data);
+                                    this.loadedImportMapping = {
+                                        id: data.id,
+                                        name: data.name,
+                                        readOnly: data.readOnly
+                                    };
 
                                     // hide loading
                                     loadingDialog.close();
@@ -1462,11 +1481,15 @@ export class ImportDataComponent
                                     return throwError(err);
                                 })
                             )
-                            .subscribe((data) => {
+                            .subscribe((data: SavedImportMappingModel) => {
                                 // refresh import mappings
                                 this.getImportMappings(() => {
                                     // update import mapping
-                                    this.loadedImportMapping = new SavedImportMappingModel(data);
+                                    this.loadedImportMapping = {
+                                        id: data.id,
+                                        name: data.name,
+                                        readOnly: data.readOnly
+                                    };
 
                                     // hide loading
                                     loadingDialog.close();
@@ -1482,14 +1505,6 @@ export class ImportDataComponent
         } else {
             createImportMapping();
         }
-    }
-
-    /**
-     * Reset import mapping to initial values
-     */
-    resetImportMapping() {
-        this.mappedFields = _.clone(this.initialImportMapping);
-        this.loadedImportMapping = undefined;
     }
 
     /**
@@ -1513,85 +1528,121 @@ export class ImportDataComponent
     /**
      * Load a saved import mapping
      */
-    loadSavedImportMapping(savedImportMapping: SavedImportMappingModel) {
+    loadSavedImportMapping(savedImportMapping: ISavedImportMappingModel) {
         // keep loaded import mapping reference
         this.loadedImportMapping = savedImportMapping;
 
-        const mapOfRequiredDestinationFields = this.requiredDestinationFieldsMap ? _.clone(this.requiredDestinationFieldsMap) : {};
-        this.mappedFields = [];
-        _.each(savedImportMapping.mappingData, (option: SavedImportField) => {
-            // create new map field
-            const mapField = new ImportableMapField(
-                option.destination,
-                option.source
-            );
+        // nothing to retrieve ?
+        if (
+            !this.loadedImportMapping ||
+            !this.loadedImportMapping.id
+        ) {
+            return;
+        }
 
-            // had sub options ?
-            mapField.mappedOptions = (option.options || []).map((item: SavedImportOption) => {
-                return {
-                    id: uuid(),
-                    parentId: mapField.id,
-                    sourceOption: item.source,
-                    destinationOption: item.destination
-                };
+        // ask for confirmation
+        this.dialogService
+            .showConfirm(
+                'LNG_PAGE_IMPORT_DATA_LOAD_SAVED_MAPPING_CONFIRMATION', {
+                    name: savedImportMapping.name
+                }
+            )
+            .subscribe((answer: DialogAnswer) => {
+                // Cancel ?
+                if (answer.button !== DialogAnswerButton.Yes) {
+                    // deselect
+                    this.loadedImportMapping = null;
+
+                    // finished
+                    return;
+                }
+
+                // display loading
+                const loadingDialog = this.createPrepareMapDataLoadingDialog();
+
+                // reset scroll position
+                if (this.virtualScrollViewport) {
+                    this.virtualScrollViewport.scrollToOffset(0);
+                }
+
+                // retrieve mapping data
+                loadingDialog.showMessage('LNG_PAGE_IMPORT_DATA_LABEL_RETRIEVE_MAP_DATA');
+                this.savedImportMappingService
+                    .getImportMapping(this.loadedImportMapping.id)
+                    .pipe(
+                        catchError((err) => {
+                            // hide loading
+                            loadingDialog.close();
+
+                            // show error
+                            this.snackbarService.showApiError(err);
+                            return throwError(err);
+                        })
+                    )
+                    .subscribe((importMapping: SavedImportMappingModel) => {
+                        // map fields
+                        loadingDialog.showMessage('LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS');
+
+                        // wait for message to be displayed
+                        setTimeout(() => {
+                            // clear map data
+                            this.mappedFields = [];
+                            this.distinctValuesCache = {};
+                            this.locationCache = {};
+                            this.locationCacheIndex = {};
+
+                            // map fields
+                            const mapOfRequiredDestinationFields = this.requiredDestinationFieldsMap ? _.clone(this.requiredDestinationFieldsMap) : {};
+                            (importMapping.mappingData || []).forEach((savedFieldMap) => {
+                                // initialize field map
+                                const field: ImportableMapField = new ImportableMapField(
+                                    savedFieldMap.destination,
+                                    savedFieldMap.source
+                                );
+
+                                // map levels
+                                if (savedFieldMap.levels) {
+                                    field.setSourceDestinationLevels(savedFieldMap.levels);
+                                }
+
+                                // required ?
+                                if (mapOfRequiredDestinationFields[field.destinationField]) {
+                                    field.readonly = true;
+                                    delete mapOfRequiredDestinationFields[field.destinationField];
+                                }
+
+                                // add it to the list
+                                this.mappedFields.push(field);
+                            });
+
+                            // add missing required fields
+                            _.each(mapOfRequiredDestinationFields, (
+                                n: boolean,
+                                destinationField: string
+                            ) => {
+                                // create
+                                const importableItem = new ImportableMapField(
+                                    destinationField
+                                );
+
+                                // make it readonly
+                                importableItem.readonly = true;
+
+                                // add to list
+                                this.mappedFields.push(importableItem);
+                            });
+
+                            // go through process of mapping sub options accordingly to what was saved
+                            // this method will hide the loading dialog too
+                            setTimeout(() => {
+                                this.retrieveDistinctValues(
+                                    loadingDialog,
+                                    importMapping
+                                );
+                            }, 50);
+                        });
+                    });
             });
-
-            // filter out for which source doesn't exist anymore
-            if (!_.isEmpty(mapField.mappedOptions)) {
-                // map possible source options
-                const optionValuesMap = this.distinctValuesCache ?
-                    _.transform(
-                        this.distinctValuesCache[mapField.sourceFieldWithoutIndexes],
-                        (a, v) => {
-                            a[v.value] = v;
-                        },
-                        {}
-                    ) :
-                    {};
-
-                // filter out items that aren't mapped out
-                // make not match value appear but ignored when sent to server, this way we can save import mappings without loosing old values
-                _.each(mapField.mappedOptions, (
-                    item: IMappedOption
-                ) => {
-                    if (item.sourceOption && !optionValuesMap[item.sourceOption]) {
-                        item.readOnly = true;
-                    }
-                });
-            }
-
-            // map sub levels ( array indexes )
-            mapField.setSourceDestinationLevels(option.levels);
-
-            // required ?
-            if (mapOfRequiredDestinationFields[mapField.destinationField]) {
-                mapField.readonly = true;
-                delete mapOfRequiredDestinationFields[mapField.destinationField];
-            }
-
-            // add it to the list
-            this.mappedFields.push(mapField);
-
-            // add new source items that weren't saved previously
-            this.addMapOptionsIfNecessary(
-                mapField,
-                false
-            );
-        });
-
-        // add missing required fields
-        _.each(mapOfRequiredDestinationFields, (n: boolean, property: string) => {
-            // create
-            const importableItem = new ImportableMapField(
-                property
-            );
-
-            // make it readonly
-            importableItem.readonly = true;
-
-            // add to list
-            this.mappedFields.push(importableItem);
-        });
     }
 
     /**
@@ -1761,6 +1812,7 @@ export class ImportDataComponent
             });
 
             // import data
+            // #TODO - check periodically where we are ( n rows from total )
             this.importExportDataService
                 .importData(
                     this.importDataUrl,
@@ -1814,7 +1866,7 @@ export class ImportDataComponent
         this.uploader.clearQueue();
         this.mappedFields = [];
         this.decryptPassword = null;
-        this.loadedImportMapping = undefined;
+        this.loadedImportMapping = null;
     }
 
     /**
@@ -2128,7 +2180,7 @@ export class ImportDataComponent
 
             // no point in continuing if I don't have a source selected
             if (!field.sourceField) {
-                return;
+                continue;
             }
 
             // do we need to map source field options ?
@@ -2259,9 +2311,24 @@ export class ImportDataComponent
     }
 
     /**
+     * Create loading dialog specific for preparing the map data
+     */
+    private createPrepareMapDataLoadingDialog(): LoadingDialogModel {
+        return this.dialogService.showLoadingDialog({
+            widthPx: 400
+        });
+    }
+
+    /**
      * Retrieve distinct values used to map fields
      */
-    retrieveDistinctValues(): void {
+    retrieveDistinctValues(
+        loadingDialog?: LoadingDialogModel,
+        importMapping?: SavedImportMappingModel
+    ): void {
+        // display loading
+        loadingDialog = loadingDialog || this.createPrepareMapDataLoadingDialog();
+
         // determine file headers for which we need to retrieve distinct values
         const distinctValuesForKeys: string[] = [];
         const distinctValuesForKeysMap: {
@@ -2285,6 +2352,7 @@ export class ImportDataComponent
             }
 
             // map for easy access later
+            // #TODO - only one fields should map for all other (even if they are on different indexes)
             if (!distinctValuesForKeysMap[field.sourceFieldWithoutIndexes]) {
                 distinctValuesForKeysMap[field.sourceFieldWithoutIndexes] = [field];
             } else {
@@ -2304,13 +2372,67 @@ export class ImportDataComponent
 
         // nothing to retrieve ?
         if (distinctValuesForKeys.length < 1) {
+            // hide dialog
+            loadingDialog.close();
+
+            // finished
             return;
         }
 
-        // display loading
-        const loadingDialog = this.dialogService.showLoadingDialog({
-            widthPx: 400
-        });
+        // map saved import fields for easy access
+        // must be undefined when initialized, otherwise it breaks some logic
+        let importMappingFieldSubOptionsMap: {
+            [fieldSource: string]: {
+                [fieldDestination: string]: {
+                    // fieldOptionSource => fieldOptionDestination[]
+                    [fieldOptionSource: string]: string[]
+                }
+            }
+        };
+        if (importMapping) {
+            // init map
+            importMappingFieldSubOptionsMap = {};
+
+            // go through saved mappings and map field sub-options data
+            importMapping.mappingData.forEach((savedImportField) => {
+                // there is no point in mapping if we don't have everything we need
+                if (
+                    !savedImportField.source ||
+                    !savedImportField.destination
+                ) {
+                    return;
+                }
+
+                // initialize field source if necessary
+                if (!importMappingFieldSubOptionsMap[savedImportField.source]) {
+                    importMappingFieldSubOptionsMap[savedImportField.source] = {};
+                }
+
+                // initialize field destination if necessary
+                if (!importMappingFieldSubOptionsMap[savedImportField.source][savedImportField.destination]) {
+                    importMappingFieldSubOptionsMap[savedImportField.source][savedImportField.destination] = {};
+                }
+
+                // map options for easy access
+                (savedImportField.options || []).forEach((savedImportOption) => {
+                    // no point in continuing ?
+                    if (
+                        !savedImportOption.source ||
+                        !savedImportOption.destination
+                    ) {
+                        return;
+                    }
+
+                    // initialize field option source if necessary
+                    if (!importMappingFieldSubOptionsMap[savedImportField.source][savedImportField.destination][savedImportOption.source]) {
+                        importMappingFieldSubOptionsMap[savedImportField.source][savedImportField.destination][savedImportOption.source] = [];
+                    }
+
+                    // add field option destination if necessary
+                    importMappingFieldSubOptionsMap[savedImportField.source][savedImportField.destination][savedImportOption.source].push(savedImportOption.destination);
+                });
+            });
+        }
 
         // initializing message
         loadingDialog.showMessage('LNG_PAGE_IMPORT_DATA_RETRIEVING_UNIQUE_VALUES');
@@ -2396,9 +2518,6 @@ export class ImportDataComponent
 
                 // retrieve locations
                 const retrieveLocations = (finishedCallback: () => void) => {
-                    // initializing message
-                    loadingDialog.showMessage('LNG_PAGE_IMPORT_DATA_RETRIEVING_LOCATIONS');
-
                     // create array of location names that we need to retrieve
                     const locationsToRetrieveMap: {
                         [locationIdName: string]: true
@@ -2408,6 +2527,7 @@ export class ImportDataComponent
                             this.distinctValuesCache[key] &&
                             this.distinctValuesCache[key].length > 0
                         ) {
+                            // go through distinct values
                             this.distinctValuesCache[key].forEach((data) => {
                                 // jump over if label not relevant
                                 if (
@@ -2420,6 +2540,31 @@ export class ImportDataComponent
                                 // add to list of locations to retrieve
                                 locationsToRetrieveMap[data.label] = true;
                             });
+
+                            // also, in case we load saved mappings then we need to retrieve saved locations
+                            if (importMappingFieldSubOptionsMap) {
+                                distinctValuesForKeysMap[key].forEach((locationField) => {
+                                    // do we have field source & destination, otherwise there is no point in continuing
+                                    if (
+                                        !locationField.sourceField ||
+                                        !locationField.destinationField
+                                    ) {
+                                        return;
+                                    }
+
+                                    // go through each saved sub-option destination and make sure we retrieve that location too
+                                    if (
+                                        importMappingFieldSubOptionsMap[locationField.sourceField] &&
+                                        importMappingFieldSubOptionsMap[locationField.sourceField][locationField.destinationField]
+                                    ) {
+                                        _.each(importMappingFieldSubOptionsMap[locationField.sourceField][locationField.destinationField], (destinationOptions: string[]) => {
+                                            destinationOptions.forEach((locationId: string) => {
+                                                locationsToRetrieveMap[locationId] = true;
+                                            });
+                                        });
+                                    }
+                                });
+                            }
                         }
                     });
 
@@ -2430,22 +2575,38 @@ export class ImportDataComponent
                         finishedCallback();
                     } else {
                         // retrieve locations
-                        const retrieveLocationsData = (locations): Observable<LocationModel[]> => {
+                        const retrieveLocationsData = (locations: string[]): Observable<LocationModel[]> => {
+                            // construct regular expression for case insensitive search for names
+                            let nameRegex: string = '';
+                            locations.forEach((location) => {
+                                nameRegex = `${nameRegex}${nameRegex ? '|' : ''}(${RequestFilterGenerator.escapeStringForRegex(location)})`;
+                            });
+
                             // configure search for current batch
                             const qb = new RequestQueryBuilder();
                             qb.filter.where({
                                 or: [
                                     {
-                                        name: {
+                                        // file location ids
+                                        // saved mappings location ids
+                                        id: {
                                             inq: locations
                                         }
                                     }, {
-                                        id: {
-                                            inq: locations
+                                        // file location names
+                                        name: {
+                                            regexp: `/^(${nameRegex})$/i`
                                         }
                                     }
                                 ]
                             });
+
+                            // we need only specific data
+                            qb.fields(
+                                'id',
+                                'name',
+                                'parentLocationId'
+                            );
 
                             // retrieve locations
                             return this.locationDataService
@@ -2529,7 +2690,7 @@ export class ImportDataComponent
                 };
 
                 // relabel child locations
-                const relabelLocations = (finishedCallback: () => void) => {
+                const reLabelLocations = (finishedCallback: () => void) => {
                     // display message
                     loadingDialog.showMessage('LNG_PAGE_IMPORT_DATA_MAPPING_RETRIEVING_RELABEL_LOCATIONS');
 
@@ -2598,7 +2759,15 @@ export class ImportDataComponent
                         setTimeout(() => {
                             // map options
                             distinctValuesForKeysMap[key].forEach((field) => {
-                                this.addMapOptionsIfNecessary(field);
+                                this.addMapOptionsIfNecessary(
+                                    field,
+                                    true,
+                                    importMappingFieldSubOptionsMap && field.sourceField && field.destinationField &&
+                                        importMappingFieldSubOptionsMap[field.sourceField] && importMappingFieldSubOptionsMap[field.sourceField][field.destinationField] ?
+                                            // fieldOptionSource => fieldOptionDestination[]
+                                            importMappingFieldSubOptionsMap[field.sourceField][field.destinationField] :
+                                            null
+                                );
                             });
 
                             // finished
@@ -2622,20 +2791,29 @@ export class ImportDataComponent
                 formattingHandler(
                     0,
                     () => {
-                        // retrieve locations
-                        retrieveLocations(() => {
-                            // relabel locations
-                            relabelLocations(() => {
-                                // remap locations
-                                addMapOptions(() => {
-                                    // hide loading
-                                    loadingDialog.close();
+                        // initializing message
+                        loadingDialog.showMessage('LNG_PAGE_IMPORT_DATA_RETRIEVING_LOCATIONS');
 
-                                    // display success
-                                    this.snackbarService.showSuccess('LNG_PAGE_IMPORT_DATA_MAPPING_FINISHED');
+                        // retrieve locations
+                        setTimeout(() => {
+                            retrieveLocations(() => {
+                                // relabel locations
+                                reLabelLocations(() => {
+                                    // remap locations
+                                    addMapOptions(() => {
+                                        // hide loading
+                                        loadingDialog.close();
+
+                                        // display success
+                                        this.snackbarService.showSuccess(
+                                            'LNG_PAGE_IMPORT_DATA_MAPPING_FINISHED',
+                                            {},
+                                            SnackbarService.DURATION_INFINITE
+                                        );
+                                    });
                                 });
                             });
-                        });
+                        }, 50);
                     }
                 );
             });

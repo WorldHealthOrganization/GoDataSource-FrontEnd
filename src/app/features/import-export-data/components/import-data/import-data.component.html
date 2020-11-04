@@ -101,8 +101,7 @@
                 [options]="savedMappingsList$ | async "
                 (optionChanged)="loadSavedImportMapping($event)"
                 optionLabelKey="name"
-                optionValueKey="id"
-                [clearable]="false">
+                optionValueKey="id">
             </app-form-select>
 
             <div fxFlex><!-- placeholder --></div>
@@ -145,13 +144,22 @@
 
                 <!-- Mappings -->
                 <div
-                    fxFlex="120px" fxLayoutAlign="start end">
-                    {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS' | translate }}
+                    fxFlex="120px" fxLayoutAlign="start end" fxLayout="row" fxLayoutGap="10px">
+                    <div
+                        fxFlex fxGrow="0">
+                        {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS' | translate }}
+                    </div>
+                    <div
+                        fxFlex>
+                        <span
+                            class="xt-icon xt-icon-xsmall"
+                            [matTooltip]="'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_DESCRIPTION' | translate">info</span>
+                    </div>
                 </div>
 
                 <!-- Array indexes -->
                 <div
-                    fxFlex="1 1" fxLayoutAlign="start end" fxLayout="row" fxLayoutGap="20px">
+                    fxFlex="1 1" fxLayoutAlign="start end" fxLayout="row" fxLayoutGap="10px">
                     <div
                         fxFlex fxGrow="0">
                         {{ 'LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX' | translate }}
@@ -159,7 +167,7 @@
                     <div
                         fxFlex>
                         <span
-                            class="xt-icon"
+                            class="xt-icon xt-icon-xsmall"
                             [matTooltip]="'LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX_DESCRIPTION' | translate">info</span>
                     </div>
                 </div>
