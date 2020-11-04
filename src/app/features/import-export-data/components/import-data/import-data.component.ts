@@ -1837,14 +1837,14 @@ export class ImportDataComponent
         const importDataBodyRowsMaxHeight: SafeStyle = this.domSanitizer.bypassSecurityTrustStyle(`calc(100vh - (${this.mappedDataTable.nativeElement.getBoundingClientRect().top}px + 170px))`);
         if (this.importDataBodyRowsMaxHeight !== importDataBodyRowsMaxHeight) {
             this.importDataBodyRowsMaxHeight = importDataBodyRowsMaxHeight;
-        }
 
-        // update virtual scroll height
-        setTimeout(() => {
-            if (this.virtualScrollViewport) {
-                this.virtualScrollViewport.checkViewportSize();
-            }
-        });
+            // update virtual scroll height
+            setTimeout(() => {
+                if (this.virtualScrollViewport) {
+                    this.virtualScrollViewport.checkViewportSize();
+                }
+            });
+        }
     }
 
     /**
@@ -2070,7 +2070,12 @@ export class ImportDataComponent
                 }
             }
         } = {};
-        (this.mappedFields || []).forEach((field) => {
+
+        // for speed purposes we will use for..loop
+        for (let fieldIndex = 0; fieldIndex < this.mappedFields.length; fieldIndex++) {
+            // retrieve field
+            const field: ImportableMapField = this.mappedFields[fieldIndex];
+
             // no point in continuing if I don't have a source selected
             if (!field.sourceField) {
                 return;
@@ -2114,7 +2119,12 @@ export class ImportDataComponent
                     total: (field.mappedOptions || []).length
                 }
             };
-            (field.mappedOptions || []).forEach((fieldOpt) => {
+
+            // for speed purposes we will use for..loop
+            for (let fieldOptionIndex = 0; fieldOptionIndex < field.mappedOptions.length; fieldOptionIndex++) {
+                // retrieve field
+                const fieldOpt: IMappedOption = field.mappedOptions[fieldOptionIndex];
+
                 // no point in continuing if I don't have a source selected
                 let optIsValid: boolean = true;
                 if (!fieldOpt.sourceOption) {
@@ -2146,21 +2156,15 @@ export class ImportDataComponent
                 if (!optIsValid) {
                     usedSourceFieldOptions[sourceKey].incomplete.no++;
                 }
-            });
-        });
-
-        // change only if values are different so we don't trigger even more binding checks
-        if (!_.isEqual(this.usedSourceFields, usedSourceFields)) {
-            this.usedSourceFields = usedSourceFields;
+            }
         }
 
-        // change only if values are different so we don't trigger even more binding checks
-        if (!_.isEqual(this.usedSourceFieldOptions, usedSourceFieldOptions)) {
-            this.usedSourceFieldOptions = usedSourceFieldOptions;
-        }
+        // update
+        this.usedSourceFields = usedSourceFields;
+        this.usedSourceFieldOptions = usedSourceFieldOptions;
 
-        // hide / show map button
-        // allow import
+        // hide / show map button ?
+        // allow import ?
         this.needToMapOptions = needToMapOptions;
 
         // run again later
