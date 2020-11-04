@@ -94,6 +94,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID_WITH_NO': 'Incomplete {{no}} / {{total}}',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_VALID': 'Complete',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_VALID_WITH_NO': 'Complete {{no}} / {{total}}',
+        'LNG_PAGE_IMPORT_DATA_LABEL_RETRIEVE_MAP_DATA': 'Retrieving map data',
         'LNG_PAGE_IMPORT_DATA_MAPPING_DATA': '{{index}} / {{total}}: Mapping "{{key}}"',
         'LNG_PAGE_IMPORT_DATA_MAPPING_FINISHED': 'Mapping of sub-options finished. Please check that all of them were mapped properly.',
         'LNG_PAGE_IMPORT_DATA_LABEL_ROW_NO': 'No',
@@ -133,6 +134,6 @@ export const EnglishUsLang = {
         /**
          * REMOVE the tokens from below
          */
-        // ...
+        // LNG_PAGE_IMPORT_DATA_BUTTON_RESET_IMPORT_MAPPING
     }
 };
