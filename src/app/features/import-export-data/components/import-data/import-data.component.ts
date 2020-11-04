@@ -24,7 +24,7 @@ import {
 import { Observable } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 import { MatDialogRef } from '@angular/material';
-import { catchError } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { DomSanitizer } from '@angular/platform-browser';
 import { SafeStyle } from '@angular/platform-browser/src/security/dom_sanitization_service';
@@ -1220,17 +1220,25 @@ export class ImportDataComponent
     /**
      * Get saved import mappings for specific page
      */
-    getImportMappings() {
-        const qb = new RequestQueryBuilder();
-
+    getImportMappings(
+        finishedCallback?: () => void
+    ) {
         // specify for what page we want to get the saved items
+        const qb = new RequestQueryBuilder();
         qb.filter.where({
             mappingKey: {
                 eq: this.savedImportPage
             }
         });
 
-        this.savedMappingsList$ = this.savedImportMappingService.getImportMappingsList(qb);
+        // retrieve data
+        this.savedMappingsList$ = this.savedImportMappingService
+            .getImportMappingsList(qb)
+            .pipe(tap(() => {
+                if (finishedCallback) {
+                    finishedCallback();
+                }
+            }));
     }
 
     /**
@@ -1319,6 +1327,7 @@ export class ImportDataComponent
      * Save an import mapping
      */
     saveImportMapping() {
+        // create import mapping
         const createImportMapping = () => {
             this.dialogService
                 .showInput(
@@ -1343,28 +1352,46 @@ export class ImportDataComponent
                     }), true)
                 .subscribe((answer: DialogAnswer) => {
                     if (answer.button === DialogAnswerButton.Yes) {
-                        this.savedImportMappingService.createImportMapping(new SavedImportMappingModel({
-                            name: answer.inputValue.value.mappingImportName,
-                            isPublic: answer.inputValue.value.isPublic,
-                            mappingKey: this.savedImportPage,
-                            mappingData: this.getMappedImportFieldsForSaving()
-                        }))
+                        // display loading
+                        const loadingDialog = this.dialogService.showLoadingDialog();
+
+                        // create import mappings
+                        this.savedImportMappingService
+                            .createImportMapping(new SavedImportMappingModel({
+                                name: answer.inputValue.value.mappingImportName,
+                                isPublic: answer.inputValue.value.isPublic,
+                                mappingKey: this.savedImportPage,
+                                mappingData: this.getMappedImportFieldsForSaving()
+                            }))
                             .pipe(
                                 catchError((err) => {
+                                    // display error
                                     this.snackbarService.showApiError(err);
+
+                                    // hide loading
+                                    loadingDialog.close();
+
+                                    // throw error down the road
                                     return throwError(err);
                                 })
                             )
                             .subscribe((data) => {
-                                this.getImportMappings();
+                                // refresh import mappings
+                                this.getImportMappings(() => {
+                                    // update loading item
+                                    this.loadedImportMapping = new SavedImportMappingModel(data);
 
-                                this.loadedImportMapping = new SavedImportMappingModel(data);
+                                    // hide loading
+                                    loadingDialog.close();
 
-                                this.snackbarService.showSuccess(`LNG_PAGE_IMPORT_DATA_LOAD_SAVED_IMPORT_MAPPING_SUCCESS_MESSAGE`);
+                                    // display success message
+                                    this.snackbarService.showSuccess(`LNG_PAGE_IMPORT_DATA_LOAD_SAVED_IMPORT_MAPPING_SUCCESS_MESSAGE`);
+                                });
                             });
                     }
                 });
         };
+
         // create / update?
         if (
             this.loadedImportMapping &&
@@ -1389,25 +1416,40 @@ export class ImportDataComponent
                 })
                 .subscribe((answer) => {
                     if (answer.button === DialogAnswerButton.Yes) {
+                        // display loading
+                        const loadingDialog = this.dialogService.showLoadingDialog();
+
                         // update
-                        this.savedImportMappingService.modifyImportMapping(
-                            this.loadedImportMapping.id, {
-                                mappingData: this.getMappedImportFieldsForSaving()
-                            }
-                        )
+                        this.savedImportMappingService
+                            .modifyImportMapping(
+                                this.loadedImportMapping.id, {
+                                    mappingData: this.getMappedImportFieldsForSaving()
+                                }
+                            )
                             .pipe(
                                 catchError((err) => {
+                                    // display error
                                     this.snackbarService.showApiError(err);
+
+                                    // hide loading
+                                    loadingDialog.close();
+
+                                    // throw error down the road
                                     return throwError(err);
                                 })
                             )
                             .subscribe((data) => {
-                                this.getImportMappings();
+                                // refresh import mappings
+                                this.getImportMappings(() => {
+                                    // update import mapping
+                                    this.loadedImportMapping = new SavedImportMappingModel(data);
 
-                                // update import mapping
-                                this.loadedImportMapping = new SavedImportMappingModel(data);
-                                // display message
-                                this.snackbarService.showSuccess('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE');
+                                    // hide loading
+                                    loadingDialog.close();
+
+                                    // display message
+                                    this.snackbarService.showSuccess('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE');
+                                });
                             });
                     } else if (answer.button === DialogAnswerButton.Extra_1) {
                         createImportMapping();
@@ -1429,35 +1471,19 @@ export class ImportDataComponent
     /**
      * Get mapped import fields for saving
      */
-    getMappedImportFieldsForSaving() {
-        const mappedFiledOptions = (fieldOptions): SavedImportOption[] => {
-            // create the array we'll return
-            const mappedFieldOptions = [];
-            // if field options are not empty, for each option push a new model of option to be saved
-            if (!_.isEmpty(fieldOptions)) {
-                _.each(fieldOptions, (fieldOption) => {
-                    mappedFieldOptions.push(new SavedImportOption({
-                        source: fieldOption.sourceOption ? fieldOption.sourceOption : '',
-                        destination: fieldOption.destinationOption ? fieldOption.destinationOption : ''
-                    }));
-                });
-            }
-
-            return mappedFieldOptions;
-        };
-        // create array of mapped import fields for saving
-        const mappedImportFieldsForSaving = [];
-
-        _.each(this.mappedFields, (mappedField: ImportableMapField) => {
-            mappedImportFieldsForSaving.push(new SavedImportField({
-                source: mappedField.sourceField,
-                destination: mappedField.destinationField,
-                options: mappedFiledOptions(mappedField.mappedOptions),
-                levels: mappedField.getSourceDestinationLevels()
-            }));
-        });
-
-        return mappedImportFieldsForSaving;
+    getMappedImportFieldsForSaving(): SavedImportField[] {
+        // prepare field options for save
+        return (this.mappedFields || []).map((mappedField) => new SavedImportField({
+            source: mappedField.sourceField,
+            destination: mappedField.destinationField,
+            options: !mappedField.mappedOptions ?
+                undefined :
+                mappedField.mappedOptions.map((fieldOption) => new SavedImportOption({
+                    source: fieldOption.sourceOption ? fieldOption.sourceOption : '',
+                    destination: fieldOption.destinationOption ? fieldOption.destinationOption : ''
+                })),
+            levels: mappedField.getSourceDestinationLevels()
+        }));
     }
 
     /**
