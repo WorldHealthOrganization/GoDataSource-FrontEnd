@@ -476,7 +476,7 @@ export class ImportDataComponent
     needToMapOptions: boolean = true;
 
     // used to determine duplicate selections
-    usedSourceFieldsForDuplicateCheck: {
+    usedSourceFieldsForValidation: {
         fields: {
             [sourceFieldWithSelectedIndexes: string]: number
         },
@@ -1688,7 +1688,7 @@ export class ImportDataComponent
                     !field.destinationField ||
                     !field.sourceDestinationLevelAreValid || (
                         field.sourceFieldWithSelectedIndexes &&
-                        this.usedSourceFieldsForDuplicateCheck.fields[field.sourceFieldWithSelectedIndexes] > 1
+                        this.usedSourceFieldsForValidation.fields[field.sourceFieldWithSelectedIndexes] > 1
                     ) || (
                         this.usedSourceFieldOptions[field.sourceFieldWithSelectedIndexes] &&
                         !this.usedSourceFieldOptions[field.sourceFieldWithSelectedIndexes].valid
@@ -2058,7 +2058,7 @@ export class ImportDataComponent
     private validateData(): void {
         // go through map fields and determine mapped sources
         this.needToMapOptions = false;
-        this.usedSourceFieldsForDuplicateCheck = {
+        this.usedSourceFieldsForValidation = {
             fields: {},
             valid: true
         };
@@ -2098,13 +2098,13 @@ export class ImportDataComponent
             const sourceFieldWithSelectedIndexes: string = field.sourceFieldWithSelectedIndexes;
 
             // count items
-            this.usedSourceFieldsForDuplicateCheck.fields[sourceFieldWithSelectedIndexes] = this.usedSourceFieldsForDuplicateCheck.fields[sourceFieldWithSelectedIndexes] ?
-                this.usedSourceFieldsForDuplicateCheck.fields[sourceFieldWithSelectedIndexes] + 1 :
+            this.usedSourceFieldsForValidation.fields[sourceFieldWithSelectedIndexes] = this.usedSourceFieldsForValidation.fields[sourceFieldWithSelectedIndexes] ?
+                this.usedSourceFieldsForValidation.fields[sourceFieldWithSelectedIndexes] + 1 :
                 1;
 
             // invalid form ?
-            if (this.usedSourceFieldsForDuplicateCheck.fields[sourceFieldWithSelectedIndexes] > 1) {
-                this.usedSourceFieldsForDuplicateCheck.valid = false;
+            if (this.usedSourceFieldsForValidation.fields[sourceFieldWithSelectedIndexes] > 1) {
+                this.usedSourceFieldsForValidation.valid = false;
             }
 
             // count options too

@@ -323,7 +323,7 @@
 
                                 <!-- Duplicate source ? -->
                                 <span
-                                    *ngIf="item.sourceFieldWithSelectedIndexes && usedSourceFieldsForDuplicateCheck.fields[item.sourceFieldWithSelectedIndexes] > 1">
+                                    *ngIf="item.sourceFieldWithSelectedIndexes && usedSourceFieldsForValidation.fields[item.sourceFieldWithSelectedIndexes] > 1">
                                     {{'LNG_FORM_VALIDATION_ERROR_DUPLICATE_VALUE' | translate}}
                                 </span>
 
@@ -416,7 +416,7 @@
 
                                     <!-- Duplicate source ? -->
                                     <span
-                                        *ngIf="item.sourceFieldWithSelectedIndexes && usedSourceFieldsForDuplicateCheck.fields[item.sourceFieldWithSelectedIndexes] > 1">
+                                        *ngIf="item.sourceFieldWithSelectedIndexes && usedSourceFieldsForValidation.fields[item.sourceFieldWithSelectedIndexes] > 1">
                                         {{'LNG_FORM_VALIDATION_ERROR_DUPLICATE_VALUE' | translate}}
                                     </span>
 
