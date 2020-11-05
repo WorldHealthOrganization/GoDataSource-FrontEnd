@@ -1,6 +1,5 @@
 import { AfterViewInit, Input } from '@angular/core';
 import { AbstractControl, ControlContainer } from '@angular/forms';
-import * as _ from 'lodash';
 import { ValueAccessorBase } from './value-accessor-base';
 import {
     AsyncValidatorArray,
@@ -89,7 +88,7 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
      * Get form control object
      */
     private getControl(): void {
-        const formControl = _.get(this.controlContainer, 'control', null);
+        const formControl = this.controlContainer && this.controlContainer.control ? this.controlContainer.control : null;
         if (formControl) {
             this.control = formControl.get(this.name);
             if (!this.control) {
@@ -125,7 +124,7 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
                 });
 
             // get the 'ngSubmit' EventEmitter of the Form Control Container
-            const ngSubmitEvent = _.get(this.controlContainer, 'ngSubmit', null);
+            const ngSubmitEvent = this.controlContainer && (this.controlContainer as any).ngSubmit ? (this.controlContainer as any).ngSubmit : null;
             if (ngSubmitEvent) {
                 ngSubmitEvent.subscribe(() => {
                     // run validations when form is submitted

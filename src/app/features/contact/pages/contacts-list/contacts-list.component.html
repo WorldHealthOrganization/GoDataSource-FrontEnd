@@ -349,7 +349,6 @@
                             multiple="true"
                             (itemChanged)="filterByLocation($event)"
                             app-reset-location-on-side-filter
-                            [fixedDropPanel]="true"
                             [useOutbreakLocations]="true">
                         </app-form-location-dropdown>
                     </div>
@@ -443,7 +442,7 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Email  -->
+        <!-- Email -->
         <ng-container matColumnDef="addresses.emailAddress">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">

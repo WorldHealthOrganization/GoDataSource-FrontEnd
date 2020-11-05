@@ -69,6 +69,40 @@ export const EnglishUsLang = {
         'LNG_USER_FIELD_LABEL_TEAMS': 'Teams',
 
         /**
+         * uiImportData
+         */
+        'LNG_PAGE_IMPORT_DATA_BUTTON_MODIFY': 'Modify',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_CLONE': 'Clone',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_REMOVE': 'Remove',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_CLOSE_MODIFY': 'Hide modify',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_EXPAND_OPTIONS': 'Show sub-options',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_COLLAPSE_OPTIONS': 'Hide sub-options',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_MAP_SUB_OPTIONS': 'Map sub-options',
+        'LNG_PAGE_IMPORT_DATA_REQUIRED': 'Field required',
+        'LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX': 'Level',
+        'LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX_DESCRIPTION': 'When Go.Data stores multiple records for the same type of data – for example a case that has three addresses, then you can choose the ‘level’ here.  For example, if you have two addresses in your source file for the same case then you can import one as Level 1 and the second as Level 2 to create the two addresses within the system.',
+        'LNG_PAGE_IMPORT_DATA_INVALID_ARRAY_INDEX': 'Invalid indexes',
+        'LNG_PAGE_IMPORT_DATA_RETRIEVING_UNIQUE_VALUES': 'Retrieving unique values',
+        'LNG_PAGE_IMPORT_DATA_RETRIEVING_LOCATIONS': 'Retrieving locations',
+        'LNG_PAGE_IMPORT_DATA_POPULATING_DISTINCT_CACHE': '{{index}} / {{total}}: Cache "{{key}}"',
+        'LNG_PAGE_IMPORT_DATA_MAPPING_RETRIEVING_LOCATIONS': '{{index}} / {{total}}: Retrieving locations',
+        'LNG_PAGE_IMPORT_DATA_MAPPING_RETRIEVING_RELABEL_LOCATIONS': 'Preparing locations cache',
+        'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS': 'Mapping',
+        'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_DESCRIPTION': 'Pending: must "Map sub-options" - Complete no / total: "total" is the number of distinct values from the file, while "no" is the number of mapped sub-options, this information is useful if you decide not to map everything, or to make sure you don\'t missing something - Complete: all file options are mapped - Incomplete no / total: "total" is the number of mapped sub-options while "no" is the number of invalid options',
+        'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_WAITING': 'Pending',
+        'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_WAITING_DESCRIPTION': 'You need to map sub-options',
+        'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID': 'Incomplete',
+        'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID_WITH_NO': 'Incomplete {{no}} / {{total}}',
+        'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_VALID': 'Complete',
+        'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_VALID_WITH_NO': 'Complete {{no}} / {{total}}',
+        'LNG_PAGE_IMPORT_DATA_LABEL_RETRIEVE_MAP_DATA': 'Retrieving map data',
+        'LNG_PAGE_IMPORT_DATA_MAPPING_DATA': '{{index}} / {{total}}: Mapping "{{key}}"',
+        'LNG_PAGE_IMPORT_DATA_MAPPING_FINISHED': 'Mapping of sub-options finished. Please check that all of them were mapped properly.',
+        'LNG_PAGE_IMPORT_DATA_LABEL_ROW_NO': 'No',
+        'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_ROWS': 'Invalid records: {{rows}}',
+        'LNG_PAGE_IMPORT_DATA_LOAD_SAVED_MAPPING_CONFIRMATION': 'Are you sure you want to load "{{name}}"? It might take a while...',
+
+        /**
          * uiClustersListPage
          */
         'LNG_PAGE_LIST_CLUSTERS_MANAGE_ICONS_BUTTON': 'Manage icons',
@@ -102,6 +136,6 @@ export const EnglishUsLang = {
         /**
          * REMOVE the tokens from below
          */
-        // ...
+        // LNG_PAGE_IMPORT_DATA_BUTTON_RESET_IMPORT_MAPPING
     }
 };

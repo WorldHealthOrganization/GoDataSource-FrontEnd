@@ -1,5 +1,5 @@
 <div class="form-element"
-     [id]="identifier" [ngClass]="{ invalid: (invalid), 'form-locations-select-tooltip': tooltip, 'fixed-drop-panel': fixedDropPanel }">
+     [id]="identifier" [ngClass]="{ invalid: (invalid), 'form-locations-select-tooltip': tooltip }">
 
     <form class="ng-select-form" #groupForm="ngForm">
         <ng-select
@@ -26,7 +26,9 @@
             [matTooltipPosition]="'right'"
             (blur)="onBlur()"
             (focus)="touchAndTriggerSearch()"
-            (change)="triggerItemChanged($event)">
+            (change)="triggerItemChanged($event)"
+            [appendTo]="appendTo"
+            [trackByFn]="trackByFn">
             <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
                 <span [app-ng-option-highlight]="search" [style.padding-left]="(item.level * 30) + 'px'">
                     {{ item.label }}

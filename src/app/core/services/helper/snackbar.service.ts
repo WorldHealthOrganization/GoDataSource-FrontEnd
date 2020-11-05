@@ -12,6 +12,7 @@ import { MultipleSnackbarComponent } from '../../../shared/components/multiple-s
 export class SnackbarService {
     // amount of time (in ms) to wait before automatically closing the snackbar
     static DURATION: number = 4500;
+    static DURATION_INFINITE: number = 0;
     static snackbarInstance: MultipleSnackbarComponent;
 
     /**

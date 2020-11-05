@@ -1,3 +1,5 @@
+@import '~styles/common';
+
 app-import-data {
     @app-import-data-height: 305px;
     .import-data-loading {
@@ -32,10 +34,6 @@ app-import-data {
             width: @mat-spinner-width;
             height: 18px;
         }
-    }
-
-    .reset-import-mapping-container {
-        margin-top: 10px;
     }
 
     .import-data {
@@ -96,12 +94,139 @@ app-import-data {
     }
 
     .import-data-map-fields {
-        .import-data-map-fields-header-columns {
+        @hover-index: 1000;
+        @hover-bg-color: white;
+        .import-data-header-row {
             font-weight: bold;
-            font-size: 20px;
+            font-size: 16px;
             border-bottom: 1px solid #CCC;
             margin-bottom: 10px;
             padding-bottom: 5px;
+
+            // hack to display it on top of hover actions
+            z-index: @hover-index;
+            background: @hover-bg-color;
+
+            // trick to have the same column width no matter of the browser used
+            overflow-y: scroll;
+            &::-webkit-scrollbar {
+                background: transparent;
+            }
+
+            // icon buttons
+            .xt-icon-xsmall {
+                font-size: 16px;
+            }
+        }
+
+        .import-data-action-buttons {
+            padding-top: 20px;
+            padding-bottom: 20px;
+
+            // hack to display it on top of hover actions
+            z-index: @hover-index;
+            background: @hover-bg-color;
+        }
+
+        .import-data-body-rows {
+            // adjust for smaller screens
+            min-height: 200px;
+
+            .import-data-body-row {
+                margin: 0;
+                padding: 0;
+                border-bottom: 1px solid #CCC;
+
+                .import-data-body-row-basic {
+                    padding: 0;
+                    margin: 0;
+
+                    .import-data-body-row-basic-data {
+                        margin-top: 7px;
+
+                        .import-data-body-row-basic-data-error {
+                            color: @color-error;
+                        }
+                    }
+
+                    .import-data-body-row-basic-validation {
+                        margin-top: 3px;
+                        margin-bottom: 10px;
+                        font-size: 12px;
+                        font-weight: bold;
+                        color: @color-error;
+
+                        .import-data-body-row-basic-validation-source {
+                            padding-left: 30px;
+                        }
+
+                        .import-data-body-row-basic-validation-destination {
+                            padding-left: 30px;
+
+                            .import-data-body-row-basic-validation-destination-required {
+                                color: darkgray;
+                            }
+                        }
+                    }
+                }
+
+                .import-data-body-row-edit-basic {
+                    padding: 10px 0;
+
+                    .import-data-body-row-edit-basic-validation-source {
+                        font-size: 12px;
+                        font-weight: bold;
+                        color: @color-error;
+                    }
+                }
+
+                .import-data-body-row-extra-details {
+                    margin: 0 100px 20px 100px;
+
+                    .import-data-body-row-extra-details-vscroll {
+
+                        .import-data-body-row-extra-details-row-basic {
+                            .import-data-body-row-extra-details-row {
+                                margin: 0;
+                                padding: 10px 0;
+                                border-top: 1px solid #CCC;
+                            }
+
+                            .import-data-body-row-extra-details-row-basic-validation {
+                                margin-top: 3px;
+                                margin-bottom: 10px;
+                                font-size: 12px;
+                                font-weight: bold;
+                                color: @color-error;
+
+                                .import-data-body-row-extra-details-row-basic-validation-source {
+                                    padding-left: 30px;
+                                }
+
+                                .import-data-body-row-extra-details-row-basic-validation-destination {
+                                    padding-left: 30px;
+                                }
+                            }
+                        }
+
+                        .import-data-body-row-edit-extra-details-row {
+                            margin: 0;
+                            padding: 10px 0;
+                            border-top: 1px solid #CCC;
+
+                            .import-data-body-row-edit-extra-details-row-validation-source {
+                                font-size: 12px;
+                                font-weight: bold;
+                                color: @color-error;
+                            }
+                        }
+
+                        .import-data-body-row-edit-extra-details-row-location {
+                            padding-right: 100px;
+                        }
+                    }
+                }
+            }
         }
 
         .import-data-map-fields-children {
@@ -145,3 +270,28 @@ app-import-data {
         }
     }
 }
+
+// ..................
+// ..................
+// ..................
+// ..................
+// ..................
+// ..................
+// ..................
+// ALL NEW METHODS
+// NEED TO CLEANUP ABOVE AFTER FINISH
+// ..................
+// ..................
+// ..................
+// ..................
+// ..................
+// ..................
+// ..................
+// + CLEANUP
+// + CLEANUP
+// + CLEANUP
+// + CLEANUP
+// + CLEANUP
+// + CLEANUP
+// + CLEANUP
+// + CLEANUP

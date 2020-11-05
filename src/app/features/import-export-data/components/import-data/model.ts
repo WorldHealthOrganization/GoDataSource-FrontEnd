@@ -23,7 +23,8 @@ export interface IFileArrayProperties {
 export class ImportableLabelValuePair {
     constructor(
         public label: string,
-        public value: string
+        public value: string,
+        public tooltip?: string
     ) {}
 }
 
@@ -38,36 +39,67 @@ export class ImportableFilePropertyValuesModel {
     } | ImportableFilePropertyValuesModel
 }
 
-
-export class ImportableFileModel {
-    id: string;
-    fileHeaders: string[] = [];
-    fileHeadersKeyValue: ImportableLabelValuePair[];
-
-    fileArrayHeaders: {
-        [headerPathName: string]: IFileArrayProperties
-    };
-
-    suggestedFieldMapping: {
-        [fileHeader: string]: string
-    };
-
-    modelProperties: ImportableFilePropertiesModel;
-    modelPropertiesKeyValue:  ImportableLabelValuePair[];
-
-    modelPropertyValues: ImportableFilePropertyValuesModel;
-    modelPropertyValuesMap: {
-        [modelProperty: string]: ImportableFilePropertyValuesModel
-    } = {};
-
+export interface IImportableFileDistinctValues {
     distinctFileColumnValues: {
         [fileHeader: string]: string[]
     };
-    distinctFileColumnValuesKeyValue: {
-        [fileHeader: string]: ImportableLabelValuePair[]
+}
+
+
+export class ImportableFileModel {
+    // file id
+    readonly id: string;
+
+    // file headers
+    readonly fileHeaders: string[] = [];
+
+    // file headers - label / value pair
+    readonly fileHeadersKeyValue: ImportableLabelValuePair[];
+
+    // file array headers - used to handle array headers
+    readonly fileArrayHeaders: {
+        [headerPathName: string]: IFileArrayProperties
     };
 
-    modelArrayProperties: {
+    // API - suggested field mappings
+    readonly suggestedFieldMapping: {
+        [fileHeader: string]: string
+    };
+
+    // model properties
+    readonly modelProperties: ImportableFilePropertiesModel;
+
+    // model properties - key value pair
+    readonly modelPropertiesKeyValue: ImportableLabelValuePair[];
+
+    // model properties - key value map
+    readonly modelPropertiesKeyValueMap: {
+        [value: string]: string
+    };
+
+    // model property values
+    readonly modelPropertyValues: ImportableFilePropertyValuesModel;
+    readonly modelPropertyValuesMap: {
+        [modelProperty: string]: {
+            id: string;
+            label: string;
+        }[]
+    } = {};
+    readonly modelPropertyValuesMapChildMap: {
+        [modelProperty: string]: {
+            [value: string]: string
+        }
+    };
+
+    // index for easy access
+    readonly modelPropertyValuesMapIndex: {
+        [modelProperty: string]: {
+            [modelPropertyIndexKey: string]: string
+        }
+    } = {};
+
+    // model array properties - questionnaires
+    readonly modelArrayProperties: {
         [propertyPath: string]: IModelArrayProperties
     };
 
@@ -83,8 +115,8 @@ export class ImportableFileModel {
     ): any {
         // validate input object
         if (
-            _.isEmpty(object) ||
-            _.isEmpty(path)
+            !object ||
+            !path
         ) {
             return undefined;
         }
@@ -108,8 +140,19 @@ export class ImportableFileModel {
         return object;
     }
 
+    /**
+     * Constructor
+     */
     constructor(
-        data = null,
+        data: {
+            id: string,
+            fileHeaders: any,
+            fileArrayHeaders: any,
+            modelProperties: any,
+            modelPropertyValues: any,
+            suggestedFieldMapping: any,
+            modelArrayProperties: any
+        },
         translate: (string) => string,
         fileType: ImportDataExtension,
         fieldsWithoutTokens: {
@@ -135,16 +178,26 @@ export class ImportableFileModel {
             extraDataUsedToFormat: any
         ) => void
     ) {
-        this.id = _.get(data, 'id');
-        this.fileHeaders = (_.get(data, 'fileHeaders', []) || []).map((value: any) => {
+        // file id
+        this.id = data.id;
+
+        // file headers
+        this.fileHeaders = (data.fileHeaders || []).map((value: any) => {
             return typeof value === 'string' ? value : value.toString();
         });
-        this.fileArrayHeaders = _.get(data, 'fileArrayHeaders') || [];
-        this.modelProperties = _.get(data, 'modelProperties', {});
-        this.modelPropertyValues = _.get(data, 'modelPropertyValues', {});
-        this.suggestedFieldMapping = _.get(data, 'suggestedFieldMapping', {});
-        this.distinctFileColumnValues = _.get(data, 'distinctFileColumnValues', {});
-        this.modelArrayProperties = _.get(data, 'modelArrayProperties', {});
+
+        // file array headers
+        this.fileArrayHeaders = data.fileArrayHeaders || [];
+
+        // model properties
+        this.modelProperties = data.modelProperties || {};
+        this.modelPropertyValues = data.modelPropertyValues || {};
+
+        // suggested mappings
+        this.suggestedFieldMapping = data.suggestedFieldMapping || {};
+
+        // model array properties
+        this.modelArrayProperties = data.modelArrayProperties || {};
 
         // format response
         if (formatDataBeforeUse) {
@@ -160,26 +213,34 @@ export class ImportableFileModel {
         }
 
         // map file headers
-        this.fileHeadersKeyValue = _.chain(this.fileHeaders)
+        this.fileHeadersKeyValue = this.fileHeaders
             .map((value: string) => {
                 return new ImportableLabelValuePair(
+                    value,
                     value,
                     value
                 );
             })
-            .sortBy((item: { label: string }) => {
-                return item.label;
-            })
-            .value() as ImportableLabelValuePair[];
+            .sort((
+                item1: { label: string },
+                item2: { label: string }
+            ) => {
+                return item1.label.localeCompare(item2.label);
+            });
 
         // recursive add value pair
+        const modelPropertyValuesMapIndex: {
+            [modelProperty: string]: {
+                [modelPropertyIndexKey: string]: string
+            }
+        } = {};
         const createImportableLabelValuePair = (
             result: ImportableLabelValuePair[],
             impLVPair: ImportableLabelValuePair,
             labelPrefix: string = ''
         ) => {
             // if this is a string property then we can push it as it is
-            if (_.isString(impLVPair.label)) {
+            if (typeof impLVPair.label === 'string') {
                 if (!excludeDestinationProperties[impLVPair.value]) {
                     // add parent prefix to child one
                     impLVPair.label = labelPrefix + translate(
@@ -194,11 +255,30 @@ export class ImportableFileModel {
                         impLVPair.value
                     );
 
+                    // indexes
+                    modelPropertyValuesMapIndex[impLVPair.value] = {};
+                    _.each(this.modelPropertyValuesMap[impLVPair.value], (propValue) => {
+                        // label
+                        if (propValue.label) {
+                            // label translated
+                            modelPropertyValuesMapIndex[impLVPair.value][_.camelCase(translate(propValue.label)).toLowerCase()] = propValue.id;
+
+                            // label not translated (LNG key)
+                            modelPropertyValuesMapIndex[impLVPair.value][_.camelCase(propValue.label).toLowerCase()] = propValue.id;
+                        }
+
+                        // id
+                        modelPropertyValuesMapIndex[impLVPair.value][_.camelCase(propValue.id).toLowerCase()] = propValue.id;
+                    });
+
+                    // add tooltip
+                    impLVPair.tooltip = impLVPair.label;
+
                     // add to list of filters to which we can push data
                     result.push(impLVPair);
                 }
             // otherwise we need to map it to multiple values
-            } else if (_.isObject(impLVPair.label)) {
+            } else if (typeof impLVPair.label === 'object') {
                 // add as parent drop-down as well
                 // NO NEED FOR NOW, since back-end doesn't have this implementation anymore
 
@@ -239,103 +319,231 @@ export class ImportableFileModel {
             })
             .value() as ImportableLabelValuePair[];
 
-        this.distinctFileColumnValuesKeyValue = {};
-        _.each(this.distinctFileColumnValues, (values: string[], property: string) => {
-            // sanitize property
-            property = property.replace(/\[\d+]$/g, '');
-            property = property.replace(/\[\d+\]/g, '[]');
+        // map modelPropertiesKeyValue for easy access
+        this.modelPropertiesKeyValueMap = {};
+        this.modelPropertiesKeyValue.forEach((item) => {
+            this.modelPropertiesKeyValueMap[item.value] = item.label;
+        });
 
-            // set distinct values
-            this.distinctFileColumnValuesKeyValue[property] = _.map(
-                values,
-                (value: string) => {
-                    return new ImportableLabelValuePair(
-                        value,
-                        value
-                    );
+        // map modelPropertyValuesMap for easy access
+        this.modelPropertyValuesMapChildMap = {};
+        _.each(
+            this.modelPropertyValuesMap,
+            (items, modelProperty) => {
+                // no need to continue ?
+                if (!items) {
+                    return;
                 }
-            );
+
+                // init
+                this.modelPropertyValuesMapChildMap[modelProperty] = {};
+                items.forEach((item) => {
+                    this.modelPropertyValuesMapChildMap[modelProperty][item.id] = translate(item.label);
+                });
+            }
+        );
+
+        // clean empty indexes
+        this.modelPropertyValuesMapIndex = {};
+        _.each(modelPropertyValuesMapIndex, (indexValues, indexKey) => {
+            // jump over ?
+            if (_.isEmpty(indexValues)) {
+                return;
+            }
+
+            // index it
+            this.modelPropertyValuesMapIndex[indexKey] = indexValues;
         });
     }
 }
 
+// ..................
+// ..................
+// ..................
+// ..................
+// ..................
+// ..................
+// ..................
+// NEED TO CLEANUP ABOVE AFTER FINISH
+// ..................
+// ..................
+// ..................
+// ..................
+// ..................
+// ..................
+// ..................
+// + CLEANUP
+// + CLEANUP
+// + CLEANUP
+// + CLEANUP
+// + CLEANUP
+// + CLEANUP
+// + CLEANUP
+// + CLEANUP
+
+
+/**
+ * Import field option
+ */
 export interface IMappedOption {
     id: string;
+    parentId: string;
     sourceOption?: string;
     destinationOption?: string;
     readOnly?: boolean;
 }
 
+/**
+ * Import field
+ */
 export class ImportableMapField {
-    public mappedOptions: IMappedOption[] = [];
+    // unique identifier
+    id: string;
 
+    // mapped options
+    mappedOptions: IMappedOption[] = [];
+    mappedOptionsCollapsed: boolean = true;
+
+    // read-only values
     private _readOnlyValues: {
         [id: string]: LabelValuePair[]
     } = {};
 
-    public readonly: boolean = false;
+    // item is readonly (required fields) ?
+    readonly: boolean = false;
 
-    public sourceDestinationLevel: number[] = [0, 0, 0];
+    // source & destination array indexes
+    private _sourceDestinationLevel: number[] = [0, 0, 0];
 
-    public id: string;
+    // used to know how many level selects to render (we need an array of string because we use *ngFor and not for(i=0; i<=numberOfMaxLevels))
+    private _numberOfMaxLevels: string[] = [];
+    get numberOfMaxLevels(): string[] {
+        return this._numberOfMaxLevels;
+    }
 
-    public isSourceArray: boolean = false;
+    // array indexes formatted for display
+    private _sourceDestinationLevelForDisplay: string;
+    get sourceDestinationLevelForDisplay(): string {
+        return this._sourceDestinationLevelForDisplay;
+    }
+
+    // source destination levels are valid ?
+    private _sourceDestinationLevelAreValid: boolean = true;
+    get sourceDestinationLevelAreValid(): boolean {
+        return this._sourceDestinationLevelAreValid;
+    }
+
+    // source contains array indexes ?
+    private _isSourceArray: boolean = false;
+    get isSourceArray(): boolean {
+        return this._isSourceArray;
+    }
+
+    // destination contains array indexes ?
+    private _isDestinationArray: boolean = false;
+    get isDestinationArray(): boolean {
+        return this._isDestinationArray;
+    }
+
+    // remove any index data for easy match for distinct values
+    private _sourceFieldWithoutIndexes: string = null;
+    get sourceFieldWithoutIndexes(): string {
+        return this._sourceFieldWithoutIndexes;
+    }
+
+    // source with selected indexes
+    private _sourceFieldWithSelectedIndexes: string;
+    get sourceFieldWithSelectedIndexes(): string {
+        return this._sourceFieldWithSelectedIndexes;
+    }
+
+    // source field
     private _sourceField: string = null;
-    public sourceFieldWithoutIndexes = null;
     set sourceField(value: string) {
+        // set source value
         this._sourceField = value;
 
-        // strip [] from teh end since we shouldn't have this case
-        this.sourceFieldWithoutIndexes = this.sourceField ? this.sourceField.replace(/\[\d+]$/g, '') : null;
-        // replace array items with general ...
-        this.sourceFieldWithoutIndexes = this.sourceFieldWithoutIndexes ? this.sourceFieldWithoutIndexes.replace(/\[\d+\]/g, '[]') : this.sourceFieldWithoutIndexes;
+        // strip [] from the end since we shouldn't have this case
+        this._sourceFieldWithoutIndexes = this.sourceField ? this.sourceField.replace(/\[\d+]$/g, '') : null;
 
-        this.isSourceArray = this.sourceField ? this.sourceField.indexOf('[]') > -1 : false;
+        // replace array items with general ...
+        this._sourceFieldWithoutIndexes = this.sourceFieldWithoutIndexes ? this.sourceFieldWithoutIndexes.replace(/\[\d+\]/g, '[]') : this.sourceFieldWithoutIndexes;
+
+        // determine if source contains array index ?
+        this._isSourceArray = this.sourceField ? this.sourceField.indexOf('[]') > -1 : false;
+
+        // determine number of max levels
         this.checkNumberOfMaxLevels();
+
+        // format array of indexes
+        this.formatArrayIndexes();
     }
     get sourceField(): string {
         return this._sourceField;
     }
 
-    public isDestinationArray: boolean = false;
+    // destination field
     private _destinationField: string = null;
     set destinationField(value: string) {
+        // set destination value
         this._destinationField = value;
-        this.isDestinationArray = this.destinationField ? this.destinationField.indexOf('[]') > -1 : false;
+
+        // determine if destination contains array index ?
+        this._isDestinationArray = this.destinationField ? this.destinationField.indexOf('[]') > -1 : false;
+
+        // determine number of max levels
         this.checkNumberOfMaxLevels();
+
+        // format array of indexes
+        this.formatArrayIndexes();
     }
     get destinationField(): string {
         return this._destinationField;
     }
 
-    numberOfMaxLevels: any[] = [];
-
+    /**
+     * Constructor
+     */
     constructor(
         destinationField: string = null,
         sourceField: string = null
     ) {
+        // generate unique id
         this.id = uuid();
+
+        // set source & destination
         this.destinationField = destinationField;
         this.sourceField = sourceField;
     }
 
-    checkNumberOfMaxLevels() {
+    /**
+     * Determine number of max levels (max(source & destination))
+     */
+    private checkNumberOfMaxLevels(): void {
+        // source
         const sourceArray: any[] = this.sourceField ?
             ( this.sourceField.match(/\[\]/g) || [] ) :
             [];
+
+        // destination
         const destinationArray: any[] = this.destinationField ?
             ( this.destinationField.match(/\[\]/g) || [] ) :
             [];
-        this.numberOfMaxLevels = sourceArray.length < destinationArray.length ? destinationArray : sourceArray;
+
+        // determine number of max levels
+        this._numberOfMaxLevels = sourceArray.length < destinationArray.length ? destinationArray : sourceArray;
     }
 
-    public getOptionsForReadOnlySource(option: IMappedOption): LabelValuePair[] {
+    /**
+     * Get options
+     */
+    getOptionsForReadOnlySource(option: IMappedOption): LabelValuePair[] {
         // if not readonly, then there is no point in constructing a list of label / values since it should exist in the main dropdown options
         if (!option.readOnly) {
             return [];
         }
 
-        // do we need to init / reinit the options ?
+        // do we need to init / re-init the options ?
         if (
             !this._readOnlyValues[option.id] ||
             this._readOnlyValues[option.id][0].value !== option.sourceOption
@@ -350,5 +558,88 @@ export class ImportableMapField {
 
         // finished
         return this._readOnlyValues[option.id];
+    }
+
+    /**
+     * Format array of indexes
+     */
+    private formatArrayIndexes(): void {
+        // no point in continuing ?
+        this._sourceDestinationLevelAreValid = true;
+        this._sourceDestinationLevelForDisplay = '';
+        this._sourceFieldWithSelectedIndexes = this.sourceField;
+        if (
+            !this.sourceField || (
+                !this.isSourceArray &&
+                !this.isDestinationArray
+            )
+        ) {
+            return;
+        }
+
+        // add indexes
+        this._numberOfMaxLevels.forEach((value, index) => {
+            // check level validity
+            if (
+                this._sourceDestinationLevel[index] === undefined ||
+                this._sourceDestinationLevel[index] === null
+            ) {
+                // invalid value
+                this._sourceDestinationLevelAreValid = false;
+
+                // there is no point in continuing since we have invalid value
+                return;
+            }
+
+            // add to key
+            this._sourceFieldWithSelectedIndexes += this._sourceDestinationLevel[index];
+
+            // format array indexes
+            this._sourceDestinationLevelForDisplay += `${this._sourceDestinationLevelForDisplay ? ' - ' : ''}${this._sourceDestinationLevel[index] + 1}`;
+        });
+
+        // invalid ?
+        if (!this._sourceDestinationLevelAreValid) {
+            this._sourceDestinationLevelForDisplay = '-';
+        }
+    }
+
+    /**
+     * Set source destination level
+     */
+    setSourceDestinationLevel(
+        index: number,
+        value: number
+    ): void {
+        // update value
+        this._sourceDestinationLevel[index] = value;
+
+        // format array of indexes
+        this.formatArrayIndexes();
+    }
+
+    /**
+     * Set source destination level
+     */
+    setSourceDestinationLevels(sourceDestinationLevel: number[]): void {
+        // update values
+        this._sourceDestinationLevel = sourceDestinationLevel;
+
+        // format array of indexes
+        this.formatArrayIndexes();
+    }
+
+    /**
+     * We should clone the result since the value should be immutable, since every change should go through setSourceDestinationLevel
+     */
+    getSourceDestinationLevels(): number[] {
+        return this._sourceDestinationLevel;
+    }
+
+    /**
+     * Implemented this way since _sourceDestinationLevel should be immutable
+     */
+    getSourceDestinationLevel(index: number): number {
+        return this._sourceDestinationLevel[index];
     }
 }

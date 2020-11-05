@@ -1,6 +1,5 @@
 import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { ControlContainer } from '@angular/forms';
-import * as _ from 'lodash';
 import { ElementBaseFailure } from '../../core';
 
 @Component({
@@ -20,14 +19,22 @@ export class FormValidationComponent {
      */
     displayErrors() {
         // form submitted?
-        const formSubmitted = _.get(this.controlContainer, 'formDirective.submitted', false);
+        if (
+            this.controlContainer &&
+            this.controlContainer.formDirective &&
+            (this.controlContainer.formDirective as any).submitted
+        ) {
+            return true;
+        }
+
+        // retrieve form controls
+        const formControls = this.controlContainer && this.controlContainer.control && (this.controlContainer.control as any).controls ?
+            (this.controlContainer.control as any).controls :
+            false;
 
         // form control touched?
-        const formControls = _.get(this.controlContainer, 'control.controls', false);
-        const controlTouched = formControls &&
+        return formControls &&
             formControls[this.controlName] &&
             formControls[this.controlName].touched;
-
-        return formSubmitted || controlTouched;
     }
 }

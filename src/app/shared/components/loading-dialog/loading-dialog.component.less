@@ -11,6 +11,8 @@ app-loading-dialog {
         width: 48px;
         max-width: 48px;
         overflow: hidden;
+        margin-left: auto;
+        margin-right: auto;
 
         @mat-spinner-width: 32px;
         @mat-spinner-height: 32px;
@@ -26,5 +28,12 @@ app-loading-dialog {
                 height: @mat-spinner-height !important;
             }
         }
+    }
+
+    .app-loading-dialog-message {
+        font-weight: bold;
+        font-size: 12px;
+        text-align: center;
+        margin-top: 20px;
     }
 }

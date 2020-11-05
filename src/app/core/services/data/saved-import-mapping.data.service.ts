@@ -6,16 +6,15 @@ import { SavedImportMappingModel } from '../../models/saved-import-mapping.model
 import { ModelHelperService } from '../helper/model-helper.service';
 import { IBasicCount } from '../../models/basic-count.interface';
 
-
 @Injectable()
 export class SavedImportMappingService {
-
+    /**
+     * Constructor
+     */
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService
-    ) {
-
-    }
+    ) {}
 
     /**
      * Retrieve the list of saved import mapping
@@ -26,6 +25,16 @@ export class SavedImportMappingService {
 
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`import-mappings?filter=${filter}`),
+            SavedImportMappingModel
+        );
+    }
+
+    /**
+     * Retrieve saved import mapping
+     */
+    getImportMapping(importMappingId: string): Observable<SavedImportMappingModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`import-mappings/${importMappingId}`),
             SavedImportMappingModel
         );
     }

@@ -1,9 +1,19 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, ViewEncapsulation } from '@angular/core';
 import { Subscriber } from 'rxjs';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { DialogComponent } from '..';
+
+export class LoadingDialogDataModel {
+    message: string;
+    messageData: {
+        [key: string]: string
+    };
+}
 
 export class LoadingDialogModel {
     constructor(
-        private subscriber: Subscriber<void>
+        private subscriber: Subscriber<void>,
+        private dataHandler: LoadingDialogDataModel
     ) {}
 
     /**
@@ -12,6 +22,19 @@ export class LoadingDialogModel {
     close() {
         this.subscriber.next();
         this.subscriber.complete();
+    }
+
+    /**
+     * Display message
+     */
+    showMessage(
+        message: string,
+        messageData?: {
+            [key: string]: string
+        }
+    ) {
+        this.dataHandler.message = message;
+        this.dataHandler.messageData = messageData;
     }
 }
 
@@ -30,4 +53,12 @@ export class LoadingDialogComponent {
         hasBackdrop: true,
         panelClass: 'dialog-loading-progress'
     };
+
+    /**
+     * Constructor
+     */
+    constructor(
+        public dialogRef: MatDialogRef<DialogComponent>,
+        @Inject(MAT_DIALOG_DATA) public data: LoadingDialogDataModel
+    ) {}
 }

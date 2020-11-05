@@ -22,9 +22,9 @@ export class HoverRowAction {
     iconTooltipTranslateData: (item: any) => {
         [key: string]: any
     };
-    click: (item: any, handler: any) => void;
+    click: (item: any, handler: any, index: any) => void;
     class: string;
-    visible: (item: any) => boolean;
+    visible: (item: any, index: any) => boolean;
 
     menuOptions: HoverRowAction[];
     menuOptionLabel: string;
@@ -42,7 +42,7 @@ export class HoverRowAction {
         iconTooltipTranslateData?: (item: any) => {
             [key: string]: any
         },
-        click?: (item: any, handler: any) => void,
+        click?: (item: any, handler: any, index: any) => void,
         type?: HoverRowActionType,
         menuOptions?: HoverRowAction[],
         menuOptionLabel?: string,
@@ -50,7 +50,7 @@ export class HoverRowAction {
             [key: string]: any
         },
         class?: string,
-        visible?: (item: any) => boolean
+        visible?: (item: any, index: any) => boolean
     }) {
         Object.assign(this, data);
     }
@@ -93,7 +93,7 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
     /**
      * During this time actions are inactive
      */
-    static readonly ACTIONS_DEAD_TIME_SINCE_SHOWN_MS: number = 400;
+    static readonly ACTIONS_DEAD_TIME_SINCE_SHOWN_MS: number = 200;
 
     /**
      * Keep shown time
@@ -256,6 +256,11 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
     actionData: any;
 
     /**
+     * Action index
+     */
+    actionIndex: any;
+
+    /**
      * Action handler
      */
     actionHandler: any;
@@ -404,6 +409,7 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
         elementRef: ElementRef,
         actions: HoverRowAction[],
         actionData: any = null,
+        actionIndex: any = null,
         mouseEvent: MouseEvent = null
     ) {
         // set actions
@@ -417,6 +423,9 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
 
         // set data
         this.actionData = actionData;
+
+        // set index
+        this.actionIndex = actionIndex;
 
         // keep mouse event
         this.mouseEvent = mouseEvent;
@@ -517,7 +526,8 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
         // perform action
         buttonData.click(
             this.actionData,
-            this.actionHandler
+            this.actionHandler,
+            this.actionIndex
         );
     }
 

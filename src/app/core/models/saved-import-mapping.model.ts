@@ -34,7 +34,13 @@ export class SavedImportOption {
     }
 }
 
-export class SavedImportMappingModel {
+export interface ISavedImportMappingModel {
+    id: string;
+    name: string;
+    readOnly: boolean;
+}
+
+export class SavedImportMappingModel implements ISavedImportMappingModel {
     id: string;
     name: string;
     isPublic: boolean;
