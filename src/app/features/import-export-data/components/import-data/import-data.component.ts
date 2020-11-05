@@ -476,8 +476,8 @@ export class ImportDataComponent
     needToMapOptions: boolean = true;
 
     // used to determine duplicate selections
-    usedSourceFields: {
-        [source: string]: number
+    usedSourceFieldsForDuplicateCheck: {
+        [sourceFieldWithSelectedIndexes: string]: number
     } = {};
 
     // used to determine duplicate selections
@@ -1694,7 +1694,7 @@ export class ImportDataComponent
                     !field.destinationField ||
                     !field.sourceDestinationLevelAreValid || (
                         field.sourceFieldWithSelectedIndexes &&
-                        this.usedSourceFields[field.sourceFieldWithSelectedIndexes] > 1
+                        this.usedSourceFieldsForDuplicateCheck[field.sourceFieldWithSelectedIndexes] > 1
                     ) || (
                         this.usedSourceFieldOptions[field.sourceFieldWithSelectedIndexes] &&
                         !this.usedSourceFieldOptions[field.sourceFieldWithSelectedIndexes].valid
@@ -2064,7 +2064,7 @@ export class ImportDataComponent
     private validateData(): void {
         // go through map fields and determine mapped sources
         this.needToMapOptions = false;
-        this.usedSourceFields = {};
+        this.usedSourceFieldsForDuplicateCheck = {};
         this.usedSourceFieldOptions = {};
 
         //  no point in continuing ?
@@ -2101,8 +2101,8 @@ export class ImportDataComponent
             const sourceKey: string = field.sourceFieldWithSelectedIndexes;
 
             // count items
-            this.usedSourceFields[sourceKey] = this.usedSourceFields[sourceKey] ?
-                this.usedSourceFields[sourceKey] + 1 :
+            this.usedSourceFieldsForDuplicateCheck[sourceKey] = this.usedSourceFieldsForDuplicateCheck[sourceKey] ?
+                this.usedSourceFieldsForDuplicateCheck[sourceKey] + 1 :
                 1;
 
             // count options too
