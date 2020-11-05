@@ -683,13 +683,14 @@
                 {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_MAP_SUB_OPTIONS' | translate }}
             </button>
 
-            <!-- Map field sub-options / Import -->
+            <!-- Import -->
             <button
                 *ngIf="!needToMapOptions"
                 mat-raised-button
                 color="accent"
                 type="button"
-                (click)="importData()">
+                (click)="importData()"
+                [disabled]="true">
                 {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_IMPORT_FILE' | translate }}
             </button>
 
