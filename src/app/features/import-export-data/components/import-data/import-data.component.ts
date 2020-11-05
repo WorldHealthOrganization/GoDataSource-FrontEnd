@@ -547,7 +547,6 @@ export class ImportDataComponent
 
     // job schedule handler
     private scheduleJob: NodeJS.Timer;
-    private determineTableDataMaxHeightJob: NodeJS.Timer;
 
     // display map button or start import ?
     needToMapOptions: boolean = true;
@@ -592,6 +591,9 @@ export class ImportDataComponent
     locationCacheIndex: {
         [indexKey: string]: string[]
     } = {};
+
+    // Used to keep function scope
+    onWindowResizeScope: any;
 
     /**
      * Constructor
@@ -756,6 +758,30 @@ export class ImportDataComponent
                 }, 50);
             }
         };
+
+        // register window resize listeners
+        this.onWindowResizeScope = () => {
+            this.determineTableDataMaxHeight();
+        };
+        window.addEventListener(
+            'resize',
+            this.onWindowResizeScope,
+            true
+        );
+    }
+
+    /**
+     * Component destroyed
+     */
+    ngOnDestroy() {
+        this.stopDataScheduleJob();
+
+        // remove window resize listener
+        window.removeEventListener(
+            'resize',
+            this.onWindowResizeScope,
+            true
+        );
     }
 
     /**
@@ -765,6 +791,10 @@ export class ImportDataComponent
         item: FileItem,
         response: string
     ): void {
+        // adjust height of table after we do the math ?
+        setTimeout(() => {
+            this.determineTableDataMaxHeight();
+        });
 
         // we should get a ImportableFileModel object
         let jsonResponse;
@@ -836,9 +866,6 @@ export class ImportDataComponent
 
             return;
         }
-
-        // determine height of table rows ?
-        this.determineTableDataMaxHeight();
 
         // start schedule job
         this.runDataScheduleJob();
@@ -1219,14 +1246,6 @@ export class ImportDataComponent
         this._displayLoading = false;
         this._displayLoadingLocked = false;
         this.progress = null;
-    }
-
-    /**
-     * Component destroyed
-     */
-    ngOnDestroy() {
-        this.stopDataScheduleJob();
-        this.stopTableDataMaxHeight();
     }
 
     /**
@@ -1907,30 +1926,12 @@ export class ImportDataComponent
 // + CLEANUP LNG_...nefolosite...
 
     /**
-     * Stop previous job
-     */
-    private stopTableDataMaxHeight(): void {
-        if (this.determineTableDataMaxHeightJob) {
-            clearTimeout(this.determineTableDataMaxHeightJob);
-            this.determineTableDataMaxHeightJob = undefined;
-        }
-    }
-
-    /**
      * Determine import data max height
      */
     private determineTableDataMaxHeight(): void {
-        // stop previous job
-        this.stopTableDataMaxHeight();
-
         // check if map fields are visible
         // wait for mappedDataTable to be initialized
         if (!this.areMapFieldVisible) {
-            // wait
-            this.determineTableDataMaxHeightJob = setTimeout(() => {
-                this.determineTableDataMaxHeight();
-            }, 200);
-
             // finished
             return;
         }
