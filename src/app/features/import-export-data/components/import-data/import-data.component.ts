@@ -65,9 +65,8 @@ enum ImportServerErrorCodes {
 })
 export class ImportDataComponent
     implements OnInit, OnDestroy {
-    /**
-     * Extension mapped to mimes
-     */
+
+    // Extension mapped to mimes
     private allowedMimeTypes: string[] = [];
     private allowedMimeTypesMap = {
         [ImportDataExtension.CSV]: 'text/csv',
@@ -83,9 +82,7 @@ export class ImportDataComponent
         ]
     };
 
-    /**
-     * Allowed extensions
-     */
+    // Allowed extensions
     private _allowedExtensions: string[];
     @Input() set allowedExtensions(extensions: string[]) {
         this._allowedExtensions = extensions;
@@ -108,24 +105,17 @@ export class ImportDataComponent
             this.uploader.options.allowedMimeType = this.allowedMimeTypes;
         }
     }
-
     get allowedExtensions(): string[] {
         return this._allowedExtensions ? this._allowedExtensions : [];
     }
 
-    /**
-     * Page title
-     */
+    // Page title
     @Input() title: string = '';
 
-    /**
-     * Tell system if this doesn't need to go through map step, uploading file is enough
-     */
+    // Tell system if this doesn't need to go through map step, uploading file is enough
     @Input() isOneStep: boolean = false;
 
-    /**
-     * Model provided to import for input
-     */
+    // Model provided to import for input
     private _model: string = undefined;
     @Input() set model(value: string) {
         this._model = value;
@@ -133,81 +123,56 @@ export class ImportDataComponent
             this.uploader.options.additionalParameter.model = this._model;
         }
     }
-
     get model(): string {
         return this._model;
     }
 
-    /**
-     * Saved import mapping
-     */
+    // Saved import mapping
     @Input() savedImportPage: string;
 
-    /**
-     * List with saved import mappings
-     */
+    // List with saved import mappings
     savedMappingsList$: Observable<SavedImportMappingModel[]>;
 
     // loaded saved import mapping
     loadedImportMapping: ISavedImportMappingModel = null;
 
-    /**
-     * File uploader
-     */
+    // File uploader
     uploader: FileUploader;
 
-    /**
-     * Cursor is over drag-drop file zone
-     */
+    // Cursor is over drag-drop file zone
     hasFileOver: boolean = false;
 
-    /**
-     * Variables sent to translation pipe
-     */
+    // Variables sent to translation pipe
     translationData: {
         types?: string
     } = {};
 
-    /**
-     * Percent displayed when uploading a file
-     */
+    // Percent displayed when uploading a file
     progress: number = null;
 
-    /**
-     * Display spinner when True, otherwise display the form
-     */
+    // Display spinner when True, otherwise display the form
     private _displayLoading: boolean = false;
     private _displayLoadingLocked: boolean = false;
-
     @Input() set displayLoading(value: boolean) {
         if (!this._displayLoadingLocked) {
             this._displayLoading = value;
         }
     }
-
     get displayLoading(): boolean {
         return this._displayLoading;
     }
 
-    /**
-     * Import success message
-     */
+    // Import success message
     @Input() importSuccessMessage: string = 'LNG_PAGE_IMPORT_DATA_SUCCESS_MESSAGE';
 
     // finished - imported data with success
-    /**
-     * Event called when we finished importing data ( this should handle page redirect )
-     */
+    // Event called when we finished importing data ( this should handle page redirect )
     @Output() finished = new EventEmitter<void>();
 
-    /**
-     * Where should we POST mapped data to ( endpoint that imports data )
-     */
+    // Where should we POST mapped data to ( endpoint that imports data )
     @Input() importDataUrl: string;
 
-    /**
-     * Endpoint to upload file ( & get header columns and other data )
-     */
+    // Endpoint to upload file ( & get header columns and other data )
     private _importFileUrl: string;
     @Input() set importFileUrl(value: string) {
         this._importFileUrl = value;
@@ -216,40 +181,24 @@ export class ImportDataComponent
             this.uploader.options.url = `${environment.apiUrl}/${this.importFileUrl}`;
         }
     }
-
     get importFileUrl(): string {
         return this._importFileUrl;
     }
 
-    /**
-     * Tokens for properties for which we don't receive labels from the server
-     */
+    // Tokens for properties for which we don't receive labels from the server
     @Input() fieldsWithoutTokens: {
         [property: string]: string
     } = {};
 
-    /**
-     * Address fields should use outbreak locations ?
-     */
+    // Address fields should use outbreak locations ?
     @Input() useOutbreakLocations: boolean = false;
 
-    /**
-     * Address fields so we can use custom dropdowns
-     */
+    // Address fields so we can use custom dropdowns
     @Input() addressFields: {
         [property: string]: boolean
     } = {};
 
-    /**
-     * Record properties that shouldn't be visible in destination dropdown
-     */
-    @Input() excludeDestinationProperties: {
-        [property: string]: boolean
-    } = {};
-
-    /**
-     * Required fields that user needs to map
-     */
+    // Required fields that user needs to map
     private requiredDestinationFieldsMap: {
         [modelProperty: string]: true
     } = {};
@@ -266,20 +215,14 @@ export class ImportDataComponent
         return this._requiredDestinationFields;
     }
 
-    /**
-     * Alis under which we upload the file
-     */
+    // Alis under which we upload the file
     @Input() fileUploadAlias: string;
 
-    /**
-     * Data to send to format callback
-     */
+    // Data to send to format callback
     @Input() extraDataUsedToFormatData: any;
 
-    /**
-     * Callback called after we receive model definitions from api
-     *  - through this callback we can alter the api response
-     */
+    // Callback called after we receive model definitions from api
+    //  * - through this callback we can alter the api response
     @Input() formatDataBeforeUse: (
         modelProperties: ImportableFilePropertiesModel,
         modelPropertyValues: ImportableFilePropertyValuesModel,
@@ -296,24 +239,16 @@ export class ImportDataComponent
         extraDataUsedToFormat: any
     ) => void;
 
-    /**
-     * Keep all file data ( header columns, module information, drop-down options etc )
-     */
+    // Keep all file data ( header columns, module information, drop-down options etc )
     importableObject: ImportableFileModel;
 
-    /**
-     * Source / Destination level value
-     */
+    // Source / Destination level value
     possibleSourceDestinationLevels: LabelValuePair[];
 
-    /**
-     * Mapped fields
-     */
+    // Mapped fields
     mappedFields: ImportableMapField[] = [];
 
-    /**
-     * Keep err msg details
-     */
+    // Keep err msg details
     errMsgDetails: {
         details: {
             failed: {
@@ -345,25 +280,14 @@ export class ImportDataComponent
         }
     };
 
-    /**
-     * Constants / Classes
-     */
-    Object = Object;
+    // Constants / Classes
     ImportServerErrorCodes = ImportServerErrorCodes;
 
-    /**
-     * Decrypt password
-     */
+    // Decrypt password
     decryptPassword: string;
 
-    /**
-     * Decrypt password alias
-     */
+    // Decrypt password alias
     @Input() decryptPasswordAlias: string = 'decryptPassword';
-
-
-
-
 
     // scrollable viewport
     @ViewChild('virtualScrollViewport') virtualScrollViewport: CdkVirtualScrollViewport;
@@ -852,7 +776,6 @@ export class ImportDataComponent
             },
             fileType,
             this.fieldsWithoutTokens,
-            this.excludeDestinationProperties,
             this.extraDataUsedToFormatData,
             this.formatDataBeforeUse
         );
@@ -1284,8 +1207,6 @@ export class ImportDataComponent
 
     /**
      * Add drop-downs for mapping a drop-down type options
-     * @param importableItem
-     * @param reInitOptions
      */
     addMapOptionsIfNecessary(
         importableItem: ImportableMapField,
@@ -1911,28 +1832,6 @@ export class ImportDataComponent
         // prepare data
         this.validateData();
     }
-
-// ..................
-// ..................
-// ..................
-// ..................
-// ..................
-// ..................
-// ..................
-// ALL NEW METHODS
-// NEED TO CLEANUP ABOVE AFTER FINISH
-// ..................
-// ..................
-// ..................
-// ..................
-// ..................
-// ..................
-// ..................
-// + CLEANUP LNG_...nefolosite...
-// + CLEANUP LNG_...nefolosite...
-// + CLEANUP LNG_...nefolosite...
-// + CLEANUP LNG_...nefolosite...
-// + CLEANUP LNG_...nefolosite...
 
     /**
      * Determine import data max height

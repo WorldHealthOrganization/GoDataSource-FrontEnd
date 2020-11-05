@@ -702,7 +702,7 @@
         *ngIf="!displayLoading && importableObject && errMsgDetails"
         fxLayout="column" fxLayoutGap="10px"
         class="import-data-errors">
-        <div class="import-data-errors-title">
+        <div>
             {{ 'LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED' | translate }}
         </div>
         <div
@@ -719,7 +719,6 @@
                     <!-- Hide / Show details -->
                     <button
                         mat-raised-button color="accent"
-                        class="import-data-errors-err-view-record-button"
                         (click)="err.showData = !err.showData">
                         {{ (err.showData ? 'LNG_PAGE_IMPORT_DATA_BUTTON_HIDE_ERR_RECORD_DETAILS' : 'LNG_PAGE_IMPORT_DATA_BUTTON_SHOW_ERR_RECORD_DETAILS') | translate }}
                     </button>

@@ -158,9 +158,6 @@ export class ImportableFileModel {
         fieldsWithoutTokens: {
             [property: string]: string
         } = {},
-        excludeDestinationProperties: {
-            [property: string]: boolean
-        } = {},
         extraDataUsedToFormatData: any,
         formatDataBeforeUse: (
             modelProperties: ImportableFilePropertiesModel,
@@ -241,42 +238,40 @@ export class ImportableFileModel {
         ) => {
             // if this is a string property then we can push it as it is
             if (typeof impLVPair.label === 'string') {
-                if (!excludeDestinationProperties[impLVPair.value]) {
-                    // add parent prefix to child one
-                    impLVPair.label = labelPrefix + translate(
-                        fieldsWithoutTokens[impLVPair.value] ?
-                            fieldsWithoutTokens[impLVPair.value] :
-                            impLVPair.label
-                    );
+                // add parent prefix to child one
+                impLVPair.label = labelPrefix + translate(
+                    fieldsWithoutTokens[impLVPair.value] ?
+                        fieldsWithoutTokens[impLVPair.value] :
+                        impLVPair.label
+                );
 
-                    // map destination field for easy access to mapped options when having [] in path
-                    this.modelPropertyValuesMap[impLVPair.value] = ImportableFileModel.lodashCustomGet(
-                        this.modelPropertyValues,
-                        impLVPair.value
-                    );
+                // map destination field for easy access to mapped options when having [] in path
+                this.modelPropertyValuesMap[impLVPair.value] = ImportableFileModel.lodashCustomGet(
+                    this.modelPropertyValues,
+                    impLVPair.value
+                );
 
-                    // indexes
-                    modelPropertyValuesMapIndex[impLVPair.value] = {};
-                    _.each(this.modelPropertyValuesMap[impLVPair.value], (propValue) => {
-                        // label
-                        if (propValue.label) {
-                            // label translated
-                            modelPropertyValuesMapIndex[impLVPair.value][_.camelCase(translate(propValue.label)).toLowerCase()] = propValue.id;
+                // indexes
+                modelPropertyValuesMapIndex[impLVPair.value] = {};
+                _.each(this.modelPropertyValuesMap[impLVPair.value], (propValue) => {
+                    // label
+                    if (propValue.label) {
+                        // label translated
+                        modelPropertyValuesMapIndex[impLVPair.value][_.camelCase(translate(propValue.label)).toLowerCase()] = propValue.id;
 
-                            // label not translated (LNG key)
-                            modelPropertyValuesMapIndex[impLVPair.value][_.camelCase(propValue.label).toLowerCase()] = propValue.id;
-                        }
+                        // label not translated (LNG key)
+                        modelPropertyValuesMapIndex[impLVPair.value][_.camelCase(propValue.label).toLowerCase()] = propValue.id;
+                    }
 
-                        // id
-                        modelPropertyValuesMapIndex[impLVPair.value][_.camelCase(propValue.id).toLowerCase()] = propValue.id;
-                    });
+                    // id
+                    modelPropertyValuesMapIndex[impLVPair.value][_.camelCase(propValue.id).toLowerCase()] = propValue.id;
+                });
 
-                    // add tooltip
-                    impLVPair.tooltip = impLVPair.label;
+                // add tooltip
+                impLVPair.tooltip = impLVPair.label;
 
-                    // add to list of filters to which we can push data
-                    result.push(impLVPair);
-                }
+                // add to list of filters to which we can push data
+                result.push(impLVPair);
             // otherwise we need to map it to multiple values
             } else if (typeof impLVPair.label === 'object') {
                 // add as parent drop-down as well
@@ -356,31 +351,6 @@ export class ImportableFileModel {
         });
     }
 }
-
-// ..................
-// ..................
-// ..................
-// ..................
-// ..................
-// ..................
-// ..................
-// NEED TO CLEANUP ABOVE AFTER FINISH
-// ..................
-// ..................
-// ..................
-// ..................
-// ..................
-// ..................
-// ..................
-// + CLEANUP
-// + CLEANUP
-// + CLEANUP
-// + CLEANUP
-// + CLEANUP
-// + CLEANUP
-// + CLEANUP
-// + CLEANUP
-
 
 /**
  * Import field option
