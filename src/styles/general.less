@@ -3,6 +3,12 @@
 @import 'overrides';
 @import 'common';
 
+body {
+    // fix for virtual scrolling
+    position: relative;
+    height: 100vh;
+}
+
 html, body, ul, li, div, span {
     margin: 0;
     padding: 0;
