@@ -477,8 +477,14 @@ export class ImportDataComponent
 
     // used to determine duplicate selections
     usedSourceFieldsForDuplicateCheck: {
-        [sourceFieldWithSelectedIndexes: string]: number
-    } = {};
+        fields: {
+            [sourceFieldWithSelectedIndexes: string]: number
+        },
+        valid: boolean
+    } = {
+        fields: {},
+        valid: false
+    };
 
     // used to determine duplicate selections
     usedSourceFieldOptions: {
@@ -2064,7 +2070,10 @@ export class ImportDataComponent
     private validateData(): void {
         // go through map fields and determine mapped sources
         this.needToMapOptions = false;
-        this.usedSourceFieldsForDuplicateCheck = {};
+        this.usedSourceFieldsForDuplicateCheck = {
+            fields: {},
+            valid: true
+        };
         this.usedSourceFieldOptions = {};
 
         //  no point in continuing ?
@@ -2101,9 +2110,14 @@ export class ImportDataComponent
             const sourceFieldWithSelectedIndexes: string = field.sourceFieldWithSelectedIndexes;
 
             // count items
-            this.usedSourceFieldsForDuplicateCheck[sourceFieldWithSelectedIndexes] = this.usedSourceFieldsForDuplicateCheck[sourceFieldWithSelectedIndexes] ?
-                this.usedSourceFieldsForDuplicateCheck[sourceFieldWithSelectedIndexes] + 1 :
+            this.usedSourceFieldsForDuplicateCheck.fields[sourceFieldWithSelectedIndexes] = this.usedSourceFieldsForDuplicateCheck.fields[sourceFieldWithSelectedIndexes] ?
+                this.usedSourceFieldsForDuplicateCheck.fields[sourceFieldWithSelectedIndexes] + 1 :
                 1;
+
+            // invalid form ?
+            if (this.usedSourceFieldsForDuplicateCheck.fields[sourceFieldWithSelectedIndexes] > 1) {
+                this.usedSourceFieldsForDuplicateCheck.valid = false;
+            }
 
             // count options too
             this.usedSourceFieldOptions[sourceFieldWithSelectedIndexes] = {
