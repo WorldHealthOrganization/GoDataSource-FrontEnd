@@ -102,7 +102,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_ROWS': 'Invalid records: {{rows}}',
         'LNG_PAGE_IMPORT_DATA_LOAD_SAVED_MAPPING_CONFIRMATION': 'Are you sure you want to load "{{name}}"? It might take a while...',
         'LNG_PAGE_IMPORT_DATA_MIGHT_TAKE_SOME_TIME_MSG': 'Please be patient, it might take a couple of minutes to process data',
-        'LNG_PAGE_IMPORT_DATA_MIGHT_TAKE_SOME_TIME_MSG_DIALOG_PREPARE_DATA': 'Preparing data',
 
         /**
          * uiClustersListPage
