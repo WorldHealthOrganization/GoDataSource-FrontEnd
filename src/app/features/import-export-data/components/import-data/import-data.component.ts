@@ -1700,7 +1700,7 @@ export class ImportDataComponent
                     !field.destinationField ||
                     !field.sourceDestinationLevelAreValid || (
                         field.sourceFieldWithSelectedIndexes &&
-                        this.usedSourceFieldsForDuplicateCheck[field.sourceFieldWithSelectedIndexes] > 1
+                        this.usedSourceFieldsForDuplicateCheck.fields[field.sourceFieldWithSelectedIndexes] > 1
                     ) || (
                         this.usedSourceFieldOptions[field.sourceFieldWithSelectedIndexes] &&
                         !this.usedSourceFieldOptions[field.sourceFieldWithSelectedIndexes].valid
