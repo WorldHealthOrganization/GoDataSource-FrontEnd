@@ -672,12 +672,17 @@ export class ImportDataComponent
                 // emit finished event - event should handle redirect
                 this.finished.emit();
             } else {
+                // display loading
+                const loadingDialog = this.createPrepareMapDataLoadingDialog();
+                loadingDialog.showMessage('LNG_PAGE_IMPORT_DATA_MIGHT_TAKE_SOME_TIME_MSG_DIALOG_PREPARE_DATA');
+
                 // wait for bindings
                 setTimeout(() => {
                     // process file data
                     this.processFileData(
                         item,
-                        response
+                        response,
+                        loadingDialog
                     );
                 }, 50);
             }
@@ -711,7 +716,8 @@ export class ImportDataComponent
      */
     private processFileData(
         item: FileItem,
-        response: string
+        response: string,
+        loadingDialog: LoadingDialogModel
     ): void {
         // after we do the math
         setTimeout(() => {
@@ -732,10 +738,16 @@ export class ImportDataComponent
             !response ||
             !jsonResponse
         ) {
+            // display errors
             this.displayError(
                 'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_RESPONSE_FROM_SERVER',
                 true
             );
+
+            // hide loading
+            loadingDialog.close();
+
+            // finished
             return;
         }
 
@@ -1168,6 +1180,9 @@ export class ImportDataComponent
         this._displayLoading = false;
         this._displayLoadingLocked = false;
         this.progress = null;
+
+        // hide loading
+        loadingDialog.close();
     }
 
     /**

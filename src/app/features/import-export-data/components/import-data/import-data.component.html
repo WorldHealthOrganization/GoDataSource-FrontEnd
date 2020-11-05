@@ -9,10 +9,18 @@
         fxLayout="row" fxLayoutAlign="center">
         <mat-spinner></mat-spinner>
         <span
-            *ngIf="progress !== null"
+            *ngIf="progress !== null && progress < 100; else displayWaitMessage"
             class="import-data-loading-progress">
             {{ progress }} %
         </span>
+
+        <!-- Might take a while message -->
+        <ng-template
+            #displayWaitMessage>
+            <div>
+                {{ 'LNG_PAGE_IMPORT_DATA_MIGHT_TAKE_SOME_TIME_MSG' | translate }}
+            </div>
+        </ng-template>
     </div>
 
     <!-- Select / Upload file -->
