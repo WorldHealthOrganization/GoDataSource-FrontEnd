@@ -2098,15 +2098,15 @@ export class ImportDataComponent
             }
 
             // determine source key
-            const sourceKey: string = field.sourceFieldWithSelectedIndexes;
+            const sourceFieldWithSelectedIndexes: string = field.sourceFieldWithSelectedIndexes;
 
             // count items
-            this.usedSourceFieldsForDuplicateCheck[sourceKey] = this.usedSourceFieldsForDuplicateCheck[sourceKey] ?
-                this.usedSourceFieldsForDuplicateCheck[sourceKey] + 1 :
+            this.usedSourceFieldsForDuplicateCheck[sourceFieldWithSelectedIndexes] = this.usedSourceFieldsForDuplicateCheck[sourceFieldWithSelectedIndexes] ?
+                this.usedSourceFieldsForDuplicateCheck[sourceFieldWithSelectedIndexes] + 1 :
                 1;
 
             // count options too
-            this.usedSourceFieldOptions[sourceKey] = {
+            this.usedSourceFieldOptions[sourceFieldWithSelectedIndexes] = {
                 options: {},
                 valid: true,
                 complete: {
@@ -2130,23 +2130,23 @@ export class ImportDataComponent
                 let optIsValid: boolean = true;
                 if (!fieldOpt.sourceOption) {
                     // invalid
-                    this.usedSourceFieldOptions[sourceKey].valid = false;
+                    this.usedSourceFieldOptions[sourceFieldWithSelectedIndexes].valid = false;
 
                     // option isn't valid
                     optIsValid = false;
                 } else {
                     // count
-                    this.usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] = this.usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] ?
-                        this.usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] + 1 :
+                    this.usedSourceFieldOptions[sourceFieldWithSelectedIndexes].options[fieldOpt.sourceOption] = this.usedSourceFieldOptions[sourceFieldWithSelectedIndexes].options[fieldOpt.sourceOption] ?
+                        this.usedSourceFieldOptions[sourceFieldWithSelectedIndexes].options[fieldOpt.sourceOption] + 1 :
                         1;
 
                     // validate
                     if (
-                        this.usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] > 1 ||
+                        this.usedSourceFieldOptions[sourceFieldWithSelectedIndexes].options[fieldOpt.sourceOption] > 1 ||
                         !fieldOpt.destinationOption
                     ) {
                         // invalid
-                        this.usedSourceFieldOptions[sourceKey].valid = false;
+                        this.usedSourceFieldOptions[sourceFieldWithSelectedIndexes].valid = false;
 
                         // option isn't valid
                         optIsValid = false;
@@ -2155,7 +2155,7 @@ export class ImportDataComponent
 
                 // count invalid options
                 if (!optIsValid) {
-                    this.usedSourceFieldOptions[sourceKey].incomplete.no++;
+                    this.usedSourceFieldOptions[sourceFieldWithSelectedIndexes].incomplete.no++;
                 }
             }
         }
