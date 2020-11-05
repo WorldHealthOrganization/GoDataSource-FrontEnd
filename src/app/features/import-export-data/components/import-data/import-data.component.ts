@@ -323,17 +323,33 @@ export class ImportDataComponent
                         !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
                         this.addressFields[item.destinationField]
                     ) &&
-                    item.mappedOptions.length < this.distinctValuesCache[item.sourceFieldWithoutIndexes].length;
+                    item.mappedOptions.length < this.distinctValuesCache[item.sourceFieldWithoutIndexes].length && (
+                        !this.usedSourceFieldOptionsForOptionMapping ||
+                        !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes] ||
+                        !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes || (
+                            this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes
+                        )
+                    );
             },
             click: (
                 item: ImportableMapField,
                 handler: HoverRowActionsDirective
             ) => {
-                // add option
-                this.addNewOptionMap(
-                    item,
-                    handler
-                );
+                // not allowed if we have duplicates because it can break the logic:
+                // this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes
+                if (
+                    this.usedSourceFieldsForValidation &&
+                    this.usedSourceFieldsForValidation.fields[item.sourceFieldWithSelectedIndexes] > 1
+                ) {
+                    // display toast
+                    this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_MUST_FIX_DUPLICATE_BEFORE_ADD');
+                } else {
+                    // add option
+                    this.addNewOptionMap(
+                        item,
+                        handler
+                    );
+                }
             }
         }),
 
@@ -350,7 +366,12 @@ export class ImportDataComponent
                         !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
                         this.addressFields[item.destinationField]
                     ) &&
-                    item.mappedOptionsCollapsed;
+                    item.mappedOptionsCollapsed && (
+                        !this.usedSourceFieldOptionsForOptionMapping ||
+                        !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes] ||
+                        !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes ||
+                        this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes
+                    );
             },
             click: (
                 item: ImportableMapField,
@@ -1242,6 +1263,11 @@ export class ImportDataComponent
             !this.distinctValuesCache[importableItem.sourceFieldWithoutIndexes] || (
                 !this.importableObject.modelPropertyValuesMap[importableItem.destinationField] &&
                 !this.addressFields[importableItem.destinationField]
+            ) || (
+                this.usedSourceFieldOptionsForOptionMapping &&
+                this.usedSourceFieldOptionsForOptionMapping[importableItem.sourceFieldWithoutIndexes] &&
+                this.usedSourceFieldOptionsForOptionMapping[importableItem.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes &&
+                this.usedSourceFieldOptionsForOptionMapping[importableItem.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes !== importableItem.sourceFieldWithSelectedIndexes
             )
         ) {
             return;
@@ -2142,6 +2168,9 @@ export class ImportDataComponent
 
                 // we need to count incomplete values
                 determineOptionMappingIncompleteNo = true;
+            } else {
+                // handled / completed above shouldn't be expandable
+                field.mappedOptionsCollapsed = true;
             }
 
             // for speed purposes we will use for..loop
@@ -2676,6 +2705,9 @@ export class ImportDataComponent
                 // remap options
                 const addMapOptions = (finishedCallback: () => void): void => {
                     // add map options
+                    const handledFieldSubOptions: {
+                        [sourceFieldWithoutIndexes: string]: true
+                    } = {};
                     const addMapOptionsHandler = (
                         index: number,
                         finishedHandlerCallback: () => void
@@ -2702,6 +2734,15 @@ export class ImportDataComponent
                         setTimeout(() => {
                             // map options
                             distinctValuesForKeysMap[key].forEach((field) => {
+                                // add options only if we didn't add already for this one
+                                if (handledFieldSubOptions[field.sourceFieldWithoutIndexes]) {
+                                    return;
+                                }
+
+                                // remember that we handled this one already
+                                handledFieldSubOptions[field.sourceFieldWithoutIndexes] = true;
+
+                                // add options
                                 this.addMapOptionsIfNecessary(
                                     field,
                                     true,

@@ -102,6 +102,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_MAPPING_FINISHED': 'Mapping of sub-options finished. Please check that all of them were mapped properly.',
         'LNG_PAGE_IMPORT_DATA_LABEL_ROW_NO': 'No',
         'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_ROWS': 'Invalid records: {{rows}}',
+        'LNG_PAGE_IMPORT_DATA_ERROR_MUST_FIX_DUPLICATE_BEFORE_ADD': 'Please fix "duplicate" issue before adding new sub-options',
         'LNG_PAGE_IMPORT_DATA_LOAD_SAVED_MAPPING_CONFIRMATION': 'Are you sure you want to load "{{name}}"? It might take a while...',
         'LNG_PAGE_IMPORT_DATA_MIGHT_TAKE_SOME_TIME_MSG': 'Please be patient, it might take a couple of minutes to process data',
 
