@@ -475,7 +475,7 @@ export class ImportDataComponent
     // display map button or start import ?
     needToMapOptions: boolean = true;
 
-    // used to determine duplicate selections
+    // used to determine duplicate selections for fields
     usedSourceFieldsForValidation: {
         fields: {
             [sourceFieldWithSelectedIndexes: string]: number
@@ -486,13 +486,20 @@ export class ImportDataComponent
         valid: false
     };
 
-    // used to determine duplicate selections
-    usedSourceFieldOptions: {
-        [source: string]: {
+    // used to determine if fields sub-options are valid
+    usedSourceFieldOptionsForValidation: {
+        [sourceFieldWithSelectedIndexes: string]: {
             options: {
-                [option: string]: number
+                [sourceOption: string]: number
             },
-            valid: boolean,
+            valid: boolean
+        }
+    } = {};
+
+    // used to determine duplicate selections - this matters since we send  to api values with source "sourceFieldWithoutIndexes" and NOT "sourceFieldWithSelectedIndexes"
+    usedSourceFieldOptionsForOptionMapping: {
+        [sourceFieldWithoutIndexes: string]: {
+            sourceFieldWithSelectedIndexes: string,
             complete: {
                 no: number,
                 total: number
@@ -1690,8 +1697,8 @@ export class ImportDataComponent
                         field.sourceFieldWithSelectedIndexes &&
                         this.usedSourceFieldsForValidation.fields[field.sourceFieldWithSelectedIndexes] > 1
                     ) || (
-                        this.usedSourceFieldOptions[field.sourceFieldWithSelectedIndexes] &&
-                        !this.usedSourceFieldOptions[field.sourceFieldWithSelectedIndexes].valid
+                        this.usedSourceFieldOptionsForValidation[field.sourceFieldWithSelectedIndexes] &&
+                        !this.usedSourceFieldOptionsForValidation[field.sourceFieldWithSelectedIndexes].valid
                     )
                 ) {
                     // add to invalid rows
@@ -2062,7 +2069,8 @@ export class ImportDataComponent
             fields: {},
             valid: true
         };
-        this.usedSourceFieldOptions = {};
+        this.usedSourceFieldOptionsForValidation = {};
+        this.usedSourceFieldOptionsForOptionMapping = {};
 
         //  no point in continuing ?
         if (!this.areMapFieldVisible) {
@@ -2096,6 +2104,7 @@ export class ImportDataComponent
 
             // determine source key
             const sourceFieldWithSelectedIndexes: string = field.sourceFieldWithSelectedIndexes;
+            const sourceFieldWithoutIndexes: string = field.sourceFieldWithoutIndexes;
 
             // count items
             this.usedSourceFieldsForValidation.fields[sourceFieldWithSelectedIndexes] = this.usedSourceFieldsForValidation.fields[sourceFieldWithSelectedIndexes] ?
@@ -2107,21 +2116,33 @@ export class ImportDataComponent
                 this.usedSourceFieldsForValidation.valid = false;
             }
 
-            // count options too
-            this.usedSourceFieldOptions[sourceFieldWithSelectedIndexes] = {
+            // count options duplicates & validate
+            this.usedSourceFieldOptionsForValidation[sourceFieldWithSelectedIndexes] = {
                 options: {},
-                valid: true,
-                complete: {
-                    no: (field.mappedOptions || []).length,
-                    total: this.distinctValuesCache && this.distinctValuesCache[field.sourceFieldWithoutIndexes] ?
-                        this.distinctValuesCache[field.sourceFieldWithoutIndexes].length :
-                        0
-                },
-                incomplete: {
-                    no: 0,
-                    total: (field.mappedOptions || []).length
-                }
+                valid: true
             };
+
+            // count option mappings - only the first one is relevant
+            let determineOptionMappingIncompleteNo: boolean = false;
+            if (!this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes]) {
+                // initialize
+                this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes] = {
+                    sourceFieldWithSelectedIndexes: sourceFieldWithSelectedIndexes,
+                    complete: {
+                        no: (field.mappedOptions || []).length,
+                        total: this.distinctValuesCache && this.distinctValuesCache[field.sourceFieldWithoutIndexes] ?
+                            this.distinctValuesCache[field.sourceFieldWithoutIndexes].length :
+                            0
+                    },
+                    incomplete: {
+                        no: 0,
+                        total: (field.mappedOptions || []).length
+                    }
+                };
+
+                // we need to count incomplete values
+                determineOptionMappingIncompleteNo = true;
+            }
 
             // for speed purposes we will use for..loop
             for (let fieldOptionIndex = 0; fieldOptionIndex < field.mappedOptions.length; fieldOptionIndex++) {
@@ -2132,23 +2153,23 @@ export class ImportDataComponent
                 let optIsValid: boolean = true;
                 if (!fieldOpt.sourceOption) {
                     // invalid
-                    this.usedSourceFieldOptions[sourceFieldWithSelectedIndexes].valid = false;
+                    this.usedSourceFieldOptionsForValidation[sourceFieldWithSelectedIndexes].valid = false;
 
                     // option isn't valid
                     optIsValid = false;
                 } else {
                     // count
-                    this.usedSourceFieldOptions[sourceFieldWithSelectedIndexes].options[fieldOpt.sourceOption] = this.usedSourceFieldOptions[sourceFieldWithSelectedIndexes].options[fieldOpt.sourceOption] ?
-                        this.usedSourceFieldOptions[sourceFieldWithSelectedIndexes].options[fieldOpt.sourceOption] + 1 :
+                    this.usedSourceFieldOptionsForValidation[sourceFieldWithSelectedIndexes].options[fieldOpt.sourceOption] = this.usedSourceFieldOptionsForValidation[sourceFieldWithSelectedIndexes].options[fieldOpt.sourceOption] ?
+                        this.usedSourceFieldOptionsForValidation[sourceFieldWithSelectedIndexes].options[fieldOpt.sourceOption] + 1 :
                         1;
 
                     // validate
                     if (
-                        this.usedSourceFieldOptions[sourceFieldWithSelectedIndexes].options[fieldOpt.sourceOption] > 1 ||
+                        this.usedSourceFieldOptionsForValidation[sourceFieldWithSelectedIndexes].options[fieldOpt.sourceOption] > 1 ||
                         !fieldOpt.destinationOption
                     ) {
                         // invalid
-                        this.usedSourceFieldOptions[sourceFieldWithSelectedIndexes].valid = false;
+                        this.usedSourceFieldOptionsForValidation[sourceFieldWithSelectedIndexes].valid = false;
 
                         // option isn't valid
                         optIsValid = false;
@@ -2156,8 +2177,11 @@ export class ImportDataComponent
                 }
 
                 // count invalid options
-                if (!optIsValid) {
-                    this.usedSourceFieldOptions[sourceFieldWithSelectedIndexes].incomplete.no++;
+                if (
+                    determineOptionMappingIncompleteNo &&
+                    !optIsValid
+                ) {
+                    this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].incomplete.no++;
                 }
             }
         }
