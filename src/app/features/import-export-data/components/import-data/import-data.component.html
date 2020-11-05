@@ -584,7 +584,7 @@
                                                 [ngModel]="mappedOpt.sourceOption"
                                                 [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
                                                 [options]="mappedOpt.readOnly ? item.getOptionsForReadOnlySource(mappedOpt) : distinctValuesCache[item.sourceFieldWithoutIndexes]"
-                                                (optionChanged)="mappedOpt.sourceOption = $event ? $event.value : $event;"
+                                                (optionChanged)="setMapOptionValue(mappedOpt, true, $event)"
                                                 [disabled]="mappedOpt.readOnly">
                                             </app-form-select-vscroll>
 
@@ -617,7 +617,7 @@
                                                 [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
                                                 [options]="importableObject.modelPropertyValuesMap[item.destinationField]"
                                                 optionValueKey="id"
-                                                (optionChanged)="mappedOpt.destinationOption = $event ? $event.value : $event;"
+                                                (optionChanged)="setMapOptionValue(mappedOpt, false, $event)"
                                                 [disabled]="mappedOpt.readOnly">
                                             </app-form-select-vscroll>
 

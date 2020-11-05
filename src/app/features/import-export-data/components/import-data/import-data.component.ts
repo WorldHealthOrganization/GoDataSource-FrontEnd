@@ -405,6 +405,7 @@ export class ImportDataComponent
                 item: ImportableMapField,
                 handler: HoverRowActionsDirective
             ) => {
+                // add option
                 this.addNewOptionMap(
                     item,
                     handler
@@ -515,6 +516,7 @@ export class ImportDataComponent
                 handler: HoverRowActionsDirective,
                 index: number
             ) => {
+                // clone field
                 this.cloneFieldMap(
                     item,
                     handler,
@@ -537,6 +539,7 @@ export class ImportDataComponent
                 handler: HoverRowActionsDirective,
                 index: number
             ) => {
+                // remove item
                 this.removeItemMap(
                     item,
                     index
@@ -544,9 +547,6 @@ export class ImportDataComponent
             }
         })
     ];
-
-    // job schedule handler
-    private scheduleJob: NodeJS.Timer;
 
     // display map button or start import ?
     needToMapOptions: boolean = true;
@@ -774,8 +774,6 @@ export class ImportDataComponent
      * Component destroyed
      */
     ngOnDestroy() {
-        this.stopDataScheduleJob();
-
         // remove window resize listener
         window.removeEventListener(
             'resize',
@@ -791,9 +789,13 @@ export class ImportDataComponent
         item: FileItem,
         response: string
     ): void {
-        // adjust height of table after we do the math ?
+        // after we do the math
         setTimeout(() => {
+            // adjust height of table after we do the math
             this.determineTableDataMaxHeight();
+
+            // validate data
+            this.validateData();
         });
 
         // we should get a ImportableFileModel object
@@ -866,9 +868,6 @@ export class ImportDataComponent
 
             return;
         }
-
-        // start schedule job
-        this.runDataScheduleJob();
 
         // required fields
         const mapOfRequiredDestinationFields = this.requiredDestinationFieldsMap ? _.clone(this.requiredDestinationFieldsMap) : {};
@@ -1747,6 +1746,9 @@ export class ImportDataComponent
 
         // validate items & import data
         setTimeout(() => {
+            // prepare data
+            this.validateData();
+
             // go through data
             const invalidFieldRows: number[] = [];
             this.mappedFields.forEach((field, fieldIndex) => {
@@ -1877,6 +1879,7 @@ export class ImportDataComponent
      * Reset form & try again
      */
     tryAgain() {
+        // reset data
         this.distinctValuesCache = {};
         this.locationCache = {};
         this.locationCacheIndex = {};
@@ -1886,6 +1889,9 @@ export class ImportDataComponent
         this.mappedFields = [];
         this.decryptPassword = null;
         this.loadedImportMapping = null;
+
+        // prepare data
+        this.validateData();
     }
 
     /**
@@ -1901,6 +1907,9 @@ export class ImportDataComponent
 
         // add options if necessary
         this.addMapOptionsIfNecessary(item);
+
+        // prepare data
+        this.validateData();
     }
 
 // ..................
@@ -2011,6 +2020,9 @@ export class ImportDataComponent
         if (this.virtualScrollViewport) {
             this.virtualScrollViewport.scrollToOffset(0);
         }
+
+        // prepare data
+        this.validateData();
     }
 
     /**
@@ -2037,6 +2049,9 @@ export class ImportDataComponent
             fieldOption,
             handler
         );
+
+        // prepare data
+        this.validateData();
     }
 
     /**
@@ -2069,6 +2084,9 @@ export class ImportDataComponent
             clonedItem,
             handler
         );
+
+        // prepare data
+        this.validateData();
     }
 
     /**
@@ -2120,59 +2138,25 @@ export class ImportDataComponent
                         }
                     }
 
+                    // prepare data
+                    this.validateData();
                 }
             });
     }
 
     /**
-     * Stop schedule job
+     * Used to determine different information about the entire data
      */
-    private stopDataScheduleJob(): void {
-        if (this.scheduleJob) {
-            clearTimeout(this.scheduleJob);
-            this.scheduleJob = undefined;
-        }
-    }
-
-    /**
-     * Used to do periodic management of data (not perfect, but otherwise we would need to rethink most of the above logic)
-     */
-    private runDataScheduleJob(): void {
-        // stop previous job
-        this.stopDataScheduleJob();
+    private validateData(): void {
+        // go through map fields and determine mapped sources
+        this.needToMapOptions = false;
+        this.usedSourceFields = {};
+        this.usedSourceFieldOptions = {};
 
         //  no point in continuing ?
         if (!this.areMapFieldVisible) {
-            // call later
-            this.scheduleJob = setTimeout(() => {
-                this.runDataScheduleJob();
-            }, 200);
-
-            // no point in continuing
             return;
         }
-
-        // go through map fields and determine mapped sources
-        let needToMapOptions: boolean = false;
-        const usedSourceFields: {
-            [source: string]: number
-        } = {};
-        const usedSourceFieldOptions: {
-            [source: string]: {
-                options: {
-                    [option: string]: number
-                },
-                valid: boolean,
-                complete: {
-                    no: number,
-                    total: number
-                },
-                incomplete: {
-                    no: number,
-                    total: number
-                }
-            }
-        } = {};
 
         // for speed purposes we will use for..loop
         for (let fieldIndex = 0; fieldIndex < this.mappedFields.length; fieldIndex++) {
@@ -2196,19 +2180,19 @@ export class ImportDataComponent
                     !this.distinctValuesCache[field.sourceFieldWithoutIndexes]
                 )
             ) {
-                needToMapOptions = true;
+                this.needToMapOptions = true;
             }
 
             // determine source key
             const sourceKey: string = field.sourceFieldWithSelectedIndexes;
 
             // count items
-            usedSourceFields[sourceKey] = usedSourceFields[sourceKey] ?
-                usedSourceFields[sourceKey] + 1 :
+            this.usedSourceFields[sourceKey] = this.usedSourceFields[sourceKey] ?
+                this.usedSourceFields[sourceKey] + 1 :
                 1;
 
             // count options too
-            usedSourceFieldOptions[sourceKey] = {
+            this.usedSourceFieldOptions[sourceKey] = {
                 options: {},
                 valid: true,
                 complete: {
@@ -2232,23 +2216,23 @@ export class ImportDataComponent
                 let optIsValid: boolean = true;
                 if (!fieldOpt.sourceOption) {
                     // invalid
-                    usedSourceFieldOptions[sourceKey].valid = false;
+                    this.usedSourceFieldOptions[sourceKey].valid = false;
 
                     // option isn't valid
                     optIsValid = false;
                 } else {
                     // count
-                    usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] = usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] ?
-                        usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] + 1 :
+                    this.usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] = this.usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] ?
+                        this.usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] + 1 :
                         1;
 
                     // validate
                     if (
-                        usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] > 1 ||
+                        this.usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] > 1 ||
                         !fieldOpt.destinationOption
                     ) {
                         // invalid
-                        usedSourceFieldOptions[sourceKey].valid = false;
+                        this.usedSourceFieldOptions[sourceKey].valid = false;
 
                         // option isn't valid
                         optIsValid = false;
@@ -2257,23 +2241,10 @@ export class ImportDataComponent
 
                 // count invalid options
                 if (!optIsValid) {
-                    usedSourceFieldOptions[sourceKey].incomplete.no++;
+                    this.usedSourceFieldOptions[sourceKey].incomplete.no++;
                 }
             }
         }
-
-        // update
-        this.usedSourceFields = usedSourceFields;
-        this.usedSourceFieldOptions = usedSourceFieldOptions;
-
-        // hide / show map button ?
-        // allow import ?
-        this.needToMapOptions = needToMapOptions;
-
-        // run again later
-        this.scheduleJob = setTimeout(() => {
-            this.runDataScheduleJob();
-        }, 800);
     }
 
     /**
@@ -2289,6 +2260,28 @@ export class ImportDataComponent
             levelIndex,
             value ? value.value : value
         );
+
+        // prepare data
+        this.validateData();
+    }
+
+    /**
+     * Set field sub-option data
+     */
+    setMapOptionValue(
+        mappedOpt: IMappedOption,
+        source: boolean,
+        data: ImportableLabelValuePair | LabelValuePair
+    ): void {
+        // set source option
+        if (source) {
+            mappedOpt.sourceOption = data ? data.value : data;
+        } else {
+            mappedOpt.destinationOption = data ? data.value : data;
+        }
+
+        // prepare data
+        this.validateData();
     }
 
     /**
@@ -2373,6 +2366,9 @@ export class ImportDataComponent
 
         // nothing to retrieve ?
         if (distinctValuesForKeys.length < 1) {
+            // prepare data
+            this.validateData();
+
             // hide dialog
             loadingDialog.close();
 
@@ -2446,6 +2442,9 @@ export class ImportDataComponent
             )
             .pipe(
                 catchError((err) => {
+                    // prepare data
+                    this.validateData();
+
                     // hide loading
                     loadingDialog.close();
 
@@ -2614,6 +2613,9 @@ export class ImportDataComponent
                                 .getLocationsList(qb)
                                 .pipe(
                                     catchError((err) => {
+                                        // prepare data
+                                        this.validateData();
+
                                         // hide loading
                                         loadingDialog.close();
 
@@ -2802,6 +2804,9 @@ export class ImportDataComponent
                                 reLabelLocations(() => {
                                     // remap locations
                                     addMapOptions(() => {
+                                        // prepare data
+                                        this.validateData();
+
                                         // hide loading
                                         loadingDialog.close();
 
@@ -2829,7 +2834,14 @@ export class ImportDataComponent
     ): void {
         // nothing selected ?
         if (!locationAutoItem) {
+            // reset value
             mappedOpt.destinationOption = null;
+
+            // prepare data
+            this.validateData();
+
+            // finished
+            return;
         }
 
         // cache location if necessary
@@ -2867,5 +2879,8 @@ export class ImportDataComponent
 
         // set option value
         mappedOpt.destinationOption = locationAutoItem.id;
+
+        // prepare data
+        this.validateData();
     }
 }
