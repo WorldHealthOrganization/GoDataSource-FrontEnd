@@ -479,9 +479,11 @@
 
                         <!-- Render each row -->
                         <cdk-virtual-scroll-viewport
+                            #mapOptionViewport
                             class="import-data-body-row-extra-details-vscroll"
                             fxLayout="column"
-                            autosize>
+                            autosize
+                            [style.height]="getFieldMapOptionsHeight(mapOptionViewport, item)">
                             <div
                                 *cdkVirtualFor="let mappedOpt of item.mappedOptions; let optIndex = index; templateCacheSize: 0">
 

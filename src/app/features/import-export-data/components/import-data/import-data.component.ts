@@ -2883,4 +2883,32 @@ export class ImportDataComponent
         // prepare data
         this.validateData();
     }
+
+    /**
+     * Determine & retrieve map option height
+     */
+    getFieldMapOptionsHeight(
+        mapOptionViewport: CdkVirtualScrollViewport,
+        field: ImportableMapField
+    ): string {
+        // determine size
+        const size: number = Math.min(
+            100 * (field.mappedOptions ? field.mappedOptions.length : 0),
+            350
+        );
+
+        // if changed we need to resize viewport
+        if (mapOptionViewport.getViewportSize() !== size) {
+            setTimeout(() => {
+                try {
+                    mapOptionViewport.checkViewportSize();
+                } catch (e) {
+                    // handle the case the item was removed due to parent virtual scroll
+                }
+            });
+        }
+
+        // return value
+        return `${size}px`;
+    }
 }
