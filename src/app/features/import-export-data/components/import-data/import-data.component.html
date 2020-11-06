@@ -261,52 +261,22 @@
                                     <!-- Complete / Incomplete -->
                                     <ng-template
                                         #completeIncomplete>
-                                        <!-- Incomplete map ? -->
+                                        <!-- No data ? -->
                                         <div
-                                            *ngIf="!usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes] ||
-                                                !usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].incomplete || (
-                                                    usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes !== item.sourceFieldWithSelectedIndexes &&
-                                                    usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].incomplete.no > 0
-                                                ); else displayIncompleteOrComplete"
+                                            *ngIf="!usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes]; else displayIncompleteOrComplete"
                                             class="import-data-body-row-basic-data-error">
-                                            {{ !usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes] ||
-                                                    usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes ?
-                                                ('LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID' | translate) :
-                                                ('LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID_HANDLED_ABOVE' | translate) }}
+                                            {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID' | translate }}
                                         </div>
 
                                         <!-- Incomplete values or complete -->
                                         <ng-template
                                             #displayIncompleteOrComplete>
-
-                                            <!-- Incomplete map ? -->
                                             <div
-                                                *ngIf="usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].incomplete.no > 0; else completeThisOrOther"
-                                                class="import-data-body-row-basic-data-error">
-                                                {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID_WITH_NO' | translate:usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].incomplete }}
+                                                [class]="usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.cssClass">
+                                                {{ usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes ?
+                                                    (usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.label | translate:usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.labelData) :
+                                                    (usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.handledAboveLabel | translate)}}
                                             </div>
-
-                                            <!-- Complete this or other ? -->
-                                            <ng-template
-                                                #completeThisOrOther>
-                                                <div
-                                                    *ngIf="usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes !== item.sourceFieldWithSelectedIndexes; else complete">
-                                                    {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_VALID_ABOVE' | translate }}
-                                                </div>
-                                            </ng-template>
-
-                                            <!-- Complete map ? -->
-                                            <ng-template
-                                                #complete>
-                                                <div>
-                                                    {{ usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].complete.total < 1 ||
-                                                        usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].complete.no === usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].complete.total ?
-                                                        ('LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_VALID' | translate) :
-                                                        ('LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_VALID_WITH_NO' | translate:usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].complete)
-                                                    }}
-                                                </div>
-                                            </ng-template>
-
                                         </ng-template>
 
                                     </ng-template>
@@ -467,7 +437,44 @@
                             <!-- Mappings -->
                             <div
                                 fxFlex="120px">
-                                <!-- placeholder -->
+                                <div
+                                    *ngIf="item.sourceFieldWithoutIndexes && item.destinationField && item.sourceFieldWithSelectedIndexes && (
+                                        !!importableObject.modelPropertyValuesMap[item.destinationField] ||
+                                        addressFields[item.destinationField]
+                                    )">
+
+                                    <!-- Waiting for map ? -->
+                                    <div
+                                        *ngIf="!distinctValuesCache || !distinctValuesCache[item.sourceFieldWithoutIndexes]; else completeIncomplete"
+                                        [matTooltip]="'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_WAITING_DESCRIPTION' | translate"
+                                        class="import-data-body-row-basic-data-error">
+                                        {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_WAITING' | translate }}
+                                    </div>
+
+                                    <!-- Complete / Incomplete -->
+                                    <ng-template
+                                        #completeIncomplete>
+                                        <!-- No data ? -->
+                                        <div
+                                            *ngIf="!usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes]; else displayIncompleteOrComplete"
+                                            class="import-data-body-row-basic-data-error">
+                                            {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID' | translate }}
+                                        </div>
+
+                                        <!-- Incomplete values or complete -->
+                                        <ng-template
+                                            #displayIncompleteOrComplete>
+                                            <div
+                                                [class]="usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.cssClass">
+                                                {{ usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes ?
+                                                (usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.label | translate:usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.labelData) :
+                                                (usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.handledAboveLabel | translate)}}
+                                            </div>
+                                        </ng-template>
+
+                                    </ng-template>
+
+                                </div>
                             </div>
 
                             <!-- Array indexes -->
@@ -724,7 +731,8 @@
                 mat-raised-button
                 color="accent"
                 type="button"
-                (click)="importData()">
+                (click)="importData()"
+                [disabled]="true">
                 {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_IMPORT_FILE' | translate }}
             </button>
 

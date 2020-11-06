@@ -528,6 +528,12 @@ export class ImportDataComponent
             incomplete: {
                 no: number,
                 total: number
+            },
+            labels: {
+                cssClass: string,
+                label: string,
+                labelData: any,
+                handledAboveLabel: string
             }
         }
     } = {};
@@ -2163,6 +2169,12 @@ export class ImportDataComponent
                     incomplete: {
                         no: 0,
                         total: (field.mappedOptions || []).length
+                    },
+                    labels: {
+                        cssClass: undefined,
+                        label: undefined,
+                        labelData: undefined,
+                        handledAboveLabel: undefined
                     }
                 };
 
@@ -2211,6 +2223,32 @@ export class ImportDataComponent
                     !optIsValid
                 ) {
                     this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].incomplete.no++;
+                }
+            }
+
+            // determine mappings labels
+            if (determineOptionMappingIncompleteNo) {
+                // do we have invalid data ?
+                if (this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].incomplete.no > 0) {
+                    // error css class
+                    this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].labels.cssClass = 'import-data-body-row-basic-data-error';
+
+                    // display incomplete labels
+                    this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].labels.label = 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID_WITH_NO';
+                    this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].labels.labelData = this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].incomplete;
+                    this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].labels.handledAboveLabel = 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID_HANDLED_ABOVE';
+                } else {
+                    // display complete labels
+                    if (
+                        this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].complete.total < 1 ||
+                        this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].complete.no === this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].complete.total
+                    ) {
+                        this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].labels.label = 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_VALID';
+                    } else {
+                        this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].labels.label = 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_VALID_WITH_NO';
+                    }
+                    this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].labels.labelData = this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].complete;
+                    this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].labels.handledAboveLabel = 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_VALID_ABOVE';
                 }
             }
         }
@@ -2315,7 +2353,6 @@ export class ImportDataComponent
             }
 
             // map for easy access later
-            // #TODO - only one fields should map for all other (even if they are on different indexes)
             if (!distinctValuesForKeysMap[field.sourceFieldWithoutIndexes]) {
                 distinctValuesForKeysMap[field.sourceFieldWithoutIndexes] = [field];
             } else {
