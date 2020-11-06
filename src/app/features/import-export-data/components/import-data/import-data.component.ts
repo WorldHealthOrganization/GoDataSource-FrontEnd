@@ -65,9 +65,8 @@ enum ImportServerErrorCodes {
 })
 export class ImportDataComponent
     implements OnInit, OnDestroy {
-    /**
-     * Extension mapped to mimes
-     */
+
+    // Extension mapped to mimes
     private allowedMimeTypes: string[] = [];
     private allowedMimeTypesMap = {
         [ImportDataExtension.CSV]: 'text/csv',
@@ -83,9 +82,7 @@ export class ImportDataComponent
         ]
     };
 
-    /**
-     * Allowed extensions
-     */
+    // Allowed extensions
     private _allowedExtensions: string[];
     @Input() set allowedExtensions(extensions: string[]) {
         this._allowedExtensions = extensions;
@@ -108,24 +105,17 @@ export class ImportDataComponent
             this.uploader.options.allowedMimeType = this.allowedMimeTypes;
         }
     }
-
     get allowedExtensions(): string[] {
         return this._allowedExtensions ? this._allowedExtensions : [];
     }
 
-    /**
-     * Page title
-     */
+    // Page title
     @Input() title: string = '';
 
-    /**
-     * Tell system if this doesn't need to go through map step, uploading file is enough
-     */
+    // Tell system if this doesn't need to go through map step, uploading file is enough
     @Input() isOneStep: boolean = false;
 
-    /**
-     * Model provided to import for input
-     */
+    // Model provided to import for input
     private _model: string = undefined;
     @Input() set model(value: string) {
         this._model = value;
@@ -133,81 +123,56 @@ export class ImportDataComponent
             this.uploader.options.additionalParameter.model = this._model;
         }
     }
-
     get model(): string {
         return this._model;
     }
 
-    /**
-     * Saved import mapping
-     */
+    // Saved import mapping
     @Input() savedImportPage: string;
 
-    /**
-     * List with saved import mappings
-     */
+    // List with saved import mappings
     savedMappingsList$: Observable<SavedImportMappingModel[]>;
 
     // loaded saved import mapping
     loadedImportMapping: ISavedImportMappingModel = null;
 
-    /**
-     * File uploader
-     */
+    // File uploader
     uploader: FileUploader;
 
-    /**
-     * Cursor is over drag-drop file zone
-     */
+    // Cursor is over drag-drop file zone
     hasFileOver: boolean = false;
 
-    /**
-     * Variables sent to translation pipe
-     */
+    // Variables sent to translation pipe
     translationData: {
         types?: string
     } = {};
 
-    /**
-     * Percent displayed when uploading a file
-     */
+    // Percent displayed when uploading a file
     progress: number = null;
 
-    /**
-     * Display spinner when True, otherwise display the form
-     */
+    // Display spinner when True, otherwise display the form
     private _displayLoading: boolean = false;
     private _displayLoadingLocked: boolean = false;
-
     @Input() set displayLoading(value: boolean) {
         if (!this._displayLoadingLocked) {
             this._displayLoading = value;
         }
     }
-
     get displayLoading(): boolean {
         return this._displayLoading;
     }
 
-    /**
-     * Import success message
-     */
+    // Import success message
     @Input() importSuccessMessage: string = 'LNG_PAGE_IMPORT_DATA_SUCCESS_MESSAGE';
 
     // finished - imported data with success
-    /**
-     * Event called when we finished importing data ( this should handle page redirect )
-     */
+    // Event called when we finished importing data ( this should handle page redirect )
     @Output() finished = new EventEmitter<void>();
 
-    /**
-     * Where should we POST mapped data to ( endpoint that imports data )
-     */
+    // Where should we POST mapped data to ( endpoint that imports data )
     @Input() importDataUrl: string;
 
-    /**
-     * Endpoint to upload file ( & get header columns and other data )
-     */
+    // Endpoint to upload file ( & get header columns and other data )
     private _importFileUrl: string;
     @Input() set importFileUrl(value: string) {
         this._importFileUrl = value;
@@ -216,40 +181,24 @@ export class ImportDataComponent
             this.uploader.options.url = `${environment.apiUrl}/${this.importFileUrl}`;
         }
     }
-
     get importFileUrl(): string {
         return this._importFileUrl;
     }
 
-    /**
-     * Tokens for properties for which we don't receive labels from the server
-     */
+    // Tokens for properties for which we don't receive labels from the server
     @Input() fieldsWithoutTokens: {
         [property: string]: string
     } = {};
 
-    /**
-     * Address fields should use outbreak locations ?
-     */
+    // Address fields should use outbreak locations ?
     @Input() useOutbreakLocations: boolean = false;
 
-    /**
-     * Address fields so we can use custom dropdowns
-     */
+    // Address fields so we can use custom dropdowns
     @Input() addressFields: {
         [property: string]: boolean
     } = {};
 
-    /**
-     * Record properties that shouldn't be visible in destination dropdown
-     */
-    @Input() excludeDestinationProperties: {
-        [property: string]: boolean
-    } = {};
-
-    /**
-     * Required fields that user needs to map
-     */
+    // Required fields that user needs to map
     private requiredDestinationFieldsMap: {
         [modelProperty: string]: true
     } = {};
@@ -266,20 +215,14 @@ export class ImportDataComponent
         return this._requiredDestinationFields;
     }
 
-    /**
-     * Alis under which we upload the file
-     */
+    // Alis under which we upload the file
     @Input() fileUploadAlias: string;
 
-    /**
-     * Data to send to format callback
-     */
+    // Data to send to format callback
     @Input() extraDataUsedToFormatData: any;
 
-    /**
-     * Callback called after we receive model definitions from api
-     *  - through this callback we can alter the api response
-     */
+    // Callback called after we receive model definitions from api
+    //  * - through this callback we can alter the api response
     @Input() formatDataBeforeUse: (
         modelProperties: ImportableFilePropertiesModel,
         modelPropertyValues: ImportableFilePropertyValuesModel,
@@ -296,24 +239,16 @@ export class ImportDataComponent
         extraDataUsedToFormat: any
     ) => void;
 
-    /**
-     * Keep all file data ( header columns, module information, drop-down options etc )
-     */
+    // Keep all file data ( header columns, module information, drop-down options etc )
     importableObject: ImportableFileModel;
 
-    /**
-     * Source / Destination level value
-     */
+    // Source / Destination level value
     possibleSourceDestinationLevels: LabelValuePair[];
 
-    /**
-     * Mapped fields
-     */
+    // Mapped fields
     mappedFields: ImportableMapField[] = [];
 
-    /**
-     * Keep err msg details
-     */
+    // Keep err msg details
     errMsgDetails: {
         details: {
             failed: {
@@ -345,25 +280,14 @@ export class ImportDataComponent
         }
     };
 
-    /**
-     * Constants / Classes
-     */
-    Object = Object;
+    // Constants / Classes
     ImportServerErrorCodes = ImportServerErrorCodes;
 
-    /**
-     * Decrypt password
-     */
+    // Decrypt password
     decryptPassword: string;
 
-    /**
-     * Decrypt password alias
-     */
+    // Decrypt password alias
     @Input() decryptPasswordAlias: string = 'decryptPassword';
-
-
-
-
 
     // scrollable viewport
     @ViewChild('virtualScrollViewport') virtualScrollViewport: CdkVirtualScrollViewport;
@@ -399,17 +323,33 @@ export class ImportDataComponent
                         !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
                         this.addressFields[item.destinationField]
                     ) &&
-                    item.mappedOptions.length < this.distinctValuesCache[item.sourceFieldWithoutIndexes].length;
+                    item.mappedOptions.length < this.distinctValuesCache[item.sourceFieldWithoutIndexes].length && (
+                        !this.usedSourceFieldOptionsForOptionMapping ||
+                        !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes] ||
+                        !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes || (
+                            this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes
+                        )
+                    );
             },
             click: (
                 item: ImportableMapField,
                 handler: HoverRowActionsDirective
             ) => {
-                // add option
-                this.addNewOptionMap(
-                    item,
-                    handler
-                );
+                // not allowed if we have duplicates because it can break the logic:
+                // this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes
+                if (
+                    this.usedSourceFieldsForValidation &&
+                    this.usedSourceFieldsForValidation.fields[item.sourceFieldWithSelectedIndexes] > 1
+                ) {
+                    // display toast
+                    this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_MUST_FIX_DUPLICATE_BEFORE_ADD');
+                } else {
+                    // add option
+                    this.addNewOptionMap(
+                        item,
+                        handler
+                    );
+                }
             }
         }),
 
@@ -426,7 +366,12 @@ export class ImportDataComponent
                         !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
                         this.addressFields[item.destinationField]
                     ) &&
-                    item.mappedOptionsCollapsed;
+                    item.mappedOptionsCollapsed && (
+                        !this.usedSourceFieldOptionsForOptionMapping ||
+                        !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes] ||
+                        !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes ||
+                        this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes
+                    );
             },
             click: (
                 item: ImportableMapField,
@@ -551,18 +496,31 @@ export class ImportDataComponent
     // display map button or start import ?
     needToMapOptions: boolean = true;
 
-    // used to determine duplicate selections
-    usedSourceFields: {
-        [source: string]: number
+    // used to determine duplicate selections for fields
+    usedSourceFieldsForValidation: {
+        fields: {
+            [sourceFieldWithSelectedIndexes: string]: number
+        },
+        valid: boolean
+    } = {
+        fields: {},
+        valid: false
+    };
+
+    // used to determine if fields sub-options are valid
+    usedSourceFieldOptionsForValidation: {
+        [sourceFieldWithSelectedIndexes: string]: {
+            options: {
+                [sourceOption: string]: number
+            },
+            valid: boolean
+        }
     } = {};
 
-    // used to determine duplicate selections
-    usedSourceFieldOptions: {
-        [source: string]: {
-            options: {
-                [option: string]: number
-            },
-            valid: boolean,
+    // used to determine duplicate selections - this matters since we send  to api values with source "sourceFieldWithoutIndexes" and NOT "sourceFieldWithSelectedIndexes"
+    usedSourceFieldOptionsForOptionMapping: {
+        [sourceFieldWithoutIndexes: string]: {
+            sourceFieldWithSelectedIndexes: string,
             complete: {
                 no: number,
                 total: number
@@ -570,6 +528,12 @@ export class ImportDataComponent
             incomplete: {
                 no: number,
                 total: number
+            },
+            labels: {
+                cssClass: string,
+                label: string,
+                labelData: any,
+                handledAboveLabel: string
             }
         }
     } = {};
@@ -808,10 +772,13 @@ export class ImportDataComponent
             !response ||
             !jsonResponse
         ) {
+            // display errors
             this.displayError(
                 'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_RESPONSE_FROM_SERVER',
                 true
             );
+
+            // finished
             return;
         }
 
@@ -852,7 +819,6 @@ export class ImportDataComponent
             },
             fileType,
             this.fieldsWithoutTokens,
-            this.excludeDestinationProperties,
             this.extraDataUsedToFormatData,
             this.formatDataBeforeUse
         );
@@ -1284,8 +1250,6 @@ export class ImportDataComponent
 
     /**
      * Add drop-downs for mapping a drop-down type options
-     * @param importableItem
-     * @param reInitOptions
      */
     addMapOptionsIfNecessary(
         importableItem: ImportableMapField,
@@ -1305,6 +1269,11 @@ export class ImportDataComponent
             !this.distinctValuesCache[importableItem.sourceFieldWithoutIndexes] || (
                 !this.importableObject.modelPropertyValuesMap[importableItem.destinationField] &&
                 !this.addressFields[importableItem.destinationField]
+            ) || (
+                this.usedSourceFieldOptionsForOptionMapping &&
+                this.usedSourceFieldOptionsForOptionMapping[importableItem.sourceFieldWithoutIndexes] &&
+                this.usedSourceFieldOptionsForOptionMapping[importableItem.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes &&
+                this.usedSourceFieldOptionsForOptionMapping[importableItem.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes !== importableItem.sourceFieldWithSelectedIndexes
             )
         ) {
             return;
@@ -1758,10 +1727,10 @@ export class ImportDataComponent
                     !field.destinationField ||
                     !field.sourceDestinationLevelAreValid || (
                         field.sourceFieldWithSelectedIndexes &&
-                        this.usedSourceFields[field.sourceFieldWithSelectedIndexes] > 1
+                        this.usedSourceFieldsForValidation.fields[field.sourceFieldWithSelectedIndexes] > 1
                     ) || (
-                        this.usedSourceFieldOptions[field.sourceFieldWithSelectedIndexes] &&
-                        !this.usedSourceFieldOptions[field.sourceFieldWithSelectedIndexes].valid
+                        this.usedSourceFieldOptionsForValidation[field.sourceFieldWithSelectedIndexes] &&
+                        !this.usedSourceFieldOptionsForValidation[field.sourceFieldWithSelectedIndexes].valid
                     )
                 ) {
                     // add to invalid rows
@@ -1911,28 +1880,6 @@ export class ImportDataComponent
         // prepare data
         this.validateData();
     }
-
-// ..................
-// ..................
-// ..................
-// ..................
-// ..................
-// ..................
-// ..................
-// ALL NEW METHODS
-// NEED TO CLEANUP ABOVE AFTER FINISH
-// ..................
-// ..................
-// ..................
-// ..................
-// ..................
-// ..................
-// ..................
-// + CLEANUP LNG_...nefolosite...
-// + CLEANUP LNG_...nefolosite...
-// + CLEANUP LNG_...nefolosite...
-// + CLEANUP LNG_...nefolosite...
-// + CLEANUP LNG_...nefolosite...
 
     /**
      * Determine import data max height
@@ -2150,8 +2097,12 @@ export class ImportDataComponent
     private validateData(): void {
         // go through map fields and determine mapped sources
         this.needToMapOptions = false;
-        this.usedSourceFields = {};
-        this.usedSourceFieldOptions = {};
+        this.usedSourceFieldsForValidation = {
+            fields: {},
+            valid: true
+        };
+        this.usedSourceFieldOptionsForValidation = {};
+        this.usedSourceFieldOptionsForOptionMapping = {};
 
         //  no point in continuing ?
         if (!this.areMapFieldVisible) {
@@ -2184,28 +2135,55 @@ export class ImportDataComponent
             }
 
             // determine source key
-            const sourceKey: string = field.sourceFieldWithSelectedIndexes;
+            const sourceFieldWithSelectedIndexes: string = field.sourceFieldWithSelectedIndexes;
+            const sourceFieldWithoutIndexes: string = field.sourceFieldWithoutIndexes;
 
             // count items
-            this.usedSourceFields[sourceKey] = this.usedSourceFields[sourceKey] ?
-                this.usedSourceFields[sourceKey] + 1 :
+            this.usedSourceFieldsForValidation.fields[sourceFieldWithSelectedIndexes] = this.usedSourceFieldsForValidation.fields[sourceFieldWithSelectedIndexes] ?
+                this.usedSourceFieldsForValidation.fields[sourceFieldWithSelectedIndexes] + 1 :
                 1;
 
-            // count options too
-            this.usedSourceFieldOptions[sourceKey] = {
+            // invalid form ?
+            if (this.usedSourceFieldsForValidation.fields[sourceFieldWithSelectedIndexes] > 1) {
+                this.usedSourceFieldsForValidation.valid = false;
+            }
+
+            // count options duplicates & validate
+            this.usedSourceFieldOptionsForValidation[sourceFieldWithSelectedIndexes] = {
                 options: {},
-                valid: true,
-                complete: {
-                    no: (field.mappedOptions || []).length,
-                    total: this.distinctValuesCache && this.distinctValuesCache[field.sourceFieldWithoutIndexes] ?
-                        this.distinctValuesCache[field.sourceFieldWithoutIndexes].length :
-                        0
-                },
-                incomplete: {
-                    no: 0,
-                    total: (field.mappedOptions || []).length
-                }
+                valid: true
             };
+
+            // count option mappings - only the first one is relevant
+            let determineOptionMappingIncompleteNo: boolean = false;
+            if (!this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes]) {
+                // initialize
+                this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes] = {
+                    sourceFieldWithSelectedIndexes: sourceFieldWithSelectedIndexes,
+                    complete: {
+                        no: (field.mappedOptions || []).length,
+                        total: this.distinctValuesCache && this.distinctValuesCache[field.sourceFieldWithoutIndexes] ?
+                            this.distinctValuesCache[field.sourceFieldWithoutIndexes].length :
+                            0
+                    },
+                    incomplete: {
+                        no: 0,
+                        total: (field.mappedOptions || []).length
+                    },
+                    labels: {
+                        cssClass: undefined,
+                        label: undefined,
+                        labelData: undefined,
+                        handledAboveLabel: undefined
+                    }
+                };
+
+                // we need to count incomplete values
+                determineOptionMappingIncompleteNo = true;
+            } else {
+                // handled / completed above shouldn't be expandable
+                field.mappedOptionsCollapsed = true;
+            }
 
             // for speed purposes we will use for..loop
             for (let fieldOptionIndex = 0; fieldOptionIndex < field.mappedOptions.length; fieldOptionIndex++) {
@@ -2216,23 +2194,23 @@ export class ImportDataComponent
                 let optIsValid: boolean = true;
                 if (!fieldOpt.sourceOption) {
                     // invalid
-                    this.usedSourceFieldOptions[sourceKey].valid = false;
+                    this.usedSourceFieldOptionsForValidation[sourceFieldWithSelectedIndexes].valid = false;
 
                     // option isn't valid
                     optIsValid = false;
                 } else {
                     // count
-                    this.usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] = this.usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] ?
-                        this.usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] + 1 :
+                    this.usedSourceFieldOptionsForValidation[sourceFieldWithSelectedIndexes].options[fieldOpt.sourceOption] = this.usedSourceFieldOptionsForValidation[sourceFieldWithSelectedIndexes].options[fieldOpt.sourceOption] ?
+                        this.usedSourceFieldOptionsForValidation[sourceFieldWithSelectedIndexes].options[fieldOpt.sourceOption] + 1 :
                         1;
 
                     // validate
                     if (
-                        this.usedSourceFieldOptions[sourceKey].options[fieldOpt.sourceOption] > 1 ||
+                        this.usedSourceFieldOptionsForValidation[sourceFieldWithSelectedIndexes].options[fieldOpt.sourceOption] > 1 ||
                         !fieldOpt.destinationOption
                     ) {
                         // invalid
-                        this.usedSourceFieldOptions[sourceKey].valid = false;
+                        this.usedSourceFieldOptionsForValidation[sourceFieldWithSelectedIndexes].valid = false;
 
                         // option isn't valid
                         optIsValid = false;
@@ -2240,8 +2218,37 @@ export class ImportDataComponent
                 }
 
                 // count invalid options
-                if (!optIsValid) {
-                    this.usedSourceFieldOptions[sourceKey].incomplete.no++;
+                if (
+                    determineOptionMappingIncompleteNo &&
+                    !optIsValid
+                ) {
+                    this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].incomplete.no++;
+                }
+            }
+
+            // determine mappings labels
+            if (determineOptionMappingIncompleteNo) {
+                // do we have invalid data ?
+                if (this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].incomplete.no > 0) {
+                    // error css class
+                    this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].labels.cssClass = 'import-data-body-row-basic-data-error';
+
+                    // display incomplete labels
+                    this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].labels.label = 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID_WITH_NO';
+                    this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].labels.labelData = this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].incomplete;
+                    this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].labels.handledAboveLabel = 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID_HANDLED_ABOVE';
+                } else {
+                    // display complete labels
+                    if (
+                        this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].complete.total < 1 ||
+                        this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].complete.no === this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].complete.total
+                    ) {
+                        this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].labels.label = 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_VALID';
+                    } else {
+                        this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].labels.label = 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_VALID_WITH_NO';
+                    }
+                    this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].labels.labelData = this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].complete;
+                    this.usedSourceFieldOptionsForOptionMapping[sourceFieldWithoutIndexes].labels.handledAboveLabel = 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_VALID_ABOVE';
                 }
             }
         }
@@ -2346,7 +2353,6 @@ export class ImportDataComponent
             }
 
             // map for easy access later
-            // #TODO - only one fields should map for all other (even if they are on different indexes)
             if (!distinctValuesForKeysMap[field.sourceFieldWithoutIndexes]) {
                 distinctValuesForKeysMap[field.sourceFieldWithoutIndexes] = [field];
             } else {
@@ -2736,6 +2742,9 @@ export class ImportDataComponent
                 // remap options
                 const addMapOptions = (finishedCallback: () => void): void => {
                     // add map options
+                    const handledFieldSubOptions: {
+                        [sourceFieldWithoutIndexes: string]: true
+                    } = {};
                     const addMapOptionsHandler = (
                         index: number,
                         finishedHandlerCallback: () => void
@@ -2762,6 +2771,15 @@ export class ImportDataComponent
                         setTimeout(() => {
                             // map options
                             distinctValuesForKeysMap[key].forEach((field) => {
+                                // add options only if we didn't add already for this one
+                                if (handledFieldSubOptions[field.sourceFieldWithoutIndexes]) {
+                                    return;
+                                }
+
+                                // remember that we handled this one already
+                                handledFieldSubOptions[field.sourceFieldWithoutIndexes] = true;
+
+                                // add options
                                 this.addMapOptionsIfNecessary(
                                     field,
                                     true,

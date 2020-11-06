@@ -9,10 +9,18 @@
         fxLayout="row" fxLayoutAlign="center">
         <mat-spinner></mat-spinner>
         <span
-            *ngIf="progress !== null"
+            *ngIf="progress !== null && progress < 100; else displayWaitMessage"
             class="import-data-loading-progress">
             {{ progress }} %
         </span>
+
+        <!-- Might take a while message -->
+        <ng-template
+            #displayWaitMessage>
+            <div>
+                {{ 'LNG_PAGE_IMPORT_DATA_MIGHT_TAKE_SOME_TIME_MSG' | translate }}
+            </div>
+        </ng-template>
     </div>
 
     <!-- Select / Upload file -->
@@ -253,27 +261,24 @@
                                     <!-- Complete / Incomplete -->
                                     <ng-template
                                         #completeIncomplete>
-                                        <!-- Incomplete map ? -->
+                                        <!-- No data ? -->
                                         <div
-                                            *ngIf="!usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes] || !usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes].valid; else complete"
+                                            *ngIf="!usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes]; else displayIncompleteOrComplete"
                                             class="import-data-body-row-basic-data-error">
-                                            {{ !usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes] ?
-                                                ('LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID' | translate) :
-                                                ('LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID_WITH_NO' | translate:usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes].incomplete)
-                                            }}
+                                            {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID' | translate }}
                                         </div>
 
-                                        <!-- Complete map ? -->
+                                        <!-- Incomplete values or complete -->
                                         <ng-template
-                                            #complete>
-                                            <div>
-                                                {{ usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes].complete.total < 1 ||
-                                                    usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes].complete.no === usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes].complete.total ?
-                                                    ('LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_VALID' | translate) :
-                                                    ('LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_VALID_WITH_NO' | translate:usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes].complete)
-                                                }}
+                                            #displayIncompleteOrComplete>
+                                            <div
+                                                [class]="usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.cssClass">
+                                                {{ usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes ?
+                                                    (usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.label | translate:usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.labelData) :
+                                                    (usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.handledAboveLabel | translate)}}
                                             </div>
                                         </ng-template>
+
                                     </ng-template>
 
                                 </div>
@@ -315,7 +320,7 @@
 
                                 <!-- Duplicate source ? -->
                                 <span
-                                    *ngIf="item.sourceFieldWithSelectedIndexes && usedSourceFields[item.sourceFieldWithSelectedIndexes] > 1">
+                                    *ngIf="item.sourceFieldWithSelectedIndexes && usedSourceFieldsForValidation.fields[item.sourceFieldWithSelectedIndexes] > 1">
                                     {{'LNG_FORM_VALIDATION_ERROR_DUPLICATE_VALUE' | translate}}
                                 </span>
 
@@ -408,7 +413,7 @@
 
                                     <!-- Duplicate source ? -->
                                     <span
-                                        *ngIf="item.sourceFieldWithSelectedIndexes && usedSourceFields[item.sourceFieldWithSelectedIndexes] > 1">
+                                        *ngIf="item.sourceFieldWithSelectedIndexes && usedSourceFieldsForValidation.fields[item.sourceFieldWithSelectedIndexes] > 1">
                                         {{'LNG_FORM_VALIDATION_ERROR_DUPLICATE_VALUE' | translate}}
                                     </span>
 
@@ -432,7 +437,44 @@
                             <!-- Mappings -->
                             <div
                                 fxFlex="120px">
-                                <!-- placeholder -->
+                                <div
+                                    *ngIf="item.sourceFieldWithoutIndexes && item.destinationField && item.sourceFieldWithSelectedIndexes && (
+                                        !!importableObject.modelPropertyValuesMap[item.destinationField] ||
+                                        addressFields[item.destinationField]
+                                    )">
+
+                                    <!-- Waiting for map ? -->
+                                    <div
+                                        *ngIf="!distinctValuesCache || !distinctValuesCache[item.sourceFieldWithoutIndexes]; else completeIncomplete"
+                                        [matTooltip]="'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_WAITING_DESCRIPTION' | translate"
+                                        class="import-data-body-row-basic-data-error">
+                                        {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_WAITING' | translate }}
+                                    </div>
+
+                                    <!-- Complete / Incomplete -->
+                                    <ng-template
+                                        #completeIncomplete>
+                                        <!-- No data ? -->
+                                        <div
+                                            *ngIf="!usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes]; else displayIncompleteOrComplete"
+                                            class="import-data-body-row-basic-data-error">
+                                            {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID' | translate }}
+                                        </div>
+
+                                        <!-- Incomplete values or complete -->
+                                        <ng-template
+                                            #displayIncompleteOrComplete>
+                                            <div
+                                                [class]="usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.cssClass">
+                                                {{ usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes ?
+                                                (usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.label | translate:usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.labelData) :
+                                                (usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.handledAboveLabel | translate)}}
+                                            </div>
+                                        </ng-template>
+
+                                    </ng-template>
+
+                                </div>
                             </div>
 
                             <!-- Array indexes -->
@@ -540,8 +582,8 @@
 
                                             <!-- Duplicate source ? -->
                                             <span
-                                                *ngIf="mappedOpt.sourceOption && usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes]
-                                                    && usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes].options[mappedOpt.sourceOption] > 1">
+                                                *ngIf="mappedOpt.sourceOption && usedSourceFieldOptionsForValidation[item.sourceFieldWithSelectedIndexes]
+                                                    && usedSourceFieldOptionsForValidation[item.sourceFieldWithSelectedIndexes].options[mappedOpt.sourceOption] > 1">
                                                 {{'LNG_FORM_VALIDATION_ERROR_DUPLICATE_VALUE' | translate}}
                                             </span>
 
@@ -597,8 +639,8 @@
 
                                                 <!-- Duplicate source ? -->
                                                 <span
-                                                    *ngIf="mappedOpt.sourceOption && usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes]
-                                                        && usedSourceFieldOptions[item.sourceFieldWithSelectedIndexes].options[mappedOpt.sourceOption] > 1">
+                                                    *ngIf="mappedOpt.sourceOption && usedSourceFieldOptionsForValidation[item.sourceFieldWithSelectedIndexes]
+                                                        && usedSourceFieldOptionsForValidation[item.sourceFieldWithSelectedIndexes].options[mappedOpt.sourceOption] > 1">
                                                     {{'LNG_FORM_VALIDATION_ERROR_DUPLICATE_VALUE' | translate}}
                                                 </span>
 
@@ -703,7 +745,7 @@
         *ngIf="!displayLoading && importableObject && errMsgDetails"
         fxLayout="column" fxLayoutGap="10px"
         class="import-data-errors">
-        <div class="import-data-errors-title">
+        <div>
             {{ 'LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED' | translate }}
         </div>
         <div
@@ -720,7 +762,6 @@
                     <!-- Hide / Show details -->
                     <button
                         mat-raised-button color="accent"
-                        class="import-data-errors-err-view-record-button"
                         (click)="err.showData = !err.showData">
                         {{ (err.showData ? 'LNG_PAGE_IMPORT_DATA_BUTTON_HIDE_ERR_RECORD_DETAILS' : 'LNG_PAGE_IMPORT_DATA_BUTTON_SHOW_ERR_RECORD_DETAILS') | translate }}
                     </button>
