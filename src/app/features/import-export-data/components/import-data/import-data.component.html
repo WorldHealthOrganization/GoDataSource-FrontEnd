@@ -150,6 +150,21 @@
                     {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_INFORMATION' | translate }}
                 </div>
 
+                <!-- Array indexes -->
+                <div
+                    fxFlex="120px" fxLayoutAlign="start end" fxLayout="row" fxLayoutGap="10px">
+                    <div
+                        fxFlex fxGrow="0">
+                        {{ 'LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX' | translate }}
+                    </div>
+                    <div
+                        fxFlex>
+                        <span
+                            class="xt-icon xt-icon-xsmall"
+                            [matTooltip]="'LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX_DESCRIPTION' | translate">info</span>
+                    </div>
+                </div>
+
                 <!-- Mappings -->
                 <div
                     fxFlex="120px" fxLayoutAlign="start end" fxLayout="row" fxLayoutGap="10px">
@@ -162,21 +177,6 @@
                         <span
                             class="xt-icon xt-icon-xsmall"
                             [matTooltip]="'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_DESCRIPTION' | translate">info</span>
-                    </div>
-                </div>
-
-                <!-- Array indexes -->
-                <div
-                    fxFlex="1 1" fxLayoutAlign="start end" fxLayout="row" fxLayoutGap="10px">
-                    <div
-                        fxFlex fxGrow="0">
-                        {{ 'LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX' | translate }}
-                    </div>
-                    <div
-                        fxFlex>
-                        <span
-                            class="xt-icon xt-icon-xsmall"
-                            [matTooltip]="'LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX_DESCRIPTION' | translate">info</span>
                     </div>
                 </div>
 
@@ -241,6 +241,12 @@
                                 {{ item.destinationField && importableObject.modelPropertiesKeyValueMap[item.destinationField] ? importableObject.modelPropertiesKeyValueMap[item.destinationField] : '-' }}
                             </div>
 
+                            <!-- Array indexes -->
+                            <div
+                                fxFlex="120px">
+                                {{ item.sourceDestinationLevelForDisplay }}
+                            </div>
+
                             <!-- Mappings -->
                             <div
                                 fxFlex="120px">
@@ -274,20 +280,14 @@
                                             <div
                                                 [class]="usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.cssClass">
                                                 {{ usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes ?
-                                                    (usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.label | translate:usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.labelData) :
-                                                    (usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.handledAboveLabel | translate)}}
+                                                (usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.label | translate:usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.labelData) :
+                                                (usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.handledAboveLabel | translate)}}
                                             </div>
                                         </ng-template>
 
                                     </ng-template>
 
                                 </div>
-                            </div>
-
-                            <!-- Array indexes -->
-                            <div
-                                fxFlex="1 1">
-                                {{ item.sourceDestinationLevelForDisplay }}
                             </div>
 
                             <!-- Actions -->
@@ -346,15 +346,9 @@
 
                             </div>
 
-                            <!-- Mappings -->
-                            <div
-                                fxFlex="120px">
-                                <!-- placeholder -->
-                            </div>
-
                             <!-- Array indexes -->
                             <div
-                                fxFlex="1 1">
+                                fxFlex="120px">
 
                                 <!-- Invalid array indexes ? -->
                                 <span
@@ -362,6 +356,12 @@
                                     {{'LNG_PAGE_IMPORT_DATA_INVALID_ARRAY_INDEX' | translate}}
                                 </span>
 
+                            </div>
+
+                            <!-- Mappings -->
+                            <div
+                                fxFlex="120px">
+                                <!-- placeholder -->
                             </div>
 
                             <!-- Actions -->
@@ -434,6 +434,27 @@
                                 </app-form-select-vscroll>
                             </div>
 
+                            <!-- Array indexes -->
+                            <div
+                                fxFlex="120px">
+                                <div
+                                    *ngIf="item.isSourceArray || item.isDestinationArray"
+                                    fxFlex fxLayout="row" fxLayoutGap="10px">
+                                    <div
+                                        *ngFor="let levelMatch of item.numberOfMaxLevels; let levelIndex = index;"
+                                        fxFlex>
+                                        <app-form-select-vscroll
+                                            [name]="'sourceDestinationLevel[' + levelIndex + ']'"
+                                            required="true"
+                                            [ngModel]="item.getSourceDestinationLevel(levelIndex)"
+                                            [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE_DESTINATION_LEVEL' | translate"
+                                            [options]="possibleSourceDestinationLevels"
+                                            (optionChanged)="setDestinationLevel(item, levelIndex, $event)">
+                                        </app-form-select-vscroll>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Mappings -->
                             <div
                                 fxFlex="120px">
@@ -474,27 +495,6 @@
 
                                     </ng-template>
 
-                                </div>
-                            </div>
-
-                            <!-- Array indexes -->
-                            <div
-                                fxFlex="1 1">
-                                <div
-                                    *ngIf="item.isSourceArray || item.isDestinationArray"
-                                    fxFlex fxLayout="row" fxLayoutGap="10px">
-                                    <div
-                                        *ngFor="let levelMatch of item.numberOfMaxLevels; let levelIndex = index;"
-                                        fxFlex>
-                                        <app-form-select-vscroll
-                                            [name]="'sourceDestinationLevel[' + levelIndex + ']'"
-                                            required="true"
-                                            [ngModel]="item.getSourceDestinationLevel(levelIndex)"
-                                            [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE_DESTINATION_LEVEL' | translate"
-                                            [options]="possibleSourceDestinationLevels"
-                                            (optionChanged)="setDestinationLevel(item, levelIndex, $event)">
-                                        </app-form-select-vscroll>
-                                    </div>
                                 </div>
                             </div>
 
