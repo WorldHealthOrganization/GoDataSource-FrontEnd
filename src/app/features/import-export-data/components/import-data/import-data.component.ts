@@ -1789,7 +1789,7 @@ export class ImportDataComponent
                 ) {
                     // here we don't need to add indexes, so we keep the arrays just as they are
                     // also, we need to merge value Maps with the previous ones
-                    const properSource = field.sourceFieldWithoutIndexes;
+                    const properSource = field.sourceField.replace(/\[\d+\]/g, '[]');
                     if (!importJSON.valuesMap[properSource]) {
                         importJSON.valuesMap[properSource] = {};
                     }
