@@ -22,7 +22,7 @@ import {
     SavedImportField, SavedImportMappingModel,
     SavedImportOption
 } from '../../../../core/models/saved-import-mapping.model';
-import { Observable } from 'rxjs';
+import { Observable, Subscriber } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 import { MatDialogRef } from '@angular/material';
 import { catchError, tap } from 'rxjs/operators';
@@ -35,6 +35,8 @@ import { LocationAutoItem } from '../../../../shared/components/form-location-dr
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { LocationModel } from '../../../../core/models/location.model';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
+import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
+import { NgModel } from '@angular/forms';
 
 export enum ImportServerModelNames {
     CASE_LAB_RESULTS = 'labResult',
@@ -244,6 +246,25 @@ export class ImportDataComponent
 
     // Source / Destination level value
     possibleSourceDestinationLevels: LabelValuePair[];
+
+    // search filters
+    @ViewChild('filterBySourceInput') filterBySourceInput: NgModel;
+    filterBySourceInputValue: string = '';
+    @ViewChild('filterByDestinationInput') filterByDestinationInput: NgModel;
+    filterByDestinationInputValue: string = '';
+
+    // visible columns handler
+    visibleItemsMsg: {
+        no: number,
+        total: number
+    } = {
+        no: 0,
+        total: 0
+    };
+    mappedFieldsVisible: number[] = [];
+    private triggerListRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
+        this.filterVisibleData();
+    }));
 
     // Mapped fields
     mappedFields: ImportableMapField[] = [];
@@ -744,6 +765,12 @@ export class ImportDataComponent
             this.onWindowResizeScope,
             true
         );
+
+        // release search logic
+        if (this.triggerListRefresh) {
+            this.triggerListRefresh.unsubscribe();
+            this.triggerListRefresh = null;
+        }
     }
 
     /**
@@ -1207,6 +1234,9 @@ export class ImportDataComponent
             this.mappedFields.push(importableItem);
         });
 
+        // rerender list of visible items
+        this.makeAllFieldsVisible();
+
         // display form
         this._displayLoading = false;
         this._displayLoadingLocked = false;
@@ -1573,10 +1603,14 @@ export class ImportDataComponent
                         // wait for message to be displayed
                         setTimeout(() => {
                             // clear map data
+                            this.mappedFieldsVisible = [];
                             this.mappedFields = [];
                             this.distinctValuesCache = {};
                             this.locationCache = {};
                             this.locationCacheIndex = {};
+
+                            // update visible items count
+                            this.updateVisibleItemsCount();
 
                             // map fields
                             const mapOfRequiredDestinationFields = this.requiredDestinationFieldsMap ? _.clone(this.requiredDestinationFieldsMap) : {};
@@ -1618,6 +1652,9 @@ export class ImportDataComponent
                                 // add to list
                                 this.mappedFields.push(importableItem);
                             });
+
+                            // rerender list of visible items
+                            this.makeAllFieldsVisible();
 
                             // go through process of mapping sub options accordingly to what was saved
                             // this method will hide the loading dialog too
@@ -1855,9 +1892,13 @@ export class ImportDataComponent
         this.importableObject = null;
         this.errMsgDetails = null;
         this.uploader.clearQueue();
+        this.mappedFieldsVisible = [];
         this.mappedFields = [];
         this.decryptPassword = null;
         this.loadedImportMapping = null;
+
+        // update visible items count
+        this.updateVisibleItemsCount();
 
         // prepare data
         this.validateData();
@@ -1936,13 +1977,6 @@ export class ImportDataComponent
     /**
      * Re-render form
      */
-    private forceRenderTable(): void {
-        this.mappedFields = [...this.mappedFields];
-    }
-
-    /**
-     * Re-render form
-     */
     private forceRenderField(field: ImportableMapField): void {
         field.mappedOptions = field.mappedOptions ? [...field.mappedOptions] : field.mappedOptions;
     }
@@ -1970,6 +2004,9 @@ export class ImportDataComponent
 
         // prepare data
         this.validateData();
+
+        // rerender list of visible items
+        this.addToListOfVisibleItems(0);
     }
 
     /**
@@ -2023,9 +2060,6 @@ export class ImportDataComponent
             clonedItem
         );
 
-        // force rerender
-        this.forceRenderTable();
-
         // start edit item
         this.editItem(
             clonedItem,
@@ -2034,6 +2068,9 @@ export class ImportDataComponent
 
         // prepare data
         this.validateData();
+
+        // rerender list of visible items
+        this.addToListOfVisibleItems(index + 1);
     }
 
     /**
@@ -2052,7 +2089,7 @@ export class ImportDataComponent
                         this.mappedFields.splice(index, 1);
 
                         // force re-render
-                        this.forceRenderTable();
+                        this.removeFromListOfVisibleItems(index);
 
                         // clear edit mode if item or parent was removed
                         if (
@@ -2928,5 +2965,154 @@ export class ImportDataComponent
 
         // return value
         return `${size}px`;
+    }
+
+    /**
+     * Determine list of visible items
+     */
+    private makeAllFieldsVisible(): void {
+        // reset filter values
+        this.filterBySourceInputValue = '';
+        this.filterByDestinationInputValue = '';
+
+        // make all items visible
+        this.mappedFieldsVisible = [];
+        for (let fieldIndex = 0; fieldIndex < this.mappedFields.length; fieldIndex++) {
+            this.mappedFieldsVisible.push(fieldIndex);
+        }
+
+        // update visible items count
+        this.updateVisibleItemsCount();
+    }
+
+    /**
+     * Update visible items count
+     */
+    private updateVisibleItemsCount(): void {
+        this.visibleItemsMsg = {
+            no: this.mappedFieldsVisible.length,
+            total: this.mappedFields.length
+        };
+    }
+
+    /**
+     * Filter by source / destination
+     */
+    triggerFilterVisibleData(): void {
+        // do we have components needed to filter by ?
+        if (
+            !this.filterBySourceInput ||
+            !this.filterByDestinationInput
+        ) {
+            return;
+        }
+
+        // retrieve filter values and prepare them for case insensitive search
+        this.filterBySourceInputValue = (this.filterBySourceInput.value || '').toLowerCase();
+        this.filterByDestinationInputValue = (this.filterByDestinationInput.value || '').toLowerCase();
+
+        // trigger filter refresh
+        this.triggerListRefresh.call();
+    }
+
+    /**
+     * Filter data
+     */
+    private filterVisibleData(): void {
+        // filter by source & destination
+        this.mappedFieldsVisible = [];
+        for (let fieldIndex = 0; fieldIndex < this.mappedFields.length; fieldIndex++) {
+            const field = this.mappedFields[fieldIndex];
+            if (
+                (
+                    !this.filterBySourceInputValue || (
+                        field.sourceField &&
+                        field.sourceField.toLowerCase().indexOf(this.filterBySourceInputValue) > -1
+                    )
+                ) && (
+                    !this.filterByDestinationInputValue || (
+                        field.destinationField &&
+                        this.importableObject.modelPropertiesKeyValueMap[field.destinationField] &&
+                        this.importableObject.modelPropertiesKeyValueMap[field.destinationField].toLowerCase().indexOf(this.filterByDestinationInputValue) > -1
+                    )
+                )
+            ) {
+                this.mappedFieldsVisible.push(fieldIndex);
+            }
+        }
+
+        // update visible items count
+        this.updateVisibleItemsCount();
+
+        // scroll into view and make the items visible
+        if (this.virtualScrollViewport) {
+            this.virtualScrollViewport.scrollToOffset(0);
+        }
+    }
+
+    /**
+     * Add to list of visible items
+     */
+    private addToListOfVisibleItems(elementIndex: number): void {
+        // add element if necessary
+        const newMappedFieldsVisible: number[] = [];
+        let elementIndexAdded: boolean = false;
+        const addElementIfNecessary = () => {
+            if (!elementIndexAdded) {
+                // add
+                newMappedFieldsVisible.push(elementIndex);
+
+                // no need to add others
+                elementIndexAdded = true;
+            }
+        };
+
+        // go through items and add the new one
+        for (let index = 0; index < this.mappedFieldsVisible.length; index++) {
+            const fieldIndex: number = this.mappedFieldsVisible[index];
+            if (fieldIndex < elementIndex) {
+                newMappedFieldsVisible.push(fieldIndex);
+            } else {
+                // add element if necessary
+                addElementIfNecessary();
+
+                // add the old items taking in account that the index needs to be incremented so it takes in accounts the new item
+                newMappedFieldsVisible.push(fieldIndex + 1);
+            }
+        }
+
+        // our new item is either the first one (empty list) or the new index is bigger then the ones from the list ?
+        addElementIfNecessary();
+
+        // update list of visible items
+        this.mappedFieldsVisible = newMappedFieldsVisible;
+
+        // update visible items count
+        this.updateVisibleItemsCount();
+    }
+
+    /**
+     * Remove from list of visible items
+     */
+    private removeFromListOfVisibleItems(elementIndex: number): void {
+        // go through items and remove the one
+        const newMappedFieldsVisible: number[] = [];
+        for (let index = 0; index < this.mappedFieldsVisible.length; index++) {
+            const fieldIndex: number = this.mappedFieldsVisible[index];
+            if (fieldIndex !== elementIndex) {
+                // remove and update index as well
+                if (fieldIndex > elementIndex) {
+                    newMappedFieldsVisible.push(fieldIndex - 1);
+                } else {
+                    newMappedFieldsVisible.push(fieldIndex);
+                }
+            }
+        }
+
+        // update list of visible items
+        this.mappedFieldsVisible = newMappedFieldsVisible;
+
+        // update visible items count
+        this.updateVisibleItemsCount();
     }
 }

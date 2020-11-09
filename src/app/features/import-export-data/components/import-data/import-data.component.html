@@ -140,28 +140,72 @@
 
                 <!-- Source -->
                 <div
-                    fxFlex="1 1" fxLayoutAlign="start end">
-                    {{ 'LNG_PAGE_IMPORT_DATA_LABEL_SOURCE_FILE_INFORMATION' | translate }}
+                    fxFlex="1 1" fxLayout="column">
+
+                    <!-- Filter -->
+                    <div
+                        fxFlex>
+                        <app-form-input
+                            #filterBySourceInput="ngModel"
+                            [ngModel]="filterBySourceInputValue"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="triggerFilterVisibleData()"
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+
+                    <!-- Label -->
+                    <div
+                        fxFlex>
+                        {{ 'LNG_PAGE_IMPORT_DATA_LABEL_SOURCE_FILE_INFORMATION' | translate }}
+                    </div>
                 </div>
 
                 <!-- Destination -->
                 <div
-                    fxFlex="1 1" fxLayoutAlign="start end">
-                    {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_INFORMATION' | translate }}
-                </div>
+                    fxFlex="1 1" fxLayout="column">
 
-                <!-- Array indexes -->
-                <div
-                    fxFlex="120px" fxLayoutAlign="start end" fxLayout="row" fxLayoutGap="10px">
-                    <div
-                        fxFlex fxGrow="0">
-                        {{ 'LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX' | translate }}
-                    </div>
+                    <!-- Filter -->
                     <div
                         fxFlex>
-                        <span
-                            class="xt-icon xt-icon-xsmall"
-                            [matTooltip]="'LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX_DESCRIPTION' | translate">info</span>
+                        <app-form-input
+                            #filterByDestinationInput="ngModel"
+                            [ngModel]="filterByDestinationInputValue"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="triggerFilterVisibleData()"
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+
+                    <!-- Label -->
+                    <div
+                        fxFlex>
+                        {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_INFORMATION' | translate }}
+                    </div>
+                </div>
+
+                <!-- Array indexes & visible items count -->
+                <div
+                    fxFlex="120px" fxLayout="column">
+                    <!-- Visible items count -->
+                    <div
+                        fxFlex fxLayoutAlign="start end">
+                        {{ 'LNG_PAGE_IMPORT_DATA_VISIBLE_ITEMS_MSG' | translate:visibleItemsMsg }}
+                    </div>
+
+                    <!-- Array indexes -->
+                    <div
+                        fxFlex fxLayoutAlign="start end" fxLayout="row" fxLayoutGap="10px">
+                        <div
+                            fxFlex fxGrow="0">
+                            {{ 'LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX' | translate }}
+                        </div>
+                        <div
+                            fxFlex>
+                            <span
+                                class="xt-icon xt-icon-xsmall"
+                                [matTooltip]="'LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX_DESCRIPTION' | translate">info</span>
+                        </div>
                     </div>
                 </div>
 
@@ -182,7 +226,7 @@
 
                 <!-- Actions -->
                 <div
-                    fxFlex="100px">
+                    fxFlex="100px" fxLayoutAlign="start end">
                     <button
                         mat-raised-button
                         color="accent"
@@ -204,212 +248,123 @@
 
                 <!-- Render each row -->
                 <div
-                    *cdkVirtualFor="let item of mappedFields; let elementIndex = index; templateCacheSize: 0"
+                    *cdkVirtualFor="let elementIndex of mappedFieldsVisible; templateCacheSize: 0"
                     class="import-data-body-row"
                     fxLayout="column">
 
-                    <!-- Source - destination - table view -->
+                    <!-- Hack for filter options -->
                     <div
-                        *ngIf="item !== elementInEditMode; else editMode"
-                        class="import-data-body-row-basic"
-                        fxLayout="column"
-                        app-hover-row-actions
-                        [hoverRowActionsComponent]="hoverRow"
-                        [hoverRowActions]="recordActions"
-                        [hoverRowActionData]="item"
-                        [hoverRowActionIndex]="elementIndex">
+                        *ngIf="mappedFields[elementIndex]; let item">
 
-                        <!-- Data -->
+                        <!-- Source - destination - table view -->
                         <div
-                            class="import-data-body-row-basic-data"
-                            fxLayout="row" fxLayoutGap="10px">
-                            <!-- Row No. -->
-                            <div
-                                fxFlex="40px" fxLayoutAlign="start end">
-                                {{ elementIndex + 1 }}
-                            </div>
-
-                            <!-- Source -->
-                            <div
-                                fxFlex="1 1" fxLayoutAlign="start end">
-                                {{ item.sourceField ? item.sourceField : '-' }}
-                            </div>
-
-                            <!-- Destination -->
-                            <div
-                                fxFlex="1 1" fxLayoutAlign="start end">
-                                {{ item.destinationField && importableObject.modelPropertiesKeyValueMap[item.destinationField] ? importableObject.modelPropertiesKeyValueMap[item.destinationField] : '-' }}
-                            </div>
-
-                            <!-- Array indexes -->
-                            <div
-                                fxFlex="120px">
-                                {{ item.sourceDestinationLevelForDisplay }}
-                            </div>
-
-                            <!-- Mappings -->
-                            <div
-                                fxFlex="120px">
-                                <div
-                                    *ngIf="item.sourceFieldWithoutIndexes && item.destinationField && item.sourceFieldWithSelectedIndexes && (
-                                        !!importableObject.modelPropertyValuesMap[item.destinationField] ||
-                                        addressFields[item.destinationField]
-                                    )">
-
-                                    <!-- Waiting for map ? -->
-                                    <div
-                                        *ngIf="!distinctValuesCache || !distinctValuesCache[item.sourceFieldWithoutIndexes]; else completeIncomplete"
-                                        [matTooltip]="'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_WAITING_DESCRIPTION' | translate"
-                                        class="import-data-body-row-basic-data-error">
-                                        {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_WAITING' | translate }}
-                                    </div>
-
-                                    <!-- Complete / Incomplete -->
-                                    <ng-template
-                                        #completeIncomplete>
-                                        <!-- No data ? -->
-                                        <div
-                                            *ngIf="!usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes]; else displayIncompleteOrComplete"
-                                            class="import-data-body-row-basic-data-error">
-                                            {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID' | translate }}
-                                        </div>
-
-                                        <!-- Incomplete values or complete -->
-                                        <ng-template
-                                            #displayIncompleteOrComplete>
-                                            <div
-                                                [class]="usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.cssClass">
-                                                {{ usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes ?
-                                                (usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.label | translate:usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.labelData) :
-                                                (usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.handledAboveLabel | translate)}}
-                                            </div>
-                                        </ng-template>
-
-                                    </ng-template>
-
-                                </div>
-                            </div>
-
-                            <!-- Actions -->
-                            <div
-                                fxFlex="100px">
-                                <!-- placeholder -->
-                            </div>
-                        </div>
-
-                        <!-- Validation Info -->
-                        <div
-                            class="import-data-body-row-basic-validation">
-
-                            <!-- Row No. -->
-                            <div
-                                fxFlex="40px">
-                                <!-- placeholder -->
-                            </div>
-
-                            <!-- Source -->
-                            <div
-                                class="import-data-body-row-basic-validation-source"
-                                fxFlex="1 1" fxLayout="row" fxLayoutGap="20px">
-
-                                <!-- Invalid value ? -->
-                                <span
-                                    *ngIf="!item.sourceField">
-                                    {{'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate}}
-                                </span>
-
-                                <!-- Duplicate source ? -->
-                                <span
-                                    *ngIf="item.sourceFieldWithSelectedIndexes && usedSourceFieldsForValidation.fields[item.sourceFieldWithSelectedIndexes] > 1">
-                                    {{'LNG_FORM_VALIDATION_ERROR_DUPLICATE_VALUE' | translate}}
-                                </span>
-
-                            </div>
-
-                            <!-- Destination -->
-                            <div
-                                class="import-data-body-row-basic-validation-destination"
-                                fxFlex="1 1" fxLayout="row" fxLayoutGap="20px">
-
-                                <!-- Required ? -->
-                                <span
-                                    *ngIf="item.readonly"
-                                    class="import-data-body-row-basic-validation-destination-required">
-                                    {{'LNG_PAGE_IMPORT_DATA_REQUIRED' | translate}}
-                                </span>
-
-                                <!-- Invalid value ? -->
-                                <span
-                                    *ngIf="!item.destinationField">
-                                    {{'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate}}
-                                </span>
-
-                            </div>
-
-                            <!-- Array indexes -->
-                            <div
-                                fxFlex="120px">
-
-                                <!-- Invalid array indexes ? -->
-                                <span
-                                    *ngIf="!item.sourceDestinationLevelAreValid">
-                                    {{'LNG_PAGE_IMPORT_DATA_INVALID_ARRAY_INDEX' | translate}}
-                                </span>
-
-                            </div>
-
-                            <!-- Mappings -->
-                            <div
-                                fxFlex="120px">
-                                <!-- placeholder -->
-                            </div>
-
-                            <!-- Actions -->
-                            <div
-                                fxFlex="100px">
-                                <!-- placeholder -->
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <!-- Source - destination - edit mode view -->
-                    <ng-template
-                        #editMode>
-
-                        <!-- Basic Details -->
-                        <div
-                            class="import-data-body-row-edit-basic"
-                            fxLayout="row" fxLayoutGap="10px"
+                            *ngIf="item !== elementInEditMode; else editMode"
+                            class="import-data-body-row-basic"
+                            fxLayout="column"
                             app-hover-row-actions
                             [hoverRowActionsComponent]="hoverRow"
                             [hoverRowActions]="recordActions"
                             [hoverRowActionData]="item"
                             [hoverRowActionIndex]="elementIndex">
 
-                            <!-- Row No. -->
+                            <!-- Data -->
                             <div
-                                fxFlex="40px">
-                                {{ elementIndex + 1 }}
+                                class="import-data-body-row-basic-data"
+                                fxLayout="row" fxLayoutGap="10px">
+                                <!-- Row No. -->
+                                <div
+                                    fxFlex="40px" fxLayoutAlign="start end">
+                                    {{ elementIndex + 1 }}
+                                </div>
+
+                                <!-- Source -->
+                                <div
+                                    fxFlex="1 1" fxLayoutAlign="start end">
+                                    {{ item.sourceField ? item.sourceField : '-' }}
+                                </div>
+
+                                <!-- Destination -->
+                                <div
+                                    fxFlex="1 1" fxLayoutAlign="start end">
+                                    {{ item.destinationField && importableObject.modelPropertiesKeyValueMap[item.destinationField] ? importableObject.modelPropertiesKeyValueMap[item.destinationField] : '-' }}
+                                </div>
+
+                                <!-- Array indexes -->
+                                <div
+                                    fxFlex="120px">
+                                    {{ item.sourceDestinationLevelForDisplay }}
+                                </div>
+
+                                <!-- Mappings -->
+                                <div
+                                    fxFlex="120px">
+                                    <div
+                                        *ngIf="item.sourceFieldWithoutIndexes && item.destinationField && item.sourceFieldWithSelectedIndexes && (
+                                            !!importableObject.modelPropertyValuesMap[item.destinationField] ||
+                                            addressFields[item.destinationField]
+                                        )">
+
+                                        <!-- Waiting for map ? -->
+                                        <div
+                                            *ngIf="!distinctValuesCache || !distinctValuesCache[item.sourceFieldWithoutIndexes]; else completeIncomplete"
+                                            [matTooltip]="'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_WAITING_DESCRIPTION' | translate"
+                                            class="import-data-body-row-basic-data-error">
+                                            {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_WAITING' | translate }}
+                                        </div>
+
+                                        <!-- Complete / Incomplete -->
+                                        <ng-template
+                                            #completeIncomplete>
+                                            <!-- No data ? -->
+                                            <div
+                                                *ngIf="!usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes]; else displayIncompleteOrComplete"
+                                                class="import-data-body-row-basic-data-error">
+                                                {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID' | translate }}
+                                            </div>
+
+                                            <!-- Incomplete values or complete -->
+                                            <ng-template
+                                                #displayIncompleteOrComplete>
+                                                <div
+                                                    [class]="usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.cssClass">
+                                                    {{ usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes ?
+                                                    (usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.label | translate:usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.labelData) :
+                                                    (usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.handledAboveLabel | translate)}}
+                                                </div>
+                                            </ng-template>
+
+                                        </ng-template>
+
+                                    </div>
+                                </div>
+
+                                <!-- Actions -->
+                                <div
+                                    fxFlex="100px">
+                                    <!-- placeholder -->
+                                </div>
                             </div>
 
-                            <!-- Source -->
+                            <!-- Validation Info -->
                             <div
-                                fxFlex="1 1" fxLayout="column">
-                                <!-- input -->
-                                <app-form-select-vscroll
-                                    name="mapObjectSource"
-                                    required="true"
-                                    [ngModel]="item.sourceField"
-                                    [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
-                                    [options]="importableObject.fileHeadersKeyValue"
-                                    (optionChanged)="setSourceDestinationValueAndDetermineOptions(item, 'sourceField', $event)">
-                                </app-form-select-vscroll>
+                                class="import-data-body-row-basic-validation">
 
-                                <!-- Duplicate source ? -->
+                                <!-- Row No. -->
                                 <div
-                                    class="import-data-body-row-edit-basic-validation-source"
+                                    fxFlex="40px">
+                                    <!-- placeholder -->
+                                </div>
+
+                                <!-- Source -->
+                                <div
+                                    class="import-data-body-row-basic-validation-source"
                                     fxFlex="1 1" fxLayout="row" fxLayoutGap="20px">
+
+                                    <!-- Invalid value ? -->
+                                    <span
+                                        *ngIf="!item.sourceField">
+                                        {{'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate}}
+                                    </span>
 
                                     <!-- Duplicate source ? -->
                                     <span
@@ -418,224 +373,260 @@
                                     </span>
 
                                 </div>
-                            </div>
 
-                            <!-- Destination -->
-                            <div
-                                fxFlex="1 1">
-                                <app-form-select-vscroll
-                                    name="mapObjectDestination"
-                                    required="true"
-                                    [ngModel]="item.destinationField"
-                                    [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
-                                    [options]="importableObject.modelPropertiesKeyValue"
-                                    (optionChanged)="setSourceDestinationValueAndDetermineOptions(item, 'destinationField', $event)"
-                                    [disabled]="item.readonly">
-                                </app-form-select-vscroll>
-                            </div>
-
-                            <!-- Array indexes -->
-                            <div
-                                fxFlex="120px">
+                                <!-- Destination -->
                                 <div
-                                    *ngIf="item.isSourceArray || item.isDestinationArray"
-                                    fxFlex fxLayout="row" fxLayoutGap="10px">
-                                    <div
-                                        *ngFor="let levelMatch of item.numberOfMaxLevels; let levelIndex = index;"
-                                        fxFlex>
-                                        <app-form-select-vscroll
-                                            [name]="'sourceDestinationLevel[' + levelIndex + ']'"
-                                            required="true"
-                                            [ngModel]="item.getSourceDestinationLevel(levelIndex)"
-                                            [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE_DESTINATION_LEVEL' | translate"
-                                            [options]="possibleSourceDestinationLevels"
-                                            (optionChanged)="setDestinationLevel(item, levelIndex, $event)">
-                                        </app-form-select-vscroll>
-                                    </div>
-                                </div>
-                            </div>
+                                    class="import-data-body-row-basic-validation-destination"
+                                    fxFlex="1 1" fxLayout="row" fxLayoutGap="20px">
 
-                            <!-- Mappings -->
-                            <div
-                                fxFlex="120px">
-                                <div
-                                    *ngIf="item.sourceFieldWithoutIndexes && item.destinationField && item.sourceFieldWithSelectedIndexes && (
-                                        !!importableObject.modelPropertyValuesMap[item.destinationField] ||
-                                        addressFields[item.destinationField]
-                                    )">
+                                    <!-- Required ? -->
+                                    <span
+                                        *ngIf="item.readonly"
+                                        class="import-data-body-row-basic-validation-destination-required">
+                                        {{'LNG_PAGE_IMPORT_DATA_REQUIRED' | translate}}
+                                    </span>
 
-                                    <!-- Waiting for map ? -->
-                                    <div
-                                        *ngIf="!distinctValuesCache || !distinctValuesCache[item.sourceFieldWithoutIndexes]; else completeIncomplete"
-                                        [matTooltip]="'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_WAITING_DESCRIPTION' | translate"
-                                        class="import-data-body-row-basic-data-error">
-                                        {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_WAITING' | translate }}
-                                    </div>
-
-                                    <!-- Complete / Incomplete -->
-                                    <ng-template
-                                        #completeIncomplete>
-                                        <!-- No data ? -->
-                                        <div
-                                            *ngIf="!usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes]; else displayIncompleteOrComplete"
-                                            class="import-data-body-row-basic-data-error">
-                                            {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID' | translate }}
-                                        </div>
-
-                                        <!-- Incomplete values or complete -->
-                                        <ng-template
-                                            #displayIncompleteOrComplete>
-                                            <div
-                                                [class]="usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.cssClass">
-                                                {{ usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes ?
-                                                (usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.label | translate:usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.labelData) :
-                                                (usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.handledAboveLabel | translate)}}
-                                            </div>
-                                        </ng-template>
-
-                                    </ng-template>
+                                    <!-- Invalid value ? -->
+                                    <span
+                                        *ngIf="!item.destinationField">
+                                        {{'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate}}
+                                    </span>
 
                                 </div>
-                            </div>
 
-                            <!-- Actions -->
-                            <div
-                                fxFlex="100px">
-                                <!-- placeholder -->
-                            </div>
+                                <!-- Array indexes -->
+                                <div
+                                    fxFlex="120px">
 
+                                    <!-- Invalid array indexes ? -->
+                                    <span
+                                        *ngIf="!item.sourceDestinationLevelAreValid">
+                                        {{'LNG_PAGE_IMPORT_DATA_INVALID_ARRAY_INDEX' | translate}}
+                                    </span>
+
+                                </div>
+
+                                <!-- Mappings -->
+                                <div
+                                    fxFlex="120px">
+                                    <!-- placeholder -->
+                                </div>
+
+                                <!-- Actions -->
+                                <div
+                                    fxFlex="100px">
+                                    <!-- placeholder -->
+                                </div>
+
+                            </div>
                         </div>
 
-                    </ng-template>
+                        <!-- Source - destination - edit mode view -->
+                        <ng-template
+                            #editMode>
 
-                    <!-- Render mapped options rows -->
-                    <div
-                        *ngIf="!item.mappedOptionsCollapsed &&
-                            item.sourceFieldWithoutIndexes && item.destinationField &&
-                            distinctValuesCache && distinctValuesCache[item.sourceFieldWithoutIndexes] && (
-                                !!importableObject.modelPropertyValuesMap[item.destinationField] ||
-                                addressFields[item.destinationField]
-                            )"
-                        class="import-data-body-row-extra-details"
-                        fxLayout="column">
-
-                        <!-- Render each row -->
-                        <cdk-virtual-scroll-viewport
-                            #mapOptionViewport
-                            class="import-data-body-row-extra-details-vscroll"
-                            fxLayout="column"
-                            autosize
-                            [style.height]="getFieldMapOptionsHeight(mapOptionViewport, item)">
+                            <!-- Basic Details -->
                             <div
-                                *cdkVirtualFor="let mappedOpt of item.mappedOptions; let optIndex = index; templateCacheSize: 0">
+                                class="import-data-body-row-edit-basic"
+                                fxLayout="row" fxLayoutGap="10px"
+                                app-hover-row-actions
+                                [hoverRowActionsComponent]="hoverRow"
+                                [hoverRowActions]="recordActions"
+                                [hoverRowActionData]="item"
+                                [hoverRowActionIndex]="elementIndex">
 
-                                <!-- Source - destination options - table view -->
+                                <!-- Row No. -->
                                 <div
-                                    *ngIf="mappedOpt !== elementInEditMode; else editModeOptions"
-                                    class="import-data-body-row-extra-details-row-basic"
-                                    fxLayout="column"
-                                    app-hover-row-actions
-                                    [hoverRowActionsComponent]="hoverRow"
-                                    [hoverRowActions]="recordActions"
-                                    [hoverRowActionData]="mappedOpt"
-                                    [hoverRowActionIndex]="optIndex">
+                                    fxFlex="40px">
+                                    {{ elementIndex + 1 }}
+                                </div>
 
-                                    <!-- Data -->
+                                <!-- Source -->
+                                <div
+                                    fxFlex="1 1" fxLayout="column">
+                                    <!-- input -->
+                                    <app-form-select-vscroll
+                                        name="mapObjectSource"
+                                        required="true"
+                                        [ngModel]="item.sourceField"
+                                        [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
+                                        [options]="importableObject.fileHeadersKeyValue"
+                                        (optionChanged)="setSourceDestinationValueAndDetermineOptions(item, 'sourceField', $event)">
+                                    </app-form-select-vscroll>
+
+                                    <!-- Duplicate source ? -->
                                     <div
-                                        class="import-data-body-row-extra-details-row"
-                                        fxLayout="row" fxLayoutGap="10px">
+                                        class="import-data-body-row-edit-basic-validation-source"
+                                        fxFlex="1 1" fxLayout="row" fxLayoutGap="20px">
 
-                                        <!-- Option Source -->
-                                        <div
-                                            fxFlex="1 1">
-                                            {{ mappedOpt.sourceOption ? mappedOpt.sourceOption : '-' }}
-                                        </div>
-
-                                        <!-- Option Destination -->
-                                        <div
-                                            fxFlex="1 1">
-                                            {{ addressFields[item.destinationField] && mappedOpt.destinationOption && locationCache[mappedOpt.destinationOption] ?
-                                                locationCache[mappedOpt.destinationOption].label : (
-                                                    mappedOpt.destinationOption && importableObject.modelPropertyValuesMapChildMap[item.destinationField] &&
-                                                    importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] ?
-                                                        importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] :
-                                                        '-'
-                                                )
-                                            }}
-                                        </div>
-                                    </div>
-
-                                    <!-- Validation Info -->
-                                    <div
-                                        class="import-data-body-row-extra-details-row-basic-validation">
-
-                                        <!-- Source -->
-                                        <div
-                                            class="import-data-body-row-extra-details-row-basic-validation-source"
-                                            fxFlex="1 1" fxLayout="row" fxLayoutGap="20px">
-
-                                            <!-- Invalid value ? -->
-                                            <span
-                                                *ngIf="!mappedOpt.sourceOption">
-                                                {{'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate}}
-                                            </span>
-
-                                            <!-- Duplicate source ? -->
-                                            <span
-                                                *ngIf="mappedOpt.sourceOption && usedSourceFieldOptionsForValidation[item.sourceFieldWithSelectedIndexes]
-                                                    && usedSourceFieldOptionsForValidation[item.sourceFieldWithSelectedIndexes].options[mappedOpt.sourceOption] > 1">
-                                                {{'LNG_FORM_VALIDATION_ERROR_DUPLICATE_VALUE' | translate}}
-                                            </span>
-
-                                        </div>
-
-                                        <!-- Destination -->
-                                        <div
-                                            class="import-data-body-row-extra-details-row-basic-validation-destination"
-                                            fxFlex="1 1" fxLayout="row" fxLayoutGap="20px">
-
-                                            <!-- Invalid value ? -->
-                                            <span
-                                                *ngIf="!mappedOpt.destinationOption">
-                                                {{'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate}}
-                                            </span>
-
-                                        </div>
+                                        <!-- Duplicate source ? -->
+                                        <span
+                                            *ngIf="item.sourceFieldWithSelectedIndexes && usedSourceFieldsForValidation.fields[item.sourceFieldWithSelectedIndexes] > 1">
+                                            {{'LNG_FORM_VALIDATION_ERROR_DUPLICATE_VALUE' | translate}}
+                                        </span>
 
                                     </div>
                                 </div>
 
-                                <!-- Source - destination - edit mode view -->
-                                <ng-template
-                                    #editModeOptions>
+                                <!-- Destination -->
+                                <div
+                                    fxFlex="1 1">
+                                    <app-form-select-vscroll
+                                        name="mapObjectDestination"
+                                        required="true"
+                                        [ngModel]="item.destinationField"
+                                        [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
+                                        [options]="importableObject.modelPropertiesKeyValue"
+                                        (optionChanged)="setSourceDestinationValueAndDetermineOptions(item, 'destinationField', $event)"
+                                        [disabled]="item.readonly">
+                                    </app-form-select-vscroll>
+                                </div>
 
-                                    <!-- Basic Details -->
+                                <!-- Array indexes -->
+                                <div
+                                    fxFlex="120px">
                                     <div
-                                        class="import-data-body-row-edit-extra-details-row"
-                                        fxLayout="row" fxLayoutGap="10px"
+                                        *ngIf="item.isSourceArray || item.isDestinationArray"
+                                        fxFlex fxLayout="row" fxLayoutGap="10px">
+                                        <div
+                                            *ngFor="let levelMatch of item.numberOfMaxLevels; let levelIndex = index;"
+                                            fxFlex>
+                                            <app-form-select-vscroll
+                                                [name]="'sourceDestinationLevel[' + levelIndex + ']'"
+                                                required="true"
+                                                [ngModel]="item.getSourceDestinationLevel(levelIndex)"
+                                                [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE_DESTINATION_LEVEL' | translate"
+                                                [options]="possibleSourceDestinationLevels"
+                                                (optionChanged)="setDestinationLevel(item, levelIndex, $event)">
+                                            </app-form-select-vscroll>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Mappings -->
+                                <div
+                                    fxFlex="120px">
+                                    <div
+                                        *ngIf="item.sourceFieldWithoutIndexes && item.destinationField && item.sourceFieldWithSelectedIndexes && (
+                                            !!importableObject.modelPropertyValuesMap[item.destinationField] ||
+                                            addressFields[item.destinationField]
+                                        )">
+
+                                        <!-- Waiting for map ? -->
+                                        <div
+                                            *ngIf="!distinctValuesCache || !distinctValuesCache[item.sourceFieldWithoutIndexes]; else completeIncomplete"
+                                            [matTooltip]="'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_WAITING_DESCRIPTION' | translate"
+                                            class="import-data-body-row-basic-data-error">
+                                            {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_WAITING' | translate }}
+                                        </div>
+
+                                        <!-- Complete / Incomplete -->
+                                        <ng-template
+                                            #completeIncomplete>
+                                            <!-- No data ? -->
+                                            <div
+                                                *ngIf="!usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes]; else displayIncompleteOrComplete"
+                                                class="import-data-body-row-basic-data-error">
+                                                {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID' | translate }}
+                                            </div>
+
+                                            <!-- Incomplete values or complete -->
+                                            <ng-template
+                                                #displayIncompleteOrComplete>
+                                                <div
+                                                    [class]="usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.cssClass">
+                                                    {{ usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes ?
+                                                    (usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.label | translate:usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.labelData) :
+                                                    (usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].labels.handledAboveLabel | translate)}}
+                                                </div>
+                                            </ng-template>
+
+                                        </ng-template>
+
+                                    </div>
+                                </div>
+
+                                <!-- Actions -->
+                                <div
+                                    fxFlex="100px">
+                                    <!-- placeholder -->
+                                </div>
+
+                            </div>
+
+                        </ng-template>
+
+                        <!-- Render mapped options rows -->
+                        <div
+                            *ngIf="!item.mappedOptionsCollapsed &&
+                                item.sourceFieldWithoutIndexes && item.destinationField &&
+                                distinctValuesCache && distinctValuesCache[item.sourceFieldWithoutIndexes] && (
+                                    !!importableObject.modelPropertyValuesMap[item.destinationField] ||
+                                    addressFields[item.destinationField]
+                                )"
+                            class="import-data-body-row-extra-details"
+                            fxLayout="column">
+
+                            <!-- Render each row -->
+                            <cdk-virtual-scroll-viewport
+                                #mapOptionViewport
+                                class="import-data-body-row-extra-details-vscroll"
+                                fxLayout="column"
+                                autosize
+                                [style.height]="getFieldMapOptionsHeight(mapOptionViewport, item)">
+                                <div
+                                    *cdkVirtualFor="let mappedOpt of item.mappedOptions; let optIndex = index; templateCacheSize: 0">
+
+                                    <!-- Source - destination options - table view -->
+                                    <div
+                                        *ngIf="mappedOpt !== elementInEditMode; else editModeOptions"
+                                        class="import-data-body-row-extra-details-row-basic"
+                                        fxLayout="column"
                                         app-hover-row-actions
                                         [hoverRowActionsComponent]="hoverRow"
                                         [hoverRowActions]="recordActions"
                                         [hoverRowActionData]="mappedOpt"
                                         [hoverRowActionIndex]="optIndex">
 
-                                        <!-- Source Option -->
+                                        <!-- Data -->
                                         <div
-                                            fxFlex="1 1" fxLayout="column">
-                                            <app-form-select-vscroll
-                                                name="mapObjectOptionsSource"
-                                                required="true"
-                                                [ngModel]="mappedOpt.sourceOption"
-                                                [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
-                                                [options]="mappedOpt.readOnly ? item.getOptionsForReadOnlySource(mappedOpt) : distinctValuesCache[item.sourceFieldWithoutIndexes]"
-                                                (optionChanged)="setMapOptionValue(mappedOpt, true, $event)"
-                                                [disabled]="mappedOpt.readOnly">
-                                            </app-form-select-vscroll>
+                                            class="import-data-body-row-extra-details-row"
+                                            fxLayout="row" fxLayoutGap="10px">
 
-                                            <!-- Duplicate source ? -->
+                                            <!-- Option Source -->
                                             <div
-                                                class="import-data-body-row-edit-extra-details-row-validation-source"
+                                                fxFlex="1 1">
+                                                {{ mappedOpt.sourceOption ? mappedOpt.sourceOption : '-' }}
+                                            </div>
+
+                                            <!-- Option Destination -->
+                                            <div
+                                                fxFlex="1 1">
+                                                {{ addressFields[item.destinationField] && mappedOpt.destinationOption && locationCache[mappedOpt.destinationOption] ?
+                                                    locationCache[mappedOpt.destinationOption].label : (
+                                                        mappedOpt.destinationOption && importableObject.modelPropertyValuesMapChildMap[item.destinationField] &&
+                                                        importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] ?
+                                                            importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] :
+                                                            '-'
+                                                    )
+                                                }}
+                                            </div>
+                                        </div>
+
+                                        <!-- Validation Info -->
+                                        <div
+                                            class="import-data-body-row-extra-details-row-basic-validation">
+
+                                            <!-- Source -->
+                                            <div
+                                                class="import-data-body-row-extra-details-row-basic-validation-source"
                                                 fxFlex="1 1" fxLayout="row" fxLayoutGap="20px">
+
+                                                <!-- Invalid value ? -->
+                                                <span
+                                                    *ngIf="!mappedOpt.sourceOption">
+                                                    {{'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate}}
+                                                </span>
 
                                                 <!-- Duplicate source ? -->
                                                 <span
@@ -646,51 +637,110 @@
 
                                             </div>
 
+                                            <!-- Destination -->
+                                            <div
+                                                class="import-data-body-row-extra-details-row-basic-validation-destination"
+                                                fxFlex="1 1" fxLayout="row" fxLayoutGap="20px">
+
+                                                <!-- Invalid value ? -->
+                                                <span
+                                                    *ngIf="!mappedOpt.destinationOption">
+                                                    {{'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate}}
+                                                </span>
+
+                                            </div>
+
                                         </div>
-
-                                        <!-- Destination Option -->
-                                        <div
-                                            fxFlex="1 1">
-
-                                            <!-- Not location ? -->
-                                            <app-form-select-vscroll
-                                                *ngIf="!addressFields || !addressFields[item.destinationField]; else addressLocation"
-                                                name="mapObjectOptionsDestination"
-                                                required="true"
-                                                [ngModel]="mappedOpt.destinationOption"
-                                                [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
-                                                [options]="importableObject.modelPropertyValuesMap[item.destinationField]"
-                                                optionValueKey="id"
-                                                (optionChanged)="setMapOptionValue(mappedOpt, false, $event)"
-                                                [disabled]="mappedOpt.readOnly">
-                                            </app-form-select-vscroll>
-
-                                            <!-- Location -->
-                                            <ng-template
-                                                #addressLocation>
-                                                <div
-                                                    fxFlex
-                                                    class="import-data-body-row-edit-extra-details-row-location">
-                                                    <app-form-location-dropdown
-                                                        name="mapObjectOptionsDestination"
-                                                        required="true"
-                                                        [ngModel]="mappedOpt.destinationOption"
-                                                        [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
-                                                        [useOutbreakLocations]="useOutbreakLocations"
-                                                        [disabled]="mappedOpt.readOnly"
-                                                        (itemChanged)="mappedOptionsLocationChanged(mappedOpt, $event)">
-                                                    </app-form-location-dropdown>
-                                                </div>
-                                            </ng-template>
-                                        </div>
-
                                     </div>
 
-                                </ng-template>
+                                    <!-- Source - destination - edit mode view -->
+                                    <ng-template
+                                        #editModeOptions>
 
-                            </div>
+                                        <!-- Basic Details -->
+                                        <div
+                                            class="import-data-body-row-edit-extra-details-row"
+                                            fxLayout="row" fxLayoutGap="10px"
+                                            app-hover-row-actions
+                                            [hoverRowActionsComponent]="hoverRow"
+                                            [hoverRowActions]="recordActions"
+                                            [hoverRowActionData]="mappedOpt"
+                                            [hoverRowActionIndex]="optIndex">
 
-                        </cdk-virtual-scroll-viewport>
+                                            <!-- Source Option -->
+                                            <div
+                                                fxFlex="1 1" fxLayout="column">
+                                                <app-form-select-vscroll
+                                                    name="mapObjectOptionsSource"
+                                                    required="true"
+                                                    [ngModel]="mappedOpt.sourceOption"
+                                                    [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
+                                                    [options]="mappedOpt.readOnly ? item.getOptionsForReadOnlySource(mappedOpt) : distinctValuesCache[item.sourceFieldWithoutIndexes]"
+                                                    (optionChanged)="setMapOptionValue(mappedOpt, true, $event)"
+                                                    [disabled]="mappedOpt.readOnly">
+                                                </app-form-select-vscroll>
+
+                                                <!-- Duplicate source ? -->
+                                                <div
+                                                    class="import-data-body-row-edit-extra-details-row-validation-source"
+                                                    fxFlex="1 1" fxLayout="row" fxLayoutGap="20px">
+
+                                                    <!-- Duplicate source ? -->
+                                                    <span
+                                                        *ngIf="mappedOpt.sourceOption && usedSourceFieldOptionsForValidation[item.sourceFieldWithSelectedIndexes]
+                                                            && usedSourceFieldOptionsForValidation[item.sourceFieldWithSelectedIndexes].options[mappedOpt.sourceOption] > 1">
+                                                        {{'LNG_FORM_VALIDATION_ERROR_DUPLICATE_VALUE' | translate}}
+                                                    </span>
+
+                                                </div>
+
+                                            </div>
+
+                                            <!-- Destination Option -->
+                                            <div
+                                                fxFlex="1 1">
+
+                                                <!-- Not location ? -->
+                                                <app-form-select-vscroll
+                                                    *ngIf="!addressFields || !addressFields[item.destinationField]; else addressLocation"
+                                                    name="mapObjectOptionsDestination"
+                                                    required="true"
+                                                    [ngModel]="mappedOpt.destinationOption"
+                                                    [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
+                                                    [options]="importableObject.modelPropertyValuesMap[item.destinationField]"
+                                                    optionValueKey="id"
+                                                    (optionChanged)="setMapOptionValue(mappedOpt, false, $event)"
+                                                    [disabled]="mappedOpt.readOnly">
+                                                </app-form-select-vscroll>
+
+                                                <!-- Location -->
+                                                <ng-template
+                                                    #addressLocation>
+                                                    <div
+                                                        fxFlex
+                                                        class="import-data-body-row-edit-extra-details-row-location">
+                                                        <app-form-location-dropdown
+                                                            name="mapObjectOptionsDestination"
+                                                            required="true"
+                                                            [ngModel]="mappedOpt.destinationOption"
+                                                            [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
+                                                            [useOutbreakLocations]="useOutbreakLocations"
+                                                            [disabled]="mappedOpt.readOnly"
+                                                            (itemChanged)="mappedOptionsLocationChanged(mappedOpt, $event)">
+                                                        </app-form-location-dropdown>
+                                                    </div>
+                                                </ng-template>
+                                            </div>
+
+                                        </div>
+
+                                    </ng-template>
+
+                                </div>
+
+                            </cdk-virtual-scroll-viewport>
+
+                        </div>
 
                     </div>
 
