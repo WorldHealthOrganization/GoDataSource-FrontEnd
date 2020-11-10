@@ -791,7 +791,7 @@
 
     <!-- Import failed errors -->
     <div
-        *ngIf="!displayLoading && importableObject && errMsgDetails"
+        *ngIf="!asyncImport && !displayLoading && importableObject && errMsgDetails"
         fxLayout="column" fxLayoutGap="10px"
         class="import-data-errors">
         <div>

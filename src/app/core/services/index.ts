@@ -50,6 +50,7 @@ import { EntityHelperService } from './helper/entity-helper.service';
 import { ContactsOfContactsDataService } from './data/contacts-of-contacts.data.service';
 import { CaptchaDataService } from './data/captcha.data.service';
 import { ListHelperService } from './helper/list-helper.service';
+import { ImportLogDataService } from './data/import-log.data.service';
 
 // export the list of services
 export const services: any[] = [
@@ -93,6 +94,7 @@ export const services: any[] = [
     GlobalEntitySearchDataService,
     DeviceDataService,
     CaptchaDataService,
+    ImportLogDataService,
 
     // guard services
     AuthGuard,

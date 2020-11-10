@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
-import { IImportableFileDistinctValues } from '../../../features/import-export-data/components/import-data/model';
+import { IAsyncImportResponse, IImportableFileDistinctValues } from '../../../features/import-export-data/components/import-data/model';
 
 @Injectable()
 export class ImportExportDataService {
@@ -16,11 +16,11 @@ export class ImportExportDataService {
 
     /**
      * Import data
-     * @param url
-     * @param data
-     * @returns {Observable<any>}
      */
-    importData(url: string, data: {}): Observable<any> {
+    importData(
+        url: string,
+        data: {}
+    ): Observable<any | IAsyncImportResponse> {
         return this.http.post(url, data);
     }
 

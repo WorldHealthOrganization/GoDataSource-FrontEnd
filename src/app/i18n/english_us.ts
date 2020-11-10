@@ -106,6 +106,10 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_LOAD_SAVED_MAPPING_CONFIRMATION': 'Are you sure you want to load "{{name}}"? It might take a while...',
         'LNG_PAGE_IMPORT_DATA_MIGHT_TAKE_SOME_TIME_MSG': 'The file was successfully uploaded. Please be patient, it might take a couple of minutes to process data',
         'LNG_PAGE_IMPORT_DATA_VISIBLE_ITEMS_MSG': 'Rows {{no}}/{{total}}',
+        'LNG_PAGE_IMPORT_DATA_IMPORTING_VALIDATING': 'Validate data',
+        'LNG_PAGE_IMPORT_DATA_IMPORTING_PREPARE': 'Preparing data',
+        'LNG_PAGE_IMPORT_DATA_IMPORTING_START_IMPORT': 'Start import',
+        'LNG_PAGE_IMPORT_DATA_IMPORTING_IMPORT_STATUS': 'Processed {{processed}}/{{total}} (failed: {{failed}})',
 
         /**
          * uiClustersListPage

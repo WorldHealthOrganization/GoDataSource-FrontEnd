@@ -3,7 +3,7 @@ import { FileItem, FileLikeObject, FileUploader } from 'ng2-file-upload';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { environment } from '../../../../../environments/environment';
-import { IMappedOption, IModelArrayProperties, ImportableFileModel, ImportableFilePropertiesModel, ImportableFilePropertyValuesModel, ImportableLabelValuePair, ImportableMapField, ImportDataExtension } from './model';
+import { IAsyncImportResponse, IMappedOption, IModelArrayProperties, ImportableFileModel, ImportableFilePropertiesModel, ImportableFilePropertyValuesModel, ImportableLabelValuePair, ImportableMapField, ImportDataExtension } from './model';
 import * as _ from 'lodash';
 import { DialogAnswer, DialogAnswerButton, HoverRowAction, LoadingDialogModel } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -37,6 +37,7 @@ import { LocationModel } from '../../../../core/models/location.model';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { NgModel } from '@angular/forms';
+import { ImportLogDataService } from '../../../../core/services/data/import-log.data.service';
 
 export enum ImportServerModelNames {
     CASE_LAB_RESULTS = 'labResult',
@@ -300,6 +301,9 @@ export class ImportDataComponent
             }[]
         }
     };
+
+    // Import is async ?
+    @Input() asyncImport: boolean = false;
 
     // Constants / Classes
     ImportServerErrorCodes = ImportServerErrorCodes;
@@ -591,7 +595,8 @@ export class ImportDataComponent
         private importExportDataService: ImportExportDataService,
         private savedImportMappingService: SavedImportMappingService,
         private domSanitizer: DomSanitizer,
-        private locationDataService: LocationDataService
+        private locationDataService: LocationDataService,
+        private importLogDataService: ImportLogDataService
     ) {
         // fix mime issue - browser not supporting some of the mimes, empty was provided to mime Type which wasn't allowing user to upload teh files
         if (!(FileLikeObject.prototype as any)._createFromObjectPrev) {
@@ -1748,7 +1753,8 @@ export class ImportDataComponent
         }
 
         // display loading
-        const loadingDialog = this.dialogService.showLoadingDialog();
+        const loadingDialog = this.createPrepareMapDataLoadingDialog();
+        loadingDialog.showMessage('LNG_PAGE_IMPORT_DATA_IMPORTING_VALIDATING');
 
         // validate items & import data
         setTimeout(() => {
@@ -1791,93 +1797,161 @@ export class ImportDataComponent
                 return;
             }
 
-            // construct import JSON
-            const importJSON = {
-                fileId: this.importableObject.id,
-                map: {},
-                valuesMap: {}
-            };
+            // mapping data
+            loadingDialog.showMessage('LNG_PAGE_IMPORT_DATA_IMPORTING_PREPARE');
+            setTimeout(() => {
+                // construct import JSON
+                const importJSON = {
+                    fileId: this.importableObject.id,
+                    map: {},
+                    valuesMap: {}
+                };
 
-            // convert import data to what API is expecting
-            this.mappedFields.forEach((field) => {
-                // forge the almighty source & destination
-                let source: string = field.sourceField;
-                let destination: string = field.destinationField;
+                // convert import data to what API is expecting
+                this.mappedFields.forEach((field) => {
+                    // forge the almighty source & destination
+                    let source: string = field.sourceField;
+                    let destination: string = field.destinationField;
 
-                // add indexes to source arrays
-                source = this.addIndexesToArrays(
-                    source,
-                    field.getSourceDestinationLevels()
-                );
-
-                // add indexes to destination arrays
-                destination = this.addIndexesToArrays(
-                    destination,
-                    field.getSourceDestinationLevels()
-                );
-
-                // map main properties
-                importJSON.map[source] = destination;
-
-                // map field options
-                if (
-                    field.mappedOptions &&
-                    field.mappedOptions.length > 0
-                ) {
-                    // here we don't need to add indexes, so we keep the arrays just as they are
-                    // also, we need to merge value Maps with the previous ones
-                    const properSource = field.sourceField.replace(/\[\d+\]/g, '[]');
-                    if (!importJSON.valuesMap[properSource]) {
-                        importJSON.valuesMap[properSource] = {};
-                    }
-
-                    // add options
-                    field.mappedOptions.forEach((option) => {
-                        importJSON.valuesMap[properSource][option.sourceOption] = option.destinationOption;
-                    });
-                }
-            });
-
-            // import data
-            // #TODO - check periodically where we are ( n rows from total )
-            this.importExportDataService
-                .importData(
-                    this.importDataUrl,
-                    importJSON
-                )
-                .pipe(
-                    catchError((err) => {
-                        // display error message
-                        if (err.code === 'IMPORT_PARTIAL_SUCCESS') {
-                            // construct custom message
-                            this.errMsgDetails = err;
-
-                            // display error
-                            this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
-                        } else {
-                            this.snackbarService.showApiError(err);
-                        }
-
-                        // hide loading
-                        loadingDialog.close();
-
-                        // propagate err
-                        return throwError(err);
-                    })
-                )
-                .subscribe(() => {
-                    // display success
-                    this.snackbarService.showSuccess(
-                        this.importSuccessMessage,
-                        this.translationData
+                    // add indexes to source arrays
+                    source = this.addIndexesToArrays(
+                        source,
+                        field.getSourceDestinationLevels()
                     );
 
-                    // hide loading
-                    loadingDialog.close();
+                    // add indexes to destination arrays
+                    destination = this.addIndexesToArrays(
+                        destination,
+                        field.getSourceDestinationLevels()
+                    );
 
-                    // emit finished event - event should handle redirect
-                    this.finished.emit();
+                    // map main properties
+                    importJSON.map[source] = destination;
+
+                    // map field options
+                    if (
+                        field.mappedOptions &&
+                        field.mappedOptions.length > 0
+                    ) {
+                        // here we don't need to add indexes, so we keep the arrays just as they are
+                        // also, we need to merge value Maps with the previous ones
+                        const properSource = field.sourceField.replace(/\[\d+\]/g, '[]');
+                        if (!importJSON.valuesMap[properSource]) {
+                            importJSON.valuesMap[properSource] = {};
+                        }
+
+                        // add options
+                        field.mappedOptions.forEach((option) => {
+                            importJSON.valuesMap[properSource][option.sourceOption] = option.destinationOption;
+                        });
+                    }
                 });
+
+                // start import
+                loadingDialog.showMessage('LNG_PAGE_IMPORT_DATA_IMPORTING_START_IMPORT');
+
+                // import data
+                setTimeout(() => {
+                    this.importExportDataService
+                        .importData(
+                            this.importDataUrl,
+                            importJSON
+                        )
+                        .pipe(
+                            catchError((err) => {
+                                // display error message
+                                if (err.code === 'IMPORT_PARTIAL_SUCCESS') {
+                                    // construct custom message
+                                    this.errMsgDetails = err;
+
+                                    // display error
+                                    this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
+                                } else {
+                                    this.snackbarService.showApiError(err);
+                                }
+
+                                // hide loading
+                                loadingDialog.close();
+
+                                // propagate err
+                                return throwError(err);
+                            })
+                        )
+                        .subscribe((response) => {
+                            // async operation ?
+                            if (this.asyncImport) {
+                                // retrieve data
+                                const asyncResponse: IAsyncImportResponse = response;
+
+                                // handler to check status periodically
+                                const checkStatusPeriodically = () => {
+                                    this.importLogDataService
+                                        .getImportLog(
+                                            asyncResponse.importLogId
+                                        )
+                                        .pipe(
+                                            catchError((err) => {
+                                                // display error message
+                                                this.snackbarService.showApiError(err);
+
+                                                // hide loading
+                                                loadingDialog.close();
+
+                                                // propagate err
+                                                return throwError(err);
+                                            })
+                                        )
+                                        .subscribe((importLogModel) => {
+                                            // update dialog message
+                                            loadingDialog.showMessage(
+                                                'LNG_PAGE_IMPORT_DATA_IMPORTING_IMPORT_STATUS', {
+                                                    processed: importLogModel.processedNo.toString(),
+                                                    total: importLogModel.totalNo.toString(),
+                                                    failed: importLogModel.result && importLogModel.result.details && importLogModel.result.details.failed ?
+                                                        importLogModel.result.details.failed.toString() :
+                                                        '0'
+                                                }
+                                            );
+
+                                            // done / error / anything why we should stop and redirect ?
+                                            // #TODO
+                                            // display success
+                                            // this.snackbarService.showSuccess(
+                                            //     this.importSuccessMessage,
+                                            //     this.translationData
+                                            // );
+                                            //
+                                            // // hide loading
+                                            // loadingDialog.close();
+                                            //
+                                            // // emit finished event - event should handle redirect
+                                            // this.finished.emit();
+
+                                            // otherwise update status later
+                                            setTimeout(() => {
+                                                checkStatusPeriodically();
+                                            }, 1000);
+                                        });
+                                };
+
+                                // update status periodically
+                                checkStatusPeriodically();
+                            } else {
+                                // display success
+                                this.snackbarService.showSuccess(
+                                    this.importSuccessMessage,
+                                    this.translationData
+                                );
+
+                                // hide loading
+                                loadingDialog.close();
+
+                                // emit finished event - event should handle redirect
+                                this.finished.emit();
+                            }
+                        });
+                });
+            });
         });
     }
 
