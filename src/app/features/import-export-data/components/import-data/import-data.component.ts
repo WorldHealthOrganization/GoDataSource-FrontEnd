@@ -1934,7 +1934,7 @@ export class ImportDataComponent
         }
 
         // determine data height
-        const importDataBodyRowsMaxHeight: SafeStyle = this.domSanitizer.bypassSecurityTrustStyle(`calc(100vh - (${this.mappedDataTable.nativeElement.getBoundingClientRect().top}px + 170px))`);
+        const importDataBodyRowsMaxHeight: SafeStyle = this.domSanitizer.bypassSecurityTrustStyle(`calc(100vh - (${this.mappedDataTable.nativeElement.getBoundingClientRect().top}px + 210px))`);
         if (this.importDataBodyRowsMaxHeight !== importDataBodyRowsMaxHeight) {
             this.importDataBodyRowsMaxHeight = importDataBodyRowsMaxHeight;
 
