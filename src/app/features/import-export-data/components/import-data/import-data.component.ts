@@ -1930,7 +1930,7 @@ export class ImportDataComponent
                                             // otherwise update status later
                                             setTimeout(() => {
                                                 checkStatusPeriodically();
-                                            }, 1000);
+                                            }, 3000);
                                         });
                                 };
 
