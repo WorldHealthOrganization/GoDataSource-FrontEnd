@@ -109,7 +109,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_IMPORTING_VALIDATING': 'Validate data',
         'LNG_PAGE_IMPORT_DATA_IMPORTING_PREPARE': 'Preparing data',
         'LNG_PAGE_IMPORT_DATA_IMPORTING_START_IMPORT': 'Start import',
-        'LNG_PAGE_IMPORT_DATA_IMPORTING_IMPORT_STATUS': 'Processed {{processed}}/{{total}} (failed: {{failed}})',
+        'LNG_PAGE_IMPORT_DATA_IMPORTING_IMPORT_STATUS': 'Processed {{processed}} / {{total}} (failed: {{failed}})',
 
         /**
          * uiClustersListPage

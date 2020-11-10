@@ -1905,10 +1905,10 @@ export class ImportDataComponent
                                             // update dialog message
                                             loadingDialog.showMessage(
                                                 'LNG_PAGE_IMPORT_DATA_IMPORTING_IMPORT_STATUS', {
-                                                    processed: importLogModel.processedNo.toString(),
-                                                    total: importLogModel.totalNo.toString(),
+                                                    processed: importLogModel.processedNo.toLocaleString('en'),
+                                                    total: importLogModel.totalNo.toLocaleString('en'),
                                                     failed: importLogModel.result && importLogModel.result.details && importLogModel.result.details.failed ?
-                                                        importLogModel.result.details.failed.toString() :
+                                                        importLogModel.result.details.failed.toLocaleString('en') :
                                                         '0'
                                                 }
                                             );
