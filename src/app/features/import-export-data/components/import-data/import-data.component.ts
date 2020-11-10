@@ -3008,8 +3008,8 @@ export class ImportDataComponent
         }
 
         // retrieve filter values and prepare them for case insensitive search
-        this.filterBySourceInputValue = (this.filterBySourceInput.value || '').toLowerCase();
-        this.filterByDestinationInputValue = (this.filterByDestinationInput.value || '').toLowerCase();
+        this.filterBySourceInputValue = this.filterBySourceInput.value;
+        this.filterByDestinationInputValue = this.filterByDestinationInput.value;
 
         // trigger filter refresh
         this.triggerListRefresh.call();
@@ -3021,19 +3021,21 @@ export class ImportDataComponent
     private filterVisibleData(): void {
         // filter by source & destination
         this.mappedFieldsVisible = [];
+        const filterBySourceInputValue: string = (this.filterBySourceInputValue || '').toLowerCase();
+        const filterByDestinationInputValue: string = (this.filterByDestinationInputValue || '').toLowerCase();
         for (let fieldIndex = 0; fieldIndex < this.mappedFields.length; fieldIndex++) {
             const field = this.mappedFields[fieldIndex];
             if (
                 (
-                    !this.filterBySourceInputValue || (
+                    !filterBySourceInputValue || (
                         field.sourceField &&
-                        field.sourceField.toLowerCase().indexOf(this.filterBySourceInputValue) > -1
+                        field.sourceField.toLowerCase().indexOf(filterBySourceInputValue) > -1
                     )
                 ) && (
-                    !this.filterByDestinationInputValue || (
+                    !filterByDestinationInputValue || (
                         field.destinationField &&
                         this.importableObject.modelPropertiesKeyValueMap[field.destinationField] &&
-                        this.importableObject.modelPropertiesKeyValueMap[field.destinationField].toLowerCase().indexOf(this.filterByDestinationInputValue) > -1
+                        this.importableObject.modelPropertiesKeyValueMap[field.destinationField].toLowerCase().indexOf(filterByDestinationInputValue) > -1
                     )
                 )
             ) {
