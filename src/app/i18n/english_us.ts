@@ -112,6 +112,18 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_IMPORTING_IMPORT_STATUS': 'Processed {{processed}} / {{total}} (failed: {{failed}})',
         'LNG_PAGE_IMPORT_DATA_ERROR_MISSING_ERROR_DETAILS': 'Something went wrong with the import, missing error details. Please check API logs',
         'LNG_PAGE_IMPORT_DATA_ERROR_PROCESSED_DETAILS': 'Processed records: {{processed.no}} / {{processed.total}}, imported: {{imported.success}}, failed: {{imported.failed}}',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_SEE_ERROR_DETAILS': 'See details',
+        'LNG_PAGE_IMPORT_DATA_ERROR_DETAILS_DIALOG_TITLE': 'Error details',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_SEE_RECORD_DATA': 'See data',
+        'LNG_PAGE_IMPORT_DATA_RECORD_DATA_DIALOG_TITLE': 'Record data',
+
+        /**
+         * uiImportResultFields
+         */
+        'LNG_IMPORT_RESULT_FIELD_LABEL_RECORD_NO': 'Record no.',
+        'LNG_IMPORT_RESULT_FIELD_LABEL_ERROR_MESSAGE': 'Error message',
+        'LNG_IMPORT_RESULT_FIELD_LABEL_ERROR_DETAILS': 'Error details',
+        'LNG_IMPORT_RESULT_FIELD_LABEL_ERROR_DATA': 'Record data',
 
         /**
          * uiClustersListPage

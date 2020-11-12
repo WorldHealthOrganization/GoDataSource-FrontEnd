@@ -25,7 +25,7 @@ import {
 import { Observable, Subscriber } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 import { MatDialogRef } from '@angular/material';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { DomSanitizer } from '@angular/platform-browser';
 import { SafeStyle } from '@angular/platform-browser/src/security/dom_sanitization_service';
@@ -34,11 +34,16 @@ import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { LocationModel } from '../../../../core/models/location.model';
-import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
+import { RequestFilterGenerator, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { NgModel } from '@angular/forms';
 import { ImportLogDataService } from '../../../../core/services/data/import-log.data.service';
 import { Constants } from '../../../../core/models/constants';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ImportResultDataService } from '../../../../core/services/data/import-result.data.service';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ImportResultModel } from '../../../../core/models/import-result.model';
 
 export enum ImportServerModelNames {
     CASE_LAB_RESULTS = 'labResult',
@@ -68,6 +73,7 @@ enum ImportServerErrorCodes {
     styleUrls: ['./import-data.component.less']
 })
 export class ImportDataComponent
+    extends ListComponent
     implements OnInit, OnDestroy {
 
     // Extension mapped to mimes
@@ -264,7 +270,7 @@ export class ImportDataComponent
         total: 0
     };
     mappedFieldsVisible: number[] = [];
-    private triggerListRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
+    private triggerImportListRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
         this.filterVisibleData();
     }));
 
@@ -315,6 +321,12 @@ export class ImportDataComponent
 
     // Import is async ?
     @Input() asyncImport: boolean = false;
+    private asyncResponse: IAsyncImportResponse;
+
+    // import results data
+    importResultsList$: Observable<ImportResultModel[]>;
+    importResultsListCount$: Observable<IBasicCount>;
+
 
     // Constants / Classes
     ImportServerErrorCodes = ImportServerErrorCodes;
@@ -599,6 +611,7 @@ export class ImportDataComponent
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private dialogService: DialogService,
@@ -607,8 +620,12 @@ export class ImportDataComponent
         private savedImportMappingService: SavedImportMappingService,
         private domSanitizer: DomSanitizer,
         private locationDataService: LocationDataService,
-        private importLogDataService: ImportLogDataService
+        private importLogDataService: ImportLogDataService,
+        private importResultDataService: ImportResultDataService
     ) {
+        // list parent
+        super(listHelperService);
+
         // fix mime issue - browser not supporting some of the mimes, empty was provided to mime Type which wasn't allowing user to upload teh files
         if (!(FileLikeObject.prototype as any)._createFromObjectPrev) {
             (FileLikeObject.prototype as any)._createFromObjectPrev = FileLikeObject.prototype._createFromObject;
@@ -769,12 +786,26 @@ export class ImportDataComponent
             this.onWindowResizeScope,
             true
         );
+
+        // initialize pagination
+        this.initPaginator();
+
+        // init visible columns
+        this.visibleTableColumns = [
+            'recordNo',
+            'error.message',
+            'error.details',
+            'data'
+        ];
     }
 
     /**
      * Component destroyed
      */
     ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+
         // remove window resize listener
         window.removeEventListener(
             'resize',
@@ -783,9 +814,9 @@ export class ImportDataComponent
         );
 
         // release search logic
-        if (this.triggerListRefresh) {
-            this.triggerListRefresh.unsubscribe();
-            this.triggerListRefresh = null;
+        if (this.triggerImportListRefresh) {
+            this.triggerImportListRefresh.unsubscribe();
+            this.triggerImportListRefresh = null;
         }
     }
 
@@ -1892,14 +1923,12 @@ export class ImportDataComponent
                             // async operation ?
                             if (this.asyncImport) {
                                 // retrieve data
-                                const asyncResponse: IAsyncImportResponse = response;
+                                this.asyncResponse = response;
 
                                 // handler to check status periodically
                                 const checkStatusPeriodically = () => {
                                     this.importLogDataService
-                                        .getImportLog(
-                                            asyncResponse.importLogId
-                                        )
+                                        .getImportLog(this.asyncResponse.importLogId)
                                         .pipe(
                                             catchError((err) => {
                                                 // display error message
@@ -1975,6 +2004,14 @@ export class ImportDataComponent
                                             // display error message
                                             this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
 
+                                            // trigger error list refresh
+                                            if (
+                                                (this.errMsgDetails.details as any).imported &&
+                                                (this.errMsgDetails.details as any).imported.failed > 0
+                                            ) {
+                                                this.needsRefreshList(true);
+                                            }
+
                                             // hide loading
                                             loadingDialog.close();
                                         });
@@ -2011,6 +2048,8 @@ export class ImportDataComponent
         this.locationCacheIndex = {};
         this.importableObject = null;
         this.errMsgDetails = null;
+        this.resetFiltersToSideFilters();
+        this.asyncResponse = null;
         this.uploader.clearQueue();
         this.mappedFieldsVisible = [];
         this.mappedFields = [];
@@ -3132,7 +3171,7 @@ export class ImportDataComponent
         this.filterByDestinationInputValue = this.filterByDestinationInput.value;
 
         // trigger filter refresh
-        this.triggerListRefresh.call();
+        this.triggerImportListRefresh.call();
     }
 
     /**
@@ -3236,5 +3275,155 @@ export class ImportDataComponent
 
         // update visible items count
         this.updateVisibleItemsCount();
+    }
+
+    /**
+     * Re(load) the Events list
+     */
+    refreshList(finishCallback: (records: any[]) => void): void {
+        // do we have import log id, there is no point in continuing otherwise ?
+        if (
+            !this.asyncResponse ||
+            !this.asyncResponse.importLogId
+        ) {
+            return;
+        }
+
+        // retrieve only import results from a specific import
+        this.queryBuilder.filter.byEquality(
+            'importLogId',
+            this.asyncResponse.importLogId,
+            true,
+            false
+        );
+
+        // default sort order ?
+        if (this.queryBuilder.sort.isEmpty()) {
+            this.queryBuilder.sort.by(
+                'recordNo',
+                RequestSortDirection.ASC
+            );
+        }
+
+        // retrieve the list of import results
+        this.importResultsList$ = this.importResultDataService
+            .getImportResultsList(this.queryBuilder)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    finishCallback([]);
+                    return throwError(err);
+                }),
+                tap(this.checkEmptyList.bind(this)),
+                tap((data: any[]) => {
+                    finishCallback(data);
+                })
+            );
+    }
+
+    /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount(): void {
+        // do we have import log id, there is no point in continuing otherwise ?
+        if (
+            !this.asyncResponse ||
+            !this.asyncResponse.importLogId
+        ) {
+            return;
+        }
+
+        // remove paginator from query builder
+        const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+        countQueryBuilder.paginator.clear();
+        countQueryBuilder.sort.clear();
+
+        // retrieve only import results from a specific import
+        countQueryBuilder.filter.byEquality(
+            'importLogId',
+            this.asyncResponse.importLogId,
+            true,
+            false
+        );
+
+        // count
+        this.importResultsListCount$ = this.importResultDataService
+            .getImportResultsCount(countQueryBuilder)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                }),
+                share()
+            );
+    }
+
+    /**
+     * See error details
+     */
+    seeErrorDetails(errJson: any): void {
+        this.dialogService
+            .showConfirm(new DialogConfiguration({
+                message: 'LNG_PAGE_IMPORT_DATA_ERROR_DETAILS_DIALOG_TITLE',
+                additionalInfo: `<code><pre>${JSON.stringify(errJson, null, 1)}</pre></code>`,
+                addDefaultButtons: false,
+                buttons: [
+                    new DialogButton({
+                        label: 'LNG_COMMON_BUTTON_CLOSE',
+                        clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
+                            dialogHandler.close();
+                        }
+                    })
+                ]
+            }))
+            .subscribe();
+    }
+
+    /**
+     * See record data
+     */
+    seeRecordData(
+        file: any,
+        save: any
+    ): void {
+        this.dialogService
+            .showConfirm(new DialogConfiguration({
+                message: 'LNG_PAGE_IMPORT_DATA_RECORD_DATA_DIALOG_TITLE',
+                additionalInfo: this.domSanitizer.bypassSecurityTrustHtml(`
+                    <div style="display: flex; flex-direction: row; box-sizing: border-box; max-height: 300px; padding-bottom: 5px;">
+                        <div style="flex: 1 1 0%; box-sizing: border-box; overflow: auto; font-weight: bold;">
+                            ${this.i18nService.instant('LNG_PAGE_IMPORT_DATA_BUTTON_ERR_RECORD_DETAILS_FILE_TITLE')}
+                        </div>
+                        <div style="display: flex; width: 10px;"></div>
+                        <div style="flex: 1 1 0%; box-sizing: border-box; overflow: auto; font-weight: bold;">
+                            ${this.i18nService.instant('LNG_PAGE_IMPORT_DATA_BUTTON_ERR_RECORD_DETAILS_MODEL_TITLE')}
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: row; box-sizing: border-box; max-height: 300px;">
+                        <div style="flex: 1 1 0%; box-sizing: border-box; overflow: auto;">
+                            <code>
+                                <pre>${JSON.stringify(file, null, 1)}</pre>
+                            </code>
+                        </div>
+                        <div style="display: flex; width: 10px;"></div>
+                        <div style="flex: 1 1 0%; box-sizing: border-box; overflow: auto;">
+                            <code>
+                                <pre>${JSON.stringify(save, null, 1)}</pre>
+                            </code>
+                        </div>
+                    </div>
+                `),
+                maxDialogWidth: '95vw',
+                addDefaultButtons: false,
+                buttons: [
+                    new DialogButton({
+                        label: 'LNG_COMMON_BUTTON_CLOSE',
+                        clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
+                            dialogHandler.close();
+                        }
+                    })
+                ]
+            }))
+            .subscribe();
     }
 }

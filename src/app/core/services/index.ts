@@ -51,6 +51,7 @@ import { ContactsOfContactsDataService } from './data/contacts-of-contacts.data.
 import { CaptchaDataService } from './data/captcha.data.service';
 import { ListHelperService } from './helper/list-helper.service';
 import { ImportLogDataService } from './data/import-log.data.service';
+import { ImportResultDataService } from './data/import-result.data.service';
 
 // export the list of services
 export const services: any[] = [
@@ -95,6 +96,7 @@ export const services: any[] = [
     DeviceDataService,
     CaptchaDataService,
     ImportLogDataService,
+    ImportResultDataService,
 
     // guard services
     AuthGuard,

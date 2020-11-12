@@ -905,8 +905,174 @@
                 </div>
 
                 <!-- Errors -->
-                <div>
-                    Errors table
+                <div
+                    *ngIf="errMsgDetails.details.imported.failed > 0">
+
+                    <!-- Total number of records from the list -->
+                    <app-total-number-of-records
+                        [value]="(importResultsListCount$ | async)?.count">
+                    </app-total-number-of-records>
+
+                    <!-- Errors table -->
+                    <div class="page-section">
+                        <!-- Reset Filters -->
+                        <div class="reset-filters">
+                            <button
+                                type="button"
+                                mat-raised-button
+                                color="accent"
+                                (click)="resetFiltersToSideFilters()">
+                                {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+                            </button>
+                            <button
+                                type="button"
+                                mat-raised-button
+                                color="accent"
+                                (click)="needsRefreshList(true)">
+                                {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+                            </button>
+                        </div>
+
+                        <!-- Error rows data -->
+                        <mat-table
+                            #table
+                            [dataSource]="importResultsList$ | async"
+                            matSort
+                            (matSortChange)="sortBy($event)">
+
+                            <!-- Record No. -->
+                            <ng-container matColumnDef="recordNo">
+                                <mat-header-cell *matHeaderCellDef>
+                                    <div class="table-header-cell">
+                                        <div mat-sort-header class="column-header">
+                                            {{ 'LNG_IMPORT_RESULT_FIELD_LABEL_RECORD_NO' | translate }}
+                                        </div>
+                                        <div class="column-filter">
+                                            <app-form-range
+                                                name="recordNoFilter"
+                                                ngModel
+                                                (changed)="filterByRangeField('recordNo', $event)"
+                                                app-reset-input-on-side-filter
+                                                [min]="1">
+                                            </app-form-range>
+                                        </div>
+                                    </div>
+                                </mat-header-cell>
+                                <mat-cell
+                                    *matCellDef="let item">
+                                    {{ item.recordNo }}
+                                </mat-cell>
+                            </ng-container>
+
+                            <!-- Error message -->
+                            <ng-container matColumnDef="error.message">
+                                <mat-header-cell *matHeaderCellDef>
+                                    <div class="table-header-cell">
+                                        <div mat-sort-header class="column-header">
+                                            {{'LNG_IMPORT_RESULT_FIELD_LABEL_ERROR_MESSAGE' | translate}}
+                                        </div>
+                                        <div class="column-filter">
+                                            <app-form-input
+                                                name="errorMessageFilter"
+                                                ngModel
+                                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                                                (optionChanged)="filterByTextContainingField('error.message', $event, true)"
+                                                app-reset-input-on-side-filter
+                                                [displayFilterIcon]="true">
+                                            </app-form-input>
+                                        </div>
+                                    </div>
+                                </mat-header-cell>
+
+                                <mat-cell *matCellDef="let item">
+                                    {{ item.error && item.error.message ? item.error.message : '-' }}
+                                </mat-cell>
+                            </ng-container>
+
+                            <!-- See error details message -->
+                            <ng-container matColumnDef="error.details">
+                                <mat-header-cell *matHeaderCellDef>
+                                    <div class="table-header-cell">
+                                        <div class="column-header">
+                                            {{'LNG_IMPORT_RESULT_FIELD_LABEL_ERROR_DETAILS' | translate}}
+                                        </div>
+                                        <div class="column-filter">
+                                            <!-- placeholder -->
+                                        </div>
+                                    </div>
+                                </mat-header-cell>
+
+                                <mat-cell *matCellDef="let item">
+                                    <ng-container
+                                        *ngIf="item.error && item.error.details">
+                                        <button
+                                            mat-raised-button
+                                            color="accent"
+                                            type="button"
+                                            (click)="seeErrorDetails(item.error.details)">
+                                            {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_SEE_ERROR_DETAILS' | translate }}
+                                        </button>
+                                    </ng-container>
+                                </mat-cell>
+                            </ng-container>
+
+                            <!-- See data -->
+                            <ng-container matColumnDef="data">
+                                <mat-header-cell *matHeaderCellDef>
+                                    <div class="table-header-cell">
+                                        <div class="column-header">
+                                            {{'LNG_IMPORT_RESULT_FIELD_LABEL_ERROR_DATA' | translate}}
+                                        </div>
+                                        <div class="column-filter">
+                                            <!-- placeholder -->
+                                        </div>
+                                    </div>
+                                </mat-header-cell>
+
+                                <mat-cell *matCellDef="let item">
+                                    <ng-container
+                                        *ngIf="item.data && item.data.file && item.data.save">
+                                        <button
+                                            mat-raised-button
+                                            color="accent"
+                                            type="button"
+                                            (click)="seeRecordData(item.data.file, item.data.save)">
+                                            {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_SEE_RECORD_DATA' | translate }}
+                                        </button>
+                                    </ng-container>
+                                </mat-cell>
+                            </ng-container>
+
+                            <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
+                            <mat-row
+                                *matRowDef="let item; columns: visibleTableColumns">
+                            </mat-row>
+                        </mat-table>
+
+                        <div
+                            *ngIf="refreshingList"
+                            class="mat-table-loading-data">
+                            <mat-spinner></mat-spinner>
+                        </div>
+
+                        <div
+                            *ngIf="!refreshingList && isEmptyList"
+                            class="mat-table">
+                            <div class="mat-row">
+                                <div class="mat-cell">
+                                    {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+                                </div>
+                            </div>
+                        </div>
+
+                        <mat-paginator
+                            [length]="(importResultsListCount$ | async)?.count"
+                            [pageSize]="pageSize"
+                            [pageSizeOptions]="pageSizeOptions"
+                            (page)="changePage($event)">
+                        </mat-paginator>
+
+                    </div>
                 </div>
 
             </ng-template>

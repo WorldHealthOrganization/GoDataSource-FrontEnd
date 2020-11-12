@@ -253,6 +253,7 @@ export class DialogConfiguration {
     public required: boolean = false;
     public buttons: DialogButton[];
     public addDefaultButtons: boolean = false;
+    public maxDialogWidth: string;
 
     // define fields
     private _fieldsList: DialogField[];
@@ -295,7 +296,8 @@ export class DialogConfiguration {
         buttons?: DialogButton[],
         addDefaultButtons?: boolean,
         yesCssClass?: string,
-        cancelCssClass?: string
+        cancelCssClass?: string,
+        maxDialogWidth?: string
     }) {
         // assign properties
         if (_.isString(data)) {
@@ -379,6 +381,14 @@ export class DialogComponent implements OnDestroy {
             configs.data = new DialogConfiguration(data as string);
         } else {
             configs.data = data as DialogConfiguration;
+        }
+
+        // change max width ?
+        if (
+            data instanceof DialogConfiguration &&
+            data.maxDialogWidth
+        ) {
+            configs.maxWidth = data.maxDialogWidth;
         }
 
         // finished

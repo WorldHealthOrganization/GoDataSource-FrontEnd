@@ -33,18 +33,31 @@ export class RequestFilterGenerator {
     /**
      * Text contains the provided value ( case insensitive )
      * @param value
+     * @param useLike
      */
-    static textContains(value: string): any {
-        return {
-            regexp: '/' +
-                RequestFilterGenerator.escapeStringForRegex(value)
-                    .replace(/%/g, '.*')
-                    .replace(/\\\?/g, '.')
-                    .replace(/&/g, '%26')
-                    .replace(/#/g, '%23')
-                    .replace(/\+/g, '%2B') +
-                '/i'
-        };
+    static textContains(
+        value: string,
+        useLike?: boolean
+    ): any {
+        return useLike ?
+            {
+                like: RequestFilterGenerator.escapeStringForRegex(value)
+                        .replace(/%/g, '.*')
+                        .replace(/\\\?/g, '.')
+                        .replace(/&/g, '%26')
+                        .replace(/#/g, '%23')
+                        .replace(/\+/g, '%2B'),
+                options: 'i'
+            } : {
+                regexp: '/' +
+                    RequestFilterGenerator.escapeStringForRegex(value)
+                        .replace(/%/g, '.*')
+                        .replace(/\\\?/g, '.')
+                        .replace(/&/g, '%26')
+                        .replace(/#/g, '%23')
+                        .replace(/\+/g, '%2B') +
+                    '/i'
+            };
     }
 
     /**

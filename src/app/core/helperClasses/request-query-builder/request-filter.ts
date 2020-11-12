@@ -159,20 +159,25 @@ export class RequestFilter {
      * @param {string} property
      * @param {string} value
      * @param {boolean} replace
+     * @param {boolean} useLike
      * @returns {RequestFilter}
      */
     byContainingText(
         property: string,
         value: string,
-        replace: boolean = true
+        replace: boolean = true,
+        useLike?: boolean
     ) {
         // do we need to remove condition ?
         if (_.isEmpty(value)) {
             this.remove(property);
         } else {
-            // filter with 'startsWith' criteria
+            // filter with 'contain' criteria
             this.where({
-                [property]: RequestFilterGenerator.textContains(value)
+                [property]: RequestFilterGenerator.textContains(
+                    value,
+                    useLike
+                )
             }, replace);
         }
         return this;
