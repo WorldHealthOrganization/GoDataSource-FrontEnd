@@ -38,6 +38,7 @@ import { RequestFilterGenerator } from '../../../../core/helperClasses/request-q
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { NgModel } from '@angular/forms';
 import { ImportLogDataService } from '../../../../core/services/data/import-log.data.service';
+import { Constants } from '../../../../core/models/constants';
 
 export enum ImportServerModelNames {
     CASE_LAB_RESULTS = 'labResult',
@@ -299,6 +300,16 @@ export class ImportDataComponent
                     }
                 }
             }[]
+        } | {
+            processed: {
+                no: string,
+                total: string
+            },
+            imported: {
+                model: string,
+                success: string,
+                failed: string
+            }
         }
     };
 
@@ -1913,24 +1924,59 @@ export class ImportDataComponent
                                                 }
                                             );
 
-                                            // done / error / anything why we should stop and redirect ?
-                                            // #TODO
-                                            // display success
-                                            // this.snackbarService.showSuccess(
-                                            //     this.importSuccessMessage,
-                                            //     this.translationData
-                                            // );
-                                            //
-                                            // // hide loading
-                                            // loadingDialog.close();
-                                            //
-                                            // // emit finished event - event should handle redirect
-                                            // this.finished.emit();
+                                            // check if we still need to wait for data to be processed
+                                            if (importLogModel.status === Constants.SYSTEM_SYNC_LOG_STATUS.IN_PROGRESS.value) {
+                                                // wait
+                                                setTimeout(() => {
+                                                    checkStatusPeriodically();
+                                                }, 3000);
 
-                                            // otherwise update status later
-                                            setTimeout(() => {
-                                                checkStatusPeriodically();
-                                            }, 3000);
+                                                // finished
+                                                return;
+                                            }
+
+                                            // finished everything with success ?
+                                            if (importLogModel.status === Constants.SYSTEM_SYNC_LOG_STATUS.SUCCESS.value) {
+                                                // display success
+                                                this.snackbarService.showSuccess(
+                                                    this.importSuccessMessage,
+                                                    this.translationData
+                                                );
+
+                                                // hide loading
+                                                loadingDialog.close();
+
+                                                // emit finished event - event should handle redirect
+                                                this.finished.emit();
+
+                                                // finished
+                                                return;
+                                            }
+
+                                            // some or all records failed to be imported
+                                            // importLogModel.status === Constants.SYSTEM_SYNC_LOG_STATUS.FAILED.value ||
+                                            // importLogModel.status === Constants.SYSTEM_SYNC_LOG_STATUS.SUCCESS_WITH_WARNINGS.value
+                                            this.errMsgDetails = {
+                                                details: {
+                                                    processed: {
+                                                        no: importLogModel.totalNo ? importLogModel.totalNo.toLocaleString('en') : '0',
+                                                        total: importLogModel.totalNo ? importLogModel.totalNo.toLocaleString('en') : '0'
+                                                    },
+                                                    imported: importLogModel.result && importLogModel.result.details ?
+                                                        {
+                                                            model: importLogModel.result.details.model,
+                                                            success: importLogModel.result.details.success ? importLogModel.result.details.success.toLocaleString('en') : '0',
+                                                            failed: importLogModel.result.details.failed ? importLogModel.result.details.failed.toLocaleString('en') : '0'
+                                                        } :
+                                                        null
+                                                }
+                                            };
+
+                                            // display error message
+                                            this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
+
+                                            // hide loading
+                                            loadingDialog.close();
                                         });
                                 };
 

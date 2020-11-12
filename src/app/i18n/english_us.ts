@@ -110,6 +110,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_IMPORTING_PREPARE': 'Preparing data',
         'LNG_PAGE_IMPORT_DATA_IMPORTING_START_IMPORT': 'Starting import',
         'LNG_PAGE_IMPORT_DATA_IMPORTING_IMPORT_STATUS': 'Processed {{processed}} / {{total}} (failed: {{failed}})',
+        'LNG_PAGE_IMPORT_DATA_ERROR_MISSING_ERROR_DETAILS': 'Something went wrong with the import, missing error details. Please check API logs',
+        'LNG_PAGE_IMPORT_DATA_ERROR_PROCESSED_DETAILS': 'Processed records: {{processed.no}} / {{processed.total}}, imported: {{imported.success}}, failed: {{imported.failed}}',
 
         /**
          * uiClustersListPage

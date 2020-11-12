@@ -790,36 +790,41 @@
     </div>
 
     <!-- Import failed errors -->
-    <div
-        *ngIf="!asyncImport && !displayLoading && importableObject && errMsgDetails"
-        fxLayout="column" fxLayoutGap="10px"
-        class="import-data-errors">
-        <div>
-            {{ 'LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED' | translate }}
-        </div>
+    <ng-container
+        *ngIf="!displayLoading && importableObject && errMsgDetails">
+
+        <!-- Old way of displaying errors -->
+        <!-- #TODO to be removed once the new way is implemented for all import models -->
         <div
-            *ngFor="let err of errMsgDetails.details && errMsgDetails.details.failed ? errMsgDetails.details.failed : []"
-            class="import-data-errors-err"
-            fxLayout="column">
+            *ngIf="!asyncImport; else asyncImportErrors"
+            fxLayout="column" fxLayoutGap="10px"
+            class="import-data-errors">
+            <div>
+                {{ 'LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED' | translate }}
+            </div>
             <div
-                fxLayout="row" fxLayoutGap="10px">
-                <!-- More details -->
+                *ngFor="let err of errMsgDetails.details && errMsgDetails.details.failed ? errMsgDetails.details.failed : []"
+                class="import-data-errors-err"
+                fxLayout="column">
                 <div
-                    *ngIf="err.data?.file"
-                    fxGrow="0">
+                    fxLayout="row" fxLayoutGap="10px">
+                    <!-- More details -->
+                    <div
+                        *ngIf="err.data?.file"
+                        fxGrow="0">
 
-                    <!-- Hide / Show details -->
-                    <button
-                        mat-raised-button color="accent"
-                        (click)="err.showData = !err.showData">
-                        {{ (err.showData ? 'LNG_PAGE_IMPORT_DATA_BUTTON_HIDE_ERR_RECORD_DETAILS' : 'LNG_PAGE_IMPORT_DATA_BUTTON_SHOW_ERR_RECORD_DETAILS') | translate }}
-                    </button>
-                </div>
+                        <!-- Hide / Show details -->
+                        <button
+                            mat-raised-button color="accent"
+                            (click)="err.showData = !err.showData">
+                            {{ (err.showData ? 'LNG_PAGE_IMPORT_DATA_BUTTON_HIDE_ERR_RECORD_DETAILS' : 'LNG_PAGE_IMPORT_DATA_BUTTON_SHOW_ERR_RECORD_DETAILS') | translate }}
+                        </button>
+                    </div>
 
-                <!-- Errors -->
-                <div
-                    [ngSwitch]="err.error?.code"
-                    fxLayoutAlign="start center">
+                    <!-- Errors -->
+                    <div
+                        [ngSwitch]="err.error?.code"
+                        fxLayoutAlign="start center">
                     <span *ngSwitchCase="ImportServerErrorCodes.DUPLICATE_RECORD">
                         {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED_DUPLICATE' | translate:{ recordNo: err.recordNo } }}
                     </span>
@@ -838,45 +843,77 @@
                         <span *ngSwitchDefault>
                         {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED_GENERAL' | translate:{ recordNo: err.recordNo, message: err.error ? ( err.error.errmsg ? ( 'LNG_API_ERROR_CODE_UNKNOWN_ERROR' | translate ) : err.error.message ) : err.message } }}
                     </span>
-                </div>
-            </div>
-            <div
-                *ngIf="err.data?.file && err.showData"
-                class="import-data-errors-err-view-record-details">
-                <div
-                    fxLayout="row" fxLayoutGap="20px">
-                    <div
-                        fxFlex
-                        class="import-data-errors-err-view-record-details-code">
-                        <div
-                            class="view-record-details-code-title">
-                            {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_ERR_RECORD_DETAILS_FILE_TITLE' | translate }}
-                        </div>
-                        <div
-                            class="view-record-details-code-data">
-                            <code>
-                                <pre>{{ err.data?.file | json }}</pre>
-                            </code>
-                        </div>
                     </div>
+                </div>
+                <div
+                    *ngIf="err.data?.file && err.showData"
+                    class="import-data-errors-err-view-record-details">
                     <div
-                        *ngIf="err.data?.save"
-                        fxFlex
-                        class="import-data-errors-err-view-record-details-code">
+                        fxLayout="row" fxLayoutGap="20px">
                         <div
-                            class="view-record-details-code-title">
-                            {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_ERR_RECORD_DETAILS_MODEL_TITLE' | translate }}
+                            fxFlex
+                            class="import-data-errors-err-view-record-details-code">
+                            <div
+                                class="view-record-details-code-title">
+                                {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_ERR_RECORD_DETAILS_FILE_TITLE' | translate }}
+                            </div>
+                            <div
+                                class="view-record-details-code-data">
+                                <code>
+                                    <pre>{{ err.data?.file | json }}</pre>
+                                </code>
+                            </div>
                         </div>
                         <div
-                            class="view-record-details-code-data">
-                            <code>
-                                <pre>{{ err.data?.save | json }}</pre>
-                            </code>
+                            *ngIf="err.data?.save"
+                            fxFlex
+                            class="import-data-errors-err-view-record-details-code">
+                            <div
+                                class="view-record-details-code-title">
+                                {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_ERR_RECORD_DETAILS_MODEL_TITLE' | translate }}
+                            </div>
+                            <div
+                                class="view-record-details-code-data">
+                                <code>
+                                    <pre>{{ err.data?.save | json }}</pre>
+                                </code>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- New way of displaying data -->
+        <!-- #TODO to be removed once we will display on a different page the imports that are in progress alongo with a different page for failed records that were imported -->
+        <ng-template
+                #asyncImportErrors>
+            <!-- No extra details -->
+            <div
+                *ngIf="!errMsgDetails.details || !errMsgDetails.details.imported; else asyncHaveDetails">
+                {{ 'LNG_PAGE_IMPORT_DATA_ERROR_MISSING_ERROR_DETAILS' | translate }}
+            </div>
+
+            <!-- Error details -->
+            <ng-template
+                #asyncHaveDetails>
+
+                <!-- Records processed, imported & failed information -->
+                <div
+                    class="import-data-errors-details">
+                    {{ 'LNG_PAGE_IMPORT_DATA_ERROR_PROCESSED_DETAILS' | translate: errMsgDetails.details }}
+                </div>
+
+                <!-- Errors -->
+                <div>
+                    Errors table
+                </div>
+
+            </ng-template>
+        </ng-template>
+
+        <!-- Try again button -->
+        <!-- #TODO - to be removed since this one is kinda useless -->
         <div fxLayout="row" fxLayoutAlign="end">
             <button
                 mat-raised-button
@@ -886,5 +923,5 @@
                 {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_TRY_AGAIN' | translate }}
             </button>
         </div>
-    </div>
+    </ng-container>
 </mat-card>

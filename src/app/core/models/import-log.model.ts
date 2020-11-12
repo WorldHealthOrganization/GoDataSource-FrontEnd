@@ -8,11 +8,13 @@ export class ImportLogModel
     implements
         IPermissionBasic {
     resourceType: string;
+    status: string;
     totalNo: number;
     processedNo: number;
     result: {
         code: string,
         details: {
+            model: string,
             success: number,
             failed: number
         }
@@ -35,7 +37,9 @@ export class ImportLogModel
     constructor(data = null) {
         super(data);
 
+        // import data
         this.resourceType = _.get(data, 'resourceType');
+        this.status = _.get(data, 'status');
         this.totalNo = _.get(data, 'totalNo');
         this.processedNo = _.get(data, 'processedNo');
         this.result = _.get(data, 'result');
