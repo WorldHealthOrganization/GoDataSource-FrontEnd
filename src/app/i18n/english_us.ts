@@ -104,7 +104,26 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_ROWS': 'Invalid records: {{rows}}',
         'LNG_PAGE_IMPORT_DATA_ERROR_MUST_FIX_DUPLICATE_BEFORE_ADD': 'Please fix "duplicate" issue before adding new sub-options',
         'LNG_PAGE_IMPORT_DATA_LOAD_SAVED_MAPPING_CONFIRMATION': 'Are you sure you want to load "{{name}}"? It might take a while...',
-        'LNG_PAGE_IMPORT_DATA_MIGHT_TAKE_SOME_TIME_MSG': 'Please be patient, it might take a couple of minutes to process data',
+        'LNG_PAGE_IMPORT_DATA_MIGHT_TAKE_SOME_TIME_MSG': 'The file was successfully uploaded. Please be patient, it might take a couple of minutes to process data',
+        'LNG_PAGE_IMPORT_DATA_VISIBLE_ITEMS_MSG': 'Rows {{no}}/{{total}}',
+        'LNG_PAGE_IMPORT_DATA_IMPORTING_VALIDATING': 'Validate data',
+        'LNG_PAGE_IMPORT_DATA_IMPORTING_PREPARE': 'Preparing data',
+        'LNG_PAGE_IMPORT_DATA_IMPORTING_START_IMPORT': 'Starting import',
+        'LNG_PAGE_IMPORT_DATA_IMPORTING_IMPORT_STATUS': 'Processed {{processed}} / {{total}} (failed: {{failed}})',
+        'LNG_PAGE_IMPORT_DATA_ERROR_MISSING_ERROR_DETAILS': 'Something went wrong with the import, missing error details. Please check API logs',
+        'LNG_PAGE_IMPORT_DATA_ERROR_PROCESSED_DETAILS': 'Processed records: {{processed.no}} / {{processed.total}}, imported: {{imported.success}}, failed: {{imported.failed}}',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_SEE_ERROR_DETAILS': 'See details',
+        'LNG_PAGE_IMPORT_DATA_ERROR_DETAILS_DIALOG_TITLE': 'Error details',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_SEE_RECORD_DATA': 'See data',
+        'LNG_PAGE_IMPORT_DATA_RECORD_DATA_DIALOG_TITLE': 'Record data',
+
+        /**
+         * uiImportResultFields
+         */
+        'LNG_IMPORT_RESULT_FIELD_LABEL_RECORD_NO': 'Record no.',
+        'LNG_IMPORT_RESULT_FIELD_LABEL_ERROR_MESSAGE': 'Error message',
+        'LNG_IMPORT_RESULT_FIELD_LABEL_ERROR_DETAILS': 'Error details',
+        'LNG_IMPORT_RESULT_FIELD_LABEL_ERROR_DATA': 'Record data',
 
         /**
          * uiClustersListPage

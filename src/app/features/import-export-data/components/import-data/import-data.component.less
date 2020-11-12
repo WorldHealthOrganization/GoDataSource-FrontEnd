@@ -251,11 +251,29 @@ app-import-data {
                         max-height: 400px;
 
                         pre {
-                            margin: 0px;
+                            margin: 0;
                         }
                     }
                 }
             }
         }
+    }
+
+    app-total-number-of-records {
+        .total-number-container {
+            padding-left: 15px;
+        }
+    }
+
+    .import-data-errors-details {
+        font-weight: bold;
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .cdk-column-recordNo,
+    .cdk-column-error-details,
+    .cdk-column-data {
+        flex: 0 0 100px;
     }
 }

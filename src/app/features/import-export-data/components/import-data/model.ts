@@ -45,6 +45,9 @@ export interface IImportableFileDistinctValues {
     };
 }
 
+export interface IAsyncImportResponse {
+    importLogId: string;
+}
 
 export class ImportableFileModel {
     // file id

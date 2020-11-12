@@ -3,7 +3,7 @@ import { FileItem, FileLikeObject, FileUploader } from 'ng2-file-upload';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { environment } from '../../../../../environments/environment';
-import { IMappedOption, IModelArrayProperties, ImportableFileModel, ImportableFilePropertiesModel, ImportableFilePropertyValuesModel, ImportableLabelValuePair, ImportableMapField, ImportDataExtension } from './model';
+import { IAsyncImportResponse, IMappedOption, IModelArrayProperties, ImportableFileModel, ImportableFilePropertiesModel, ImportableFilePropertyValuesModel, ImportableLabelValuePair, ImportableMapField, ImportDataExtension } from './model';
 import * as _ from 'lodash';
 import { DialogAnswer, DialogAnswerButton, HoverRowAction, LoadingDialogModel } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -22,10 +22,10 @@ import {
     SavedImportField, SavedImportMappingModel,
     SavedImportOption
 } from '../../../../core/models/saved-import-mapping.model';
-import { Observable } from 'rxjs';
+import { Observable, Subscriber } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 import { MatDialogRef } from '@angular/material';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { DomSanitizer } from '@angular/platform-browser';
 import { SafeStyle } from '@angular/platform-browser/src/security/dom_sanitization_service';
@@ -34,7 +34,16 @@ import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { LocationModel } from '../../../../core/models/location.model';
-import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
+import { RequestFilterGenerator, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
+import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
+import { NgModel } from '@angular/forms';
+import { ImportLogDataService } from '../../../../core/services/data/import-log.data.service';
+import { Constants } from '../../../../core/models/constants';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ImportResultDataService } from '../../../../core/services/data/import-result.data.service';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ImportResultModel } from '../../../../core/models/import-result.model';
 
 export enum ImportServerModelNames {
     CASE_LAB_RESULTS = 'labResult',
@@ -64,6 +73,7 @@ enum ImportServerErrorCodes {
     styleUrls: ['./import-data.component.less']
 })
 export class ImportDataComponent
+    extends ListComponent
     implements OnInit, OnDestroy {
 
     // Extension mapped to mimes
@@ -245,6 +255,25 @@ export class ImportDataComponent
     // Source / Destination level value
     possibleSourceDestinationLevels: LabelValuePair[];
 
+    // search filters
+    @ViewChild('filterBySourceInput') filterBySourceInput: NgModel;
+    filterBySourceInputValue: string = '';
+    @ViewChild('filterByDestinationInput') filterByDestinationInput: NgModel;
+    filterByDestinationInputValue: string = '';
+
+    // visible columns handler
+    visibleItemsMsg: {
+        no: number,
+        total: number
+    } = {
+        no: 0,
+        total: 0
+    };
+    mappedFieldsVisible: number[] = [];
+    private triggerImportListRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
+        this.filterVisibleData();
+    }));
+
     // Mapped fields
     mappedFields: ImportableMapField[] = [];
 
@@ -277,8 +306,27 @@ export class ImportDataComponent
                     }
                 }
             }[]
+        } | {
+            processed: {
+                no: string,
+                total: string
+            },
+            imported: {
+                model: string,
+                success: string,
+                failed: string
+            }
         }
     };
+
+    // Import is async ?
+    @Input() asyncImport: boolean = false;
+    private asyncResponse: IAsyncImportResponse;
+
+    // import results data
+    importResultsList$: Observable<ImportResultModel[]>;
+    importResultsListCount$: Observable<IBasicCount>;
+
 
     // Constants / Classes
     ImportServerErrorCodes = ImportServerErrorCodes;
@@ -563,6 +611,7 @@ export class ImportDataComponent
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private dialogService: DialogService,
@@ -570,8 +619,13 @@ export class ImportDataComponent
         private importExportDataService: ImportExportDataService,
         private savedImportMappingService: SavedImportMappingService,
         private domSanitizer: DomSanitizer,
-        private locationDataService: LocationDataService
+        private locationDataService: LocationDataService,
+        private importLogDataService: ImportLogDataService,
+        private importResultDataService: ImportResultDataService
     ) {
+        // list parent
+        super(listHelperService);
+
         // fix mime issue - browser not supporting some of the mimes, empty was provided to mime Type which wasn't allowing user to upload teh files
         if (!(FileLikeObject.prototype as any)._createFromObjectPrev) {
             (FileLikeObject.prototype as any)._createFromObjectPrev = FileLikeObject.prototype._createFromObject;
@@ -732,18 +786,38 @@ export class ImportDataComponent
             this.onWindowResizeScope,
             true
         );
+
+        // initialize pagination
+        this.initPaginator();
+
+        // init visible columns
+        this.visibleTableColumns = [
+            'recordNo',
+            'error.message',
+            'error.details',
+            'data'
+        ];
     }
 
     /**
      * Component destroyed
      */
     ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+
         // remove window resize listener
         window.removeEventListener(
             'resize',
             this.onWindowResizeScope,
             true
         );
+
+        // release search logic
+        if (this.triggerImportListRefresh) {
+            this.triggerImportListRefresh.unsubscribe();
+            this.triggerImportListRefresh = null;
+        }
     }
 
     /**
@@ -1207,6 +1281,9 @@ export class ImportDataComponent
             this.mappedFields.push(importableItem);
         });
 
+        // rerender list of visible items
+        this.makeAllFieldsVisible();
+
         // display form
         this._displayLoading = false;
         this._displayLoadingLocked = false;
@@ -1573,10 +1650,14 @@ export class ImportDataComponent
                         // wait for message to be displayed
                         setTimeout(() => {
                             // clear map data
+                            this.mappedFieldsVisible = [];
                             this.mappedFields = [];
                             this.distinctValuesCache = {};
                             this.locationCache = {};
                             this.locationCacheIndex = {};
+
+                            // update visible items count
+                            this.updateVisibleItemsCount();
 
                             // map fields
                             const mapOfRequiredDestinationFields = this.requiredDestinationFieldsMap ? _.clone(this.requiredDestinationFieldsMap) : {};
@@ -1618,6 +1699,9 @@ export class ImportDataComponent
                                 // add to list
                                 this.mappedFields.push(importableItem);
                             });
+
+                            // rerender list of visible items
+                            this.makeAllFieldsVisible();
 
                             // go through process of mapping sub options accordingly to what was saved
                             // this method will hide the loading dialog too
@@ -1711,7 +1795,8 @@ export class ImportDataComponent
         }
 
         // display loading
-        const loadingDialog = this.dialogService.showLoadingDialog();
+        const loadingDialog = this.createPrepareMapDataLoadingDialog();
+        loadingDialog.showMessage('LNG_PAGE_IMPORT_DATA_IMPORTING_VALIDATING');
 
         // validate items & import data
         setTimeout(() => {
@@ -1754,93 +1839,202 @@ export class ImportDataComponent
                 return;
             }
 
-            // construct import JSON
-            const importJSON = {
-                fileId: this.importableObject.id,
-                map: {},
-                valuesMap: {}
-            };
+            // mapping data
+            loadingDialog.showMessage('LNG_PAGE_IMPORT_DATA_IMPORTING_PREPARE');
+            setTimeout(() => {
+                // construct import JSON
+                const importJSON = {
+                    fileId: this.importableObject.id,
+                    map: {},
+                    valuesMap: {}
+                };
 
-            // convert import data to what API is expecting
-            this.mappedFields.forEach((field) => {
-                // forge the almighty source & destination
-                let source: string = field.sourceField;
-                let destination: string = field.destinationField;
+                // convert import data to what API is expecting
+                this.mappedFields.forEach((field) => {
+                    // forge the almighty source & destination
+                    let source: string = field.sourceField;
+                    let destination: string = field.destinationField;
 
-                // add indexes to source arrays
-                source = this.addIndexesToArrays(
-                    source,
-                    field.getSourceDestinationLevels()
-                );
-
-                // add indexes to destination arrays
-                destination = this.addIndexesToArrays(
-                    destination,
-                    field.getSourceDestinationLevels()
-                );
-
-                // map main properties
-                importJSON.map[source] = destination;
-
-                // map field options
-                if (
-                    field.mappedOptions &&
-                    field.mappedOptions.length > 0
-                ) {
-                    // here we don't need to add indexes, so we keep the arrays just as they are
-                    // also, we need to merge value Maps with the previous ones
-                    const properSource = field.sourceFieldWithoutIndexes;
-                    if (!importJSON.valuesMap[properSource]) {
-                        importJSON.valuesMap[properSource] = {};
-                    }
-
-                    // add options
-                    field.mappedOptions.forEach((option) => {
-                        importJSON.valuesMap[properSource][option.sourceOption] = option.destinationOption;
-                    });
-                }
-            });
-
-            // import data
-            // #TODO - check periodically where we are ( n rows from total )
-            this.importExportDataService
-                .importData(
-                    this.importDataUrl,
-                    importJSON
-                )
-                .pipe(
-                    catchError((err) => {
-                        // display error message
-                        if (err.code === 'IMPORT_PARTIAL_SUCCESS') {
-                            // construct custom message
-                            this.errMsgDetails = err;
-
-                            // display error
-                            this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
-                        } else {
-                            this.snackbarService.showApiError(err);
-                        }
-
-                        // hide loading
-                        loadingDialog.close();
-
-                        // propagate err
-                        return throwError(err);
-                    })
-                )
-                .subscribe(() => {
-                    // display success
-                    this.snackbarService.showSuccess(
-                        this.importSuccessMessage,
-                        this.translationData
+                    // add indexes to source arrays
+                    source = this.addIndexesToArrays(
+                        source,
+                        field.getSourceDestinationLevels()
                     );
 
-                    // hide loading
-                    loadingDialog.close();
+                    // add indexes to destination arrays
+                    destination = this.addIndexesToArrays(
+                        destination,
+                        field.getSourceDestinationLevels()
+                    );
 
-                    // emit finished event - event should handle redirect
-                    this.finished.emit();
+                    // map main properties
+                    importJSON.map[source] = destination;
+
+                    // map field options
+                    if (
+                        field.mappedOptions &&
+                        field.mappedOptions.length > 0
+                    ) {
+                        // here we don't need to add indexes, so we keep the arrays just as they are
+                        // also, we need to merge value Maps with the previous ones
+                        const properSource = field.sourceField.replace(/\[\d+\]/g, '[]');
+                        if (!importJSON.valuesMap[properSource]) {
+                            importJSON.valuesMap[properSource] = {};
+                        }
+
+                        // add options
+                        field.mappedOptions.forEach((option) => {
+                            importJSON.valuesMap[properSource][option.sourceOption] = option.destinationOption;
+                        });
+                    }
                 });
+
+                // start import
+                loadingDialog.showMessage('LNG_PAGE_IMPORT_DATA_IMPORTING_START_IMPORT');
+
+                // import data
+                setTimeout(() => {
+                    this.importExportDataService
+                        .importData(
+                            this.importDataUrl,
+                            importJSON
+                        )
+                        .pipe(
+                            catchError((err) => {
+                                // display error message
+                                if (err.code === 'IMPORT_PARTIAL_SUCCESS') {
+                                    // construct custom message
+                                    this.errMsgDetails = err;
+
+                                    // display error
+                                    this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
+                                } else {
+                                    this.snackbarService.showApiError(err);
+                                }
+
+                                // hide loading
+                                loadingDialog.close();
+
+                                // propagate err
+                                return throwError(err);
+                            })
+                        )
+                        .subscribe((response) => {
+                            // async operation ?
+                            if (this.asyncImport) {
+                                // retrieve data
+                                this.asyncResponse = response;
+
+                                // handler to check status periodically
+                                const checkStatusPeriodically = () => {
+                                    this.importLogDataService
+                                        .getImportLog(this.asyncResponse.importLogId)
+                                        .pipe(
+                                            catchError((err) => {
+                                                // display error message
+                                                this.snackbarService.showApiError(err);
+
+                                                // hide loading
+                                                loadingDialog.close();
+
+                                                // propagate err
+                                                return throwError(err);
+                                            })
+                                        )
+                                        .subscribe((importLogModel) => {
+                                            // update dialog message
+                                            loadingDialog.showMessage(
+                                                'LNG_PAGE_IMPORT_DATA_IMPORTING_IMPORT_STATUS', {
+                                                    processed: importLogModel.processedNo.toLocaleString('en'),
+                                                    total: importLogModel.totalNo.toLocaleString('en'),
+                                                    failed: importLogModel.result && importLogModel.result.details && importLogModel.result.details.failed ?
+                                                        importLogModel.result.details.failed.toLocaleString('en') :
+                                                        '0'
+                                                }
+                                            );
+
+                                            // check if we still need to wait for data to be processed
+                                            if (importLogModel.status === Constants.SYSTEM_SYNC_LOG_STATUS.IN_PROGRESS.value) {
+                                                // wait
+                                                setTimeout(() => {
+                                                    checkStatusPeriodically();
+                                                }, 3000);
+
+                                                // finished
+                                                return;
+                                            }
+
+                                            // finished everything with success ?
+                                            if (importLogModel.status === Constants.SYSTEM_SYNC_LOG_STATUS.SUCCESS.value) {
+                                                // display success
+                                                this.snackbarService.showSuccess(
+                                                    this.importSuccessMessage,
+                                                    this.translationData
+                                                );
+
+                                                // hide loading
+                                                loadingDialog.close();
+
+                                                // emit finished event - event should handle redirect
+                                                this.finished.emit();
+
+                                                // finished
+                                                return;
+                                            }
+
+                                            // some or all records failed to be imported
+                                            // importLogModel.status === Constants.SYSTEM_SYNC_LOG_STATUS.FAILED.value ||
+                                            // importLogModel.status === Constants.SYSTEM_SYNC_LOG_STATUS.SUCCESS_WITH_WARNINGS.value
+                                            this.errMsgDetails = {
+                                                details: {
+                                                    processed: {
+                                                        no: importLogModel.totalNo ? importLogModel.totalNo.toLocaleString('en') : '0',
+                                                        total: importLogModel.totalNo ? importLogModel.totalNo.toLocaleString('en') : '0'
+                                                    },
+                                                    imported: importLogModel.result && importLogModel.result.details ?
+                                                        {
+                                                            model: importLogModel.result.details.model,
+                                                            success: importLogModel.result.details.success ? importLogModel.result.details.success.toLocaleString('en') : '0',
+                                                            failed: importLogModel.result.details.failed ? importLogModel.result.details.failed.toLocaleString('en') : '0'
+                                                        } :
+                                                        null
+                                                }
+                                            };
+
+                                            // display error message
+                                            this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
+
+                                            // trigger error list refresh
+                                            if (
+                                                (this.errMsgDetails.details as any).imported &&
+                                                (this.errMsgDetails.details as any).imported.failed > 0
+                                            ) {
+                                                this.needsRefreshList(true);
+                                            }
+
+                                            // hide loading
+                                            loadingDialog.close();
+                                        });
+                                };
+
+                                // update status periodically
+                                checkStatusPeriodically();
+                            } else {
+                                // display success
+                                this.snackbarService.showSuccess(
+                                    this.importSuccessMessage,
+                                    this.translationData
+                                );
+
+                                // hide loading
+                                loadingDialog.close();
+
+                                // emit finished event - event should handle redirect
+                                this.finished.emit();
+                            }
+                        });
+                });
+            });
         });
     }
 
@@ -1854,10 +2048,16 @@ export class ImportDataComponent
         this.locationCacheIndex = {};
         this.importableObject = null;
         this.errMsgDetails = null;
+        this.resetFiltersToSideFilters();
+        this.asyncResponse = null;
         this.uploader.clearQueue();
+        this.mappedFieldsVisible = [];
         this.mappedFields = [];
         this.decryptPassword = null;
         this.loadedImportMapping = null;
+
+        // update visible items count
+        this.updateVisibleItemsCount();
 
         // prepare data
         this.validateData();
@@ -1893,7 +2093,7 @@ export class ImportDataComponent
         }
 
         // determine data height
-        const importDataBodyRowsMaxHeight: SafeStyle = this.domSanitizer.bypassSecurityTrustStyle(`calc(100vh - (${this.mappedDataTable.nativeElement.getBoundingClientRect().top}px + 170px))`);
+        const importDataBodyRowsMaxHeight: SafeStyle = this.domSanitizer.bypassSecurityTrustStyle(`calc(100vh - (${this.mappedDataTable.nativeElement.getBoundingClientRect().top}px + 210px))`);
         if (this.importDataBodyRowsMaxHeight !== importDataBodyRowsMaxHeight) {
             this.importDataBodyRowsMaxHeight = importDataBodyRowsMaxHeight;
 
@@ -1936,13 +2136,6 @@ export class ImportDataComponent
     /**
      * Re-render form
      */
-    private forceRenderTable(): void {
-        this.mappedFields = [...this.mappedFields];
-    }
-
-    /**
-     * Re-render form
-     */
     private forceRenderField(field: ImportableMapField): void {
         field.mappedOptions = field.mappedOptions ? [...field.mappedOptions] : field.mappedOptions;
     }
@@ -1970,6 +2163,9 @@ export class ImportDataComponent
 
         // prepare data
         this.validateData();
+
+        // rerender list of visible items
+        this.addToListOfVisibleItems(0);
     }
 
     /**
@@ -2023,9 +2219,6 @@ export class ImportDataComponent
             clonedItem
         );
 
-        // force rerender
-        this.forceRenderTable();
-
         // start edit item
         this.editItem(
             clonedItem,
@@ -2034,6 +2227,9 @@ export class ImportDataComponent
 
         // prepare data
         this.validateData();
+
+        // rerender list of visible items
+        this.addToListOfVisibleItems(index + 1);
     }
 
     /**
@@ -2052,7 +2248,7 @@ export class ImportDataComponent
                         this.mappedFields.splice(index, 1);
 
                         // force re-render
-                        this.forceRenderTable();
+                        this.removeFromListOfVisibleItems(index);
 
                         // clear edit mode if item or parent was removed
                         if (
@@ -2928,5 +3124,306 @@ export class ImportDataComponent
 
         // return value
         return `${size}px`;
+    }
+
+    /**
+     * Determine list of visible items
+     */
+    private makeAllFieldsVisible(): void {
+        // reset filter values
+        this.filterBySourceInputValue = '';
+        this.filterByDestinationInputValue = '';
+
+        // make all items visible
+        this.mappedFieldsVisible = [];
+        for (let fieldIndex = 0; fieldIndex < this.mappedFields.length; fieldIndex++) {
+            this.mappedFieldsVisible.push(fieldIndex);
+        }
+
+        // update visible items count
+        this.updateVisibleItemsCount();
+    }
+
+    /**
+     * Update visible items count
+     */
+    private updateVisibleItemsCount(): void {
+        this.visibleItemsMsg = {
+            no: this.mappedFieldsVisible.length,
+            total: this.mappedFields.length
+        };
+    }
+
+    /**
+     * Filter by source / destination
+     */
+    triggerFilterVisibleData(): void {
+        // do we have components needed to filter by ?
+        if (
+            !this.filterBySourceInput ||
+            !this.filterByDestinationInput
+        ) {
+            return;
+        }
+
+        // retrieve filter values and prepare them for case insensitive search
+        this.filterBySourceInputValue = this.filterBySourceInput.value;
+        this.filterByDestinationInputValue = this.filterByDestinationInput.value;
+
+        // trigger filter refresh
+        this.triggerImportListRefresh.call();
+    }
+
+    /**
+     * Filter data
+     */
+    private filterVisibleData(): void {
+        // filter by source & destination
+        this.mappedFieldsVisible = [];
+        const filterBySourceInputValue: string = (this.filterBySourceInputValue || '').toLowerCase();
+        const filterByDestinationInputValue: string = (this.filterByDestinationInputValue || '').toLowerCase();
+        for (let fieldIndex = 0; fieldIndex < this.mappedFields.length; fieldIndex++) {
+            const field = this.mappedFields[fieldIndex];
+            if (
+                (
+                    !filterBySourceInputValue || (
+                        field.sourceField &&
+                        field.sourceField.toLowerCase().indexOf(filterBySourceInputValue) > -1
+                    )
+                ) && (
+                    !filterByDestinationInputValue || (
+                        field.destinationField &&
+                        this.importableObject.modelPropertiesKeyValueMap[field.destinationField] &&
+                        this.importableObject.modelPropertiesKeyValueMap[field.destinationField].toLowerCase().indexOf(filterByDestinationInputValue) > -1
+                    )
+                )
+            ) {
+                this.mappedFieldsVisible.push(fieldIndex);
+            }
+        }
+
+        // update visible items count
+        this.updateVisibleItemsCount();
+
+        // scroll into view and make the items visible
+        if (this.virtualScrollViewport) {
+            this.virtualScrollViewport.scrollToOffset(0);
+        }
+    }
+
+    /**
+     * Add to list of visible items
+     */
+    private addToListOfVisibleItems(elementIndex: number): void {
+        // add element if necessary
+        const newMappedFieldsVisible: number[] = [];
+        let elementIndexAdded: boolean = false;
+        const addElementIfNecessary = () => {
+            if (!elementIndexAdded) {
+                // add
+                newMappedFieldsVisible.push(elementIndex);
+
+                // no need to add others
+                elementIndexAdded = true;
+            }
+        };
+
+        // go through items and add the new one
+        for (let index = 0; index < this.mappedFieldsVisible.length; index++) {
+            const fieldIndex: number = this.mappedFieldsVisible[index];
+            if (fieldIndex < elementIndex) {
+                newMappedFieldsVisible.push(fieldIndex);
+            } else {
+                // add element if necessary
+                addElementIfNecessary();
+
+                // add the old items taking in account that the index needs to be incremented so it takes in accounts the new item
+                newMappedFieldsVisible.push(fieldIndex + 1);
+            }
+        }
+
+        // our new item is either the first one (empty list) or the new index is bigger then the ones from the list ?
+        addElementIfNecessary();
+
+        // update list of visible items
+        this.mappedFieldsVisible = newMappedFieldsVisible;
+
+        // update visible items count
+        this.updateVisibleItemsCount();
+    }
+
+    /**
+     * Remove from list of visible items
+     */
+    private removeFromListOfVisibleItems(elementIndex: number): void {
+        // go through items and remove the one
+        const newMappedFieldsVisible: number[] = [];
+        for (let index = 0; index < this.mappedFieldsVisible.length; index++) {
+            const fieldIndex: number = this.mappedFieldsVisible[index];
+            if (fieldIndex !== elementIndex) {
+                // remove and update index as well
+                if (fieldIndex > elementIndex) {
+                    newMappedFieldsVisible.push(fieldIndex - 1);
+                } else {
+                    newMappedFieldsVisible.push(fieldIndex);
+                }
+            }
+        }
+
+        // update list of visible items
+        this.mappedFieldsVisible = newMappedFieldsVisible;
+
+        // update visible items count
+        this.updateVisibleItemsCount();
+    }
+
+    /**
+     * Re(load) the Events list
+     */
+    refreshList(finishCallback: (records: any[]) => void): void {
+        // do we have import log id, there is no point in continuing otherwise ?
+        if (
+            !this.asyncResponse ||
+            !this.asyncResponse.importLogId
+        ) {
+            return;
+        }
+
+        // retrieve only import results from a specific import
+        this.queryBuilder.filter.byEquality(
+            'importLogId',
+            this.asyncResponse.importLogId,
+            true,
+            false
+        );
+
+        // default sort order ?
+        if (this.queryBuilder.sort.isEmpty()) {
+            this.queryBuilder.sort.by(
+                'recordNo',
+                RequestSortDirection.ASC
+            );
+        }
+
+        // retrieve the list of import results
+        this.importResultsList$ = this.importResultDataService
+            .getImportResultsList(this.queryBuilder)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    finishCallback([]);
+                    return throwError(err);
+                }),
+                tap(this.checkEmptyList.bind(this)),
+                tap((data: any[]) => {
+                    finishCallback(data);
+                })
+            );
+    }
+
+    /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount(): void {
+        // do we have import log id, there is no point in continuing otherwise ?
+        if (
+            !this.asyncResponse ||
+            !this.asyncResponse.importLogId
+        ) {
+            return;
+        }
+
+        // remove paginator from query builder
+        const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+        countQueryBuilder.paginator.clear();
+        countQueryBuilder.sort.clear();
+
+        // retrieve only import results from a specific import
+        countQueryBuilder.filter.byEquality(
+            'importLogId',
+            this.asyncResponse.importLogId,
+            true,
+            false
+        );
+
+        // count
+        this.importResultsListCount$ = this.importResultDataService
+            .getImportResultsCount(countQueryBuilder)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                }),
+                share()
+            );
+    }
+
+    /**
+     * See error details
+     */
+    seeErrorDetails(errJson: any): void {
+        this.dialogService
+            .showConfirm(new DialogConfiguration({
+                message: 'LNG_PAGE_IMPORT_DATA_ERROR_DETAILS_DIALOG_TITLE',
+                additionalInfo: `<code><pre>${JSON.stringify(errJson, null, 1)}</pre></code>`,
+                addDefaultButtons: false,
+                buttons: [
+                    new DialogButton({
+                        label: 'LNG_COMMON_BUTTON_CLOSE',
+                        clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
+                            dialogHandler.close();
+                        }
+                    })
+                ]
+            }))
+            .subscribe();
+    }
+
+    /**
+     * See record data
+     */
+    seeRecordData(
+        file: any,
+        save: any
+    ): void {
+        this.dialogService
+            .showConfirm(new DialogConfiguration({
+                message: 'LNG_PAGE_IMPORT_DATA_RECORD_DATA_DIALOG_TITLE',
+                additionalInfo: this.domSanitizer.bypassSecurityTrustHtml(`
+                    <div style="display: flex; flex-direction: row; box-sizing: border-box; max-height: 300px; padding-bottom: 5px;">
+                        <div style="flex: 1 1 0%; box-sizing: border-box; overflow: auto; font-weight: bold;">
+                            ${this.i18nService.instant('LNG_PAGE_IMPORT_DATA_BUTTON_ERR_RECORD_DETAILS_FILE_TITLE')}
+                        </div>
+                        <div style="display: flex; width: 10px;"></div>
+                        <div style="flex: 1 1 0%; box-sizing: border-box; overflow: auto; font-weight: bold;">
+                            ${this.i18nService.instant('LNG_PAGE_IMPORT_DATA_BUTTON_ERR_RECORD_DETAILS_MODEL_TITLE')}
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: row; box-sizing: border-box; max-height: 300px;">
+                        <div style="flex: 1 1 0%; box-sizing: border-box; overflow: auto;">
+                            <code>
+                                <pre>${JSON.stringify(file, null, 1)}</pre>
+                            </code>
+                        </div>
+                        <div style="display: flex; width: 10px;"></div>
+                        <div style="flex: 1 1 0%; box-sizing: border-box; overflow: auto;">
+                            <code>
+                                <pre>${JSON.stringify(save, null, 1)}</pre>
+                            </code>
+                        </div>
+                    </div>
+                `),
+                maxDialogWidth: '95vw',
+                addDefaultButtons: false,
+                buttons: [
+                    new DialogButton({
+                        label: 'LNG_COMMON_BUTTON_CLOSE',
+                        clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
+                            dialogHandler.close();
+                        }
+                    })
+                ]
+            }))
+            .subscribe();
     }
 }

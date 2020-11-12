@@ -572,14 +572,18 @@ export abstract class ListComponent implements OnDestroy {
      * Filter the list by a text field
      * @param {string} property
      * @param {string} value
+     * @param {boolean} useLike
      */
     filterByTextContainingField(
         property: string,
-        value: string
+        value: string,
+        useLike?: boolean
     ) {
         this.queryBuilder.filter.byContainingText(
             property as string,
-            value
+            value,
+            true,
+            useLike
         );
 
         // refresh list

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Input, ViewEncapsulation } from '@angular/core';
 
 @Component({
     selector: 'app-total-number-of-records',
@@ -6,13 +6,6 @@ import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
     templateUrl: './total-number-of-records.component.html',
     styleUrls: ['./total-number-of-records.component.less']
 })
-export class TotalNumberOfRecordsComponent implements OnInit {
-
+export class TotalNumberOfRecordsComponent {
     @Input() value: number;
-
-    constructor() {
-    }
-
-    ngOnInit() {
-    }
 }
