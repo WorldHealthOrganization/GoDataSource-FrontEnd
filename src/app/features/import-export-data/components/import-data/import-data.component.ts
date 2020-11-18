@@ -2074,10 +2074,13 @@ export class ImportDataComponent
         // set value
         item[property] = value ? value.value : value;
 
+        // 1 - prepare data need to determine what options we can add
+        this.validateData();
+
         // add options if necessary
         this.addMapOptionsIfNecessary(item);
 
-        // prepare data
+        // 2 - update data after options were added
         this.validateData();
     }
 
