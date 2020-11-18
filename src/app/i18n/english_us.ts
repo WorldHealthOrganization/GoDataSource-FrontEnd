@@ -88,7 +88,57 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_MAPPING_RETRIEVING_LOCATIONS': '{{index}} / {{total}}: Retrieving locations',
         'LNG_PAGE_IMPORT_DATA_MAPPING_RETRIEVING_RELABEL_LOCATIONS': 'Preparing locations cache',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS': 'Mapping',
-        'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_DESCRIPTION': 'Pending: must "Map sub-options" - Complete no / total: "total" is the number of distinct values from the file, while "no" is the number of mapped sub-options, this information is useful if you decide not to map everything, or to make sure you don\'t missing something - Complete: all file options are mapped - Incomplete no / total: "total" is the number of mapped sub-options while "no" is the number of invalid options - Handled above: it means that there are similar mappings above that if handled it will suffice - Completed above: Same as completed, but to see / change options you need to go above to the similar map',
+
+        'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_DESCRIPTION': `
+            <div style="padding-bottom: 10px">
+                <span style="color: #770000; font-weight: bold;">
+                    Pending:
+                </span>
+                <span>
+                    this field has not been completely loaded and mapped yet (please click on the "Map sub-options" button)
+                </span>
+            </div>
+            <div style="padding-bottom: 10px">
+                <span style="font-weight: bold;">
+                    Complete no / total:
+                </span>
+                <span>
+                    the number of values that have been mapped out of the total number of distinct values in the input file, this information is useful if you decide not to map everything, or to check that nothing is missed
+                </span>
+            </div>
+            <div style="padding-bottom: 10px">
+                <span style="font-weight: bold;">
+                    Complete:
+                </span>
+                <span>
+                    all file options are mapped and ready for import
+                </span>
+            </div>
+            <div style="padding-bottom: 10px">
+                <span style="color: #770000; font-weight: bold;">
+                    Incomplete no / total:
+                </span>
+                <span>
+                    the number of invalid values that are present out of the total number of distinct mapped values in the input file
+                </span>
+            </div>
+            <div style="padding-bottom: 10px">
+                <span style="color: #770000; font-weight: bold;">
+                    Handled above:
+                </span>
+                <span>
+                    a mapping already provided to the system for another field in this import is applicable here also and has been reused
+                </span>
+            </div>
+            <div style="padding-bottom: 10px">
+                <span style="font-weight: bold;">
+                    Completed above:
+                </span>
+                <span>
+                    a mapping already provided to the system for another field in this import is applicable here also and has been reused globally for all valid fields
+                </span>
+            </div>
+        `,
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_WAITING': 'Pending',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_WAITING_DESCRIPTION': 'You need to map sub-options',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_INVALID': 'Incomplete',

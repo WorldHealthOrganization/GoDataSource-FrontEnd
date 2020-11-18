@@ -27,6 +27,7 @@
         "@angular/platform-browser": "7.2.15",
         "@angular/platform-browser-dynamic": "7.2.15",
         "@angular/router": "7.2.15",
+        "@material-extended/mde": "2.1.1",
         "@handsontable/angular": "3.0.0",
         "@ng-select/ng-select": "2.20.5",
         "@ngx-translate/core": "11.0.1",
