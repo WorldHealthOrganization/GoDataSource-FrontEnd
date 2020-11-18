@@ -88,7 +88,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_MAPPING_RETRIEVING_LOCATIONS': '{{index}} / {{total}}: Retrieving locations',
         'LNG_PAGE_IMPORT_DATA_MAPPING_RETRIEVING_RELABEL_LOCATIONS': 'Preparing locations cache',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS': 'Mapping',
-
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_DESCRIPTION': `
             <div style="padding-bottom: 10px">
                 <span style="color: #770000; font-weight: bold;">
