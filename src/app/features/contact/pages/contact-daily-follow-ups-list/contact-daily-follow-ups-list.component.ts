@@ -9,7 +9,7 @@ import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { DialogAnswerButton, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
+import { DialogAnswerButton, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogConfiguration } from '../../../../shared/components/dialog/dialog.component';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
@@ -1089,6 +1089,10 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                     }))
                     .subscribe((answer: DialogAnswer) => {
                         if (answer.button === DialogAnswerButton.Yes) {
+                            // display loading
+                            const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
+
+                            // generate follow-ups
                             this.followUpsDataService
                                 .generateFollowUps(
                                     this.selectedOutbreak.id,
@@ -1100,11 +1104,19 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                                 )
                                 .pipe(
                                     catchError((err) => {
+                                        // hide loading
+                                        loadingDialog.close();
+
+                                        // error
                                         this.snackbarService.showApiError(err);
                                         return throwError(err);
                                     })
                                 )
                                 .subscribe(() => {
+                                    // hide loading
+                                    loadingDialog.close();
+
+                                    // finished
                                     this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
 
                                     // reload data
