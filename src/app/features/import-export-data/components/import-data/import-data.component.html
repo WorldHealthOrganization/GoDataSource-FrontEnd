@@ -202,9 +202,21 @@
                         </div>
                         <div
                             fxFlex>
+
+                            <!-- details popover -->
+                            <mde-popover
+                                #arrayIndexMdePopover="mdePopover"
+                                class="mdePopover"
+                                mdePopoverTriggerOn="hover">
+                                <span
+                                    [innerHTML]="'LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX_DESCRIPTION' | translate | safeHtml">
+                                </span>
+                            </mde-popover>
+
+                            <!-- info button -->
                             <span
                                 class="xt-icon xt-icon-xsmall"
-                                [matTooltip]="'LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX_DESCRIPTION' | translate">info</span>
+                                [mdePopoverTriggerFor]="arrayIndexMdePopover">info</span>
                         </div>
                     </div>
                 </div>
@@ -218,9 +230,20 @@
                     </div>
                     <div
                         fxFlex>
+                        <!-- details popover -->
+                        <mde-popover
+                            #mappingMdePopover="mdePopover"
+                            class="mdePopover"
+                            mdePopoverTriggerOn="hover">
+                                <span
+                                    [innerHTML]="'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_DESCRIPTION' | translate | safeHtml">
+                                </span>
+                        </mde-popover>
+
+                        <!-- info button -->
                         <span
                             class="xt-icon xt-icon-xsmall"
-                            [matTooltip]="'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_DESCRIPTION' | translate">info</span>
+                            [mdePopoverTriggerFor]="mappingMdePopover">info</span>
                     </div>
                 </div>
 

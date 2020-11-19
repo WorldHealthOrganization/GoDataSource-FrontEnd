@@ -465,23 +465,10 @@ ng-select {
             }
         }
     }
+}
 
-    .ng-dropdown-panel {
-        .scrollable-content {
-            width: auto;
-            min-width: 100%;
-        }
-
-        .scroll-host {
-            overflow-x: auto;
-        }
-
-        .ng-dropdown-panel-items {
-            .ng-option {
-                overflow: visible;
-            }
-        }
-    }
+.ng-dropdown-panel {
+    min-width: 250px !important;
 }
 
 .cdk-overlay-container {
@@ -520,5 +507,20 @@ a.xlink-button {
     &:hover {
         cursor: pointer;
         text-decoration: underline;
+    }
+}
+
+.mdePopover {
+    max-width: 450px;
+    color: white;
+    background-color: #707070;
+    padding: 8px;
+    border-radius: 5px;
+    font-size: 15px;
+    font-weight: normal;
+    text-align: justify;
+
+    &:hover {
+        cursor: pointer;
     }
 }

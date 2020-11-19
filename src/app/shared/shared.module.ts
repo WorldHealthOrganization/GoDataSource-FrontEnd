@@ -15,6 +15,7 @@ import { HotTableModule } from '@handsontable/angular';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { ScrollingModule as ExperimentalScrollingModule } from '@angular/cdk-experimental/scrolling';
+import { MdePopoverModule } from '@material-extended/mde';
 
 // components
 import * as fromSharedComponents from './components';
@@ -31,6 +32,7 @@ import * as fromSharedPipes from './pipes';
         XtFormsModule,
         AngularMaterialModule,
         TranslateModule,
+        MdePopoverModule,
         MglTimelineModule,
         FileUploadModule,
         NgxWigModule,
@@ -54,6 +56,7 @@ import * as fromSharedPipes from './pipes';
         TranslateModule,
         XtFormsModule,
         AngularMaterialModule,
+        MdePopoverModule,
         MglTimelineModule,
         ScrollingModule,
         ExperimentalScrollingModule,
