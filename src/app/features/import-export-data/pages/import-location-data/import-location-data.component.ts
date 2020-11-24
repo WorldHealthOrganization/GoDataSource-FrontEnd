@@ -38,6 +38,10 @@ export class ImportLocationDataComponent {
         'name'
     ];
 
+    addressFields = {
+        'parentLocationId': true
+    };
+
     /**
      * Constructor
      */
