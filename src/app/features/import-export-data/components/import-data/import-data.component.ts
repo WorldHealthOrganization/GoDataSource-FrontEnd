@@ -1404,11 +1404,15 @@ export class ImportDataComponent
                 importableItem.mappedOptions.push(mapOpt);
             } else {
                 // check if we can find a proper destination option
-                const sourceOptReduced: string = _.camelCase(mapOpt.sourceOption).toLowerCase();
+                const sourceOption: string = mapOpt.sourceOption;
+                const sourceOptReduced: string = _.camelCase(sourceOption).toLowerCase();
                 destinationOpt = this.addressFields[importableItem.destinationField] ? (
                     this.locationCacheIndex[sourceOptReduced] && this.locationCacheIndex[sourceOptReduced].length === 1 ?
-                        this.locationCacheIndex[sourceOptReduced][0] :
-                        undefined
+                        this.locationCacheIndex[sourceOptReduced][0] : (
+                            this.locationCache && this.locationCache[sourceOption] ?
+                                sourceOption :
+                                undefined
+                        )
                 ) : (
                     this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField] ?
                         this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField][sourceOptReduced] :
