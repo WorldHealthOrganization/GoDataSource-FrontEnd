@@ -29,11 +29,9 @@ export interface IConvertChainToGraphElements {
     edges: {
         data: GraphEdgeModel
     }[];
-    edgesHierarchical: any[];
     caseNodesWithoutDates: any[];
     contactNodesWithoutDates: any[];
     eventNodesWithoutDates: any[];
-    timelineDateCheckpoints: any[];
 }
 
 @Injectable()
@@ -162,11 +160,9 @@ export class TransmissionChainDataService {
         const graphData: IConvertChainToGraphElements = {
             nodes: [],
             edges: [],
-            edgesHierarchical: [],
             caseNodesWithoutDates: [],
             contactNodesWithoutDates: [],
-            eventNodesWithoutDates: [],
-            timelineDateCheckpoints: []
+            eventNodesWithoutDates: []
         };
 
         const selectedNodeIds: {
@@ -489,15 +485,12 @@ export class TransmissionChainDataService {
             });
 
             // generate checkpoint nodes
-            graphData.timelineDateCheckpoints = [];
             const counterDate = moment(minTimelineDate);
             counterDate.subtract(1, 'days');
-            graphData.timelineDateCheckpoints.push(counterDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
             const momentMaxTimelineDate = moment(maxTimelineDate);
             while (counterDate.isBefore(momentMaxTimelineDate)) {
                 counterDate.add(1, 'days');
                 const counterDateFormatted = counterDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-                graphData.timelineDateCheckpoints.push(counterDateFormatted);
                 // generate node
                 const checkpointNode = new GraphNodeModel({
                     dateTimeline: counterDateFormatted,
@@ -507,7 +500,6 @@ export class TransmissionChainDataService {
                 });
                 graphData.nodes.push({data: checkpointNode});
             }
-            graphData.timelineDateCheckpoints.push(counterDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
         }
 
         // generate edges based on the nodes included in the graph
