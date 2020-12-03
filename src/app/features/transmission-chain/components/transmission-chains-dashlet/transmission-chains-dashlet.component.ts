@@ -208,6 +208,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     // snapshots
     snapshotOptions: LabelValuePair[];
     selectedSnapshot: string;
+    selectedSnapshotOption: LabelValuePair;
 
     // cytoscape-graph.component data
     style: any;
@@ -2162,6 +2163,29 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     pageSizeChanged(pageSize: number) {
         this.pageSize = pageSize;
         this.mustLoadChain = true;
+    }
+
+    /**
+     * Selected option snapshot changed
+     */
+    selectedSnapshotOptionChanged(selectedSnapshotOption): void {
+        this.selectedSnapshotOption = selectedSnapshotOption;
+    }
+
+    /**
+     * Changed page
+     */
+    changedPage(): void {
+        // show loading
+        const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
+
+        // update view
+        this.updateView();
+
+        // hide loading
+        setTimeout(() => {
+            loadingDialog.close();
+        });
     }
 }
 

@@ -151,7 +151,7 @@ export class TransmissionChainDataService {
         // #TODO so until we rewrite the graph component there is no point in stressing out that much with this since we will have to rewrite this entire function since it was written like ...
         // sort chains by size descending
         chainGroup.chains.sort((chain1, chain2) => {
-            return chain2.size - chain1.size;
+            return chain2.chainRelations.length - chain1.chainRelations.length;
         });
 
         // go through edges and map them to determine isolated nodes
@@ -184,19 +184,19 @@ export class TransmissionChainDataService {
             currentPageIndex = pages.length - 1;
             if (
                 pages.length < 1 ||
-                pages[currentPageIndex].totalSize + chain.size > pageSize
+                pages[currentPageIndex].totalSize + chain.chainRelations.length > pageSize
             ) {
                 // add next page
                 pages.push({
                     chains: [chainIndex],
                     isolatedNodes: null,
-                    totalSize: chain.size,
+                    totalSize: chain.chainRelations.length,
                     pageIndex: pages.length,
                     pageLabel: (pages.length + 1).toString()
                 });
             } else {
                 // increase total size of page
-                pages[currentPageIndex].totalSize += chain.size;
+                pages[currentPageIndex].totalSize += chain.chainRelations.length;
 
                 // add chain to the page list
                 pages[currentPageIndex].chains.push(chainIndex);
