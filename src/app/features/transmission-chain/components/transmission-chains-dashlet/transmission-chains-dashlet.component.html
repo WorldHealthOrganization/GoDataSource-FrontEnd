@@ -243,6 +243,7 @@
                 <app-form-select
                     name="snapshotsList"
                     [(ngModel)]="selectedSnapshot"
+                    [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOTS' | translate"
                     required="true"
                     [options]="snapshotOptions"
                     [clearable]="false"
@@ -253,16 +254,27 @@
                 <app-form-select
                     name="chainView"
                     [(ngModel)]="transmissionChainViewType"
+                    [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_CHART' | translate"
                     required="true"
                     [options]="transmissionChainViewTypes"
                     [clearable]="false"
                     (ngModelChange)="mustLoadChain = true">
                 </app-form-select>
 
+                <!-- Page size -->
+                <app-form-input
+                    name="chainView"
+                    [(ngModel)]="pageSize"
+                    [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE_SIZE' | translate"
+                    required="true"
+                    type="number"
+                    (ngModelChange)="pageSizeChanged($event)">
+                </app-form-input>
+
             </div>
 
             <div
-                *ngIf="mustLoadChain && selectedSnapshot && transmissionChainViewType"
+                *ngIf="mustLoadChain && selectedSnapshot && transmissionChainViewType && pageSize > 0"
                 fxLayout="row" fxFlexAlign="end" fxLayoutGap="10px">
                 <!-- Apply filters -->
                 <button
@@ -272,6 +284,25 @@
                     (click)="loadChainsOfTransmission()">
                     {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_LOAD_SNAPSHOT' | translate }}
                 </button>
+            </div>
+
+            <div
+                fxLayout="row" fxLayoutGap="20px">
+
+                <!-- Pages -->
+                <app-form-select
+                    *ngIf="!mustLoadChain && chainGroupId && chainGroupId === selectedSnapshot && chainPages && chainPages.length > 0"
+                    name="chainPagesList"
+                    [(ngModel)]="selectedChainPageIndex"
+                    [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE' | translate"
+                    required="true"
+                    [options]="chainPages"
+                    [clearable]="false"
+                    optionLabelKey="pageLabel"
+                    optionValueKey="pageIndex"
+                    (ngModelChange)="updateView()">
+                </app-form-select>
+
             </div>
         </mat-card>
 

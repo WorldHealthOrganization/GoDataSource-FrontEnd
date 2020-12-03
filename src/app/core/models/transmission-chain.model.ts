@@ -268,3 +268,11 @@ export class TransmissionChainGroupModel {
         );
     }
 }
+
+export interface ITransmissionChainGroupPageModel {
+    chains: number[];
+    isolatedNodes: string[];
+    totalSize: number;
+    pageIndex: number;
+    pageLabel: string;
+}

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
-import { TransmissionChainGroupModel } from '../../models/transmission-chain.model';
+import { ITransmissionChainGroupPageModel, TransmissionChainGroupModel } from '../../models/transmission-chain.model';
 import { MetricIndependentTransmissionChainsModel } from '../../models/metrics/metric-independent-transmission-chains.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { GraphNodeModel } from '../../models/graph-node.model';
@@ -140,23 +140,134 @@ export class TransmissionChainDataService {
     }
 
     /**
+     * Retrieve chain of transmission pages
+     */
+    getChainOfTransmissionPages(
+        chainGroup: TransmissionChainGroupModel,
+        pageSize: number
+    ): ITransmissionChainGroupPageModel[] {
+        // if bubble graph we must split it into multiple pages
+        // #TODO this should be integrated in the code bellow so we don't do again the logic that was done once...but that would mean that we need to rewrite some of the logic, which might cause other issues
+        // #TODO so until we rewrite the graph component there is no point in stressing out that much with this since we will have to rewrite this entire function since it was written like ...
+        // sort chains by size descending
+        chainGroup.chains.sort((chain1, chain2) => {
+            return chain2.size - chain1.size;
+        });
+
+        // go through edges and map them to determine isolated nodes
+        const entitiesThatHaveEdges: {
+            [entityId: string]: true
+        } = {};
+        chainGroup.relationships.forEach((rel) => {
+            rel.persons.forEach((relPerson) => {
+                entitiesThatHaveEdges[relPerson.id] = true;
+            });
+        });
+
+        // determine isolated nodes
+        const isolatedNodes: string[] = [];
+        Object.keys(chainGroup.nodesMap).forEach((entityId) => {
+            // entity has relationship ?
+            if (entitiesThatHaveEdges[entityId]) {
+                return;
+            }
+
+            // isolated node
+            isolatedNodes.push(entityId);
+        });
+
+        // construct pages
+        const pages: ITransmissionChainGroupPageModel[] = [];
+        let currentPageIndex: number;
+        (chainGroup.chains || []).forEach((chain, chainIndex) => {
+            // add new page ?
+            currentPageIndex = pages.length - 1;
+            if (
+                pages.length < 1 ||
+                pages[currentPageIndex].totalSize + chain.size > pageSize
+            ) {
+                // add next page
+                pages.push({
+                    chains: [chainIndex],
+                    isolatedNodes: null,
+                    totalSize: chain.size,
+                    pageIndex: pages.length,
+                    pageLabel: (pages.length + 1).toString()
+                });
+            } else {
+                // increase total size of page
+                pages[currentPageIndex].totalSize += chain.size;
+
+                // add chain to the page list
+                pages[currentPageIndex].chains.push(chainIndex);
+            }
+        });
+
+        // fill out current page with isolated nodes
+        currentPageIndex = pages.length - 1;
+        if (
+            currentPageIndex > -1 &&
+            pages[currentPageIndex].totalSize < pageSize
+        ) {
+            const size: number = pageSize - pages[currentPageIndex].totalSize;
+            pages[currentPageIndex].totalSize += size;
+            pages[currentPageIndex].isolatedNodes = isolatedNodes.splice(0, size);
+        }
+
+        // create pages from isolated nodes
+        while (isolatedNodes.length > 0) {
+            // split isolated nodes
+            const nodes = isolatedNodes.splice(0, pageSize);
+            pages.push({
+                chains: null,
+                isolatedNodes: nodes,
+                totalSize: nodes.length,
+                pageIndex: pages.length,
+                pageLabel: (pages.length + 1).toString()
+            });
+        }
+
+        // finished
+        return pages;
+    }
+
+    /**
      * Convert transmission chain model to the format needed by the graph
-     * @param chainGroup
-     * @param filters
-     * @param colorCriteria
-     * @param locationsListMap
-     * @param selectedViewType
-     * @returns {any}
      */
     convertChainToGraphElements(
         chainGroup: TransmissionChainGroupModel,
-        filters: any,
+        filters: {
+            showContacts?: boolean,
+            showEvents?: boolean
+        },
         colorCriteria: any,
         locationsListMap: {
             [idLocation: string]: LocationModel
         },
-        selectedViewType: string = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value
+        selectedViewType: string,
+        page: ITransmissionChainGroupPageModel
     ): IConvertChainToGraphElements {
+        // if we have a pge then we must limit nodes to the specific items
+        const pageAllowedNodes: {
+            [nodeId: string]: true
+        } = {};
+        if (page) {
+            // go through chains
+            (page.chains || []).forEach((chainIndex) => {
+                chainGroup.chains[chainIndex].chainRelations.forEach((rel) => {
+                    rel.entityIds.forEach((entityId: string) => {
+                        pageAllowedNodes[entityId] = true;
+                    });
+                });
+            });
+
+            // go through isolated nodes
+            (page.isolatedNodes || []).forEach((entityId) => {
+                pageAllowedNodes[entityId] = true;
+            });
+        }
+
+        // render data
         const graphData: IConvertChainToGraphElements = {
             nodes: [],
             edges: [],
@@ -185,6 +296,11 @@ export class TransmissionChainDataService {
                 // prepare node
                 let allowAdd = false;
                 const nodeProps: any = node.model;
+
+                // don't render node
+                if (!pageAllowedNodes[node.model.id]) {
+                    return;
+                }
 
                 // show nodes based on their type
                 if (

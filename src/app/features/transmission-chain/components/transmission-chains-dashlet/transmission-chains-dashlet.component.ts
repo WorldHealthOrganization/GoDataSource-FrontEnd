@@ -21,7 +21,7 @@ import { LocationDataService } from '../../../../core/services/data/location.dat
 import { EntityType } from '../../../../core/models/entity-type';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { ActivatedRoute } from '@angular/router';
-import { TransmissionChainGroupModel, TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
+import { ITransmissionChainGroupPageModel, TransmissionChainGroupModel, TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 import { TransmissionChainFilters } from '../transmission-chains-filters/transmission-chains-filters.component';
 import { catchError, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
@@ -65,6 +65,14 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     Constants = Constants;
     WorldMapMarkerLayer = WorldMapMarkerLayer;
     ClusterModel = ClusterModel;
+
+    // chain pages
+    chainPageSize: number;
+    chainPages: ITransmissionChainGroupPageModel[];
+    selectedChainPageIndex: number = 0;
+
+    // page size
+    pageSize: number = 500;
 
     selectedOutbreak: OutbreakModel;
     chainGroupId: string;
@@ -1329,7 +1337,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 this.filters,
                 this.legend,
                 this.locationsListMap,
-                this.transmissionChainViewType
+                this.transmissionChainViewType,
+                this.chainPages && this.chainPages[this.selectedChainPageIndex] ?
+                    this.chainPages[this.selectedChainPageIndex] :
+                    undefined
             );
 
             // configure geo map
@@ -2020,6 +2031,15 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
         // same group, we don't need to retrieve anything from BE ?
         if (this.chainGroupId === this.selectedSnapshot) {
+            // must update pages ?
+            if (this.chainPageSize !== this.pageSize) {
+                this.chainPageSize = this.pageSize;
+                this.chainPages = this.transmissionChainDataService.getChainOfTransmissionPages(
+                    this.chainGroup,
+                    this.pageSize
+                );
+            }
+
             // update view
             this.updateView();
 
@@ -2030,6 +2050,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         // retrieve chain of transmission
         const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
         this.chainGroup = undefined;
+        this.chainPages = undefined;
+        this.selectedChainPageIndex = 0;
         this.chainGroupId = this.selectedSnapshot;
         this.transmissionChainDataService
             .getCalculatedIndependentTransmissionChains(
@@ -2076,6 +2098,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
                     // keep original chains
                     this.chainGroup = chainGroup;
+                    this.chainPageSize = this.pageSize;
+                    this.chainPages = this.transmissionChainDataService.getChainOfTransmissionPages(
+                        this.chainGroup,
+                        this.pageSize
+                    );
 
                     // finished
                     loadingDialog.close();
@@ -2113,6 +2140,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
                             // keep original chains
                             this.chainGroup = chainGroup;
+                            this.chainPageSize = this.pageSize;
+                            this.chainPages = this.transmissionChainDataService.getChainOfTransmissionPages(
+                                this.chainGroup,
+                                this.pageSize
+                            );
 
                             // finished
                             loadingDialog.close();
@@ -2122,6 +2154,14 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                         });
                 }
             });
+    }
+
+    /**
+     * Page size changed
+     */
+    pageSizeChanged(pageSize: number) {
+        this.pageSize = pageSize;
+        this.mustLoadChain = true;
     }
 }
 
