@@ -18,7 +18,9 @@ import { moment } from '../../helperClasses/x-moment';
 import { ContactModel } from '../../models/contact.model';
 import { ContactOfContactModel } from '../../models/contact-of-contact.model';
 import { EventModel } from '../../models/event.model';
+import { CotSnapshotModel } from '../../models/cot-snapshot.model';
 import { CaseModel } from '../../models/case.model';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 export interface IConvertChainToGraphElements {
     nodes: {
@@ -625,5 +627,68 @@ export class TransmissionChainDataService {
         return graphData;
     }
 
+    /**
+     * Retrieve the list of COT snapshots list for an Outbreak
+     */
+    getSnapshotsList(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<CotSnapshotModel[]> {
+        const filter = queryBuilder.buildQuery();
+        return this.modelHelper.mapObservableListToModel(
+            this.http.get(`outbreaks/${outbreakId}/transmission-chains?filter=${filter}`),
+            CotSnapshotModel
+        );
+    }
+
+    /**
+     * Return count of COT snapshots list for an Outbreak
+     */
+    getSnapshotsCount(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<IBasicCount> {
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+        return this.http.get(`outbreaks/${outbreakId}/transmission-chains/count?where=${whereFilter}`);
+    }
+
+    /**
+     * Delete an existing COT snapshots list for an Outbreak
+     */
+    deleteSnapshot(
+        outbreakId: string,
+        cotSnapshotId: string
+    ): Observable<any> {
+        return this.http.delete(`outbreaks/${outbreakId}/transmission-chains/${cotSnapshotId}`);
+    }
+
+    /**
+     * Generate cot graph snapshot
+     */
+    calculateIndependentTransmissionChains(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+        // generate filter
+        const filter = queryBuilder.buildQuery();
+        return this.http.post(
+            `outbreaks/${outbreakId}/relationships/calculate-independent-transmission-chains?filter=${filter}`,
+            {}
+        );
+    }
+
+    /**
+     * Retrieve chain of transmission data
+     */
+    getCalculatedIndependentTransmissionChains(
+        outbreakId: string,
+        snapshotId: string
+    ): Observable<TransmissionChainGroupModel> {
+        return this.http
+            .get(`outbreaks/${outbreakId}/transmission-chains/${snapshotId}/result`)
+            .pipe(
+                map(this.mapTransmissionChainDataToModel)
+            );
+    }
 }
 

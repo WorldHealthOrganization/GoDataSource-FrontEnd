@@ -300,5 +300,12 @@ export class GenericDataService {
     getGanttChartTypes(): Observable<any[]> {
         return of(Object.values(Constants.GANTT_CHART_TYPES));
     }
+
+    /**
+     * Retrieve the list of cot snapshot possible statuses
+     */
+    getCotSnapshotStatusList(): Observable<any[]> {
+        return of(Object.values(Constants.COT_SNAPSHOT_STATUSES));
+    }
 }
 

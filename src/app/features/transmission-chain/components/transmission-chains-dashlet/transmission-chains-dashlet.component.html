@@ -1,245 +1,288 @@
 <div class="chain-settings" fxLayout="column">
-    <div fxLayout="row" fxLayoutAlign="space-between center">
-        <!-- settings toggle -->
+    <div
+        fxLayout="row" fxLayoutGap="10px">
+        <!-- See snapshot -->
         <button
+            *ngIf="!showGraphConfiguration"
             mat-raised-button
-            (click)="toggleSettings()">
-            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_SETTINGS' | translate }}
+            (click)="showGraphConfigurationHideFilters()">
+            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_GRAPH' | translate }}
         </button>
 
-        <!-- Date - moment in time -->
-        <div fxFlex="150px">
-            <app-form-datepicker
-                class="global-date-filter"
-                [(ngModel)]="dateGlobalFilter"
-                [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTER_DATE' | translate"
-                [tooltip]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTER_DESCRIPTION' | translate"
-                (optionChanged)="onChangeGlobalDate()">
-            </app-form-datepicker>
-        </div>
+        <!-- Generate new graph -->
+        <button
+            *ngIf="!showFilters"
+            mat-raised-button
+            (click)="showFiltersHideGraphConf()">
+            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_SETTINGS' | translate }}
+        </button>
     </div>
 
-    <!-- settings panel -->
+    <!-- Generate new graph -->
     <div
-        *ngIf="showSettings"
+        *ngIf="showFilters"
         fxLayout="column"
-        class="settings-container"
-    >
-        <div fxLayout="row" fxLayoutGap="10px">
-            <!-- entity type filter - events -->
-            <app-form-checkbox
-                fxFlex="150px"
-                name="showEvents"
-                [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_EVENTS_LABEL' | translate"
-                [(ngModel)]="filters.showEvents">
-            </app-form-checkbox>
+        class="settings-container">
 
-            <!-- entity type filter - contacts -->
-            <app-form-checkbox
-                fxFlex="150px"
-                name="showContacts"
-                [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_LABEL' | translate"
-                [(ngModel)]="filters.showContacts"
-                (optionChanged)="updateShowContactsOfContactValue($event)">
-            </app-form-checkbox>
-
-            <!--  This checkbox is valid only if 'showContacts' is already enabled -->
-            <app-form-checkbox
-                name="includeContactsOfContacts "
-                [disabled]="!filters.showContacts"
-                [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_OF_CONTACTS' | translate"
-                [(ngModel)]="filters.includeContactsOfContacts"
-                fxFlex="150px">
-            </app-form-checkbox>
-        </div>
-
-        <div fxLayout="row wrap" fxLayoutGap="20px">
-            <!-- Filters -->
-            <app-transmission-chain-filters
-                fxFlex
-                titleName="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTERS_TITLE"
-                [filters]="filters"
-                [clusterOptions]="clusterOptions">
-            </app-transmission-chain-filters>
-
-            <!-- Right Side => Node Settings & Edge Settings -->
+        <div
+            fxLayout="row" fxLayoutAlign="space-between end">
             <div
-                *ngIf="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value"
-                fxFlex fxLayout="column" fxLayoutGap="20px">
-                <!-- Node Settings -->
-                <mat-card fxLayout="column" fxLayoutGap="10px">
-                    <div class="settings-container-title">
-                        {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SETTINGS_TITLE' | translate }}
-                    </div>
+                fxLayout="row" fxLayoutGap="10px">
+                <!-- entity type filter - events -->
+                <app-form-checkbox
+                    fxFlex="150px"
+                    name="showEvents"
+                    [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_EVENTS_LABEL' | translate"
+                    [(ngModel)]="filters.showEvents">
+                </app-form-checkbox>
 
-                    <!-- Node Label -->
-                    <div fxLayout="column">
-                        <div>
-                            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_TITLE' | translate }}
-                        </div>
+                <!-- entity type filter - contacts -->
+                <app-form-checkbox
+                    fxFlex="150px"
+                    name="showContacts"
+                    [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_LABEL' | translate"
+                    [(ngModel)]="filters.showContacts"
+                    (optionChanged)="updateShowContactsOfContactValue($event)">
+                </app-form-checkbox>
 
-                        <div fxLayout="row">
-                            <app-form-radio
-                                name="nodeLabelCriteria"
-                                [(ngModel)]="colorCriteria.nodeLabelCriteria"
-                                [options]="nodeLabelCriteriaOptions$ | async">
-                            </app-form-radio>
-                        </div>
-                    </div>
+                <!--  This checkbox is valid only if 'showContacts' is already enabled -->
+                <app-form-checkbox
+                    name="includeContactsOfContacts "
+                    [disabled]="!filters.showContacts"
+                    [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_OF_CONTACTS' | translate"
+                    [(ngModel)]="filters.includeContactsOfContacts"
+                    fxFlex="150px">
+                </app-form-checkbox>
+            </div>
 
-                    <!-- Node Label Color -->
-                    <div fxLayout="column">
-                        <div>
-                            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE' | translate }}
-                        </div>
-
-                        <div fxLayout="row">
-                            <app-form-radio
-                                name="nodeNameColorCriteria"
-                                [(ngModel)]="colorCriteria.nodeNameColorCriteria"
-                                [options]="nodeColorCriteriaOptions$ | async">
-                            </app-form-radio>
-                        </div>
-                    </div>
-
-                    <!-- Node Color -->
-                    <div fxLayout="column">
-                        <div>
-                            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE' | translate }}
-                        </div>
-
-                        <div fxLayout="row">
-                            <app-form-radio
-                                name="nodeColorCriteria"
-                                [(ngModel)]="colorCriteria.nodeColorCriteria"
-                                [options]="nodeColorCriteriaOptions$ | async">
-                            </app-form-radio>
-                        </div>
-                    </div>
-
-                    <!-- Node Icon -->
-                    <div fxLayout="column">
-                        <div>
-                            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_ICON_TITLE' | translate }}
-                        </div>
-
-                        <div fxLayout="row">
-                            <app-form-radio
-                                name="nodeIconCriteria"
-                                [(ngModel)]="colorCriteria.nodeIconCriteria"
-                                [options]="nodeIconCriteriaOptions$ | async">
-                            </app-form-radio>
-                        </div>
-                    </div>
-
-                    <!-- Node Shape -->
-                    <div fxLayout="column">
-                        <div>
-                            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SHAPE_TITLE' | translate }}
-                        </div>
-
-                        <div fxLayout="row">
-                            <app-form-radio
-                                name="nodeShapeCriteria"
-                                [(ngModel)]="colorCriteria.nodeShapeCriteria"
-                                [options]="nodeShapeCriteriaOptions$ | async">
-                            </app-form-radio>
-                        </div>
-                    </div>
-
-                </mat-card>
-
-                <!-- Edge Settings -->
-                <mat-card fxLayout="column" fxLayoutGap="10px">
-                    <div class="settings-container-title">
-                        {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_SETTINGS_TITLE' | translate }}
-                    </div>
-
-                    <!-- Edge Label -->
-                    <div fxLayout="column">
-                        <div>
-                            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_LABEL_TITLE' | translate }}
-                        </div>
-
-                        <div fxLayout="row">
-                            <app-form-radio
-                                name="edgeLabelCriteria"
-                                [(ngModel)]="colorCriteria.edgeLabelCriteria"
-                                [options]="edgeLabelCriteriaOptions$ | async"
-                                (optionChanged)="changeEdgeLabelIconSelection('label',$event)">
-                            </app-form-radio>
-                        </div>
-                    </div>
-
-                    <!-- Edge Icon -->
-                    <div fxLayout="column">
-                        <div>
-                            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_ICON_TITLE' | translate }}
-                        </div>
-
-                        <div fxLayout="row">
-                            <app-form-radio
-                                name="edgeIconCriteria"
-                                [(ngModel)]="colorCriteria.edgeIconCriteria"
-                                [options]="edgeIconCriteriaOptions$ | async"
-                                (optionChanged)="changeEdgeLabelIconSelection('icon',$event)">
-                            </app-form-radio>
-                        </div>
-                    </div>
-
-                    <!-- Edge Color -->
-                    <div fxLayout="column">
-                        <div>
-                            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE' | translate }}
-                        </div>
-
-                        <div fxLayout="row">
-                            <app-form-radio
-                                name="edgeColorCriteria"
-                                [(ngModel)]="colorCriteria.edgeColorCriteria"
-                                [options]="edgeColorCriteriaOptions$ | async">
-                            </app-form-radio>
-                        </div>
-                    </div>
-                </mat-card>
+            <!-- Date - moment in time -->
+            <div
+                fxFlex="150px">
+                <app-form-datepicker
+                    class="global-date-filter"
+                    [(ngModel)]="dateGlobalFilter"
+                    [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTER_DATE' | translate"
+                    [tooltip]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTER_DESCRIPTION' | translate">
+                </app-form-datepicker>
             </div>
         </div>
 
-        <div fxLayout="row" fxFlexAlign="end" fxLayoutGap="10px">
-            <!-- Reset filters -->
-            <button
-                fxFlex="150px"
-                mat-raised-button
-                (click)="resetFilters()">
-                {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_RESET_SETTINGS' | translate }}
-            </button>
+        <!-- Filters -->
+        <app-transmission-chain-filters
+            fxFlex
+            titleName="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTERS_TITLE"
+            [filters]="filters"
+            [clusterOptions]="clusterOptions">
+        </app-transmission-chain-filters>
 
+        <div fxLayout="row" fxFlexAlign="end" fxLayoutGap="10px">
             <!-- Apply filters -->
             <button
                 fxFlex="150px"
                 mat-raised-button
                 color="accent"
-                (click)="refreshChain()">
+                (click)="generateChainsOfTransmission()">
                 {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_APPLY_SETTINGS' | translate }}
             </button>
         </div>
+    </div>
+
+    <!-- Graph configuration -->
+    <div
+        *ngIf="showGraphConfiguration"
+        fxFlex fxLayout="column" fxLayoutGap="20px"
+        class="settings-container">
+        <!-- Node Settings -->
+        <mat-card fxLayout="column" fxLayoutGap="10px">
+            <div class="settings-container-title">
+                {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SETTINGS_TITLE' | translate }}
+            </div>
+
+            <!-- Node Label -->
+            <div fxLayout="column">
+                <div>
+                    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_TITLE' | translate }}
+                </div>
+
+                <div fxLayout="row">
+                    <app-form-radio
+                        name="nodeLabelCriteria"
+                        [(ngModel)]="colorCriteria.nodeLabelCriteria"
+                        [options]="nodeLabelCriteriaOptions$ | async">
+                    </app-form-radio>
+                </div>
+            </div>
+
+            <!-- Node Label Color -->
+            <div fxLayout="column">
+                <div>
+                    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE' | translate }}
+                </div>
+
+                <div fxLayout="row">
+                    <app-form-radio
+                        name="nodeNameColorCriteria"
+                        [(ngModel)]="colorCriteria.nodeNameColorCriteria"
+                        [options]="nodeColorCriteriaOptions$ | async">
+                    </app-form-radio>
+                </div>
+            </div>
+
+            <!-- Node Color -->
+            <div fxLayout="column">
+                <div>
+                    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE' | translate }}
+                </div>
+
+                <div fxLayout="row">
+                    <app-form-radio
+                        name="nodeColorCriteria"
+                        [(ngModel)]="colorCriteria.nodeColorCriteria"
+                        [options]="nodeColorCriteriaOptions$ | async">
+                    </app-form-radio>
+                </div>
+            </div>
+
+            <!-- Node Icon -->
+            <div fxLayout="column">
+                <div>
+                    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_ICON_TITLE' | translate }}
+                </div>
+
+                <div fxLayout="row">
+                    <app-form-radio
+                        name="nodeIconCriteria"
+                        [(ngModel)]="colorCriteria.nodeIconCriteria"
+                        [options]="nodeIconCriteriaOptions$ | async">
+                    </app-form-radio>
+                </div>
+            </div>
+
+            <!-- Node Shape -->
+            <div fxLayout="column">
+                <div>
+                    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SHAPE_TITLE' | translate }}
+                </div>
+
+                <div fxLayout="row">
+                    <app-form-radio
+                        name="nodeShapeCriteria"
+                        [(ngModel)]="colorCriteria.nodeShapeCriteria"
+                        [options]="nodeShapeCriteriaOptions$ | async">
+                    </app-form-radio>
+                </div>
+            </div>
+
+        </mat-card>
+
+        <!-- Edge Settings -->
+        <mat-card fxLayout="column" fxLayoutGap="10px">
+            <div class="settings-container-title">
+                {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_SETTINGS_TITLE' | translate }}
+            </div>
+
+            <!-- Edge Label -->
+            <div fxLayout="column">
+                <div>
+                    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_LABEL_TITLE' | translate }}
+                </div>
+
+                <div fxLayout="row">
+                    <app-form-radio
+                        name="edgeLabelCriteria"
+                        [(ngModel)]="colorCriteria.edgeLabelCriteria"
+                        [options]="edgeLabelCriteriaOptions$ | async"
+                        (optionChanged)="changeEdgeLabelIconSelection('label',$event)">
+                    </app-form-radio>
+                </div>
+            </div>
+
+            <!-- Edge Icon -->
+            <div fxLayout="column">
+                <div>
+                    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_ICON_TITLE' | translate }}
+                </div>
+
+                <div fxLayout="row">
+                    <app-form-radio
+                        name="edgeIconCriteria"
+                        [(ngModel)]="colorCriteria.edgeIconCriteria"
+                        [options]="edgeIconCriteriaOptions$ | async"
+                        (optionChanged)="changeEdgeLabelIconSelection('icon',$event)">
+                    </app-form-radio>
+                </div>
+            </div>
+
+            <!-- Edge Color -->
+            <div fxLayout="column">
+                <div>
+                    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE' | translate }}
+                </div>
+
+                <div fxLayout="row">
+                    <app-form-radio
+                        name="edgeColorCriteria"
+                        [(ngModel)]="colorCriteria.edgeColorCriteria"
+                        [options]="edgeColorCriteriaOptions$ | async">
+                    </app-form-radio>
+                </div>
+            </div>
+        </mat-card>
+    </div>
+
+    <!-- Load snapshot -->
+    <div
+        *ngIf="!showFilters"
+        fxFlex fxLayout="column" fxLayoutGap="20px"
+        class="settings-container">
+        <mat-card fxLayout="column" fxLayoutGap="10px">
+            <div
+                fxLayout="row" fxLayoutGap="20px">
+
+                <!-- Snapshots -->
+                <app-form-select
+                    name="snapshotsList"
+                    [(ngModel)]="selectedSnapshot"
+                    required="true"
+                    [options]="snapshotOptions"
+                    [clearable]="false"
+                    (ngModelChange)="mustLoadChain = true">
+                </app-form-select>
+
+                <!-- dropdown with view types -->
+                <app-form-select
+                    name="chainView"
+                    [(ngModel)]="transmissionChainViewType"
+                    required="true"
+                    [options]="transmissionChainViewTypes"
+                    [clearable]="false"
+                    (ngModelChange)="mustLoadChain = true">
+                </app-form-select>
+
+            </div>
+
+            <div
+                *ngIf="mustLoadChain"
+                fxLayout="row" fxFlexAlign="end" fxLayoutGap="10px">
+                <!-- Apply filters -->
+                <button
+                    fxFlex="150px"
+                    mat-raised-button
+                    color="accent"
+                    (click)="loadChainsOfTransmission()">
+                    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_LOAD_SNAPSHOT' | translate }}
+                </button>
+            </div>
+        </mat-card>
+
     </div>
 </div>
 
 <!-- cytoscape element -->
 <div
+    *ngIf="chainGroup && !mustLoadChain"
     class="cytoscape-graph-element">
     <div class="cytoscape-graph-container">
-        <!-- dropdown with view types -->
-        <app-form-select
-            name="chainView"
-            [ngModel]="transmissionChainViewType"
-            required="true"
-            [options]="transmissionChainViewTypes$ | async"
-            (optionChanged)="updateView($event)"
-            [clearable]="false">
-        </app-form-select>
-
         <!-- legend -->
         <div
             *ngIf="legend && showLegend && (transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0)"
@@ -496,15 +539,9 @@
     <div>
         {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CHAINS_FILTERED_BY_SIZE' | translate}} {{sizeOfChainsFilter}}
     </div>
-    <button mat-raised-button (click)="resetChain()">
-        {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_RESET_CHAINS' | translate }}
-    </button>
 </div>
 <div *ngIf="personId">
     <div>
         {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CHAINS_FILTERED_BY_PERSON' | translate}} {{personName}}
     </div>
-    <button mat-raised-button (click)="resetChain()">
-        {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_RESET_CHAINS' | translate }}
-    </button>
 </div>

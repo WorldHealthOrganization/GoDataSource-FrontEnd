@@ -14,7 +14,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
@@ -23,7 +23,7 @@ import { ClusterDataService } from '../../../../core/services/data/cluster.data.
 import { ActivatedRoute } from '@angular/router';
 import { TransmissionChainGroupModel, TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 import { TransmissionChainFilters } from '../transmission-chains-filters/transmission-chains-filters.component';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { WorldMapMarker, WorldMapPath, WorldMapMarkerLayer, WorldMapPoint, WorldMapMarkerType, WorldMapComponent, WorldMapPathType } from '../../../../common-modules/world-map/components/world-map/world-map.component';
@@ -67,11 +67,12 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     ClusterModel = ClusterModel;
 
     selectedOutbreak: OutbreakModel;
+    chainGroupId: string;
     chainGroup: TransmissionChainGroupModel;
     graphElements: IConvertChainToGraphElements;
-    showSettings: boolean = false;
+    showFilters: boolean = false;
+    showGraphConfiguration: boolean = false;
     filters: TransmissionChainFilters = new TransmissionChainFilters();
-    resetFiltersData: any;
     locationsListMap: {
         [idLocation: string]: LocationModel
     } = {};
@@ -151,7 +152,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     };
 
     // default color criteria
-    resetColorCriteriaData: any;
     colorCriteria: any = {
         nodeLabelCriteria: Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.NAME.value,
         nodeColorCriteria: Constants.TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS.TYPE.value,
@@ -194,13 +194,20 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     // authenticated user
     authUser: UserModel;
 
+    // tell system that we must load chain
+    mustLoadChain: boolean = true;
+
+    // snapshots
+    snapshotOptions: LabelValuePair[];
+    selectedSnapshot: string;
+
     // cytoscape-graph.component data
     style: any;
     transmissionChainViewType: string;
     markers: WorldMapMarker[] = [];
     lines: WorldMapPath[] = [];
     cy: any;
-    transmissionChainViewTypes$: Observable<LabelValuePair[]>;
+    transmissionChainViewTypes: LabelValuePair[];
     timelineViewType: string = 'horizontal';
     datesArrayMap: {
         [key: string]: number
@@ -386,12 +393,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         }
     ];
 
-    // keep cytoscape object configs
-    private _cytoConf: any;
-
-    // data loaded
-    private _dataLoaded: boolean = false;
-
     /**
      * Constructor
      */
@@ -428,6 +429,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         this.filters.includeContactsOfContacts = false;
         this.filters.showEvents = true;
 
+        // color criteria
         this.nodeColorCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeColorCriteriaOptions();
         this.edgeColorCriteriaOptions$ = this.genericDataService.getTransmissionChainEdgeColorCriteriaOptions();
         this.edgeLabelCriteriaOptions$ = this.genericDataService.getTransmissionChainEdgeLabelCriteriaOptions();
@@ -437,53 +439,49 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         this.nodeLabelCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeLabelCriteriaOptions();
 
         // load view types
-        this.transmissionChainViewTypes$ = this.genericDataService
+        this.genericDataService
             .getTransmissionChainViewTypes()
-            .pipe(
-                map((types: LabelValuePair[]): LabelValuePair[] => {
-                    // determine items to which we have access
-                    const filteredTypes: LabelValuePair[] = [];
-                    types.forEach((type: LabelValuePair) => {
-                        if (
-                            (
-                                type.value === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value &&
-                                TransmissionChainModel.canViewBubbleNetwork(this.authUser)
-                            ) || (
-                                type.value === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.HIERARCHICAL_NETWORK.value &&
-                                TransmissionChainModel.canViewHierarchicalNetwork(this.authUser)
-                            ) || (
-                                type.value === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value &&
-                                TransmissionChainModel.canViewTimelineNetworkDateOfOnset(this.authUser)
-                            ) || (
-                                type.value === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value &&
-                                TransmissionChainModel.canViewTimelineNetworkDateOfLastContact(this.authUser)
-                            ) || (
-                                type.value === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value &&
-                                TransmissionChainModel.canViewTimelineNetworkDateOfReporting(this.authUser)
-                            ) || (
-                                type.value === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value &&
-                                TransmissionChainModel.canViewGeospatialMap(this.authUser)
-                            )
-                        ) {
-                            filteredTypes.push(type);
-                        }
-                    });
-
-                    // default to bubble
+            .subscribe((types: LabelValuePair[]): void => {
+                // determine items to which we have access
+                const filteredTypes: LabelValuePair[] = [];
+                types.forEach((type: LabelValuePair) => {
                     if (
-                        !this.transmissionChainViewType &&
-                        filteredTypes.length > 0
+                        (
+                            type.value === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value &&
+                            TransmissionChainModel.canViewBubbleNetwork(this.authUser)
+                        ) || (
+                            type.value === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.HIERARCHICAL_NETWORK.value &&
+                            TransmissionChainModel.canViewHierarchicalNetwork(this.authUser)
+                        ) || (
+                            type.value === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value &&
+                            TransmissionChainModel.canViewTimelineNetworkDateOfOnset(this.authUser)
+                        ) || (
+                            type.value === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value &&
+                            TransmissionChainModel.canViewTimelineNetworkDateOfLastContact(this.authUser)
+                        ) || (
+                            type.value === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value &&
+                            TransmissionChainModel.canViewTimelineNetworkDateOfReporting(this.authUser)
+                        ) || (
+                            type.value === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value &&
+                            TransmissionChainModel.canViewGeospatialMap(this.authUser)
+                        )
                     ) {
-                        // set value
-                        this.updateView({
-                            value: filteredTypes[0].value
-                        });
+                        filteredTypes.push(type);
                     }
+                });
 
-                    // finished
-                    return filteredTypes;
-                })
-            );
+                // default to bubble
+                if (
+                    !this.transmissionChainViewType &&
+                    filteredTypes.length > 0
+                ) {
+                    // set value
+                    this.transmissionChainViewType = filteredTypes[0].value;
+                }
+
+                // finished
+                this.transmissionChainViewTypes = filteredTypes;
+            });
 
         // check if we have global filters set
         this.route.queryParams.subscribe((queryParams: any) => {
@@ -565,8 +563,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                                     });
                                 });
 
-                            // load chain
-                            this.displayChainsOfTransmission(true);
+                            // retrieve snapshots
+                            this.retrieveSnapshotsList();
                         }
                     });
             });
@@ -589,9 +587,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     /**
      * Display chains of transmission
      */
-    displayChainsOfTransmission(
-        reloadData: boolean
-    ) {
+    generateChainsOfTransmission() {
+        // close settings panel
+        this.showFilters = false;
+        this.showGraphConfiguration = false;
+
         // if there is no outbreak then we can't continue
         if (
             !this.selectedOutbreak ||
@@ -601,322 +601,179 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             return;
         }
 
-        // configure data
-        if (this.transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value) {
-            // format chart
-            this.mapColorCriteria();
+        // create queryBuilder for filters
+        const requestQueryBuilder = new RequestQueryBuilder();
+        requestQueryBuilder.filter.firstLevelConditions();
+
+        // retrieve only specific fields so we don't retrieve huge amounts of data that won't be used since we don't have pagination here
+        requestQueryBuilder.fields(
+            // edges
+            'edges.id',
+            'edges.persons',
+            'edges.certaintyLevelId',
+            'edges.socialRelationshipTypeId',
+            'edges.socialRelationshipDetail',
+            'edges.exposureTypeId',
+            'edges.exposureFrequencyId',
+            'edges.exposureDurationId',
+            'edges.contactDate',
+            'edges.clusterId',
+
+            // nodes
+            'nodes.id',
+            'nodes.type',
+            'nodes.date',
+            'nodes.dateOfOnset',
+            'nodes.dateOfLastContact',
+            'nodes.dateOfReporting',
+            'nodes.classification',
+            'nodes.name',
+            'nodes.firstName',
+            'nodes.middleName',
+            'nodes.lastName',
+            'nodes.riskLevel',
+            'nodes.gender',
+            'nodes.occupation',
+            'nodes.outcomeId',
+            'nodes.age',
+            'nodes.dob',
+            'nodes.address',
+            'nodes.addresses',
+            'nodes.visualId',
+            'nodes.classification',
+            'nodes.isDateOfOnsetApproximate'
+        );
+
+        // do we have chainIncludesPerson filters ?
+        if (this.personId) {
+            // include custom person builder that will handle these filters
+            const chainIncludesPersonRequestQueryBuilder: RequestQueryBuilder = requestQueryBuilder.addChildQueryBuilder('chainIncludesPerson');
+            chainIncludesPersonRequestQueryBuilder.filter.byEquality(
+                'id',
+                this.personId
+            );
         }
 
-        // reload data
-        if (reloadData) {
-            // data loaded
-            this._dataLoaded = true;
-
-            // create queryBuilder for filters
-            const requestQueryBuilder = new RequestQueryBuilder();
-            requestQueryBuilder.filter.firstLevelConditions();
-
-            // retrieve only specific fields so we don't retrieve huge amounts of data that won't be used since we don't have pagination here
-            requestQueryBuilder.fields(
-                // edges
-                'edges.id',
-                'edges.persons',
-                'edges.certaintyLevelId',
-                'edges.socialRelationshipTypeId',
-                'edges.socialRelationshipDetail',
-                'edges.exposureTypeId',
-                'edges.exposureFrequencyId',
-                'edges.exposureDurationId',
-                'edges.contactDate',
-                'edges.clusterId',
-
-                // nodes
-                'nodes.id',
-                'nodes.type',
-                'nodes.date',
-                'nodes.dateOfOnset',
-                'nodes.dateOfLastContact',
-                'nodes.dateOfReporting',
-                'nodes.classification',
-                'nodes.name',
-                'nodes.firstName',
-                'nodes.middleName',
-                'nodes.lastName',
-                'nodes.riskLevel',
-                'nodes.gender',
-                'nodes.occupation',
-                'nodes.outcomeId',
-                'nodes.age',
-                'nodes.dob',
-                'nodes.address',
-                'nodes.addresses',
-                'nodes.visualId',
-                'nodes.classification',
-                'nodes.isDateOfOnsetApproximate'
+        // add filter for size ( under where )
+        if (this.sizeOfChainsFilter) {
+            requestQueryBuilder.filter.byEquality(
+                'size',
+                _.parseInt(this.sizeOfChainsFilter)
             );
+        }
 
-            // do we have chainIncludesPerson filters ?
+        // global date - see state in time
+        if (this.dateGlobalFilter) {
+            requestQueryBuilder.filter.byEquality(
+                'endDate',
+                moment(this.dateGlobalFilter).toISOString()
+            );
+        }
+
+        // add flags
+        if (this.filters.showContacts) {
+            requestQueryBuilder.filter.flag('includeContacts', 1);
+            // add this flag only if the user is on a personal chain of transmission
             if (this.personId) {
-                // include custom person builder that will handle these filters
-                const chainIncludesPersonRequestQueryBuilder: RequestQueryBuilder = requestQueryBuilder.addChildQueryBuilder('chainIncludesPerson');
-                chainIncludesPersonRequestQueryBuilder.filter.byEquality(
-                    'id',
-                    this.personId
-                );
+                requestQueryBuilder.filter.flag('noContactChains', false);
             }
 
-            // add filter for size ( under where )
-            if (this.sizeOfChainsFilter) {
-                requestQueryBuilder.filter.byEquality(
-                    'size',
-                    _.parseInt(this.sizeOfChainsFilter)
-                );
+            // this flag is working only if 'showContacts' is true
+            if (this.filters.includeContactsOfContacts) {
+                requestQueryBuilder.filter.flag('includeContactsOfContacts', 1);
             }
+        }
 
-            // global date - see state in time
-            if (this.dateGlobalFilter) {
-                requestQueryBuilder.filter.byEquality(
-                    'endDate',
-                    moment(this.dateGlobalFilter).toISOString()
-                );
-            }
+        // person query
+        const personQuery = requestQueryBuilder.addChildQueryBuilder('person');
 
-            // add flags
-            if (this.filters.showContacts) {
-                requestQueryBuilder.filter.flag('includeContacts', 1);
-                // add this flag only if the user is on a personal chain of transmission
-                if (this.personId) {
-                    requestQueryBuilder.filter.flag('noContactChains', false);
-                }
+        // discarded cases
+        // handled by API
+        // NOTHING to do here
 
-                // this flag is working only if 'showContacts' is true
-                if (this.filters.includeContactsOfContacts) {
-                    requestQueryBuilder.filter.flag('includeContactsOfContacts', 1);
-                }
-            }
+        // attach other filters ( locations & classifications & others... )
+        if (!_.isEmpty(this.filters)) {
+            // include custom person builder that will handle these filters
+            const filterObject = new TransmissionChainFilters(this.filters);
+            filterObject.attachConditionsToRequestQueryBuilder(personQuery);
 
-            // person query
-            const personQuery = requestQueryBuilder.addChildQueryBuilder('person');
-
-            // discarded cases
-            // handled by API
-            // NOTHING to do here
-
-            // attach other filters ( locations & classifications & others... )
-            if (!_.isEmpty(this.filters)) {
-                // include custom person builder that will handle these filters
-                const filterObject = new TransmissionChainFilters(this.filters);
-                filterObject.attachConditionsToRequestQueryBuilder(personQuery);
-
-                // attach classification conditions to parent qb as well ( besides personQuery )
-                // isolated classification
-                if (!_.isEmpty(filterObject.classificationId)) {
-                    requestQueryBuilder.filter.where({
-                        or: [
-                            {
-                                type: {
-                                    neq: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE'
-                                }
-                            }, {
-                                type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
-                                classification: {
-                                    inq: filterObject.classificationId
-                                }
+            // attach classification conditions to parent qb as well ( besides personQuery )
+            // isolated classification
+            if (!_.isEmpty(filterObject.classificationId)) {
+                requestQueryBuilder.filter.where({
+                    or: [
+                        {
+                            type: {
+                                neq: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE'
                             }
-                        ]
-                    });
-                }
-
-                // attach cluster condition
-                if (!_.isEmpty(filterObject.clusterIds)) {
-                    requestQueryBuilder.filter.where({
-                        clusterId: {
-                            inq: filterObject.clusterIds
+                        }, {
+                            type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+                            classification: {
+                                inq: filterObject.classificationId
+                            }
                         }
-                    });
-                }
+                    ]
+                });
             }
 
-            // display loading
-            const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
-
-            // get chain data and convert to graph nodes
-            this.transmissionChainDataService
-                .getIndependentTransmissionChainData(
-                    this.selectedOutbreak.id,
-                    requestQueryBuilder
-                )
-                .pipe(
-                    catchError((err) => {
-                        // display error message
-                        this.snackbarService.showApiError(err);
-
-                        // finished
-                        loadingDialog.close();
-                        return throwError(err);
-                    })
-                )
-                .subscribe((chainGroup) => {
-                    // determine locations that we need to retrieve
-                    let locationIdsToRetrieve: any = {};
-                    _.forEach(chainGroup.nodesMap, (node) => {
-                        // determine main address
-                        let mainAddress: AddressModel;
-                        if (node.type === EntityType.EVENT) {
-                            mainAddress = (node.model as EventModel).address;
-                        } else {
-                            mainAddress = (node.model as CaseModel | ContactModel | ContactOfContactModel).mainAddress;
-                        }
-
-                        // check if we have location
-                        if (
-                            mainAddress &&
-                            mainAddress.locationId
-                        ) {
-                            locationIdsToRetrieve[mainAddress.locationId] = true;
-                        }
-                    });
-
-                    // transform locations to array
-                    locationIdsToRetrieve = Object.keys(locationIdsToRetrieve);
-
-                    // do we need to retrieve locations ?
-                    if (locationIdsToRetrieve.length < 1) {
-                        // reset locations
-                        this.locationsListMap = {};
-
-                        // keep original chains
-                        this.chainGroup = chainGroup;
-                        this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(
-                            this.chainGroup.clone(),
-                            this.filters,
-                            this.legend,
-                            this.locationsListMap,
-                            this.transmissionChainViewType
-                        );
-
-                        // finished
-                        loadingDialog.close();
-
-                        // configure geo map
-                        if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value) {
-                            this.initGeospatialMap();
-                        }
-
-                        // render
-                        this.renderGraph();
-                    } else {
-                        // retrieve locations
-                        const locationQueryBuilder = new RequestQueryBuilder();
-                        locationQueryBuilder.fields('id', 'name');
-                        locationQueryBuilder.filter.bySelect(
-                            'id',
-                            locationIdsToRetrieve,
-                            false,
-                            null
-                        );
-                        this.locationDataService
-                            .getLocationsList(locationQueryBuilder)
-                            .pipe(
-                                catchError((err) => {
-                                    // display error message
-                                    this.snackbarService.showApiError(err);
-
-                                    // finished
-                                    loadingDialog.close();
-                                    return throwError(err);
-                                })
-                            )
-                            .subscribe((locations) => {
-                                // map locations
-                                this.locationsListMap = {};
-                                (locations || []).forEach((location) => {
-                                    this.locationsListMap[location.id] = location;
-                                });
-
-                                // keep original chains
-                                this.chainGroup = chainGroup;
-                                this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(
-                                    this.chainGroup.clone(),
-                                    this.filters,
-                                    this.legend,
-                                    this.locationsListMap,
-                                    this.transmissionChainViewType
-                                );
-
-                                // finished
-                                loadingDialog.close();
-
-                                // configure geo map
-                                if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value) {
-                                    this.initGeospatialMap();
-                                }
-
-                                // render
-                                this.renderGraph();
-                            });
+            // attach cluster condition
+            if (!_.isEmpty(filterObject.clusterIds)) {
+                requestQueryBuilder.filter.where({
+                    clusterId: {
+                        inq: filterObject.clusterIds
                     }
                 });
-        } else {
-            this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(
-                this.chainGroup.clone(),
-                this.filters,
-                this.legend,
-                this.locationsListMap,
-                this.transmissionChainViewType
-            );
-
-            // configure geo map
-            if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value) {
-                this.initGeospatialMap();
             }
-
-            // render
-            this.renderGraph();
         }
+
+        // display loading
+        const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
+
+        // get chain data and convert to graph nodes
+        this.transmissionChainDataService
+            .calculateIndependentTransmissionChains(
+                this.selectedOutbreak.id,
+                requestQueryBuilder
+            )
+            .pipe(
+                catchError((err) => {
+                    // display error message
+                    this.snackbarService.showApiError(err);
+
+                    // finished
+                    loadingDialog.close();
+                    return throwError(err);
+                })
+            )
+            .subscribe((data) => {
+                // display message
+                this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_GENERATE_SNAPSHOT_IN_PROGRESS');
+
+                // select snapshot
+                this.selectedSnapshot = data.transmissionChainId;
+
+                // update list of snapshots
+                this.retrieveSnapshotsList();
+
+                // finished
+                loadingDialog.close();
+            });
     }
 
     /**
-     * display / hide the settings section
+     * Show filters
      */
-    toggleSettings() {
-        this.showSettings = !this.showSettings;
-
-        // get default filters
-        setTimeout(() => {
-            if (
-                this.showSettings &&
-                !this.resetFiltersData
-            ) {
-                this.resetFiltersData = _.cloneDeep(this.filters);
-                this.resetColorCriteriaData = _.cloneDeep(this.colorCriteria);
-            }
-        });
+    showFiltersHideGraphConf(): void {
+        this.showFilters = true;
+        this.showGraphConfiguration = false;
     }
 
     /**
-     * refresh chain data based on filters
+     * Show graph configuration
      */
-    refreshChain() {
-        // refresh chart
-        this.displayChainsOfTransmission(true);
-
-        // close settings panel
-        this.showSettings = false;
-    }
-
-    /**
-     * reset filters
-     */
-    resetFilters() {
-        // reset settings
-        this.filters = _.cloneDeep(this.resetFiltersData);
-        this.colorCriteria = _.cloneDeep(this.resetColorCriteriaData);
-
-        // close settings panel
-        setTimeout(() => {
-            this.refreshChain();
-        });
+    showGraphConfigurationHideFilters(): void {
+        this.showFilters = false;
+        this.showGraphConfiguration = true;
     }
 
     /**
@@ -1110,22 +967,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * reset chain - navigate to chains of transmission not filtered
-     */
-    resetChain() {
-        this.sizeOfChainsFilter = null;
-        this.personId = null;
-        this.refreshChain();
-    }
-
-    /**
-     * Reload COT when global date changes
-     */
-    onChangeGlobalDate() {
-        this.displayChainsOfTransmission(true);
-    }
-
-    /**
      * return the png representation of the graph
      * @param {number} splitFactor
      * @returns {any}
@@ -1202,7 +1043,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         if (this.cy) {
             this.cy.destroy();
             this.cy = null;
-            this._cytoConf = undefined;
         }
     }
 
@@ -1239,26 +1079,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         // load the correct layout based on the view selected
         this.configureGraphViewType();
 
-        // define new confs
-        const cytoConf = {
-            layout: this.layout,
-            style: this.style,
-            elements: this.graphElements,
-            minZoom: this.defaultZoom.min,
-            maxZoom: this.defaultZoom.max,
-            wheelSensitivity: TransmissionChainsDashletComponent.wheelSensitivity
-        };
-
-        // check if confs are the same then there is no point in rendering again
-        if (_.isEqual(cytoConf, this._cytoConf)) {
-            return;
-        }
-
         // release cyto
         this.destroyCytoscape();
-
-        // use the new confs
-        this._cytoConf = cytoConf;
 
         // display loading
         const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
@@ -1268,7 +1090,14 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 {
                     container: this.cyRef.nativeElement
                 },
-                this._cytoConf
+                {
+                    layout: this.layout,
+                    style: this.style,
+                    elements: this.graphElements,
+                    minZoom: this.defaultZoom.min,
+                    maxZoom: this.defaultZoom.max,
+                    wheelSensitivity: TransmissionChainsDashletComponent.wheelSensitivity
+                }
             ));
 
             // add node tap event
@@ -1489,13 +1318,25 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     /**
      * re-render the layout on view type change
      */
-    updateView($event) {
-        // change type
-        this.transmissionChainViewType = $event.value;
-
-        // refresh chain to load the new criteria
+    updateView() {
+        // wait for binding
         setTimeout(() => {
-            this.displayChainsOfTransmission(!this._dataLoaded);
+            // refresh chain to load the new criteria
+            this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(
+                this.chainGroup.clone(),
+                this.filters,
+                this.legend,
+                this.locationsListMap,
+                this.transmissionChainViewType
+            );
+
+            // configure geo map
+            if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value) {
+                this.initGeospatialMap();
+            }
+
+            // render
+            this.renderGraph();
         });
     }
 
@@ -2078,6 +1919,197 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
         // finished
         return false;
+    }
+
+    /**
+     * Retrieve snapshots list
+     */
+    retrieveSnapshotsList(): void {
+        // do we have required data ?
+        if (
+            !this.selectedOutbreak ||
+            !this.selectedOutbreak.id
+        ) {
+            return;
+        }
+
+        // configure query builder
+        const qb = new RequestQueryBuilder();
+
+        // sort
+        qb.sort.by(
+            'startDate',
+            RequestSortDirection.DESC
+        );
+
+        // filter out failed
+        qb.filter.where({
+            status: {
+                neq: Constants.COT_SNAPSHOT_STATUSES.LNG_COT_STATUS_FAILED.value
+            }
+        });
+
+        // retrieve snapshots
+        this.transmissionChainDataService
+            .getSnapshotsList(
+                this.selectedOutbreak.id,
+                qb
+            )
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                })
+            )
+            .subscribe((snapshots) => {
+                // format snapshots
+                this.snapshotOptions = [];
+                (snapshots || []).forEach((snapshot) => {
+                    // snapshot name
+                    const name: string = snapshot.startDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT);
+
+                    // add snapshot to list of options
+                    this.snapshotOptions.push(new LabelValuePair(
+                        snapshot.status === Constants.COT_SNAPSHOT_STATUSES.LNG_COT_STATUS_IN_PROGRESS.value ?
+                            this.i18nService.instant(
+                                'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SNAPSHOT_STATUS__IN_PROGRESS', {
+                                    name: name
+                                }
+                            ) :
+                            name,
+                        snapshot.id,
+                        snapshot.status === Constants.COT_SNAPSHOT_STATUSES.LNG_COT_STATUS_IN_PROGRESS.value
+                    ));
+                });
+            });
+    }
+
+    /**
+     * Retrieve snapshot / refresh graph
+     */
+    loadChainsOfTransmission(): void {
+        // do we have required data ?
+        if (
+            !this.selectedOutbreak ||
+            !this.selectedOutbreak.id ||
+            !this.selectedSnapshot
+        ) {
+            return;
+        }
+
+        // chain loaded
+        this.mustLoadChain = false;
+
+        // configure data
+        if (this.transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value) {
+            // format chart
+            this.mapColorCriteria();
+        }
+
+        // same group, we don't need to retrieve anything from BE ?
+        if (this.chainGroupId === this.selectedSnapshot) {
+            // update view
+            this.updateView();
+
+            // finished
+            return;
+        }
+
+        // retrieve chain of transmission
+        const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
+        this.chainGroup = undefined;
+        this.chainGroupId = this.selectedSnapshot;
+        this.transmissionChainDataService
+            .getCalculatedIndependentTransmissionChains(
+                this.selectedOutbreak.id,
+                this.selectedSnapshot
+            )
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+
+                    // finished
+                    loadingDialog.close();
+                    return throwError(err);
+                })
+            )
+            .subscribe((chainGroup) => {
+                // determine locations that we need to retrieve
+                let locationIdsToRetrieve: any = {};
+                _.forEach(chainGroup.nodesMap, (node) => {
+                    // determine main address
+                    let mainAddress: AddressModel;
+                    if (node.type === EntityType.EVENT) {
+                        mainAddress = (node.model as EventModel).address;
+                    } else {
+                        mainAddress = (node.model as CaseModel | ContactModel | ContactOfContactModel).mainAddress;
+                    }
+
+                    // check if we have location
+                    if (
+                        mainAddress &&
+                        mainAddress.locationId
+                    ) {
+                        locationIdsToRetrieve[mainAddress.locationId] = true;
+                    }
+                });
+
+                // transform locations to array
+                locationIdsToRetrieve = Object.keys(locationIdsToRetrieve);
+
+                // do we need to retrieve locations ?
+                if (locationIdsToRetrieve.length < 1) {
+                    // reset locations
+                    this.locationsListMap = {};
+
+                    // keep original chains
+                    this.chainGroup = chainGroup;
+
+                    // finished
+                    loadingDialog.close();
+
+                    // update view
+                    this.updateView();
+                } else {
+                    // retrieve locations
+                    const locationQueryBuilder = new RequestQueryBuilder();
+                    locationQueryBuilder.fields('id', 'name');
+                    locationQueryBuilder.filter.bySelect(
+                        'id',
+                        locationIdsToRetrieve,
+                        false,
+                        null
+                    );
+                    this.locationDataService
+                        .getLocationsList(locationQueryBuilder)
+                        .pipe(
+                            catchError((err) => {
+                                // display error message
+                                this.snackbarService.showApiError(err);
+
+                                // finished
+                                loadingDialog.close();
+                                return throwError(err);
+                            })
+                        )
+                        .subscribe((locations) => {
+                            // map locations
+                            this.locationsListMap = {};
+                            (locations || []).forEach((location) => {
+                                this.locationsListMap[location.id] = location;
+                            });
+
+                            // keep original chains
+                            this.chainGroup = chainGroup;
+
+                            // finished
+                            loadingDialog.close();
+
+                            // update view
+                            this.updateView();
+                        });
+                }
+            });
     }
 }
 
