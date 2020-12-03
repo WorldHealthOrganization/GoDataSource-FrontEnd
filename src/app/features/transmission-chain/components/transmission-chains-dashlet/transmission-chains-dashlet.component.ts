@@ -1951,6 +1951,12 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             }
         });
 
+        // created by current user
+        qb.filter.byEquality(
+            'createdBy',
+            this.authUser.id
+        );
+
         // retrieve snapshots
         this.transmissionChainDataService
             .getSnapshotsList(
