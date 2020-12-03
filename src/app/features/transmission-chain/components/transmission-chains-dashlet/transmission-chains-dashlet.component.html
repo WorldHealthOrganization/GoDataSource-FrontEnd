@@ -262,7 +262,7 @@
             </div>
 
             <div
-                *ngIf="mustLoadChain"
+                *ngIf="mustLoadChain && selectedSnapshot && transmissionChainViewType"
                 fxLayout="row" fxFlexAlign="end" fxLayoutGap="10px">
                 <!-- Apply filters -->
                 <button

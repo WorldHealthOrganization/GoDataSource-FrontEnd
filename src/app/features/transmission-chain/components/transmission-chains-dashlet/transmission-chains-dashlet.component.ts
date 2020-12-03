@@ -766,6 +766,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     showFiltersHideGraphConf(): void {
         this.showFilters = true;
         this.showGraphConfiguration = false;
+        this.mustLoadChain = true;
     }
 
     /**
@@ -774,6 +775,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     showGraphConfigurationHideFilters(): void {
         this.showFilters = false;
         this.showGraphConfiguration = true;
+        this.mustLoadChain = true;
     }
 
     /**
@@ -1996,6 +1998,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         ) {
             return;
         }
+
+        // hide filters & confs
+        this.showFilters = false;
+        this.showGraphConfiguration = false;
 
         // chain loaded
         this.mustLoadChain = false;
