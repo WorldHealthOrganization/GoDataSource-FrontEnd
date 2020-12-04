@@ -1334,7 +1334,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         setTimeout(() => {
             // refresh chain to load the new criteria
             this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(
-                this.chainGroup.clone(),
+                this.chainGroup,
                 this.filters,
                 this.legend,
                 this.locationsListMap,

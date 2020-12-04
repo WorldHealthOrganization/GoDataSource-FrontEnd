@@ -243,30 +243,6 @@ export class TransmissionChainGroupModel {
             );
         });
     }
-
-    /**
-     * Create copy
-     */
-    clone(): TransmissionChainGroupModel {
-        // clone nodes
-        const nodes = [];
-        for (const nodeKey in this.nodesMap) {
-            nodes.push(this.nodesMap[nodeKey].model);
-        }
-
-        // clone relationships
-        const relationships = this.relationships.map((relModel) => {
-            return new RelationshipModel(relModel);
-        });
-
-        // create clone
-        return new TransmissionChainGroupModel(
-            nodes,
-            relationships,
-            // no need to clone this for now...
-            this.originalChains
-        );
-    }
 }
 
 export interface ITransmissionChainGroupPageModel {
