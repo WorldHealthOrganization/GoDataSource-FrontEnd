@@ -244,19 +244,28 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     // Nodes are automatically arranged to optimally use the space
     layoutCola: any = {
         name: 'cola',
-        fit: true,
-        flow: {axis: 'y', minSeparation: 30},
-        padding: 10,
-        nodeDimensionsIncludeLabels: true,
-        maxSimulationTime: 2000,
-        avoidOverlap: true,
-        unconstrIter: 10,
-        userConstIter: 20,
+        nodeDimensionsIncludeLabels: false,
+        maxSimulationTime: 10,
+        avoidOverlap: false,
+        unconstrIter: undefined,
+        userConstIter: undefined,
+        allConstIter: undefined,
+
+        randomize: false,
+        convergenceThreshold: 0.05,
+        flow: undefined,
+        alignment: undefined,
+        gapInequalities: undefined,
+
+        edgeLength: undefined, // sets edge length directly in simulation
+        edgeSymDiffLength: undefined, // symmetric diff edge length in simulation
+        edgeJaccardLength: undefined, // jaccard edge length in simulation
+
         // disable animation since fit doesn't work properly with async anim
         animate: false,
         stop: () => {
             if (this.cy) {
-                this.cy.fit();
+                // this.cy.fit();
             }
         }
     };
