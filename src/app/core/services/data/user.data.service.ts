@@ -165,9 +165,7 @@ export class UserDataService {
     forgotPassword(data: any) {
         return this.http.post(
             'users/reset',
-            data, {
-                withCredentials: true
-            }
+            data
         );
     }
 
@@ -189,9 +187,7 @@ export class UserDataService {
     resetPasswordQuestions(data: any) {
         return this.http.post(
             'users/reset-password-with-security-question',
-            data, {
-                withCredentials: true
-            }
+            data
         );
     }
 

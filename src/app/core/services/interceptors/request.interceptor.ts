@@ -24,8 +24,12 @@ export class RequestInterceptor implements HttpInterceptor {
         const clonedRequest = request.clone({
             // set HTTP headers to be applied on request
             setHeaders: this.getHeaders(),
+
             // normalize HTTP request's URL
-            url: this.normalizeUrl(request.url)
+            url: this.normalizeUrl(request.url),
+
+            // for handling session variables
+            withCredentials: true
         });
 
         // do NOT log the "logging" request

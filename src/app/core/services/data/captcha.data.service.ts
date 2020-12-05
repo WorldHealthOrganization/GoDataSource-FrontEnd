@@ -27,9 +27,7 @@ export class CaptchaDataService {
     generateSVG(forComponent: CaptchaDataFor): Observable<SafeHtml> {
         return this.http
             .get(
-                `captcha/generate-svg?forComponent=${forComponent}`, {
-                    withCredentials: true
-                }
+                `captcha/generate-svg?forComponent=${forComponent}`
             )
             .pipe(map((svgData: string) => this.domSanitizer.bypassSecurityTrustHtml(svgData)));
     }
