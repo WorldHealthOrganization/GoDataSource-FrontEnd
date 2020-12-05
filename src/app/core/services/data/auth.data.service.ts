@@ -68,9 +68,7 @@ export class AuthDataService {
         return this.http
             .post(
                 twoFA ? 'users/two-factor-authentication-step-2' : 'users/login',
-                user, {
-                    withCredentials: true
-                }
+                user
             )
             .pipe(
                 switchMap((authRes: IAuthTwoFactor | AuthModel) => {
