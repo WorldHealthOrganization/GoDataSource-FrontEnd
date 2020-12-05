@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
-import { TransmissionChainGroupModel } from '../../models/transmission-chain.model';
+import { ITransmissionChainGroupPageModel, TransmissionChainGroupModel } from '../../models/transmission-chain.model';
 import { MetricIndependentTransmissionChainsModel } from '../../models/metrics/metric-independent-transmission-chains.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { GraphNodeModel } from '../../models/graph-node.model';
@@ -18,7 +18,9 @@ import { moment } from '../../helperClasses/x-moment';
 import { ContactModel } from '../../models/contact.model';
 import { ContactOfContactModel } from '../../models/contact-of-contact.model';
 import { EventModel } from '../../models/event.model';
+import { CotSnapshotModel } from '../../models/cot-snapshot.model';
 import { CaseModel } from '../../models/case.model';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 export interface IConvertChainToGraphElements {
     nodes: {
@@ -27,11 +29,9 @@ export interface IConvertChainToGraphElements {
     edges: {
         data: GraphEdgeModel
     }[];
-    edgesHierarchical: any[];
     caseNodesWithoutDates: any[];
     contactNodesWithoutDates: any[];
     eventNodesWithoutDates: any[];
-    timelineDateCheckpoints: any[];
 }
 
 @Injectable()
@@ -140,31 +140,140 @@ export class TransmissionChainDataService {
     }
 
     /**
+     * Retrieve chain of transmission pages
+     */
+    getChainOfTransmissionPages(
+        chainGroup: TransmissionChainGroupModel,
+        pageSize: number
+    ): ITransmissionChainGroupPageModel[] {
+        // if bubble graph we must split it into multiple pages
+        // #TODO this should be integrated in the code bellow so we don't do again the logic that was done once...but that would mean that we need to rewrite some of the logic, which might cause other issues
+        // #TODO so until we rewrite the graph component there is no point in stressing out that much with this since we will have to rewrite this entire function since it was written like ...
+        // sort chains by size descending
+        chainGroup.chains.sort((chain1, chain2) => {
+            return chain2.chainRelations.length - chain1.chainRelations.length;
+        });
+
+        // go through edges and map them to determine isolated nodes
+        const entitiesThatHaveEdges: {
+            [entityId: string]: true
+        } = {};
+        chainGroup.relationships.forEach((rel) => {
+            rel.persons.forEach((relPerson) => {
+                entitiesThatHaveEdges[relPerson.id] = true;
+            });
+        });
+
+        // determine isolated nodes
+        const isolatedNodes: string[] = [];
+        Object.keys(chainGroup.nodesMap).forEach((entityId) => {
+            // entity has relationship ?
+            if (entitiesThatHaveEdges[entityId]) {
+                return;
+            }
+
+            // isolated node
+            isolatedNodes.push(entityId);
+        });
+
+        // construct pages
+        const pages: ITransmissionChainGroupPageModel[] = [];
+        let currentPageIndex: number;
+        (chainGroup.chains || []).forEach((chain, chainIndex) => {
+            // add new page ?
+            currentPageIndex = pages.length - 1;
+            if (
+                pages.length < 1 ||
+                pages[currentPageIndex].totalSize + chain.chainRelations.length > pageSize
+            ) {
+                // add next page
+                pages.push({
+                    chains: [chainIndex],
+                    isolatedNodes: null,
+                    totalSize: chain.chainRelations.length,
+                    pageIndex: pages.length,
+                    pageLabel: (pages.length + 1).toString()
+                });
+            } else {
+                // increase total size of page
+                pages[currentPageIndex].totalSize += chain.chainRelations.length;
+
+                // add chain to the page list
+                pages[currentPageIndex].chains.push(chainIndex);
+            }
+        });
+
+        // fill out current page with isolated nodes
+        currentPageIndex = pages.length - 1;
+        if (
+            currentPageIndex > -1 &&
+            pages[currentPageIndex].totalSize < pageSize
+        ) {
+            const size: number = pageSize - pages[currentPageIndex].totalSize;
+            pages[currentPageIndex].totalSize += size;
+            pages[currentPageIndex].isolatedNodes = isolatedNodes.splice(0, size);
+        }
+
+        // create pages from isolated nodes
+        while (isolatedNodes.length > 0) {
+            // split isolated nodes
+            const nodes = isolatedNodes.splice(0, pageSize);
+            pages.push({
+                chains: null,
+                isolatedNodes: nodes,
+                totalSize: nodes.length,
+                pageIndex: pages.length,
+                pageLabel: (pages.length + 1).toString()
+            });
+        }
+
+        // finished
+        return pages;
+    }
+
+    /**
      * Convert transmission chain model to the format needed by the graph
-     * @param chainGroup
-     * @param filters
-     * @param colorCriteria
-     * @param locationsListMap
-     * @param selectedViewType
-     * @returns {any}
      */
     convertChainToGraphElements(
         chainGroup: TransmissionChainGroupModel,
-        filters: any,
+        filters: {
+            showContacts?: boolean,
+            showEvents?: boolean
+        },
         colorCriteria: any,
         locationsListMap: {
             [idLocation: string]: LocationModel
         },
-        selectedViewType: string = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value
+        selectedViewType: string,
+        page: ITransmissionChainGroupPageModel
     ): IConvertChainToGraphElements {
+        // if we have a pge then we must limit nodes to the specific items
+        const pageAllowedNodes: {
+            [nodeId: string]: true
+        } = {};
+        if (page) {
+            // go through chains
+            (page.chains || []).forEach((chainIndex) => {
+                chainGroup.chains[chainIndex].chainRelations.forEach((rel) => {
+                    rel.entityIds.forEach((entityId: string) => {
+                        pageAllowedNodes[entityId] = true;
+                    });
+                });
+            });
+
+            // go through isolated nodes
+            (page.isolatedNodes || []).forEach((entityId) => {
+                pageAllowedNodes[entityId] = true;
+            });
+        }
+
+        // render data
         const graphData: IConvertChainToGraphElements = {
             nodes: [],
             edges: [],
-            edgesHierarchical: [],
             caseNodesWithoutDates: [],
             contactNodesWithoutDates: [],
-            eventNodesWithoutDates: [],
-            timelineDateCheckpoints: []
+            eventNodesWithoutDates: []
         };
 
         const selectedNodeIds: {
@@ -187,6 +296,11 @@ export class TransmissionChainDataService {
                 // prepare node
                 let allowAdd = false;
                 const nodeProps: any = node.model;
+
+                // don't render node
+                if (!pageAllowedNodes[node.model.id]) {
+                    return;
+                }
 
                 // show nodes based on their type
                 if (
@@ -487,15 +601,12 @@ export class TransmissionChainDataService {
             });
 
             // generate checkpoint nodes
-            graphData.timelineDateCheckpoints = [];
             const counterDate = moment(minTimelineDate);
             counterDate.subtract(1, 'days');
-            graphData.timelineDateCheckpoints.push(counterDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
             const momentMaxTimelineDate = moment(maxTimelineDate);
             while (counterDate.isBefore(momentMaxTimelineDate)) {
                 counterDate.add(1, 'days');
                 const counterDateFormatted = counterDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-                graphData.timelineDateCheckpoints.push(counterDateFormatted);
                 // generate node
                 const checkpointNode = new GraphNodeModel({
                     dateTimeline: counterDateFormatted,
@@ -505,125 +616,187 @@ export class TransmissionChainDataService {
                 });
                 graphData.nodes.push({data: checkpointNode});
             }
-            graphData.timelineDateCheckpoints.push(counterDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
         }
 
         // generate edges based on the nodes included in the graph
-        if (!_.isEmpty(chainGroup.relationships)) {
-            _.forEach(chainGroup.relationships, (relationship, key) => {
-                // add relation only if the nodes are in the selectedNodes array
-                if (
-                    selectedNodeIds[relationship.persons[0].id] &&
-                    selectedNodeIds[relationship.persons[1].id]
-                ) {
-                    const graphEdge = new GraphEdgeModel();
-                    graphEdge.id = relationship.id;
-                    if (relationship.persons[0].source) {
-                        graphEdge.source = relationship.persons[0].id;
-                        graphEdge.sourceType = relationship.persons[0].type;
-                        graphEdge.target = relationship.persons[1].id;
-                        graphEdge.targetType = relationship.persons[1].type;
-                    } else {
-                        graphEdge.source = relationship.persons[1].id;
-                        graphEdge.sourceType = relationship.persons[1].type;
-                        graphEdge.target = relationship.persons[0].id;
-                        graphEdge.targetType = relationship.persons[0].type;
-                    }
-                    // set colors
-                    if (!_.isEmpty(colorCriteria.edgeColor)) {
-                        if (colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]]) {
-                            graphEdge.edgeColor = colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]];
-                        }
-                    }
-                    // set edge style
-                    graphEdge.setEdgeStyle(relationship);
+        _.forEach(chainGroup.relationships, (relationship) => {
+            // add relation only if the nodes are in the selectedNodes array
+            if (
+                !selectedNodeIds[relationship.persons[0].id] ||
+                !selectedNodeIds[relationship.persons[1].id]
+            ) {
+                return;
+            }
 
-                    // set edge label
-                    if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.NONE.value) {
-                        graphEdge.label = '';
-                    } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value) {
-                        // translate values
-                        graphEdge.label = colorCriteria.edgeLabelContextTransmissionEntries[relationship.socialRelationshipTypeId];
-                    } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_LEVEL.value) {
-                        graphEdge.label = relationship.socialRelationshipDetail ? relationship.socialRelationshipDetail : '';
-                    } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.CLUSTER_NAME.value) {
-                        graphEdge.label = colorCriteria.clustersList[relationship.clusterId];
-                    } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.DAYS_DAYE_ONSET_LAST_CONTACT.value) {
-                        // calculate difference in dates between the dates of onset or dates of onset and last contact.
-                        const sourceNode = chainGroup.nodesMap[graphEdge.source];
-                        const targetNode = chainGroup.nodesMap[graphEdge.target];
-                        let noDays = 0;
-                        let sourceDate = '';
-                        let targetDate = '';
-                        if (
-                            sourceNode.type === EntityType.CASE &&
-                            sourceNode.model instanceof CaseModel
-                        ) {
-                            if (sourceNode.model.dateOfOnset) {
-                                sourceDate = sourceNode.model.dateOfOnset;
-                            }
-                        } else if (sourceNode.type === EntityType.CONTACT) {
-                            if (relationship.contactDate) {
-                                sourceDate = relationship.contactDate;
-                            }
-                        } else if (
-                            sourceNode.type === EntityType.EVENT &&
-                            sourceNode.model instanceof EventModel
-                        ) {
-                            if (sourceNode.model.date) {
-                                sourceDate = sourceNode.model.date;
-                            }
-                        }
-
-                        if (
-                            targetNode.type === EntityType.CASE &&
-                            targetNode.model instanceof CaseModel
-                        ) {
-                            if (targetNode.model.dateOfOnset) {
-                                targetDate = targetNode.model.dateOfOnset;
-                            }
-                        } else if (targetNode.type === EntityType.CONTACT) {
-                            if (relationship.contactDate) {
-                                targetDate = relationship.contactDate;
-                            }
-                        } else if (
-                            targetNode.type === EntityType.EVENT &&
-                            targetNode.model instanceof EventModel
-                        ) {
-                            if (targetNode.model.date) {
-                                targetDate = targetNode.model.date;
-                            }
-                        }
-
-                        if (
-                            sourceDate &&
-                            targetDate
-                        ) {
-                            const momentTargetDate = moment(targetDate, Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-                            const momentSourceDate = moment(sourceDate, Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-                            noDays = Math.round(moment.duration(momentTargetDate.diff(momentSourceDate)).asDays());
-                            graphEdge.label = String(noDays);
-                        }
-                    }
-
-                    // set edge icon
-                    if (colorCriteria.edgeIconField === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value) {
-                        graphEdge.setEdgeIconContextOfTransmission(relationship);
-                        graphEdge.fontFamily = 'xtIcon';
-
-                    } else if (colorCriteria.edgeIconField === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.EXPOSURE_TYPE.value) {
-                        graphEdge.setEdgeIconExposureType(relationship);
-                        graphEdge.fontFamily = 'xtIcon';
-                    }
-
-                    graphData.edges.push({data: graphEdge});
+            const graphEdge = new GraphEdgeModel();
+            graphEdge.id = relationship.id;
+            if (relationship.persons[0].source) {
+                graphEdge.source = relationship.persons[0].id;
+                graphEdge.sourceType = relationship.persons[0].type;
+                graphEdge.target = relationship.persons[1].id;
+                graphEdge.targetType = relationship.persons[1].type;
+            } else {
+                graphEdge.source = relationship.persons[1].id;
+                graphEdge.sourceType = relationship.persons[1].type;
+                graphEdge.target = relationship.persons[0].id;
+                graphEdge.targetType = relationship.persons[0].type;
+            }
+            // set colors
+            if (!_.isEmpty(colorCriteria.edgeColor)) {
+                if (colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]]) {
+                    graphEdge.edgeColor = colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]];
                 }
-            });
-        }
+            }
+            // set edge style
+            graphEdge.setEdgeStyle(relationship);
+
+            // set edge label
+            if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.NONE.value) {
+                graphEdge.label = '';
+            } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value) {
+                // translate values
+                graphEdge.label = colorCriteria.edgeLabelContextTransmissionEntries[relationship.socialRelationshipTypeId];
+            } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_LEVEL.value) {
+                graphEdge.label = relationship.socialRelationshipDetail ? relationship.socialRelationshipDetail : '';
+            } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.CLUSTER_NAME.value) {
+                graphEdge.label = colorCriteria.clustersList[relationship.clusterId];
+            } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.DAYS_DAYE_ONSET_LAST_CONTACT.value) {
+                // calculate difference in dates between the dates of onset or dates of onset and last contact.
+                const sourceNode = chainGroup.nodesMap[graphEdge.source];
+                const targetNode = chainGroup.nodesMap[graphEdge.target];
+                let noDays = 0;
+                let sourceDate = '';
+                let targetDate = '';
+                if (
+                    sourceNode.type === EntityType.CASE &&
+                    sourceNode.model instanceof CaseModel
+                ) {
+                    if (sourceNode.model.dateOfOnset) {
+                        sourceDate = sourceNode.model.dateOfOnset;
+                    }
+                } else if (sourceNode.type === EntityType.CONTACT) {
+                    if (relationship.contactDate) {
+                        sourceDate = relationship.contactDate;
+                    }
+                } else if (
+                    sourceNode.type === EntityType.EVENT &&
+                    sourceNode.model instanceof EventModel
+                ) {
+                    if (sourceNode.model.date) {
+                        sourceDate = sourceNode.model.date;
+                    }
+                }
+
+                if (
+                    targetNode.type === EntityType.CASE &&
+                    targetNode.model instanceof CaseModel
+                ) {
+                    if (targetNode.model.dateOfOnset) {
+                        targetDate = targetNode.model.dateOfOnset;
+                    }
+                } else if (targetNode.type === EntityType.CONTACT) {
+                    if (relationship.contactDate) {
+                        targetDate = relationship.contactDate;
+                    }
+                } else if (
+                    targetNode.type === EntityType.EVENT &&
+                    targetNode.model instanceof EventModel
+                ) {
+                    if (targetNode.model.date) {
+                        targetDate = targetNode.model.date;
+                    }
+                }
+
+                if (
+                    sourceDate &&
+                    targetDate
+                ) {
+                    const momentTargetDate = moment(targetDate, Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                    const momentSourceDate = moment(sourceDate, Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                    noDays = Math.round(moment.duration(momentTargetDate.diff(momentSourceDate)).asDays());
+                    graphEdge.label = String(noDays);
+                }
+            }
+
+            // set edge icon
+            if (colorCriteria.edgeIconField === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value) {
+                graphEdge.setEdgeIconContextOfTransmission(relationship);
+                graphEdge.fontFamily = 'xtIcon';
+
+            } else if (colorCriteria.edgeIconField === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.EXPOSURE_TYPE.value) {
+                graphEdge.setEdgeIconExposureType(relationship);
+                graphEdge.fontFamily = 'xtIcon';
+            }
+
+            graphData.edges.push({data: graphEdge});
+        });
 
         // finished
         return graphData;
     }
 
+    /**
+     * Retrieve the list of COT snapshots list for an Outbreak
+     */
+    getSnapshotsList(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<CotSnapshotModel[]> {
+        const filter = queryBuilder.buildQuery();
+        return this.modelHelper.mapObservableListToModel(
+            this.http.get(`outbreaks/${outbreakId}/transmission-chains?filter=${filter}`),
+            CotSnapshotModel
+        );
+    }
+
+    /**
+     * Return count of COT snapshots list for an Outbreak
+     */
+    getSnapshotsCount(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<IBasicCount> {
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+        return this.http.get(`outbreaks/${outbreakId}/transmission-chains/count?where=${whereFilter}`);
+    }
+
+    /**
+     * Delete an existing COT snapshots list for an Outbreak
+     */
+    deleteSnapshot(
+        outbreakId: string,
+        cotSnapshotId: string
+    ): Observable<any> {
+        return this.http.delete(`outbreaks/${outbreakId}/transmission-chains/${cotSnapshotId}`);
+    }
+
+    /**
+     * Generate cot graph snapshot
+     */
+    calculateIndependentTransmissionChains(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+        // generate filter
+        const filter = queryBuilder.buildQuery();
+        return this.http.post(
+            `outbreaks/${outbreakId}/relationships/calculate-independent-transmission-chains?filter=${filter}`,
+            {}
+        );
+    }
+
+    /**
+     * Retrieve chain of transmission data
+     */
+    getCalculatedIndependentTransmissionChains(
+        outbreakId: string,
+        snapshotId: string
+    ): Observable<TransmissionChainGroupModel> {
+        return this.http
+            .get(`outbreaks/${outbreakId}/transmission-chains/${snapshotId}/result`)
+            .pipe(
+                map(this.mapTransmissionChainDataToModel)
+            );
+    }
 }
 

@@ -7,7 +7,6 @@ import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import * as _ from 'lodash';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -69,7 +68,6 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
         private route: ActivatedRoute,
         private entityDataService: EntityDataService,
         private outbreakDataService: OutbreakDataService,
-        private genericDataService: GenericDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private relationshipDataService: RelationshipDataService

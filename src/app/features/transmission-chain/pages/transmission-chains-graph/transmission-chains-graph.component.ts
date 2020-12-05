@@ -480,9 +480,6 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_DELETE_PERSON_SUCCESS_MESSAGE');
 
-                            // refresh graph
-                            this.cotDashletChild.refreshChain();
-
                             // reset form
                             this.resetFormModels();
 
@@ -538,9 +535,6 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             )
             .subscribe(() => {
                 this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE');
-
-                // refresh graph
-                this.cotDashletChild.refreshChain();
 
                 // reset form
                 this.resetFormModels();
@@ -613,9 +607,6 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             .subscribe(() => {
                 this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
 
-                // refresh graph
-                this.cotDashletChild.refreshChain();
-
                 // reset form
                 this.resetFormModels();
 
@@ -682,9 +673,6 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             .subscribe(() => {
                 this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_OF_CONTACT_SUCCESS_MESSAGE');
 
-                // refresh graph
-                this.cotDashletChild.refreshChain();
-
                 // reset form
                 this.resetFormModels();
 
@@ -722,9 +710,6 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             )
             .subscribe(() => {
                 this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_SUCCESS_MESSAGE');
-
-                // refresh graph
-                this.cotDashletChild.refreshChain();
 
                 // reset form
                 this.resetFormModels();
@@ -768,9 +753,6 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             .subscribe(() => {
                 this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE');
 
-                // refresh graph
-                this.cotDashletChild.refreshChain();
-
                 // reset selected relationship
                 this.selectedRelationship = undefined;
 
@@ -805,9 +787,6 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
 
-                            // refresh graph
-                            this.cotDashletChild.refreshChain();
-
                             // reset selected relationship
                             this.selectedRelationship = undefined;
 
@@ -828,9 +807,6 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
      * Refresh COT after a relationship was reversed
      */
     refreshAfterReverseRelationshipPersons() {
-        // refresh graph
-        this.cotDashletChild.refreshChain();
-
         // reset selected relationship
         this.selectedRelationship = undefined;
 

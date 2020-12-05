@@ -45,6 +45,18 @@ const routes: Routes = [
                 PERMISSION.COT_VIEW_CASE_COUNT_MAP
             ]
         }
+    },
+
+    // Snapshots list page
+    {
+        path: 'snapshots',
+        component: fromPages.TransmissionChainsSnapshotListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.COT_LIST
+            ]
+        }
     }
 ];
 

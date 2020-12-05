@@ -6,7 +6,7 @@
             <div class="topnav-actions">
 
                 <button
-                    *ngIf="TransmissionChainModel.canExportGraphs(authUser)"
+                    *ngIf="TransmissionChainModel.canList(authUser) || TransmissionChainModel.canExportGraphs(authUser)"
                     mat-raised-button color="accent"
                     [matMenuTriggerFor]="quickActionsMenu">
                     {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
@@ -14,12 +14,20 @@
 
                 <mat-menu #quickActionsMenu="matMenu">
                     <button
+                        *ngIf="TransmissionChainModel.canList(authUser)"
+                        mat-menu-item
+                        [routerLink]="['/transmission-chains', 'snapshots']">
+                        {{ 'LNG_PAGE_LIST_ASYNC_COT_TITLE' | translate }}
+                    </button>
+
+                    <button
                         *ngIf="TransmissionChainModel.canExportGraphs(authUser)"
                         [disabled]="x86Architecture"
                         mat-menu-item
                         (click)="exportVisualizedMapOrGraph()">
                         {{ buttonText | translate}}
                     </button>
+
                 </mat-menu>
             </div>
         </div>

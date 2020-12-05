@@ -34,6 +34,7 @@ export enum UserSettings {
     USER_ROLE_FIELDS = 'userRoleFields',
     ENTITY_NOT_DUPLICATES_FIELDS = 'entityNotDuplicatesFields',
     USER_FIELDS = 'userFields',
+    COT_SNAPSHOT_FIELDS = 'cotSnapshotFields'
 }
 
 /**
@@ -68,6 +69,7 @@ abstract class UserSettingsHandlers {
     static USER_ROLE_FIELDS = [];
     static ENTITY_NOT_DUPLICATES_FIELDS = [];
     static USER_FIELDS = [];
+    static COT_SNAPSHOT_FIELDS = [];
 }
 
 export enum PhoneNumberType {

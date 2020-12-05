@@ -1033,6 +1033,22 @@ export class Constants {
         }
     };
 
+    // cot snapshot statuses
+    static COT_SNAPSHOT_STATUSES = {
+        LNG_COT_STATUS_SUCCESS: {
+            label: 'LNG_COT_STATUS_SUCCESS',
+            value: 'LNG_COT_STATUS_SUCCESS'
+        },
+        LNG_COT_STATUS_FAILED: {
+            label: 'LNG_COT_STATUS_FAILED',
+            value: 'LNG_COT_STATUS_FAILED'
+        },
+        LNG_COT_STATUS_IN_PROGRESS: {
+            label: 'LNG_COT_STATUS_IN_PROGRESS',
+            value: 'LNG_COT_STATUS_IN_PROGRESS'
+        }
+    };
+
     /**
      * Today date
      */

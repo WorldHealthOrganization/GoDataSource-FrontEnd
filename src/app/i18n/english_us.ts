@@ -201,13 +201,48 @@ export const EnglishUsLang = {
          * uiClustersListPage
          */
         'LNG_PAGE_LIST_CLUSTERS_LABEL_NO_ICON': 'No icon',
-        'LNG_PAGE_LIST_CLUSTERS_LABEL_NO_COLOR': 'No colour'
+        'LNG_PAGE_LIST_CLUSTERS_LABEL_NO_COLOR': 'No colour',
 
+        /**
+         * NEW GROUP
+         * uiAsyncCotListPage
+         */
+        'LNG_PAGE_LIST_ASYNC_COT_TITLE': 'Chains of transmission snapshots',
+        'LNG_PAGE_LIST_ASYNC_COT_ACTION_DELETE_SNAPSHOT': 'Delete snapshot',
+        'LNG_PAGE_LIST_ASYNC_COT_ACTION_DELETE_SUCCESS_MESSAGE': 'Snapshot deleted',
 
+        /**
+         * NEW GROUP
+         * uiAsyncCotFields
+         */
+        'LNG_ASYNC_COT_FIELD_LABEL_STATUS': 'Status',
+        'LNG_ASYNC_COT_FIELD_LABEL_START_DATE': 'Start date',
+        'LNG_ASYNC_COT_FIELD_LABEL_END_DATE': 'End date',
+        'LNG_ASYNC_COT_FIELD_LABEL_ERROR': 'Error',
+
+        /**
+         * uiDialogs
+         */
+        'LNG_DIALOG_CONFIRM_DELETE_COT_SNAPSHOT': 'Are you sure you want to delete this cot snapshot?',
+
+        /**
+         * uiChainsOfTransmissionGraph
+         */
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_SETTINGS': 'Configure and generate new chain of transmission',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_GRAPH': 'Configure chain of transmission snapshot',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_LOAD_SNAPSHOT': 'See snapshot',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SNAPSHOT_STATUS__IN_PROGRESS': '{{name}} is still in progress',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_GENERATE_SNAPSHOT_IN_PROGRESS': 'Generating snapshot',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE': 'Page',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOTS': 'Snapshots',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_CHART': 'Chart',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE_SIZE': 'Page Size'
 
         /**
          * REMOVE the tokens from below
          */
         // LNG_PAGE_IMPORT_DATA_BUTTON_RESET_IMPORT_MAPPING
+        // LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_RESET_SETTINGS
+        // LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_RESET_CHAINS
     }
 };
