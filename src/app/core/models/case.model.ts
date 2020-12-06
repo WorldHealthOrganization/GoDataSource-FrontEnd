@@ -227,11 +227,30 @@ export class CaseModel
         this.burialLocationId = _.get(data, 'burialLocationId');
         this.documents = _.get(data, 'documents', []);
 
-        const locationsList = _.get(data, 'locations', []);
+        // address location
+        const locationsList: any[] = _.get(data, 'locations', []);
+        let locationsMap: {
+            [locationId: string]: any
+        };
+        if (
+            locationsList &&
+            locationsList.length > 0
+        ) {
+            locationsMap = {};
+            locationsList.forEach((location) => {
+                // location exists anymore ?
+                if (!location) {
+                    return;
+                }
+
+                // map location
+                locationsMap[location.id] = location;
+            });
+        }
         this.addresses = _.map(
             _.get(data, 'addresses', []),
             (addressData) => {
-                return new AddressModel(addressData, locationsList);
+                return new AddressModel(addressData, locationsMap);
             }
         );
 

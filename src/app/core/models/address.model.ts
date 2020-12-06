@@ -31,16 +31,22 @@ export class AddressModel {
         return _.find(addresses, { typeId: AddressType.CURRENT_ADDRESS });
     }
 
-    constructor(data = null, locationsList: LocationModel[] = []) {
+    /**
+     * Constructor
+     */
+    constructor(
+        data = null,
+        locationsMap?: {
+            [locationId: string]: LocationModel
+        }
+    ) {
         this.typeId = _.get(data, 'typeId');
         this.city = _.get(data, 'city');
         this.postalCode = _.get(data, 'postalCode');
         this.addressLine1 = _.get(data, 'addressLine1');
         this.locationId = _.get(data, 'locationId');
-        this.location = locationsList && locationsList.length > 0 ?
-            new LocationModel(
-                _.find(locationsList, {id: this.locationId})
-            ) :
+        this.location = locationsMap && this.locationId ?
+            locationsMap[this.locationId] :
             new LocationModel(_.get(data, 'location'));
         this.date = _.get(data, 'date', moment().toISOString());
         this.geoLocation = _.get(data, 'geoLocation', {});

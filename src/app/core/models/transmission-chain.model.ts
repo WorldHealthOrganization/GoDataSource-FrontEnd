@@ -4,16 +4,10 @@ import { CaseModel } from './case.model';
 import { EntityType } from './entity-type';
 import { Constants } from './constants';
 import { EventModel } from './event.model';
-import { moment } from '../helperClasses/x-moment';
+import { Moment, moment } from '../helperClasses/x-moment';
 import { IPermissionChainsOfTransmission } from './permission.interface';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
-
-export class TransmissionChainRelation {
-    constructor(
-        public entityIds: string[]
-    ) {}
-}
 
 export class TransmissionChainModel
     implements
@@ -30,7 +24,9 @@ export class TransmissionChainModel
     } = {};
 
     // all relations between Cases
-    chainRelations: TransmissionChainRelation[] = [];
+    chainRelations: {
+        entityIds: string[]
+    }[] = [];
     // whether the Chain is active or inactive
     active: boolean;
     // duration of the chain ( no of days )
@@ -91,56 +87,84 @@ export class TransmissionChainModel
 
         const chainRelationsData = _.get(chainData, 'chain', []);
 
-        // go through all chain relations
-        _.each(chainRelationsData, (relation: string[]) => {
-            // go through all Person(case or event) IDs from relation
-            _.each(relation, (personId) => {
-                if (
-                    // if we didn't already collect this Case info
-                    !this.casesMap[personId] &&
-                    !this.eventsMap[personId] &&
-                    // and if we have Case info
-                    entityMap[personId]
-                ) {
-                    // collect Case or Event info, mapped by personID
-                    if (entityMap[personId].type === EntityType.EVENT) {
-                        const eventModel: EventModel = entityMap[personId].model as EventModel;
-                        this.eventsMap[personId] = eventModel;
-                        if (
-                            !this.earliestDateOfOnset ||
-                            moment(eventModel.date).isBefore(this.earliestDateOfOnset)
-                        ) {
-                            this.earliestDateOfOnset = moment(eventModel.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-                            this.rootPerson = eventModel;
-                        }
-                    } else {
-                        const caseModel: CaseModel = entityMap[personId].model as CaseModel;
-                        this.casesMap[personId] = caseModel;
-                        if (
-                            caseModel.dateOfOnset && (
-                                moment(caseModel.dateOfOnset).isBefore(this.earliestDateOfOnset) ||
-                                !this.earliestDateOfOnset
-                            )
-                        ) {
-                            this.earliestDateOfOnset = moment(caseModel.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-                            this.rootPerson = caseModel;
-                        }
+        // go through all Person(case or event) IDs from relation
+        this.casesMapLength = 0;
+        this.aliveCasesCount = 0;
+        let earliestDateOfOnset: Moment;
+        const processRelationPersonId = (personId) => {
+            if (
+                // if we didn't already collect this Case info
+                !this.casesMap[personId] &&
+                !this.eventsMap[personId] &&
+                // and if we have Case info
+                entityMap[personId]
+            ) {
+                // collect Case or Event info, mapped by personID
+                if (entityMap[personId].type === EntityType.EVENT) {
+                    const eventModel: EventModel = entityMap[personId].model as EventModel;
+                    this.eventsMap[personId] = eventModel;
+                    const date = eventModel.date ?
+                        moment(eventModel.date) :
+                        undefined;
+                    if (
+                        date && (
+                            !earliestDateOfOnset ||
+                            date.isBefore(earliestDateOfOnset)
+                        )
+                    ) {
+                        earliestDateOfOnset = date;
+                        this.rootPerson = eventModel;
+                    }
+                } else {
+                    const caseModel: CaseModel = entityMap[personId].model as CaseModel;
+                    this.casesMap[personId] = caseModel;
+                    this.casesMapLength++;
+                    const date = caseModel.dateOfOnset ?
+                        moment(caseModel.dateOfOnset) :
+                        undefined;
+                    if (
+                        date && (
+                            !earliestDateOfOnset ||
+                            date.isBefore(earliestDateOfOnset)
+                        )
+                    ) {
+                        earliestDateOfOnset = date;
+                        this.rootPerson = caseModel;
+                    }
+
+                    if (caseModel.outcomeId !== Constants.OUTCOME_STATUS.DECEASED) {
+                        this.aliveCasesCount++;
                     }
                 }
-            });
-
-            // keep each relation
-            this.chainRelations.push(new TransmissionChainRelation(relation));
-        });
-
-        // count cases
-        this.casesMapLength = Object.keys(this.casesMap).length;
-        this.aliveCasesCount = 0;
-        _.each(this.casesMap, (caseData) => {
-            if (caseData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED) {
-                this.aliveCasesCount++;
             }
-        });
+        };
+
+        // go through all chain relations
+        if (chainRelationsData) {
+            for (let chainRelationIndex = 0; chainRelationIndex < chainRelationsData.length; chainRelationIndex++) {
+                // get relation ids
+                const relation: string[] = chainRelationsData[chainRelationIndex];
+
+                // jump over if we have an invalid relation
+                if (relation.length !== 2) {
+                    return;
+                }
+
+                // process
+                processRelationPersonId(relation[0]);
+                processRelationPersonId(relation[1]);
+
+                // keep each relation
+                this.chainRelations.push({
+                    entityIds: relation
+                });
+            }
+        }
+
+        // format
+        this.earliestDateOfOnset = earliestDateOfOnset ?
+            moment(earliestDateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            undefined;
     }
 
     /**

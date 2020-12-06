@@ -101,7 +101,12 @@ export class EventModel
 
         // we need the object to use the custom getter that constructs the address from all fields
         const location = _.get(data, 'location');
-        this.address = new AddressModel(_.get(data, 'address'), [location]);
+        this.address = new AddressModel(
+            _.get(data, 'address'),
+            location ? {
+                [location.id]: location
+            } : undefined
+        );
 
         this.inconsistencies = _.get(data, 'inconsistencies', []);
         _.each(this.inconsistencies, (inconsistency, index) => {
