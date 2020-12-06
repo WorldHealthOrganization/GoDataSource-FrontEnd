@@ -469,7 +469,7 @@ export class EntityModel {
         this.type = _.get(data, 'type');
 
         this.relationship = _.get(data, 'relationship');
-        if (!_.isEmpty(this.relationship)) {
+        if (this.relationship) {
             this.relationship = this.relationship instanceof RelationshipModel ?
                 this.relationship :
                 new RelationshipModel(this.relationship);
