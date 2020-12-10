@@ -262,12 +262,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         edgeJaccardLength: undefined, // jaccard edge length in simulation
 
         // disable animation since fit doesn't work properly with async anim
-        animate: false,
-        stop: () => {
-            if (this.cy) {
-                // this.cy.fit();
-            }
-        }
+        animate: false
     };
     // layout dagre - tree - hierarchic view
     // the nodes are automatically arranged based on source / target properties
@@ -550,41 +545,49 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                     this.outbreakSubscriber = null;
                 }
 
-                this.outbreakSubscriber = this.outbreakDataService
-                    .getSelectedOutbreakSubject()
-                    .subscribe((selectedOutbreak: OutbreakModel) => {
-                        this.selectedOutbreak = selectedOutbreak;
+                // wait for data to bind
+                setTimeout(() => {
+                    // loading data
+                    const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
+                    this.outbreakSubscriber = this.outbreakDataService
+                        .getSelectedOutbreakSubject()
+                        .subscribe((selectedOutbreak: OutbreakModel) => {
+                            this.selectedOutbreak = selectedOutbreak;
 
-                        // when we have data
-                        if (
-                            this.selectedOutbreak &&
-                            this.selectedOutbreak.id
-                        ) {
-                            // load person if selected
-                            if (this.personId) {
-                                this.entityDataService
-                                    .getEntity(this.selectedEntityType, this.selectedOutbreak.id, this.personId)
-                                    .subscribe((entity) => {
-                                        this.personName = entity.name;
+                            // when we have data
+                            if (
+                                this.selectedOutbreak &&
+                                this.selectedOutbreak.id
+                            ) {
+                                // load person if selected
+                                if (this.personId) {
+                                    this.entityDataService
+                                        .getEntity(this.selectedEntityType, this.selectedOutbreak.id, this.personId)
+                                        .subscribe((entity) => {
+                                            this.personName = entity.name;
+                                        });
+                                }
+
+                                // load clusters list
+                                this.clusterDataService
+                                    .getClusterList(this.selectedOutbreak.id)
+                                    .subscribe((clusters) => {
+                                        this.clusterOptions = clusters;
+
+                                        this.legend.clustersList = {};
+                                        _.forEach(clusters, (cluster) => {
+                                            this.legend.clustersList[cluster.id] = cluster.name;
+                                        });
                                     });
-                            }
 
-                            // load clusters list
-                            this.clusterDataService
-                                .getClusterList(this.selectedOutbreak.id)
-                                .subscribe((clusters) => {
-                                    this.clusterOptions = clusters;
-
-                                    this.legend.clustersList = {};
-                                    _.forEach(clusters, (cluster) => {
-                                        this.legend.clustersList[cluster.id] = cluster.name;
-                                    });
+                                // retrieve snapshots
+                                this.retrieveSnapshotsList(() => {
+                                    // hide loading
+                                    loadingDialog.close();
                                 });
-
-                            // retrieve snapshots
-                            this.retrieveSnapshotsList();
-                        }
-                    });
+                            }
+                        });
+                });
             });
     }
 
@@ -771,10 +774,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 this.selectedSnapshot = data.transmissionChainId;
 
                 // update list of snapshots
-                this.retrieveSnapshotsList();
-
-                // finished
-                loadingDialog.close();
+                this.retrieveSnapshotsList(() => {
+                    // finished
+                    loadingDialog.close();
+                });
             });
     }
 
@@ -1947,12 +1950,14 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     /**
      * Retrieve snapshots list
      */
-    retrieveSnapshotsList(): void {
+    retrieveSnapshotsList(finishedCallback: () => void): void {
         // do we have required data ?
         if (
             !this.selectedOutbreak ||
             !this.selectedOutbreak.id
         ) {
+            // finished
+            finishedCallback();
             return;
         }
 
@@ -1987,6 +1992,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showApiError(err);
+
+                    // finished
+                    finishedCallback();
+
                     return throwError(err);
                 })
             )
@@ -2009,6 +2018,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                         snapshot.id,
                         snapshot.status === Constants.COT_SNAPSHOT_STATUSES.LNG_COT_STATUS_IN_PROGRESS.value
                     ));
+
+
+                    // finished
+                    finishedCallback();
                 });
             });
     }
