@@ -145,6 +145,10 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent imple
         // default table columns
         this.tableColumns = [
             new VisibleColumnModel({
+                field: 'name',
+                label: 'LNG_ASYNC_COT_FIELD_LABEL_NAME'
+            }),
+            new VisibleColumnModel({
                 field: 'startDate',
                 label: 'LNG_ASYNC_COT_FIELD_LABEL_START_DATE'
             }),
@@ -155,6 +159,10 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent imple
             new VisibleColumnModel({
                 field: 'status',
                 label: 'LNG_ASYNC_COT_FIELD_LABEL_STATUS'
+            }),
+            new VisibleColumnModel({
+                field: 'fileSize',
+                label: 'LNG_ASYNC_COT_FIELD_LABEL_FILE_SIZE'
             }),
             new VisibleColumnModel({
                 field: 'error',

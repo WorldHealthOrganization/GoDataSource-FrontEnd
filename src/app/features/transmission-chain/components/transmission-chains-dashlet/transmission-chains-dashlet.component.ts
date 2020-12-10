@@ -34,7 +34,7 @@ import * as cytoscape from 'cytoscape';
 import * as cola from 'cytoscape-cola';
 import * as dagre from 'cytoscape-dagre';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
-import { LoadingDialogModel, ViewCotEdgeDialogComponent, ViewCotNodeDialogComponent } from '../../../../shared/components';
+import { DialogAnswerButton, DialogConfiguration, DialogField, LoadingDialogModel, ViewCotEdgeDialogComponent, ViewCotNodeDialogComponent } from '../../../../shared/components';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { EventModel } from '../../../../core/models/event.model';
@@ -262,12 +262,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         edgeJaccardLength: undefined, // jaccard edge length in simulation
 
         // disable animation since fit doesn't work properly with async anim
-        animate: false,
-        stop: () => {
-            if (this.cy) {
-                // this.cy.fit();
-            }
-        }
+        animate: false
     };
     // layout dagre - tree - hierarchic view
     // the nodes are automatically arranged based on source / target properties
@@ -550,41 +545,49 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                     this.outbreakSubscriber = null;
                 }
 
-                this.outbreakSubscriber = this.outbreakDataService
-                    .getSelectedOutbreakSubject()
-                    .subscribe((selectedOutbreak: OutbreakModel) => {
-                        this.selectedOutbreak = selectedOutbreak;
+                // wait for data to bind
+                setTimeout(() => {
+                    // loading data
+                    const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
+                    this.outbreakSubscriber = this.outbreakDataService
+                        .getSelectedOutbreakSubject()
+                        .subscribe((selectedOutbreak: OutbreakModel) => {
+                            this.selectedOutbreak = selectedOutbreak;
 
-                        // when we have data
-                        if (
-                            this.selectedOutbreak &&
-                            this.selectedOutbreak.id
-                        ) {
-                            // load person if selected
-                            if (this.personId) {
-                                this.entityDataService
-                                    .getEntity(this.selectedEntityType, this.selectedOutbreak.id, this.personId)
-                                    .subscribe((entity) => {
-                                        this.personName = entity.name;
+                            // when we have data
+                            if (
+                                this.selectedOutbreak &&
+                                this.selectedOutbreak.id
+                            ) {
+                                // load person if selected
+                                if (this.personId) {
+                                    this.entityDataService
+                                        .getEntity(this.selectedEntityType, this.selectedOutbreak.id, this.personId)
+                                        .subscribe((entity) => {
+                                            this.personName = entity.name;
+                                        });
+                                }
+
+                                // load clusters list
+                                this.clusterDataService
+                                    .getClusterList(this.selectedOutbreak.id)
+                                    .subscribe((clusters) => {
+                                        this.clusterOptions = clusters;
+
+                                        this.legend.clustersList = {};
+                                        _.forEach(clusters, (cluster) => {
+                                            this.legend.clustersList[cluster.id] = cluster.name;
+                                        });
                                     });
-                            }
 
-                            // load clusters list
-                            this.clusterDataService
-                                .getClusterList(this.selectedOutbreak.id)
-                                .subscribe((clusters) => {
-                                    this.clusterOptions = clusters;
-
-                                    this.legend.clustersList = {};
-                                    _.forEach(clusters, (cluster) => {
-                                        this.legend.clustersList[cluster.id] = cluster.name;
-                                    });
+                                // retrieve snapshots
+                                this.retrieveSnapshotsList(() => {
+                                    // hide loading
+                                    loadingDialog.close();
                                 });
-
-                            // retrieve snapshots
-                            this.retrieveSnapshotsList();
-                        }
-                    });
+                            }
+                        });
+                });
             });
     }
 
@@ -606,10 +609,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      * Display chains of transmission
      */
     generateChainsOfTransmission() {
-        // close settings panel
-        this.showFilters = false;
-        this.showGraphConfiguration = false;
-
         // if there is no outbreak then we can't continue
         if (
             !this.selectedOutbreak ||
@@ -619,162 +618,192 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             return;
         }
 
-        // create queryBuilder for filters
-        const requestQueryBuilder = new RequestQueryBuilder();
-        requestQueryBuilder.filter.firstLevelConditions();
+        // snapshot settings
+        this.dialogService
+            .showInput(
+                new DialogConfiguration({
+                    message: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_APPLY_SETTINGS',
+                    yesLabel: 'LNG_COMMON_BUTTON_CREATE',
+                    required: true,
+                    fieldsList: [new DialogField({
+                        name: 'snapshotName',
+                        placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOT_NAME',
+                        required: true,
+                        type: 'text'
+                    })],
+                }),
+                true
+            )
+            .subscribe((answer) => {
+                if (answer.button !== DialogAnswerButton.Yes) {
+                    return;
+                }
 
-        // retrieve only specific fields so we don't retrieve huge amounts of data that won't be used since we don't have pagination here
-        requestQueryBuilder.fields(
-            // edges
-            'edges.id',
-            'edges.persons',
-            'edges.certaintyLevelId',
-            'edges.socialRelationshipTypeId',
-            'edges.socialRelationshipDetail',
-            'edges.exposureTypeId',
-            'edges.exposureFrequencyId',
-            'edges.exposureDurationId',
-            'edges.contactDate',
-            'edges.clusterId',
+                // close settings panel
+                this.showFilters = false;
+                this.showGraphConfiguration = false;
 
-            // nodes
-            'nodes.id',
-            'nodes.type',
-            'nodes.date',
-            'nodes.dateOfOnset',
-            'nodes.dateOfLastContact',
-            'nodes.dateOfReporting',
-            'nodes.classification',
-            'nodes.name',
-            'nodes.firstName',
-            'nodes.middleName',
-            'nodes.lastName',
-            'nodes.riskLevel',
-            'nodes.gender',
-            'nodes.occupation',
-            'nodes.outcomeId',
-            'nodes.age',
-            'nodes.dob',
-            'nodes.address',
-            'nodes.addresses',
-            'nodes.visualId',
-            'nodes.classification',
-            'nodes.isDateOfOnsetApproximate'
-        );
+                // snapshot name
+                const snapshotName: string = answer.inputValue.value.snapshotName;
 
-        // do we have chainIncludesPerson filters ?
-        if (this.personId) {
-            // include custom person builder that will handle these filters
-            const chainIncludesPersonRequestQueryBuilder: RequestQueryBuilder = requestQueryBuilder.addChildQueryBuilder('chainIncludesPerson');
-            chainIncludesPersonRequestQueryBuilder.filter.byEquality(
-                'id',
-                this.personId
-            );
-        }
+                // create queryBuilder for filters
+                const requestQueryBuilder = new RequestQueryBuilder();
+                requestQueryBuilder.filter.firstLevelConditions();
 
-        // add filter for size ( under where )
-        if (this.sizeOfChainsFilter) {
-            requestQueryBuilder.filter.byEquality(
-                'size',
-                _.parseInt(this.sizeOfChainsFilter)
-            );
-        }
+                // retrieve only specific fields so we don't retrieve huge amounts of data that won't be used since we don't have pagination here
+                requestQueryBuilder.fields(
+                    // edges
+                    'edges.id',
+                    'edges.persons',
+                    'edges.certaintyLevelId',
+                    'edges.socialRelationshipTypeId',
+                    'edges.socialRelationshipDetail',
+                    'edges.exposureTypeId',
+                    'edges.exposureFrequencyId',
+                    'edges.exposureDurationId',
+                    'edges.contactDate',
+                    'edges.clusterId',
 
-        // global date - see state in time
-        if (this.dateGlobalFilter) {
-            requestQueryBuilder.filter.byEquality(
-                'endDate',
-                moment(this.dateGlobalFilter).toISOString()
-            );
-        }
+                    // nodes
+                    'nodes.id',
+                    'nodes.type',
+                    'nodes.date',
+                    'nodes.dateOfOnset',
+                    'nodes.dateOfLastContact',
+                    'nodes.dateOfReporting',
+                    'nodes.classification',
+                    'nodes.name',
+                    'nodes.firstName',
+                    'nodes.middleName',
+                    'nodes.lastName',
+                    'nodes.riskLevel',
+                    'nodes.gender',
+                    'nodes.occupation',
+                    'nodes.outcomeId',
+                    'nodes.age',
+                    'nodes.dob',
+                    'nodes.address',
+                    'nodes.addresses',
+                    'nodes.visualId',
+                    'nodes.classification',
+                    'nodes.isDateOfOnsetApproximate'
+                );
 
-        // add flags
-        if (this.filters.showContacts) {
-            requestQueryBuilder.filter.flag('includeContacts', 1);
-            // add this flag only if the user is on a personal chain of transmission
-            if (this.personId) {
-                requestQueryBuilder.filter.flag('noContactChains', false);
-            }
+                // do we have chainIncludesPerson filters ?
+                if (this.personId) {
+                    // include custom person builder that will handle these filters
+                    const chainIncludesPersonRequestQueryBuilder: RequestQueryBuilder = requestQueryBuilder.addChildQueryBuilder('chainIncludesPerson');
+                    chainIncludesPersonRequestQueryBuilder.filter.byEquality(
+                        'id',
+                        this.personId
+                    );
+                }
 
-            // this flag is working only if 'showContacts' is true
-            if (this.filters.includeContactsOfContacts) {
-                requestQueryBuilder.filter.flag('includeContactsOfContacts', 1);
-            }
-        }
+                // add filter for size ( under where )
+                if (this.sizeOfChainsFilter) {
+                    requestQueryBuilder.filter.byEquality(
+                        'size',
+                        _.parseInt(this.sizeOfChainsFilter)
+                    );
+                }
 
-        // person query
-        const personQuery = requestQueryBuilder.addChildQueryBuilder('person');
+                // global date - see state in time
+                if (this.dateGlobalFilter) {
+                    requestQueryBuilder.filter.byEquality(
+                        'endDate',
+                        moment(this.dateGlobalFilter).toISOString()
+                    );
+                }
 
-        // discarded cases
-        // handled by API
-        // NOTHING to do here
-
-        // attach other filters ( locations & classifications & others... )
-        if (!_.isEmpty(this.filters)) {
-            // include custom person builder that will handle these filters
-            const filterObject = new TransmissionChainFilters(this.filters);
-            filterObject.attachConditionsToRequestQueryBuilder(personQuery);
-
-            // attach classification conditions to parent qb as well ( besides personQuery )
-            // isolated classification
-            if (!_.isEmpty(filterObject.classificationId)) {
-                requestQueryBuilder.filter.where({
-                    or: [
-                        {
-                            type: {
-                                neq: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE'
-                            }
-                        }, {
-                            type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
-                            classification: {
-                                inq: filterObject.classificationId
-                            }
-                        }
-                    ]
-                });
-            }
-
-            // attach cluster condition
-            if (!_.isEmpty(filterObject.clusterIds)) {
-                requestQueryBuilder.filter.where({
-                    clusterId: {
-                        inq: filterObject.clusterIds
+                // add flags
+                if (this.filters.showContacts) {
+                    requestQueryBuilder.filter.flag('includeContacts', 1);
+                    // add this flag only if the user is on a personal chain of transmission
+                    if (this.personId) {
+                        requestQueryBuilder.filter.flag('noContactChains', false);
                     }
-                });
-            }
-        }
 
-        // display loading
-        const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
+                    // this flag is working only if 'showContacts' is true
+                    if (this.filters.includeContactsOfContacts) {
+                        requestQueryBuilder.filter.flag('includeContactsOfContacts', 1);
+                    }
+                }
 
-        // get chain data and convert to graph nodes
-        this.transmissionChainDataService
-            .calculateIndependentTransmissionChains(
-                this.selectedOutbreak.id,
-                requestQueryBuilder
-            )
-            .pipe(
-                catchError((err) => {
-                    // display error message
-                    this.snackbarService.showApiError(err);
+                // person query
+                const personQuery = requestQueryBuilder.addChildQueryBuilder('person');
 
-                    // finished
-                    loadingDialog.close();
-                    return throwError(err);
-                })
-            )
-            .subscribe((data) => {
-                // display message
-                this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_GENERATE_SNAPSHOT_IN_PROGRESS');
+                // discarded cases
+                // handled by API
+                // NOTHING to do here
 
-                // select snapshot
-                this.selectedSnapshot = data.transmissionChainId;
+                // attach other filters ( locations & classifications & others... )
+                if (!_.isEmpty(this.filters)) {
+                    // include custom person builder that will handle these filters
+                    const filterObject = new TransmissionChainFilters(this.filters);
+                    filterObject.attachConditionsToRequestQueryBuilder(personQuery);
 
-                // update list of snapshots
-                this.retrieveSnapshotsList();
+                    // attach classification conditions to parent qb as well ( besides personQuery )
+                    // isolated classification
+                    if (!_.isEmpty(filterObject.classificationId)) {
+                        requestQueryBuilder.filter.where({
+                            or: [
+                                {
+                                    type: {
+                                        neq: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE'
+                                    }
+                                }, {
+                                    type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+                                    classification: {
+                                        inq: filterObject.classificationId
+                                    }
+                                }
+                            ]
+                        });
+                    }
 
-                // finished
-                loadingDialog.close();
+                    // attach cluster condition
+                    if (!_.isEmpty(filterObject.clusterIds)) {
+                        requestQueryBuilder.filter.where({
+                            clusterId: {
+                                inq: filterObject.clusterIds
+                            }
+                        });
+                    }
+                }
+
+                // display loading
+                const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
+
+                // get chain data and convert to graph nodes
+                this.transmissionChainDataService
+                    .calculateIndependentTransmissionChains(
+                        this.selectedOutbreak.id,
+                        snapshotName,
+                        requestQueryBuilder
+                    )
+                    .pipe(
+                        catchError((err) => {
+                            // display error message
+                            this.snackbarService.showApiError(err);
+
+                            // finished
+                            loadingDialog.close();
+                            return throwError(err);
+                        })
+                    )
+                    .subscribe((data) => {
+                        // display message
+                        this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_GENERATE_SNAPSHOT_IN_PROGRESS');
+
+                        // select snapshot
+                        this.selectedSnapshot = data.transmissionChainId;
+
+                        // update list of snapshots
+                        this.retrieveSnapshotsList(() => {
+                            // finished
+                            loadingDialog.close();
+                        });
+                    });
             });
     }
 
@@ -1947,12 +1976,14 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     /**
      * Retrieve snapshots list
      */
-    retrieveSnapshotsList(): void {
+    retrieveSnapshotsList(finishedCallback: () => void): void {
         // do we have required data ?
         if (
             !this.selectedOutbreak ||
             !this.selectedOutbreak.id
         ) {
+            // finished
+            finishedCallback();
             return;
         }
 
@@ -1987,6 +2018,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showApiError(err);
+
+                    // finished
+                    finishedCallback();
+
                     return throwError(err);
                 })
             )
@@ -1995,13 +2030,13 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 this.snapshotOptions = [];
                 (snapshots || []).forEach((snapshot) => {
                     // snapshot name
-                    const name: string = snapshot.startDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT);
+                    const name: string = `${snapshot.name} - ${snapshot.startDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT)}`;
 
                     // add snapshot to list of options
                     this.snapshotOptions.push(new LabelValuePair(
                         snapshot.status === Constants.COT_SNAPSHOT_STATUSES.LNG_COT_STATUS_IN_PROGRESS.value ?
                             this.i18nService.instant(
-                                'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SNAPSHOT_STATUS__IN_PROGRESS', {
+                                'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SNAPSHOT_STATUS_IN_PROGRESS', {
                                     name: name
                                 }
                             ) :
@@ -2010,6 +2045,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                         snapshot.status === Constants.COT_SNAPSHOT_STATUSES.LNG_COT_STATUS_IN_PROGRESS.value
                     ));
                 });
+
+                // finished
+                finishedCallback();
             });
     }
 

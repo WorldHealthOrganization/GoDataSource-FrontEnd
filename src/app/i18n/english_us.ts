@@ -216,9 +216,11 @@ export const EnglishUsLang = {
          * uiAsyncCotFields
          */
         'LNG_ASYNC_COT_FIELD_LABEL_STATUS': 'Status',
+        'LNG_ASYNC_COT_FIELD_LABEL_NAME': 'Name',
         'LNG_ASYNC_COT_FIELD_LABEL_START_DATE': 'Start date',
         'LNG_ASYNC_COT_FIELD_LABEL_END_DATE': 'End date',
         'LNG_ASYNC_COT_FIELD_LABEL_ERROR': 'Error',
+        'LNG_ASYNC_COT_FIELD_LABEL_FILE_SIZE': 'File size',
 
         /**
          * uiDialogs
@@ -228,15 +230,20 @@ export const EnglishUsLang = {
         /**
          * uiChainsOfTransmissionGraph
          */
-        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_SETTINGS': 'Configure and generate new chain of transmission',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_SETTINGS': 'Create Snapshot',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_APPLY_SETTINGS': 'Create Snapshot',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_GRAPH': 'Configure chain of transmission snapshot',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_LOAD_SNAPSHOT': 'See snapshot',
-        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SNAPSHOT_STATUS__IN_PROGRESS': '{{name}} is still in progress',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SNAPSHOT_STATUS_IN_PROGRESS': '{{name}} is still in progress',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_GENERATE_SNAPSHOT_IN_PROGRESS': 'Generating snapshot',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE': 'Page',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOTS': 'Snapshots',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_CHART': 'Chart',
-        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE_SIZE': 'Page Size'
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE_SIZE': 'Number of relationships per page',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_AVOID_OVERLAP': 'Avoid Overlap',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_RANDOMIZE': 'Randomize',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_NODE_SIZE_INCLUDE_LABELS': 'Node size must include labels',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOT_NAME': 'Snapshot name'
 
         /**
          * REMOVE the tokens from below
