@@ -775,13 +775,15 @@ export class TransmissionChainDataService {
      */
     calculateIndependentTransmissionChains(
         outbreakId: string,
+        snapshotName: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<any> {
         // generate filter
         const filter = queryBuilder.buildQuery();
         return this.http.post(
-            `outbreaks/${outbreakId}/relationships/calculate-independent-transmission-chains?filter=${filter}`,
-            {}
+            `outbreaks/${outbreakId}/relationships/calculate-independent-transmission-chains?filter=${filter}`, {
+                name: snapshotName
+            }
         );
     }
 

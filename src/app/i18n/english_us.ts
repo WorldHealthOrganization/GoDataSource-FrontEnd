@@ -240,7 +240,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE_SIZE': 'Number of relationships per page',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_AVOID_OVERLAP': 'Avoid Overlap',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_RANDOMIZE': 'Randomize',
-        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_NODE_SIZE_INCLUDE_LABELS': 'Node size must include labels'
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_NODE_SIZE_INCLUDE_LABELS': 'Node size must include labels',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOT_NAME': 'Snapshot name'
 
         /**
          * REMOVE the tokens from below
