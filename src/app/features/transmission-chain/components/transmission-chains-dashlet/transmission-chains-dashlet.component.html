@@ -47,7 +47,7 @@
 
                 <!--  This checkbox is valid only if 'showContacts' is already enabled -->
                 <app-form-checkbox
-                    name="includeContactsOfContacts "
+                    name="includeContactsOfContacts"
                     [disabled]="!filters.showContacts"
                     [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_OF_CONTACTS' | translate"
                     [(ngModel)]="filters.includeContactsOfContacts"
@@ -92,6 +92,36 @@
         *ngIf="showGraphConfiguration"
         fxFlex fxLayout="column" fxLayoutGap="20px"
         class="settings-container">
+
+        <div
+            fxLayout="row" fxLayoutGap="10px">
+            <!-- entity type filter - events -->
+            <app-form-checkbox
+                fxFlex="150px"
+                name="showEvents"
+                [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_EVENTS_LABEL' | translate"
+                [(ngModel)]="filters.showEvents">
+            </app-form-checkbox>
+
+            <!-- entity type filter - contacts -->
+            <app-form-checkbox
+                fxFlex="150px"
+                name="showContacts"
+                [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_LABEL' | translate"
+                [(ngModel)]="filters.showContacts"
+                (optionChanged)="updateShowContactsOfContactValue($event)">
+            </app-form-checkbox>
+
+            <!--  This checkbox is valid only if 'showContacts' is already enabled -->
+            <app-form-checkbox
+                name="includeContactsOfContacts"
+                [disabled]="!filters.showContacts"
+                [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_OF_CONTACTS' | translate"
+                [(ngModel)]="filters.includeContactsOfContacts"
+                fxFlex="150px">
+            </app-form-checkbox>
+        </div>
+
         <!-- Node Settings -->
         <mat-card fxLayout="column" fxLayoutGap="10px">
             <div class="settings-container-title">

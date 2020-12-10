@@ -80,11 +80,13 @@ export class TransmissionChainModel
             [id: string]: EntityModel
         } = {}
     ) {
+        // data
         this.active = _.get(chainData, 'active', false);
         this.size = _.get(chainData, 'size', 0);
         this.contactsCount = _.get(chainData, 'contactsCount', 0);
         this.duration = _.get(chainData, 'period.duration', 0);
 
+        // all relations between cases
         const chainRelationsData = _.get(chainData, 'chain', []);
 
         // go through all Person(case or event) IDs from relation

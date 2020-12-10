@@ -228,7 +228,8 @@ export const EnglishUsLang = {
         /**
          * uiChainsOfTransmissionGraph
          */
-        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_SETTINGS': 'Configure and generate new chain of transmission',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_SETTINGS': 'Create Snapshot',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_APPLY_SETTINGS': 'Create Snapshot',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_GRAPH': 'Configure chain of transmission snapshot',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_LOAD_SNAPSHOT': 'See snapshot',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SNAPSHOT_STATUS__IN_PROGRESS': '{{name}} is still in progress',
@@ -236,7 +237,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE': 'Page',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOTS': 'Snapshots',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_CHART': 'Chart',
-        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE_SIZE': 'Page Size'
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE_SIZE': 'Number of relationships per page'
 
         /**
          * REMOVE the tokens from below
