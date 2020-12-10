@@ -18,6 +18,33 @@ export class CotSnapshotModel
     startDate: Moment;
     endDate: Moment;
 
+    // size in bytes
+    private _sizeBytes: number;
+    private _sizeBytesHumanReadable: string;
+    get sizeBytes(): number {
+        return this._sizeBytes;
+    }
+    set sizeBytes(sizeBytes: number) {
+        // set value
+        this._sizeBytes = sizeBytes;
+
+        // format human readable
+        if (this.sizeBytes) {
+            const k = 1024;
+            const dm = 2;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+            const i = Math.floor(Math.log(this.sizeBytes) / Math.log(k));
+            this._sizeBytesHumanReadable = parseFloat((this.sizeBytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        } else {
+            this._sizeBytesHumanReadable = '-';
+        }
+    }
+
+    // file size in human readable format
+    get sizeBytesHumanReadable(): string {
+        return this._sizeBytesHumanReadable;
+    }
+
     /**
      * Static Permissions - IPermissionBasic
      */
@@ -46,6 +73,9 @@ export class CotSnapshotModel
         if (this.startDate) {
             this.startDate = moment(this.startDate);
         }
+
+        // file size
+        this.sizeBytes = _.get(data, 'sizeBytes', 0);
 
         // end date
         this.endDate = _.get(data, 'endDate');

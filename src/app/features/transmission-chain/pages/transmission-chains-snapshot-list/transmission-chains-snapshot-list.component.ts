@@ -161,6 +161,10 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent imple
                 label: 'LNG_ASYNC_COT_FIELD_LABEL_STATUS'
             }),
             new VisibleColumnModel({
+                field: 'fileSize',
+                label: 'LNG_ASYNC_COT_FIELD_LABEL_FILE_SIZE'
+            }),
+            new VisibleColumnModel({
                 field: 'error',
                 label: 'LNG_ASYNC_COT_FIELD_LABEL_ERROR'
             })

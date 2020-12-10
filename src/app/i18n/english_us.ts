@@ -220,6 +220,7 @@ export const EnglishUsLang = {
         'LNG_ASYNC_COT_FIELD_LABEL_START_DATE': 'Start date',
         'LNG_ASYNC_COT_FIELD_LABEL_END_DATE': 'End date',
         'LNG_ASYNC_COT_FIELD_LABEL_ERROR': 'Error',
+        'LNG_ASYNC_COT_FIELD_LABEL_FILE_SIZE': 'File size',
 
         /**
          * uiDialogs
