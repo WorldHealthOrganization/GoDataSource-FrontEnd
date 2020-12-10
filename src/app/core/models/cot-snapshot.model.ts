@@ -11,6 +11,7 @@ export class CotSnapshotModel
     implements
         IPermissionBasic {
     id: string;
+    name: string;
     outbreakId: string;
     status: string;
     error: string;
@@ -35,6 +36,7 @@ export class CotSnapshotModel
 
         // base data
         this.id = _.get(data, 'id');
+        this.name = _.get(data, 'name');
         this.outbreakId = _.get(data, 'outbreakId');
         this.status = _.get(data, 'status');
         this.error = _.get(data, 'error');

@@ -2030,13 +2030,13 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 this.snapshotOptions = [];
                 (snapshots || []).forEach((snapshot) => {
                     // snapshot name
-                    const name: string = snapshot.startDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT);
+                    const name: string = `${snapshot.name} - ${snapshot.startDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT)}`;
 
                     // add snapshot to list of options
                     this.snapshotOptions.push(new LabelValuePair(
                         snapshot.status === Constants.COT_SNAPSHOT_STATUSES.LNG_COT_STATUS_IN_PROGRESS.value ?
                             this.i18nService.instant(
-                                'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SNAPSHOT_STATUS__IN_PROGRESS', {
+                                'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SNAPSHOT_STATUS_IN_PROGRESS', {
                                     name: name
                                 }
                             ) :

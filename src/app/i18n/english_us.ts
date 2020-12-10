@@ -216,6 +216,7 @@ export const EnglishUsLang = {
          * uiAsyncCotFields
          */
         'LNG_ASYNC_COT_FIELD_LABEL_STATUS': 'Status',
+        'LNG_ASYNC_COT_FIELD_LABEL_NAME': 'Name',
         'LNG_ASYNC_COT_FIELD_LABEL_START_DATE': 'Start date',
         'LNG_ASYNC_COT_FIELD_LABEL_END_DATE': 'End date',
         'LNG_ASYNC_COT_FIELD_LABEL_ERROR': 'Error',
@@ -232,7 +233,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_APPLY_SETTINGS': 'Create Snapshot',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_GRAPH': 'Configure chain of transmission snapshot',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_LOAD_SNAPSHOT': 'See snapshot',
-        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SNAPSHOT_STATUS__IN_PROGRESS': '{{name}} is still in progress',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SNAPSHOT_STATUS_IN_PROGRESS': '{{name}} is still in progress',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_GENERATE_SNAPSHOT_IN_PROGRESS': 'Generating snapshot',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE': 'Page',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOTS': 'Snapshots',
