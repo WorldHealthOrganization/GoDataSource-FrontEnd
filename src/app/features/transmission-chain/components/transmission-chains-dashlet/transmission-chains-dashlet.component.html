@@ -1,6 +1,6 @@
 <div class="chain-settings">
     <div
-        fxLayout="row" fxLayoutGap="10px">
+        class="chain-settings-buttons">
         <!-- See snapshot -->
         <button
             *ngIf="!showGraphConfiguration && selectedSnapshot && chainGroup && chainGroupId === selectedSnapshot"
@@ -90,7 +90,6 @@
     <!-- Graph configuration -->
     <div
         *ngIf="showGraphConfiguration && selectedSnapshot && chainGroup && chainGroupId === selectedSnapshot"
-        fxFlex fxLayout="column" fxLayoutGap="20px"
         class="settings-container">
 
         <div
@@ -265,7 +264,6 @@
     <!-- Load snapshot -->
     <div
         *ngIf="!showFilters"
-        fxFlex fxLayout="column" fxLayoutGap="20px"
         class="settings-container">
         <mat-card fxLayout="column">
             <div
