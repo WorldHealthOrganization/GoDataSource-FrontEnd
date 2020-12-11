@@ -192,8 +192,11 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent imple
             );
         }
 
-        // retrieve only snapshots from this user ?
-        // #TODO
+        // created by current user
+        this.queryBuilder.filter.byEquality(
+            'createdBy',
+            this.authUser.id
+        );
 
         // retrieve the list of Cases
         this.cotSnapshotsList$ = this.transmissionChainDataService

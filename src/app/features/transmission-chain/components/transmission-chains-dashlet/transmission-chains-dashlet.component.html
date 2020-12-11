@@ -1,9 +1,9 @@
-<div class="chain-settings" fxLayout="column">
+<div class="chain-settings">
     <div
         fxLayout="row" fxLayoutGap="10px">
         <!-- See snapshot -->
         <button
-            *ngIf="!showGraphConfiguration"
+            *ngIf="!showGraphConfiguration && selectedSnapshot && chainGroup && chainGroupId === selectedSnapshot"
             mat-raised-button
             (click)="showGraphConfigurationHideFilters()">
             {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_GRAPH' | translate }}
@@ -20,7 +20,7 @@
 
     <!-- Generate new graph -->
     <div
-        *ngIf="showFilters"
+        *ngIf="showFilters && selectedOutbreak?.id === authUser?.activeOutbreakId"
         fxLayout="column"
         class="settings-container">
 
@@ -89,7 +89,7 @@
 
     <!-- Graph configuration -->
     <div
-        *ngIf="showGraphConfiguration"
+        *ngIf="showGraphConfiguration && selectedSnapshot && chainGroup && chainGroupId === selectedSnapshot"
         fxFlex fxLayout="column" fxLayoutGap="20px"
         class="settings-container">
 
@@ -100,24 +100,26 @@
                 fxFlex="150px"
                 name="showEvents"
                 [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_EVENTS_LABEL' | translate"
-                [(ngModel)]="filters.showEvents">
+                [(ngModel)]="showEvents">
             </app-form-checkbox>
 
             <!-- entity type filter - contacts -->
             <app-form-checkbox
+                *ngIf="!snapshotOptionsMap || !selectedSnapshot || !snapshotOptionsMap[selectedSnapshot] || snapshotOptionsMap[selectedSnapshot].snapshot.showContacts"
                 fxFlex="150px"
                 name="showContacts"
                 [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_LABEL' | translate"
-                [(ngModel)]="filters.showContacts"
+                [(ngModel)]="showContacts"
                 (optionChanged)="updateShowContactsOfContactValue($event)">
             </app-form-checkbox>
 
             <!--  This checkbox is valid only if 'showContacts' is already enabled -->
             <app-form-checkbox
+                *ngIf="!snapshotOptionsMap || !selectedSnapshot || !snapshotOptionsMap[selectedSnapshot] || snapshotOptionsMap[selectedSnapshot].snapshot.showContactsOfContacts"
                 name="includeContactsOfContacts"
-                [disabled]="!filters.showContacts"
+                [disabled]="!showContacts"
                 [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_OF_CONTACTS' | translate"
-                [(ngModel)]="filters.includeContactsOfContacts"
+                [(ngModel)]="showContactsOfContacts"
                 fxFlex="150px">
             </app-form-checkbox>
         </div>
@@ -277,7 +279,7 @@
                     required="true"
                     [options]="snapshotOptions"
                     [clearable]="false"
-                    (ngModelChange)="mustLoadChain = true">
+                    (ngModelChange)="mustLoadChain = true; showEvents = true; showContacts = false; showContactsOfContacts = false;">
                 </app-form-select>
 
                 <!-- dropdown with view types -->

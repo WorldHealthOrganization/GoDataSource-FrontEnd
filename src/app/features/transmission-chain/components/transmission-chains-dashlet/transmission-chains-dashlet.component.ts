@@ -82,6 +82,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     showFilters: boolean = false;
     showGraphConfiguration: boolean = false;
     filters: TransmissionChainFilters = new TransmissionChainFilters();
+    showEvents: boolean = true;
+    showContacts: boolean = false;
+    showContactsOfContacts: boolean = false;
     locationsListMap: {
         [idLocation: string]: LocationModel
     } = {};
@@ -723,11 +726,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
                 // add flags
                 if (this.filters.showContacts) {
+                    // we need contact chains as well
                     requestQueryBuilder.filter.flag('includeContacts', 1);
-                    // add this flag only if the user is on a personal chain of transmission
-                    if (this.personId) {
-                        requestQueryBuilder.filter.flag('noContactChains', false);
-                    }
+                    requestQueryBuilder.filter.flag('noContactChains', false);
 
                     // this flag is working only if 'showContacts' is true
                     if (this.filters.includeContactsOfContacts) {
@@ -1379,7 +1380,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             // refresh chain to load the new criteria
             this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(
                 this.chainGroup,
-                this.filters,
+                {
+                    showEvents: this.showEvents,
+                    showContacts: this.showContacts,
+                    showContactsOfContacts: this.showContactsOfContacts
+                },
                 this.legend,
                 this.locationsListMap,
                 this.transmissionChainViewType,

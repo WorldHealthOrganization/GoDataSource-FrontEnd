@@ -18,6 +18,8 @@ export class CotSnapshotModel
     error: string;
     startDate: Moment;
     endDate: Moment;
+    showContacts: boolean;
+    showContactsOfContacts: boolean;
 
     // size in bytes
     private _sizeBytes: number;
@@ -64,6 +66,8 @@ export class CotSnapshotModel
         this.outbreakId = _.get(data, 'outbreakId');
         this.status = _.get(data, 'status');
         this.error = _.get(data, 'error');
+        this.showContacts = _.get(data, 'showContacts');
+        this.showContactsOfContacts = _.get(data, 'showContactsOfContacts');
 
         // start date
         this.startDate = _.get(data, 'startDate');
