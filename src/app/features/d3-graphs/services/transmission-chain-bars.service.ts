@@ -650,7 +650,10 @@ export class TransmissionChainBarsService {
     private drawEntity(entityId: string) {
         // keep case / event data for later use
         const entityData = this.graphData.personsMap[entityId] as EntityBarModel;
-        if (!entityData) {
+        if (
+            !entityData ||
+            !entityData.date
+        ) {
             return;
         }
 

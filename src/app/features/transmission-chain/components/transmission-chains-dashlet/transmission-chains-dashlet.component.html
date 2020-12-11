@@ -76,6 +76,14 @@
         </app-transmission-chain-filters>
 
         <div fxLayout="row" fxFlexAlign="end" fxLayoutGap="10px">
+            <!-- Cancel -->
+            <button
+                fxFlex="150px"
+                mat-raised-button
+                (click)="showFilters = false">
+                {{ 'LNG_COMMON_BUTTON_CANCEL' | translate }}
+            </button>
+
             <!-- Apply filters -->
             <button
                 fxFlex="150px"

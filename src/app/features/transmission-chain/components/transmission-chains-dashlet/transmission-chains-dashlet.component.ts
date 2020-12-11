@@ -561,7 +561,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                     this.outbreakSubscriber = this.outbreakDataService
                         .getSelectedOutbreakSubject()
                         .subscribe((selectedOutbreak: OutbreakModel) => {
+                            // set outbreak
                             this.selectedOutbreak = selectedOutbreak;
+
+                            // reset filters
+                            this.showFilters = false;
 
                             // when we have data
                             if (

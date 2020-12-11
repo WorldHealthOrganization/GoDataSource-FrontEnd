@@ -1206,7 +1206,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         // display export dialog
         this.dialogService.showExportDialog({
             // required
-            message: 'LNG_PAGE_LIST_CASES_EXPORT_TITLE',
+            message: 'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE',
             url: this.exportContactsUrl,
             fileName: this.contactsDataExportFileName,
 
@@ -1215,6 +1215,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
+            displayUseQuestionVariable: true,
             anonymizeFields: this.anonymizeFields,
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
