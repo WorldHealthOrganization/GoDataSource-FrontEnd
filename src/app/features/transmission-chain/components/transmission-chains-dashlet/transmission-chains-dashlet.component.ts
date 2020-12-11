@@ -2112,7 +2112,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         }
 
         // retrieve chain of transmission
-        const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
+        const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog({
+            widthPx: 200
+        });
         this.chainGroup = undefined;
         this.chainPages = undefined;
         this.selectedChainPageIndex = 0;
@@ -2121,15 +2123,19 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             .getCalculatedIndependentTransmissionChains(
                 this.selectedOutbreak.id,
                 this.snapshotOptionsMap[this.selectedSnapshot].snapshot,
-                (progress: string): void => {
+                (
+                    snapshotData: CotSnapshotModel,
+                    progress: string
+                ): void => {
                     if (progress) {
                         loadingDialog.showMessage(
                             'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOT_DOWNLOAD_PROGRESS', {
+                                name: snapshotData.name,
                                 progress: progress.toString()
                             }
                         );
                     } else {
-                        loadingDialog.showMessage(null);
+                        loadingDialog.showMessage('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOT_DOWNLOAD_FINISHED');
                     }
                 }
             )

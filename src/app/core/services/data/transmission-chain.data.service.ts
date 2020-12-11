@@ -794,7 +794,10 @@ export class TransmissionChainDataService {
     getCalculatedIndependentTransmissionChains(
         outbreakId: string,
         snapshotData: CotSnapshotModel,
-        progressCallback?: (progress: string) => void
+        progressCallback?: (
+            snapshotData: CotSnapshotModel,
+            progress?: string
+        ) => void
     ): Observable<TransmissionChainGroupModel> {
         return new Observable<TransmissionChainGroupModel>((observer) => {
             this.http
@@ -816,7 +819,10 @@ export class TransmissionChainDataService {
                     switch (response.type) {
                         case HttpEventType.DownloadProgress:
                             if (progressCallback) {
-                                progressCallback(FileSize.bytesToReadableForm(response.loaded));
+                                progressCallback(
+                                    snapshotData,
+                                    FileSize.bytesToReadableForm(response.loaded)
+                                );
                             }
                             break;
 
