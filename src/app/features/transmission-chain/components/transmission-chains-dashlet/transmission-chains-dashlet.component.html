@@ -277,8 +277,7 @@
                     required="true"
                     [options]="snapshotOptions"
                     [clearable]="false"
-                    (ngModelChange)="mustLoadChain = true"
-                    (optionChanged)="selectedSnapshotOptionChanged($event)">
+                    (ngModelChange)="mustLoadChain = true">
                 </app-form-select>
 
                 <!-- dropdown with view types -->
@@ -336,7 +335,7 @@
             </div>
 
             <div
-                *ngIf="mustLoadChain && selectedSnapshot && transmissionChainViewType && pageSize > 0 && selectedSnapshotOption && !selectedSnapshotOption.disabled"
+                *ngIf="mustLoadChain && selectedSnapshot && transmissionChainViewType && pageSize > 0 && snapshotOptionsMap[selectedSnapshot] && !snapshotOptionsMap[selectedSnapshot].option.disabled"
                 fxLayout="row" fxFlexAlign="end" fxLayoutGap="10px">
                 <!-- Apply filters -->
                 <button

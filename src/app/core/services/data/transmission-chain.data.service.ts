@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpEventType } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { ITransmissionChainGroupPageModel, TransmissionChainGroupModel } from '../../models/transmission-chain.model';
 import { MetricIndependentTransmissionChainsModel } from '../../models/metrics/metric-independent-transmission-chains.model';
@@ -13,7 +13,7 @@ import { I18nService } from '../helper/i18n.service';
 import * as _ from 'lodash';
 import { LocationModel } from '../../models/location.model';
 import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache';
-import { map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { moment } from '../../helperClasses/x-moment';
 import { ContactModel } from '../../models/contact.model';
 import { ContactOfContactModel } from '../../models/contact-of-contact.model';
@@ -21,6 +21,7 @@ import { EventModel } from '../../models/event.model';
 import { CotSnapshotModel } from '../../models/cot-snapshot.model';
 import { CaseModel } from '../../models/case.model';
 import { IBasicCount } from '../../models/basic-count.interface';
+import { FileSize } from '../../helperClasses/file-size';
 
 export interface IConvertChainToGraphElements {
     nodes: {
@@ -792,13 +793,46 @@ export class TransmissionChainDataService {
      */
     getCalculatedIndependentTransmissionChains(
         outbreakId: string,
-        snapshotId: string
+        snapshotData: CotSnapshotModel,
+        progressCallback?: (progress: string) => void
     ): Observable<TransmissionChainGroupModel> {
-        return this.http
-            .get(`outbreaks/${outbreakId}/transmission-chains/${snapshotId}/result`)
-            .pipe(
-                map(this.mapTransmissionChainDataToModel)
-            );
+        return new Observable<TransmissionChainGroupModel>((observer) => {
+            this.http
+                .get(
+                    `outbreaks/${outbreakId}/transmission-chains/${snapshotData.id}/result`, {
+                        reportProgress: true,
+                        observe: 'events'
+                    }
+                )
+                .pipe(
+                    catchError((err) => {
+                        observer.error(err);
+                        observer.complete();
+                        return throwError(err);
+                    })
+                )
+                .subscribe((response) => {
+                    // handle download progress
+                    switch (response.type) {
+                        case HttpEventType.DownloadProgress:
+                            if (progressCallback) {
+                                progressCallback(FileSize.bytesToReadableForm(response.loaded));
+                            }
+                            break;
+
+                        case HttpEventType.Response:
+                            // hide progress
+                            progressCallback(null);
+
+                            // finished
+                            setTimeout(() => {
+                                observer.next(this.mapTransmissionChainDataToModel(response.body));
+                                observer.complete();
+                            });
+                            break;
+                    }
+                });
+        });
     }
 }
 
