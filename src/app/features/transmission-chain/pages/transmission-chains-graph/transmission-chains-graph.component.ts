@@ -210,10 +210,24 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             .subscribe((answer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     const loadingDialog = this.dialogService.showLoadingDialog();
+
                     // get the chosen split factor
                     const splitFactor = answer.inputValue.value.splitFactor;
+
                     // get the base64 png
-                    const pngBase64 = this.cotDashletChild.getPng64(splitFactor).replace('data:image/png;base64,', '');
+                    let pngBase64 = this.cotDashletChild.getPng64(splitFactor);
+
+                    // check that png was generated
+                    if (!pngBase64) {
+                        // display error
+                        this.snackbarService.showNotice('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT_NOTHING_TO_EXPORT');
+                        loadingDialog.close();
+                        return;
+                    }
+
+                    // format
+                    pngBase64 = pngBase64.replace('data:image/png;base64,', '');
+
                     // call the api for the pdf
                     this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: Number(splitFactor)})
                         .subscribe((blob) => {

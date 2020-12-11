@@ -238,8 +238,9 @@ export class TransmissionChainDataService {
     convertChainToGraphElements(
         chainGroup: TransmissionChainGroupModel,
         filters: {
+            showEvents?: boolean,
             showContacts?: boolean,
-            showEvents?: boolean
+            showContactsOfContacts?: boolean
         },
         colorCriteria: any,
         locationsListMap: {
@@ -330,7 +331,7 @@ export class TransmissionChainDataService {
                     }
                 } else if (
                     node.type === EntityType.CONTACT_OF_CONTACT &&
-                    filters.showContacts
+                    filters.showContacts && filters.showContactsOfContacts
                 ) {
                     const contactOfContactData: ContactOfContactModel = node.model as ContactOfContactModel;
                     allowAdd = true;

@@ -245,7 +245,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_NODE_SIZE_INCLUDE_LABELS': 'Node size must include labels',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOT_NAME': 'Snapshot name',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOT_DOWNLOAD_PROGRESS': '{{name}} processed: {{progress}}',
-        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOT_DOWNLOAD_FINISHED': 'Rendering'
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOT_DOWNLOAD_FINISHED': 'Rendering',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT_NOTHING_TO_EXPORT': 'Please make sure that graph is visible'
 
         /**
          * REMOVE the tokens from below
