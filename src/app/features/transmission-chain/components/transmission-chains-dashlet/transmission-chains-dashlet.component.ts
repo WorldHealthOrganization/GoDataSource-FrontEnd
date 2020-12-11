@@ -41,6 +41,7 @@ import { EventModel } from '../../../../core/models/event.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { ClusterModel } from '../../../../core/models/cluster.model';
+import { CotSnapshotModel } from '../../../../core/models/cot-snapshot.model';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -207,8 +208,13 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
     // snapshots
     snapshotOptions: LabelValuePair[];
+    snapshotOptionsMap: {
+        [snapshotID: string]: {
+            snapshot: CotSnapshotModel,
+            option: LabelValuePair
+        }
+    } = {};
     selectedSnapshot: string;
-    selectedSnapshotOption: LabelValuePair;
 
     // cytoscape-graph.component data
     style: any;
@@ -2028,12 +2034,13 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             .subscribe((snapshots) => {
                 // format snapshots
                 this.snapshotOptions = [];
+                this.snapshotOptionsMap = {};
                 (snapshots || []).forEach((snapshot) => {
                     // snapshot name
                     const name: string = `${snapshot.name} - ${snapshot.startDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT)}`;
 
-                    // add snapshot to list of options
-                    this.snapshotOptions.push(new LabelValuePair(
+                    // create options
+                    const option: LabelValuePair = new LabelValuePair(
                         snapshot.status === Constants.COT_SNAPSHOT_STATUSES.LNG_COT_STATUS_IN_PROGRESS.value ?
                             this.i18nService.instant(
                                 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SNAPSHOT_STATUS_IN_PROGRESS', {
@@ -2043,7 +2050,16 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                             name,
                         snapshot.id,
                         snapshot.status === Constants.COT_SNAPSHOT_STATUSES.LNG_COT_STATUS_IN_PROGRESS.value
-                    ));
+                    );
+
+                    // map snapshot for easy access
+                    this.snapshotOptionsMap[snapshot.id] = {
+                        snapshot: snapshot,
+                        option: option
+                    };
+
+                    // add snapshot to list of options
+                    this.snapshotOptions.push(option);
                 });
 
                 // finished
@@ -2096,7 +2112,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         }
 
         // retrieve chain of transmission
-        const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
+        const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog({
+            widthPx: 200
+        });
         this.chainGroup = undefined;
         this.chainPages = undefined;
         this.selectedChainPageIndex = 0;
@@ -2104,7 +2122,22 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         this.transmissionChainDataService
             .getCalculatedIndependentTransmissionChains(
                 this.selectedOutbreak.id,
-                this.selectedSnapshot
+                this.snapshotOptionsMap[this.selectedSnapshot].snapshot,
+                (
+                    snapshotData: CotSnapshotModel,
+                    progress: string
+                ): void => {
+                    if (progress) {
+                        loadingDialog.showMessage(
+                            'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOT_DOWNLOAD_PROGRESS', {
+                                name: snapshotData.name,
+                                progress: progress.toString()
+                            }
+                        );
+                    } else {
+                        loadingDialog.showMessage('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOT_DOWNLOAD_FINISHED');
+                    }
+                }
             )
             .pipe(
                 catchError((err) => {
@@ -2210,13 +2243,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     pageSizeChanged(pageSize: number) {
         this.pageSize = pageSize;
         this.mustLoadChain = true;
-    }
-
-    /**
-     * Selected option snapshot changed
-     */
-    selectedSnapshotOptionChanged(selectedSnapshotOption): void {
-        this.selectedSnapshotOption = selectedSnapshotOption;
     }
 
     /**

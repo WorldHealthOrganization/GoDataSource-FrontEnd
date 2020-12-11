@@ -5,6 +5,7 @@ import { IPermissionBasic } from './permission.interface';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
+import { FileSize } from '../helperClasses/file-size';
 
 export class CotSnapshotModel
     extends BaseModel
@@ -30,11 +31,7 @@ export class CotSnapshotModel
 
         // format human readable
         if (this.sizeBytes) {
-            const k = 1024;
-            const dm = 2;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-            const i = Math.floor(Math.log(this.sizeBytes) / Math.log(k));
-            this._sizeBytesHumanReadable = parseFloat((this.sizeBytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+            this._sizeBytesHumanReadable = FileSize.bytesToReadableForm(this.sizeBytes);
         } else {
             this._sizeBytesHumanReadable = '-';
         }
