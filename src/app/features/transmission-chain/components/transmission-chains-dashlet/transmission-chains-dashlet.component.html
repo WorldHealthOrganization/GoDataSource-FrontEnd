@@ -11,7 +11,7 @@
 
         <!-- Generate new graph -->
         <button
-            *ngIf="!showFilters"
+            *ngIf="!showFilters && selectedOutbreak?.id === authUser?.activeOutbreakId"
             mat-raised-button
             (click)="showFiltersHideGraphConf()">
             {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_SETTINGS' | translate }}
