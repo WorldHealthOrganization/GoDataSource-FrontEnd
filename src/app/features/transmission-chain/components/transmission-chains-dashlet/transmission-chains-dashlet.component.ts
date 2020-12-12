@@ -75,6 +75,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     // page size
     pageSize: number = 500;
 
+    // luster icon map
+    clusterIconMap: {
+        [clusterId: string]: string
+    } = {};
+
     selectedOutbreak: OutbreakModel;
     chainGroupId: string;
     chainGroup: TransmissionChainGroupModel;
@@ -588,8 +593,12 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                                         this.clusterOptions = clusters;
 
                                         this.legend.clustersList = {};
+                                        this.clusterIconMap = {};
                                         _.forEach(clusters, (cluster) => {
                                             this.legend.clustersList[cluster.id] = cluster.name;
+                                            if (cluster.icon) {
+                                                this.clusterIconMap[cluster.id] = cluster.icon;
+                                            }
                                         });
                                     });
 
@@ -911,14 +920,12 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
         if (this.colorCriteria.edgeIconCriteria !== Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.NONE.value) {
             if (this.colorCriteria.edgeIconCriteria === 'clusterId') {
-                // we should check if we have this information, if not we must wait for it to be retrieved
-                // #TODO
                 // must refactor this entire function :)
                 (this.clusterOptions || []).forEach((item) => {
-                    // this.legend.edgeIcon[item.id] = {
-                    //     isUrl: true,
-                    //     url: item.iconUrl
-                    // };
+                    this.legend.edgeIcon[item.id] = {
+                        class: 'mat-icon',
+                        icon: item.icon
+                    };
                 });
                 this.legend.edgeIconKeys = Object.keys(this.legend.edgeIcon);
             } else {
@@ -932,6 +939,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 }
                 _.forEach(edgeIconReferenceDataEntries, (value) => {
                     this.legend.edgeIcon[value.value] = {
+                        class: 'xt-icon',
                         icon: getEdgeIconFunc(value.value)
                     };
                 });
@@ -1394,7 +1402,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 this.transmissionChainViewType,
                 this.chainPages && this.chainPages[this.selectedChainPageIndex] ?
                     this.chainPages[this.selectedChainPageIndex] :
-                    undefined
+                    undefined,
+                this.clusterIconMap
             );
 
             // configure geo map
