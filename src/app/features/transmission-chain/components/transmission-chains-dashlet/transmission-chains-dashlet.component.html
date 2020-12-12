@@ -316,29 +316,13 @@
                 *ngIf="transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value"
                 fxLayout="row" fxLayoutGap="20px">
 
-                <!-- Avoid overlap -->
-                <app-form-checkbox
-                    name="chainAvoidOverlap"
-                    [(ngModel)]="layoutCola.avoidOverlap"
-                    [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_AVOID_OVERLAP' | translate"
+                <!-- Fast / Slow render -->
+                <app-form-radio
+                    name="chainColaRenderMethod"
+                    [(ngModel)]="renderMethod"
+                    [options]="renderMethodOptions"
                     (ngModelChange)="mustLoadChain = true">
-                </app-form-checkbox>
-
-                <!-- Randomize -->
-                <app-form-checkbox
-                    name="chainRandomize"
-                    [(ngModel)]="layoutCola.randomize"
-                    [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_RANDOMIZE' | translate"
-                    (ngModelChange)="mustLoadChain = true">
-                </app-form-checkbox>
-
-                <!-- Node names include labels -->
-                <app-form-checkbox
-                    name="chainNodeDimensionsIncludeLabels"
-                    [(ngModel)]="layoutCola.nodeDimensionsIncludeLabels"
-                    [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_NODE_SIZE_INCLUDE_LABELS' | translate"
-                    (ngModelChange)="mustLoadChain = true">
-                </app-form-checkbox>
+                </app-form-radio>
 
             </div>
 

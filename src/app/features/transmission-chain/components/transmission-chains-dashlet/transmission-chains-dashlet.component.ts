@@ -254,8 +254,23 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         min: 0.02,
         max: 4
     };
+
+    // render method
+    renderMethod: string = 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_RENDER_METHOD_FAST';
+    renderMethodOptions = [
+        new LabelValuePair(
+            'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_RENDER_METHOD_FAST',
+            'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_RENDER_METHOD_FAST'
+        ),
+        new LabelValuePair(
+            'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_RENDER_METHOD_PRECISE',
+            'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_RENDER_METHOD_PRECISE'
+        )
+    ];
+
     // layout cola - bubble view
     // Nodes are automatically arranged to optimally use the space
+    // fast render method
     layoutCola: any = {
         name: 'cola',
         nodeDimensionsIncludeLabels: false,
@@ -1423,8 +1438,30 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         // Decide what layout to use based on the view type selected or send at initialization
         if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value) {
             cytoscape.use(cola);
-            this.layout = this.layoutCola;
+            this.layout = _.cloneDeep(this.layoutCola);
             this.style = this.defaultStyle;
+
+            // set render method
+            if (this.renderMethod === 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_RENDER_METHOD_PRECISE') {
+                this.layout.nodeDimensionsIncludeLabels = true;
+                this.layout.avoidOverlap = true;
+                this.layout.randomize = true;
+
+                this.layout.fit = true;
+                this.layout.flow = {
+                    axis: 'y',
+                    minSeparation: 30
+                };
+                this.layout.padding = 10;
+                this.layout.unconstrIter = 10;
+                this.layout.userConstIter = 20;
+                this.layout.maxSimulationTime = 2000;
+                this.layout.stop = () => {
+                    if (this.cy) {
+                        this.cy.fit();
+                    }
+                };
+            }
         } else if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.HIERARCHICAL_NETWORK.value) {
             cytoscape.use(dagre);
             this.layout = this.layoutDagre;
