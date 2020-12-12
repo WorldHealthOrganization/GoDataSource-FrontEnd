@@ -73,7 +73,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     selectedChainPageIndex: number = 0;
 
     // page size
-    pageSize: number = 500;
+    pageSize: number = 250;
 
     // luster icon map
     clusterIconMap: {
