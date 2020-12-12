@@ -175,27 +175,16 @@ export const EnglishUsLang = {
         'LNG_IMPORT_RESULT_FIELD_LABEL_ERROR_DATA': 'Record data',
 
         /**
-         * uiClustersListPage
-         */
-        'LNG_PAGE_LIST_CLUSTERS_MANAGE_ICONS_BUTTON': 'Manage icons',
-
-        /**
          * uiClusterFields
          */
         'LNG_CLUSTER_FIELD_LABEL_COLOR': 'Colour',
         'LNG_CLUSTER_FIELD_LABEL_COLOR_DESCRIPTION': '',
         'LNG_CLUSTER_FIELD_LABEL_ICON': 'Icon',
-        'LNG_CLUSTER_FIELD_LABEL_ICON_DESCRIPTION': '',
 
         /**
-         * uiCreateClusterPage
+         * uiCommonButtons
          */
-        'LNG_PAGE_CREATE_CLUSTER_LABEL_NO_ICON': 'No icon',
-
-        /**
-         * uiViewModifyClusterPage
-         */
-        'LNG_PAGE_MODIFY_CLUSTER_LABEL_NO_ICON': 'No icon',
+        'LNG_COMMON_BUTTON_REMOVE': 'Remove',
 
         /**
          * uiClustersListPage
@@ -254,5 +243,6 @@ export const EnglishUsLang = {
         // LNG_PAGE_IMPORT_DATA_BUTTON_RESET_IMPORT_MAPPING
         // LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_RESET_SETTINGS
         // LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_RESET_CHAINS
+        // LNG_PAGE_MODIFY_CLUSTER_TAB_DETAILS_TITLE
     }
 };

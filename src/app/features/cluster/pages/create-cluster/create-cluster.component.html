@@ -10,7 +10,7 @@
 
         <!-- Details step -->
         <mat-step [stepControl]="detailsForm">
-            <form #detailsForm="ngForm">
+            <form #detailsForm="ngForm" class="form-content">
                 <ng-template matStepLabel>{{'LNG_PAGE_CREATE_CLUSTER_TAB_DETAILS_TITLE' | translate}}</ng-template>
 
                 <mat-card class="page-section fit-color-picker">
@@ -67,48 +67,11 @@
                             </div>
 
                             <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
-                                <!-- View Icon  -->
-                                <div
-                                    *ngIf="!changeIcon"
-                                    fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
-
-                                    <!-- Label -->
-                                    <div>
-                                        {{ 'LNG_CLUSTER_FIELD_LABEL_ICON' | translate }}
-                                    </div>
-
-                                    <!-- Image -->
-                                    <img
-                                        *ngIf="clusterData.iconId"
-                                        [src]="clusterData.iconUrl"/>
-                                    <div
-                                        *ngIf="!clusterData.iconId">
-                                        {{ 'LNG_PAGE_CREATE_CLUSTER_LABEL_NO_ICON' | translate }}
-                                    </div>
-
-                                    <!-- Change -->
-                                    <div>
-                                        <button
-                                            type="button"
-                                            mat-raised-button
-                                            (click)="changeIcon = true;">
-                                            {{'LNG_COMMON_BUTTON_CHANGE' | translate}}
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- Change Icon -->
-                                <app-form-select
-                                    *ngIf="changeIcon"
-                                    name="iconId"
-                                    [ngModel]="clusterData.iconId"
-                                    [placeholder]="'LNG_CLUSTER_FIELD_LABEL_ICON' | translate"
-                                    tooltip="LNG_CLUSTER_FIELD_LABEL_ICON_DESCRIPTION"
-                                    [options]="iconsList$ | async"
-                                    optionLabelKey="name"
-                                    optionValueKey="id"
-                                    optionLabelImgKey="url">
-                                </app-form-select>
+                                <app-form-icon-picker
+                                    name="icon"
+                                    [ngModel]="clusterData.icon"
+                                    [placeholder]="'LNG_CLUSTER_FIELD_LABEL_ICON' | translate">
+                                </app-form-icon-picker>
                             </div>
                         </div>
                     </div>

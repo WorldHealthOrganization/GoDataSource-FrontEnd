@@ -10,24 +10,6 @@
                         {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                     </button>
                 </ng-container>
-
-                <button
-                    *ngIf="IconModel.canList(authUser)"
-                    mat-raised-button
-                    color="accent"
-                    [matMenuTriggerFor]="quickActionsMenu">
-                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
-                </button>
-
-                <mat-menu #quickActionsMenu="matMenu">
-                    <button
-                        *ngIf="IconModel.canList(authUser)"
-                        mat-menu-item
-                        [routerLink]="['/reference-data', 'manage-icons', 'list']"
-                        [queryParams]="{ fromClusters: true }">
-                        {{'LNG_PAGE_LIST_CLUSTERS_MANAGE_ICONS_BUTTON' | translate}}
-                    </button>
-                </mat-menu>
             </div>
         </div>
     </ng-container>
@@ -119,13 +101,15 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item">
-                <img
-                    *ngIf="item.iconId"
-                    [src]="item.iconUrl" />
-                <div
-                    *ngIf="!item.iconId">
+                <span
+                    *ngIf="item.icon; else noIcon"
+                    class="cluster-icon-picker-icon">
+                    {{ item.icon }}
+                </span>
+                <ng-template
+                    #noIcon>
                     {{ 'LNG_PAGE_LIST_CLUSTERS_LABEL_NO_ICON' | translate }}
-                </div>
+                </ng-template>
             </mat-cell>
         </ng-container>
 

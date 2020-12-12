@@ -915,10 +915,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 // #TODO
                 // must refactor this entire function :)
                 (this.clusterOptions || []).forEach((item) => {
-                    this.legend.edgeIcon[item.id] = {
-                        isUrl: true,
-                        url: item.iconUrl
-                    };
+                    // this.legend.edgeIcon[item.id] = {
+                    //     isUrl: true,
+                    //     url: item.iconUrl
+                    // };
                 });
                 this.legend.edgeIconKeys = Object.keys(this.legend.edgeIcon);
             } else {

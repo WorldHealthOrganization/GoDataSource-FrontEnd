@@ -19,7 +19,6 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { IconModel } from 'app/core/models/icon.model';
 
 @Component({
     selector: 'app-clusters-list',
@@ -34,7 +33,6 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
 
     // constants
     ClusterModel = ClusterModel;
-    IconModel = IconModel;
 
     outbreakSubscriber: Subscription;
 
