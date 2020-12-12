@@ -17,7 +17,6 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import * as _ from 'lodash';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { ClusterModel } from '../../../../core/models/cluster.model';
 
 @Component({
     selector: 'app-manage-icons-list',
@@ -31,9 +30,6 @@ export class ManageIconsListComponent extends ListComponent implements OnInit, O
 
     // Category Name
     category: ReferenceDataCategoryModel;
-
-    // came from cluster list page ?
-    fromClusters: boolean = false;
 
     // constants
     IconModel = IconModel;
@@ -95,12 +91,7 @@ export class ManageIconsListComponent extends ListComponent implements OnInit, O
 
         // get the query params
         this.route.queryParams
-            .subscribe((params: { categoryId?: string, fromClusters?: string }) => {
-                // came from cluster list page
-                if (params.fromClusters) {
-                    this.fromClusters = JSON.parse(params.fromClusters);
-                }
-
+            .subscribe((params: { categoryId?: string }) => {
                 // retrieve Reference Data Category info
                 if (!params.categoryId) {
                     // update breadcrumbs
@@ -133,22 +124,9 @@ export class ManageIconsListComponent extends ListComponent implements OnInit, O
         this.breadcrumbs = [];
 
         // add reference categories list breadcrumb only if we have permission
-        if (
-            !this.fromClusters &&
-            ReferenceDataCategoryModel.canList(this.authUser)
-        ) {
+        if (ReferenceDataCategoryModel.canList(this.authUser)) {
             this.breadcrumbs.push(
                 new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
-            );
-        }
-
-        // add cluster list breadcrumb only if we have permission
-        if (
-            this.fromClusters &&
-            ClusterModel.canList(this.authUser)
-        ) {
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel('LNG_PAGE_LIST_CLUSTERS_TITLE', '/clusters')
             );
         }
 

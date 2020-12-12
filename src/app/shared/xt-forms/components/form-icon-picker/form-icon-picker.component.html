@@ -1,0 +1,55 @@
+<div
+    class="form-icon-picker-container form-element"
+    [ngClass]="{invalid: (invalid)}">
+
+    <!-- label -->
+    <span
+        class="form-icon-picker-label">
+        {{ 'LNG_CLUSTER_FIELD_LABEL_ICON' | translate }}
+    </span>
+
+    <!-- icon holder -->
+    <input
+        type="hidden"
+        [name]="name"
+        [ngModel]="value" />
+
+    <!-- icon display -->
+    <span
+        class="form-icon-picker-icon">
+        {{ value ? value : '-'}}
+    </span>
+
+    <!-- icon chooser -->
+    <button
+        *ngIf="!disabled"
+        type="button"
+        mat-raised-button>
+        <div
+            [iconPicker]="value"
+            ipPosition="bottom"
+            ipIconSize="24px"
+            [ipIconPack]="ipIconPack"
+            [ipFallbackIcon]="' '"
+            (iconPickerSelect)="iconPickerSelect($event)"
+            [ipPlaceHolder]="'LNG_COMMON_LABEL_SEARCH' | translate">
+            {{ 'LNG_COMMON_BUTTON_CHANGE' | translate }}
+        </div>
+    </button>
+
+    <!-- remove icon -->
+    <button
+        *ngIf="!disabled"
+        type="button"
+        mat-raised-button
+        (click)="removeIcon()">
+        {{ 'LNG_COMMON_BUTTON_REMOVE' | translate }}
+    </button>
+
+    <app-form-validation
+        *ngIf="invalid"
+        [controlContainer]="controlContainer"
+        [controlName]="name"
+        [messages]="failures">
+    </app-form-validation>
+</div>

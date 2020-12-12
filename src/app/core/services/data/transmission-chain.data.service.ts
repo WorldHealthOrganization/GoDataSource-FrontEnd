@@ -247,7 +247,10 @@ export class TransmissionChainDataService {
             [idLocation: string]: LocationModel
         },
         selectedViewType: string,
-        page: ITransmissionChainGroupPageModel
+        page: ITransmissionChainGroupPageModel,
+        clusterIconMap: {
+            [clusterId: string]: string
+        }
     ): IConvertChainToGraphElements {
         // if we have a pge then we must limit nodes to the specific items
         const pageAllowedNodes: {
@@ -728,8 +731,17 @@ export class TransmissionChainDataService {
             } else if (colorCriteria.edgeIconField === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.EXPOSURE_TYPE.value) {
                 graphEdge.setEdgeIconExposureType(relationship);
                 graphEdge.fontFamily = 'xtIcon';
+            } else if (
+                colorCriteria.edgeIconField === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.CLUSTER.value &&
+                relationship.clusterId &&
+                clusterIconMap &&
+                clusterIconMap[relationship.clusterId]
+            ) {
+                graphEdge.label = clusterIconMap[relationship.clusterId];
+                graphEdge.fontFamily = 'Material Icons';
             }
 
+            // add edge
             graphData.edges.push({data: graphEdge});
         });
 

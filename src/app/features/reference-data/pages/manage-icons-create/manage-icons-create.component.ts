@@ -12,7 +12,6 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { UserModel } from '../../../../core/models/user.model';
-import { ClusterModel } from '../../../../core/models/cluster.model';
 
 export enum IconExtension {
     PNG = '.png',
@@ -42,9 +41,6 @@ export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements 
 
     // Category Name
     category: ReferenceDataCategoryModel;
-
-    // came from cluster list page ?
-    fromClusters: boolean = false;
 
     // Icon Model
     icon: IconModel = new IconModel();
@@ -121,12 +117,7 @@ export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements 
 
         // get the query params
         this.route.queryParams
-            .subscribe((params: { categoryId?: string, fromClusters?: string }) => {
-                // came from cluster list page
-                if (params.fromClusters) {
-                    this.fromClusters = JSON.parse(params.fromClusters);
-                }
-
+            .subscribe((params: { categoryId?: string }) => {
                 // retrieve Reference Data Category info
                 if (!params.categoryId) {
                     // update breadcrumbs
@@ -145,22 +136,9 @@ export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements 
         this.breadcrumbs = [];
 
         // add reference categories list breadcrumb only if we have permission
-        if (
-            !this.fromClusters &&
-            ReferenceDataCategoryModel.canList(this.authUser)
-        ) {
+        if (ReferenceDataCategoryModel.canList(this.authUser)) {
             this.breadcrumbs.push(
                 new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
-            );
-        }
-
-        // add cluster list breadcrumb only if we have permission
-        if (
-            this.fromClusters &&
-            ClusterModel.canList(this.authUser)
-        ) {
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel('LNG_PAGE_LIST_CLUSTERS_TITLE', '/clusters')
             );
         }
 
@@ -171,8 +149,7 @@ export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements 
                     'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_LIST_TITLE',
                     '/reference-data/manage-icons/list',
                     false, {
-                        categoryId: this.category ? this.category.id : undefined,
-                        fromClusters: this.fromClusters
+                        categoryId: this.category ? this.category.id : undefined
                     }
                 )
             );

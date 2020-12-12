@@ -483,16 +483,9 @@
             <div
                 *ngFor="let edgeIconItem of legend.edgeIconKeys" class="legend-item">
                 <span
-                    *ngIf="!legend.edgeIcon[edgeIconItem].isUrl; else notIcon"
-                    class="xt-icon">
+                    [class]="legend.edgeIcon[edgeIconItem].class">
                     {{ legend.edgeIcon[edgeIconItem].icon }}
                 </span>
-                <ng-template
-                    #notIcon>
-                    <img
-                        *ngIf="legend.edgeIcon[edgeIconItem].url"
-                        [src]="legend.edgeIcon[edgeIconItem].url" />
-                </ng-template>
                 <div>
                     {{legend.clustersList && legend.clustersList[edgeIconItem] ? legend.clustersList[edgeIconItem] : (edgeIconItem | translate)}}
                 </div>
