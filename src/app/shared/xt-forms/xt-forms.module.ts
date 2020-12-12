@@ -10,7 +10,6 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { components } from './components';
 import { validatorDirectives } from './validators';
 import { ScrollingModule } from '@angular/cdk/scrolling';
-import { IconPickerModule } from 'ngx-icon-picker';
 
 @NgModule({
     imports: [
@@ -18,7 +17,6 @@ import { IconPickerModule } from 'ngx-icon-picker';
         FormsModule,
         FlexLayoutModule,
         AngularMaterialModule,
-        IconPickerModule,
         Ng5SliderModule,
         NgxMatSelectSearchModule,
         TranslateModule,
@@ -34,7 +32,6 @@ import { IconPickerModule } from 'ngx-icon-picker';
         FormsModule,
         FlexLayoutModule,
         AngularMaterialModule,
-        IconPickerModule,
         Ng5SliderModule,
         ScrollingModule,
         ...components,

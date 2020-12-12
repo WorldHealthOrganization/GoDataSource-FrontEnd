@@ -182,11 +182,6 @@ export const EnglishUsLang = {
         'LNG_CLUSTER_FIELD_LABEL_ICON': 'Icon',
 
         /**
-         * uiCommonButtons
-         */
-        'LNG_COMMON_BUTTON_REMOVE': 'Remove',
-
-        /**
          * uiClustersListPage
          */
         'LNG_PAGE_LIST_CLUSTERS_LABEL_NO_ICON': 'No icon',
