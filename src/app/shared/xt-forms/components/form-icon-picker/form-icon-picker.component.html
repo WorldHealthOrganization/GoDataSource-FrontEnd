@@ -8,12 +8,6 @@
         {{ 'LNG_CLUSTER_FIELD_LABEL_ICON' | translate }}
     </span>
 
-    <!-- icon holder -->
-    <input
-        type="hidden"
-        [name]="name"
-        [ngModel]="value" />
-
     <!-- icon display -->
     <span
         class="form-icon-picker-icon">
@@ -21,30 +15,15 @@
     </span>
 
     <!-- icon chooser -->
-    <button
+    <app-form-select-vscroll
         *ngIf="!disabled"
-        type="button"
-        mat-raised-button>
-        <div
-            [iconPicker]="value"
-            ipPosition="bottom"
-            ipIconSize="24px"
-            [ipIconPack]="ipIconPack"
-            [ipFallbackIcon]="' '"
-            (iconPickerSelect)="iconPickerSelect($event)"
-            [ipPlaceHolder]="'LNG_COMMON_LABEL_SEARCH' | translate">
-            {{ 'LNG_COMMON_BUTTON_CHANGE' | translate }}
-        </div>
-    </button>
-
-    <!-- remove icon -->
-    <button
-        *ngIf="!disabled"
-        type="button"
-        mat-raised-button
-        (click)="removeIcon()">
-        {{ 'LNG_COMMON_BUTTON_REMOVE' | translate }}
-    </button>
+        [name]="name"
+        [(ngModel)]="value"
+        [options]="matOptions"
+        [placeholder]="'LNG_COMMON_BUTTON_CHANGE' | translate"
+        (blur)="onBlur()"
+        [labelIsMaterialIcon]="true">
+    </app-form-select-vscroll>
 
     <app-form-validation
         *ngIf="invalid"

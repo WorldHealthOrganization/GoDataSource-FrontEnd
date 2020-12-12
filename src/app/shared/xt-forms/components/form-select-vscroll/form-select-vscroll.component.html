@@ -53,7 +53,8 @@
                     [disabled]="option[optionDisabledKey]">
                     <!-- hack to fix matTooltip not working properly with cdkVirtualFor -->
                     <div
-                        [matTooltip]="option[optionTooltipKey] | translate">
+                        [matTooltip]="option[optionTooltipKey] | translate"
+                        [class.label-as-mat-icon]="labelIsMaterialIcon">
                         {{option[optionLabelKey] | translate}}
                     </div>
                 </mat-option>

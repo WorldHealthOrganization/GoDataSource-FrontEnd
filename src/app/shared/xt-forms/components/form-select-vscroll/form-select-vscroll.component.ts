@@ -67,6 +67,9 @@ export class FormSelectVscrollComponent
     @Input() filterOptionsPlaceholder: string = 'LNG_COMMON_LABEL_SEARCH';
     @Input() filterOptionsDelayMs: number = 200;
 
+    // label is material icon ?
+    @Input() labelIsMaterialIcon: boolean;
+
     // selected option
     selectedOption: any;
 
