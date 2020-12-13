@@ -2199,7 +2199,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         });
 
         // retrieve data
-        this.transmissionChainDataService
+        this._updateSnapshotsSubscription = this.transmissionChainDataService
             .getSnapshotsList(
                 this.selectedOutbreak.id,
                 qb
