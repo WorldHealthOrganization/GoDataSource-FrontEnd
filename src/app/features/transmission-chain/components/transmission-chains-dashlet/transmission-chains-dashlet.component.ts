@@ -2154,7 +2154,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     private checkAgainForInProgressSnapshots(): void {
         setTimeout(() => {
             this.updateSnapshotsInProgress();
-        }, 1500);
+        }, 3000);
     }
 
     /**
