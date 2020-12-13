@@ -435,6 +435,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         }
     ];
 
+    // keep snapshot update subscription
+    private _updateSnapshotsSubscription: Subscription;
+
     /**
      * Constructor
      */
@@ -637,6 +640,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             this.outbreakSubscriber.unsubscribe();
             this.outbreakSubscriber = null;
         }
+
+        // stop any update snapshot request we might have pending
+        this.stopUpdateSnapshotsInProgress();
 
         // release cyto
         this.destroyCytoscape();
@@ -2057,13 +2063,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             RequestSortDirection.DESC
         );
 
-        // filter out failed
-        qb.filter.where({
-            status: {
-                neq: Constants.COT_SNAPSHOT_STATUSES.LNG_COT_STATUS_FAILED.value
-            }
-        });
-
         // created by current user
         qb.filter.byEquality(
             'createdBy',
@@ -2091,20 +2090,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 this.snapshotOptions = [];
                 this.snapshotOptionsMap = {};
                 (snapshots || []).forEach((snapshot) => {
-                    // snapshot name
-                    const name: string = `${snapshot.name} - ${snapshot.startDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT)}`;
-
-                    // create options
+                    // create option
                     const option: LabelValuePair = new LabelValuePair(
-                        snapshot.status === Constants.COT_SNAPSHOT_STATUSES.LNG_COT_STATUS_IN_PROGRESS.value ?
-                            this.i18nService.instant(
-                                'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SNAPSHOT_STATUS_IN_PROGRESS', {
-                                    name: name
-                                }
-                            ) :
-                            name,
+                        this.getSnapshotOptionLabel(snapshot),
                         snapshot.id,
-                        snapshot.status === Constants.COT_SNAPSHOT_STATUSES.LNG_COT_STATUS_IN_PROGRESS.value
+                        snapshot.status !== Constants.COT_SNAPSHOT_STATUSES.LNG_COT_STATUS_SUCCESS.value
                     );
 
                     // map snapshot for easy access
@@ -2117,8 +2107,121 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                     this.snapshotOptions.push(option);
                 });
 
+                // trigger periodic update of snapshots that are still in progress
+                this.checkAgainForInProgressSnapshots();
+
                 // finished
                 finishedCallback();
+            });
+    }
+
+    /**
+     * Retrieve proper label for snapshot dropdown option
+     */
+    private getSnapshotOptionLabel(snapshot: CotSnapshotModel): string {
+        const name: string = `${snapshot.name} - ${snapshot.startDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT)}`;
+        switch (snapshot.status) {
+            case Constants.COT_SNAPSHOT_STATUSES.LNG_COT_STATUS_IN_PROGRESS.value:
+                return this.i18nService.instant(
+                    'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SNAPSHOT_STATUS_IN_PROGRESS', {
+                        name: name
+                    }
+                );
+            case Constants.COT_SNAPSHOT_STATUSES.LNG_COT_STATUS_FAILED.value:
+                return this.i18nService.instant(
+                    'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SNAPSHOT_STATUS_FAILED', {
+                        name: name
+                    }
+                );
+            default:
+                return name;
+        }
+    }
+
+    /**
+     * Stop update snapshots
+     */
+    private stopUpdateSnapshotsInProgress(): void {
+        if (this._updateSnapshotsSubscription) {
+            this._updateSnapshotsSubscription.unsubscribe();
+            this._updateSnapshotsSubscription = undefined;
+        }
+    }
+
+    /**
+     * Trigger periodic update of snapshots that are still in progress
+     */
+    private checkAgainForInProgressSnapshots(): void {
+        setTimeout(() => {
+            this.updateSnapshotsInProgress();
+        }, 1500);
+    }
+
+    /**
+     * Update snapshots status that are still in progress
+     */
+    private updateSnapshotsInProgress(): void {
+        // stop any update snapshot request we might have pending
+        this.stopUpdateSnapshotsInProgress();
+
+        // determine snapshots that are still in progress
+        const inProgressSnapshots: string[] = [];
+        _.each(this.snapshotOptionsMap, (snapshotOptionsMapItem) => {
+            if (snapshotOptionsMapItem.snapshot.status === Constants.COT_SNAPSHOT_STATUSES.LNG_COT_STATUS_IN_PROGRESS.value) {
+                inProgressSnapshots.push(snapshotOptionsMapItem.snapshot.id);
+            }
+        });
+
+        // do we have anything to update ?
+        if (inProgressSnapshots.length < 1) {
+            return;
+        }
+
+        // construct query
+        const qb: RequestQueryBuilder = new RequestQueryBuilder();
+
+        // we need only the status
+        qb.fields(
+            'id',
+            'status',
+            'name',
+            'startDate'
+        );
+
+        // filter out failed
+        qb.filter.where({
+            id: {
+                inq: inProgressSnapshots
+            },
+            status: {
+                neq: Constants.COT_SNAPSHOT_STATUSES.LNG_COT_STATUS_IN_PROGRESS.value
+            }
+        });
+
+        // retrieve data
+        this.transmissionChainDataService
+            .getSnapshotsList(
+                this.selectedOutbreak.id,
+                qb
+            )
+            .subscribe((snapshots) => {
+                // update snapshot data
+                (snapshots || []).forEach((snapshot) => {
+                    if (
+                        this.snapshotOptionsMap &&
+                        this.snapshotOptionsMap[snapshot.id]
+                    ) {
+                        // update status so we don't retrieve it again
+                        this.snapshotOptionsMap[snapshot.id].snapshot.status = snapshot.status;
+
+                        // update name and enable / disable option
+                        this.snapshotOptionsMap[snapshot.id].option.disabled = this.snapshotOptionsMap[snapshot.id].snapshot.status !== Constants.COT_SNAPSHOT_STATUSES.LNG_COT_STATUS_SUCCESS.value;
+                        this.snapshotOptionsMap[snapshot.id].option.label = this.getSnapshotOptionLabel(snapshot);
+                    }
+                });
+
+                // check again if we have anything else to retrieve
+                this.checkAgainForInProgressSnapshots();
             });
     }
 
