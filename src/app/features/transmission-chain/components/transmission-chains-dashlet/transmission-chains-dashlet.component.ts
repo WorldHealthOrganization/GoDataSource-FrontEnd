@@ -437,6 +437,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
     // keep snapshot update subscription
     private _updateSnapshotsSubscription: Subscription;
+    private _updateSnapshotsTimer: NodeJS.Timer;
 
     /**
      * Constructor
@@ -2142,9 +2143,16 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      * Stop update snapshots
      */
     private stopUpdateSnapshotsInProgress(): void {
+        // release api request subscription
         if (this._updateSnapshotsSubscription) {
             this._updateSnapshotsSubscription.unsubscribe();
             this._updateSnapshotsSubscription = undefined;
+        }
+
+        // release timer
+        if (this._updateSnapshotsTimer) {
+            clearTimeout(this._updateSnapshotsTimer);
+            this._updateSnapshotsTimer = undefined;
         }
     }
 
@@ -2152,7 +2160,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      * Trigger periodic update of snapshots that are still in progress
      */
     private checkAgainForInProgressSnapshots(): void {
-        setTimeout(() => {
+        // stop any update snapshot request we might have pending
+        this.stopUpdateSnapshotsInProgress();
+
+        // update
+        this._updateSnapshotsTimer = setTimeout(() => {
             this.updateSnapshotsInProgress();
         }, 3000);
     }
