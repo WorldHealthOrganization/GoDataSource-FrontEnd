@@ -246,8 +246,8 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
      * Export geospatial map
      */
     exportGeospatialMap() {
-        const loadingDialog = this.dialogService.showLoadingDialog();
         if (this.cotDashletChild.worldMap) {
+            const loadingDialog = this.dialogService.showLoadingDialog();
             this.cotDashletChild.worldMap
                 .printToBlob()
                 .subscribe((blob) => {
@@ -259,7 +259,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
                     loadingDialog.close();
                 });
         } else {
-            loadingDialog.close();
+            this.snackbarService.showNotice('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT_NOTHING_TO_EXPORT');
         }
     }
 

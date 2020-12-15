@@ -62,6 +62,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
     @ViewChild('cyItem') cyRef: ElementRef;
 
+    // needed to export geo map image from parent component
+    @ViewChild('worldMap') worldMap: WorldMapComponent;
+
     // constants
     Constants = Constants;
     WorldMapMarkerLayer = WorldMapMarkerLayer;
