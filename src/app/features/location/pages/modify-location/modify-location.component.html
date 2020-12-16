@@ -1,0 +1,221 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<form
+    #form="ngForm"
+    class="page-content form-section"
+    [class.form-view-only]="viewOnly"
+    (submit)="modifyLocation(form)">
+
+    <div
+        fxFlex fxLayout="column" fxLayoutGap="20px"
+        class="form-content">
+
+        <!-- location breadcrumb -->
+        <app-location-breadcrumbs
+            #locationBreadcrumbs
+            [activeLocationBreadcrumb]="viewOnly ? 'LNG_PAGE_VIEW_LOCATION_NAME': 'LNG_PAGE_MODIFY_LOCATION_NAME'"></app-location-breadcrumbs>
+
+        <mat-tab-group class="page-tabs-navbar">
+
+            <mat-tab [label]="'LNG_PAGE_MODIFY_LOCATION_TAB_DETAILS_TITLE'| translate">
+
+                <!-- Details section -->
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-input
+                                name="name"
+                                [(ngModel)]="locationData.name"
+                                [placeholder]="'LNG_LOCATION_FIELD_LABEL_NAME' | translate"
+                                tooltip="LNG_LOCATION_FIELD_LABEL_NAME_DESCRIPTION"
+                                required="true"
+                                [disabled]="viewOnly">
+                            </app-form-input>
+
+                            <app-form-slide-toggle
+                                name="active"
+                                [(ngModel)]="locationData.active"
+                                [label]="'LNG_LOCATION_FIELD_LABEL_ACTIVE' | translate"
+                                tooltip="LNG_LOCATION_FIELD_LABEL_ACTIVE_DESCRIPTION"
+                                [disabled]="viewOnly">
+                            </app-form-slide-toggle>
+
+                            <app-form-input
+                                name="populationDensity"
+                                [(ngModel)]="locationData.populationDensity"
+                                [placeholder]="'LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY' | translate"
+                                tooltip="LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY_DESCRIPTION"
+                                type="number"
+                                [disabled]="viewOnly">
+                            </app-form-input>
+
+                            <app-form-select
+                                name="geographicalLevelId"
+                                [(ngModel)]="locationData.geographicalLevelId"
+                                [placeholder]="'LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL' | translate"
+                                tooltip="LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL_DESCRIPTION"
+                                [options]="geographicalLevelsList$ | async"
+                                optionLabelKey="label"
+                                optionValueKey="value"
+                                required="true"
+                                multiple="false"
+                                [disabled]="viewOnly">
+                            </app-form-select>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-location-dropdown
+                                fxFlex
+                                name="parentLocationId"
+                                [ngModel]="locationData.parentLocationId"
+                                [placeholder]="'LNG_LOCATION_FIELD_LABEL_PARENT_LOCATION' | translate"
+                                tooltip="LNG_LOCATION_FIELD_LABEL_PARENT_LOCATION_DESCRIPTION"
+                                [disabled]="viewOnly">
+                            </app-form-location-dropdown>
+
+                            <div
+                                fxFlex fxLayout="row" fxLayoutGap="20px">
+                                <app-form-input
+                                    #latInput
+                                    name="geoLocation[lat]"
+                                    [ngModel]="locationData.geoLocation?.lat"
+                                    [placeholder]="'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LAT' | translate"
+                                    tooltip="LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LAT_DESCRIPTION"
+                                    [required]="isLatLngRequired(lngInput.value)"
+                                    app-min-max-validator
+                                    [min]="-90"
+                                    [minNumber]="-90"
+                                    [max]="90"
+                                    [maxNumber]="90"
+                                    [disabled]="viewOnly"
+                                    type="number"
+                                    (optionChanged)="onChangeLatLng('lat', $event)">
+                                </app-form-input>
+
+                                <app-form-input
+                                    #lngInput
+                                    name="geoLocation[lng]"
+                                    [ngModel]="locationData.geoLocation?.lng"
+                                    [placeholder]="'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LNG' | translate"
+                                    tooltip="LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LNG_DESCRIPTION"
+                                    [required]="isLatLngRequired(latInput.value)"
+                                    app-min-max-validator
+                                    [min]="-180"
+                                    [minNumber]="-180"
+                                    [max]="180"
+                                    [maxNumber]="180"
+                                    [disabled]="viewOnly"
+                                    type="number"
+                                    (optionChanged)="onChangeLatLng('lng', $event)">
+                                </app-form-input>
+                            </div>
+                        </div>
+                    </div>
+                </mat-card>
+
+                <!-- Create / update by user information section -->
+                <div class="section-title">
+                    {{ 'LNG_PAGE_MODIFY_LOCATION_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE' | translate }}
+                </div>
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-input
+                                name="createdByUser"
+                                [ngModel]="locationData.createdByUser?.name"
+                                [placeholder]="'LNG_LOCATION_FIELD_LABEL_CREATED_BY'| translate"
+                                tooltip="LNG_LOCATION_FIELD_LABEL_CREATED_BY_DESCRIPTION"
+                                [disabled]="true">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="createdAt"
+                                [ngModel]="locationData.createdAt | dateTimeDefault"
+                                [placeholder]="'LNG_LOCATION_FIELD_LABEL_CREATED_AT'| translate"
+                                tooltip="LNG_LOCATION_FIELD_LABEL_CREATED_AT_DESCRIPTION"
+                                [disabled]="true">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="updatedByUser"
+                                [ngModel]="locationData.updatedByUser?.name"
+                                [placeholder]="'LNG_LOCATION_FIELD_LABEL_UPDATED_BY'| translate"
+                                tooltip="LNG_LOCATION_FIELD_LABEL_UPDATED_BY_DESCRIPTION"
+                                [disabled]="true">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="updatedAt"
+                                [ngModel]="locationData.updatedAt | dateTimeDefault"
+                                [placeholder]="'LNG_LOCATION_FIELD_LABEL_UPDATED_AT'| translate"
+                                tooltip="LNG_LOCATION_FIELD_LABEL_UPDATED_AT_DESCRIPTION"
+                                [disabled]="true">
+                            </app-form-input>
+                        </div>
+                    </div>
+                </mat-card>
+
+                <!-- Synonyms section -->
+                <div class="section-title">
+                    {{ 'LNG_LOCATION_FIELD_LABEL_SYNONYMS' | translate }}
+                </div>
+                <app-form-input-list
+                    name="synonyms"
+                    [ngModel]="locationData.synonyms"
+                    type="text"
+                    [placeholder]="'LNG_LOCATION_FIELD_LABEL_SYNONYM' | translate"
+                    tooltip="LNG_LOCATION_FIELD_LABEL_SYNONYM_DESCRIPTION"
+                    [required]="true"
+                    [unique]="true"
+                    [disabled]="viewOnly">
+                </app-form-input-list>
+
+                <!-- Identifiers section -->
+                <div class="section-title">
+                    {{ 'LNG_LOCATION_FIELD_LABEL_IDENTIFIERS' | translate}}
+                </div>
+                <app-form-location-identifier-list
+                    name="identifiers"
+                    [ngModel]="locationData.identifiers"
+                    [required]="true"
+                    codePlaceholder="LNG_LOCATION_FIELD_LABEL_IDENTIFIER_CODE"
+                    descriptionPlaceholder="LNG_LOCATION_FIELD_LABEL_IDENTIFIER_DESCRIPTION"
+                    [disabled]="viewOnly">
+                </app-form-location-identifier-list>
+            </mat-tab>
+
+        </mat-tab-group>
+    </div>
+
+    <div class="form-actions">
+        <div class="page-tabs-navbar-placeholder"></div>
+
+        <button
+            *ngIf="viewOnly && LocationModel.canModify(authUser)"
+            mat-raised-button
+            color="accent"
+            type="button"
+            [routerLink]="['/locations', locationId, 'modify']">
+            {{'LNG_COMMON_BUTTON_EDIT'| translate}}
+        </button>
+        <button
+            *ngIf="!viewOnly"
+            mat-raised-button
+            color="accent">
+            {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+        </button>
+
+        <button
+            *ngIf="LocationModel.canList(authUser)"
+            type="button"
+            [routerLink]="backToCurrent ? ['/locations', locationId, 'children'] : (locationData.parentLocationId ? ['/locations', locationData.parentLocationId, 'children'] : ['/locations'])"
+            mat-raised-button>
+            {{ (viewOnly ? 'LNG_COMMON_BUTTON_BACK' : 'LNG_COMMON_BUTTON_CANCEL') | translate}}
+        </button>
+    </div>
+</form>

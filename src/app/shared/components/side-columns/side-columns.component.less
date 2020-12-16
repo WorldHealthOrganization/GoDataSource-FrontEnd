@@ -1,0 +1,88 @@
+@import '~styles/common';
+
+// styles
+.side-columns {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    .page-overlay {
+        width: 100vw;
+        height: 100vh;
+        position: fixed;
+    }
+
+    mat-sidenav-container {
+        position: absolute;
+        z-index: 10;
+
+        mat-sidenav {
+            margin-top: 5vh;
+            max-height: 90vh;
+            width: 300px;
+            padding: 15px 0 15px 15px;
+            height: auto;
+            bottom: unset !important;
+            overflow: hidden;
+
+            .actions {
+                overflow-y: auto;
+                max-height: calc(90vh - 122px);
+                padding-bottom: 7px;
+            }
+
+            .side-filters-reset-button {
+                font-weight: 600
+            }
+
+            .buttons-container {
+                display: flex;
+                margin-top: 20px;
+                margin-right: 15px;
+
+                .stretched-button {
+                    flex: 1 auto;
+                    font-weight: 600;
+                    border-radius: 5px;
+                }
+            }
+        }
+    }
+
+    .sidenav-toggle {
+        background-color: white;
+        margin-top: 205px;
+        padding: 7px 5px;
+
+        .sidenav-icon-spinner {
+            width: 24px !important;
+            height: 24px !important;
+
+            svg {
+                width: 24px !important;
+                height: 24px !important;
+            }
+        }
+    }
+
+    .section {
+
+        &:not(:first-child) {
+            margin-top: 20px;
+        }
+
+        .title {
+            font-size: 22px;
+            padding-bottom: 10px;
+        }
+
+        .side-filter-columns-checkbox {
+            .form-checkbox-container {
+                margin: 5px 0;
+                padding: 0;
+                height: auto;
+                min-height: 0;
+            }
+        }
+    }
+}

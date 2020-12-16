@@ -1,0 +1,171 @@
+app-transmission-chains-dashlet {
+    .chain-settings {
+        .chain-settings-buttons {
+            button {
+                margin-right: 20px;
+            }
+        }
+
+        .settings-container {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-top: 1px solid #EEE;
+            border-bottom: 1px solid #EEE;
+
+            .mat-card {
+                .settings-container-title {
+                    font-weight: 600;
+                    font-size: 20px;
+                }
+            }
+        }
+    }
+
+    .cytoscape-graph-element {
+        .full-screen-bottomed-item {
+            position: fixed;
+            margin: 5px 7px;
+            bottom: 0;
+            left: 0;
+        }
+
+        .cy-zoom-buttons {
+            position: absolute;
+            margin: 5px 7px;
+            z-index: 9999;
+
+            &.cy-zoom-buttons-full-screen {
+                position: fixed;
+                top: 0;
+                left: 0;
+            }
+
+            .cy-zoom-button {
+                margin-bottom: 7px;
+                min-width: 20px;
+                min-height: auto;
+                line-height: normal;
+                height: auto;
+                padding: 5px;
+                font-weight: bold;
+            }
+        }
+
+        .cytoscape-graph-container {
+            position: relative;
+        }
+
+        .cy {
+            width: 97%;
+            min-height: 550px;
+            height: 550px;
+            display: block;
+            padding: 20px;
+            resize: vertical;
+            overflow: hidden;
+            border: 1px solid #d3d3d3;
+
+            &.cy-full-screen {
+                position: fixed;
+                background-color: white;
+                width: 100vw;
+                height: 100vh;
+                top: 0;
+                left: 0;
+            }
+        }
+
+        .graph-legend {
+            background-color: #FFFFFF;
+            font-size: 0.8em;
+            position: absolute;
+            top: 120px;
+            right: 20px;
+            width: auto;
+            max-width: 300px;
+            height: auto;
+            max-height: 75%;
+            padding: 10px 10px;
+            overflow-y: auto;
+            z-index: 9999;
+            border: 1px solid #CCC;
+
+            &.full-screen-graph-legend {
+                position: fixed;
+                top: 60px;
+            }
+
+            .legend-name {
+                font-weight: bold;
+                margin-top: 10px;
+                margin-bottom: 5px;
+
+                .legend-field-name {
+                    font-weight: normal;
+                    margin-left: 5px;
+                }
+            }
+
+            .legend-item {
+                margin-left: 10px;
+                display: flex;
+                align-items: center;
+
+                >:first-child {
+                    margin-right: 3px;
+                }
+
+                .xt-icon {
+                    font-size: 18px;
+                }
+
+                .mat-icon {
+                    font-family: 'Material Icons';
+                    font-size: 18px;
+                    font-style: normal;
+                    font-weight: 400;
+                }
+            }
+
+            .legend-item:after {
+                content: ".";
+                visibility: hidden;
+                display: block;
+                height: 0;
+                clear: both;
+            }
+
+            .legend-color {
+                width: 10px;
+                height: 10px;
+            }
+
+            .legend-icon {
+                width: 20px;
+                height: 20px;
+                background-size: contain;
+                background-repeat: no-repeat;
+            }
+        }
+
+        .entities-no-dates {
+            cursor: pointer;
+        }
+
+        .graph-actions {
+            position: absolute;
+            right: 15px;
+            z-index: 9999;
+
+            &.graph-actions-full-screen {
+                position: fixed;
+                top: 0;
+            }
+
+            &.graph-actions-geo-map {
+                margin-right: 150px;
+            }
+        }
+    }
+}

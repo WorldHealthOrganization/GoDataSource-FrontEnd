@@ -1,0 +1,92 @@
+app-contact-range-follow-ups-list {
+    .filters {
+        margin-bottom: 20px;
+    }
+
+    .follow-up-range-loading {
+        position: relative;
+        height: 128px;
+        text-align: center;
+
+        @mat-spinner-width: 64px;
+        @mat-spinner-height: 64px;
+        mat-spinner {
+            z-index: 500;
+            display: inline-block;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            vertical-align: middle;
+            width: @mat-spinner-width !important;
+            height: @mat-spinner-height !important;
+
+            svg {
+                width: @mat-spinner-width !important;
+                height: @mat-spinner-height !important;
+            }
+        }
+    }
+
+    .follow-up-range-status-legend {
+        padding: 5px;
+    }
+
+    .follow-up-range-table-content {
+        overflow-x: auto;
+        padding-top: 20px;
+
+        .follow-up-range-date-header {
+            padding-top: 16px;
+            margin-bottom: 2px;
+            border-bottom: 2px solid #CCC;
+
+            .follow-up-range-date-column-header {
+                transform: rotate(-60deg) translate(40%,-100%);
+                min-width: 100px;
+            }
+        }
+
+        .follow-up-range-records {
+            .follow-up-range-records-row {
+                .follow-up-range-column-data {
+                    border-bottom: 1px solid #CCC;
+                    padding-top: 5px;
+                    padding-bottom: 5px;
+                }
+
+                .follow-up-range-name-column-data {
+                    overflow-wrap: break-word;
+
+                    &.follow-up-range-name-column-data-no-wrap {
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
+                        overflow: hidden;
+                    }
+                }
+
+                .follow-up-range-date-column-data {
+                    border-right: 1px dashed #CCC;
+                    padding-right: 2px;
+                    padding-left: 2px;
+
+                    .follow-up-range-date-column-data-info {
+                        border: 1px solid transparent;
+
+                        &:hover {
+                            cursor: pointer;
+                            border-color: #CCC;
+                        }
+
+                        .follow-up-range-date-column-data-bell {
+                            max-width: 10px;
+                            max-height: 10px;
+                            width: 100%;
+                            margin: 0 auto 1px auto;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

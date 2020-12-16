@@ -1,0 +1,70 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<form
+    #form="ngForm"
+    class="page-content form-section"
+    [class.form-view-only]="viewOnly"
+    (submit)="modifyLanguage(form)">
+
+    <div class="form-content">
+        <mat-tab-group class="page-tabs-navbar">
+
+            <mat-tab [label]="'LNG_PAGE_MODIFY_LANGUAGE_TAB_DETAILS_TITLE' | translate">
+
+                <!-- Details section -->
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-input
+                                name="name"
+                                [(ngModel)]="languageData.name"
+                                [placeholder]="'LNG_LANGUAGE_FIELD_LABEL_NAME' | translate"
+                                tooltip="LNG_LANGUAGE_FIELD_LABEL_NAME_DESCRIPTION"
+                                required="true"
+                                [disabled]="viewOnly">
+                            </app-form-input>
+
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
+                    </div>
+                </mat-card>
+
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+
+    <div class="form-actions">
+        <div class="page-tabs-navbar-placeholder"></div>
+
+        <button
+            *ngIf="viewOnly && LanguageModel.canModify(authUser) && languageData.id && !languageData.readOnly"
+            mat-raised-button type="button"
+            color="accent"
+            [routerLink]="['/languages', languageId, 'modify']">
+            {{'LNG_COMMON_BUTTON_EDIT'| translate}}
+        </button>
+
+        <ng-container
+            *ngIf="!viewOnly">
+            <button
+                mat-raised-button
+                color="accent">
+                {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+            </button>
+
+            <button
+                *ngIf="LanguageModel.canList(authUser)"
+                type="button"
+                routerLink="/languages"
+                mat-raised-button>
+                {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
+            </button>
+        </ng-container>
+    </div>
+</form>

@@ -1,0 +1,25 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<mat-card class="page-section page-content mat-card">
+
+    <div fxLayout="column" fxLayoutGap="20px">
+
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="30px">
+            <div
+                *ngIf="versionData?.version">
+                {{ 'LNG_PAGE_VERSION_TEXT_DESCRIPTION' | translate: { version: versionData.version, build: versionData.build } }}
+            </div>
+            <div
+                *ngIf="!versionData?.version"
+                class="app-version-spinner">
+                <mat-spinner></mat-spinner>
+            </div>
+        </div>
+
+    </div>
+
+</mat-card>

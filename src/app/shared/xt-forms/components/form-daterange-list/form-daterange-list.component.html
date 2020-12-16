@@ -1,0 +1,40 @@
+<div class="daterange-list-container form-element "
+     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+
+    <form
+        #groupForm="ngForm"
+        fxLayout="column"
+    >
+        <div
+            *ngFor="let daterange of values; let i = index; trackBy: trackByIndex"
+            fxLayout="row" fxLayoutAlign="start center"
+        >
+            <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+                <div fxFlex fxLayout="row">
+                    <app-form-daterange
+                        [name]="name + '[' + i + ']'"
+                        [ngModel]="values[i]"
+                        (changed)="onChange(false)"
+                        [required]="required"
+                        (groupValidated)="validateGroup()"
+                        [disabled]="disabled"
+                        [fromTooltip]="fromTooltip"
+                        [toTooltip]="toTooltip"
+                        [minDate]="minDate">
+                    </app-form-daterange>
+                </div>
+            </mat-card>
+
+            <button *ngIf="!readOnly" type="button" mat-icon-button (click)="delete(i)">
+                <span class="xt-icon">delete</span>
+            </button>
+
+        </div>
+
+        <div fxLayout="row">
+            <button *ngIf="!disabled" type="button" mat-button color="primary" (click)="add()">
+                {{'LNG_COMMON_BUTTON_ADD_DATE_RANGE' | translate}}
+            </button>
+        </div>
+    </form>
+</div>

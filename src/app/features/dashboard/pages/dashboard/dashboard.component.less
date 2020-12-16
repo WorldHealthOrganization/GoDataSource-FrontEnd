@@ -1,0 +1,55 @@
+/* Angular Material overrides */
+@menu-item-height: 30px;
+.dashboard-kpi-menu-item {
+    height: @menu-item-height !important;
+    line-height: @menu-item-height !important;
+}
+
+app-dashboard {
+
+    .other-kpi-header {
+        margin: 20px 0;
+        font-weight: bold;
+        font-size: 23px;
+    }
+
+    .other-kpi-content {
+        clear: both;
+        padding-bottom: 20px;
+    }
+
+    .dashboard-section {
+        margin-bottom: 10px;
+        margin-top: 10px;
+    }
+
+    .dashlet-kpi-header {
+        margin: 20px 0;
+        font-weight: bold;
+        font-size: 23px;
+
+        &.dashlet-kpi-header-100 {
+            width: 100%;
+        }
+    }
+
+    .dashlet-kpi-content {
+        clear: both;
+        padding-bottom: 20px;
+    }
+
+    .dashboard-gauge {
+        padding: 10px;
+        margin: 15px;
+        min-height: 250px;
+        min-width: 315px;
+
+        .other-kpi-header {
+            height: 50px;
+        }
+    }
+
+    #tempCanvas {
+        display: none;
+    }
+}

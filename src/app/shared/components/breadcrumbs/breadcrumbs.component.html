@@ -1,0 +1,26 @@
+<div class="breadcrumbs" fxLayout="row">
+
+    <mat-list class="breadcrumbs-list" fxLayout="row" fxLayoutAlign="start center" fxFlex>
+
+        <ng-container *ngFor="let item of items; let last = last;">
+
+            <mat-list-item class="breadcrumb-item" [ngClass]="{'active': item.active}">
+                <a *ngIf="!item.active" class="a-no-style"
+                    [routerLink]="item.link" [queryParams]="item.params"
+                    (click)="item.onClick()">
+                    {{item.label | translate: item.translateData}}
+                </a>
+                <div *ngIf="item.active">
+                    {{item.label | translate: item.translateData}}
+                </div>
+            </mat-list-item>
+
+            <mat-list-item *ngIf="displaySeparator && (addSeparatorAtTheEnd || !last)" class="breadcrumb-separator">
+                <span [innerHTML]="separator"></span>
+            </mat-list-item>
+
+        </ng-container>
+
+    </mat-list>
+
+</div>

@@ -1,0 +1,57 @@
+<div class="form-element"
+     [id]="identifier" [ngClass]="{ invalid: (invalid), 'form-locations-select-tooltip': tooltip }">
+
+    <form class="ng-select-form" #groupForm="ngForm">
+        <ng-select
+            #locationHandler
+            [name]="name"
+            [(ngModel)]="value"
+            [items]="locationItems"
+            [placeholder]="placeholder + (placeholder && required ? ' *' : '')"
+            [loadingText]="loadingText | translate"
+            bindLabel="label"
+            bindValue="id"
+            [hideSelected]="false"
+            [multiple]="multiple"
+            [searchable]="true"
+            [virtualScroll]="true"
+            [loading]="locationLoading"
+            [typeahead]="locationInput$"
+            [typeToSearchText]="typeToSearchText | translate"
+            [notFoundText]="currentNotFoundText | translate:notFoundTextData"
+            [clearable]="true"
+            [disabled]="disabled"
+            [required]="required"
+            [matTooltip]="'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_HOVER_TOOLTIP' | translate"
+            [matTooltipPosition]="'right'"
+            (blur)="onBlur()"
+            (focus)="touchAndTriggerSearch()"
+            (change)="triggerItemChanged($event)"
+            [appendTo]="appendTo"
+            [trackByFn]="trackByFn">
+            <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
+                <span [app-ng-option-highlight]="search" [style.padding-left]="(item.level * 30) + 'px'">
+                    {{ item.label }}
+                </span>
+            </ng-template>
+        </ng-select>
+
+        <span
+            *ngIf="tooltip"
+            #tooltipCtrl="matTooltip"
+            [matTooltip]="tooltip"
+            class="xt-icon form-icon"
+            (click)="displayTooltip($event, tooltipCtrl)"
+        >
+            help
+        </span>
+
+        <!--[messages]="failures"-->
+        <app-form-validation
+            [controlContainer]="controlContainer"
+            [controlName]="name"
+            *ngIf="ngInvalid"
+            [messages]="ngFailureMessages"
+        ></app-form-validation>
+    </form>
+</div>

@@ -1,0 +1,21 @@
+<div
+    *ngIf="items === null else showChips"
+    class="loading-chips">
+    <mat-spinner></mat-spinner>
+</div>
+<ng-template
+    #showChips>
+    <mat-chip-list>
+        <mat-chip *ngFor="let item of items" (click)="onChange(item)">
+            <div
+                fxLayout="row">
+                <div class="counted-items-list-count" [style.background-color]="item.countBgColor">
+                    {{ item.count }}
+                </div>
+                <div class="counted-items-list-label">
+                    {{ item.label | translate }}
+                </div>
+            </div>
+        </mat-chip>
+    </mat-chip-list>
+</ng-template>

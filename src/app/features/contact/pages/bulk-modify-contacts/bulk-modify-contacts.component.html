@@ -1,0 +1,56 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<div class="page-content">
+    <form class="form-section">
+        <div class="form-content">
+            <mat-card class="page-section" fxLayout="column">
+                <ng-container
+                    *ngIf="errorMessages && errorMessages.length > 0">
+                    <div
+                        class="bulk-modify-contacts-errors">
+                        <div
+                            class="bulk-modify-contacts-errors-title">
+                            {{ 'LNG_PAGE_BULK_MODIFY_CONTACTS_LABEL_ERRORS' | translate }}
+                        </div>
+                        <div
+                            *ngFor="let err of errorMessages">
+                            {{ err.message | translate:err.data }}
+                        </div>
+                    </div>
+                </ng-container>
+
+                <div class="sheet-wrapper" fxLayout="row" fxLayoutAlign="center">
+                    <input
+                        #inputForMakingFormDirty="ngModel"
+                        type="hidden"
+                        ngModel
+                        name="modifyContactsHidden"/>
+
+                    <app-hot-table-wrapper
+                        #hotTableWrapper
+                        [data]="data"
+                        [sheetContextMenu]="sheetContextMenu"
+                        [sheetColumns]="sheetColumns"
+                        (afterBecameDirty)="afterBecameDirty()"
+                        [startRows]="1"
+                        [minSpareRows]="0"
+                        widthReduction="320"
+                    ></app-hot-table-wrapper>
+                </div>
+            </mat-card>
+        </div>
+
+        <div class="form-actions">
+            <button
+                mat-raised-button
+                color="accent"
+                (click)="modifyContacts()">
+                {{ 'LNG_COMMON_BUTTON_SAVE' | translate }}
+            </button>
+        </div>
+    </form>
+</div>

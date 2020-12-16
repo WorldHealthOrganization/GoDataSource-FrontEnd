@@ -1,0 +1,114 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+                <button
+                    *ngIf="HelpCategoryModel.canList(authUser)"
+                    mat-raised-button color="accent"
+                    [routerLink]="'./categories'">
+                    {{'LNG_PAGE_GLOBAL_HELP_BUTTON_MANAGE_CATEGORIES' | translate}}
+                </button>
+            </div>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<!-- Side columns -->
+<app-side-columns
+    [tableColumns]="tableColumns"
+    (visibleColumnsChanged)="applySideColumnsChanged($event)">
+</app-side-columns>
+
+<mat-card class="page-section page-content">
+
+    <div>
+        <app-form-input
+            name="helpSearchFilter"
+            [(ngModel)]="searchedTerm"
+            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+            (optionChanged)="filterByTextFieldHelpSearch($event)"
+            [displayFilterIcon]="true">
+        </app-form-input>
+    </div>
+
+    <!-- Hover question effects / actions -->
+    <app-hover-row-actions
+        #hoverRow
+        [active]="!refreshingList"
+    ></app-hover-row-actions>
+
+    <mat-table #table [dataSource]="helpItemsList$ | async" matSort (matSortChange)="sortBy($event)">
+
+        <!-- Title -->
+        <ng-container matColumnDef="title">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_HELP_ITEM_FIELD_LABEL_TITLE' | translate}}</div>
+                    <div class="column-filter">
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.title | translate }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Category -->
+        <ng-container matColumnDef="categoryId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_HELP_ITEM_FIELD_LABEL_CATEGORY' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="categoryFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="helpCategoriesList$ | async"
+                            (optionChanged)="filterBySelectField('categoryId', $event, 'id')"
+                            optionLabelKey="name"
+                            optionValueKey="id"
+                            [multiple]="true"
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ (item.category ? item.category.name: '') | translate }}
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
+        <mat-row
+            *matRowDef="let item; columns: visibleTableColumns"
+            app-hover-row-actions
+            [hoverRowActionsComponent]="hoverRow"
+            [hoverRowActions]="recordActions"
+            [hoverRowActionData]="item"
+        ></mat-row>
+    </mat-table>
+
+    <div
+        *ngIf="refreshingList"
+        class="mat-table-loading-data">
+        <mat-spinner></mat-spinner>
+    </div>
+
+    <div
+        *ngIf="!refreshingList && isEmptyList"
+        class="mat-table"
+    >
+        <div class="mat-row">
+            <div class="mat-cell">
+                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+            </div>
+        </div>
+    </div>
+
+</mat-card>

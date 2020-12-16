@@ -1,0 +1,234 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<!-- Side columns -->
+<app-side-columns
+    [tableColumnsUserSettingsKey]="UserSettings.ENTITY_NOT_DUPLICATES_FIELDS"
+    [tableColumns]="tableColumns"
+    (visibleColumnsChanged)="applySideColumnsChanged($event)">
+</app-side-columns>
+
+<!--Total number of records from the list-->
+<app-total-number-of-records
+    [value]="(notDuplicatesListCount$ | async)?.count">
+</app-total-number-of-records>
+
+<mat-card class="page-section page-content">
+    <div class="reset-filters">
+        <!-- Reset Filters -->
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="resetFiltersToSideFilters()">
+            {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+        </button>
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="needsRefreshList(true)">
+            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+        </button>
+    </div>
+
+    <!-- Hover question effects / actions -->
+    <app-hover-row-actions
+        #hoverRow
+        [active]="!refreshingList"
+        leftSideClass="hover-row-actions-mat-table-left"
+    ></app-hover-row-actions>
+
+    <mat-table #table [dataSource]="notDuplicatesList$ | async" matSort (matSortChange)="sortBy($event, { age: [ 'years', 'months' ] })">
+        <!-- Last Name -->
+        <ng-container matColumnDef="lastName">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell" fxLayout="column" >
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_ENTITY_FIELD_LABEL_LAST_NAME' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="lastNameFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('lastName', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.lastName }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- First Name -->
+        <ng-container matColumnDef="firstName">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_ENTITY_FIELD_LABEL_FIRST_NAME' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="firstNameFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('firstName', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.firstName }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Visual Id -->
+        <ng-container matColumnDef="visualId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell" fxLayout="column" >
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_ENTITY_FIELD_LABEL_VISUAL_ID' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="visualId"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('visualId', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.visualId }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Age -->
+        <ng-container matColumnDef="age">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_ENTITY_FIELD_LABEL_AGE' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-range
+                            name="ageFilter"
+                            ngModel
+                            (changed)="filterByAgeRangeField('age', $event)"
+                            app-reset-input-on-side-filter
+                            [min]="0"
+                            [max]="Constants.DEFAULT_AGE_MAX_YEARS"
+                            fromPlaceholder="LNG_AGE_FIELD_FILTER_LABEL_FROM"
+                            toPlaceholder="LNG_AGE_FIELD_FILTER_LABEL_TO">
+                        </app-form-range>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                <app-age-label [age]="item.age"></app-age-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Gender -->
+        <ng-container matColumnDef="gender">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_ENTITY_FIELD_LABEL_GENDER' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="genderFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="genderList$ | async"
+                            (optionChanged)="filterBySelectField('gender', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.gender | translate }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Phone number -->
+        <ng-container matColumnDef="phoneNumber">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_ENTITY_FIELD_LABEL_PHONE_NUMBER' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="phoneNumberFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByPhoneNumber('addresses.phoneNumber', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                <ng-container *ngFor="let phoneNumber of item.phoneNumbers">
+                    {{phoneNumber}}<br/>
+                </ng-container>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
+        <mat-row
+            *matRowDef="let item; columns: visibleTableColumns"
+            app-hover-row-actions
+            [hoverRowActionsComponent]="hoverRow"
+            [hoverRowActions]="recordActions"
+            [hoverRowActionData]="item"
+        ></mat-row>
+    </mat-table>
+
+    <div
+        *ngIf="refreshingList"
+        class="mat-table-loading-data">
+        <mat-spinner></mat-spinner>
+    </div>
+
+    <div
+        *ngIf="!refreshingList && isEmptyList"
+        class="mat-table"
+    >
+        <div class="mat-row">
+            <div class="mat-cell">
+                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+            </div>
+        </div>
+    </div>
+
+    <mat-paginator
+        [length]="(notDuplicatesListCount$ | async)?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
+
+</mat-card>

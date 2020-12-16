@@ -1,0 +1,63 @@
+<mat-toolbar class="topnav">
+
+    <mat-list class="topnav-list" fxLayout="row" fxFlex>
+
+        <mat-list-item fxFlex="0 0 0" class="logo-item">
+            <a
+                [routerLink]="['/']"
+                tabindex="-1"
+                class="a-no-style logo">
+                <img src="/assets/images/small-logo.png"/>
+            </a>
+        </mat-list-item>
+
+        <mat-divider [vertical]="true"></mat-divider>
+
+        <mat-list-item fxFlex class="dynamic-section">
+            <!-- Dynamic content -->
+            <ng-content select="[dynamic-section]"></ng-content>
+        </mat-list-item>
+
+        <div class="topnav-static-actions" fxLayout="row">
+            <ng-container
+                *ngIf="OutbreakModel.canView(authUser)">
+                <mat-divider [vertical]="true"></mat-divider>
+
+                <mat-list-item>
+                    <app-form-select
+                        name="activeOutbreak"
+                        [(ngModel)]="selectedOutbreak.id"
+                        [placeholder]="'LNG_LAYOUT_SELECTED_OUTBREAK_LABEL' | translate"
+                        [disabled]="!activeOutbreakEditable"
+                        [options]="outbreaksList"
+                        optionLabelKey="name"
+                        optionValueKey="id"
+                        optionTooltipKey="details"
+                        (optionChanged)="selectOutbreak($event)"
+                        [clearable]="false"
+                        [enableFilterOptions]="true">
+                    </app-form-select>
+                </mat-list-item>
+            </ng-container>
+
+            <mat-divider [vertical]="true"></mat-divider>
+
+            <mat-list-item>
+                <app-form-select
+                    name="language"
+                    [(ngModel)]="selectedLanguageId"
+                    [placeholder]="'LNG_LAYOUT_LANGUAGE_LABEL' | translate"
+                    [options]="languagesList$ | async"
+                    optionLabelKey="name"
+                    optionValueKey="id"
+                    (optionChanged)="selectLanguage($event)"
+                    [clearable]="false">
+                </app-form-select>
+            </mat-list-item>
+        </div>
+
+    </mat-list>
+
+</mat-toolbar>
+
+<div class="topnav-static-actions-placeholder"></div>

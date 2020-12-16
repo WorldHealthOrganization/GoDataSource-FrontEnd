@@ -1,0 +1,10 @@
+<app-dashboard-custom-metric-dashlet
+    [link]="ContactModel.canList(authUser) ? '/contacts' : ''"
+    [params]="getDashletParamsIncludingGlobalFilters(queryParams)"
+    [value]="contactsWithSuccessfulFollowup?.contactsWithSuccessfulFollowupsCount + ' / ' + contactsWithSuccessfulFollowup?.totalContactsWithFollowupsCount"
+    (hide)="onHide()"
+    (moveBefore)="onMoveBefore()"
+    (moveAfter)="onMoveAfter()"
+    [displayLoading]="displayLoading">
+    {{ 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP' | translate:{date: (dataForDate | dateDefault)} }}
+</app-dashboard-custom-metric-dashlet>

@@ -1,0 +1,25 @@
+<div
+    fxFlex fxLayout="row"
+    class="colors-legend-container">
+    <div
+        *ngIf="title"
+        fxFlex fxGrow="0"
+        class="color-legend-title">
+        {{ title | translate }}
+    </div>
+    <div fxFlex fxLayout="row">
+        <ng-container
+            *ngFor="let legendDot of optionsList$ | async"
+        >
+            <div
+                *ngIf="legendDot.colorCode"
+                class="color-container"
+            >
+                <span class="color-dot" [style.color]="legendDot.colorCode">
+                    &#9679;
+                </span>
+                {{legendDot.label | translate}}
+            </div>
+        </ng-container>
+    </div>
+</div>

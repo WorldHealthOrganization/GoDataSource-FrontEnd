@@ -1,0 +1,54 @@
+<div class="daterange-container form-element "
+     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+
+    <form
+        #groupForm="ngForm"
+        class="form-daterange"
+        fxLayout="row">
+        <div
+            *ngIf="startDateVisible"
+            fxFlex fxLayout="row">
+                <app-form-datepicker
+                    [name]="name + '[startDate]'"
+                    [(ngModel)]="dateRange.startDate"
+                    [placeholder]="'LNG_FORM_RANGE_FIELD_LABEL_FROM' | translate"
+                    [tooltip]="fromTooltip | translate"
+                    [disabled]="disabled"
+                    [required]="required"
+                    (optionChanged)="onChange()"
+                    app-date-validator
+                    [dateSameOrBefore]="dateSameOrBefore"
+                    [dateSameOrAfter]="minDate"
+                    [minDate]="minDate"
+                    [maxDate]="maxDate">
+                </app-form-datepicker>
+        </div>
+
+        <div
+            *ngIf="startDateVisible && endDateVisible"
+            fxLayout="row"
+            fxLayoutAlign="center center"
+            class="form-range-separator">
+            -
+        </div>
+
+        <div
+            *ngIf="endDateVisible"
+            fxFlex fxLayout="row">
+            <app-form-datepicker
+                [name]="name + '[endDate]'"
+                [(ngModel)]="dateRange.endDate"
+                [placeholder]="'LNG_FORM_RANGE_FIELD_LABEL_TO' | translate"
+                [tooltip]="toTooltip | translate"
+                [disabled]="disabled"
+                [required]="required"
+                (optionChanged)="onChange()"
+                app-date-validator
+                [dateSameOrAfter]="dateSameOrAfter"
+                [dateSameOrBefore]="maxDate"
+                [minDate]="minDate"
+                [maxDate]="maxDate">
+            </app-form-datepicker>
+        </div>
+    </form>
+</div>

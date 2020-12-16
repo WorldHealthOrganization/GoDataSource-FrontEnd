@@ -1,0 +1,175 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<div class="page-content">
+
+    <mat-horizontal-stepper
+        linear
+        #stepper
+        (selectionChange)="onChangeStep([followDetailsForm])"
+    >
+        <!-- Details step -->
+        <mat-step [stepControl]="followDetailsForm">
+            <form #followDetailsForm="ngForm" fxLayout="column">
+                <ng-template matStepLabel>
+                    {{'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_TAB_DETAILS_TITLE'| translate}}
+                </ng-template>
+
+                <mat-card class="page-section">
+                    <div fxLayout="column" fxLayoutGap="5px" class="info-container">
+                        <div>
+                            {{ 'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_MODIFY_DATA_INFO_LABEL' | translate }}
+                        </div>
+
+                        <div *ngIf="futureFollowUps">
+                            {{ 'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_MODIFY_DATA_IN_THE_FUTURE_LABEL' | translate}}
+                        </div>
+                    </div>
+
+                    <app-selected-contacts-list
+                        [persons]="selectedContacts">
+                    </app-selected-contacts-list>
+
+                    <app-selected-follow-up-dates
+                        [followUpDates]="followUpDates">
+                    </app-selected-follow-up-dates>
+                </mat-card>
+
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-select
+                                #targetedInput
+                                name="targeted"
+                                ngModel
+                                [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate"
+                                tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION"
+                                [options]="yesNoOptionsList$ | async"
+                                optionLabelKey="label"
+                                optionValueKey="value"
+                                (optionChanged)="onTargetedChangeValue($event)">
+                            </app-form-select>
+
+                            <app-form-select
+                                name="statusId"
+                                ngModel
+                                [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID' | translate"
+                                tooltip="LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID_DESCRIPTION"
+                                [options]="dailyStatusTypeOptions$ | async"
+                                optionLabelKey="label"
+                                optionValueKey="value"
+                                [disabled]="futureFollowUps">
+                            </app-form-select>
+
+                            <app-form-select
+                                #teamInput
+                                name="teamId"
+                                ngModel
+                                [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_TEAM' | translate"
+                                tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TEAM_DESCRIPTION"
+                                [options]="teamsList$ | async"
+                                optionLabelKey="name"
+                                optionValueKey="id"
+                                (optionChanged)="onTeamChangeValue($event)">
+                            </app-form-select>
+
+                            <div fxFlex><!--Placeholder--></div>
+
+                        </div>
+                    </div>
+                </mat-card>
+
+                <div class="stepper-navigation-buttons">
+                    <button mat-raised-button color="accent" matStepperNext>
+                        {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
+                    </button>
+                </div>
+            </form>
+        </mat-step>
+
+        <!-- Final step -->
+        <mat-step>
+            <ng-template matStepLabel>
+                {{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}
+            </ng-template>
+
+            <mat-card class="page-section">
+                <div fxLayout="column" fxLayoutGap="5px" class="info-container">
+                    <div>
+                        {{ 'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_MODIFY_DATA_INFO_LABEL' | translate }}
+                    </div>
+                </div>
+
+                <app-selected-contacts-list
+                    [persons]="selectedContacts">
+                </app-selected-contacts-list>
+
+                <app-selected-follow-up-dates
+                    [followUpDates]="followUpDates">
+                </app-selected-follow-up-dates>
+            </mat-card>
+
+            <mat-card
+                class="page-section"
+                fxFlex fxLayout="column"
+            >
+                <span class="changes-title">
+                    {{'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_CHANGES_FOR_SELECTED_FOLLOW_UPS' | translate}}
+                </span>
+
+                <div
+                    *ngIf="currentDirtyFields.targeted !== undefined"
+                    fxLayout="row" fxLayoutGap="15px"
+                >
+                    <span>{{'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate}}:</span>
+                    <app-yes-no-label [value]="currentDirtyFields.targeted"></app-yes-no-label>
+                </div>
+
+                <div
+                    *ngIf="currentDirtyFields.statusId !== undefined"
+                    fxLayout="row" fxLayoutGap="15px"
+                >
+                    <span>{{'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID' | translate}}:</span>
+                    <app-list-item-label
+                        [options]="dailyStatusTypeOptions$ | async"
+                        optionLabelKey="label"
+                        optionValueKey="value"
+                        [value]="currentDirtyFields.statusId"
+                    ></app-list-item-label>
+                </div>
+
+                <div
+                    *ngIf="currentDirtyFields.teamId !== undefined"
+                    fxLayout="row" fxLayoutGap="15px"
+                >
+                    <span>{{'LNG_FOLLOW_UP_FIELD_LABEL_TEAM' | translate}}:</span>
+                    <app-list-item-label
+                        [options]="teamsList$ | async"
+                        optionLabelKey="name"
+                        optionValueKey="id"
+                        [value]="currentDirtyFields.teamId"
+                    ></app-list-item-label>
+                </div>
+            </mat-card>
+
+            {{'LNG_STEPPER_FINAL_STEP_TEXT_UPDATE' | translate}}
+
+            <div class="stepper-navigation-buttons">
+                <button mat-raised-button type="button" matStepperPrevious>
+                    {{'LNG_STEPPER_BUTTON_BACK' | translate}}
+                </button>
+                <button
+                    type="button"
+                    mat-raised-button
+                    color="accent"
+                    (click)="updateFollowUps([followDetailsForm])"
+                    [disabled]="nothingToChange()">
+                    {{'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_UPDATE_FOLLOW_UPS_BUTTON' | translate}}
+                </button>
+            </div>
+        </mat-step>
+    </mat-horizontal-stepper>
+</div>

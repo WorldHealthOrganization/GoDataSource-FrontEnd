@@ -1,0 +1,159 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<!--Total number of records from the list-->
+<app-total-number-of-records
+    [value]="(savedImportMappingsListCount$ | async)?.count">
+</app-total-number-of-records>
+
+<mat-card class="page-section page-content">
+    <!-- Reset Filters -->
+    <div class="reset-filters">
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="resetFiltersToSideFilters()">
+            {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+        </button>
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="needsRefreshList(true)">
+            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+        </button>
+    </div>
+
+    <!-- Hover question effects / actions -->
+    <app-hover-row-actions
+        #hoverRow
+        [active]="!refreshingList"
+    ></app-hover-row-actions>
+
+    <mat-table #table [dataSource]="savedImportMappingsList$ | async" matSort (matSortChange)="sortBy($event)">
+
+        <!-- Name -->
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_NAME' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="nameFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('name', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.name }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Public -->
+        <ng-container matColumnDef="isPublic">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell" fxLayout="column">
+                    <div mat-sort-header class="column-header">{{'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_IS_PUBLIC' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="isPublicFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="yesNoOptionsList$ | async"
+                            (optionChanged)="filterByBooleanField('isPublic', $event.value)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                <app-form-slide-toggle
+                    *ngIf="!item.readOnly"
+                    name="isPublic"
+                    [(ngModel)]="item.isPublic"
+                    [label]="'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_IS_PUBLIC' | translate"
+                    tooltip="LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_IS_PUBLIC_DESCRIPTION"
+                    (optionChanged)="setPublicItem(item.id, $event)">
+                </app-form-slide-toggle>
+                <app-yes-no-label
+                    *ngIf="item.readOnly"
+                    [value]="item.isPublic">
+                </app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- For page -->
+        <ng-container matColumnDef="mappingKey">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell" fxLayout="column">
+                    <div mat-sort-header class="column-header">{{'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_FOR_PAGE' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="mappingKeysFilter"
+                            ngModel
+                            [options]="pagesWithSavedFilters"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterBySelectField('mappingKey', $event)"
+                            app-reset-input-on-side-filter
+                            optionLabelKey="label"
+                            optionLabelValue="value"
+                            [displayFilterIcon]="true"
+                            [multiple]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.mappingKey | translate }}
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="fixedTableColumns"></mat-header-row>
+        <mat-row
+            *matRowDef="let item; columns: fixedTableColumns"
+            app-hover-row-actions
+            [hoverRowActionsComponent]="hoverRow"
+            [hoverRowActions]="recordActions"
+            [hoverRowActionData]="item"
+        ></mat-row>
+    </mat-table>
+
+    <div
+        *ngIf="refreshingList"
+        class="mat-table-loading-data">
+        <mat-spinner></mat-spinner>
+    </div>
+
+    <div
+        *ngIf="!refreshingList && isEmptyList"
+        class="mat-table"
+    >
+        <div class="mat-row">
+            <div class="mat-cell">
+                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+            </div>
+        </div>
+    </div>
+
+    <mat-paginator
+        [length]="(savedImportMappingsListCount$ | async)?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
+
+</mat-card>

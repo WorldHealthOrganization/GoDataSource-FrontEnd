@@ -1,0 +1,52 @@
+<div class="form-element "
+     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+
+    <form
+        #groupForm="ngForm"
+        fxLayout="column"
+    >
+        <div
+            *ngFor="let item of values; let i = index; trackBy: trackByIndex"
+            fxLayout="row" fxLayoutAlign="start center"
+        >
+            <mat-card
+                class="page-section"
+                fxFlex fxLayout="column"
+            >
+                <div
+                    *ngIf="displayOnsetDateWarningMessage(values[i].startDate)"
+                    class="warning-message"
+                    fxLayout="row">
+                    {{ 'LNG_HOSPITALISATION_ISOLATION_DATE_RANGE_WARNING_CASE_DATEOFONSET_AFTER_START_DATE' | translate }}
+                </div>
+
+                <app-form-case-center-daterange
+                    [name]="name + '[' + i + ']'"
+                    [(ngModel)]="values[i]"
+                    [minDate]="minDate"
+                    [maxDate]="maxDate"
+                    [fromTooltip]="fromTooltip"
+                    [toTooltip]="toTooltip"
+                    [centerNameLabel]="centerNameLabel"
+                    [centerNameTooltip]="centerNameTooltip"
+                    [required]="required"
+                    [disabled]="disabled"
+                    (changed)="onChange(false)"
+                    (groupValidated)="validateGroup()"
+                ></app-form-case-center-daterange>
+            </mat-card>
+
+            <div fxLayout="column">
+                <button *ngIf="!disabled" type="button" mat-icon-button (click)="delete(i)">
+                    <span class="xt-icon">delete</span>
+                </button>
+            </div>
+        </div>
+
+        <div fxLayout="row">
+            <button *ngIf="!disabled" type="button" mat-button color="primary" (click)="add()">
+                {{'LNG_COMMON_BUTTON_ADD_DATE_RANGE' | translate}}
+            </button>
+        </div>
+    </form>
+</div>

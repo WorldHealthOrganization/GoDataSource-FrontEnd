@@ -1,0 +1,59 @@
+@import '~styles/_colors';
+
+app-chronology {
+    mgl-timeline {
+        padding: 30px 0 15px 0 !important;
+
+        @timeline-header-width: 180px;
+        .mgl-timeline-line {
+            background-color: @color-accent-main-light !important;
+            width: 5px !important;
+            left: calc(@timeline-header-width + 5px) !important;
+        }
+
+        mgl-timeline-entry {
+            width: 100% !important;
+
+            mgl-timeline-entry-side {
+                left: calc(@timeline-header-width + 50px) !important;
+                max-width: ~'calc(100% - 270px)' !important;
+                width: auto !important;
+                text-align: left !important;
+                background-color: white;
+                box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+                padding: 15px;
+                transform: translateY(-14px);
+            }
+
+            .mgl-timeline-entry-card {
+                background-color: transparent !important;
+                width: @timeline-header-width !important;
+
+                .mgl-timeline-entry-card-header {
+                    background-color: transparent !important;
+
+                    mgl-timeline-entry-dot {
+                        background-color: @color-accent-main;
+                        z-index: 1000;
+                        border: 5px solid white;
+                        text-align: center;
+                        font-size: 14px;
+                        font-weight: bold;
+                        color: white;
+
+                        span {
+                            position: relative;
+                            top: 5px;
+                        }
+                    }
+
+                    mgl-timeline-entry-header {
+                        padding: 0;
+                        font-weight: bold;
+                        font-size: 20px;
+                    }
+                }
+            }
+        }
+    }
+}

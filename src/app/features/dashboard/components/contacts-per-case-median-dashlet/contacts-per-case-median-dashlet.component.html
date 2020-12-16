@@ -1,0 +1,10 @@
+<app-dashboard-custom-metric-dashlet
+    [params]="getDashletParamsIncludingGlobalFilters()"
+    [value]="medianNoContactsPerCase"
+    (hide)="onHide()"
+    (moveBefore)="onMoveBefore()"
+    (moveAfter)="onMoveAfter()"
+    [displayLoading]="displayLoading">
+    {{ "LNG_PAGE_DASHBOARD_KPI_CONTACTS_PER_CASE_MEDIAN_TITLE" | translate}}
+</app-dashboard-custom-metric-dashlet>
+

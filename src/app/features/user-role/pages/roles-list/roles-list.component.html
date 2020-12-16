@@ -1,0 +1,324 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+                <button *ngIf="UserRoleModel.canCreate(authUser)" mat-raised-button color="accent"
+                        [routerLink]="'./create'">
+                    {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
+                </button>
+            </div>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<!--Total number of records from the list-->
+<app-total-number-of-records
+    [value]="(rolesListCount$ | async)?.count">
+</app-total-number-of-records>
+
+<!-- Side columns -->
+<app-side-columns
+    [tableColumnsUserSettingsKey]="UserSettings.USER_ROLE_FIELDS"
+    [tableColumns]="tableColumns"
+    (visibleColumnsChanged)="applySideColumnsChanged($event)">
+</app-side-columns>
+
+<mat-card class="page-section page-content">
+    <!-- Reset Filters -->
+    <div class="reset-filters">
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="resetFiltersToSideFilters()">
+            {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+        </button>
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="needsRefreshList(true)">
+            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+        </button>
+    </div>
+
+    <!-- Hover question effects / actions -->
+    <app-hover-row-actions
+        #hoverRow
+        [active]="!refreshingList"
+    ></app-hover-row-actions>
+
+    <mat-table #table [dataSource]="rolesList$ | async" matSort (matSortChange)="sortBy($event)">
+        <!-- Name -->
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell" fxLayout="column">
+                    <div mat-sort-header class="column-header">
+                        {{ 'LNG_USER_ROLE_FIELD_LABEL_NAME' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="nameFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('name', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.name }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Description -->
+        <ng-container matColumnDef="description">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell" fxLayout="column">
+                    <div class="column-header">
+                        {{ 'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="descriptionFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('description', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.description }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Users -->
+        <ng-container matColumnDef="users">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell" fxLayout="column">
+                    <div class="column-header">
+                        <span>
+                            {{ 'LNG_USER_ROLE_FIELD_LABEL_USERS' | translate }}
+                        </span>
+
+                        <button
+                            type="button"
+                            mat-icon-button
+                            class="column-actions-button"
+                            [disableRipple]="true"
+                            [matMenuTriggerFor]="columnActions"
+                            color="accent"
+                        >
+                            <span class="xt-icon">arrowDropdownCircle</span>
+                        </button>
+
+                        <mat-menu #columnActions="matMenu">
+                            <button
+                                mat-menu-item
+                                (click)="toggleColumn('users', true)">
+                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND_ALL' | translate }}
+                            </button>
+                            <button
+                                mat-menu-item
+                                (click)="toggleColumn('users', false)">
+                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE_ALL' | translate }}
+                            </button>
+                        </mat-menu>
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="userListFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="userList$ | async"
+                            (optionChanged)="filterBySelectField('users._id', $event, 'id')"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true"
+                            optionLabelKey="name"
+                            optionValueKey="id"
+                            [multiple]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                <ng-container *ngIf="!isCellExpanded('users', item.id)">
+                    <app-number-of-items-label
+                        [value]="item.users?.length"
+                    ></app-number-of-items-label>
+
+                    <button
+                        type="button"
+                        mat-button
+                        color="accent"
+                        (click)="toggleCell('users', item.id, true)"
+                    >
+                        {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND' | translate }}
+                    </button>
+                </ng-container>
+
+                <div
+                    *ngIf="isCellExpanded('users', item.id)"
+                    fxLayout="column" fxLayoutAlign="start start">
+                    <mat-chip-list fxLayout="row wrap">
+                        <mat-chip
+                            *ngFor="let user of item.users"
+                            [matTooltip]="user.name"
+                        >
+                            {{ user.name }}
+                        </mat-chip>
+                    </mat-chip-list>
+
+                    <button
+                        type="button"
+                        mat-button
+                        color="accent"
+                        (click)="toggleCell('users', item.id, false)"
+                    >
+                        {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE' | translate }}
+                    </button>
+                </div>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Permissions -->
+        <ng-container matColumnDef="permissions">
+            <mat-header-cell *matHeaderCellDef fxFlex>
+                <div class="table-header-cell" fxLayout="column">
+                    <div class="column-header" fxLayout="row">
+                        <span>
+                            {{ 'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS' | translate }}
+                        </span>
+
+                        <button
+                            type="button"
+                            mat-icon-button
+                            class="column-actions-button"
+                            [disableRipple]="true"
+                            [matMenuTriggerFor]="columnActions"
+                            color="accent"
+                        >
+                            <span class="xt-icon">arrowDropdownCircle</span>
+                        </button>
+
+                        <mat-menu #columnActions="matMenu">
+                            <button
+                                mat-menu-item
+                                (click)="toggleColumn('permissions', true)">
+                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND_ALL' | translate }}
+                            </button>
+                            <button
+                                mat-menu-item
+                                (click)="toggleColumn('permissions', false)">
+                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE_ALL' | translate }}
+                            </button>
+                        </mat-menu>
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select-groups
+                            name="rolesFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [groups]="availablePermissions$ | async"
+                            [defaultValues]="PermissionModel.HIDDEN_PERMISSIONS"
+                            removeDefaultOptionOnOptionChanged="true"
+                            groupLabelKey="groupLabel"
+                            groupValueKey="groupAllId"
+                            groupOptionsKey="permissions"
+                            groupOptionLabelKey="label"
+                            groupOptionValueKey="id"
+                            groupOptionHiddenKey="hidden"
+                            groupAllLabel="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_ALL"
+                            groupAllTooltip="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_ALL_DESCRIPTION"
+                            groupNoneLabel="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_NONE"
+                            groupNoneTooltip="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_NONE_DESCRIPTION"
+                            groupPartialLabel="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL"
+                            groupPartialTooltip="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL_DESCRIPTION"
+                            app-reset-input-on-side-filter
+                            (optionChanged)="filterBySelectField('permissionIds', $event, null)">
+                        </app-form-select-groups>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" fxFlex>
+                <ng-container *ngIf="!isCellExpanded('permissions', item.id)">
+                    <app-number-of-items-label
+                        [value]="item.permissions?.length"
+                    ></app-number-of-items-label>
+
+                    <button
+                        type="button"
+                        mat-button
+                        color="accent"
+                        (click)="toggleCell('permissions', item.id, true)"
+                    >
+                        {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND' | translate}}
+                    </button>
+                </ng-container>
+
+                <div
+                    *ngIf="isCellExpanded('permissions', item.id)"
+                    fxLayout="column" fxLayoutAlign="start start">
+                    <mat-chip-list fxLayout="row wrap">
+                        <mat-chip
+                            *ngFor="let permission of item.permissions"
+                            [matTooltip]="permission.description | translate">{{ permission.label | translate }}
+                        </mat-chip>
+                    </mat-chip-list>
+
+                    <button
+                        type="button"
+                        mat-button
+                        color="accent"
+                        (click)="toggleCell('permissions', item.id, false)"
+                    >
+                        {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE' | translate}}
+                    </button>
+                </div>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
+        <mat-row
+            *matRowDef="let item; columns: visibleTableColumns"
+            app-hover-row-actions
+            [hoverRowActionsComponent]="hoverRow"
+            [hoverRowActions]="recordActions"
+            [hoverRowActionData]="item"
+        ></mat-row>
+    </mat-table>
+
+    <div
+        *ngIf="refreshingList"
+        class="mat-table-loading-data">
+        <mat-spinner></mat-spinner>
+    </div>
+
+    <div
+        *ngIf="!refreshingList && isEmptyList"
+        class="mat-table"
+    >
+        <div class="mat-row">
+            <div class="mat-cell">
+                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+            </div>
+        </div>
+    </div>
+
+    <mat-paginator
+        [length]="(rolesListCount$ | async)?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
+
+</mat-card>

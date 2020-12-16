@@ -1,0 +1,58 @@
+<div class="document-list-container form-element "
+     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+
+    <!-- Edit Mode -->
+    <form
+        *ngIf="!disabled"
+        #groupForm="ngForm"
+        fxLayout="column"
+    >
+        <div
+            *ngFor="let document of values; let i = index; trackBy: trackByIndex"
+            fxLayout="row" fxLayoutAlign="start center"
+        >
+            <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+                <app-form-document
+                    [name]="name + '[' + i + ']'"
+                    [ngModel]="values[i]"
+                    [required]="required"
+                    [disabled]="disabled"
+                    (changed)="onChange(false)"
+                    (groupValidated)="validateGroup()"
+                    [componentTitle]="'LNG_DOCUMENT_LABEL_DOCUMENTS' | translate">
+                </app-form-document>
+            </mat-card>
+
+            <button type="button" mat-icon-button (click)="delete(i)">
+                <span class="xt-icon">delete</span>
+            </button>
+        </div>
+
+        <div fxLayout="row">
+            <button type="button" mat-button color="primary" (click)="add()">{{ 'LNG_DOCUMENT_LABEL_ADD_NEW_DOCUMENT' | translate }}</button>
+        </div>
+    </form>
+    <!-- End of Edit Mode -->
+
+    <!-- View Only Mode -->
+    <div fxLayout="column" *ngIf="disabled">
+        <ng-container *ngIf="values && values.length > 0; else noDocuments">
+            <div
+                *ngFor="let document of values; let i = index"
+                fxLayout="row" fxLayoutAlign="start center"
+            >
+                <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+                    <app-form-document
+                        [name]="name + '[' + i + ']'"
+                        [ngModel]="values[i]"
+                        [disabled]="disabled">
+                    </app-form-document>
+                </mat-card>
+            </div>
+        </ng-container>
+        <ng-template #noDocuments>
+            {{ 'LNG_DOCUMENT_LABEL_NO_DOCUMENTS' | translate }}
+        </ng-template>
+    </div>
+    <!-- End of View Only Mode -->
+</div>

@@ -1,0 +1,22 @@
+<mgl-timeline [alternate]="false">
+    <mgl-timeline-entry *ngFor="let entry of entries">
+        <mgl-timeline-entry-header
+            (click)="noClick($event)">
+            {{ entry.date | dateDefault }}
+        </mgl-timeline-entry-header>
+
+        <mgl-timeline-entry-dot
+            class="primary"
+            [size]="27"
+            (click)="noClick($event)">
+            <span>
+                {{ entry.daysSincePreviousEvent }}
+            </span>
+        </mgl-timeline-entry-dot>
+
+        <mgl-timeline-entry-side>
+            {{ entry.type === Constants.CHRONOLOGY_ITEM_TYPE.FOLLOW_UP ? ('LNG_PAGE_VIEW_CHRONOLOGY_CHRONOLOGY_ITEM_TYPE_FOLLOW_UP' | translate) : '' }}
+            {{ entry.label | translate:entry.translateData }}
+        </mgl-timeline-entry-side>
+    </mgl-timeline-entry>
+</mgl-timeline>

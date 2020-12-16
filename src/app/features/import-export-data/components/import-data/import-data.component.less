@@ -1,0 +1,279 @@
+@import '~styles/common';
+
+app-import-data {
+    @app-import-data-height: 305px;
+    .import-data-loading {
+        height: @app-import-data-height;
+        text-align: center;
+
+        @mat-spinner-width: 64px;
+        @mat-spinner-height: 64px;
+        mat-spinner {
+            display: inline-block;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            vertical-align: middle;
+            width: @mat-spinner-width !important;
+            height: @mat-spinner-height !important;
+
+            svg {
+                width: @mat-spinner-width !important;
+                height: @mat-spinner-height !important;
+            }
+        }
+
+        .import-data-loading-progress {
+            display: inline-block;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            vertical-align: middle;
+            width: @mat-spinner-width;
+            height: 18px;
+        }
+    }
+
+    .import-data {
+        height: @app-import-data-height;
+
+        .import-data-drop-zone {
+            border: dotted 3px lightgray;
+            height: 100px;
+
+            &.import-data-file-over {
+                border: dotted 3px red;
+            }
+        }
+
+        .import-data-file-or {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        // variables
+        @app-import-data-border: 1px solid #CCC;
+        @app-import-data-padding: 10px;
+        @app-import-data-bg-color: #EEE;
+        @app-import-data-bg-color-hover: #CCC;
+        .import-data-file-input {
+            margin: 0;
+            padding: 0;
+            cursor: pointer;
+
+            .import-data-file-input-label {
+                padding: @app-import-data-padding;
+                background-color: @app-import-data-bg-color;
+                border-radius: 5px 0 0 5px;
+                border: @app-import-data-border;
+                font-weight: bold;
+                box-sizing: border-box;
+            }
+
+            .import-data-file-input-file {
+                padding: @app-import-data-padding;
+                border: @app-import-data-border;
+                box-sizing: border-box;
+            }
+
+            .import-data-file-input-browse {
+                padding: @app-import-data-padding;
+                background-color: @app-import-data-bg-color;
+                border-radius: 0 5px 5px 0;
+                border: @app-import-data-border;
+                font-weight: bold;
+                box-sizing: border-box;
+
+                &:hover {
+                    background-color: @app-import-data-bg-color-hover;
+                }
+            }
+        }
+    }
+
+    .import-data-map-fields {
+        @hover-index: 1000;
+        @hover-bg-color: white;
+        .import-data-header-row {
+            font-weight: bold;
+            font-size: 16px;
+            border-bottom: 1px solid #CCC;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+
+            // hack to display it on top of hover actions
+            z-index: @hover-index;
+            background: @hover-bg-color;
+
+            // trick to have the same column width no matter of the browser used
+            overflow-y: scroll;
+            &::-webkit-scrollbar {
+                background: transparent;
+            }
+
+            // icon buttons
+            .xt-icon-xsmall {
+                font-size: 16px;
+            }
+        }
+
+        .import-data-action-buttons {
+            padding-top: 20px;
+            padding-bottom: 20px;
+
+            // hack to display it on top of hover actions
+            z-index: @hover-index;
+            background: @hover-bg-color;
+        }
+
+        .import-data-body-rows {
+            // adjust for smaller screens
+            min-height: 200px;
+
+            .import-data-body-row {
+                margin: 0;
+                padding: 0;
+                border-bottom: 1px solid #CCC;
+
+                .import-data-body-row-basic {
+                    padding: 0;
+                    margin: 0;
+
+                    .import-data-body-row-basic-data {
+                        margin-top: 7px;
+
+                        .import-data-body-row-basic-data-error {
+                            color: @color-error;
+                        }
+                    }
+
+                    .import-data-body-row-basic-validation {
+                        margin-top: 3px;
+                        margin-bottom: 10px;
+                        font-size: 12px;
+                        font-weight: bold;
+                        color: @color-error;
+
+                        .import-data-body-row-basic-validation-source {
+                            padding-left: 30px;
+                        }
+
+                        .import-data-body-row-basic-validation-destination {
+                            padding-left: 30px;
+
+                            .import-data-body-row-basic-validation-destination-required {
+                                color: darkgray;
+                            }
+                        }
+                    }
+                }
+
+                .import-data-body-row-edit-basic {
+                    padding: 10px 0;
+
+                    .import-data-body-row-edit-basic-validation-source {
+                        font-size: 12px;
+                        font-weight: bold;
+                        color: @color-error;
+                    }
+                }
+
+                .import-data-body-row-extra-details {
+                    margin: 0 100px 20px 100px;
+
+                    .import-data-body-row-extra-details-vscroll {
+
+                        .import-data-body-row-extra-details-row-basic {
+                            .import-data-body-row-extra-details-row {
+                                margin: 0;
+                                padding: 10px 0;
+                                border-top: 1px solid #CCC;
+                            }
+
+                            .import-data-body-row-extra-details-row-basic-validation {
+                                margin-top: 3px;
+                                margin-bottom: 10px;
+                                font-size: 12px;
+                                font-weight: bold;
+                                color: @color-error;
+
+                                .import-data-body-row-extra-details-row-basic-validation-source {
+                                    padding-left: 30px;
+                                }
+
+                                .import-data-body-row-extra-details-row-basic-validation-destination {
+                                    padding-left: 30px;
+                                }
+                            }
+                        }
+
+                        .import-data-body-row-edit-extra-details-row {
+                            margin: 0;
+                            padding: 10px 0;
+                            border-top: 1px solid #CCC;
+
+                            .import-data-body-row-edit-extra-details-row-validation-source {
+                                font-size: 12px;
+                                font-weight: bold;
+                                color: @color-error;
+                            }
+                        }
+
+                        .import-data-body-row-edit-extra-details-row-location {
+                            padding-right: 100px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .import-data-errors {
+        .import-data-errors-err {
+            .import-data-errors-err-view-record-details {
+                padding: 5px;
+
+                .import-data-errors-err-view-record-details-code {
+                    border: 1px solid #CCC;
+                    max-width: ~'calc(50% - 10px)';
+
+                    .view-record-details-code-title {
+                        text-align: center;
+                        border-bottom: 1px solid #CCC;
+                        font-weight: bold;
+                        padding: 5px;
+                    }
+
+                    .view-record-details-code-data {
+                        overflow: auto;
+                        max-height: 400px;
+
+                        pre {
+                            margin: 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    app-total-number-of-records {
+        .total-number-container {
+            padding-left: 15px;
+        }
+    }
+
+    .import-data-errors-details {
+        font-weight: bold;
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .cdk-column-recordNo,
+    .cdk-column-error-details,
+    .cdk-column-data {
+        flex: 0 0 100px;
+    }
+}

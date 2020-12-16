@@ -1,0 +1,18 @@
+<div class="form-checkbox-container form-element"
+     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+
+    <mat-checkbox *ngIf="!readonly"
+                      [(ngModel)]="value" [attr.name]="name" [labelPosition]="labelBefore ? 'before' : 'after'"
+                      [disabled]="disabled" [disableRipple]="disableRipple"
+                      (click)="onClick()" (change)="onChange()">
+        {{label}}
+    </mat-checkbox>
+
+    <span *ngIf="readonly" class="label-readonly">
+        <ng-container *ngIf="value">{{label}}</ng-container>
+        <ng-container *ngIf="!value">{{notCheckedLabel}}</ng-container>
+    </span>
+
+    <app-form-validation [controlContainer]="controlContainer" [controlName]="name" *ngIf="invalid" [messages]="failures"></app-form-validation>
+
+</div>

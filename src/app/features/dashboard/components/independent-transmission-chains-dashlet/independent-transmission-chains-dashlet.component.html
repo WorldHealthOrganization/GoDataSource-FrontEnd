@@ -1,0 +1,10 @@
+<app-dashboard-custom-metric-dashlet
+    [link]="TransmissionChainModel.canList(authUser) ? '/transmission-chains/list' : ''"
+    [params]="getDashletParamsIncludingGlobalFilters()"
+    [value]="independentTransmissionChainsCount"
+    (hide)="onHide()"
+    (moveBefore)="onMoveBefore()"
+    (moveAfter)="onMoveAfter()"
+    [displayLoading]="displayLoading">
+    {{ 'LNG_PAGE_DASHBOARD_KPI_INDEPENDENT_TRANSMISSION_CHAINS' | translate }}
+</app-dashboard-custom-metric-dashlet>

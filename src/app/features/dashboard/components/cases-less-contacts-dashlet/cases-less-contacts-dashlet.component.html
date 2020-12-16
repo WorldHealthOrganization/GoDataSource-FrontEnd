@@ -1,0 +1,27 @@
+<app-dashboard-custom-metric-dashlet
+    [link]="CaseModel.canList(authUser) ? '/cases' : ''"
+    [params]="getDashletParamsIncludingGlobalFilters({ applyListFilter: Constants.APPLY_LIST_FILTER.CASES_LESS_CONTACTS, x: xLessContacts })"
+    [value]="casesLessContactsCount"
+    (hide)="onHide()"
+    (moveBefore)="onMoveBefore()"
+    (moveAfter)="onMoveAfter()"
+    [displayLoading]="displayLoading">
+
+    <div fxLayout="row" fxLayoutGap="10px">
+        <div>
+            {{'LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE_BEFORE_VALUE' | translate}}
+        </div>
+
+        <app-form-input
+            type="number"
+            name="daysFilter"
+            [ngModel]="xLessContacts"
+            (optionChanged)="onChangeSetting($event)">
+        </app-form-input>
+
+        <div fxFlexOffset="5px">
+            {{'LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE_AFTER_VALUE' | translate}}
+        </div>
+    </div>
+
+</app-dashboard-custom-metric-dashlet>

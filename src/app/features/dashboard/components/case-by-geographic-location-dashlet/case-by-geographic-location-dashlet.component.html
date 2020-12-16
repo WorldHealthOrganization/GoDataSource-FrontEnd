@@ -1,0 +1,32 @@
+<!-- Chart -->
+<ng-container
+    *ngIf="!displayLoading && casesLocationResults?.length > 0">
+    <ngx-charts-pie-chart
+        [view]="[315,250]"
+        [results]="casesLocationResults"
+        [doughnut]="true"
+        [legend]="false"
+        [trimLabels]="false"
+        [labels]="true"
+        (select)="onDoughnutPress($event)">
+    </ngx-charts-pie-chart>
+</ng-container>
+
+<!-- No data -->
+<ng-container
+    *ngIf="!displayLoading && casesLocationResults?.length < 1">
+    <div
+        fxFlex fxLayout="column" fxFlexAlign="center"
+        class="dashlet-no-data">
+        <div>
+            {{ 'LNG_PAGE_DASHLET_CASES_BY_GEOGRAPHIC_LOCATION_NO_DATA_LABEL' | translate }}
+        </div>
+    </div>
+</ng-container>
+
+<!-- Loading data -->
+<div
+    *ngIf="displayLoading"
+    class="dashlet-loading">
+    <mat-spinner></mat-spinner>
+</div>

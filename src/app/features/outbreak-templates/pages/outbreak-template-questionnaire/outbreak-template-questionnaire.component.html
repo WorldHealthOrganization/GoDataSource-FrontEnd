@@ -1,0 +1,24 @@
+<app-topnav
+    [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<!-- Side columns -->
+<app-side-columns
+    [tableColumnsUserSettingsKey]="UserSettings.OUTBREAK_TEMPLATE_MODIFY_QUESTIONNAIRE_FIELDS"
+    [tableColumns]="tableColumns"
+    (visibleColumnsChanged)="applySideColumnsChanged($event)">
+</app-side-columns>
+
+<!-- Render form -->
+<mat-card class="page-section page-content">
+    <app-form-modify-questionnaire
+        #questionnaire
+        [parent]="outbreakTemplate"
+        [visibleTableColumns]="visibleTableColumns"
+        (initBreadcrumbs)="initializeBreadcrumbs($event)"
+        (updateQuestionnaire)="updateQuestionnaire($event)">
+    </app-form-modify-questionnaire>
+</mat-card>

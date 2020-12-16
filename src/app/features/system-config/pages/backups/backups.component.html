@@ -1,0 +1,318 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+                <ng-container *ngIf="!waitForBackupIdToBeReady && !loading">
+                    <button
+                        *ngIf="settings && (BackupModel.canSetAutomaticBackupSettings(authUser) || BackupModel.canCreate(authUser))"
+                        mat-raised-button
+                        color="accent"
+                        [matMenuTriggerFor]="quickActionsMenu">
+                        {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
+                    </button>
+
+                    <mat-menu #quickActionsMenu="matMenu">
+                        <ng-container *ngIf="settings">
+                            <!-- Modify settings -->
+                            <button
+                                *ngIf="BackupModel.canSetAutomaticBackupSettings(authUser)"
+                                mat-menu-item
+                                (click)="configureAutomaticBackupSettings()">
+                                {{ 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_BUTTON' | translate }}
+                            </button>
+
+                            <!-- Create backup -->
+                            <button
+                                *ngIf="BackupModel.canCreate(authUser)"
+                                mat-menu-item
+                                (click)="backupData()">
+                                {{ 'LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_BUTTON' | translate }}
+                            </button>
+                        </ng-container>
+                    </mat-menu>
+                </ng-container>
+            </div>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<!--Total number of records from the list-->
+<app-total-number-of-records
+    *ngIf="!loading"
+    [value]="(backupsListCount$ | async)?.count">
+</app-total-number-of-records>
+
+<mat-card class="page-section page-content">
+    <!-- Backups -->
+    <ng-container
+        *ngIf="!waitForBackupIdToBeReady && !loading">
+        <!-- Filters -->
+        <div class="reset-filters">
+            <button
+                type="button"
+                mat-raised-button
+                color="accent"
+                (click)="resetFiltersToSideFilters()">
+                {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+            </button>
+            <button
+                type="button"
+                mat-raised-button
+                color="accent"
+                (click)="needsRefreshList(true)">
+                {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+            </button>
+        </div>
+
+        <!-- Hover question effects / actions -->
+        <app-hover-row-actions
+            #hoverRow
+            [active]="!refreshingList"
+        ></app-hover-row-actions>
+
+        <mat-table #table [dataSource]="backupsList$ | async" matSort (matSortChange)="sortBy($event)">
+            <!-- Description -->
+            <ng-container matColumnDef="description">
+                <mat-header-cell *matHeaderCellDef>
+                    <div class="table-header-cell">
+                        <div mat-sort-header class="column-header">{{'LNG_BACKUP_FIELD_LABEL_DESCRIPTION' | translate}}
+                        </div>
+                        <div class="column-filter">
+                            <app-form-input
+                                name="descriptionFilter"
+                                ngModel
+                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                (optionChanged)="filterByTextContainingField('description', $event)"
+                                app-reset-input-on-side-filter
+                                [displayFilterIcon]="true">
+                            </app-form-input>
+                        </div>
+                    </div>
+                </mat-header-cell>
+
+                <mat-cell
+                    *matCellDef="let item"
+                    class="cell-break-all">
+                    {{ item.description }}
+                </mat-cell>
+            </ng-container>
+            <!-- Location -->
+            <ng-container matColumnDef="location">
+                <mat-header-cell *matHeaderCellDef>
+                    <div class="table-header-cell">
+                        <div mat-sort-header class="column-header">{{'LNG_BACKUP_FIELD_LABEL_LOCATION' | translate}}
+                        </div>
+                        <div class="column-filter">
+                            <app-form-input
+                                name="locationFilter"
+                                ngModel
+                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                (optionChanged)="filterByTextContainingField('location', $event)"
+                                app-reset-input-on-side-filter
+                                [displayFilterIcon]="true">
+                            </app-form-input>
+                        </div>
+                    </div>
+                </mat-header-cell>
+
+                <mat-cell
+                    *matCellDef="let item"
+                    class="cell-break-all">
+                    {{ item.location }}
+                </mat-cell>
+            </ng-container>
+
+            <!-- Modules -->
+            <ng-container matColumnDef="modules">
+                <mat-header-cell *matHeaderCellDef>
+                    <div class="table-header-cell">
+                        <div class="column-header">{{'LNG_BACKUP_FIELD_LABEL_MODULES' | translate}}</div>
+                        <div class="column-filter">
+                            <app-form-select
+                                name="modulesFilter"
+                                ngModel
+                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                [options]="backupModulesList$ | async"
+                                (optionChanged)="filterBySelectField('modules', $event)"
+                                multiple="true"
+                                app-reset-input-on-side-filter
+                                [allowSelectionOfDisabledItems]="true"
+                                [displayInvisibleItems]="true"
+                                [displayFilterIcon]="true">
+                            </app-form-select>
+                        </div>
+                    </div>
+                </mat-header-cell>
+
+                <mat-cell *matCellDef="let item">
+                    <span
+                        *ngFor="let module of item.modules; let i = index">
+                        {{(i > 0 ? ', ' : '') + (getModuleTranslation(module) | translate) }}
+                    </span>
+                </mat-cell>
+            </ng-container>
+
+            <!-- Date -->
+            <ng-container matColumnDef="date">
+                <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
+                    <div class="table-header-cell">
+                        <div mat-sort-header class="column-header">{{'LNG_BACKUP_FIELD_LABEL_DATE' | translate}}</div>
+                        <div class="column-filter">
+                            <app-form-daterange
+                                name="dateFilter"
+                                ngModel
+                                (changed)="filterByDateRangeField('date', $event)"
+                                app-reset-input-on-side-filter>
+                            </app-form-daterange>
+                        </div>
+                    </div>
+                </mat-header-cell>
+
+                <mat-cell class="has-date-range-filter" *matCellDef="let item">
+                    {{ item.date | dateDefault }}
+                </mat-cell>
+            </ng-container>
+
+            <!-- Status -->
+            <ng-container matColumnDef="status">
+                <mat-header-cell *matHeaderCellDef>
+                    <div class="table-header-cell">
+                        <div mat-sort-header class="column-header">{{'LNG_BACKUP_FIELD_LABEL_STATUS' | translate}}</div>
+                        <div class="column-filter">
+                            <app-form-select
+                                name="statusFilter"
+                                ngModel
+                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                [options]="backupStatusList$ | async"
+                                (optionChanged)="filterBySelectField('status', $event)"
+                                multiple="true"
+                                app-reset-input-on-side-filter
+                                [allowSelectionOfDisabledItems]="true"
+                                [displayInvisibleItems]="true"
+                                [displayFilterIcon]="true">
+                            </app-form-select>
+                        </div>
+                    </div>
+                </mat-header-cell>
+
+                <mat-cell *matCellDef="let item">
+                    {{ item.status | translate }}
+                </mat-cell>
+            </ng-container>
+
+            <!-- Size -->
+            <ng-container matColumnDef="fileSize">
+                <mat-header-cell *matHeaderCellDef>
+                    <div class="table-header-cell">
+                        <div class="column-header">
+                            {{'LNG_BACKUP_FIELD_LABEL_FILE_SIZE' | translate}}
+                        </div>
+                        <div class="column-filter">
+                            <!--Placeholder-->
+                        </div>
+                    </div>
+                </mat-header-cell>
+
+                <mat-cell *matCellDef="let item">
+                    {{ item.sizeBytesHumanReadable }}
+                </mat-cell>
+            </ng-container>
+
+            <!-- Created by user -->
+            <ng-container matColumnDef="user">
+                <mat-header-cell *matHeaderCellDef>
+                    <div class="table-header-cell">
+                        <div mat-sort-header class="column-header">
+                            {{ 'LNG_BACKUP_FIELD_LABEL_USER' | translate }}
+                        </div>
+                        <div class="column-filter">
+                            <app-form-select
+                                name="usersFilter"
+                                ngModel
+                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                [options]="usersList$ | async"
+                                multiple="true"
+                                (optionChanged)="filterBySelectField('userId', $event, 'id')"
+                                optionLabelKey="name"
+                                optionValueKey="id"
+                                app-reset-input-on-side-filter
+                                [allowSelectionOfDisabledItems]="true"
+                                [displayFilterIcon]="true">
+                            </app-form-select>
+                        </div>
+                    </div>
+                </mat-header-cell>
+
+                <mat-cell *matCellDef="let item">
+                    {{ item.user ? item.user.firstName + ' ' + item.user.lastName : ''}}
+                </mat-cell>
+            </ng-container>
+
+            <!-- Error -->
+            <ng-container matColumnDef="error">
+                <mat-header-cell *matHeaderCellDef>
+                    <div class="table-header-cell">
+                        <div mat-sort-header class="column-header">{{'LNG_BACKUP_FIELD_LABEL_ERROR' | translate}}</div>
+                        <div class="column-filter">
+                            <app-form-input
+                                name="errorFilter"
+                                ngModel
+                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                (optionChanged)="filterByTextContainingField('error', $event)"
+                                app-reset-input-on-side-filter
+                                [displayFilterIcon]="true">
+                            </app-form-input>
+                        </div>
+                    </div>
+                </mat-header-cell>
+
+                <mat-cell *matCellDef="let item">
+                    {{ item.error }}
+                </mat-cell>
+            </ng-container>
+
+            <mat-header-row *matHeaderRowDef="fixedTableColumns"></mat-header-row>
+            <mat-row
+                *matRowDef="let item; columns: fixedTableColumns"
+                app-hover-row-actions
+                [hoverRowActionsComponent]="hoverRow"
+                [hoverRowActions]="recordActions"
+                [hoverRowActionData]="item"
+            ></mat-row>
+        </mat-table>
+
+        <div
+            *ngIf="refreshingList"
+            class="mat-table-loading-data">
+            <mat-spinner></mat-spinner>
+        </div>
+
+        <div
+            *ngIf="!refreshingList && isEmptyList"
+            class="mat-table"
+        >
+            <div class="mat-row">
+                <div class="mat-cell">
+                    {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+                </div>
+            </div>
+        </div>
+    </ng-container>
+
+    <!-- waiting for backup -->
+    <div
+        *ngIf="waitForBackupIdToBeReady || loading"
+        class="wait-for-backup">
+        <mat-spinner></mat-spinner>
+    </div>
+
+    <mat-paginator
+        *ngIf="!loading"
+        [length]="(backupsListCount$ | async)?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
+</mat-card>

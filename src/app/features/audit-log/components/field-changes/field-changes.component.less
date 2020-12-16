@@ -1,0 +1,27 @@
+@color-old-value: red;
+@color-new-value: green;
+
+app-field-changes {
+    .string-diff {
+        .field-name {
+            font-weight: bold;
+        }
+        .field-changes {
+            padding-left: 15px;
+        }
+        .old-value {
+            color: @color-old-value;
+            text-decoration: line-through;
+        }
+        .new-value {
+            color: @color-new-value;
+        }
+        .rich-content {
+            font-style: italic;
+        }
+
+        .object-value-property {
+            cursor: pointer;
+        }
+    }
+}

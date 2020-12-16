@@ -1,0 +1,242 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<!-- Side filters -->
+<app-side-filters
+    [filterOptions]="availableSideFilters"
+    (filtersApplied)="applySideFilters($event)"
+    [savedFiltersType]="savedFiltersType">
+</app-side-filters>
+
+<app-total-number-of-records
+    [value]="(entitiesListCount$ | async)?.count">
+</app-total-number-of-records>
+
+<div class="page-content form-section">
+    <div class="form-content">
+
+        <form
+            #tableForm="ngForm">
+            <mat-card class="page-section">
+
+                <div class="top-section-wrapper">
+                    <!--List Color Legend-->
+                    <div>
+                        <app-color-list-legend
+                            [referenceDataCategory]="ReferenceDataCategory.PERSON_TYPE">
+                        </app-color-list-legend>
+                    </div>
+
+                    <!--Reset Filters-->
+                    <div class="reset-filters">
+                        <button
+                            type="button"
+                            mat-raised-button
+                            color="accent"
+                            (click)="resetFiltersToSideFilters()">
+                            {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+                        </button>
+
+                        <button
+                            type="button"
+                            mat-raised-button
+                            color="accent"
+                            (click)="needsRefreshList(true)">
+                            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+                        </button>
+                    </div>
+                </div>
+
+                <mat-table #table [dataSource]="entitiesList$ | async" matSort (matSortChange)="sortBy($event, { age: [ 'years', 'months' ] })">
+
+                    <!-- Checkbox -->
+                    <ng-container matColumnDef="radio">
+                        <mat-header-cell *matHeaderCellDef fxFlex="60px">
+                            <div class="table-header-cell">
+                            </div>
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let item;" fxFlex="60px">
+
+                            <app-form-checkbox
+                                #listCheckedIndividual
+                                [name]="'listCheckedIndividual[' + item.id + ']'"
+                                class="table-checkbox"
+                                (optionChanged)="checkedRecord(item, $event)">
+                            </app-form-checkbox>
+
+                        </mat-cell>
+                    </ng-container>
+
+                    <!-- Last Name -->
+                    <ng-container matColumnDef="lastName">
+                        <mat-header-cell *matHeaderCellDef>
+                            <div class="table-header-cell">
+                                <div mat-sort-header class="column-header">
+                                    {{'LNG_ENTITY_FIELD_LABEL_LAST_NAME' | translate}}
+                                </div>
+                                <div class="column-filter">
+                                    <app-form-input
+                                        name="lastNameFilter"
+                                        ngModel
+                                        [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                        (optionChanged)="filterByTextField('lastName', $event)"
+                                        [displayFilterIcon]="true">
+                                    </app-form-input>
+                                </div>
+                            </div>
+                        </mat-header-cell>
+
+                        <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                            {{item.lastName}}
+                        </mat-cell>
+                    </ng-container>
+
+                    <!-- First Name -->
+                    <ng-container matColumnDef="firstName">
+                        <mat-header-cell *matHeaderCellDef>
+                            <div class="table-header-cell">
+                                <div mat-sort-header class="column-header">
+                                    {{'LNG_ENTITY_FIELD_LABEL_FIRST_NAME' | translate}}
+                                </div>
+                                <div class="column-filter">
+                                    <app-form-input
+                                        name="firstNameFilter"
+                                        ngModel
+                                        [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                        (optionChanged)="filterByTextField(['firstName', 'name'], $event)"
+                                        [displayFilterIcon]="true">
+                                    </app-form-input>
+                                </div>
+                            </div>
+                        </mat-header-cell>
+
+                        <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                            {{item.type === EntityType.EVENT ? item.name : item.firstName}}
+                        </mat-cell>
+                    </ng-container>
+
+                    <!-- Case / Contact Visual ID -->
+                    <ng-container matColumnDef="visualId">
+                        <mat-header-cell *matHeaderCellDef>
+                            <div class="table-header-cell">
+                                <div mat-sort-header class="column-header">
+                                    {{'LNG_ENTITY_FIELD_LABEL_VISUAL_ID' | translate}}
+                                </div>
+                                <div class="column-filter">
+                                    <app-form-input
+                                        name="visualIdFilter"
+                                        ngModel
+                                        [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                        (optionChanged)="filterByTextField('visualId', $event)"
+                                        [displayFilterIcon]="true">
+                                    </app-form-input>
+                                </div>
+                            </div>
+                        </mat-header-cell>
+
+                        <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                            {{ item.visualId }}
+                        </mat-cell>
+                    </ng-container>
+
+                    <!-- Gender -->
+                    <ng-container matColumnDef="gender">
+                        <mat-header-cell *matHeaderCellDef>
+                            <div class="table-header-cell">
+                                <div mat-sort-header class="column-header">
+                                    {{'LNG_ENTITY_FIELD_LABEL_GENDER' | translate}}
+                                </div>
+                                <div class="column-filter">
+                                    <app-form-select
+                                        name="genderFilter"
+                                        ngModel
+                                        [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                        [options]="genderList$ | async"
+                                        (optionChanged)="filterBySelectField('gender', $event)"
+                                        multiple="true"
+                                        [allowSelectionOfDisabledItems]="true"
+                                        [displayInvisibleItems]="true"
+                                        [displayFilterIcon]="true">
+                                    </app-form-select>
+                                </div>
+                            </div>
+                        </mat-header-cell>
+
+                        <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                            {{ item.gender | translate }}
+                        </mat-cell>
+                    </ng-container>
+
+                    <!-- Place -->
+                    <ng-container matColumnDef="place">
+                        <mat-header-cell *matHeaderCellDef>
+                            <div class="table-header-cell">
+                                <div class="column-header">
+                                    {{'LNG_ENTITY_FIELD_LABEL_PLACE' | translate}}
+                                </div>
+                                <div class="column-filter location-drop-down-column-header-container">
+                                    <app-form-location-dropdown
+                                        name="locationFilter"
+                                        ngModel
+                                        [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                        (itemChanged)="filterByLocation($event)"
+                                        multiple="true"
+                                        app-reset-input-on-side-filter
+                                        [useOutbreakLocations]="true">
+                                    </app-form-location-dropdown>
+                                </div>
+                            </div>
+                        </mat-header-cell>
+
+                        <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                            {{item.mainAddress.location?.name}}
+                        </mat-cell>
+                    </ng-container>
+
+                    <mat-header-row *matHeaderRowDef="fixedTableColumns"></mat-header-row>
+                    <mat-row *matRowDef="let item; columns: fixedTableColumns"></mat-row>
+                </mat-table>
+
+                <div
+                    *ngIf="refreshingList"
+                    class="mat-table-loading-data">
+                    <mat-spinner></mat-spinner>
+                </div>
+
+                <div
+                    *ngIf="!refreshingList && isEmptyList"
+                    class="mat-table"
+                >
+                    <div class="mat-row">
+                        <div class="mat-cell">
+                            {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+                        </div>
+                    </div>
+                </div>
+
+                <mat-paginator
+                    [length]="(entitiesListCount$ | async)?.count"
+                    [pageSize]="pageSize"
+                    [pageSizeOptions]="pageSizeOptions"
+                    (page)="changePage($event)">
+                </mat-paginator>
+
+            </mat-card>
+        </form>
+    </div>
+    <div
+        class="form-actions">
+        <button
+            mat-raised-button
+            color="accent"
+            (click)="switchWithSelectedRecord()"
+            [disabled]="!checkedAtLeastOneRecord">
+            {{ 'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_SET_SOURCE_BUTTON' | translate}}
+        </button>
+    </div>
+</div>

@@ -1,0 +1,80 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<div class="page-content">
+
+    <mat-horizontal-stepper linear #stepper>
+
+        <!-- Details step -->
+        <mat-step [stepControl]="detailsForm">
+            <form #detailsForm="ngForm">
+                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_FOLLOW_UP_TAB_DETAILS_TITLE'| translate}}</ng-template>
+
+                <!-- Details section -->
+                <mat-card class="page-section" fxLayout="column">
+                    <div fxLayout="row" fxLayoutGap="20px">
+                        <ng-container
+                            *ngIf="contactData && ContactModel.canView(authUser)">
+                            <div>{{EntityType.CONTACT | translate}}</div>
+                            <a [routerLink]="['/contacts', contactData.id, 'view']">{{ contactData.name }}</a>
+                        </ng-container>
+                    </div>
+
+                    <div fxLayout="row" fxLayoutGap="20px">
+                        <app-form-datepicker
+                            name="date"
+                            [(ngModel)]="followUpData.date"
+                            [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate"
+                            tooltip="LNG_FOLLOW_UP_FIELD_LABEL_DATE_DESCRIPTION"
+                            required="true"
+                            app-date-validator>
+                        </app-form-datepicker>
+
+                        <app-form-slide-toggle
+                            name="targeted"
+                            [(ngModel)]="followUpData.targeted"
+                            [label]="'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate"
+                            tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION">
+                        </app-form-slide-toggle>
+
+                        <app-form-select
+                            name="statusId"
+                            [(ngModel)]="followUpData.statusId"
+                            [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID' | translate"
+                            tooltip="LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID_DESCRIPTION"
+                            [options]="dailyStatusTypeOptions$ | async"
+                            [required]="true"
+                            optionLabelKey="label"
+                            optionValueKey="value">
+                        </app-form-select>
+
+                        <div fxFlex><!-- placeholder --></div>
+                    </div>
+                </mat-card>
+
+                <div class="stepper-navigation-buttons">
+                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}
+                    </button>
+                </div>
+            </form>
+        </mat-step>
+
+        <!-- Final step -->
+        <mat-step>
+            <ng-template matStepLabel>{{'LNG_STEPPER_FINAL_STEP_LABEL'| translate}}</ng-template>
+            {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
+            <div class="stepper-navigation-buttons">
+                <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK'| translate}}
+                </button>
+                <button *app-selected-outbreak-is-active type="button" mat-raised-button color="accent"
+                        (click)="createNewFollowUp([detailsForm])">
+                    {{'LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_BUTTON' | translate}}
+                </button>
+            </div>
+        </mat-step>
+    </mat-horizontal-stepper>
+
+</div>

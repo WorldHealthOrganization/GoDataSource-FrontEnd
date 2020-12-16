@@ -1,0 +1,26 @@
+app-form-checkbox {
+
+    .form-checkbox-container {
+        // simulate the "form-input" dimmensions
+        height: 45.5px;
+        padding-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+
+        .mat-form-field {
+            width: 100%;
+        }
+
+    }
+
+    // checkbox inside tables (used to select rows)
+    &.table-checkbox {
+
+        .form-checkbox-container {
+            height: auto;
+            justify-content: center;
+            padding-bottom: 5px;
+        }
+    }
+}

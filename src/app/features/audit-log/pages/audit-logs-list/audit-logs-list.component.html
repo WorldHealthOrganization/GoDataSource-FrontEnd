@@ -1,0 +1,258 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<!-- Side columns -->
+<app-side-columns
+    [tableColumnsUserSettingsKey]="UserSettings.AUDIT_LOG_FIELDS"
+    [tableColumns]="tableColumns"
+    (visibleColumnsChanged)="applySideColumnsChanged($event)">
+</app-side-columns>
+
+<!--Total number of records from the list-->
+<app-total-number-of-records
+    [value]="(auditLogsListCount$ | async)?.count">
+</app-total-number-of-records>
+
+<mat-card class="page-section page-content">
+    <!-- Reset Filters -->
+    <div class="reset-filters">
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="resetFiltersToSideFilters()">
+            {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+        </button>
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="needsRefreshList(true)">
+            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+        </button>
+    </div>
+
+    <mat-table #table [dataSource]="auditLogsList$ | async" matSort (matSortChange)="sortBy($event)">
+        <!-- Action -->
+        <ng-container matColumnDef="action">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell" fxLayout="column">
+                    <div mat-sort-header class="column-header">{{'LNG_AUDIT_LOG_FIELD_LABEL_ACTION' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="actionFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [options]="auditLogActionsList$ | async"
+                            (optionChanged)="filterBySelectField('action', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.action | translate }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Model Name -->
+        <ng-container matColumnDef="modelName">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell" fxLayout="column">
+                    <div mat-sort-header class="column-header">{{'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_NAME' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="modelNameFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [options]="dataModuleList"
+                            (optionChanged)="filterBySelectField('modelName', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ (dataModuleMapped[item.modelName] ? dataModuleMapped[item.modelName] : item.modelName) | translate }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Record ID -->
+        <ng-container matColumnDef="recordId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell" fxLayout="column">
+                    <div mat-sort-header class="column-header">{{'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_ID' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="recordIdFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            (optionChanged)="filterByTextField('recordId', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.recordId }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Time -->
+        <ng-container matColumnDef="createdAt">
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
+                <div class="table-header-cell" fxLayout="column">
+                    <div mat-sort-header class="column-header">{{'LNG_AUDIT_LOG_FIELD_LABEL_CREATED_AT' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-daterange
+                            name="createdAtFilter"
+                            [ngModel]="dateFilterDefaultValue"
+                            (changed)="filterByDateRangeField('createdAt', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
+                {{ item.createdAt | dateTimeDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Changes -->
+        <ng-container matColumnDef="changedData">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell" fxLayout="column">
+                    <div class="column-header">{{'LNG_AUDIT_LOG_FIELD_LABEL_CHANGE_DATA' | translate}}</div>
+                    <div class="column-filter">
+                        <!-- placeholder -->
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                <app-log-entry-changes [value]="item"></app-log-entry-changes>
+            </mat-cell>
+        </ng-container>
+
+        <!-- User -->
+        <ng-container matColumnDef="userId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell" fxLayout="column">
+                    <div class="column-header">{{'LNG_AUDIT_LOG_FIELD_LABEL_USER' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="userIdFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [options]="usersList$ | async"
+                            (optionChanged)="filterBySelectField('userId', $event, 'id')"
+                            multiple="true"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true"
+                            optionValueKey="id"
+                            optionLabelKey="name">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.user?.id ? item.user.name + ' ( ' + item.user.email + ' )' : '' }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- User Roles -->
+        <ng-container matColumnDef="userRole">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell" fxLayout="column">
+                    <div mat-sort-header class="column-header">{{'LNG_AUDIT_LOG_FIELD_LABEL_USER_ROLES' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="userRoleFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            (optionChanged)="filterByTextContainingField('userRole', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.userRole }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- IP Address -->
+        <ng-container matColumnDef="userIPAddress">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell" fxLayout="column">
+                    <div mat-sort-header class="column-header">{{'LNG_AUDIT_LOG_FIELD_LABEL_IP_ADDRESS' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="userIPAddressFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            (optionChanged)="filterByTextField('userIPAddress', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.userIPAddress }}
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
+        <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
+    </mat-table>
+
+    <div
+        *ngIf="refreshingList"
+        class="mat-table-loading-data">
+        <mat-spinner></mat-spinner>
+    </div>
+
+    <div
+        *ngIf="!refreshingList && isEmptyList"
+        class="mat-table"
+    >
+        <div class="mat-row">
+            <div class="mat-cell">
+                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+            </div>
+        </div>
+    </div>
+
+    <mat-paginator
+        [length]="(auditLogsListCount$ | async)?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
+
+</mat-card>

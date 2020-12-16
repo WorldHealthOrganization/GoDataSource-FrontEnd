@@ -1,0 +1,101 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<div class="page-content">
+
+    <mat-horizontal-stepper linear #stepper>
+        <!-- Details step -->
+        <mat-step [stepControl]="form">
+            <form #form="ngForm">
+                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_USER_ROLE_TAB_DETAILS_TITLE'| translate}}</ng-template>
+
+                <div fxLayout="column">
+                    <mat-card class="page-section">
+                        <app-form-input
+                            name="name"
+                            [(ngModel)]="newUserRole.name"
+                            [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_NAME' | translate"
+                            tooltip="LNG_USER_ROLE_FIELD_LABEL_NAME_DESCRIPTION"
+                            required="true">
+                        </app-form-input>
+
+                        <app-form-textarea
+                            name="description"
+                            [(ngModel)]="newUserRole.description"
+                            [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION' | translate"
+                            tooltip="LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION_DESCRIPTION">
+                        </app-form-textarea>
+
+                        <app-form-select-groups
+                            #selectedPermissions
+                            name="permissionIds"
+                            [(ngModel)]="newUserRole.permissionIds"
+                            [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS' | translate"
+                            tooltip="LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS_DESCRIPTION"
+                            required="true"
+                            [groups]="availablePermissions$ | async"
+                            [groupOptionFormatMethod]="groupOptionFormatMethod"
+                            [defaultValues]="PermissionModel.HIDDEN_PERMISSIONS"
+                            removeDefaultOptionOnOptionChanged="true"
+                            groupLabelKey="groupLabel"
+                            groupTooltipKey="groupDescription"
+                            groupValueKey="groupAllId"
+                            groupOptionsKey="permissions"
+                            groupOptionLabelKey="label"
+                            groupOptionValueKey="id"
+                            groupOptionTooltipKey="description"
+                            groupOptionHiddenKey="hidden"
+                            groupAllLabel="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_ALL"
+                            groupAllTooltip="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_ALL_DESCRIPTION"
+                            groupNoneLabel="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_NONE"
+                            groupNoneTooltip="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_NONE_DESCRIPTION"
+                            groupPartialLabel="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL"
+                            groupPartialTooltip="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL_DESCRIPTION"
+                            (groupSelectionChanged)="groupSelectionChanged($event)"
+                            (groupOptionCheckStateChanged)="groupOptionCheckStateChanged($event)"
+                            app-group-option-requirements-validator
+                            [appGroupRequiredOptions]="availablePermissions$ | async"
+                            appGroupKey="groupAllId"
+                            appGroupOptionsKey="permissions"
+                            appGroupOptionsValueKey="id"
+                            appGroupOptionsLabelKey="label"
+                            appGroupOptionsRequirementsKey="requires"
+                            requiredWithoutDefaultValues="true">
+                        </app-form-select-groups>
+                    </mat-card>
+
+                    <div class="stepper-navigation-buttons">
+                        <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                    </div>
+                </div>
+            </form>
+        </mat-step>
+
+        <!-- Final step -->
+        <mat-step>
+            <ng-template matStepLabel>
+                {{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}
+            </ng-template>
+
+            {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
+
+            <div class="stepper-navigation-buttons">
+                <button mat-raised-button type="button" matStepperPrevious>
+                    {{'LNG_STEPPER_BUTTON_BACK' | translate}}
+                </button>
+                <button
+                    type="button" mat-raised-button color="accent"
+                    (click)="createNewRole(form)">
+                    {{'LNG_PAGE_CREATE_USER_ROLE_CREATE_USER_ROLE_BUTTON' | translate}}
+                </button>
+            </div>
+        </mat-step>
+
+    </mat-horizontal-stepper>
+
+</div>
+
+

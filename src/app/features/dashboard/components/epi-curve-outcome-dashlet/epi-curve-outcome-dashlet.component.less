@@ -1,0 +1,31 @@
+app-epi-curve-outcome-dashlet {
+    .dashlet-no-data {
+        height: 356px;
+    }
+
+    .dashlet-loading {
+        height: 356px;
+        width: 100%;
+        text-align: center;
+
+        @mat-spinner-width: 32px;
+        @mat-spinner-height: 32px;
+
+        mat-spinner {
+            display: inline-block;
+            width: @mat-spinner-width !important;
+            height: @mat-spinner-height !important;
+            position: relative;
+            top: ~'calc(50% - 16px)';
+
+            svg {
+                width: @mat-spinner-width !important;
+                height: @mat-spinner-height !important;
+            }
+        }
+    }
+
+    .week-type {
+        margin-left: 20px;
+    }
+}

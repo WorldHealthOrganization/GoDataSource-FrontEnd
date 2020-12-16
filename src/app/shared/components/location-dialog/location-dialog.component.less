@@ -1,0 +1,32 @@
+@import '~styles/common';
+
+.mat-dialog-container {
+    padding: 24px 9px 9px 24px;
+    // add max-height in vh so the modal will not exceed the viewport making impossible to click on the buttons or see all content
+    max-height: 95vh !important;
+}
+
+app-location-dialog {
+    .dialog-main {
+        font-family: @font-roboto;
+        font-size: 14px;
+        color: #8e8e8e;
+
+        .dialog-main-msg {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            font-family: @font-roboto;
+            line-height: 1.2;
+            color: #000;
+        }
+
+        .dialog-button {
+            font-family: @font-roboto;
+            text-transform: uppercase;
+            color: #000;
+            font-weight: 700;
+            margin-top: 20px;
+        }
+    }
+}

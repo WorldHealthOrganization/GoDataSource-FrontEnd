@@ -1,0 +1,10 @@
+<div>
+    {{'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_SELECTED_CONTACTS' | translate}}
+</div>
+<div fxLayout="row wrap" fxLayoutGap="20px">
+    <a
+        *ngFor="let person of persons"
+        [routerLink]="[person.type === EntityType.CASE ? '/cases' :'/contacts', person.id, 'view']">
+        {{ person.name }}
+    </a>
+</div>

@@ -1,0 +1,205 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<form
+    #form="ngForm"
+    [class.form-view-only]="viewOnly"
+    class="page-content form-section"
+    (submit)="modifyUser(form)">
+
+    <div class="form-content">
+
+        <mat-tab-group class="page-tabs-navbar">
+
+            <mat-tab [label]="'LNG_PAGE_MODIFY_USER_TAB_DETAILS_TITLE'| translate">
+
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-input
+                                name="firstName"
+                                [(ngModel)]="user.firstName"
+                                [placeholder]="'LNG_USER_FIELD_LABEL_FIRST_NAME' | translate"
+                                tooltip="LNG_USER_FIELD_LABEL_FIRST_NAME_DESCRIPTION"
+                                required="true"
+                                [disabled]="viewOnly">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="lastName"
+                                [(ngModel)]="user.lastName"
+                                [placeholder]="'LNG_USER_FIELD_LABEL_LAST_NAME' | translate"
+                                tooltip="LNG_USER_FIELD_LABEL_LAST_NAME_DESCRIPTION"
+                                required="true"
+                                [disabled]="viewOnly">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="email"
+                                [(ngModel)]="user.email"
+                                [placeholder]="'LNG_USER_FIELD_LABEL_EMAIL' | translate"
+                                tooltip="LNG_USER_FIELD_LABEL_EMAIL_DESCRIPTION"
+                                required="true"
+                                app-email-validator
+                                [disabled]="viewOnly">
+                            </app-form-input>
+
+                            <app-form-select
+                                name="roleIds"
+                                [(ngModel)]="user.roleIds"
+                                [placeholder]="'LNG_USER_FIELD_LABEL_ROLES' | translate"
+                                tooltip="LNG_USER_FIELD_LABEL_ROLES_DESCRIPTION"
+                                required="true"
+                                [options]="rolesList$ | async"
+                                optionLabelKey="name"
+                                optionValueKey="id"
+                                optionTooltipKey="description"
+                                [disabled]="authUser.id === user.id || viewOnly"
+                                multiple="true">
+                            </app-form-select>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-select
+                                name="institutionName"
+                                [(ngModel)]="user.institutionName"
+                                [placeholder]="'LNG_USER_FIELD_LABEL_INSTITUTION_NAME' | translate"
+                                tooltip="LNG_USER_FIELD_LABEL_INSTITUTION_NAME_DESCRIPTION"
+                                [options]="institutionsList$ | async"
+                                [disabled]="viewOnly">
+                            </app-form-select>
+
+                            <app-form-input
+                                [name]="'telephoneNumbers[' + PhoneNumberType.PRIMARY_PHONE_NUMBER + ']'"
+                                [(ngModel)]="user.telephoneNumbers[PhoneNumberType.PRIMARY_PHONE_NUMBER]"
+                                [placeholder]="'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS' | translate"
+                                tooltip="LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS_DESCRIPTION"
+                                [disabled]="viewOnly">
+                            </app-form-input>
+
+                            <app-form-slide-toggle
+                                name="disregardGeographicRestrictions"
+                                [(ngModel)]="user.disregardGeographicRestrictions"
+                                [label]="'LNG_USER_FIELD_LABEL_DISREGARD_GEOGRAPHIC_RESTRICTIONS' | translate"
+                                tooltip="LNG_USER_FIELD_LABEL_DISREGARD_GEOGRAPHIC_RESTRICTIONS_DESCRIPTION"
+                                [disabled]="viewOnly">
+                            </app-form-slide-toggle>
+
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
+
+                        <div
+                            *ngIf="OutbreakModel.canList(authUser)"
+                            fxLayout="row" fxLayoutGap="20px">
+                            <app-form-select
+                                name="outbreakIds"
+                                [(ngModel)]="user.outbreakIds"
+                                [placeholder]="'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS' | translate"
+                                tooltip="LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS_DESCRIPTION"
+                                optionLabelKey="name"
+                                optionValueKey="id"
+                                optionTooltipKey="description"
+                                [options]="outbreaksList$ | async"
+                                [multiple]="true"
+                                [disabled]="viewOnly"
+                                [enableFilterOptions]="true">
+                            </app-form-select>
+
+                            <app-form-select
+                                name="activeOutbreakId"
+                                [(ngModel)]="user.activeOutbreakId"
+                                [placeholder]="'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK' | translate"
+                                tooltip="LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK_DESCRIPTION"
+                                optionLabelKey="name"
+                                optionValueKey="id"
+                                optionTooltipKey="description"
+                                [options]="outbreaksList$ | async"
+                                [disabled]="viewOnly"
+                                [enableFilterOptions]="true">
+                            </app-form-select>
+
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
+                    </div>
+                </mat-card>
+
+                <mat-card
+                    *ngIf="!viewOnly"
+                    class="page-section">
+                    <div fxLayout="column">
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-input
+                                *ngIf="askForOldPassword"
+                                type="password"
+                                name="oldPassword"
+                                [(ngModel)]="oldPassword"
+                                [placeholder]="'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CURRENT_PASSWORD' | translate"
+                                tooltip="LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CURRENT_PASSWORD_DESCRIPTION"
+                                [disabled]="viewOnly"
+                                [required]="!!user.password">
+                            </app-form-input>
+
+                            <app-form-input
+                                type="password"
+                                name="password"
+                                [(ngModel)]="user.password"
+                                [placeholder]="'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_NEW_PASSWORD' | translate"
+                                tooltip="LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_NEW_PASSWORD_DESCRIPTION"
+                                minlength="12"
+                                app-trigger-validation-for="passwordConfirm"
+                                [disabled]="viewOnly">
+                            </app-form-input>
+
+                            <app-form-input
+                                type="password"
+                                name="passwordConfirm"
+                                [(ngModel)]="passwordConfirmModel"
+                                [placeholder]="'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CONFIRM_NEW_PASSWORD' | translate"
+                                tooltip="LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CONFIRM_NEW_PASSWORD_DESCRIPTION"
+                                [required]="!!user.password"
+                                app-equal-validator="password"
+                                [disabled]="viewOnly">
+                            </app-form-input>
+
+                            <div fxFlex><!-- placeholder --></div>
+                            <div
+                                *ngIf="!askForOldPassword"
+                                fxFlex><!-- placeholder --></div>
+                        </div>
+                    </div>
+                </mat-card>
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+
+    <div class="form-actions">
+        <div class="page-tabs-navbar-placeholder"></div>
+
+        <button
+            *ngIf="viewOnly && UserModel.canModify(authUser) && user.id && user.id !== authUser.id"
+            mat-raised-button
+            type="button"
+            color="accent"
+            [routerLink]="['/users', userId, 'modify']">
+            {{'LNG_COMMON_BUTTON_EDIT' | translate}}
+        </button>
+
+        <ng-container *ngIf="!viewOnly">
+            <button mat-raised-button color="accent" type="submit">
+                {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+            </button>
+            <button
+                *ngIf="UserModel.canList(authUser)"
+                type="button"
+                [routerLink]="'/users'"
+                mat-raised-button>
+                {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
+            </button>
+        </ng-container>
+    </div>
+
+</form>

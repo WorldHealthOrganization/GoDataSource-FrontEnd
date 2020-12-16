@@ -1,0 +1,192 @@
+@font-face {
+  font-family: 'xtIcon';
+  src:
+    url('fonts/xtIcon.ttf?73rrbf') format('truetype'),
+    url('fonts/xtIcon.woff?73rrbf') format('woff'),
+    url('fonts/xtIcon.svg?73rrbf#xtIcon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.xt-icon {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'xtIcon' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  
+  /* Enable Ligatures ================ */
+  letter-spacing: 0;
+  -webkit-font-feature-settings: "liga";
+  -moz-font-feature-settings: "liga=1";
+  -moz-font-feature-settings: "liga";
+  -ms-font-feature-settings: "liga" 1;
+  font-feature-settings: "liga";
+  -webkit-font-variant-ligatures: discretionary-ligatures;
+  font-variant-ligatures: discretionary-ligatures;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.xtIconellipse:before {
+  content: "\e92f";
+}
+.xtIconpentagon:before {
+  content: "\e930";
+}
+.xtIconsquare:before {
+  content: "\e931";
+}
+.xtIconstar:before {
+  content: "\e932";
+}
+.xtIconbaseline-contacts-24px-1:before {
+  content: "\e924";
+}
+.xtIconbaseline-person_add-24px:before {
+  content: "\e925";
+}
+.xtIconbaseline-turned_in-24px:before {
+  content: "\e926";
+}
+.xtIconbaseline-nature_people-24px:before {
+  content: "\e927";
+}
+.xtIconbaseline-airline_seat_flat-24px:before {
+  content: "\e928";
+}
+.xtIconbaseline-commute-24px:before {
+  content: "\e929";
+}
+.xtIconbaseline-touch_app-24px:before {
+  content: "\e92a";
+}
+.xtIconbaseline-hotel-24px:before {
+  content: "\e92b";
+}
+.xtIconbaseline-pan_tool-24px:before {
+  content: "\e92c";
+}
+.xtIconbaseline-free_breakfast-24px:before {
+  content: "\e92d";
+}
+.xtIconbaseline-supervised_user_circle-24px:before {
+  content: "\e920";
+}
+.xtIconround-arrow_drop_down_circle-24px:before {
+  content: "\e91f";
+}
+.xtIconbaseline-visibility_off-24px:before {
+  content: "\e91d";
+}
+.xtIconbaseline-visibility-24px:before {
+  content: "\e91e";
+}
+.xtIconbaseline-swap_vert-24px:before {
+  content: "\e91c";
+}
+.xtIconbaseline-close-24px-1:before {
+  content: "\e91b";
+}
+.xtIconbaseline-person_pin-24px:before {
+  content: "\e91a";
+}
+.xtIconbaseline-view_column-24px:before {
+  content: "\e919";
+}
+.xtIconbaseline-group_work-24px:before {
+  content: "\e918";
+}
+.xtIconbaseline-location_on-24px:before {
+  content: "\e917";
+}
+.xtIconbaseline-bar_chart-24px:before {
+  content: "\e915";
+}
+.xtIconbaseline-timeline-24px:before {
+  content: "\e916";
+}
+.xtIconbaseline-filter_list-24px:before {
+  content: "\e914";
+}
+.xtIconbaseline-keyboard_arrow_right-24px:before {
+  content: "\e913";
+}
+.xtIconbaseline-add_circle_outline-24px:before {
+  content: "\e900";
+}
+.xtIconbaseline-file_copy-24px:before {
+  content: "\e911";
+}
+.xtIconuser:before {
+  content: "\e912";
+  color: #4db0a0;
+}
+.xtIconbaseline-language-24px:before {
+  content: "\e906";
+}
+.xtIconbaseline-bug_report-24px:before {
+  content: "\e902";
+}
+.xtIconbaseline-create_new_folder-24px:before {
+  content: "\e903";
+}
+.xtIconbaseline-event-24px:before {
+  content: "\e904";
+}
+.xtIconbaseline-expand_more-24px:before {
+  content: "\e905";
+}
+.xtIconbaseline-people-24px:before {
+  content: "\e907";
+}
+.xtIconbaseline-settings-20px:before {
+  content: "\e910";
+}
+.xtIconbaseline-help-24px:before {
+  content: "\e90f";
+}
+.xtIconbaseline-link-24px:before {
+  content: "\e90e";
+}
+.xtIconbaseline-delete-24px:before {
+  content: "\e90d";
+}
+.xtIconbaseline-arrow_drop_down-24px:before {
+  content: "\e90c";
+}
+.xtIconbaseline-more_vert-24px:before {
+  content: "\e90b";
+}
+.xtIconbaseline-search-24px:before {
+  content: "\e908";
+}
+.xtIconbaseline-add-24px:before {
+  content: "\e909";
+}
+.xtIconbaseline-menu-24px:before {
+  content: "\e90a";
+}
+.xtIconbaseline-home-24px:before {
+  content: "\e901";
+}
+.xtIconinfo:before {
+  content: "\e923";
+}
+.xtIconsync:before {
+  content: "\e92e";
+}
+.xtIconlab:before {
+  content: "\e9aa";
+}
+.xtIconarrow-down:before {
+  content: "\e922";
+}
+.xtIconarrow-up:before {
+  content: "\e921";
+}

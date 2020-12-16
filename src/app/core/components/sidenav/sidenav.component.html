@@ -1,0 +1,125 @@
+<div class="sidenav" fxLayout="column">
+
+    <!-- Logo -->
+    <div class="logo" fxLayout="row" fxLayoutAlign="center">
+        <div class="logo-image-container">
+            <a
+                [routerLink]="['/']"
+                tabindex="-1"
+                class="a-no-style">
+                <img src="/assets/images/go-data-logo-with-text.png" />
+            </a>
+        </div>
+    </div>
+
+    <!-- Account Menu Item -->
+    <div class="item account-item" fxLayout="row">
+
+        <!-- Submenu -->
+        <mat-menu #menu="matMenu" xPosition="before" yPosition="below">
+            <ng-container
+                *ngFor="let childItem of accountItem.children">
+                <button
+                    *ngIf="shouldDisplayItem(childItem)"
+                    mat-menu-item
+                    [routerLink]="[childItem.link]">
+                    {{childItem.label | translate}}
+                </button>
+            </ng-container>
+        </mat-menu>
+
+        <!-- Menu Item Button -->
+        <button fxFlex mat-button color="primary" [matMenuTriggerFor]="menu">
+
+            <div class="item-content" fxLayout="row" fxLayoutAlign="space-between center">
+
+                <!-- Item icon and label -->
+                <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+
+                    <!-- Item icon -->
+                    <span class="xt-icon">{{accountItem.icon}}</span>
+
+                    <!-- Item label -->
+                    <div class="item-name" fxLayout="column" fxLayoutAlign="center start">
+                        <div class="user-name">
+                            {{authUser.firstName}} {{authUser.lastName}}
+                        </div>
+                        <div class="user-email">
+                            {{authUser.email}}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- "Expand" icon -->
+                <span class="xt-icon expand">thinArrowDown</span>
+            </div>
+
+        </button>
+    </div>
+
+    <div class="item-separator account-item-separator"></div>
+
+    <!-- Main Menu Items  -->
+    <ng-container *ngFor="let item of mainItems; let itemIndex = index">
+
+        <!-- Menu Item with Link -->
+        <div *ngIf="item.link && shouldDisplayItem(item)" class="item" fxLayout="row">
+
+            <button fxFlex mat-button color="primary" [routerLink]="item.link">
+
+                <div class="item-content" fxLayout="row" fxLayoutAlign="start center">
+
+                    <!-- Item icon and label -->
+                    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+
+                        <!-- Item icon -->
+                        <span class="xt-icon">{{item.icon}}</span>
+
+                        <!-- Item label -->
+                        <div class="item-name">{{item.label | translate}}</div>
+                    </div>
+                </div>
+
+            </button>
+        </div>
+
+        <!-- Menu Item with Submenu -->
+        <div *ngIf="item.children?.length > 0 && shouldDisplayItem(item)" class="item" fxLayout="row">
+
+            <!-- Submenu -->
+            <mat-menu #menu="matMenu" xPosition="before" yPosition="below">
+                <ng-container *ngFor="let childItem of item.children">
+                    <button *ngIf="shouldDisplayItem(childItem)" mat-menu-item  [routerLink]="[childItem.link]">
+                        {{childItem.label | translate}}
+                    </button>
+                </ng-container>
+            </mat-menu>
+
+            <!-- Menu Item Button -->
+            <button fxFlex mat-button color="primary" [matMenuTriggerFor]="menu">
+
+                <div class="item-content" fxLayout="row" fxLayoutAlign="space-between center">
+
+                    <!-- Item icon and label -->
+                    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+
+                        <!-- Item icon -->
+                        <span class="xt-icon">{{item.icon}}</span>
+
+                        <!-- Item label -->
+                        <div class="item-name">{{item.label | translate}}</div>
+                    </div>
+
+                    <!-- "Expand" icon -->
+                    <span class="xt-icon expand">thinArrowDown</span>
+                </div>
+
+            </button>
+        </div>
+
+        <!-- Separator -->
+        <div *ngIf="item.separator && shouldDisplayItem(item, mainItems, itemIndex)" class="item-separator"></div>
+
+    </ng-container>
+
+</div>

@@ -1,0 +1,11 @@
+<span>
+    {{
+        age?.months > 0 ?
+            age?.months + ' ' + ('LNG_AGE_FIELD_LABEL_MONTHS' | translate) :
+            (
+                age?.years > 0 ?
+                    (age?.years + ' ' + ('LNG_AGE_FIELD_LABEL_YEARS' | translate)) :
+                    ''
+            )
+    }}
+</span>
