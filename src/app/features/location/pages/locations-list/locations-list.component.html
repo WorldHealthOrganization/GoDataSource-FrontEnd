@@ -1,0 +1,434 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+        </div>
+
+        <div class="topnav-actions">
+            <button
+                *ngIf="LocationModel.canCreate(authUser)"
+                mat-raised-button
+                color="accent"
+                [routerLink]="parentId ? ['/locations', parentId, 'create'] : ['/locations', 'create']">
+                {{( parentId ? 'LNG_PAGE_LIST_LOCATIONS_ADD_SUBLOCATION_BUTTON' : 'LNG_PAGE_LIST_LOCATIONS_ADD_LOCATION_BUTTON') | translate}} <span class="xt-icon">addCircle</span>
+            </button>
+
+            <button
+                *ngIf="!parentId && !appliedListFilter && (LocationModel.canExport(authUser) || LocationModel.canImport(authUser))"
+                mat-raised-button color="accent" [matMenuTriggerFor]="quickActionsMenu">
+                {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
+            </button>
+
+            <mat-menu #quickActionsMenu="matMenu">
+                <app-export-button
+                    *ngIf="LocationModel.canExport(authUser)"
+                    [menuItem]="true"
+                    [label]="'LNG_PAGE_LIST_LOCATIONS_EXPORT_BUTTON' | translate"
+                    [message]="'LNG_PAGE_LIST_LOCATIONS_EXPORT_TITLE' | translate"
+                    url="locations/hierarchical/export"
+                    [fileName]="hierarchicalLocationsDataExportFileName"
+                    [fileType]="ExportDataExtension.JSON"
+                    (exportStart)="showLoadingDialog()"
+                    (exportFinished)="closeLoadingDialog()">
+                </app-export-button>
+
+                <ng-container *ngIf="LocationModel.canImport(authUser)">
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/import-export-data', 'hierarchical-locations', 'import']">
+                        {{'LNG_PAGE_LIST_LOCATIONS_IMPORT_HIERARCHICAL_BUTTON' | translate}}
+                    </button>
+
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/import-export-data', 'location-data', 'import']">
+                        {{'LNG_PAGE_LIST_LOCATIONS_IMPORT_LOCATIONS_BUTTON' | translate}}
+                    </button>
+                </ng-container>
+            </mat-menu>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<app-side-columns
+    [tableColumnsUserSettingsKey]="UserSettings.LOCATION_FIELDS"
+    [tableColumns]="tableColumns"
+    (visibleColumnsChanged)="applySideColumnsChanged($event)">
+</app-side-columns>
+
+<div fxLayout="row" fxLayoutAlign="space-between center">
+    <!--Total number of records from the list-->
+    <app-total-number-of-records
+        fxFlex
+        [value]="(locationsListCount$ | async)?.count">
+    </app-total-number-of-records>
+
+    <div
+        fxFlex
+        class="location-search-filter"
+        [ngClass]="{ 'form-section': !!parentId }">
+        <app-form-location-dropdown
+            #locationFilter
+            fxFlex
+            name="locationIds"
+            [ngModel]="undefined"
+            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+            [useOutbreakLocations]="false"
+            (itemChanged)="searchLocationChanged($event)">
+        </app-form-location-dropdown>
+
+        <div
+            *ngIf="parentId"
+            class="form-actions">
+            <!-- placeholder -->
+        </div>
+    </div>
+</div>
+
+<div [ngClass]="{ 'form-section': !!parentId }">
+    <div class="form-content">
+        <mat-card class="page-section page-content">
+            <!-- location breadcrumb -->
+            <app-location-breadcrumbs></app-location-breadcrumbs>
+
+            <!-- Reset Filters -->
+            <div class="reset-filters">
+                <button
+                    type="button"
+                    mat-raised-button
+                    color="accent"
+                    (click)="resetFiltersToSideFilters()">
+                    {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+                </button>
+                <button
+                    type="button"
+                    mat-raised-button
+                    color="accent"
+                    (click)="needsRefreshList(true)">
+                    {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+                </button>
+            </div>
+
+            <!-- Hover question effects / actions -->
+            <app-hover-row-actions
+                #hoverRow
+                [active]="!refreshingList"
+            ></app-hover-row-actions>
+
+            <mat-table #table [dataSource]="locationsList$ | async" matSort (matSortChange)="sortBy($event)">
+
+                <!-- Name -->
+                <ng-container matColumnDef="name">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div mat-sort-header class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_NAME" | translate}}</div>
+                            <div class="column-filter">
+                                <app-form-input
+                                    name="nameFilter"
+                                    ngModel
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                    (optionChanged)="filterByTextField('name', $event)"
+                                    app-reset-input-on-side-filter
+                                    [displayFilterIcon]="true">
+                                </app-form-input>
+                            </div>
+                        </div>
+                    </mat-header-cell>
+
+                    <mat-cell *matCellDef="let item">
+                        {{ item.name }}
+                    </mat-cell>
+                </ng-container>
+
+                <!-- Synonyms -->
+                <ng-container matColumnDef="synonyms">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_SYNONYMS" | translate}}</div>
+                            <div class="column-filter">
+                                <app-form-input
+                                    name="synonymsFilter"
+                                    ngModel
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                    (optionChanged)="filterByTextField('synonyms', $event)"
+                                    app-reset-input-on-side-filter
+                                    [displayFilterIcon]="true">
+                                </app-form-input>
+                            </div>
+                        </div>
+                    </mat-header-cell>
+
+                    <mat-cell *matCellDef="let item">
+                        {{ item.synonymsAsString }}
+                    </mat-cell>
+                </ng-container>
+
+                <!-- Identifiers -->
+                <ng-container matColumnDef="identifiers">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div class="column-header">{{ 'LNG_LOCATION_FIELD_LABEL_IDENTIFIERS' | translate}}</div>
+                            <div class="column-filter">
+                                <app-form-input
+                                    name="identifiersFilter"
+                                    ngModel
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                    (optionChanged)="filterByIdentifierCode($event)"
+                                    app-reset-input-on-side-filter
+                                    [displayFilterIcon]="true">
+                                </app-form-input>
+                            </div>
+                        </div>
+                    </mat-header-cell>
+
+                    <mat-cell *matCellDef="let item">
+                        {{ item.identifiersAsString }}
+                    </mat-cell>
+                </ng-container>
+
+                <!-- Lat / Lng -->
+                <ng-container matColumnDef="latLng">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_GEO_LOCATION" | translate}}</div>
+                            <div class="column-filter">
+                                <!-- placeholder -->
+                            </div>
+                        </div>
+                    </mat-header-cell>
+
+                    <mat-cell *matCellDef="let item">
+                        {{ item.geoLocation && item.geoLocation.lat ? item.geoLocation.lat + ', ' + item.geoLocation.lng : '' }}
+                    </mat-cell>
+                </ng-container>
+
+                <!-- Active -->
+                <ng-container matColumnDef="active">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div mat-sort-header class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_ACTIVE" | translate }}</div>
+                            <div class="column-filter">
+                                <app-form-select
+                                    name="activeFilter"
+                                    ngModel
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                    [options]="yesNoOptionsList$ | async"
+                                    (optionChanged)="filterByBooleanField('active', $event.value)"
+                                    app-reset-input-on-side-filter
+                                    [allowSelectionOfDisabledItems]="true"
+                                    [displayInvisibleItems]="true"
+                                    [displayFilterIcon]="true">
+                                </app-form-select>
+                            </div>
+                        </div>
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let item">
+                        <app-yes-no-label [value]="item.active"></app-yes-no-label>
+                    </mat-cell>
+                </ng-container>
+
+                <!-- Population density -->
+                <ng-container matColumnDef="populationDensity">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div mat-sort-header class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY" | translate }}</div>
+                            <div class="column-filter">
+                                <app-form-range
+                                    name="populationDensityFilter"
+                                    ngModel
+                                    (changed)="filterByRangeField('populationDensity', $event)"
+                                    app-reset-input-on-side-filter>
+                                </app-form-range>
+                            </div>
+                        </div>
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let item">
+                        {{ item.populationDensity }}
+                    </mat-cell>
+                </ng-container>
+
+                <!-- Geographical Level  -->
+                <ng-container matColumnDef="geographicalLevelId">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div mat-sort-header class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL" | translate }}</div>
+                            <div class="column-filter">
+                                <app-form-select
+                                    name="geographicalLevelFilter"
+                                    ngModel
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                    [options]="geographicalLevelsList$ | async"
+                                    multiple="true"
+                                    (optionChanged)="filterBySelectField('geographicalLevelId', $event)"
+                                    [allowSelectionOfDisabledItems]="true"
+                                    [displayInvisibleItems]="true"
+                                    [displayFilterIcon]="true">
+                                </app-form-select>
+                            </div>
+                        </div>
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let item">
+                        {{ item.geographicalLevelId | translate }}
+                    </mat-cell>
+                </ng-container>
+
+                <!-- Created By -->
+                <ng-container matColumnDef="createdBy">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div class="column-header">
+                                {{ 'LNG_LOCATION_FIELD_LABEL_CREATED_BY' | translate }}
+                            </div>
+                            <div class="column-filter">
+                                <app-form-select
+                                    name="createdByFilter"
+                                    ngModel
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                    [options]="userList$ | async"
+                                    (optionChanged)="filterBySelectField('createdBy', $event, 'id')"
+                                    app-reset-input-on-side-filter
+                                    [allowSelectionOfDisabledItems]="true"
+                                    [displayFilterIcon]="true"
+                                    optionLabelKey="name"
+                                    optionValueKey="id"
+                                    [multiple]="true">
+                                </app-form-select>
+                            </div>
+                        </div>
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let item">
+                        {{ item.createdByUser?.name }}
+                    </mat-cell>
+                </ng-container>
+
+                <!-- Created At -->
+                <ng-container matColumnDef="createdAt">
+                    <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div mat-sort-header class="column-header">
+                                {{ 'LNG_LOCATION_FIELD_LABEL_CREATED_AT' | translate }}
+                            </div>
+                            <div class="column-filter">
+                                <app-form-daterange
+                                    name="createdAtFilter"
+                                    ngModel
+                                    (changed)="filterByDateRangeField('createdAt', $event)"
+                                    app-reset-input-on-side-filter>
+                                </app-form-daterange>
+                            </div>
+                        </div>
+                    </mat-header-cell>
+                    <mat-cell class="has-date-range-filter" *matCellDef="let item">
+                        {{ item.createdAt | dateTimeDefault }}
+                    </mat-cell>
+                </ng-container>
+
+                <!-- Modified By -->
+                <ng-container matColumnDef="updatedBy">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div class="column-header">
+                                {{ 'LNG_LOCATION_FIELD_LABEL_UPDATED_BY' | translate }}
+                            </div>
+                            <div class="column-filter">
+                                <app-form-select
+                                    name="updatedByFilter"
+                                    ngModel
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                    [options]="userList$ | async"
+                                    (optionChanged)="filterBySelectField('updatedBy', $event, 'id')"
+                                    app-reset-input-on-side-filter
+                                    [allowSelectionOfDisabledItems]="true"
+                                    [displayFilterIcon]="true"
+                                    optionLabelKey="name"
+                                    optionValueKey="id"
+                                    [multiple]="true">
+                                </app-form-select>
+                            </div>
+                        </div>
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let item">
+                        {{ item.updatedByUser?.name }}
+                    </mat-cell>
+                </ng-container>
+
+                <!-- Updated At -->
+                <ng-container matColumnDef="updatedAt">
+                    <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div mat-sort-header class="column-header">
+                                {{ 'LNG_LOCATION_FIELD_LABEL_UPDATED_AT' | translate }}
+                            </div>
+                            <div class="column-filter">
+                                <app-form-daterange
+                                    name="updatedAtFilter"
+                                    ngModel
+                                    (changed)="filterByDateRangeField('updatedAt', $event)"
+                                    app-reset-input-on-side-filter>
+                                </app-form-daterange>
+                            </div>
+                        </div>
+                    </mat-header-cell>
+                    <mat-cell class="has-date-range-filter" *matCellDef="let item">
+                        {{ item.updatedAt | dateTimeDefault }}
+                    </mat-cell>
+                </ng-container>
+
+                <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
+                <mat-row
+                    *matRowDef="let item; columns: visibleTableColumns"
+                    app-hover-row-actions
+                    [hoverRowActionsComponent]="hoverRow"
+                    [hoverRowActions]="recordActions"
+                    [hoverRowActionData]="item"
+                ></mat-row>
+            </mat-table>
+
+            <div
+                *ngIf="refreshingList"
+                class="mat-table-loading-data">
+                <mat-spinner></mat-spinner>
+            </div>
+
+            <div
+                *ngIf="!refreshingList && isEmptyList"
+                class="mat-table"
+            >
+                <div class="mat-row">
+                    <div class="mat-cell">
+                        {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+                    </div>
+                </div>
+            </div>
+
+            <mat-paginator
+                [length]="(locationsListCount$ | async)?.count"
+                [pageSize]="pageSize"
+                [pageSizeOptions]="pageSizeOptions"
+                (page)="changePage($event)">
+            </mat-paginator>
+        </mat-card>
+    </div>
+
+    <div
+        *ngIf="parentId"
+        class="form-actions">
+        <button
+            *ngIf="LocationModel.canView(authUser)"
+            mat-raised-button
+            color="accent"
+            [routerLink]="['/locations', parentId, 'view']"
+            [queryParams]="{ backToCurrent: true }">
+            {{'LNG_COMMON_BUTTON_VIEW' | translate}}
+        </button>
+
+        <button
+            *ngIf="LocationModel.canModify(authUser)"
+            mat-raised-button
+            color="accent"
+            [routerLink]="['/locations', parentId, 'modify']"
+            [queryParams]="{ backToCurrent: true }">
+            {{'LNG_COMMON_BUTTON_MODIFY' | translate}}
+        </button>
+    </div>
+</div>

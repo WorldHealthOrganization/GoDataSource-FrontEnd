@@ -1,0 +1,542 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<form
+    #form="ngForm"
+    class="page-content form-section"
+    [class.form-view-only]="viewOnly"
+    (submit)="modifyCase(form)">
+
+    <div class="form-content">
+        <mat-tab-group class="page-tabs-navbar">
+
+            <mat-tab [label]="'LNG_PAGE_MODIFY_CASE_TAB_PERSONAL_TITLE' | translate">
+
+                <!-- Personal Details section -->
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-input
+                                name="firstName"
+                                [(ngModel)]="caseData.firstName"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_FIRST_NAME' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_FIRST_NAME_DESCRIPTION"
+                                required="true"
+                                maxlength="200"
+                                [disabled]="viewOnly">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="middleName"
+                                [(ngModel)]="caseData.middleName"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_MIDDLE_NAME' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION"
+                                maxlength="200"
+                                [disabled]="viewOnly">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="lastName"
+                                [(ngModel)]="caseData.lastName"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_LAST_NAME' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_LAST_NAME_DESCRIPTION"
+                                maxlength="200"
+                                [disabled]="viewOnly">
+                            </app-form-input>
+
+                            <app-form-select
+                                name="gender"
+                                [(ngModel)]="caseData.gender"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_GENDER' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_GENDER_DESCRIPTION"
+                                [options]="genderList$ | async"
+                                [disabled]="viewOnly">
+                            </app-form-select>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <div
+                                fxFlex fxLayout="row" fxLayoutGap="20px">
+                                <div
+                                    fxFlex>
+                                    <app-form-select
+                                        *ngIf="caseData.gender !== Constants.GENDER_MALE"
+                                        name="pregnancyStatus"
+                                        [(ngModel)]="caseData.pregnancyStatus"
+                                        [placeholder]="'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS' | translate"
+                                        tooltip="LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION"
+                                        [options]="pregnancyStatusList$ | async"
+                                        [disabled]="viewOnly"
+                                        [clearable]="false">
+                                    </app-form-select>
+                                </div>
+
+                                <app-form-select
+                                    name="occupation"
+                                    [(ngModel)]="caseData.occupation"
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_OCCUPATION' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_OCCUPATION_DESCRIPTION"
+                                    [options]="occupationsList$ | async"
+                                    [disabled]="viewOnly"
+                                    [enableFilterOptions]="true">
+                                </app-form-select>
+                            </div>
+
+                            <app-form-age-dob
+                                fxFlex
+                                name="ageDob"
+                                [(ngModel)]="caseData"
+                                [required]="false"
+                                [disabled]="viewOnly"
+                                ageButtonLabel="LNG_CASE_FIELD_LABEL_AGE_BUTTON"
+                                dobButtonLabel="LNG_CASE_FIELD_LABEL_DATE_OF_BIRTH_BUTTON"
+                                dobPlaceholder="LNG_CASE_FIELD_LABEL_DOB"
+                                dobTooltip="LNG_CASE_FIELD_LABEL_DOB_DESCRIPTION"
+                                ageTooltip="LNG_CASE_FIELD_LABEL_AGE_DESCRIPTION">
+                            </app-form-age-dob>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <!-- Due to an angular bug => compose validators, we need this validator to be able to use the async general one... -->
+                            <!-- [maxlength]="255" -->
+                            <app-form-input
+                                name="visualId"
+                                #visualId="ngModel"
+                                [(ngModel)]="caseData.visualId"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_VISUAL_ID' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
+                                [displayRefresh]="displayRefresh"
+                                (refresh)="generateVisualId()"
+                                [tooltipTranslateData]="visualIDTranslateData"
+                                [maxlength]="255"
+                                [disabled]="viewOnly"
+                                app-general-async-validator
+                                [asyncValidatorObservable]="viewOnly ? null : caseIdMaskValidator"
+                                [validateOnlyWhenDirty]="true">
+                            </app-form-input>
+
+                            <app-form-datepicker
+                                name="dateOfReporting"
+                                [(ngModel)]="caseData.dateOfReporting"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING'| translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION"
+                                required="true"
+                                [disabled]="viewOnly"
+                                [maxDate]="serverToday"
+                                app-date-validator
+                                [dateSameOrBefore]="[
+                                    serverToday
+                                ]">
+                            </app-form-datepicker>
+
+                            <app-form-slide-toggle
+                                name="isDateOfReportingApproximate"
+                                [(ngModel)]="caseData.isDateOfReportingApproximate"
+                                [label]="'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION"
+                                [disabled]="viewOnly">
+                            </app-form-slide-toggle>
+
+                            <div fxFlex><!--Placeholder--></div>
+                        </div>
+                    </div>
+                </mat-card>
+
+                <!-- Flagged section -->
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-select
+                                name="riskLevel"
+                                [(ngModel)]="caseData.riskLevel"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_LEVEL' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_RISK_LEVEL_DESCRIPTION"
+                                [options]="caseRiskLevelsList$ | async"
+                                [disabled]="viewOnly">
+                            </app-form-select>
+
+                            <div fxFlex><!--Placeholder--></div>
+                            <div fxFlex><!--Placeholder--></div>
+                        </div>
+
+                        <div fxLayout="row">
+                            <app-form-textarea
+                                name="riskReason"
+                                [(ngModel)]="caseData.riskReason"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_REASON' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION"
+                                [disabled]="viewOnly">
+                            </app-form-textarea>
+                        </div>
+                    </div>
+                </mat-card>
+
+                <div class="section-title">{{'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED_DETAILS' | translate}}</div>
+
+                <!--Vaccines received section-->
+                <app-form-vaccines-list
+                    name="vaccinesReceived"
+                    [(ngModel)]="caseData.vaccinesReceived"
+                    [disabled]="viewOnly"
+                    [required]="true">
+                </app-form-vaccines-list>
+
+                <!-- Documents section -->
+                <div class="section-title">{{'LNG_CASE_FIELD_LABEL_DOCUMENTS' | translate}}</div>
+                <app-form-document-list
+                    name="documents"
+                    [(ngModel)]="caseData.documents"
+                    [required]="true"
+                    [disabled]="viewOnly">
+                </app-form-document-list>
+
+                <!-- Create / update by user information section -->
+                <div class="section-title">
+                    {{ 'LNG_PAGE_MODIFY_CASE_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE' | translate }}
+                </div>
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-input
+                                name="createdByUser"
+                                [ngModel]="caseData.createdByUser?.name"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_CREATED_BY'| translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_CREATED_BY_DESCRIPTION"
+                                [disabled]="true">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="createdAt"
+                                [ngModel]="caseData.createdAt | dateTimeDefault"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_CREATED_AT'| translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_CREATED_AT_DESCRIPTION"
+                                [disabled]="true">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="updatedByUser"
+                                [ngModel]="caseData.updatedByUser?.name"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_UPDATED_BY'| translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_UPDATED_BY_DESCRIPTION"
+                                [disabled]="true">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="updatedAt"
+                                [ngModel]="caseData.updatedAt | dateTimeDefault"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_UPDATED_AT'| translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_UPDATED_AT_DESCRIPTION"
+                                [disabled]="true">
+                            </app-form-input>
+                        </div>
+                    </div>
+                </mat-card>
+            </mat-tab>
+
+            <mat-tab [label]="'LNG_PAGE_MODIFY_CASE_TAB_ADDRESS_TITLE' | translate">
+                <app-form-address-list
+                    name="addresses"
+                    [(ngModel)]="caseData.addresses"
+                    [required]="true"
+                    [disabled]="viewOnly">
+                </app-form-address-list>
+            </mat-tab>
+
+            <mat-tab [label]="'LNG_PAGE_MODIFY_CASE_TAB_INFECTION_TITLE' | translate">
+
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-select
+                                name="classification"
+                                [(ngModel)]="caseData.classification"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_CLASSIFICATION' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_CLASSIFICATION_DESCRIPTION"
+                                required="true"
+                                [options]="caseClassificationsList$ | async"
+                                [disabled]="viewOnly">
+                            </app-form-select>
+
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+
+                            <app-form-datepicker
+                                name="dateOfOnset"
+                                [(ngModel)]="caseData.dateOfOnset"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_ONSET_DESCRIPTION"
+                                [disabled]="viewOnly"
+                                [maxDate]="serverToday"
+                                app-date-validator
+                                [required]="selectedOutbreak ? selectedOutbreak.isDateOfOnsetRequired : true"
+                                [dateSameOrBefore]="[
+                                    serverToday,
+                                    'dateOfOutcome'
+                                ]"
+                                [dateSameOrAfter]="dateOnsetSameOrAfterDates()">
+                            </app-form-datepicker>
+
+                            <app-form-slide-toggle
+                                name="isDateOfOnsetApproximate"
+                                [(ngModel)]="caseData.isDateOfOnsetApproximate"
+                                [label]="'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE_DESCRIPTION"
+                                [disabled]="viewOnly">
+                            </app-form-slide-toggle>
+
+                            <app-form-datepicker
+                                name="dateBecomeCase"
+                                [(ngModel)]="caseData.dateBecomeCase"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE_DESCRIPTION"
+                                [disabled]="viewOnly"
+                                [maxDate]="serverToday"
+                                app-date-validator
+                                [dateSameOrBefore]="serverToday">
+                            </app-form-datepicker>
+
+                            <app-form-datepicker
+                                name="dateOfInfection"
+                                [(ngModel)]="caseData.dateOfInfection"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION_DESCRIPTION"
+                                [disabled]="viewOnly"
+                                [maxDate]="serverToday"
+                                app-date-validator
+                                [dateSameOrBefore]="[
+                                    serverToday,
+                                    'dateOfOutcome',
+                                    'dateOfOnset'
+                                ]">
+                            </app-form-datepicker>
+                        </div>
+
+                    </div>
+                </mat-card>
+
+                <!-- Outcome section -->
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-select
+                                name="outcomeId"
+                                [(ngModel)]="caseData.outcomeId"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_OUTCOME' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_OUTCOME_DESCRIPTION"
+                                [options]="outcomeList$ | async"
+                                [disabled]="viewOnly">
+                            </app-form-select>
+
+                            <app-form-datepicker
+                                name="dateOfOutcome"
+                                [(ngModel)]="caseData.dateOfOutcome"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME_DESCRIPTION"
+                                [disabled]="viewOnly"
+                                [maxDate]="serverToday"
+                                app-date-validator
+                                [dateSameOrBefore]="serverToday"
+                                [dateSameOrAfter]="[
+                                    'dateOfOnset'
+                                ]">
+                            </app-form-datepicker>
+
+                            <app-form-slide-toggle
+                                name="transferRefused"
+                                [(ngModel)]="caseData.transferRefused"
+                                [label]="'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED_DESCRIPTION"
+                                [disabled]="viewOnly">
+                            </app-form-slide-toggle>
+
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px" *ngIf="caseData.outcomeId === Constants.OUTCOME_STATUS.DECEASED">
+                            <ng-container>
+                                <app-form-slide-toggle
+                                    name="safeBurial"
+                                    [(ngModel)]="caseData.safeBurial"
+                                    [label]="'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_SAFETY_BURIAL_DESCRIPTION"
+                                    [disabled]="viewOnly">
+                                </app-form-slide-toggle>
+
+                                <app-form-datepicker
+                                    name="dateOfBurial"
+                                    [(ngModel)]="caseData.dateOfBurial"
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL_DESCRIPTION"
+                                    [maxDate]="serverToday"
+                                    app-date-validator
+                                    [dateSameOrBefore]="serverToday"
+                                    [dateSameOrAfter]="[
+                                        'dateOfOutcome'
+                                    ]"
+                                    [disabled]="viewOnly">
+                                </app-form-datepicker>
+
+                                <app-form-location-dropdown
+                                    name="burialLocationId"
+                                    [(ngModel)]="caseData.burialLocationId"
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL_DESCRIPTION"
+                                    [useOutbreakLocations]="true"
+                                    [disabled]="viewOnly">
+                                </app-form-location-dropdown>
+
+                                <app-form-input
+                                    name="burialPlaceName"
+                                    [(ngModel)]="caseData.burialPlaceName"
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME_DESCRIPTION"
+                                    [disabled]="viewOnly">
+                                </app-form-input>
+
+                            </ng-container>
+                        </div>
+                    </div>
+                </mat-card>
+
+                <div class="section-title">{{'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS' | translate}}</div>
+                <!-- Dates section -->
+                <app-form-case-center-daterange-list
+                    name="dateRanges"
+                    [(ngModel)]="caseData.dateRanges"
+                    [disabled]="viewOnly"
+                    [required]="true"
+                    fromTooltip="LNG_CASE_FIELD_LABEL_DATE_RANGE_FROM_DESCRIPTION"
+                    toTooltip="LNG_CASE_FIELD_LABEL_DATE_RANGE_TO_DESCRIPTION"
+                    [componentTitle]="'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS' | translate"
+                    centerNameLabel="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME"
+                    centerNameTooltip="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME_DESCRIPTION"
+                    [dateOfOnset]="caseData.dateOfOnset"
+                    [maxDate]="serverToday">
+                </app-form-case-center-daterange-list>
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+
+    <div class="form-actions">
+        <div class="page-tabs-navbar-placeholder"></div>
+
+        <ng-container
+            *app-selected-outbreak-is-active>
+            <button
+                *ngIf="viewOnly && CaseModel.canModify(authUser)"
+                type="button"
+                mat-raised-button color="accent"
+                [routerLink]="['/cases', caseId, 'modify']">
+                {{'LNG_COMMON_BUTTON_EDIT' | translate}}
+            </button>
+
+            <ng-container *ngIf="!viewOnly">
+                <button
+                    [disabled]="form.pending"
+                    class="button-with-spinner"
+                    mat-raised-button color="accent">
+                    <div
+                        *ngIf="form.pending"
+                        class="loading-chips">
+                        <mat-spinner></mat-spinner>
+                    </div>
+                    {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+                </button>
+
+                <button
+                    *ngIf="CaseModel.canList(authUser)"
+                    type="button"
+                    [routerLink]="'/cases'"
+                    mat-raised-button>
+                    {{'LNG_COMMON_BUTTON_CANCEL'| translate}}
+                </button>
+            </ng-container>
+
+            <div class="page-tabs-navbar-placeholder"></div>
+
+            <ng-container
+                *ngIf="CaseModel.canCreateContact(authUser) && ContactModel.canCreate(authUser)">
+                <button
+                    type="button"
+                    mat-raised-button color="accent"
+                    routerLink="/contacts/create"
+                    [queryParams]="{ entityType: EntityType.CASE, entityId: caseId }">
+                    {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
+                </button>
+
+                <div class="page-tabs-navbar-placeholder"></div>
+            </ng-container>
+
+            <button
+                type="button"
+                mat-raised-button
+                [routerLink]="['/cases', caseId, viewOnly || selectedOutbreak?.id !== authUser?.activeOutbreakId ? 'view-questionnaire' : 'modify-questionnaire']">
+                {{'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE' | translate}}
+            </button>
+        </ng-container>
+
+        <button
+            *ngIf="CaseModel.canList(authUser)"
+            mat-raised-button type="button"
+            [routerLink]="['/duplicated-records/cases', caseId, 'marked-not-duplicates']">
+            {{'LNG_PAGE_MODIFY_CASE_ACTION_SEE_RECORDS_NOT_DUPLICATES' | translate}}
+        </button>
+
+        <button
+            *ngIf="CaseModel.canListRelationshipContacts(authUser)"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/relationships', EntityType.CASE, caseId, 'contacts']">
+            {{ 'LNG_COMMON_BUTTON_EXPOSURES_FROM' | translate }}
+        </button>
+        <button
+            *ngIf="CaseModel.canListRelationshipExposures(authUser)"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/relationships', EntityType.CASE, caseId, 'exposures']">
+            {{ 'LNG_COMMON_BUTTON_EXPOSURES_TO' | translate }}
+        </button>
+
+        <div
+            *ngIf="CaseModel.canListRelationshipContacts(authUser) || CaseModel.canListRelationshipExposures(authUser)"
+            class="page-tabs-navbar-placeholder"></div>
+
+        <button
+            *ngIf="LabResultModel.canList(authUser) && CaseModel.canListLabResult(authUser)"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/lab-results', 'cases', caseId]">
+            {{ 'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS' | translate }}
+        </button>
+        <button
+            *ngIf="CaseModel.canViewMovementMap(authUser)"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/cases', caseId, 'movement']">
+            {{ 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_MOVEMENT' | translate }}
+        </button>
+        <button
+            *ngIf="CaseModel.canViewChronologyChart(authUser)"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/cases', caseId, 'chronology']">
+            {{ 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CHRONOLOGY' | translate }}
+        </button>
+        <button
+            *ngIf="FollowUpModel.canList(authUser)"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/contacts/case-related-follow-ups', caseId]">
+            {{ 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS' | translate }}
+        </button>
+    </div>
+</form>

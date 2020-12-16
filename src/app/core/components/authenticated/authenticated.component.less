@@ -1,0 +1,43 @@
+@import '~styles/common';
+
+.authenticated {
+
+    .sidenav-toggle {
+        position: fixed;
+        z-index: 2;
+        min-width: 0;
+        width: auto;
+        margin-top: 105px;
+        font-size: 14px;
+        line-height: 1;
+        padding: 10px 7px;
+    }
+
+    .context-help-trigger {
+        position: fixed;
+        z-index: 2;
+        min-width: 0;
+        width: auto;
+        bottom: 10px;
+        padding: 10px;
+        background-color: @color-accent-main;
+        color: #fff;
+        text-decoration: none;
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+    .sidenav-container {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+
+        mat-sidenav {
+            z-index: 10;
+        }
+    }
+}

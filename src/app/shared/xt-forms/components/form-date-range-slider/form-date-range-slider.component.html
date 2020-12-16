@@ -1,0 +1,57 @@
+<div
+    [id]="identifier"
+    class="form-date-range-slider form-element"
+    fxFlex fxLayout="column">
+
+    <!-- Label -->
+    <div
+        *ngIf="label">
+        {{ label | translate }}
+    </div>
+
+    <div *ngIf="allowMinMaxToBeChanged" fxLayout="column">
+        <form fxLayout="row" fxLayoutAlign="space-between center">
+            <!-- Min Input -->
+            <app-form-datepicker
+                fxFlex="150px"
+                name="minRange"
+                [(ngModel)]="minDate"
+                [placeholder]="'LNG_FORM_DATE_RANGE_SLIDER_FIELD_LABEL_MIN'| translate"
+                tooltip="LNG_FORM_DATE_RANGE_SLIDER_FIELD_LABEL_DESCRIPTION">
+            </app-form-datepicker>
+
+            <!-- Max Input -->
+            <app-form-datepicker
+                fxFlex="150px"
+                name="maxRange"
+                [(ngModel)]="maxDate"
+                [placeholder]="'LNG_FORM_DATE_RANGE_SLIDER_FIELD_LABEL_MAX'| translate"
+                tooltip="LNG_FORM_DATE_RANGE_SLIDER_FIELD_LABEL_MAX_DESCRIPTION">
+            </app-form-datepicker>
+        </form>
+    </div>
+
+    <div
+        fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px">
+        <!-- Slider -->
+        <ng5-slider
+            fxFlex
+            #sliderElement
+            [value]="sliderValue.low"
+            [highValue]="sliderValue.high"
+            [options]="sliderOptions"
+            (userChange)="onChange($event)">
+        </ng5-slider>
+
+        <!-- Tooltip -->
+        <span
+            *ngIf="tooltip"
+            fxFlex="24px"
+            #tooltipCtrl="matTooltip"
+            [matTooltip]="tooltip"
+            class="xt-icon form-icon"
+            (click)="displayTooltip($event, tooltipCtrl)">
+            help
+        </span>
+    </div>
+</div>

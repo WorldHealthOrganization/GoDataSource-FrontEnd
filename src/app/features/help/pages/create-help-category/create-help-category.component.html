@@ -1,0 +1,73 @@
+<app-topnav [activeOutbreakEditable]="true">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<div class="page-content">
+
+    <mat-horizontal-stepper linear #stepper>
+
+        <!-- Details step -->
+        <mat-step [stepControl]="detailsForm">
+            <form #detailsForm="ngForm">
+                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_HELP_CATEGORY_TAB_DETAILS_TITLE' | translate}}
+                </ng-template>
+
+                <!-- Details section -->
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-input
+                                name="name"
+                                [(ngModel)]="helpCategoryData.name"
+                                [placeholder]="'LNG_HELP_CATEGORY_FIELD_LABEL_NAME' | translate"
+                                tooltip="LNG_HELP_CATEGORY_FIELD_LABEL_NAME_DESCRIPTION"
+                                required="true"
+                                maxlength="100">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="order"
+                                [(ngModel)]="helpCategoryData.order"
+                                [placeholder]="'LNG_HELP_CATEGORY_FIELD_LABEL_ORDER' | translate"
+                                tooltip="LNG_HELP_CATEGORY_FIELD_LABEL_ORDER_DESCRIPTION"
+                                required="true"
+                                type="number">
+                            </app-form-input>
+
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-textarea
+                                name="description"
+                                [(ngModel)]="helpCategoryData.description"
+                                [placeholder]="'LNG_HELP_CATEGORY_FIELD_LABEL_DESCRIPTION' | translate"
+                                tooltip="LNG_HELP_CATEGORY_FIELD_LABEL_DESCRIPTION_DESCRIPTION"
+                                maxlength="500">
+                            </app-form-textarea>
+                        </div>
+                    </div>
+                </mat-card>
+
+                <div class="stepper-navigation-buttons">
+                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                </div>
+            </form>
+        </mat-step>
+
+        <!-- Final step -->
+        <mat-step>
+            <ng-template matStepLabel>{{'LNG_STEPPER_FINAL_STEP_LABEL'| translate}}</ng-template>
+            {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
+            <div class="stepper-navigation-buttons">
+                <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                <button type="button" mat-raised-button color="accent"
+                        (click)="createNewCategory([detailsForm])">
+                    {{'LNG_PAGE_CREATE_HELP_CATEGORY_ACTION_CREATE_CATEGORY_BUTTON' | translate}}
+                </button>
+            </div>
+        </mat-step>
+    </mat-horizontal-stepper>
+
+</div>

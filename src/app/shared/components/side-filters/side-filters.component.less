@@ -1,0 +1,185 @@
+@import '~styles/common';
+
+// variables
+
+// styles
+.side-filters {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    .page-overlay {
+        width: 100vw;
+        height: 100vh;
+        position: fixed;
+    }
+
+    mat-sidenav-container {
+        position: absolute;
+        z-index: 10;
+
+        mat-sidenav {
+            margin-top: 5vh;
+            max-height: 90vh;
+            width: 400px;
+            padding: 0 0 15px 15px;
+            height: auto;
+            bottom: unset !important;
+            overflow: hidden;
+
+            .title {
+                font-family: @font-roboto;
+                font-weight: normal;
+            }
+
+            .filters-sort-actions {
+                overflow-y: auto;
+                max-height: calc(90vh - 122px);
+
+                .filters-load-filter {
+                    margin-right: 15px;
+                }
+            }
+
+            .actions {
+                margin-bottom: 7px;
+
+                .switch-buttons {
+                    margin-right: 15px;
+                }
+            }
+
+            .side-filters-reset-button {
+                font-weight: 600
+            }
+
+            .buttons-container {
+                display: flex;
+                position: relative;
+                margin-right: 15px;
+
+                .stretched-button {
+                    flex: 1 auto;
+                    font-weight: 600;
+                    border-radius: 5px;
+                    margin-right: 7px;
+                    margin-top: 20px;
+                }
+
+                .side-filters-reset-button {
+                    border-radius: 5px;
+                    margin-top: 20px;
+                }
+            }
+
+            .save-filter-button{
+                position: relative;
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            .buttons-container:before {
+                content: '';
+                position: absolute;
+                background-color: #eeeeee;
+                width: 100%;
+                height: 1px;
+                display: block;
+                top: 0px;
+            }
+
+            .add-side-filter {
+                padding: 0px;
+            }
+        }
+    }
+
+    .sidenav-toggle {
+        background-color: white;
+        margin-top: 255px;
+        padding: 7px 5px;
+    }
+
+    .section {
+
+        &:not(:first-child) {
+            margin-top: 20px;
+        }
+
+        .title {
+            font-size: 22px;
+            padding-bottom: 10px;
+        }
+    }
+
+    .add-side-filter {
+        text-transform: uppercase;
+        text-align: left;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .filters-section {
+        position: relative;
+
+        .applied-filter {
+
+            .operator {
+                padding-left: 20px;
+                font-family: @font-roboto;
+            }
+
+            .filter-container {
+                margin: 10px 0;
+                position: relative;
+
+                .filter-details {
+                    padding: 15px;
+
+                    .filter-details-delete-button {
+                        position: absolute;
+                        right: 0;
+                        top: 50%;
+                    }
+
+                    .mat-form-field-infix {
+                        width: auto;
+                    }
+                }
+            }
+        }
+    }
+
+    .filters-section:after {
+        content: '';
+        position: absolute;
+        background-color: #eeeeee;
+        width: 100%;
+        height: 1px;
+        display: block;
+        bottom: 0px;
+    }
+
+    .sort-section {
+        .applied-sort {
+            .sort-container {
+                margin: 10px 0;
+                position: relative;
+
+                .sort-details {
+                    padding: 15px;
+
+                    .sort-details-delete-button {
+                        position: absolute;
+                        right: 0;
+                        top: 0;
+                    }
+
+                    .mat-form-field-infix {
+                        width: auto;
+                    }
+                }
+            }
+        }
+    }
+}

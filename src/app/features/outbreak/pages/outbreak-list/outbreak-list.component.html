@@ -1,0 +1,537 @@
+<app-topnav #topNav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+                <button *ngIf="OutbreakModel.canCreate(authUser)" mat-raised-button color="accent"
+                        [routerLink]="'./create'">
+                    {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
+                </button>
+            </div>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<!-- Side columns -->
+<app-side-columns
+    [tableColumnsUserSettingsKey]="UserSettings.OUTBREAK_FIELDS"
+    [tableColumns]="tableColumns"
+    (visibleColumnsChanged)="applySideColumnsChanged($event)">
+</app-side-columns>
+
+<!-- Total number of records from the list -->
+<app-total-number-of-records
+    [value]="(outbreaksListCount$ | async)?.count">
+</app-total-number-of-records>
+
+<mat-card class="page-section page-content">
+    <!-- Reset Filters -->
+    <div class="reset-filters">
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="resetFiltersToSideFilters()">
+            {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+        </button>
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="needsRefreshList(true)">
+            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+        </button>
+    </div>
+
+    <!-- Hover question effects / actions -->
+    <app-hover-row-actions
+        #hoverRow
+        [active]="!refreshingList"
+    ></app-hover-row-actions>
+
+    <mat-table #table [dataSource]="outbreaksList$ | async" matSort (matSortChange)="sortBy($event)">
+        <!-- Name -->
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_NAME' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="nameFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('name', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let outbreak">
+                {{outbreak.name}}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Disease -->
+        <ng-container matColumnDef="disease">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_DISEASE' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="diseaseFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="diseasesList$ | async"
+                            multiple="true"
+                            (optionChanged)="filterBySelectField('disease', $event)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let outbreak">
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.DISEASE"
+                    [value]="outbreak.disease">
+                </app-reference-data-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Country -->
+        <ng-container matColumnDef="country">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="countriesFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="countriesList$ | async"
+                            multiple="true"
+                            (optionChanged)="filterBySelectField('countries', $event)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let outbreak">
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.COUNTRY"
+                    [value]="outbreak.countries">
+                </app-reference-data-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Location Geographical Level -->
+        <ng-container matColumnDef="reportingGeographicalLevelId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_LOCATION_GEOGRAPHICAL_LEVEL' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="geographicalLevelFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="geographicalLevelsList$ | async"
+                            multiple="true"
+                            (optionChanged)="filterBySelectField('reportingGeographicalLevelId', $event)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let outbreak">
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL"
+                    [value]="outbreak.reportingGeographicalLevelId">
+                </app-reference-data-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Start Date -->
+        <ng-container matColumnDef="startDate">
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_START_DATE' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-daterange
+                            name="startDateFilter"
+                            ngModel
+                            (changed)="filterByDateRangeField('startDate', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell class="has-date-range-filter" *matCellDef="let outbreak">
+                {{outbreak.startDate | dateDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- End Date -->
+        <ng-container matColumnDef="endDate">
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_END_DATE' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-daterange
+                            name="endDateFilter"
+                            ngModel
+                            (changed)="filterByDateRangeField('endDate', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell class="has-date-range-filter" *matCellDef="let outbreak">
+                {{outbreak.endDate | dateDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Active -->
+        <ng-container matColumnDef="active">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_ACTIVE' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="activeFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="activeOptionsList$ | async"
+                            (optionChanged)="filterByActiveOutbreak('id', $event)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let outbreak">
+                <app-yes-no-label [value]="outbreak.id == authUser.activeOutbreakId"></app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Generate follow-ups algorithm -->
+        <ng-container matColumnDef="generateFollowUpsTeamAssignmentAlgorithm">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="generateFollowUpsTeamAssignmentAlgorithmFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="followUpsTeamAssignmentAlgorithm$ | async"
+                            multiple="true"
+                            (optionChanged)="filterBySelectField('generateFollowUpsTeamAssignmentAlgorithm', $event)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let outbreak">
+                {{ outbreak.generateFollowUpsTeamAssignmentAlgorithm | translate }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Generate follow-ups overwrite -->
+        <ng-container matColumnDef="generateFollowUpsOverwriteExisting">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="generateFollowUpsOverwriteExistingFilter"
+                            [ngModel]="''"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="yesNoOptionsList$ | async"
+                            (optionChanged)="filterByBooleanField('generateFollowUpsOverwriteExisting', $event.value)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let outbreak">
+                <app-yes-no-label [value]="outbreak.generateFollowUpsOverwriteExisting"></app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Keep team assignment -->
+        <ng-container matColumnDef="generateFollowUpsKeepTeamAssignment">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="generateFollowUpsKeepTeamAssignmentFilter"
+                            [ngModel]="''"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="yesNoOptionsList$ | async"
+                            (optionChanged)="filterByBooleanField('generateFollowUpsKeepTeamAssignment', $event.value)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let outbreak">
+                <app-yes-no-label [value]="outbreak.generateFollowUpsKeepTeamAssignment"></app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="isContactLabResultsActive">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_LAB_RESULTS_ACTIVE' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="isContactLabResultsActiveFilter"
+                            [ngModel]="''"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="yesNoOptionsList$ | async"
+                            (optionChanged)="filterByBooleanField('isContactLabResultsActive', $event.value)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let outbreak">
+                <app-yes-no-label [value]="outbreak.isContactLabResultsActive"></app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="isDateOfOnsetRequired">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_OUTBREAK_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="isDateOfOnsetRequiredFilter"
+                            [ngModel]="''"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="yesNoOptionsList$ | async"
+                            (optionChanged)="filterByBooleanField('isDateOfOnsetRequired', $event.value)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let outbreak">
+                <app-yes-no-label [value]="outbreak.isDateOfOnsetRequired"></app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="deleted">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_DELETED' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="deletedFilter"
+                            [ngModel]="false"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="yesNoOptionsList$ | async"
+                            (optionChanged)="filterByDeletedField($event.value)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let outbreak">
+                <app-yes-no-label [value]="outbreak.deleted"></app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Created By -->
+        <ng-container matColumnDef="createdBy">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{ 'LNG_OUTBREAK_FIELD_LABEL_CREATED_BY' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="createdByFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="userList$ | async"
+                            (optionChanged)="filterBySelectField('createdBy', $event, 'id')"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            optionLabelKey="name"
+                            optionValueKey="id"
+                            [multiple]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.createdByUser?.name }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Created At -->
+        <ng-container matColumnDef="createdAt">
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{ 'LNG_OUTBREAK_FIELD_LABEL_CREATED_AT' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-daterange
+                            name="createdAtFilter"
+                            ngModel
+                            (changed)="filterByDateRangeField('createdAt', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
+                {{ item.createdAt | dateTimeDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Modified By -->
+        <ng-container matColumnDef="updatedBy">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{ 'LNG_OUTBREAK_FIELD_LABEL_UPDATED_BY' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="updatedByFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="userList$ | async"
+                            (optionChanged)="filterBySelectField('updatedBy', $event, 'id')"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            optionLabelKey="name"
+                            optionValueKey="id"
+                            [multiple]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.updatedByUser?.name }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Updated At -->
+        <ng-container matColumnDef="updatedAt">
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{ 'LNG_OUTBREAK_FIELD_LABEL_UPDATED_AT' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-daterange
+                            name="updatedAtFilter"
+                            ngModel
+                            (changed)="filterByDateRangeField('updatedAt', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
+                {{ item.updatedAt | dateTimeDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
+        <mat-row
+            *matRowDef="let item; columns: visibleTableColumns"
+            app-hover-row-actions
+            [hoverRowActionsComponent]="hoverRow"
+            [hoverRowActions]="recordActions"
+            [hoverRowActionData]="item"
+        ></mat-row>
+    </mat-table>
+
+    <div
+        *ngIf="refreshingList"
+        class="mat-table-loading-data">
+        <mat-spinner></mat-spinner>
+    </div>
+
+    <div
+        *ngIf="!refreshingList && isEmptyList"
+        class="mat-table"
+    >
+        <div class="mat-row">
+            <div class="mat-cell">
+                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+            </div>
+        </div>
+    </div>
+
+    <mat-paginator
+        [length]="(outbreaksListCount$ | async)?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
+</mat-card>
+
+
+
+

@@ -1,0 +1,58 @@
+.form-input-container {
+
+    @position-helper: 24px;
+    .mat-form-field {
+        width: 100%;
+
+        .mat-form-field-infix {
+            width: auto;
+        }
+
+        &.display-filter-icon {
+            .filter-icon {
+                position: absolute;
+                top: 6px;
+                left: 6px;
+                span {
+                    font-size: 15px;
+                }
+            }
+
+            .filter-icon-input {
+                padding-left: @position-helper;
+                max-width: ~'calc(100% -  @{position-helper})';
+            }
+
+            .mat-form-field-label {
+                margin-left: @position-helper;
+                width: ~'calc(100% - @{position-helper})'
+            }
+        }
+    }
+
+    .refresh-icon {
+        display: inline !important;
+        line-height: 0;
+        float: right;
+        margin-top: -12px;
+        margin-right: 25px;
+        position: relative;
+        cursor: pointer;
+    }
+
+}
+
+.form-input-password {
+    input {
+        width: ~'calc(100% - 48px)' !important;
+    }
+
+    .form-password-icon {
+        display: inline !important;
+        cursor: pointer;
+        line-height: 0;
+        float: right;
+        margin-top: 7px;
+    }
+
+}

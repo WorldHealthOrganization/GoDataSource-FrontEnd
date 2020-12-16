@@ -1,0 +1,10 @@
+<app-dashboard-custom-metric-dashlet
+    [link]="ContactModel.canList(authUser) ? '/contacts' : ''"
+    [params]="getDashletParamsIncludingGlobalFilters({applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_LOST_TO_FOLLOW_UP})"
+    [value]="noContactsLostToFollowUp"
+    (hide)="onHide()"
+    (moveBefore)="onMoveBefore()"
+    (moveAfter)="onMoveAfter()"
+    [displayLoading]="displayLoading">
+    {{ 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_LOST_TO_FOLLOW_UP' | translate }}
+</app-dashboard-custom-metric-dashlet>

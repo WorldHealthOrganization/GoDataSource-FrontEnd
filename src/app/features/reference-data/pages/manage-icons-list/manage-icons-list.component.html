@@ -1,0 +1,119 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+                <button
+                    *ngIf="IconModel.canCreate(authUser)"
+                    mat-raised-button
+                    color="accent"
+                    [routerLink]="['/reference-data', 'manage-icons', 'add']"
+                    [queryParams]="{ categoryId: category?.id }">
+                    {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
+                </button>
+            </div>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<!--Total number of records from the list-->
+<app-total-number-of-records
+    [value]="(iconsListCount$ | async)?.count">
+</app-total-number-of-records>
+
+<mat-card class="page-section page-content">
+    <!-- Reset Filters -->
+    <div class="reset-filters">
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="needsRefreshList(true)">
+            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+        </button>
+    </div>
+
+    <!-- Hover question effects / actions -->
+    <app-hover-row-actions
+        #hoverRow
+        [active]="!refreshingList"
+    ></app-hover-row-actions>
+
+    <mat-table #table [dataSource]="iconsList$ | async">
+
+        <!-- Name -->
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_ICON_FIELD_LABEL_NAME' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="nameFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('name', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.name }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Name -->
+        <ng-container matColumnDef="icon">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_ICON_FIELD_LABEL_ICON' | translate}}</div>
+                    <div class="column-filter">
+                        <!-- Placeholder -->
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                <img [src]="item.url" />
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="fixedTableColumns"></mat-header-row>
+        <mat-row
+            *matRowDef="let item; columns: fixedTableColumns"
+            app-hover-row-actions
+            [hoverRowActionsComponent]="hoverRow"
+            [hoverRowActions]="recordActions"
+            [hoverRowActionData]="item"
+        ></mat-row>
+    </mat-table>
+
+    <div
+        *ngIf="refreshingList"
+        class="mat-table-loading-data">
+        <mat-spinner></mat-spinner>
+    </div>
+
+    <div
+        *ngIf="!refreshingList && isEmptyList"
+        class="mat-table"
+    >
+        <div class="mat-row">
+            <div class="mat-cell">
+                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+            </div>
+        </div>
+    </div>
+
+    <mat-paginator
+        [length]="(iconsListCount$ | async)?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
+</mat-card>
+
+

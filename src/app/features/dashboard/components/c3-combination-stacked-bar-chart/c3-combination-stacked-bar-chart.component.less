@@ -1,0 +1,78 @@
+app-c3-combination-stacked-bar-chart {
+    .c3 path, .c3 line {
+        fill: none;
+    }
+
+    .c3-legend-item {
+        cursor: default !important;
+    }
+
+    .tick {
+        font-size: 12px;
+    }
+
+    .c3-axis {
+        fill: #000000;
+    }
+    .c3-axis line, .c3-axis path {
+        stroke: #ccc;
+        fill: none !important
+    }
+    .c3-axis-y .tick line {
+        stroke: #fff;
+        fill: #fff
+    }
+
+    /* manipulate the number of ticks displayed */
+    .c3-axis-x-10n .tick text {
+        display: none !important;
+    }
+    .c3-axis-x-10n .tick:nth-child(10n) text {
+        display: block !important;
+    }
+
+    .c3-axis-x-8n .tick text {
+        display: none !important;
+    }
+    .c3-axis-x-8n .tick:nth-child(8n) text {
+        display: block !important;
+    }
+
+    .c3-axis-x-5n .tick text {
+        display: none !important;
+    }
+    .c3-axis-x-5n .tick:nth-child(5n) text {
+        display: block !important;
+    }
+
+    .c3-axis-x-3n .tick text {
+        display: none !important;
+    }
+    .c3-axis-x-3n .tick:nth-child(3n) text {
+        display: block !important;
+    }
+
+    .c3-axis-x-2n .tick text {
+        display: none !important;
+    }
+    .c3-axis-x-2n .tick:nth-child(2n) text {
+        display: block !important;
+    }
+
+    .c3-axis-x-n .tick text {
+        display: none !important;
+    }
+    .c3-axis-x-n .tick:nth-child(n) text {
+        display: block !important;
+    }
+
+    .c3-chart-texts {
+        .c3-chart-text {
+            .c3-texts {
+                .c3-text {
+                    text-shadow: -1px -1px 0 #FFF, 1px -1px 0 #FFF, 1px 1px 0 #FFF, -1px 1px 0 #FFF;
+                }
+            }
+        }
+    }
+}

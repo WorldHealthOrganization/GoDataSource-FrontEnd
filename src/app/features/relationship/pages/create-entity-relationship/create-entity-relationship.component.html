@@ -1,0 +1,86 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<div class="page-content">
+
+    <mat-horizontal-stepper linear #stepper>
+
+        <!-- Relationships step -->
+        <mat-step [stepControl]="relationshipsForm">
+            <form #relationshipsForm="ngForm" fxLayout="column">
+                <ng-template matStepLabel>
+                    {{'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_TAB_RELATIONSHIPS' | translate}}
+                </ng-template>
+
+                <div
+                    *ngFor="let person of selectedEntities; let ind = index"
+                    fxLayout="row" fxLayoutAlign="start center"
+                >
+                    <mat-card
+                        fxFlex
+                        class="page-section">
+
+                        <input
+                            type="hidden"
+                            [name]="'relationships[' + relationshipsIds[ind] + '][relatedEntityId]'"
+                            [ngModel]="person.id"/>
+
+                        <input
+                            type="hidden"
+                            [name]="'relationships[' + relationshipsIds[ind] + '][relatedEntityType]'"
+                            [ngModel]="person.type"/>
+
+                        <app-form-relationship
+                            [name]="'relationships[' + relationshipsIds[ind] + '][relationship]'"
+                            [ngModel]="relationships[ind]"
+                            [relatedObject]="person"
+                            required="true"
+                            [displayCopyField]="true"
+                            [displayCopyFieldDescription]="'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_COPY_BUTTON_TITLE' | translate"
+                            (copyValue)="copyValueToEmptyFields($event, relationships[ind], relationshipsForm)"
+                            [certaintyLevelOptions$]="certaintyLevelOptions$"
+                            [exposureTypeOptions$]="exposureTypeOptions$"
+                            [exposureFrequencyOptions$]="exposureFrequencyOptions$"
+                            [exposureDurationOptions$]="exposureDurationOptions$"
+                            [socialRelationshipOptions$]="socialRelationshipOptions$"
+                            [clusterOptions$]="clusterOptions$"
+                        ></app-form-relationship>
+                    </mat-card>
+
+                    <div
+                        fxFlex="70px">
+                        <button
+                            *ngIf="selectedEntities.length > 1"
+                            type="button"
+                            mat-icon-button
+                            (click)="removeRelationship(ind)">
+                            <span class="xt-icon">delete</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="stepper-navigation-buttons">
+                    <button mat-raised-button color="accent" matStepperNext>
+                        {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
+                    </button>
+                </div>
+            </form>
+        </mat-step>
+
+        <!-- Final step -->
+        <mat-step>
+            <ng-template matStepLabel>{{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}</ng-template>
+            {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
+            <div class="stepper-navigation-buttons">
+                <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                <button type="button" mat-raised-button color="accent" (click)="createNewRelationship(relationshipsForm)">
+                    {{'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_BUTTON' | translate}}
+                </button>
+            </div>
+        </mat-step>
+    </mat-horizontal-stepper>
+
+</div>

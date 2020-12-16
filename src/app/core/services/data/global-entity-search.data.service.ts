@@ -1,0 +1,55 @@
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { CaseModel } from '../../models/case.model';
+import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
+import { ContactModel } from '../../models/contact.model';
+import { EventModel } from '../../models/event.model';
+import { HttpClient } from '@angular/common/http';
+import * as _ from 'lodash';
+import { EntityModel } from '../../models/entity-and-relationship.model';
+import { map } from 'rxjs/operators';
+import { ContactOfContactModel } from '../../models/contact-of-contact.model';
+
+@Injectable()
+export class GlobalEntitySearchDataService {
+
+    constructor(
+        private http: HttpClient
+    ) {}
+
+    /**
+     * Return the entity matched by identifier
+     * @param {string} outbreakId
+     * @param {string} globalSearchValue
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<(CaseModel | ContactModel | EventModel)[]>}
+     */
+    searchEntity(
+        outbreakId: string,
+        globalSearchValue: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<(CaseModel | ContactModel | EventModel | ContactOfContactModel)[]> {
+
+        const qb = new RequestQueryBuilder();
+
+        qb.filter.firstLevelConditions();
+        // add condition for identifier
+        qb.filter.where({
+            identifier: globalSearchValue
+        }, true);
+
+        qb.merge(queryBuilder);
+
+        const filter = qb.buildQuery();
+
+        return this.http.get(`outbreaks/${outbreakId}/people?filter=${filter}`)
+            .pipe(
+                map((peopleList) => {
+                    return _.map(peopleList, (entity) => {
+                        return new EntityModel(entity).model;
+                    });
+                })
+            );
+    }
+}
+

@@ -1,0 +1,100 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<mat-card class="page-section page-content">
+    <!-- Filters -->
+    <div class="reset-filters">
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="needsRefreshList(true)">
+            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+        </button>
+    </div>
+
+    <!-- Hover question effects / actions -->
+    <app-hover-row-actions
+        #hoverRow
+        [active]="!refreshingList"
+    ></app-hover-row-actions>
+
+    <mat-table #table [dataSource]="usageDetailsList">
+        <!-- Type -->
+        <ng-container matColumnDef="type">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>{{'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_TYPE' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.typeLabel | translate }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Name -->
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>{{'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_NAME' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.name }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Outbreak -->
+        <ng-container matColumnDef="outbreakName">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>{{'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_OUTBREAK' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.outbreakName }}
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="fixedTableColumns"></mat-header-row>
+        <mat-row
+            *matRowDef="let item; columns: fixedTableColumns"
+            app-hover-row-actions
+            [hoverRowActionsComponent]="hoverRow"
+            [hoverRowActions]="recordActions"
+            [hoverRowActionData]="item"
+        ></mat-row>
+    </mat-table>
+
+    <div
+        *ngIf="usageDetailsListMore"
+        class="app-location-usage-list-too-many">
+        {{ 'LNG_PAGE_LIST_USAGE_LOCATIONS_LABEL_MORE_RECORDS' | translate:usageDetailsListMore }}
+    </div>
+
+    <div
+        *ngIf="refreshingList"
+        class="mat-table-loading-data">
+        <mat-spinner></mat-spinner>
+    </div>
+
+    <div
+        *ngIf="!refreshingList && isEmptyList"
+        class="mat-table"
+    >
+        <div class="mat-row">
+            <div class="mat-cell">
+                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+            </div>
+        </div>
+    </div>
+
+</mat-card>

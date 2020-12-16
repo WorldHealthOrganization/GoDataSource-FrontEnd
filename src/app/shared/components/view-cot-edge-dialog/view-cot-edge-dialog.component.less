@@ -1,0 +1,31 @@
+@import '~styles/common';
+
+.dialog-view-cot-edge {
+    .small-dialog;
+
+    .mat-dialog-container {
+        padding: 24px 24px 9px 24px;
+        // handle scroll on children
+        overflow: hidden;
+    }
+
+    .dialog-title {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 15px;
+        font-family: @font-roboto;
+        text-align: center;
+    }
+
+    .dialog-data-content {
+        overflow: auto;
+
+        .label-value {
+            .dialog-label-value;
+        }
+    }
+
+    a {
+        .dialog-simple-link;
+    }
+}

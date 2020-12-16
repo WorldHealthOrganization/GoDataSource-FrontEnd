@@ -1,0 +1,34 @@
+<div
+    class="form-icon-picker-container form-element"
+    [ngClass]="{invalid: (invalid)}">
+
+    <!-- label -->
+    <span
+        class="form-icon-picker-label">
+        {{ 'LNG_CLUSTER_FIELD_LABEL_ICON' | translate }}
+    </span>
+
+    <!-- icon display -->
+    <span
+        class="form-icon-picker-icon">
+        {{ value ? value : '-'}}
+    </span>
+
+    <!-- icon chooser -->
+    <app-form-select-vscroll
+        *ngIf="!disabled"
+        [name]="name"
+        [(ngModel)]="value"
+        [options]="matOptions"
+        [placeholder]="'LNG_COMMON_BUTTON_CHANGE' | translate"
+        (blur)="onBlur()"
+        [labelIsMaterialIcon]="true">
+    </app-form-select-vscroll>
+
+    <app-form-validation
+        *ngIf="invalid"
+        [controlContainer]="controlContainer"
+        [controlName]="name"
+        [messages]="failures">
+    </app-form-validation>
+</div>

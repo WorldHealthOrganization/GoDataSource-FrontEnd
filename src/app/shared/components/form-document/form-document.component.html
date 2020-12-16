@@ -1,0 +1,30 @@
+<div class="document-container form-element "OnInit
+     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+
+    <form #groupForm="ngForm">
+        <div fxLayout="row" fxLayoutGap="20px" fxFlex="50">
+            <app-form-select
+                [name]="name + '[type]'"
+                [(ngModel)]="document.type"
+                [placeholder]="'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE' | translate"
+                tooltip="LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE_DESCRIPTION"
+                [options]="documentTypesList$ | async"
+                [disabled]="disabled"
+                [required]="required"
+                optionLabelKey="label"
+                optionValueKey="value"
+                (optionChanged)="onChange()">
+            </app-form-select>
+
+            <app-form-input
+                [name]="name + '[number]'"
+                [(ngModel)]="document.number"
+                [placeholder]="'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER' | translate"
+                tooltip="LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER_DESCRIPTION"
+                [disabled]="disabled"
+                [required]="required"
+                (input)="onChange()">
+            </app-form-input>
+        </div>
+    </form>
+</div>

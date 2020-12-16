@@ -1,0 +1,28 @@
+<app-dashboard-custom-metric-dashlet
+    [link]="CaseModel.canList(authUser) ? '/cases' : ''"
+    [params]="getDashletParamsIncludingGlobalFilters({applyListFilter: Constants.APPLY_LIST_FILTER.CASES_IN_THE_TRANSMISSION_CHAINS, x: xPreviousDays})"
+    [value]="this.casesKnownTransmissionChainsCount + ' / ' + this.totalCases"
+    (hide)="onHide()"
+    (moveBefore)="onMoveBefore()"
+    (moveAfter)="onMoveAfter()"
+    [displayLoading]="displayLoading">
+
+    <div fxLayout="row" fxLayoutGap="10px">
+
+        <div>
+            {{'LNG_PAGE_DASHBOARD_KPI_NEW_CASES_PREVIOUS_DAYS_TRANSMISSION_CHAINS_BEFORE_VALUE' | translate}}
+        </div>
+
+        <app-form-input
+            type="number"
+            name="daysFilter"
+            [ngModel]="xPreviousDays"
+            (optionChanged)="onChangeSetting($event)">
+        </app-form-input>
+
+        <div>
+            {{'LNG_PAGE_DASHBOARD_KPI_NEW_CASES_PREVIOUS_DAYS_TRANSMISSION_CHAINS_AFTER_VALUE' | translate}}
+        </div>
+    </div>
+</app-dashboard-custom-metric-dashlet>
+

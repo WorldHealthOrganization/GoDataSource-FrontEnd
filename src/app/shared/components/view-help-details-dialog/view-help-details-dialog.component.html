@@ -1,0 +1,27 @@
+<div
+    fxFlex fxLayout="column"
+    class="page-section"
+>
+    <div
+        fxGrow="0" fxLayout="column"
+        class="view-item-title"
+    >
+        {{ helpItemData.title | translate }}
+    </div>
+
+    <div
+        fxLayout="column"
+        [innerHtml]="helpItemData.content | translate">
+    </div>
+
+    <div
+        fxGrow="0" fxLayout="row" fxLayoutAlign="end"
+        class="view-help-details-dialog-buttons">
+        <button
+            mat-button
+            (click)="closeDialog()"
+            type="button">
+            {{ 'LNG_COMMON_BUTTON_CANCEL' | translate | uppercase }}
+        </button>
+    </div>
+</div>

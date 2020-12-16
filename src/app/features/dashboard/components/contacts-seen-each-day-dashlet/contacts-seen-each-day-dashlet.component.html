@@ -1,0 +1,10 @@
+<app-dashboard-custom-metric-dashlet
+    [link]="ContactModel.canList(authUser) ? '/contacts' : ''"
+    [params]="getDashletParamsIncludingGlobalFilters(queryParams)"
+    [value]="contactsSeenEachDay"
+    (hide)="onHide()"
+    (moveBefore)="onMoveBefore()"
+    (moveAfter)="onMoveAfter()"
+    [displayLoading]="displayLoading">
+    {{ 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_SEEN_EACH_DAY' | translate:{date: (dataForDate | dateDefault)} }}
+</app-dashboard-custom-metric-dashlet>

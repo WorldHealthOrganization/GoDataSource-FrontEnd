@@ -1,0 +1,35 @@
+app-form-select-vscroll {
+    @position-helper: 24px;
+    .mat-form-field {
+        width: 100%;
+
+        .mat-form-field-infix {
+            width: auto;
+        }
+    }
+}
+
+@vscroll-mat-option-height: 48px;
+.mat-option-vscroll {
+    // for virtual scroll
+    height: @vscroll-mat-option-height !important;
+    min-height: @vscroll-mat-option-height !important;
+    max-height: @vscroll-mat-option-height !important;
+
+    .label-as-mat-icon {
+        font-family: 'Material Icons';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 24px;
+    }
+}
+
+.mat-option-vscroll-selected {
+    visibility: hidden;
+    position: absolute;
+}
+
+.mat-select-virtual-scroll-viewport {
+    height: 192px;
+    overflow-x: hidden;
+}

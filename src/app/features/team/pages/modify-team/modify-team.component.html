@@ -1,0 +1,94 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<form
+    #form="ngForm"
+    class="page-content form-section"
+    [class.form-view-only]="viewOnly"
+    (submit)="modifyTeam(form)">
+
+    <div class="form-content">
+
+
+        <mat-tab-group class="page-tabs-navbar">
+
+            <mat-tab [label]="'LNG_PAGE_MODIFY_TEAM_TAB_DETAILS_TITLE' | translate">
+
+                <!-- Details section -->
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+                        <div fxLayout="row">
+                            <app-form-input
+                                name="name"
+                                [(ngModel)]="teamData.name"
+                                [placeholder]="'LNG_TEAM_FIELD_LABEL_NAME' | translate"
+                                tooltip="LNG_TEAM_FIELD_LABEL_NAME_DESCRIPTION"
+                                [disabled]="viewOnly"
+                                required="true">
+                            </app-form-input>
+                        </div>
+
+                        <div fxLayout="row">
+                            <app-form-select
+                                name="userIds"
+                                [(ngModel)]="teamData.userIds"
+                                [placeholder]="'LNG_TEAM_FIELD_LABEL_USERS' | translate"
+                                tooltip="LNG_TEAM_FIELD_LABEL_USERS_DESCRIPTION"
+                                required="true"
+                                [options]="usersList$ | async"
+                                optionLabelKey="name"
+                                optionValueKey="id"
+                                optionTooltipKey="description"
+                                [disabled]="viewOnly"
+                                multiple="true"
+                                (optionChanged)="usersChanged($event)"
+                                [enableFilterOptions]="true">
+                            </app-form-select>
+                        </div>
+
+                        <div fxLayout="row">
+                            <app-form-location-dropdown
+                                fxFlex
+                                name="locationIds"
+                                [(ngModel)]="teamData.locationIds"
+                                [placeholder]="'LNG_TEAM_FIELD_LABEL_LOCATIONS' | translate"
+                                tooltip="LNG_TEAM_FIELD_LABEL_LOCATIONS_DESCRIPTION"
+                                [disabled]="viewOnly"
+                                [required]="false"
+                                [multiple]="true">
+                            </app-form-location-dropdown>
+                        </div>
+
+                    </div>
+                </mat-card>
+
+            </mat-tab>
+
+        </mat-tab-group>
+    </div>
+
+    <div class="form-actions">
+        <div class="page-tabs-navbar-placeholder"></div>
+
+        <button
+            *ngIf="viewOnly && TeamModel.canModify(authUser)"
+            mat-raised-button type="button"
+            color="accent"
+            [routerLink]="['/teams', teamId, 'modify']">
+            {{'LNG_COMMON_BUTTON_EDIT'| translate}}
+        </button>
+        <ng-container *ngIf="!viewOnly">
+            <button mat-raised-button color="accent">
+                {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+            </button>
+            <button
+                *ngIf="TeamModel.canList(authUser)"
+                type="button" [routerLink]="'/teams'" mat-raised-button>
+                {{'LNG_COMMON_BUTTON_CANCEL'| translate}}
+            </button>
+        </ng-container>
+    </div>
+</form>

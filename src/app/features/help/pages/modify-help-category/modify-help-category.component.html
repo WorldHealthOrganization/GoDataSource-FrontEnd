@@ -1,0 +1,95 @@
+<app-topnav [activeOutbreakEditable]="true">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<form
+    #form="ngForm"
+    class="page-content form-section"
+    [class.form-view-only]="viewOnly"
+    (submit)="modifyHelpCategory(form)">
+
+    <div class="form-content">
+        <mat-tab-group class="page-tabs-navbar">
+
+            <mat-tab [label]="'LNG_PAGE_MODIFY_HELP_CATEGORY_TAB_DETAILS_TITLE' | translate">
+
+                <!-- Details section -->
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+                        <div fxLayout="row" fxLayoutGap="20px">
+
+                            <app-form-input
+                                name="name"
+                                [ngModel]="helpCategoryData.name | translate"
+                                [placeholder]="'LNG_HELP_CATEGORY_FIELD_LABEL_NAME' | translate"
+                                tooltip="LNG_HELP_CATEGORY_FIELD_LABEL_NAME_DESCRIPTION"
+                                required="true"
+                                maxlength="100"
+                                [disabled]="viewOnly">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="order"
+                                [(ngModel)]="helpCategoryData.order"
+                                [placeholder]="'LNG_HELP_CATEGORY_FIELD_LABEL_ORDER' | translate"
+                                tooltip="LNG_HELP_CATEGORY_FIELD_LABEL_ORDER_DESCRIPTION"
+                                required="true"
+                                type="number"
+                                [disabled]="viewOnly">
+                            </app-form-input>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-textarea
+                                name="description"
+                                [ngModel]="helpCategoryData.description | translate"
+                                [placeholder]="'LNG_HELP_CATEGORY_FIELD_LABEL_DESCRIPTION' | translate"
+                                tooltip="LNG_HELP_CATEGORY_FIELD_LABEL_DESCRIPTION_DESCRIPTION"
+                                maxlength="500"
+                                [disabled]="viewOnly">
+                            </app-form-textarea>
+                        </div>
+                    </div>
+                </mat-card>
+
+            </mat-tab>
+
+        </mat-tab-group>
+    </div>
+
+    <div class="form-actions">
+        <div class="page-tabs-navbar-placeholder"></div>
+
+        <button
+            *ngIf="viewOnly && HelpCategoryModel.canModify(authUser)"
+            mat-raised-button type="button" color="accent"
+            [routerLink]="['/help/categories', categoryId, 'modify']">
+            {{'LNG_COMMON_BUTTON_EDIT'| translate}}
+        </button>
+
+        <ng-container *ngIf="!viewOnly">
+            <button mat-raised-button color="accent">
+                {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+            </button>
+
+            <button
+                *ngIf="HelpCategoryModel.canList(authUser)"
+                type="button"
+                [routerLink]="'/help/categories'"
+                mat-raised-button>
+                {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
+            </button>
+        </ng-container>
+
+        <div class="page-tabs-navbar-placeholder"></div>
+
+        <button
+            *ngIf="HelpItemModel.canList(authUser)"
+            mat-raised-button type="button" color="accent"
+            [routerLink]="['/help/categories', categoryId, 'items']">
+            {{'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_VIEW_HELP_ITEMS_BUTTON'| translate}}
+        </button>
+    </div>
+</form>

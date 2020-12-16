@@ -1,0 +1,49 @@
+<div
+    class="form-slide-toggle-container form-element {{ tooltip ? 'form-slide-tooltip' : '' }}"
+    [id]="identifier" [ngClass]="{invalid: (invalid)}"
+    fxLayout="column"
+>
+
+    <div
+        class="form-slide-toggle-inner"
+        fxLayout="row" fxLayoutAlign="start end"
+    >
+        <mat-slide-toggle
+            *ngIf="!readonly"
+            [(ngModel)]="value"
+            [attr.name]="name"
+            [labelPosition]="labelBefore ? 'before' : 'after'"
+            [disabled]="disabled"
+            (click)="onClick()" (change)="onChange()">
+            {{label}}
+        </mat-slide-toggle>
+
+        <span
+            *ngIf="readonly"
+            class="label-readonly">
+            <ng-container *ngIf="value">
+                {{label}}
+            </ng-container>
+            <ng-container *ngIf="!value">
+                {{notCheckedLabel}}
+            </ng-container>
+        </span>
+
+        <span
+            *ngIf="tooltip"
+            #tooltipCtrl="matTooltip"
+            [matTooltip]="tooltip"
+            class="xt-icon form-icon"
+            (click)="displayTooltip($event, tooltipCtrl)"
+        >
+            help
+        </span>
+    </div>
+
+    <app-form-validation
+        [controlContainer]="controlContainer"
+        [controlName]="name"
+        *ngIf="invalid"
+        [messages]="failures">
+    </app-form-validation>
+</div>

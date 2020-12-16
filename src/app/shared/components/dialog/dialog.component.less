@@ -1,0 +1,132 @@
+@import '~styles/common';
+
+.mat-dialog-main-panel {
+    .mat-dialog-container {
+        padding: 24px 9px 9px 24px;
+        // add max-height in vh so the modal will not exceed the viewport making impossible to click on the buttons or see all content
+        max-height: 95vh !important;
+        // handle scroll on children
+        overflow: hidden;
+    }
+}
+
+app-dialog {
+    .dialog-main {
+        font-family: @font-roboto;
+        font-size: 14px;
+        color: #8e8e8e;
+
+        .dialog-main-msg {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            font-family: @font-roboto;
+            color: #000;
+        }
+
+        // Form data section
+        .dialog-data-content {
+            overflow: auto;
+
+            .dialog-additional-info {
+                font-size: 15px;
+                margin-bottom: 20px;
+                max-width: 100%;
+            }
+
+            .dialog-form-data {
+                .field-list-item:last-child {
+                    margin-right: 20px;
+                }
+
+                .dialog-section-title {
+                    font-size: 16px;
+                    font-weight: 700;
+                    margin-top: 10px;
+                    font-family: @font-roboto;
+                    color: #000;
+                }
+
+                .dialog-checkbox-list {
+                    min-height: 40px;
+
+                    .dialog-checkbox-list-item {
+                        .dialog-checkbox-list-item-checkbox {
+                            .form-checkbox-container {
+                                height: auto;
+                                justify-content: center;
+                                padding-bottom: 2px;
+                            }
+                        }
+
+                        .dialog-checkbox-list-item-action {
+                            padding-bottom: 2px;
+                        }
+                    }
+                }
+
+                .link-item-action {
+                    padding-bottom: 2px;
+                }
+
+                a {
+                    color: #0071e1;
+                    margin: 3px;
+                    font-weight: bold;
+                    text-decoration: none;
+
+                    &:active {
+                        color: #0071e1;
+                        text-decoration: none;
+                    }
+
+                    &:hover {
+                        cursor: pointer;
+                        text-decoration: underline;
+                    }
+                }
+
+                .dialog-action {
+                    color: #0071e1;
+                    margin: 3px;
+                    font-weight: bold;
+                    overflow-wrap: break-word;
+
+                    &.dialog-action-has-action:hover {
+                        cursor: pointer;
+                        text-decoration: underline;
+                    }
+                }
+            }
+        }
+
+        // Buttons section
+        .dialog-button {
+            font-family: @font-roboto;
+            text-transform: uppercase;
+            color: #000;
+            font-weight: 700;
+            margin-top: 20px;
+
+            &.danger {
+                background-color: #FF3547;
+            }
+
+            &.primary {
+                background-color: #33B5E5;
+            }
+
+            &.success {
+                background-color: #00C851;
+            }
+        }
+
+        .ng-star-inserted .mat-button,
+        .ng-star-inserted .mat-flat-button,
+        .ng-star-inserted .mat-icon-button,
+        .ng-star-inserted .mat-stroked-button {
+            line-height: normal;
+            padding: 9px 16px;
+        }
+    }
+}

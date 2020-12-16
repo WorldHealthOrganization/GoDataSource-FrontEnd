@@ -1,0 +1,48 @@
+<!-- Chart -->
+<ng-container
+    *ngIf="!displayLoading && histogramResults?.length > 0">
+    <div fxLayout="column" fxFlex fxLayoutAlign="center">
+        <ngx-charts-bar-vertical
+            class="histogram-size-chains"
+            [scheme]="{ domain: [caseRefDataColor] }"
+            [results]="histogramResults"
+            [gradient]="false"
+            [xAxis]="true"
+            [yAxis]="true"
+            [legend]="false"
+            [showXAxisLabel]="true"
+            [showYAxisLabel]="true"
+            [yAxisTickFormatting]="axisFormat"
+            [xAxisLabel]="'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_LABEL' | translate"
+            [yAxisLabel]="'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_NUMBER_LABEL' | translate"
+            (select)="onSelectChart($event)">
+            <ng-template let-model="model">
+                <div>
+                    {{'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_LABEL' | translate}}: {{model.name}}
+                </div>
+                <div>
+                    {{'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_NUMBER_LABEL' | translate}}: {{model.value}}
+                </div>
+            </ng-template>
+        </ngx-charts-bar-vertical>
+    </div>
+</ng-container>
+
+<!-- No data -->
+<ng-container
+    *ngIf="!displayLoading && histogramResults?.length < 1">
+    <div
+        fxFlex fxLayout="column" fxFlexAlign="center"
+        class="dashlet-no-data">
+        <div>
+            {{ 'LNG_PAGE_DASHLET_SIZE_OF_CHAINS_OF_TRANSMISSION_NO_DATA_LABEL' | translate }}
+        </div>
+    </div>
+</ng-container>
+
+<!-- Loading data -->
+<div
+    *ngIf="displayLoading"
+    class="dashlet-loading">
+    <mat-spinner></mat-spinner>
+</div>

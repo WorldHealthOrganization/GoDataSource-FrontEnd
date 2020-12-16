@@ -1,0 +1,272 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+                <button
+                    *ngIf="IconModel.canList(authUser)"
+                    mat-raised-button
+                    color="accent"
+                    [routerLink]="['/reference-data', 'manage-icons', 'list']"
+                    [queryParams]="{ categoryId: categoryId }">
+                    {{'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_MANAGE_ICONS_BUTTON' | translate}}
+                </button>
+
+                <button
+                    *ngIf="ReferenceDataEntryModel.canCreate(authUser)"
+                    mat-raised-button color="accent" [routerLink]="'./create'">
+                    {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
+                </button>
+            </div>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<!-- Side columns -->
+<app-side-columns
+    [tableColumnsUserSettingsKey]="UserSettings.REF_DATA_CAT_ENTRIES_FIELDS"
+    [tableColumns]="tableColumns"
+    (visibleColumnsChanged)="applySideColumnsChanged($event)">
+</app-side-columns>
+
+<!--Total number of records from the list-->
+<app-total-number-of-records
+    [value]="categoryEntriesCount?.count">
+</app-total-number-of-records>
+
+<mat-card class="page-section page-content">
+
+    <!-- Hover question effects / actions -->
+    <app-hover-row-actions
+        #hoverRow
+        [active]="!refreshingList"
+    ></app-hover-row-actions>
+
+    <mat-table #table [dataSource]="categoryEntries">
+
+        <!-- Label -->
+        <ng-container matColumnDef="label">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.value | translate }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Code -->
+        <ng-container matColumnDef="code">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CODE' | translate}}
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.code }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Description -->
+        <ng-container matColumnDef="description">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.description | translate }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Icon -->
+        <ng-container matColumnDef="icon">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                <img
+                    *ngIf="item.iconId"
+                    [src]="item.iconUrl" />
+                <div
+                    *ngIf="!item.iconId">
+                    {{ 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_LABEL_NO_ICON' | translate }}
+                </div>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Color -->
+        <ng-container matColumnDef="color">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                <div
+                    *ngIf="item.colorCode"
+                    class="ref-data-color-picker"
+                    [style.background]="item.colorCode">
+                    {{ item.colorCode }}
+                </div>
+
+                <div
+                    *ngIf="!item.colorCode">
+                    {{ 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_LABEL_NO_COLOR' | translate }}
+                </div>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Order -->
+        <ng-container matColumnDef="order">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                <app-form-input
+                    *ngIf="ReferenceDataEntryModel.canModify(authUser)"
+                    name="order"
+                    [ngModel]="item.order"
+                    [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER' | translate"
+                    tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER_DESCRIPTION"
+                    type="number"
+                    (optionChanged)="changeRefEntryOrder(item, $event)">
+                </app-form-input>
+                <div
+                    *ngIf="!ReferenceDataEntryModel.canModify(authUser)">
+                    {{ item.order }}
+                </div>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Active -->
+        <ng-container matColumnDef="active">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ (item.active ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO') | translate }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Readonly-->
+        <ng-container matColumnDef="readonly">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_SYSTEM_VALUE' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                <app-yes-no-label [value]="item.readonly"></app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Created By -->
+        <ng-container matColumnDef="createdBy">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{ 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CREATED_BY' | translate }}
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.createdByUser?.name }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Created At -->
+        <ng-container matColumnDef="createdAt">
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{ 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CREATED_AT' | translate }}
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
+                {{ item.createdAt | dateTimeDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Modified By -->
+        <ng-container matColumnDef="updatedBy">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{ 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_UPDATED_BY' | translate }}
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.updatedByUser?.name }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Updated At -->
+        <ng-container matColumnDef="updatedAt">
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{ 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_UPDATED_AT' | translate }}
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
+                {{ item.updatedAt | dateTimeDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
+        <mat-row
+            *matRowDef="let item; columns: visibleTableColumns"
+            app-hover-row-actions
+            [hoverRowActionsComponent]="hoverRow"
+            [hoverRowActions]="recordActions"
+            [hoverRowActionData]="item"
+        ></mat-row>
+    </mat-table>
+
+    <div
+        *ngIf="refreshingList"
+        class="mat-table-loading-data">
+        <mat-spinner></mat-spinner>
+    </div>
+
+    <div
+        *ngIf="!refreshingList && isEmptyList"
+        class="mat-table"
+    >
+        <div class="mat-row">
+            <div class="mat-cell">
+                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+            </div>
+        </div>
+    </div>
+
+    <mat-paginator
+        [length]="categoryEntriesCount?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
+
+</mat-card>

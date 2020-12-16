@@ -1,0 +1,91 @@
+<app-topnav [activeOutbreakEditable]="true">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<div class="page-content">
+
+    <mat-horizontal-stepper linear #stepper>
+
+        <!-- Details step -->
+        <mat-step [stepControl]="detailsForm">
+            <form #detailsForm="ngForm">
+                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_HELP_ITEM_TAB_DETAILS_TITLE' | translate}}</ng-template>
+
+                <!-- Details section -->
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-input
+                                name="title"
+                                [(ngModel)]="helpItemData.title"
+                                [placeholder]="'LNG_HELP_ITEM_FIELD_LABEL_TITLE' | translate"
+                                tooltip="LNG_HELP_ITEM_FIELD_LABEL_TITLE_DESCRIPTION"
+                                required="true"
+                                maxlength="100">
+                            </app-form-input>
+
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-ngx-wig
+                                name="content"
+                                [(ngModel)]="helpItemData.content"
+                                buttons="list1, list2, _, bold, underline, italic, _, linkCustom, insertImageCustom">
+                            </app-form-ngx-wig>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-textarea
+                                name="comment"
+                                [ngModel]="helpItemData.comment"
+                                [placeholder]="'LNG_HELP_ITEM_FIELD_LABEL_COMMENT' | translate"
+                                tooltip="LNG_HELP_ITEM_FIELD_LABEL_COMMENT_DESCRIPTION"
+                                maxlength="500">
+                            </app-form-textarea>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-input
+                                name="page"
+                                [ngModel]="helpItemData.page"
+                                [placeholder]="'LNG_HELP_ITEM_FIELD_LABEL_PAGE' | translate"
+                                tooltip="LNG_HELP_ITEM_FIELD_LABEL_PAGE_DESCRIPTION"
+                                maxlength="200">
+                            </app-form-input>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-input
+                                name="order"
+                                [ngModel]="helpItemData.order"
+                                [placeholder]="'LNG_HELP_ITEM_FIELD_LABEL_ORDER' | translate"
+                                tooltip="LNG_HELP_ITEM_FIELD_LABEL_ORDER_DESCRIPTION"
+                                maxlength="200">
+                            </app-form-input>
+                        </div>
+                    </div>
+                </mat-card>
+
+                <div class="stepper-navigation-buttons">
+                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                </div>
+            </form>
+        </mat-step>
+
+        <!-- Final step -->
+        <mat-step>
+            <ng-template matStepLabel>{{'LNG_STEPPER_FINAL_STEP_LABEL'| translate}}</ng-template>
+            {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
+            <div class="stepper-navigation-buttons">
+                <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                <button type="button" mat-raised-button color="accent"
+                        (click)="createHelpCategoryItem([detailsForm])">
+                    {{'LNG_PAGE_CREATE_HELP_ITEM_ACTION_CREATE_ITEM_BUTTON' | translate}}
+                </button>
+            </div>
+        </mat-step>
+    </mat-horizontal-stepper>
+
+</div>

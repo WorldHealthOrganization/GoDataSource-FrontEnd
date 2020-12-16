@@ -1,0 +1,34 @@
+<div class="authenticated app-theme" fxLayout="column" *ngIf="authUser">
+    <!-- Debug -->
+    <app-form-debug *ngIf="debugVisible"></app-form-debug>
+    <!-- End of Debug -->
+
+    <mat-sidenav-container class="sidenav-container">
+
+        <mat-sidenav #snav mode="over" fixedInViewport>
+            <app-sidenav></app-sidenav>
+        </mat-sidenav>
+
+        <mat-sidenav-content>
+
+            <button class="sidenav-toggle" mat-raised-button color="accent" (click)="snav.toggle()">
+                {{ 'LNG_LAYOUT_MENU_BUTTON_LABEL' | translate }}
+            </button>
+
+            <!-- global search entities by identifier -->
+            <app-global-entity-search>
+            </app-global-entity-search>
+
+            <!-- context help - display help items based on the page you are on -->
+            <div *ngIf="contextSearchHelpItems"
+                class="context-help-trigger"
+                (click)="displayHelpDialog()">
+                <span class="xt-icon">help</span>
+            </div>
+
+            <router-outlet></router-outlet>
+
+        </mat-sidenav-content>
+    </mat-sidenav-container>
+
+</div>

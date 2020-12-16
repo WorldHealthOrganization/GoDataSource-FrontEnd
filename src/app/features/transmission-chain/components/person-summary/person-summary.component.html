@@ -1,0 +1,81 @@
+<div fxLayout="column" fxLayoutGap="20px">
+
+    <div fxLayout="row" fxLayoutAlign="space-between center">
+        <span class="person-type">{{person.type | translate}}</span>
+
+        <span class="xt-icon" (click)="onRemove()">close</span>
+    </div>
+
+    <div class="person-summary-wrapper">
+        <div fxLayout="column" fxLayoutGap="10px">
+            <div
+                *ngFor="let data of personData"
+                fxLayout="row" fxLayoutGap="10px"
+            >
+                <span class="label">{{data.label | translate}}:</span>
+                <span class="value">{{data.value | translate}}</span>
+            </div>
+        </div>
+    </div>
+
+    <div fxLayout="column" fxLayoutGap="10px">
+        <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="10px">
+            <a
+                *ngIf="person.canModify(authUser)"
+                mat-raised-button
+                color="accent"
+                (click)="onModifyPerson()"
+            >
+                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON' | translate}}
+            </a>
+
+            <a
+                *ngIf="(this.person.type === EntityType.EVENT || this.person.type === EntityType.CASE) && ContactModel.canCreate(authUser)"
+                mat-raised-button
+                color="accent"
+                (click)="onCreateContact()"
+            >
+                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_FOR_PERSON' | translate}}
+            </a>
+
+            <a
+                *ngIf="this.person.type === EntityType.CONTACT && ContactOfContactModel.canCreate(authUser)"
+                mat-raised-button
+                color="accent"
+                (click)="onCreateContactOfContact()"
+            >
+                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_OF_CONTACT_FOR_PERSON' | translate}}
+            </a>
+
+            <a
+                *ngIf="person.canDelete(authUser)"
+                mat-raised-button
+                color="warn"
+                (click)="onDeletePerson()"
+            >
+                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_DELETE_PERSON' | translate}}
+            </a>
+        </div>
+
+        <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="10px">
+            <a
+                [href]="personLink"
+                target="_blank"
+                mat-raised-button
+                color="primary"
+            >
+                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_PERSON' | translate}}
+            </a>
+
+            <a
+                [href]="personChainLink"
+                target="_blank"
+                mat-raised-button
+                color="primary"
+            >
+                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_PERSON_CHAIN' | translate}}
+            </a>
+        </div>
+    </div>
+
+</div>

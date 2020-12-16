@@ -1,0 +1,54 @@
+<div class="global-search">
+
+    <button class="sidenav-toggle" mat-raised-button (click)="openSideNav()">
+        <span
+            class="xt-icon">
+            search
+        </span>
+    </button>
+
+    <div class="page-overlay mat-drawer-backdrop" [class.mat-drawer-shown]="sideNav.opened"
+         (click)="closeSideNav()"></div>
+
+    <mat-sidenav-container>
+
+        <mat-sidenav #sideNav mode="over" fixedInViewport>
+
+            <form #form="ngForm" (submit)="search(form)">
+
+                <div class="section columns-section">
+
+                    <div class="title">
+                        {{'LNG_GLOBAL_ENTITY_SEARCH_TITLE' | translate}}
+                    </div>
+
+                    <div class="actions">
+
+                        <app-form-input
+                            name="globalSearchValue"
+                            [(ngModel)]="globalSearchValue"
+                            [placeholder]="'LNG_GLOBAL_ENTITY_SEARCH_ENTITY_ID_LABEL' | translate"
+                            tooltip="LNG_GLOBAL_ENTITY_SEARCH_ENTITY_ID_LABEL_VALUE_DESCRIPTION"
+                            required="true">
+                        </app-form-input>
+
+                    </div>
+                </div>
+
+                <div class="buttons-container">
+                    <button
+                        class="stretched-button"
+                        mat-raised-button
+                        color="accent"
+                        type="submit">
+                        {{'LNG_GLOBAL_ENTITY_SEARCH_BUTTON' | translate}}
+                    </button>
+                </div>
+
+            </form>
+
+        </mat-sidenav>
+
+    </mat-sidenav-container>
+
+</div>

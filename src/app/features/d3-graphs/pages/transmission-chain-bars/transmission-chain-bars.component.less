@@ -1,0 +1,69 @@
+@relationship-accent-color: #da0000;
+
+app-transmission-chain-bars {
+    .filters {
+        margin-bottom: 20px;
+    }
+
+    .transmission-chain-bars-legend {
+        margin-bottom: 20px;
+    }
+
+    .legend-rect {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+    }
+
+    .transmission-chain-bars-cell-width {
+        position: absolute;
+        width: 100px;
+        margin-top: 50px;
+
+        mat-slider {
+            width: 100%;
+            min-width: 0;
+            height: auto;
+            position: static;
+        }
+    }
+
+    #chart {
+        display: flex;
+        width: 100%;
+        // keep some padding for scrollbars when exporting the graph
+        padding-right: 18px;
+        box-sizing: border-box;
+
+        .entities-container {
+            flex: 1 1;
+            overflow-x: scroll;
+            overflow-y: hidden;
+
+            .relationship {
+                &.accent {
+                    stroke: @relationship-accent-color;
+                    fill: @relationship-accent-color;
+                }
+            }
+
+            .entity-info-header {
+                cursor: pointer;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+
+            .entity-bar {
+                cursor: pointer;
+
+                &.accent {
+                    rect {
+                        stroke: @relationship-accent-color;
+                    }
+                }
+            }
+        }
+    }
+}

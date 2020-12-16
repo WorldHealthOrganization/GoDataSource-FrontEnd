@@ -1,0 +1,99 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<div class="page-content">
+
+    <mat-horizontal-stepper linear #stepper>
+
+        <!-- Details step -->
+        <mat-step [stepControl]="detailsForm">
+            <form #detailsForm="ngForm" class="form-content">
+                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_CLUSTER_TAB_DETAILS_TITLE' | translate}}</ng-template>
+
+                <mat-card class="page-section fit-color-picker">
+                    <div fxLayout="column">
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-input
+                                name="name"
+                                [ngModel]="clusterData.name"
+                                [placeholder]="'LNG_CLUSTER_FIELD_LABEL_NAME' | translate"
+                                tooltip="LNG_CLUSTER_FIELD_LABEL_NAME_DESCRIPTION"
+                                required="true"
+                                maxlength="200">
+                            </app-form-input>
+
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
+
+                        <div fxLayout="row">
+                            <app-form-textarea
+                                name="description"
+                                [ngModel]="clusterData.description"
+                                [placeholder]="'LNG_CLUSTER_FIELD_LABEL_DESCRIPTION' | translate"
+                                tooltip="LNG_CLUSTER_FIELD_LABEL_DESCRIPTION_DESCRIPTION">
+                            </app-form-textarea>
+                        </div>
+
+                        <div
+                            fxFlex fxLayout="row" fxLayoutGap="20px">
+                            <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
+                                <div>
+                                    {{ 'LNG_CLUSTER_FIELD_LABEL_COLOR' | translate }}
+                                    <span
+                                        *ngIf="'LNG_CLUSTER_FIELD_LABEL_COLOR_DESCRIPTION' | translate"
+                                        [matTooltip]="'LNG_CLUSTER_FIELD_LABEL_COLOR_DESCRIPTION' | translate"
+                                        class="xt-icon form-icon">help</span>
+                                </div>
+
+                                <input
+                                    #colorPickerInput="ngModel"
+                                    fxFlex="132px"
+                                    class="cluster-color-picker"
+                                    [style.background]="clusterData.colorCode"
+                                    name="colorCode"
+                                    [ngModel]="clusterData.colorCode"
+                                    type="text"
+                                    [readonly]="true"
+                                    [required]="false"
+                                    [colorPicker]="clusterData.colorCode"
+                                    cpOutputFormat="hex"
+                                    (colorPickerChange)="clusterData.colorCode = $event; colorPickerInput.control.markAsDirty();"
+                                    (click)="$event.target.select()"/>
+                            </div>
+
+                            <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
+                                <app-form-icon-picker
+                                    name="icon"
+                                    [ngModel]="clusterData.icon"
+                                    [placeholder]="'LNG_CLUSTER_FIELD_LABEL_ICON' | translate">
+                                </app-form-icon-picker>
+                            </div>
+                        </div>
+                    </div>
+                </mat-card>
+
+                <div class="stepper-navigation-buttons">
+                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                </div>
+            </form>
+        </mat-step>
+
+        <!-- Final step -->
+        <mat-step>
+            <ng-template matStepLabel>{{'LNG_STEPPER_FINAL_STEP_LABEL'| translate}}</ng-template>
+            {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
+            <div class="stepper-navigation-buttons">
+                <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                <button *app-selected-outbreak-is-active type="button" mat-raised-button color="accent" (click)="createNewCluster([detailsForm])">
+                    {{'LNG_PAGE_CREATE_CLUSTER_ACTION_CREATE_CLUSTER_BUTTON' | translate}}
+                </button>
+            </div>
+        </mat-step>
+    </mat-horizontal-stepper>
+
+</div>

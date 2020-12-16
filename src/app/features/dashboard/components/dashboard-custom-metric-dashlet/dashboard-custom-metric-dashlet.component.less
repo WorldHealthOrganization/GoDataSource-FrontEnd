@@ -1,0 +1,169 @@
+@import '~styles/common';
+
+/* Angular Material overrides */
+@menu-item-height: 30px;
+.dashlet-menu-item {
+    height: @menu-item-height !important;
+    line-height: @menu-item-height !important;
+}
+
+@media @ie11-only {
+    .ie-header-class {
+        app-form-input {
+            min-width: 40px !important;
+        }
+    }
+}
+
+app-dashboard-custom-metric-dashlet {
+    .dashboard-box {
+        height: 170px;
+        color: white;
+        margin: 10px;
+        width: auto;
+
+        .dashboard-box-header {
+            text-align: left;
+            padding: 7px 7px 7px 15px;
+            font-size: 14px;
+            min-height: 27px;
+
+            /* Angular Material overrides below */
+            .mat-form-field-infix {
+                padding: 6px;
+                border-top: none;
+            }
+
+            .mat-form-field-wrapper {
+                padding-bottom: 0;
+            }
+
+            .mat-form-field-underline {
+                bottom: 0;
+                background-color: white;
+            }
+
+            .mat-form-field-label {
+                color: #f0f0f0;
+                top: 12px;
+            }
+
+            // disable floating label
+            .mat-form-field-should-float {
+                .mat-form-field-label {
+                    display: none !important;
+                }
+            }
+
+            .ng-select {
+                padding: 0;
+
+                .ng-select-bottom {
+                    margin-top: 17px;
+                }
+                .ng-select-top {
+                    margin-bottom: 20px;
+                }
+
+                .ng-select-container,
+                input,
+                .ng-placeholder,
+                .ng-arrow,
+                .ng-clear {
+                    color: white !important;
+                }
+
+                .ng-clear-wrapper {
+                    &.ng-star-inserted {
+                        position: absolute;
+                        right: 15px;
+                    }
+                }
+
+                .ng-spinner-loader {
+                    position: absolute;
+                    right: 30px;
+                }
+
+                .ng-arrow-wrapper,
+                .ng-clear-wrapper {
+                    border-top: none !important;
+                }
+
+                .ng-value-container {
+                    padding: 0 15px 0 0 !important;
+                    width: 300px;
+                    max-width: 300px;
+                    border-top: none;
+
+                    .ng-placeholder {
+                        top: 0;
+                    }
+                }
+
+                .ng-select-container {
+                    align-items: normal;
+                    min-height: 28px;
+
+                    &:after {
+                        border-color: white;
+                    }
+                }
+
+                &.ng-select-focused,
+                .ng-has-value {
+                    .ng-placeholder {
+                        display: none !important;
+                        transform: none !important;
+                    }
+                }
+            }
+            app-form-input {
+                max-width: 50px;
+                text-align: center;
+            }
+
+            app-form-daterange {
+                max-width: 240px;
+            }
+
+            app-form-location-dropdown {
+                min-width: 200px;
+            }
+
+        }
+
+        .dashboard-box-content {
+            text-align: center;
+            padding: 15px;
+            font-size: 60px;
+            font-weight: bold;
+            min-height: 70px;
+            line-height: normal;
+
+            .dashlet-loading {
+                @mat-spinner-width: 32px;
+                @mat-spinner-height: 32px;
+                mat-spinner {
+                    display: inline-block;
+                    width: @mat-spinner-width !important;
+                    height: @mat-spinner-height !important;
+
+                    svg {
+                        width: @mat-spinner-width !important;
+                        height: @mat-spinner-height !important;
+
+                        circle {
+                            stroke: white;
+                        }
+                    }
+                }
+            }
+
+            span[ng-reflect-router-link] {
+                cursor: pointer;
+            }
+        }
+
+    }
+}

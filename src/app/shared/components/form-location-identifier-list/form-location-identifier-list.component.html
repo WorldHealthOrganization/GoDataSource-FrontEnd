@@ -1,0 +1,34 @@
+<div class="form-element "
+     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+
+    <form
+        #groupForm="ngForm"
+        fxLayout="column"
+    >
+        <div
+            *ngFor="let item of values; let i = index; trackBy: trackByIndex"
+            fxLayout="row" fxLayoutAlign="start center"
+        >
+            <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+                <app-form-location-identifier
+                    [name]="name + '[' + i + ']'"
+                    [(ngModel)]="value[i]"
+                    [required]="required"
+                    [disabled]="disabled"
+                    (changed)="onChange(false)"
+                    (groupValidated)="validateGroup()">
+                </app-form-location-identifier>
+            </mat-card>
+
+            <button *ngIf="!disabled" type="button" mat-icon-button (click)="delete(i)">
+                <span class="xt-icon">delete</span>
+            </button>
+        </div>
+
+        <div fxLayout="row">
+            <button *ngIf="!disabled" type="button" mat-button color="primary" (click)="add()">
+                {{'LNG_INPUT_LABEL_ADD_INPUT' | translate}}
+            </button>
+        </div>
+    </form>
+</div>

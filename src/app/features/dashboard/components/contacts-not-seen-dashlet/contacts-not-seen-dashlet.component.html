@@ -1,0 +1,27 @@
+<app-dashboard-custom-metric-dashlet
+    [link]="ContactModel.canList(authUser) ? '/contacts' : ''"
+    [params]="getDashletParamsIncludingGlobalFilters({applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_NOT_SEEN, x: xDaysNotSeen })"
+    [value]="contactsNotSeenCount"
+    (hide)="onHide()"
+    (moveBefore)="onMoveBefore()"
+    (moveAfter)="onMoveAfter()"
+    [displayLoading]="displayLoading">
+
+    <div fxLayout="row" fxLayoutGap="10px">
+        <div>
+            {{ 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_NOT_SEEN_TITLE_BEFORE_VALUE' | translate}}
+        </div>
+
+        <app-form-input
+            type="number"
+            name="daysFilter"
+            [ngModel]="xDaysNotSeen"
+            (optionChanged)="onChangeSetting($event)">
+        </app-form-input>
+
+        <div fxFlexOffset="5px">
+            {{'LNG_PAGE_DASHBOARD_KPI_CONTACTS_NOT_SEEN_TITLE_AFTER_VALUE' | translate}}
+        </div>
+    </div>
+
+</app-dashboard-custom-metric-dashlet>

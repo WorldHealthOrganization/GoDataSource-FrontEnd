@@ -1,0 +1,136 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<form
+    #form="ngForm"
+    class="page-content form-section"
+    [class.form-view-only]="viewOnly"
+    (submit)="modifyCluster(form)">
+
+    <div class="form-content">
+        <mat-card class="page-section fit-color-picker">
+
+            <div fxLayout="column">
+                <div fxLayout="row" fxLayoutGap="20px">
+                    <app-form-input
+                        name="name"
+                        [ngModel]="clusterData.name"
+                        [placeholder]="'LNG_CLUSTER_FIELD_LABEL_NAME' | translate"
+                        tooltip="LNG_CLUSTER_FIELD_LABEL_NAME_DESCRIPTION"
+                        required="true"
+                        maxlength="200"
+                        [disabled]="viewOnly">
+                    </app-form-input>
+
+                    <div fxFlex><!-- placeholder --></div>
+                    <div fxFlex><!-- placeholder --></div>
+                    <div fxFlex><!-- placeholder --></div>
+                </div>
+
+                <div fxLayout="row">
+                    <app-form-textarea
+                        name="description"
+                        [ngModel]="clusterData.description"
+                        [placeholder]="'LNG_CLUSTER_FIELD_LABEL_DESCRIPTION' | translate"
+                        tooltip="LNG_CLUSTER_FIELD_LABEL_DESCRIPTION_DESCRIPTION"
+                        [disabled]="viewOnly">
+                    </app-form-textarea>
+                </div>
+
+                <div
+                    fxFlex fxLayout="row" fxLayoutGap="20px">
+                    <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
+                        <div>
+                            {{ 'LNG_CLUSTER_FIELD_LABEL_COLOR' | translate }}
+                            <span
+                                *ngIf="'LNG_CLUSTER_FIELD_LABEL_COLOR_DESCRIPTION' | translate"
+                                [matTooltip]="'LNG_CLUSTER_FIELD_LABEL_COLOR_DESCRIPTION' | translate"
+                                class="xt-icon form-icon">help</span>
+                        </div>
+
+                        <!-- Read only -->
+                        <input
+                            *ngIf="viewOnly"
+                            fxFlex="132px"
+                            class="cluster-color-picker"
+                            [style.background]="clusterData.colorCode"
+                            name="colorCode"
+                            [ngModel]="clusterData.colorCode"
+                            [readonly]="true"
+                            [required]="false"/>
+
+                        <!-- Read & Write -->
+                        <input
+                            *ngIf="!viewOnly"
+                            #colorPickerInput="ngModel"
+                            fxFlex="132px"
+                            class="cluster-color-picker"
+                            [style.background]="clusterData.colorCode"
+                            name="colorCode"
+                            [ngModel]="clusterData.colorCode"
+                            type="text"
+                            [readonly]="true"
+                            [required]="false"
+                            [colorPicker]="clusterData.colorCode"
+                            cpOutputFormat="hex"
+                            (colorPickerChange)="clusterData.colorCode = $event; colorPickerInput.control.markAsDirty();"
+                            (click)="$event.target.select()"/>
+                    </div>
+
+                    <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
+                        <app-form-icon-picker
+                            name="icon"
+                            [ngModel]="clusterData.icon"
+                            [placeholder]="'LNG_CLUSTER_FIELD_LABEL_ICON' | translate"
+                            [disabled]="viewOnly">
+                        </app-form-icon-picker>
+                    </div>
+                </div>
+            </div>
+        </mat-card>
+
+    </div>
+
+    <div class="form-actions">
+        <div class="page-tabs-navbar-placeholder"></div>
+        <button *ngIf="viewOnly && ClusterModel.canModify(authUser)"
+                mat-raised-button type="button" color="accent"
+                [routerLink]="['/clusters', clusterId, 'modify']">
+            {{'LNG_COMMON_BUTTON_EDIT' | translate}}
+        </button>
+        <ng-container *ngIf="!viewOnly">
+            <button mat-raised-button color="accent">
+                {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+            </button>
+
+            <button
+                *ngIf="ClusterModel.canList(authUser)"
+                type="button"
+                [routerLink]="'/clusters'"
+                mat-raised-button>
+                {{'LNG_COMMON_BUTTON_CANCEL'| translate}}
+            </button>
+
+            <div class="page-tabs-navbar-placeholder"></div>
+        </ng-container>
+
+
+        <div
+            *ngIf="(viewOnly && ClusterModel.canModify(authUser)) || !viewOnly"
+            class="page-tabs-navbar-placeholder"></div>
+
+        <button
+            *ngIf="ClusterModel.canListPeople(authUser)"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/clusters', clusterId, 'people']">
+            {{ 'LNG_PAGE_MODIFY_CLUSTER_ACTION_VIEW_PEOPLE' | translate }}
+        </button>
+
+    </div>
+
+
+</form>

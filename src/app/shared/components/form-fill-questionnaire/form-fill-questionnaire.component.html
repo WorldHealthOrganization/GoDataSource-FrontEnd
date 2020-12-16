@@ -1,0 +1,293 @@
+<div class="form-element"
+     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+
+    <form #groupForm="ngForm">
+        <mat-card
+            class="page-section"
+            fxLayout="column"
+        >
+            <div
+                *ngIf="questionsGroupedByCategory?.length > 0"
+                fxLayout="column" fxLayoutGap="5px"
+            >
+                <div
+                    *ngFor="let categoryData of questionsGroupedByCategory"
+                    fxLayout="column" fxLayoutAlign="start stretch"
+                >
+                    <div
+                        *ngIf="!hideCategories"
+                        fxLayout="row" fxLayoutAlign="center"
+                        class="questionnaire-category-title"
+                    >
+                        {{ categoryData.category | translate }}
+                    </div>
+                    <div fxLayout="column">
+                        <div
+                            *ngFor="let question of categoryData.questions; let questionIndex = index"
+                            [class]="question.answerType === Constants.ANSWER_TYPES.MARKUP.value ? 'questionnaire-category-question-markup' : 'questionnaire-category-question'"
+                            fxLayout="column"
+                            [ngClass]="{'inactive-question-wrapper': question.inactive || inactiveSubquestion}"
+                            [fxShow]="!question.inactive || (value[question.variable] && value[question.variable][0]?.value)"
+                        >
+                            <!-- Go through each question answer -->
+                            <div
+                                *ngFor="let answerData of (childValueIndex === undefined ? value[question.variable] : [value[question.variable][childValueIndex]]); let answerDataIndex = index"
+                                fxLayout="column">
+
+                                <!-- Questions and answers & remove buttons -->
+                                <div fxLayout="row"
+                                     [ngClass]="{'question-is-inactive': question.inactive || inactiveSubquestion}"
+                                >
+                                    <!-- Questions and answers -->
+                                    <div fxFlex [fxLayout]="question.multiAnswer ? 'column' : 'row'">
+
+                                        <!-- Question -->
+                                        <div
+                                            *ngIf="answerDataIndex < 1"
+                                            fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px"
+                                            [fxFlex]="question.multiAnswer ? 'none' : '1 1'"
+                                        >
+                                            <!-- Question no. -->
+                                            <div
+                                                *ngIf="question.answerType !== Constants.ANSWER_TYPES.MARKUP.value"
+                                                fxFlex="48px">
+                                                <div class="questionnaire-category-question-nr">
+                                                    {{ ( 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BADGE' | translate ) + categoryData.questionNo[questionIndex] }}
+                                                </div>
+                                            </div>
+
+                                            <!-- Question text -->
+                                            <div
+                                                fxFlex
+                                                class="questionnaire-category-question-text">
+                                                {{ question.text | translate }}
+                                            </div>
+
+                                            <!-- Question multi answer add new answer -->
+                                            <div
+                                                *ngIf="!disabled && question.multiAnswer && answerDataIndex < 1"
+                                                fxFlex="140px" fxLayout="row" fxLayoutAlign="end center">
+                                                <button
+                                                    *ngIf="!question.inactive"
+                                                    mat-raised-button color="accent"
+                                                    type="button"
+                                                    (click)="addMultiAnswer(question.variable)">
+                                                    {{'LNG_QUESTIONNAIRE_BUTTON_ADD_MULTI_ANSWER' | translate}}
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Date & Answer-->
+                                        <div
+                                            [fxFlex]="question.multiAnswer ? 'none' : '1 1'"
+                                            fxLayout="row" fxLayoutGap="20px"
+                                        >
+                                            <!-- Date -->
+                                            <div
+                                                *ngIf="question.multiAnswer"
+                                                fxFlex fxLayout="row" fxLayoutGap="5px">
+                                                <app-form-datepicker
+                                                    [name]="name + '[' + question.variable + ']' + '[' + (childValueIndex === undefined ? answerDataIndex : childValueIndex) + '][date]'"
+                                                    [alternativeName]="alternativeName + '[' + questionIndex + ']'"
+                                                    [ngModel]="answerData.date"
+                                                    [placeholder]="'LNG_QUESTIONNAIRE_LABEL_MULTI_ANSWER_DATE' | translate"
+                                                    [required]="!!answerData.value"
+                                                    [disabled]="disabled || question.inactive"
+                                                    (optionChanged)="changedAnswerDate(answerData, $event)"
+                                                    app-date-validator>
+                                                </app-form-datepicker>
+
+                                                <div
+                                                    fxFlex="40px">
+                                                    <button
+                                                        *ngIf="answerData.date && !question.inactive"
+                                                        class="copy-field-button"
+                                                        type="button"
+                                                        mat-icon-button
+                                                        [title]="'LNG_QUESTIONNAIRE_LABEL_MULTI_ANSWER_COPY_DATE_DESCRIPTION' | translate"
+                                                        (click)="triggerCopyDate(answerData.date)">
+                                                        <span class="xt-icon">fileCopy</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <!-- Answer -->
+                                            <div fxFlex fxLayout="column">
+                                                <div fxLayout="row" fxLayoutGap="5px">
+                                                    <!-- Free Text -->
+                                                    <app-form-input
+                                                        *ngIf="question.answerType === Constants.ANSWER_TYPES.FREE_TEXT.value || question.answerType === Constants.ANSWER_TYPES.NUMERIC.value"
+                                                        [name]="name + '[' + question.variable + ']' + '[' + (childValueIndex === undefined ? answerDataIndex : childValueIndex) + '][value]'"
+                                                        [alternativeName]="alternativeName + '[' + questionIndex + ']'"
+                                                        [ngModel]="answerData.value"
+                                                        (optionChanged)="textValueChanged(question.answerType, answerData, $event)"
+                                                        [placeholder]="(question.answerType === Constants.ANSWER_TYPES.NUMERIC.value ? 'LNG_QUESTIONNAIRE_LABEL_WRITE_NUMERIC_ANSWER' : 'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER') | translate"
+                                                        [required]="!skipRequired && question.required"
+                                                        [disabled]="disabled || question.inactive"
+                                                        [type]="question.answerType === Constants.ANSWER_TYPES.NUMERIC.value ? 'number' : 'text'">
+                                                    </app-form-input>
+
+                                                    <!-- Date / Time Picker -->
+                                                    <app-form-datepicker
+                                                        *ngIf="question.answerType === Constants.ANSWER_TYPES.DATE_TIME.value"
+                                                        [name]="name + '[' + question.variable + ']' + '[' + (childValueIndex === undefined ? answerDataIndex : childValueIndex) + '][value]'"
+                                                        [alternativeName]="alternativeName + '[' + questionIndex + ']'"
+                                                        [(ngModel)]="answerData.value"
+                                                        [placeholder]="'LNG_QUESTIONNAIRE_LABEL_SELECT_DATE' | translate"
+                                                        [required]="!skipRequired && question.required"
+                                                        [disabled]="disabled || question.inactive"
+                                                        (optionChanged)="onChange()"
+                                                        app-date-validator>
+                                                    </app-form-datepicker>
+
+                                                    <!-- Single & Multiple Answers -->
+                                                    <app-form-select
+                                                        *ngIf="question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value || question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value"
+                                                        [name]="name + '[' + question.variable + ']' + '[' + (childValueIndex === undefined ? answerDataIndex : childValueIndex) + '][value]'"
+                                                        [alternativeName]="alternativeName + '[' + questionIndex + ']'"
+                                                        [ngModel]="answerData.value"
+                                                        [placeholder]="(question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value ? 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWER' : 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWERS') | translate"
+                                                        [required]="!skipRequired && question.required"
+                                                        [options]="question.answers"
+                                                        optionLabelKey="label"
+                                                        optionValueKey="value"
+                                                        [multiple]="question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value"
+                                                        (optionChanged)="selectedDropdownAnswer(question.variable, (childValueIndex === undefined ? answerDataIndex : childValueIndex), $event)"
+                                                        [disabled]="disabled || question.inactive">
+                                                    </app-form-select>
+
+                                                    <!-- Upload File -->
+                                                    <div
+                                                        *ngIf="question.answerType === Constants.ANSWER_TYPES.FILE_UPLOAD.value"
+                                                        fxFlex fxLayout="row" fxLayoutGap="20px">
+                                                        <input
+                                                            hidden
+                                                            #importDataBtn
+                                                            type="file"
+                                                            ng2FileSelect
+                                                            [uploader]="uploadersData[question.variable][(childValueIndex === undefined ? answerDataIndex : childValueIndex)].uploader"/>
+                                                        <div
+                                                            fxFlex fxLayout="row" fxLayoutGap="20px">
+                                                            <div fxFlex fxLayout="column" fxLayoutGap="20px">
+                                                                <div>
+                                                                    {{ uploadersData[question.variable][(childValueIndex === undefined ? answerDataIndex : childValueIndex)].uploader.queue.length > 0 ?
+                                                                    uploadersData[question.variable][(childValueIndex === undefined ? answerDataIndex : childValueIndex)].uploader.queue[0].file.name : (
+                                                                        answerData.value && uploadersData[question.variable][(childValueIndex === undefined ? answerDataIndex : childValueIndex)].attachment ?
+                                                                            uploadersData[question.variable][(childValueIndex === undefined ? answerDataIndex : childValueIndex)].attachment.name :
+                                                                            (('LNG_QUESTIONNAIRE_LABEL_CHOOSE_FILE' | translate) + (question.required ? '*' : ''))
+                                                                    )
+                                                                    }}
+                                                                </div>
+
+                                                                <!-- Validation Input -->
+                                                                <app-form-hidden-input
+                                                                    #fileHiddenInput="ngModel"
+                                                                    [name]="name + '[' + question.variable + ']' + '[' + (childValueIndex === undefined ? answerDataIndex : childValueIndex) + '][value]'"
+                                                                    [alternativeName]="alternativeName + '[' + questionIndex + ']'"
+                                                                    [placeholder]="'LNG_QUESTIONNAIRE_LABEL_CHOOSE_FILE' | translate"
+                                                                    [ngModel]="answerData.value"
+                                                                    [required]="(uploadersData[question.variable][(childValueIndex === undefined ? answerDataIndex : childValueIndex)].uploading || (!skipRequired && question.required)) && !question.inactive">
+                                                                </app-form-hidden-input>
+                                                            </div>
+
+                                                            <div
+                                                                *ngIf="answerData.value"
+                                                                fxFlex="90px">
+                                                                <button
+                                                                    type="button"
+                                                                    mat-raised-button
+                                                                    (click)="downloadAttachment(question.variable, (childValueIndex === undefined ? answerDataIndex : childValueIndex))">
+                                                                    {{ 'LNG_QUESTIONNAIRE_BUTTON_DOWNLOAD' | translate }}
+                                                                </button>
+                                                            </div>
+
+                                                            <div
+                                                                *ngIf="(!disabled && answerData.value) && !question.inactive"
+                                                                fxFlex="90px">
+                                                                <button
+                                                                    type="button"
+                                                                    mat-raised-button
+                                                                    (click)="removeAttachment(question.variable, (childValueIndex === undefined ? answerDataIndex : childValueIndex), importDataBtn, fileHiddenInput)">
+                                                                    {{ 'LNG_QUESTIONNAIRE_BUTTON_REMOVE' | translate }}
+                                                                </button>
+                                                            </div>
+
+                                                            <div
+                                                                *ngIf="!disabled && !question.inactive"
+                                                                fxFlex="90px">
+                                                                <button
+                                                                    type="button"
+                                                                    mat-raised-button
+                                                                    color="primary"
+                                                                    (click)="importAttachment(importDataBtn, fileHiddenInput)"
+                                                                    [disabled]="uploadersData[question.variable][(childValueIndex === undefined ? answerDataIndex : childValueIndex)].uploading">
+                                                                    {{ (answerData.value ? 'LNG_QUESTIONNAIRE_BUTTON_REPLACE' : 'LNG_QUESTIONNAIRE_BUTTON_BROWSE') | translate }}
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Multi answer remove button -->
+                                    <div
+                                        *ngIf="!disabled && question.multiAnswer"
+                                        fxFlex="48px" fxLayout="column" fxLayoutAlign="end">
+                                        <button
+                                            *ngIf="value[question.variable].length > 1 && !question.inactive"
+                                            type="button"
+                                            mat-icon-button
+                                            class="questionnaire-category-question-remove-btn"
+                                            (click)="removeMultiAnswer(question.variable, (childValueIndex === undefined ? answerDataIndex : childValueIndex))">
+                                            <span class="xt-icon">delete</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Additional questions -->
+                                <div
+                                    *ngIf="(
+                                        question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value ||
+                                        question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value
+                                    ) && hasSubQuestions(question, answerData.value)"
+                                    class="questionnaire-category-question-additional"
+                                    fxLayout="column"
+                                >
+                                    <div
+                                        *ngFor="let answer of subQuestionsAnswer(question, answerData.value)"
+                                        fxLayout="column"
+                                    >
+                                        <app-form-fill-questionnaire
+                                            [name]="name"
+                                            [alternativeName]="alternativeName + '[' + questionIndex + ']'"
+                                            [ngModel]="value"
+                                            [questions]="additionalQuestions[question.variable][answer]"
+                                            [disabled]="disabled || question.inactive"
+                                            [hideCategories]="true"
+                                            [inactiveSubquestion]="question.inactive || inactiveSubquestion"
+                                            (changed)="onChange(false)"
+                                            (groupValidated)="validateGroup()"
+                                            [componentTitle]="'LNG_QUESTIONNAIRE_SUB_QUESTIONS_TITLE' | translate"
+                                            [parentDate]="answerData.date"
+                                            [childValueIndex]="determineChildIndex(question.variable, (childValueIndex === undefined ? answerDataIndex : childValueIndex), answer)"
+                                            [uploadersData]="uploadersData"
+                                            [skipRequired]="skipRequired"
+                                        ></app-form-fill-questionnaire>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                *ngIf="questionsGroupedByCategory?.length < 1"
+                fxLayout="row" fxLayoutAlign="center">
+                {{ 'LNG_QUESTIONNAIRE_TEMPLATE_NO_DATA_LABEL' | translate }}
+            </div>
+        </mat-card>
+    </form>
+</div>

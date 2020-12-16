@@ -1,0 +1,59 @@
+<div class="form-element"
+     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+
+    <form
+        #groupForm="ngForm"
+        fxLayout="column"
+    >
+        <div
+            *ngFor="let inputValue of values; let i = index; trackBy: trackByIndex"
+            fxLayout="row" fxLayoutAlign="start center">
+            <mat-card
+                class="page-section"
+                fxFlex fxLayout="column"
+            >
+                <div
+                    fxLayout="row" fxLayoutGap="20px">
+                    <app-form-input
+                        [name]="name + '[' + i + '][name]'"
+                        [(ngModel)]="values[i].name"
+                        [placeholder]="namePlaceholder"
+                        [tooltip]="nameTooltip"
+                        [disabled]="disabled"
+                        (optionChanged)="onChange()"
+                        [required]="required">
+                    </app-form-input>
+
+                    <div fxFlex><!-- placeholder --></div>
+                    <div fxFlex><!-- placeholder --></div>
+                    <div fxFlex><!-- placeholder --></div>
+                </div>
+                <div
+                    fxLayout="row" fxLayoutGap="20px">
+                    <app-form-input
+                        [name]="name + '[' + i + '][url]'"
+                        [(ngModel)]="values[i].url"
+                        [placeholder]="urlPlaceholder"
+                        [tooltip]="urlTooltip"
+                        [disabled]="disabled"
+                        (optionChanged)="onChange()"
+                        [required]="required">
+                    </app-form-input>
+                </div>
+            </mat-card>
+
+            <button
+                *ngIf="!disabled"
+                type="button" mat-icon-button
+                (click)="delete(i)">
+                <span class="xt-icon">delete</span>
+            </button>
+        </div>
+
+        <div
+            *ngIf="!disabled"
+            fxLayout="row">
+            <button type="button" mat-button color="primary" (click)="add()">{{ 'LNG_INPUT_LABEL_ADD_ITEM' | translate }}</button>
+        </div>
+    </form>
+</div>

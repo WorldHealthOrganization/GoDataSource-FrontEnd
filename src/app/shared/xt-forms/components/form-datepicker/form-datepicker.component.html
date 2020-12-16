@@ -1,0 +1,40 @@
+<div class="form-datepicker-container form-element {{ tooltip ? 'form-datepicker-tooltip' : '' }}"
+     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+
+    <mat-form-field>
+        <input
+            matInput
+            [(ngModel)]="value"
+            [attr.name]="name"
+            [required]="required"
+            [placeholder]="placeholder"
+            [matDatepicker]="pickerStartDate"
+            [disabled]="disabled"
+            (blur)="onBlur()"
+            (dateInput)="onChange()"
+            (click)="showDatePickerDialog(pickerStartDate)"
+            (focus)="showDatePickerDialog(pickerStartDate)"
+            [max]="maxDate"
+            [min]="minDate"/>
+
+        <mat-datepicker-toggle matSuffix [for]="pickerStartDate"></mat-datepicker-toggle>
+        <mat-datepicker #pickerStartDate (selectedChanged)="onChange()"></mat-datepicker>
+
+        <span
+            *ngIf="tooltip"
+            #tooltipCtrl="matTooltip"
+            [matTooltip]="tooltip"
+            class="xt-icon form-icon"
+            (click)="displayTooltip($event, tooltipCtrl)"
+        >
+            help
+        </span>
+    </mat-form-field>
+
+    <app-form-validation
+        *ngIf="invalid"
+        [controlContainer]="controlContainer"
+        [controlName]="name"
+        [messages]="failures">
+    </app-form-validation>
+</div>

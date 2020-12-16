@@ -1,0 +1,215 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<form
+    #form="ngForm"
+    class="page-content form-section"
+    [class.form-view-only]="viewOnly"
+    (submit)="modifyFollowUp(form)">
+
+    <div class="form-content">
+        <mat-tab-group class="page-tabs-navbar">
+
+            <mat-tab [label]="'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_TITLE' | translate">
+
+                <!-- Details section -->
+                <mat-card class="page-section" fxLayout="column">
+                    <div
+                        *ngIf="ContactModel.canView(authUser) && relatedPersonData"
+                        class="follow-ups-title"
+                        fxLayout="row" fxLayoutGap="20px">
+                        <div>{{ relatedPersonData.type === EntityType.CASE ? 'LNG_FOLLOW_UP_FIELD_LABEL_CASE' : 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT' | translate }}</div>
+                        <a
+                            [routerLink]="[relatedPersonData.type === EntityType.CASE ? '/cases' : '/contacts', relatedPersonData.id, 'view']">
+                            {{ relatedPersonData.name }}
+                        </a>
+                        <div
+                            *ngIf="relatedPersonData.type === EntityType.CASE">
+                            {{ 'LNG_PAGE_MODIFY_FOLLOW_UP_FIELD_LABEL_FOLLOW_UP_WITH_INFO' | translate: {personName: relatedPersonData.name} }}
+                        </div>
+                    </div>
+                    <div fxLayout="row" fxLayoutGap="20px">
+                        <app-form-datepicker
+                            name="date"
+                            [(ngModel)]="followUpData.date"
+                            [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate"
+                            tooltip="LNG_FOLLOW_UP_FIELD_LABEL_DATE_DESCRIPTION"
+                            required="true"
+                            [disabled]="true">
+                        </app-form-datepicker>
+
+                        <app-form-slide-toggle
+                            name="targeted"
+                            [(ngModel)]="followUpData.targeted"
+                            [label]="'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate"
+                            tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION"
+                            [disabled]="viewOnly">
+                        </app-form-slide-toggle>
+
+                        <app-form-select
+                            name="statusId"
+                            [(ngModel)]="followUpData.statusId"
+                            [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID' | translate"
+                            tooltip="LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID_DESCRIPTION"
+                            [options]="dailyStatusTypeOptions$ | async"
+                            [disabled]="viewOnly || Constants.isDateInTheFuture(followUpData.date)"
+                            [required]="true"
+                            optionLabelKey="label"
+                            optionValueKey="value">
+                        </app-form-select>
+
+                        <div fxFlex><!-- placeholder --></div>
+                    </div>
+                </mat-card>
+
+                <div class="section-title">{{ 'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_LABEL_ADDRESS' | translate }}</div>
+                <mat-card class="page-section">
+                    <app-form-address
+                        name="address"
+                        [ngModel]="followUpData.address"
+                        [disabled]="true">
+                    </app-form-address>
+                </mat-card>
+
+                <div class="section-title">{{ 'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_LABEL_ASSIGN' | translate }}</div>
+                <mat-card class="page-section">
+                    <app-form-select
+                        name="teamId"
+                        [ngModel]="followUpData.teamId"
+                        [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_TEAM' | translate"
+                        tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TEAM_DESCRIPTION"
+                        [options]="teamsList$ | async"
+                        optionLabelKey="name"
+                        optionValueKey="id"
+                        [disabled]="viewOnly">
+                    </app-form-select>
+                </mat-card>
+
+                <!-- Fill location information section -->
+                <div class="section-title">
+                    {{ 'LNG_FOLLOW_UP_FIELD_LABEL_FILL_LOCATION' | translate }}
+                </div>
+                <mat-card class="page-section">
+                    <div fxLayout="row" fxLayoutGap="20px">
+                        <ng-container
+                            *ngIf="!!followUpData.fillLocation?.geoLocation?.lat; else noFillLocation">
+                            <app-form-input
+                                name="fillLocation[geoLocation][lat]"
+                                [ngModel]="followUpData.fillLocation?.geoLocation?.lat"
+                                [placeholder]="'LNG_FILL_LOCATION_FIELD_LABEL_GEO_LOCATION_LAT' | translate"
+                                tooltip="LNG_FILL_LOCATION_FIELD_LABEL_GEO_LOCATION_LAT_DESCRIPTION"
+                                [disabled]="true">
+                            </app-form-input>
+                            <app-form-input
+                                name="fillLocation[geoLocation][lng]"
+                                [ngModel]="followUpData.fillLocation?.geoLocation?.lng"
+                                [placeholder]="'LNG_FILL_LOCATION_FIELD_LABEL_GEO_LOCATION_LNG' | translate"
+                                tooltip="LNG_FILL_LOCATION_FIELD_LABEL_GEO_LOCATION_LNG_DESCRIPTION"
+                                [disabled]="true">
+                            </app-form-input>
+
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                        </ng-container>
+
+                        <ng-template
+                            #noFillLocation>
+                            <div fxFlex>
+                                {{ 'LNG_FOLLOW_UP_FIELD_LABEL_FILL_LOCATION_NO_LOCATION' | translate }}
+                            </div>
+                        </ng-template>
+                    </div>
+                </mat-card>
+
+                <!-- Create / update by user information section -->
+                <div class="section-title">
+                    {{ 'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE' | translate }}
+                </div>
+                <mat-card class="page-section">
+                    <div fxLayout="row" fxLayoutGap="20px">
+                        <app-form-input
+                            name="createdByUser"
+                            [ngModel]="followUpData.createdByUser?.name"
+                            [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY'| translate"
+                            tooltip="LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY_DESCRIPTION"
+                            [disabled]="true">
+                        </app-form-input>
+
+                        <app-form-input
+                            name="createdAt"
+                            [ngModel]="followUpData.createdAt | dateTimeDefault"
+                            [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_AT'| translate"
+                            tooltip="LNG_FOLLOW_UP_FIELD_LABEL_CREATED_AT_DESCRIPTION"
+                            [disabled]="true">
+                        </app-form-input>
+
+                        <app-form-input
+                            name="updatedByUser"
+                            [ngModel]="followUpData.updatedByUser?.name"
+                            [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_BY'| translate"
+                            tooltip="LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_BY_DESCRIPTION"
+                            [disabled]="true">
+                        </app-form-input>
+
+                        <app-form-input
+                            name="updatedAt"
+                            [ngModel]="followUpData.updatedAt | dateTimeDefault"
+                            [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_AT'| translate"
+                            tooltip="LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_AT_DESCRIPTION"
+                            [disabled]="true">
+                        </app-form-input>
+                    </div>
+                </mat-card>
+            </mat-tab>
+
+        </mat-tab-group>
+    </div>
+
+    <div class="form-actions">
+        <div class="page-tabs-navbar-placeholder"></div>
+
+        <button
+            *ngIf="viewOnly && FollowUpModel.canModify(authUser) && !Constants.isDateInTheFuture(followUpData.date)"
+            mat-raised-button type="button" color="accent"
+            [routerLink]="['/contacts', contactId, 'follow-ups', followUpId, 'modify']"
+            [queryParams]="{rootPage: rootPage, rootCaseId: rootCaseId}"
+        >
+            {{'LNG_COMMON_BUTTON_EDIT'| translate}}
+        </button>
+
+        <ng-container *ngIf="!viewOnly">
+            <button mat-raised-button color="accent">
+                {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+            </button>
+
+            <button
+                *ngIf="FollowUpModel.canList(authUser)"
+                type="button"
+                routerLink="/contacts/follow-ups"
+                mat-raised-button>
+                {{ 'LNG_COMMON_BUTTON_CANCEL' | translate }}
+            </button>
+        </ng-container>
+
+        <div class="page-tabs-navbar-placeholder"></div>
+
+        <button
+            type="button"
+            mat-raised-button
+            [routerLink]="['/contacts', contactId, 'follow-ups', followUpId, viewOnly || selectedOutbreak?.id !== authUser?.activeOutbreakId ? 'view-questionnaire' : 'modify-questionnaire']"
+            [queryParams]="{rootPage: rootPage}">
+            {{'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE' | translate}}
+        </button>
+
+        <button
+            *ngIf="ContactModel.canView(authUser)"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/contacts', contactId, 'view']">
+            {{ 'LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_VIEW_CONTACT' | translate }}
+        </button>
+    </div>
+</form>

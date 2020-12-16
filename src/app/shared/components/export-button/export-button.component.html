@@ -1,0 +1,16 @@
+<button
+    *ngIf="!menuItem"
+    mat-raised-button
+    color="accent"
+    (click)="triggerExport()"
+    type="button">
+    {{ label | translate }}
+</button>
+
+<button
+    *ngIf="menuItem"
+    mat-menu-item
+    (click)="triggerExport()"
+    type="button">
+    {{ label | translate }}
+</button>

@@ -1,0 +1,58 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<form
+    #form="ngForm"
+    class="page-content form-section"
+    [class.form-view-only]="viewOnly"
+    (submit)="modifyCase(form)">
+
+    <div class="form-content">
+        <mat-tab-group class="page-tabs-navbar">
+            <mat-tab [label]="'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE' | translate">
+                <app-form-fill-questionnaire
+                    *ngIf="!!caseData?.id"
+                    name="questionnaireAnswers"
+                    [ngModel]="caseData.questionnaireAnswers"
+                    [questions]="selectedOutbreak.caseInvestigationTemplate"
+                    [disabled]="viewOnly"
+                    [componentTitle]="'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE' | translate">
+                </app-form-fill-questionnaire>
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+
+    <div class="form-actions">
+        <div class="form-actions-no-scroll">
+            <div class="page-tabs-navbar-placeholder"></div>
+
+            <ng-container
+                *app-selected-outbreak-is-active>
+                <button
+                    *ngIf="viewOnly && CaseModel.canModify(authUser)"
+                    type="button"
+                    mat-raised-button color="accent"
+                    [routerLink]="['/cases', caseId, 'modify-questionnaire']">
+                    {{'LNG_COMMON_BUTTON_EDIT' | translate}}
+                </button>
+
+                <button
+                    *ngIf="!viewOnly"
+                    class="button-with-spinner"
+                    mat-raised-button color="accent">
+                    {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+                </button>
+            </ng-container>
+
+            <button
+                type="button"
+                [routerLink]="['/cases', caseId, viewOnly ? 'view' : 'modify']"
+                mat-raised-button>
+                {{'LNG_COMMON_BUTTON_BACK' | translate}}
+            </button>
+        </div>
+    </div>
+</form>

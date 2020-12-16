@@ -1,0 +1,85 @@
+<div
+    *ngIf="!displayLoading && layers.length > 0"
+    [style.width]="width"
+    [style.height]="height"
+    [ngClass]="{ 'full-screen-map' : fullScreenMode }">
+    <!--Full screen map-->
+    <app-form-slide-toggle
+        class="world-map-full-screen"
+        [(ngModel)]="fullScreenMode"
+        [label]="'LNG_PAGE_WORLD_MAP_FULL_SCREEN_LABEL' | translate"
+        (optionChanged)="fullScreenToggleTrigger()">
+    </app-form-slide-toggle>
+
+    <!-- Draw map -->
+    <div id="worldMap"></div>
+</div>
+
+<!-- Still loading map -->
+<div
+    *ngIf="displayLoading || layers.length < 1"
+    class="world-map-loading"
+    [style.width]="width"
+    [style.height]="height">
+    <mat-spinner></mat-spinner>
+</div>
+
+<!-- Disclaimer -->
+<div
+    *ngIf="displayDisclaimer && !fullScreenMode"
+    fxLayout="column"
+    class="app-world-map-disclaimer">
+    <!-- Show / Hide Disclaimer -->
+    <div
+        class="app-world-map-disclaimer-button">
+        <button
+            type="button"
+            mat-icon-button
+            [title]="'LNG_PAGE_WORLD_MAP_DISCLAIMER' | translate"
+            (click)="displayDisclaimerContent = !displayDisclaimerContent">
+            <span class="xt-icon">info</span>
+        </button>
+    </div>
+
+    <!-- Disclaimer -->
+    <div
+        *ngIf="displayDisclaimerContent"
+        fxLayout="column"
+        class="app-world-map-disclaimer-content">
+        <!-- Text -->
+        <div
+            class="app-world-map-disclaimer-text">
+            {{ 'LNG_PAGE_WORLD_MAP_DISCLAIMER_TEXT' | translate }}
+        </div>
+
+        <!-- Data Source -->
+        <div fxLayout="row" fxLayoutGap="20px">
+            <div
+                fxFlex fxGrow="0"
+                class="app-world-map-disclaimer-header app-world-map-disclaimer-no-wrap">
+                {{ 'LNG_PAGE_WORLD_MAP_DISCLAIMER_DATA_SOURCE_LABEL' | translate }}
+            </div>
+            <div fxFlex>
+                {{ 'LNG_PAGE_WORLD_MAP_DISCLAIMER_DATA_SOURCE_TEXT' | translate }}
+            </div>
+        </div>
+
+        <!-- Map Production -->
+        <div fxLayout="row" fxLayoutGap="20px">
+            <div
+                fxFlex fxGrow="0"
+                class="app-world-map-disclaimer-header app-world-map-disclaimer-no-wrap">
+                {{ 'LNG_PAGE_WORLD_MAP_DISCLAIMER_MAP_PRODUCTION_LABEL' | translate }}
+            </div>
+            <div fxFlex>
+                {{ 'LNG_PAGE_WORLD_MAP_DISCLAIMER_MAP_PRODUCTION_TEXT' | translate }}
+            </div>
+        </div>
+
+        <!-- WHO Organization -->
+        <div
+            class="app-world-map-disclaimer-header">
+            {{ 'LNG_PAGE_WORLD_MAP_DISCLAIMER_WHO_LABEL' | translate }}
+        </div>
+    </div>
+</div>

@@ -1,0 +1,55 @@
+<div class="dashboard-box">
+    <!-- Dynamic title -->
+    <div class="dashboard-box-header">
+
+        <div
+            fxLayout="row" fxLayoutAlign="space-between center"
+            class="ie-header-class">
+            <ng-content></ng-content>
+
+            <div>
+                <button mat-icon-button [disableRipple]="true" [matMenuTriggerFor]="actionsMenu">
+                    <span class="xt-icon">menu</span>
+                </button>
+
+                <mat-menu #actionsMenu="matMenu">
+                    <button class="dashlet-menu-item" mat-menu-item (click)="onHide()">
+                        {{'LNG_PAGE_DASHBOARD_KPI_DASHLET_MENU_HIDE_LABEL' | translate}}
+                    </button>
+                    <button class="dashlet-menu-item" mat-menu-item (click)="onMoveBefore()">
+                        {{'LNG_PAGE_DASHBOARD_KPI_DASHLET_MENU_MOVE_BEFORE_LABEL' | translate}}
+                    </button>
+                    <button class="dashlet-menu-item" mat-menu-item (click)="onMoveAfter()">
+                        {{'LNG_PAGE_DASHBOARD_KPI_DASHLET_MENU_MOVE_AFTER_LABEL' | translate}}
+                    </button>
+                </mat-menu>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="dashboard-box-content">
+        <span
+            *ngIf="!displayLoading">
+            <span
+                *ngIf="link; else noLink"
+                [routerLink]="link"
+                [queryParams]="params">
+                {{ value }}
+            </span>
+            <ng-template
+                #noLink>
+                <span>
+                    {{ value }}
+                </span>
+            </ng-template>
+        </span>
+
+        <!-- Loading data -->
+        <div
+            *ngIf="displayLoading"
+            class="dashlet-loading">
+            <mat-spinner></mat-spinner>
+        </div>
+    </div>
+</div>

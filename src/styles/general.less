@@ -1,0 +1,526 @@
+//Imports:
+@import '_fonts';
+@import 'overrides';
+@import 'common';
+
+body {
+    // fix for virtual scrolling
+    position: relative;
+    height: 100vh;
+}
+
+html, body, ul, li, div, span {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+/* Generic styles */
+.a-no-style {
+    text-decoration: none;
+    color: inherit;
+    outline: none;
+}
+
+.transparent {
+    opacity: 0;
+}
+
+.stepper-navigation-buttons {
+    display: flex;
+    justify-content: flex-end;
+
+    >*:not(:first-child) {
+        margin-left: 5px;
+    }
+}
+
+/* Commonly used styles */
+.form-element-height {
+    height: 65.5px;
+}
+
+// back to login button
+.back-to-login-button {
+    margin-top: 15px !important;
+}
+
+.page-section {
+    margin: 15px;
+    box-shadow: -2px 2px 8px 1px rgba(0, 0, 0, .3) !important;
+
+    &.form-content {
+        margin-left: 0;
+    }
+
+    .top-section-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    // Reset filters
+    .reset-filters {
+        display: flex;
+        justify-content: flex-end;
+        position: relative;
+        padding-bottom: 10px;
+
+        button {
+            margin-right: 10px;
+
+            &:last-child {
+                margin-right: 0px;
+            }
+        }
+    }
+
+    // Bulk Actions on List pages
+    .bulk-actions-button {
+        width: 24px;
+    }
+
+    // Column Actions on List pages
+    .column-actions-button {
+        height: 24px;
+        margin-left: 7px;
+
+        .mat-button-wrapper {
+            display: flex;
+        }
+    }
+
+    /* Mat Table overrides */
+    .mat-table {
+
+        // variables
+        @cell-padding-left: 20px;
+
+        .mat-row {
+            display: flex;
+            align-items: center !important;
+            padding: 2px 0 !important;
+            min-height: 40px !important;
+
+            .mat-cell {
+                font-size: 16px !important;
+                padding-left: @cell-padding-left;
+
+                &.cell-break-all {
+                    word-break: break-all;
+                }
+
+                app-form-slide-toggle {
+                    .form-slide-toggle-container {
+                        height: auto;
+                        padding-bottom: 0;
+                    }
+                }
+
+                app-form-input,
+                app-form-select {
+                    .form-input-container,
+                    .form-select-container {
+                        height: 20px;
+
+                        .mat-form-field-wrapper {
+                            padding-bottom: 0;
+
+                            .mat-form-field-infix {
+                                padding: 5px 0 0 0;
+                                height: 17px;
+
+                                .mat-input-element,
+                                .mat-select {
+                                    position: absolute;
+                                    margin-top: -19px;
+                                }
+
+                                .mat-form-field-label-wrapper {
+                                    top: -36px;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        .mat-header-row {
+            padding: 0 !important;
+
+            .mat-header-cell {
+                font-size: 14px !important;
+                font-weight: bold !important;
+                padding-left: @cell-padding-left;
+
+                .mat-sort-header-button {
+                    text-align: left;
+                }
+
+                .mat-sort-header-arrow {
+                    color: @color-accent-main
+                }
+
+                .table-header-cell {
+                    flex: 1 1;
+                    display: flex;
+                    flex-direction: column;
+
+                    .mat-sort-header-container {
+                        justify-content: space-between;
+                    }
+
+                    .column-filter {
+                        padding-top: 10px;
+                        // keep the height as a placeholder for columns without filters
+                        height: 56px;
+                    }
+                }
+            }
+        }
+
+        .mat-header-cell,
+        .mat-cell {
+            &.has-date-range-filter {
+                // need some space to display the From - To Dates properly
+                min-width: 220px;
+            }
+        }
+
+        .mat-chip-list {
+            .mat-chip-list-wrapper {
+                .mat-chip {
+                    margin-top: 5px !important;
+                    margin-bottom: 5px !important;
+                    height: auto;
+                }
+            }
+        }
+
+        .location-drop-down-column-header {
+            overflow: visible;
+        }
+
+        .location-drop-down-column-header-container {
+            margin-top: 5px;
+            padding-top: 0 !important;
+            align-items: center;
+            height: 65px !important;
+
+            app-form-location-dropdown {
+                .ng-value-container {
+                    white-space: nowrap;
+                    flex-wrap: nowrap;
+                    width: 45px;
+                    display: flex;
+                }
+                .ng-value {
+                    padding-right: 5px;
+                    overflow: hidden !important;
+                }
+            }
+
+            .ng-placeholder {
+                font-weight: normal !important;
+                overflow: hidden;
+            }
+        }
+    }
+
+    .mat-table-loading-data {
+        padding-top: 20px;
+        padding-bottom: 20px;
+        text-align: center;
+
+        @mat-spinner-width: 24px;
+        @mat-spinner-height: 24px;
+        mat-spinner {
+            display: inline-block;
+            width: @mat-spinner-width !important;
+            height: @mat-spinner-height !important;
+
+            svg {
+                width: @mat-spinner-width !important;
+                height: @mat-spinner-height !important;
+            }
+        }
+    }
+
+    app-form-slide-toggle {
+        display: inline-block;
+    }
+
+    .mat-table-number-column {
+        color: #0071e1;
+        font-weight: 700;
+
+        &:hover {
+            cursor: pointer;
+            text-decoration: underline;
+        }
+    }
+}
+
+form.form-view-only {
+    mat-slide-toggle.mat-disabled {
+        opacity: 1;
+        color: rgba(0, 0, 0, 0.38);
+    }
+
+    input.mat-input-element:disabled,
+    textarea.mat-input-element:disabled,
+    mat-select.mat-select-disabled .mat-select-value,
+    ng-select.ng-select-disabled .ng-select-container .ng-value-container .ng-value,
+    mat-slide-toggle.mat-disabled {
+        color: black;
+    }
+
+    mat-form-field.mat-form-field-disabled .mat-form-field-label,
+    ng-select.ng-select-disabled .ng-placeholder {
+        color: #333 !important;
+    }
+}
+
+// form elements having dynamic width
+.form-element-host {
+    flex: 1 1;
+}
+
+.mat-tooltip {
+    font-size: 14px !important;
+}
+
+// handle the tooltips on input fields
+.form-input-tooltip,
+.form-datepicker-tooltip,
+.form-select-tooltip,
+.form-select-groups-tooltip,
+.form-textarea-tooltip,
+.form-slide-tooltip,
+.form-locations-select-tooltip {
+    .mat-input-element,
+    .mat-select {
+        width: ~'calc(100% - 24px)';
+    }
+
+    .form-icon {
+        display: inline !important;
+        cursor: pointer;
+        line-height: 0;
+        float: right;
+        margin-top: 7px;
+    }
+
+    ng-select {
+        .ng-select-container {
+            padding-right: 24px;
+        }
+    }
+}
+
+.form-locations-select-tooltip {
+    .form-icon {
+        position: absolute;
+        right: 24px;
+        margin-top: -37px;
+    }
+}
+
+.form-slide-tooltip {
+    .form-icon {
+        margin-bottom: 12px;
+        margin-left: 5px;
+    }
+}
+
+.page-content {
+    margin-left: @page-left-margin;
+
+    .mat-expansion-panel {
+        margin: 5px 15px;
+
+        &.mat-expansion-panel-no-padding {
+            .mat-expansion-panel-body {
+                padding: 0;
+            }
+        }
+    }
+}
+
+.page-tabs-navbar {
+    flex: 1 1;
+}
+
+.page-tabs-navbar-placeholder {
+    height: 49px;
+}
+
+.form-section {
+    display: flex;
+
+    .form-content {
+        flex: 1 1;
+        margin-right: 10px;
+        overflow-x: auto;
+    }
+
+    // column on the right of forms
+    .form-actions {
+        // keep extra left-right margins of 10px
+        width: @page-right-margin + 20px;
+        display: flex;
+        flex-direction: column;
+        padding: 15px 0;
+
+        button {
+            width: @page-right-margin;
+            margin: 0 0 7px 0;
+        }
+
+        .form-actions-no-scroll {
+            position: fixed;
+        }
+    }
+
+}
+
+.button-with-spinner {
+    display: flex !important;
+    justify-content: space-around;
+    align-items: center;
+
+    .loading-chips {
+        @mat-spinner-width: 16px;
+        @mat-spinner-height: 16px;
+
+        float: left;
+        margin-right: 10px;
+        margin-top: 3px;
+
+        mat-spinner {
+            display: inline-block;
+            width: @mat-spinner-width !important;
+            height: @mat-spinner-height !important;
+
+            svg {
+                width: @mat-spinner-width !important;
+                height: @mat-spinner-height !important;
+            }
+        }
+    }
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.switch-buttons {
+    button {
+        border-radius: 5px;
+    }
+}
+
+.mat-menu-item {
+    &.mat-menu-item-delete,
+    &.mat-menu-item-restore {
+        color: darkred;
+    }
+}
+
+.mat-icon-button {
+    &.icon-item-delete {
+        color: darkred !important;
+    }
+}
+
+.column-header {
+    font-size: 16px;
+    font-weight: bold;
+    font-family: @font-roboto, sans-serif;
+    color: black;
+}
+
+/* Ng Select Invalid Styles */
+@material-invalid-color: #f44336;
+ng-select {
+    &.ng-invalid {
+        &.ng-touched {
+            .ng-select-container {
+                .ng-value-container {
+                    .ng-placeholder {
+                        color: @material-invalid-color;
+                    }
+                }
+
+                input {
+                    color: @material-invalid-color;
+                    caret-color: @material-invalid-color;
+                }
+            }
+        }
+    }
+}
+
+.ng-dropdown-panel {
+    min-width: 250px !important;
+}
+
+.cdk-overlay-container {
+    .cdk-overlay-pane {
+        .table-max-sized-menu {
+            max-height: ~"calc(50vh - 48px)";
+        }
+
+        .mat-option {
+            touch-action: auto !important;
+        }
+    }
+}
+
+.warning-message {
+    padding: 7px 0px;
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+a.xlink-button {
+    color: #0071e1;
+    margin: 3px;
+    font-weight: bold;
+    text-decoration: none;
+
+    &.margin-right-x {
+        margin-right: 20px;
+    }
+
+    &:active {
+        color: #0071e1;
+        text-decoration: none;
+    }
+
+    &:hover {
+        cursor: pointer;
+        text-decoration: underline;
+    }
+}
+
+.mdePopover {
+    max-width: 450px;
+    color: white;
+    background-color: #707070;
+    padding: 8px;
+    border-radius: 5px;
+    font-size: 15px;
+    font-weight: normal;
+    text-align: justify;
+
+    &:hover {
+        cursor: pointer;
+    }
+}

@@ -1,0 +1,602 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+                <ng-container *app-selected-outbreak-is-active>
+                    <button
+                        *ngIf="entityId && entityType && RelationshipModel.canCreate(this.authUser) && entityCanCreate"
+                        mat-raised-button color="accent"
+                        [routerLink]="['/relationships', entityType, entityId, relationshipTypeRoutePath, 'available-entities']">
+                        {{'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_ADD_RELATIONSHIP' | translate}} <span class="xt-icon">addCircle</span>
+                    </button>
+                </ng-container>
+            </div>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<!-- Side columns -->
+<app-side-columns
+    [tableColumnsUserSettingsKey]="UserSettings.RELATIONSHIP_FIELDS"
+    [tableColumns]="tableColumns"
+    (visibleColumnsChanged)="applySideColumnsChanged($event)">
+</app-side-columns>
+
+<app-total-number-of-records
+    [value]="(relationshipsListCount$ | async)?.count">
+</app-total-number-of-records>
+
+<mat-card class="page-section page-content">
+    <div class="top-section-wrapper">
+        <!--Color Legend-->
+        <div>
+            <app-color-list-legend [referenceDataCategory]="ReferenceDataCategory.PERSON_TYPE">
+            </app-color-list-legend>
+        </div>
+        <!--Reset Filters-->
+        <div class="reset-filters">
+            <button
+                type="button"
+                mat-raised-button
+                color="accent"
+                (click)="resetFiltersToSideFilters()">
+                {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+            </button>
+
+            <button
+                type="button"
+                mat-raised-button
+                color="accent"
+                (click)="needsRefreshList(true)">
+                {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+            </button>
+        </div>
+    </div>
+
+    <!-- Hover question effects / actions -->
+    <app-hover-row-actions
+        #hoverRow
+        [active]="!refreshingList"
+        leftSideClass="hover-row-actions-mat-table-left"
+    ></app-hover-row-actions>
+
+    <mat-table #table [dataSource]="relationshipsList$ | async" matSort (matSortChange)="sortBy($event)">
+        <!-- Checkbox -->
+        <ng-container matColumnDef="checkbox">
+            <mat-header-cell *matHeaderCellDef fxFlex="60px">
+                <div class="table-header-cell">
+                    <div>
+                        <button
+                            type="button"
+                            class="bulk-actions-button"
+                            mat-icon-button
+                            [disableRipple]="true"
+                            [matMenuTriggerFor]="actionsMenuMultipleRecords"
+                            color="accent"
+                            [matTooltip]="'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_TOOLTIP' | translate"
+                            [disabled]="isEmptyList"
+                        >
+                            <span class="xt-icon">arrowDropdownCircle</span>
+                        </button>
+
+                        <mat-menu #actionsMenuMultipleRecords="matMenu">
+                            <button
+                                *ngIf="!checkedAllRecords"
+                                mat-menu-item
+                                (click)="checkAllRecords()">
+                                {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL' | translate }}
+                            </button>
+                            <button
+                                *ngIf="checkedRecords.length > 0"
+                                mat-menu-item
+                                (click)="uncheckAllRecords()">
+                                {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}
+                            </button>
+
+                            <ng-container *ngIf="(RelationshipModel.canShare(authUser) && entityCanShare) ||
+                                entityCanChangeSource || (RelationshipModel.canBulkDelete(authUser) && entityCanBulkDelete)">
+
+                                <mat-divider></mat-divider>
+
+                                <button
+                                    *ngIf="RelationshipModel.canShare(authUser) && entityCanShare"
+                                    [disabled]="checkedRecords.length < 1"
+                                    mat-menu-item
+                                    (click)="shareSelectedRelationships()">
+                                    {{ shareSelectedRelationshipsButtonLabel | translate }}
+                                </button>
+
+                                <button
+                                    *ngIf="relationshipType === RelationshipType.CONTACT && entityCanChangeSource"
+                                    mat-menu-item
+                                    [disabled]="checkedRecords.length === 0"
+                                    (click)="changeSourceForSelectedRelationships()">
+                                    {{ 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_CHANGE_SOURCE' | translate }}
+                                </button>
+
+                                <ng-container
+                                    *ngIf="RelationshipModel.canBulkDelete(authUser) && entityCanBulkDelete">
+                                    <mat-divider></mat-divider>
+
+                                    <button
+                                        [disabled]="checkedRecords.length < 1"
+                                        mat-menu-item
+                                        (click)="deleteSelectedRelationships()">
+                                        {{ 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS' | translate }}
+                                    </button>
+                                </ng-container>
+                            </ng-container>
+                        </mat-menu>
+                    </div>
+                    <div class="column-filter">
+                        <!-- placeholder -->
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item;" fxFlex="60px">
+                <app-form-checkbox
+                    #listCheckedIndividual
+                    [name]="'listCheckedIndividual[' + item.relationship.id + ']'"
+                    class="table-checkbox"
+                    ngModel
+                    (optionChanged)="checkedRecord(item, $event)">
+                </app-form-checkbox>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Last Name -->
+        <ng-container matColumnDef="lastName">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_LAST_NAME' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="lastNameFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField(['lastName', 'name'], $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                {{item.model.lastName}}
+            </mat-cell>
+        </ng-container>
+
+        <!-- First Name -->
+        <ng-container matColumnDef="firstName">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_FIRST_NAME' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="firstNameFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField(['firstName', 'name'], $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                {{item.model.firstName}}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Case / Contact Visual ID -->
+        <ng-container matColumnDef="visualId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{ 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_VISUAL_ID' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="visualIdFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('visualId', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                {{item.model.visualId}}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Contact Date -->
+        <ng-container matColumnDef="contactDate">
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-daterange
+                            name="dateFilter"
+                            ngModel
+                            (changed)="filterByChildQueryBuilder('relationship').byDateRange('contactDate', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell class="has-date-range-filter" *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                {{ item.relationship.contactDate | dateDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Certainty Level -->
+        <ng-container matColumnDef="certaintyLevelId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="certaintyLevelFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="certaintyLevelList$ | async"
+                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('certaintyLevelId', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.CERTAINTY_LEVEL"
+                    [value]="item.relationship.certaintyLevelId">
+                </app-reference-data-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Exposure Type -->
+        <ng-container matColumnDef="exposureTypeId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="exposureType"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="exposureTypeList$ | async"
+                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('exposureTypeId', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.EXPOSURE_TYPE"
+                    [value]="item.relationship.exposureTypeId">
+                </app-reference-data-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Exposure Frequency -->
+        <ng-container matColumnDef="exposureFrequencyId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="exposureFrequency"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="exposuresFrequencyList$ | async"
+                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('exposureFrequencyId', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.EXPOSURE_FREQUENCY"
+                    [value]="item.relationship.exposureFrequencyId">
+                </app-reference-data-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Exposure Duration -->
+        <ng-container matColumnDef="exposureDurationId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="exposureDuration"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="exposureDurationList$ | async"
+                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('exposureDurationId', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.EXPOSURE_DURATION"
+                    [value]="item.relationship.exposureDurationId">
+                </app-reference-data-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Relation -->
+        <ng-container matColumnDef="socialRelationshipTypeId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{'LNG_RELATIONSHIP_FIELD_LABEL_RELATION' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="relation"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="relationshipTypeList$ | async"
+                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('socialRelationshipTypeId', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.CONTEXT_OF_TRANSMISSION"
+                    [value]="item.relationship.socialRelationshipTypeId">
+                </app-reference-data-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Relation details -->
+        <ng-container matColumnDef="socialRelationshipDetail">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="socialRelationshipDetailFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByChildQueryBuilder('relationship').byText('socialRelationshipDetail', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                {{item.relationship.socialRelationshipDetail}}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Cluster -->
+        <ng-container matColumnDef="clusterId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="clusterIdFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="clusterOptions$ | async"
+                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('clusterId', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                <app-list-item-label
+                    [options]="clusterOptions$ | async"
+                    optionLabelKey="label"
+                    optionValueKey="value"
+                    [value]="item.relationship.clusterId"
+                ></app-list-item-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Created By -->
+        <ng-container matColumnDef="createdBy">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{ 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_BY' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="createdByFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="userList$ | async"
+                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('createdBy', $event, true, 'id')"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            optionLabelKey="name"
+                            optionValueKey="id"
+                            [multiple]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.relationship.createdByUser?.name }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Created At -->
+        <ng-container matColumnDef="createdAt">
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{ 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_AT' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-daterange
+                            name="createdAtFilter"
+                            ngModel
+                            (changed)="filterByChildQueryBuilder('relationship').byDateRange('createdAt', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
+                {{ item.relationship.createdAt | dateTimeDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Modified By -->
+        <ng-container matColumnDef="updatedBy">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{ 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_BY' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="updatedByFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="userList$ | async"
+                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('updatedBy', $event, true, 'id')"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            optionLabelKey="name"
+                            optionValueKey="id"
+                            [multiple]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.relationship.updatedByUser?.name }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Updated At -->
+        <ng-container matColumnDef="updatedAt">
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{ 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_AT' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-daterange
+                            name="updatedAtFilter"
+                            ngModel
+                            (changed)="filterByChildQueryBuilder('relationship').byDateRange('updatedAt', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
+                {{ item.relationship.updatedAt | dateTimeDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
+        <mat-row
+            *matRowDef="let item; columns: visibleTableColumns"
+            app-hover-row-actions
+            [hoverRowActionsComponent]="hoverRow"
+            [hoverRowActions]="recordActions"
+            [hoverRowActionData]="item"
+        ></mat-row>
+    </mat-table>
+
+    <div
+        *ngIf="refreshingList"
+        class="mat-table-loading-data">
+        <mat-spinner></mat-spinner>
+    </div>
+
+    <div
+        *ngIf="!refreshingList && isEmptyList"
+        class="mat-table"
+    >
+        <div class="mat-row">
+            <div class="mat-cell">
+                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+            </div>
+        </div>
+    </div>
+
+    <mat-paginator
+        [length]="(relationshipsListCount$ | async)?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
+
+</mat-card>

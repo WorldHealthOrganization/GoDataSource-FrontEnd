@@ -1,0 +1,55 @@
+@import '~styles/common';
+
+app-counted-items-list {
+    margin: 0 15px;
+    padding-top: 15px;
+    min-height: 45px;
+
+    .mat-chip-list-wrapper {
+        place-content: flex-end;
+
+        @margin-left-right: 7px;
+        @margin-top-bottom: 12px;
+        @border-radius: 7px;
+        .mat-chip {
+            margin: 3px 7px !important;
+            border-radius: @border-radius;
+            padding: 0px;
+            cursor: pointer;
+
+            .counted-items-list-count,
+            .counted-items-list-label {
+                padding: @margin-left-right @margin-top-bottom;
+                border-radius: @border-radius;
+            }
+
+            .counted-items-list-count {
+                font-weight: bold;
+            }
+        }
+    }
+
+    .loading-chips {
+        @mat-spinner-width: 16px;
+        @mat-spinner-height: 16px;
+
+        float:right;
+        margin-right: 20px;
+        margin-top: 8px;
+
+        mat-spinner {
+            display: inline-block;
+            width: @mat-spinner-width !important;
+            height: @mat-spinner-height !important;
+
+            svg {
+                width: @mat-spinner-width !important;
+                height: @mat-spinner-height !important;
+            }
+        }
+    }
+
+    @media @mobile-devices {
+        padding-top: 0;
+    }
+}

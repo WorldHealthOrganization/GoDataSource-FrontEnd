@@ -1,0 +1,56 @@
+<div class="age-dob-container form-element "OnInit
+     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+
+    <form #groupForm="ngForm">
+        <div fxLayout="row" fxLayoutGap="20px">
+            <div fxFlex fxLayout="column" fxLayoutAlign="center">
+                <div class="switch-buttons" fxLayout="row">
+                    <button
+                        fxFlex
+                        mat-raised-button
+                        type="button"
+                        [color]="ageSelected ? 'primary' : ''"
+                        (click)="switchAgeDob(true)">
+                        {{ ageButtonLabel | translate }}
+                    </button>
+                    <button
+                        fxFlex
+                        mat-raised-button
+                        type="button"
+                        [color]="!ageSelected ? 'primary' : ''"
+                        (click)="switchAgeDob(false)">
+                        {{ dobButtonLabel | translate }}
+                    </button>
+                </div>
+            </div>
+
+            <div
+                fxFlex>
+                <app-form-age
+                    [fxShow]="ageSelected"
+                    name="age"
+                    [(ngModel)]="ageDob.age"
+                    [disabled]="disabled"
+                    [required]="required"
+                    (changed)="ageChanged()"
+                    [tooltip]="ageTooltip">
+                </app-form-age>
+
+                <app-form-datepicker
+                    [fxShow]="!ageSelected"
+                    #dob
+                    name="dob"
+                    [(ngModel)]="ageDob.dob"
+                    [placeholder]="dobPlaceholder | translate"
+                    [tooltip]="dobTooltip"
+                    [disabled]="disabled"
+                    [required]="required"
+                    [maxDate]="today"
+                    app-date-validator
+                    [dateSameOrBefore]="today"
+                    (optionChanged)="dobChanged(dob, $event)">
+                </app-form-datepicker>
+            </div>
+        </div>
+    </form>
+</div>

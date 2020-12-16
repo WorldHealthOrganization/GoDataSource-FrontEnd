@@ -1,0 +1,18 @@
+app-transmission-chains-snapshot-list {
+    .cot-snapshot-in-progress {
+        margin-left: 10px;
+
+        @mat-spinner-width: 12px;
+        @mat-spinner-height: 12px;
+        mat-spinner {
+            display: inline-block;
+            width: @mat-spinner-width !important;
+            height: @mat-spinner-height !important;
+
+            svg {
+                width: @mat-spinner-width !important;
+                height: @mat-spinner-height !important;
+            }
+        }
+    }
+}

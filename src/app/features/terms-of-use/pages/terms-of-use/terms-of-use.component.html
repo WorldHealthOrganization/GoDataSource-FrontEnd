@@ -1,0 +1,22 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<mat-card class="page-section page-content mat-card">
+
+    <div fxLayout="column" fxLayoutGap="20px">
+        <span class="header-message">{{ 'LNG_PAGE_TERMS_OF_USE_HEADER_TITLE' | translate}}</span>
+
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="30px">
+            <a
+                href="/assets/terms-of-use/Go.Data%20-%20Terms%20of%20Use%20and%20Software%20License%20Agreement.pdf"
+                target="_blank">
+                Terms of use
+            </a>
+        </div>
+
+    </div>
+
+</mat-card>

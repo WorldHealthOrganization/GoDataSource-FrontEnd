@@ -1,0 +1,280 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+        </div>
+
+        <div class="topnav-actions">
+            <button
+                *ngIf="TeamModel.canCreate(authUser)"
+                mat-raised-button
+                color="accent"
+                [routerLink]="['/teams', 'create']">
+                {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
+            </button>
+
+            <button
+                *ngIf="TeamModel.canListWorkload(authUser)"
+                mat-raised-button
+                color="accent"
+                [matMenuTriggerFor]="quickActionsMenu">
+                {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
+            </button>
+
+            <mat-menu #quickActionsMenu="matMenu">
+                <button
+                    *ngIf="TeamModel.canListWorkload(authUser)"
+                    mat-menu-item
+                    [routerLink]="['/teams', 'workload']">
+                    {{'LNG_PAGE_LIST_TEAMS_ACTION_VIEW_TEAMS_WORKLOAD' | translate}}
+                </button>
+            </mat-menu>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<!--Total number of records from the list-->
+<app-total-number-of-records
+    [value]="(teamsListCount$ | async)?.count">
+</app-total-number-of-records>
+
+<mat-card class="page-section page-content">
+    <!-- Reset Filters -->
+    <div class="reset-filters">
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="resetFiltersToSideFilters()">
+            {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+        </button>
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="needsRefreshList(true)">
+            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+        </button>
+    </div>
+
+    <!-- Hover question effects / actions -->
+    <app-hover-row-actions
+        #hoverRow
+        [active]="!refreshingList"
+    ></app-hover-row-actions>
+
+    <mat-table #table [dataSource]="teamsList$" matSort (matSortChange)="sortBy($event)">
+
+        <!-- Name -->
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{ "LNG_TEAM_FIELD_LABEL_NAME" | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="nameFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('name', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                    {{ item.name }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Members -->
+        <ng-container matColumnDef="users">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        <span>{{ "LNG_TEAM_FIELD_LABEL_USERS" | translate}}</span>
+
+                        <button
+                            type="button"
+                            mat-icon-button
+                            class="column-actions-button"
+                            [disableRipple]="true"
+                            [matMenuTriggerFor]="columnActions"
+                            color="accent"
+                        >
+                            <span class="xt-icon">arrowDropdownCircle</span>
+                        </button>
+
+                        <mat-menu #columnActions="matMenu">
+                            <button
+                                mat-menu-item
+                                (click)="toggleColumn('users', true)">
+                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND_ALL' | translate }}
+                            </button>
+                            <button
+                                mat-menu-item
+                                (click)="toggleColumn('users', false)">
+                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE_ALL' | translate }}
+                            </button>
+                        </mat-menu>
+                    </div>
+                    <div class="column-filter">
+                        <!-- placeholder -->
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                <ng-container *ngIf="!isCellExpanded('users', item.id)">
+                    <app-number-of-items-label
+                        [value]="item.members?.length"
+                    ></app-number-of-items-label>
+
+                    <button
+                        type="button"
+                        mat-button
+                        color="accent"
+                        (click)="toggleCell('users', item.id, true)"
+                    >
+                        {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND' | translate}}
+                    </button>
+                </ng-container>
+
+                <div
+                    *ngIf="isCellExpanded('users', item.id)"
+                    fxLayout="column" fxLayoutAlign="start start"
+                >
+                    <mat-chip-list fxLayout="row wrap">
+                        <mat-chip
+                            *ngFor="let member of item.members"
+                            [matTooltip]="member.name"
+                        >
+                            {{ member.name }}
+                        </mat-chip>
+                    </mat-chip-list>
+
+                    <button
+                        type="button"
+                        mat-button
+                        color="accent"
+                        (click)="toggleCell('users', item.id, false)"
+                    >
+                        {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE' | translate}}
+                    </button>
+                </div>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Locations -->
+        <ng-container matColumnDef="locations">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        <span>{{ "LNG_TEAM_FIELD_LABEL_LOCATIONS" | translate}}</span>
+
+                        <button
+                            type="button"
+                            mat-icon-button
+                            class="column-actions-button"
+                            [disableRipple]="true"
+                            [matMenuTriggerFor]="columnActions"
+                            color="accent"
+                        >
+                            <span class="xt-icon">arrowDropdownCircle</span>
+                        </button>
+
+                        <mat-menu #columnActions="matMenu">
+                            <button
+                                mat-menu-item
+                                (click)="toggleColumn('locations', true)">
+                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND_ALL' | translate }}
+                            </button>
+                            <button
+                                mat-menu-item
+                                (click)="toggleColumn('locations', false)">
+                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE_ALL' | translate }}
+                            </button>
+                        </mat-menu>
+                    </div>
+                    <div class="column-filter">
+                        <!-- placeholder -->
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                <ng-container *ngIf="!isCellExpanded('locations', item.id)">
+                    <app-number-of-items-label
+                        [value]="item.locationIds?.length"
+                    ></app-number-of-items-label>
+
+                    <button
+                        type="button"
+                        mat-button
+                        color="accent"
+                        (click)="toggleCell('locations', item.id, true)"
+                    >
+                        {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND' | translate}}
+                    </button>
+                </ng-container>
+
+                <div
+                    *ngIf="isCellExpanded('locations', item.id)"
+                    fxLayout="column" fxLayoutAlign="start start">
+                    <mat-chip-list fxLayout="row wrap">
+                        <mat-chip
+                            *ngFor="let location of item.locations"
+                            [matTooltip]="location.name"
+                        >
+                            {{ location.name }}
+                        </mat-chip>
+                    </mat-chip-list>
+
+                    <button
+                        type="button"
+                        mat-button
+                        color="accent"
+                        (click)="toggleCell('locations', item.id, false)"
+                    >
+                        {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE' | translate}}
+                    </button>
+                </div>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="fixedTableColumns"></mat-header-row>
+        <mat-row
+            *matRowDef="let item; columns: fixedTableColumns"
+            app-hover-row-actions
+            [hoverRowActionsComponent]="hoverRow"
+            [hoverRowActions]="recordActions"
+            [hoverRowActionData]="item"
+        ></mat-row>
+    </mat-table>
+
+    <div
+        *ngIf="refreshingList"
+        class="mat-table-loading-data">
+        <mat-spinner></mat-spinner>
+    </div>
+
+    <div
+        *ngIf="!refreshingList && isEmptyList"
+        class="mat-table"
+    >
+        <div class="mat-row">
+            <div class="mat-cell">
+                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+            </div>
+        </div>
+    </div>
+
+    <mat-paginator
+        [length]="(teamsListCount$ | async)?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
+</mat-card>
+

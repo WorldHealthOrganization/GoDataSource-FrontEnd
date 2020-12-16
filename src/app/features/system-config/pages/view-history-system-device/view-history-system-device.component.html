@@ -1,0 +1,15 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<mat-card class="page-section page-content">
+
+    <ul class="device-history">
+        <li *ngFor="let historyItem of deviceHistoryList">
+            {{ historyItem.status | translate }} - {{ historyItem.createdAt | dateTimeDefault }}
+        </li>
+    </ul>
+
+</mat-card>

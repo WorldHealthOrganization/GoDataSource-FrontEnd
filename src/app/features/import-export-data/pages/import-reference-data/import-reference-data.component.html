@@ -1,0 +1,16 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<app-import-data
+    [allowedExtensions]="allowedExtensions"
+    [title]="'LNG_PAGE_IMPORT_REFERENCE_DATA_TITLE'"
+    (finished)="finished()"
+    [importFileUrl]="importFileUrl"
+    [importDataUrl]="importDataUrl"
+    [model]="ImportServerModelNames.REFERENCE_DATA"
+    [requiredDestinationFields]="requiredDestinationFields"
+    [savedImportPage]="Constants.APP_IMPORT_PAGE.REFERENCE_DATA.value">
+</app-import-data>

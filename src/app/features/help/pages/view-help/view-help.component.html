@@ -1,0 +1,19 @@
+<app-topnav [activeOutbreakEditable]="true">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<mat-card class="page-section page-content">
+
+    <div
+         class="view-item-title">
+        {{ helpItemData.title | translate }}
+    </div>
+
+    <div
+         [innerHtml]="helpItemData.content | translate">
+    </div>
+
+</mat-card>
+
