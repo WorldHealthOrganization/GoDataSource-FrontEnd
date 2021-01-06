@@ -66,6 +66,7 @@ export class FormSelectVscrollComponent
     private _filterTimeout: any;
     @Input() filterOptionsPlaceholder: string = 'LNG_COMMON_LABEL_SEARCH';
     @Input() filterOptionsDelayMs: number = 200;
+    @Input() delay: boolean = false;
 
     // label is material icon ?
     @Input() labelIsMaterialIcon: boolean;
@@ -166,36 +167,52 @@ export class FormSelectVscrollComponent
             return;
         }
 
-        // clear timeout interval and filter
-        this.clearFilterTimeoutCall();
-        this._filterTimeout = setTimeout(() => {
-            // case insensitive
-            byValue = byValue.toLowerCase();
+        // apply delay
+        if (this.delay) {
+            // clear timeout interval and filter
+            this.clearFilterTimeoutCall();
+            this._filterTimeout = setTimeout(() => {
+                    return this.filterOptionsByValue(byValue);
+                },
+                this.filterOptionsDelayMs);
+        } else {
+            return this.filterOptionsByValue(byValue);
+        }
+    }
 
-            // filter
-            this.filteredOptions = this.options.filter((item: any): boolean => {
-                // nothing to filter ?
-                if (
-                    !this.optionLabelKey ||
-                    !item[this.optionLabelKey]
-                ) {
-                    return false;
-                }
+    /**
+     * Filter options by value
+     */
+    private filterOptionsByValue(byValue?: string) {
+        // case insensitive
+        byValue = byValue.toLowerCase();
 
-                // prepare to filter
-                let translatedValue: string = this.i18nService.instant(item[this.optionLabelKey]);
-                translatedValue = translatedValue.toLowerCase();
-
-                // filter
-                return translatedValue.indexOf(byValue) > -1;
-            });
-
-            // reset virtual scroll position
-            if (this.cdkVirtualScrollViewport) {
-                this.cdkVirtualScrollViewport.scrollToOffset(0);
+        // filter
+        this.filteredOptions = this.options.filter((item: any): boolean => {
+            // nothing to filter ?
+            if (
+                !this.optionLabelKey ||
+                !item[this.optionLabelKey]
+            ) {
+                return false;
             }
 
-        }, this.filterOptionsDelayMs);
+            // prepare to filter
+            let translatedValue: string = this.i18nService.instant(item[this.optionLabelKey]);
+            translatedValue = translatedValue.toLowerCase();
+
+            // filter
+            return translatedValue.indexOf(byValue) > -1;
+        });
+
+        // reset virtual scroll position
+        if (this.cdkVirtualScrollViewport) {
+            this.cdkVirtualScrollViewport.scrollToOffset(0);
+        }
+
+        // finished
+        return true;
+
     }
 
     /**
