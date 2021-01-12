@@ -243,6 +243,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             [id: string]: number
         }
     } = {};
+    // show/hide map
+    showMap: boolean = true;
     // show/hide legend?
     showLegend: boolean = true;
     // toggle edit mode
@@ -2290,7 +2292,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         });
         this.chainGroup = undefined;
         this.chainPages = undefined;
-        this.selectedChainPageIndex = 0;
+        this.selectedChainPageIndex = this.transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value ? 0 : -1;
+        this.showMap = this.transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value;
         this.chainGroupId = this.selectedSnapshot;
         this.transmissionChainDataService
             .getCalculatedIndependentTransmissionChains(
@@ -2414,6 +2417,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      * Page size changed
      */
     pageSizeChanged(pageSize: number) {
+        this.checkShowMap();
         this.pageSize = pageSize;
         this.mustLoadChain = true;
     }
@@ -2426,6 +2430,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
 
         // update view
+        this.checkShowMap();
         this.updateView();
 
         // hide loading
@@ -2433,6 +2438,14 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             loadingDialog.close();
         });
     }
+
+    /**
+     * Checks the map display
+     */
+    private checkShowMap(): void {
+        this.showMap = this.transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value || +this.selectedChainPageIndex > -1;
+    }
+
 }
 
 
