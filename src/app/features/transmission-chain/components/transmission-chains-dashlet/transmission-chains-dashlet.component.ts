@@ -42,6 +42,7 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { CotSnapshotModel } from '../../../../core/models/cot-snapshot.model';
+import {AppMessages} from "../../../../core/enums/app-messages.enum";
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -1543,6 +1544,20 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      */
     toggleEditMode() {
         this.changeEditMode.emit(this.editMode);
+
+        // show a descriptive message to user when editing CoT about fixed data
+        if (this.editMode){
+            this.snackbarService.showNotice(
+                'LNG_GENERIC_WARNING_EDIT_COT',
+                {},
+                false,
+                AppMessages.APP_MESSAGE_UNRESPONSIVE_EDIT_COT
+            );
+        } else {
+            // hide message
+            this.snackbarService.hideMessage(AppMessages.APP_MESSAGE_UNRESPONSIVE_EDIT_COT);
+        }
+
     }
 
     /**
