@@ -388,7 +388,7 @@
             <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 <app-reference-data-label
                     [category]="ReferenceDataCategory.RISK_LEVEL"
-                    [value]="item.contact?.riskLevel">
+                    [value]="item.person?.riskLevel">
                 </app-reference-data-label>
             </mat-cell>
         </ng-container>
