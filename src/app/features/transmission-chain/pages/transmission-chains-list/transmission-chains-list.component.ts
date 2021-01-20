@@ -279,12 +279,6 @@ export class TransmissionChainsListComponent extends ListComponent implements On
                         qb
                     );
             } else {
-                // don't restrict relationships
-                qb.filter.flag(
-                    'dontLimitRelationships',
-                    true
-                );
-
                 // attach extra filter conditions
                 qb.filter.flag(
                     'countContacts',
@@ -309,6 +303,7 @@ export class TransmissionChainsListComponent extends ListComponent implements On
                     })
                 )
                 .subscribe((data) => {
+                    console.log(data);
                     // list of items
                     this.transmissionChainsAll = data.chains;
 
