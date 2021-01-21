@@ -303,7 +303,6 @@ export class TransmissionChainsListComponent extends ListComponent implements On
                     })
                 )
                 .subscribe((data) => {
-                    console.log(data);
                     // list of items
                     this.transmissionChainsAll = data.chains;
 
