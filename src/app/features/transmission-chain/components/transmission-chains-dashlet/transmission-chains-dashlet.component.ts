@@ -42,7 +42,7 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { CotSnapshotModel } from '../../../../core/models/cot-snapshot.model';
-import {AppMessages} from "../../../../core/enums/app-messages.enum";
+import { AppMessages } from '../../../../core/enums/app-messages.enum';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -1546,7 +1546,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         this.changeEditMode.emit(this.editMode);
 
         // show a descriptive message to user when editing CoT about fixed data
-        if (this.editMode){
+        if (this.editMode) {
             this.snackbarService.showNotice(
                 'LNG_GENERIC_WARNING_EDIT_COT',
                 {},
