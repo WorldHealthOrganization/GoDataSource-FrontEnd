@@ -12,6 +12,10 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
+        /**
+         * uiGenericErrorsWarningsInfoMessages
+        */
+        'LNG_GENERIC_WARNING_EDIT_COT': 'Edit Mode will be saved to the database but will not show in the chain of transmission graph until you generate and load a new snapshot.'
 
 
 
