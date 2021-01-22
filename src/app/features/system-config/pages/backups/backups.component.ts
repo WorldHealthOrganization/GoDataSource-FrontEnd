@@ -453,95 +453,129 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
      * Configure automatic backup settings
      */
     configureAutomaticBackupSettings() {
-        return this.dialogService.showInput(new DialogConfiguration({
-            message: 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_TITLE',
-            yesLabel: 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SAVE_BUTTON',
-            additionalInfo: this.settings.dataBackup ? 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_EXISTING_CONFIGURATION_INFO' : '',
-            translateData: this.settings.dataBackup ? {
-                descriptionLabel: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION'),
-                description: this.settings.dataBackup.description ?
-                    this.settings.dataBackup.description :
-                    '',
-                locationLabel: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_LOCATION'),
-                location: this.settings.dataBackup.location,
-                backupIntervalLabel: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_BACKUP_INTERVAL'),
-                backupInterval: this.settings.dataBackup.backupInterval,
-                dataRetentionIntervalLabel: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_RETENTION_INTERVAL'),
-                dataRetentionInterval: this.settings.dataBackup.dataRetentionInterval,
-                modulesLabel: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_MODULES'),
-                modules: this.settings.dataBackup.modules ? this.settings.dataBackup.modules.join(', ') : ''
-            } : {},
-            fieldsList: [
-                // description
-                new DialogField({
-                    name: 'description',
-                    placeholder: 'LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION',
-                    description: 'LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION_DESCRIPTION',
-                    required: false,
-                    value: this.settings.dataBackup.description
-                }),
+        this.genericDataService
+            .getFilterYesNoOptions()
+            .subscribe((yesNoOptions: LabelValuePair[]) => {
+                const yesNoOptionsFiltered: LabelValuePair[] = _.filter(yesNoOptions, (item: LabelValuePair) => _.isBoolean(item.value));
+                return this.dialogService.showInput(new DialogConfiguration({
+                    message: 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_TITLE',
+                    yesLabel: 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SAVE_BUTTON',
+                    additionalInfo: this.settings.dataBackup ? 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_EXISTING_CONFIGURATION_INFO' : '',
+                    translateData: this.settings.dataBackup ? {
+                        disabledLabel: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_DISABLED'),
+                        disabled: this.settings.dataBackup.disabled ? this.i18nService.instant('LNG_COMMON_LABEL_YES') : this.i18nService.instant('LNG_COMMON_LABEL_NO'),
+                        descriptionLabel: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION'),
+                        description: this.settings.dataBackup.description ?
+                            this.settings.dataBackup.description :
+                            '',
+                        locationLabel: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_LOCATION'),
+                        location: this.settings.dataBackup.location,
+                        backupIntervalLabel: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_BACKUP_INTERVAL'),
+                        backupInterval: this.settings.dataBackup.backupInterval,
+                        dataRetentionIntervalLabel: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_RETENTION_INTERVAL'),
+                        dataRetentionInterval: this.settings.dataBackup.dataRetentionInterval,
+                        modulesLabel: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_MODULES'),
+                        modules: this.settings.dataBackup.modules ? this.settings.dataBackup.modules.join(', ') : ''
+                    } : {},
+                    fieldsList: [
+                        // disabled
+                        new DialogField({
+                            name: 'disabled',
+                            placeholder: 'LNG_BACKUP_FIELD_LABEL_DISABLED',
+                            description: 'LNG_BACKUP_FIELD_LABEL_DISABLED_DESCRIPTION',
+                            inputOptions: yesNoOptionsFiltered,
+                            inputOptionsClearable: false,
+                            required: true,
+                            value: this.settings.dataBackup.disabled
+                        }),
 
-                // location
-                new DialogField({
-                    name: 'location',
-                    placeholder: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_LOCATION',
-                    description: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_LOCATION_DESCRIPTION',
-                    required: true,
-                    value: this.settings.dataBackup.location
-                }),
+                        // description
+                        new DialogField({
+                            name: 'description',
+                            placeholder: 'LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION',
+                            description: 'LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION_DESCRIPTION',
+                            required: false,
+                            value: this.settings.dataBackup.description,
+                            visible: (fieldsData): boolean => {
+                                return !fieldsData['disabled'];
+                            }
 
-                // backup interval
-                new DialogField({
-                    name: 'backupInterval',
-                    placeholder: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_BACKUP_INTERVAL',
-                    description: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_BACKUP_INTERVAL_DESCRIPTION',
-                    required: true,
-                    value: this.settings.dataBackup.backupInterval,
-                    type: 'number'
-                }),
+                        }),
 
-                // data retention interval
-                new DialogField({
-                    name: 'dataRetentionInterval',
-                    placeholder: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_RETENTION_INTERVAL',
-                    description: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_RETENTION_INTERVAL_DESCRIPTION',
-                    required: true,
-                    value: this.settings.dataBackup.dataRetentionInterval,
-                    type: 'number'
-                }),
+                        // location
+                        new DialogField({
+                            name: 'location',
+                            placeholder: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_LOCATION',
+                            description: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_LOCATION_DESCRIPTION',
+                            required: true,
+                            value: this.settings.dataBackup.location,
+                            visible: (fieldsData): boolean => {
+                                return !fieldsData['disabled'];
+                            }
+                        }),
 
-                // module list
-                new DialogField({
-                    name: 'modules',
-                    placeholder: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_MODULES',
-                    description: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_MODULES_DESCRIPTION',
-                    inputOptions: this.moduleList,
-                    inputOptionsMultiple: true,
-                    required: true,
-                    value: this.settings.dataBackup.modules
-                })
-            ]
-        })).subscribe((answer: DialogAnswer) => {
-            if (answer.button === DialogAnswerButton.Yes) {
-                this.systemSettingsDataService
-                    .modifySystemSettings({
-                        dataBackup: answer.inputValue.value
-                    })
-                    .pipe(
-                        catchError((err) => {
-                            this.snackbarService.showApiError(err);
-                            return throwError(err);
+                        // backup interval
+                        new DialogField({
+                            name: 'backupInterval',
+                            placeholder: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_BACKUP_INTERVAL',
+                            description: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_BACKUP_INTERVAL_DESCRIPTION',
+                            required: true,
+                            value: this.settings.dataBackup.backupInterval,
+                            type: 'number',
+                            visible: (fieldsData): boolean => {
+                                return !fieldsData['disabled'];
+                            }
+                        }),
+
+                        // data retention interval
+                        new DialogField({
+                            name: 'dataRetentionInterval',
+                            placeholder: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_RETENTION_INTERVAL',
+                            description: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_RETENTION_INTERVAL_DESCRIPTION',
+                            required: true,
+                            value: this.settings.dataBackup.dataRetentionInterval,
+                            type: 'number',
+                            visible: (fieldsData): boolean => {
+                                return !fieldsData['disabled'];
+                            }
+                        }),
+
+                        // module list
+                        new DialogField({
+                            name: 'modules',
+                            placeholder: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_MODULES',
+                            description: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_MODULES_DESCRIPTION',
+                            inputOptions: this.moduleList,
+                            inputOptionsMultiple: true,
+                            required: true,
+                            value: this.settings.dataBackup.modules,
+                            visible: (fieldsData): boolean => {
+                                return !fieldsData['disabled'];
+                            }
                         })
-                    )
-                    .subscribe(() => {
-                        // display success message
-                        this.snackbarService.showSuccess('LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SUCCESS_MESSAGE');
+                    ]
+                })).subscribe((answer: DialogAnswer) => {
+                    if (answer.button === DialogAnswerButton.Yes) {
+                        this.systemSettingsDataService
+                            .modifySystemSettings({
+                                dataBackup: answer.inputValue.value
+                            })
+                            .pipe(
+                                catchError((err) => {
+                                    this.snackbarService.showApiError(err);
+                                    return throwError(err);
+                                })
+                            )
+                            .subscribe(() => {
+                                // display success message
+                                this.snackbarService.showSuccess('LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SUCCESS_MESSAGE');
 
-                        // refresh settings
-                        this.refreshSystemSettings();
-                    });
-            }
-        });
+                                // refresh settings
+                                this.refreshSystemSettings();
+                            });
+                    }
+                });
+            });
     }
 
     /**
