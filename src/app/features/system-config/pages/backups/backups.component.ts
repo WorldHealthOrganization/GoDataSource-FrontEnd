@@ -453,6 +453,8 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
      * Configure automatic backup settings
      */
     configureAutomaticBackupSettings() {
+        // keep the existing configuration
+        const currentSettings = {...this.settings.dataBackup};
         this.genericDataService
             .getFilterYesNoOptions()
             .subscribe((yesNoOptions: LabelValuePair[]) => {
@@ -460,7 +462,9 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
                 return this.dialogService.showInput(new DialogConfiguration({
                     message: 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_TITLE',
                     yesLabel: 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SAVE_BUTTON',
-                    additionalInfo: this.settings.dataBackup ? 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_EXISTING_CONFIGURATION_INFO' : '',
+                    additionalInfo: this.settings.dataBackup && !this.settings.dataBackup.disabled ?
+                        'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_EXISTING_CONFIGURATION_INFO' :
+                        'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_EXISTING_CONFIGURATION_INFO_DISABLE',
                     translateData: this.settings.dataBackup ? {
                         disabledLabel: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_DISABLED'),
                         disabled: this.settings.dataBackup.disabled ? this.i18nService.instant('LNG_COMMON_LABEL_YES') : this.i18nService.instant('LNG_COMMON_LABEL_NO'),
@@ -497,7 +501,7 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
                             required: false,
                             value: this.settings.dataBackup.description,
                             visible: (fieldsData): boolean => {
-                                return !fieldsData['disabled'];
+                                return !fieldsData.disabled;
                             }
 
                         }),
@@ -510,7 +514,7 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
                             required: true,
                             value: this.settings.dataBackup.location,
                             visible: (fieldsData): boolean => {
-                                return !fieldsData['disabled'];
+                                return !fieldsData.disabled;
                             }
                         }),
 
@@ -523,7 +527,7 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
                             value: this.settings.dataBackup.backupInterval,
                             type: 'number',
                             visible: (fieldsData): boolean => {
-                                return !fieldsData['disabled'];
+                                return !fieldsData.disabled;
                             }
                         }),
 
@@ -536,7 +540,7 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
                             value: this.settings.dataBackup.dataRetentionInterval,
                             type: 'number',
                             visible: (fieldsData): boolean => {
-                                return !fieldsData['disabled'];
+                                return !fieldsData.disabled;
                             }
                         }),
 
@@ -550,12 +554,18 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
                             required: true,
                             value: this.settings.dataBackup.modules,
                             visible: (fieldsData): boolean => {
-                                return !fieldsData['disabled'];
+                                return !fieldsData.disabled;
                             }
                         })
                     ]
                 })).subscribe((answer: DialogAnswer) => {
                     if (answer.button === DialogAnswerButton.Yes) {
+                        // if the automatic backup is off do not change the rest of the settings
+                        if (answer.inputValue.value.disabled) {
+                            answer.inputValue.value = {...currentSettings};
+                            answer.inputValue.value.disabled = true;
+                        }
+
                         this.systemSettingsDataService
                             .modifySystemSettings({
                                 dataBackup: answer.inputValue.value

@@ -21,6 +21,7 @@ export const EnglishUsLang = {
          * uiAutomaticBackupFields
          */
         'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_EXISTING_CONFIGURATION_INFO' : '<b>Existing configuration: </b><br>{{disabledLabel}}: {{disabled}} <br>{{descriptionLabel}}: {{description}} <br>{{locationLabel}}: {{location}} <br>{{backupIntervalLabel}}: {{backupInterval}} <br>{{dataRetentionIntervalLabel}}: {{dataRetentionInterval}} <br>{{modulesLabel}}: {{modules}}',
+        'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_EXISTING_CONFIGURATION_INFO_DISABLE' : '<b>Existing configuration: </b><br>{{disabledLabel}}: {{disabled}}',
         'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_DISABLED': 'Disabled',
 
         /**
