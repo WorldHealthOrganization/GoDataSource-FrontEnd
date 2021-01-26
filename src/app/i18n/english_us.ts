@@ -15,9 +15,20 @@ export const EnglishUsLang = {
         /**
          * uiGenericErrorsWarningsInfoMessages
         */
-        'LNG_GENERIC_WARNING_EDIT_COT': 'Edit Mode will be saved to the database but will not show in the chain of transmission graph until you generate and load a new snapshot.'
+        'LNG_GENERIC_WARNING_EDIT_COT': 'Edit Mode will be saved to the database but will not show in the chain of transmission graph until you generate and load a new snapshot.',
 
+        /**
+         * uiAutomaticBackupFields
+         */
+        'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_EXISTING_CONFIGURATION_INFO' : '<b>Existing configuration: </b><br>{{disabledLabel}}: {{disabled}} <br>{{descriptionLabel}}: {{description}} <br>{{locationLabel}}: {{location}} <br>{{backupIntervalLabel}}: {{backupInterval}} <br>{{dataRetentionIntervalLabel}}: {{dataRetentionInterval}} <br>{{modulesLabel}}: {{modules}}',
+        'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_EXISTING_CONFIGURATION_INFO_DISABLE' : '<b>Existing configuration: </b><br>{{disabledLabel}}: {{disabled}}',
+        'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_DISABLED': 'Disabled',
 
+        /**
+         * uiBackupFields
+         */
+        'LNG_BACKUP_FIELD_LABEL_DISABLED': 'Disabled',
+        'LNG_BACKUP_FIELD_LABEL_DISABLED_DESCRIPTION' : 'Turn On/Off Automatic Backups'
 
 
         /**
