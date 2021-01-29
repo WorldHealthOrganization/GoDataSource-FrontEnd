@@ -644,6 +644,11 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
                                 translateQuestionnaire(outbreak.caseInvestigationTemplate);
                             }
 
+                            // translate questionnaire questions - Contact Form
+                            if (!_.isEmpty(outbreak.contactInvestigationTemplate)) {
+                                translateQuestionnaire(outbreak.contactInvestigationTemplate);
+                            }
+
                             // translate questionnaire questions - Lab Results Form
                             if (!_.isEmpty(outbreak.labResultsTemplate)) {
                                 translateQuestionnaire(outbreak.labResultsTemplate);
