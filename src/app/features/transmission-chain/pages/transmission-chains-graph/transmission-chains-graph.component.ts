@@ -69,6 +69,10 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     sizeOfChainsFilter: number = null;
     // person Id - to filter the chain
     personId: string = null;
+    // snapshot Id, showPersonContacts, showPersonContactsOfContacts - to filter the chains
+    snapshotId: string = null;
+    showPersonContacts: boolean = false;
+    showPersonContactsOfContacts: boolean = false;
     // type of the selected person . event
     selectedEntityType: EntityType = null;
     // should we display personal chain of transmission link?
@@ -126,12 +130,28 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.route.queryParams
-            .subscribe((params: { personId: string, selectedEntityType: EntityType, sizeOfChainsFilter: number }) => {
+            .subscribe((params: { personId: string, selectedEntityType: EntityType, sizeOfChainsFilter: number, snapshotId?: string, showPersonContacts?: boolean, showPersonContactsOfContacts?: boolean }) => {
                 // check if person id was sent in url
                 if (params.personId && params.selectedEntityType) {
                     this.personId = params.personId;
                     this.selectedEntityType = params.selectedEntityType;
                 }
+
+                // check if the snapshotId was sent in url
+                if (!!params.snapshotId) {
+                    this.snapshotId = params.snapshotId;
+                }
+
+                // check if the showContacts was sent in url
+                if (!!params.showPersonContacts) {
+                    this.showPersonContacts = params.showPersonContacts;
+                }
+
+                // check if the showContactsOfContacts was sent in url
+                if (!!params.showPersonContactsOfContacts) {
+                    this.showPersonContactsOfContacts = params.showPersonContactsOfContacts;
+                }
+
                 // check if the size of chains was sent in url
                 if (params.sizeOfChainsFilter) {
                     this.sizeOfChainsFilter = params.sizeOfChainsFilter;
@@ -333,7 +353,10 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
                                         ...{
                                             data: {
                                                 entity: entityData,
-                                                displayPersonalCotLink: this.displayPersonChainOfTransmissionLink
+                                                displayPersonalCotLink: this.displayPersonChainOfTransmissionLink,
+                                                snapshotId: this.cotDashletChild.selectedSnapshot,
+                                                showPersonContacts: this.cotDashletChild.showContacts,
+                                                showPersonContactsOfContacts: this.cotDashletChild.showContactsOfContacts
                                             }
                                         }
                                     }

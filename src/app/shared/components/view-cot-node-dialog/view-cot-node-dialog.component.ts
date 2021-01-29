@@ -17,7 +17,10 @@ import { ContactOfContactModel } from '../../../core/models/contact-of-contact.m
 export class ViewCOTNodeData {
     constructor(
         public entity: CaseModel | EventModel | ContactModel,
-        public displayPersonalCotLink: boolean
+        public displayPersonalCotLink: boolean,
+        public snapshotId?: string,
+        public showPersonContacts?: boolean,
+        public showPersonContactsOfContacts?: boolean,
     ) {}
 }
 
@@ -79,6 +82,19 @@ export class ViewCotNodeDialogComponent implements OnDestroy {
         const personListLink = EntityModel.getLinkForEntityType(this.entity.type);
         this.resourceViewPageLink = `/${personListLink}/${this.entity.id}/view`;
         this.personChainLink = `/transmission-chains?personId=${this.entity.id}&selectedEntityType=${this.entity.type}`;
+
+        // add optional params
+        if (!!this.data.snapshotId) {
+            this.personChainLink = this.personChainLink + `&snapshotId=${this.data.snapshotId}`;
+        }
+
+        if (!!this.data.showPersonContacts) {
+            this.personChainLink = this.personChainLink + `&showPersonContacts=${this.data.showPersonContacts}`;
+        }
+
+        if (!!this.data.showPersonContactsOfContacts) {
+            this.personChainLink = this.personChainLink + `&showPersonContactsOfContacts=${this.data.showPersonContactsOfContacts}`;
+        }
 
         // init timer handler
         this.initTimerHandler();

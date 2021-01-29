@@ -11,7 +11,7 @@
 
         <!-- Generate new graph -->
         <button
-            *ngIf="!showFilters && selectedOutbreak?.id === authUser?.activeOutbreakId"
+            *ngIf="!showFilters && selectedOutbreak?.id === authUser?.activeOutbreakId  && showSnapshots"
             mat-raised-button
             (click)="showFiltersHideGraphConf()">
             {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_SETTINGS' | translate }}
@@ -278,7 +278,7 @@
                 fxLayout="row" fxLayoutGap="20px">
 
                 <!-- Snapshots -->
-                <app-form-select
+                <app-form-select *ngIf="showSnapshots"
                     name="snapshotsList"
                     [(ngModel)]="selectedSnapshot"
                     [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOTS' | translate"
@@ -300,7 +300,7 @@
                 </app-form-select>
 
                 <!-- Page size -->
-                <app-form-input
+                <app-form-input *ngIf="showSnapshots"
                     name="chainView"
                     [(ngModel)]="pageSize"
                     [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE_SIZE' | translate"
@@ -340,7 +340,7 @@
             </div>
 
             <div
-                fxLayout="row" fxLayoutGap="20px">
+                fxLayout="row" fxLayoutGap="20px" *ngIf="showSnapshots">
 
                 <!-- Pages -->
                 <app-form-select-vscroll
