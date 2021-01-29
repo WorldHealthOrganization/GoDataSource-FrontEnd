@@ -278,7 +278,8 @@
                 fxLayout="row" fxLayoutGap="20px">
 
                 <!-- Snapshots -->
-                <app-form-select *ngIf="showSnapshots"
+                <app-form-select
+                    *ngIf="showSnapshots"
                     name="snapshotsList"
                     [(ngModel)]="selectedSnapshot"
                     [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOTS' | translate"
@@ -300,7 +301,8 @@
                 </app-form-select>
 
                 <!-- Page size -->
-                <app-form-input *ngIf="showSnapshots"
+                <app-form-input
+                    *ngIf="showSnapshots"
                     name="chainView"
                     [(ngModel)]="pageSize"
                     [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE_SIZE' | translate"
@@ -340,7 +342,8 @@
             </div>
 
             <div
-                fxLayout="row" fxLayoutGap="20px" *ngIf="showSnapshots">
+                *ngIf="showSnapshots"
+                fxLayout="row" fxLayoutGap="20px">
 
                 <!-- Pages -->
                 <app-form-select-vscroll
