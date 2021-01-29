@@ -54,6 +54,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     static wheelSensitivity: number = 0.3;
 
     @Input() sizeOfChainsFilter: string = null;
+    @Input() snapshotId: string = null;
+    @Input() showPersonContacts: boolean = false;
+    @Input() showPersonContactsOfContacts: boolean = false;
     @Input() personId: string = null;
     @Input() selectedEntityType: EntityType = null;
 
@@ -94,6 +97,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     showEvents: boolean = true;
     showContacts: boolean = false;
     showContactsOfContacts: boolean = false;
+    showSnapshots: boolean = true;
     locationsListMap: {
         [idLocation: string]: LocationModel
     } = {};
@@ -625,11 +629,47 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                                         });
                                     });
 
-                                // retrieve snapshots
-                                this.retrieveSnapshotsList(() => {
-                                    // hide loading
-                                    loadingDialog.close();
-                                });
+                                // load snapshot if selected
+                                if (this.snapshotId) {
+                                    // hide the snapshot list
+                                    this.showSnapshots = false;
+
+                                    // show contacts and contacts of contacts
+                                    this.showContacts = this.showPersonContacts;
+                                    this.showContactsOfContacts = this.showPersonContactsOfContacts;
+
+                                    // set the selected snapshot
+                                    this.selectedSnapshot = this.snapshotId;
+
+                                    // retrieve snapshot
+                                    this.transmissionChainDataService
+                                        .getSnapshot(this.selectedOutbreak.id, this.snapshotId)
+                                        .subscribe((entity) => {
+                                            // create option
+                                            const option: LabelValuePair = new LabelValuePair(
+                                                this.getSnapshotOptionLabel(entity),
+                                                entity.id
+                                            );
+
+                                            // map snapshot for easy access
+                                            this.snapshotOptionsMap[entity.id] = {
+                                                snapshot: entity,
+                                                option: option
+                                            };
+
+                                            // hide loading
+                                            loadingDialog.close();
+
+                                            // display graph
+                                            this.loadChainsOfTransmission();
+                                        });
+                                } else {
+                                    // retrieve snapshots
+                                    this.retrieveSnapshotsList(() => {
+                                        // hide loading
+                                        loadingDialog.close();
+                                    });
+                                }
                             }
                         });
                 });
@@ -2256,6 +2296,94 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     }
 
     /**
+     * Retrieves the person chain of transmission
+     */
+    private chainsOfTransmissionGetPersonChain(chainGroup: TransmissionChainGroupModel): void {
+        // return if no person id is provided
+        if (!this.personId) {
+            return;
+        }
+
+        // go through all chains to remove the unrelated data
+        let usedEntityIdsMap: {
+            [entityId: string]: true
+        } = {};
+        _.each(chainGroup.chains, (chain) => {
+            // go through all chain relations
+            chain.chainRelations.forEach((rel) => {
+                // ignore if we have an invalid relation
+                if (
+                    !rel.entityIds ||
+                    rel.entityIds.length !== 2
+                ) {
+                    return;
+                }
+
+                // keep the person Ids
+                usedEntityIdsMap[rel.entityIds[0]] = true;
+                usedEntityIdsMap[rel.entityIds[1]] = true;
+            });
+
+            // keep the chain and exit if the person was found in the chain relation
+            if (usedEntityIdsMap[this.personId]) {
+                // we found the chain
+                chainGroup.chains = [chain];
+                return false;
+            }
+
+            // ignore the person Ids in the next check
+            usedEntityIdsMap = {};
+        });
+
+        // remove relationships
+        const remainingRelationships: RelationshipModel[] = [];
+        chainGroup.relationships.forEach((rel) => {
+            // ignore if we have an invalid relation
+            if (
+                !rel.persons ||
+                rel.persons.length !== 2
+            ) {
+                return;
+            }
+
+            // ignore if person id is not found
+            if (
+                !usedEntityIdsMap[rel.persons[0].id] &&
+                !usedEntityIdsMap[rel.persons[1].id]
+            ) {
+                return;
+            }
+
+            // keep the relationship
+            usedEntityIdsMap[rel.persons[0].id] = true;
+            usedEntityIdsMap[rel.persons[1].id] = true;
+            remainingRelationships.push(rel);
+
+            // #TODO check if we need to add others relationships because usedEntityIdsMap was changed
+        });
+
+        // use only the relationships related to person
+        chainGroup.relationships = remainingRelationships;
+
+        // go through all nodes map
+        const remainingNodesMap: {
+            [id: string]: EntityModel
+        } = {};
+        _.forEach(chainGroup.nodesMap, (node, entityId) => {
+            // ignore if the node is not related to the person node
+            if (!usedEntityIdsMap[entityId]) {
+                return;
+            }
+
+            // keep the node
+            remainingNodesMap[entityId] = node;
+        });
+
+        // use only the nodes related to person
+        chainGroup.nodesMap = remainingNodesMap;
+    }
+
+    /**
      * Retrieve snapshot / refresh graph
      */
     loadChainsOfTransmission(): void {
@@ -2337,6 +2465,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 })
             )
             .subscribe((chainGroup) => {
+                // remove the unrelated data if a person id is provided
+                this.chainsOfTransmissionGetPersonChain(chainGroup);
+
                 // determine locations that we need to retrieve
                 let locationIdsToRetrieve: any = {};
                 _.forEach(chainGroup.nodesMap, (node) => {

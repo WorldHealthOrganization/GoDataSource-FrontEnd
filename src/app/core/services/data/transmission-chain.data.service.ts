@@ -750,6 +750,22 @@ export class TransmissionChainDataService {
     }
 
     /**
+     * Retrieve a COT snapshot for an Outbreak
+     * @param {string} outbreakId
+     * @param {string} cotSnapshotId
+     * @returns {Observable<CotSnapshotModel>}
+     */
+    getSnapshot(
+        outbreakId: string,
+        cotSnapshotId: string
+    ): Observable<CotSnapshotModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`outbreaks/${outbreakId}/transmission-chains/${cotSnapshotId}`),
+            CotSnapshotModel
+        );
+    }
+
+    /**
      * Retrieve the list of COT snapshots list for an Outbreak
      */
     getSnapshotsList(
