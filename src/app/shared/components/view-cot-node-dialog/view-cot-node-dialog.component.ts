@@ -20,7 +20,7 @@ export class ViewCOTNodeData {
         public displayPersonalCotLink: boolean,
         public snapshotId?: string,
         public showPersonContacts?: boolean,
-        public showPersonContactsOfContacts?: boolean,
+        public showPersonContactsOfContacts?: boolean
     ) {}
 }
 

@@ -130,7 +130,14 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.route.queryParams
-            .subscribe((params: { personId: string, selectedEntityType: EntityType, sizeOfChainsFilter: number, snapshotId?: string, showPersonContacts?: boolean, showPersonContactsOfContacts?: boolean }) => {
+            .subscribe((params: {
+                personId: string,
+                selectedEntityType: EntityType,
+                sizeOfChainsFilter: number,
+                snapshotId?: string,
+                showPersonContacts?: boolean,
+                showPersonContactsOfContacts?: boolean
+            }) => {
                 // check if person id was sent in url
                 if (params.personId && params.selectedEntityType) {
                     this.personId = params.personId;
