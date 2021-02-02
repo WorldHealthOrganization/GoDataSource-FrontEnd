@@ -3,6 +3,7 @@ import { UserModel } from './user.model';
 import { IPermissionBackup, IPermissionBasic, IPermissionRestorable } from './permission.interface';
 import { PERMISSION } from './permission.model';
 import { FileSize } from '../helperClasses/file-size';
+import { Moment, moment } from '../helperClasses/x-moment';
 
 export class BackupModel
     implements
@@ -14,6 +15,8 @@ export class BackupModel
     location: string;
     modules: string[];
     date: string;
+    startedAt: Moment;
+    endedAt: Moment;
     status: string;
     error: string;
     userId: string;
@@ -42,6 +45,36 @@ export class BackupModel
      */
     get sizeBytesHumanReadable(): string {
         return this._sizeBytesHumanReadable;
+    }
+
+    // duration
+    private _duration: moment.duration;
+    private _durationHumanReadable: string;
+
+    /**
+     * Get Duration in friendly form
+     */
+    get duration(): moment.duration {
+        return this._duration;
+    }
+
+    set duration(duration) {
+        // set value
+        this._duration = duration;
+
+        // format human readable
+        if (this._duration.asSeconds() !== 0) {
+            this._durationHumanReadable = moment.setDiffTimeString(this._duration);
+        } else {
+            this._durationHumanReadable = '-';
+        }
+    }
+
+    /**
+     * Get Duration in friendly form
+     */
+    get durationHumanReadable(): string {
+        return this._durationHumanReadable;
     }
 
     /**
@@ -77,6 +110,23 @@ export class BackupModel
         this.error = _.get(data, 'error');
         this.userId = _.get(data, 'userId');
         this.sizeBytes = _.get(data, 'sizeBytes', 0);
+
+        // startedAt
+        this.startedAt = _.get(data, 'startedAt');
+        if (this.startedAt) {
+            this.startedAt = moment(this.startedAt);
+        }
+
+        // endedAt
+        this.endedAt = _.get(data, 'endedAt');
+        if (this.endedAt) {
+            this.endedAt = moment(this.endedAt);
+        }
+
+        // set duration
+        this.duration = this.startedAt && this.endedAt ?
+            moment.duration(this.endedAt.diff(this.startedAt)) :
+            moment.duration();
 
         this.user = _.get(data, 'user');
         if (!_.isEmpty(this.user)) {

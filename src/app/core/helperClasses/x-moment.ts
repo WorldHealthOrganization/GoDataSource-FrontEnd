@@ -33,7 +33,24 @@ export function moment(inp?: momentOriginal.MomentInput, format?: momentOriginal
         momentOriginal.utc(date.format('YYYY-MM-DD'));
 }
 
+/**
+ * Convert date diff to readable format
+ */
+function setDiffTimeString(diffDuration: moment.duration): string {
+    const str = [];
+    diffDuration.years() > 0 ? str.push(`${diffDuration.years()}y`) : null;
+    diffDuration.months() > 0 ? str.push(`${diffDuration.months()}M`) : null;
+    diffDuration.days() > 0 ? str.push(`${diffDuration.days()}d`) : null;
+    diffDuration.hours() > 0 ? str.push(`${diffDuration.hours()}h`) : null;
+    diffDuration.minutes() > 0 ? str.push(`${diffDuration.minutes()}m`) : null;
+    diffDuration.seconds() > 0 ? str.push(`${diffDuration.seconds()}s`) : null;
+
+    // return response
+    return str.join(' ');
+}
+
 // extra functionality
 moment.utc = momentOriginal.utc;
 moment.ISO_8601 = momentOriginal.ISO_8601;
 moment.duration = momentOriginal.duration;
+moment.setDiffTimeString = setDiffTimeString;

@@ -66,6 +66,7 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
         'date',
         'status',
         'fileSize',
+        'duration',
         'user',
         'error'
     ];

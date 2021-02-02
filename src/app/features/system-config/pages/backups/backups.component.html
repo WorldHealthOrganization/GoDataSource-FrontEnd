@@ -220,6 +220,24 @@
                 </mat-cell>
             </ng-container>
 
+            <!-- Duration -->
+            <ng-container matColumnDef="duration">
+                <mat-header-cell *matHeaderCellDef>
+                    <div class="table-header-cell">
+                        <div class="column-header">
+                            {{'LNG_BACKUP_FIELD_LABEL_DURATION' | translate}}
+                        </div>
+                        <div class="column-filter">
+                            <!--Placeholder-->
+                        </div>
+                    </div>
+                </mat-header-cell>
+
+                <mat-cell *matCellDef="let item">
+                    {{ item.durationHumanReadable }}
+                </mat-cell>
+            </ng-container>
+
             <!-- Created by user -->
             <ng-container matColumnDef="user">
                 <mat-header-cell *matHeaderCellDef>
