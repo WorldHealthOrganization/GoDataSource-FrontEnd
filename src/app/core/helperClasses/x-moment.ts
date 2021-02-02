@@ -36,14 +36,37 @@ export function moment(inp?: momentOriginal.MomentInput, format?: momentOriginal
 /**
  * Convert date diff to readable format
  */
-function setDiffTimeString(diffDuration: moment.duration): string {
+function setDiffTimeString(diffDuration: duration): string {
     const str = [];
-    diffDuration.years() > 0 ? str.push(`${diffDuration.years()}y`) : null;
-    diffDuration.months() > 0 ? str.push(`${diffDuration.months()}M`) : null;
-    diffDuration.days() > 0 ? str.push(`${diffDuration.days()}d`) : null;
-    diffDuration.hours() > 0 ? str.push(`${diffDuration.hours()}h`) : null;
-    diffDuration.minutes() > 0 ? str.push(`${diffDuration.minutes()}m`) : null;
-    diffDuration.seconds() > 0 ? str.push(`${diffDuration.seconds()}s`) : null;
+
+    // years
+    if (diffDuration.years() > 0) {
+        str.push(`${diffDuration.years()}y`);
+    }
+
+    // months
+    if (diffDuration.months() > 0) {
+        str.push(`${diffDuration.months()}M`);
+    }
+
+    // days
+    if (diffDuration.days() > 0) {
+        str.push(`${diffDuration.days()}d`);
+    }
+
+    // hours
+    if (diffDuration.hours() > 0) {
+        str.push(`${diffDuration.hours()}h`);
+    }
+    // minutes
+    if (diffDuration.minutes() > 0) {
+        str.push(`${diffDuration.minutes()}m`);
+    }
+
+    // seconds
+    if (diffDuration.seconds() > 0) {
+        str.push(`${diffDuration.seconds()}s`);
+    }
 
     // return response
     return str.join(' ');
