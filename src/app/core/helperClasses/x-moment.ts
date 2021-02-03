@@ -1,5 +1,5 @@
 import * as momentOriginal from 'moment';
-import { Moment as MomentOriginal, MomentBuiltinFormat as MomentBuiltinFormatOriginal } from 'moment';
+import { Moment as MomentOriginal, MomentBuiltinFormat as MomentBuiltinFormatOriginal, unitOfTime as MomentUnitOfTime } from 'moment';
 import * as _ from 'lodash';
 
 /**
@@ -32,6 +32,46 @@ export function moment(inp?: momentOriginal.MomentInput, format?: momentOriginal
         date :
         momentOriginal.utc(date.format('YYYY-MM-DD'));
 }
+
+// extract the duration between two dates in friendly form
+moment.humanizeDurationBetweenTwoDates = (endDate: Moment, startDate: Moment): string => {
+    // return if no dates are provided
+    if (
+        !startDate ||
+        !endDate
+    ) {
+        return undefined;
+    }
+
+    // define the units of time
+    const unitsOfTime: MomentUnitOfTime.Base[] = [
+        'y',
+        'M',
+        'd',
+        'h',
+        'm',
+        's'
+    ];
+
+    // calculate duration
+    const diffDuration = moment.duration(endDate.diff(startDate));
+
+    // extract and format the duration
+    let formattedDuration: string = '';
+    unitsOfTime.forEach((item: MomentUnitOfTime.Base) => {
+        // extract the value
+        const value: number = diffDuration.get(item);
+        if (value < 1) {
+            return;
+        }
+
+        // add the value
+        formattedDuration = `${formattedDuration ? formattedDuration + ' ' : ''}${value}${item}`;
+    });
+
+    // return the formatted duration
+    return formattedDuration;
+};
 
 // extra functionality
 moment.utc = momentOriginal.utc;
