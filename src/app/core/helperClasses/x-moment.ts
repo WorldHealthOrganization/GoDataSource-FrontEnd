@@ -1,5 +1,5 @@
 import * as momentOriginal from 'moment';
-import { Moment as MomentOriginal, MomentBuiltinFormat as MomentBuiltinFormatOriginal } from 'moment';
+import { Moment as MomentOriginal, MomentBuiltinFormat as MomentBuiltinFormatOriginal, unitOfTime as MomentUnitOfTime } from 'moment';
 import * as _ from 'lodash';
 
 /**
@@ -33,47 +33,35 @@ export function moment(inp?: momentOriginal.MomentInput, format?: momentOriginal
         momentOriginal.utc(date.format('YYYY-MM-DD'));
 }
 
-/**
- * Convert date diff to readable format
- */
-function setDiffTimeString(diffDuration: duration): string {
-    const str = [];
-
-    // years
-    if (diffDuration.years() > 0) {
-        str.push(`${diffDuration.years()}y`);
+// extract the duration between two dates in friendly form
+moment.humanizeDurationBetweenTwoDates = (endDate: Moment, startDate: Moment): string => {
+    // return if no dates are provided
+    if (!startDate || !endDate) {
+        return undefined;
     }
 
-    // months
-    if (diffDuration.months() > 0) {
-        str.push(`${diffDuration.months()}M`);
-    }
+    // define the units of time
+    const unitsOfTime: string[] = ['y', 'M', 'd', 'h', 'm', 's'];
 
-    // days
-    if (diffDuration.days() > 0) {
-        str.push(`${diffDuration.days()}d`);
-    }
+    // calculate duration
+    const diffDuration = moment.duration(endDate.diff(startDate));
 
-    // hours
-    if (diffDuration.hours() > 0) {
-        str.push(`${diffDuration.hours()}h`);
-    }
-    // minutes
-    if (diffDuration.minutes() > 0) {
-        str.push(`${diffDuration.minutes()}m`);
-    }
+    // extract and format the duration
+    let formattedDuration: string = '';
+    unitsOfTime.forEach((item: MomentUnitOfTime.Base) => {
+        // extract the value
+        const value: number = diffDuration.get(item);
+        if (value < 1) {
+            return;
+        }
+        formattedDuration = `${formattedDuration ? formattedDuration + ' ' : ''}${value}${item}`;
+    });
 
-    // seconds
-    if (diffDuration.seconds() > 0) {
-        str.push(`${diffDuration.seconds()}s`);
-    }
-
-    // return response
-    return str.join(' ');
-}
+    // return the formatted duration
+    return formattedDuration;
+};
 
 // extra functionality
 moment.utc = momentOriginal.utc;
 moment.ISO_8601 = momentOriginal.ISO_8601;
 moment.duration = momentOriginal.duration;
-moment.setDiffTimeString = setDiffTimeString;

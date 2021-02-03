@@ -15,8 +15,6 @@ export class BackupModel
     location: string;
     modules: string[];
     date: string;
-    startedAt: Moment;
-    endedAt: Moment;
     status: string;
     error: string;
     userId: string;
@@ -48,33 +46,36 @@ export class BackupModel
     }
 
     // duration
-    private _duration: moment.duration;
-    private _durationHumanReadable: string;
+    private _startedAt: Moment;
+    private _endedAt: Moment;
+    private _duration: string;
 
-    /**
-     * Get Duration in friendly form
-     */
-    get duration(): moment.duration {
-        return this._duration;
+    get startedAt(): Moment {
+        return this._startedAt;
     }
 
-    set duration(duration) {
+    set startedAt(date: Moment) {
         // set value
-        this._duration = duration;
+        this._startedAt = date;
 
-        // format human readable
-        if (this._duration.asSeconds() !== 0) {
-            this._durationHumanReadable = moment.setDiffTimeString(this._duration);
-        } else {
-            this._durationHumanReadable = '-';
-        }
+        // update duration
+        this.updateDuration();
     }
 
-    /**
-     * Get Duration in friendly form
-     */
-    get durationHumanReadable(): string {
-        return this._durationHumanReadable;
+    get endedAt(): Moment {
+        return this._endedAt;
+    }
+
+    set endedAt(date: Moment) {
+        // set value
+        this._endedAt = date;
+
+        // update duration
+        this.updateDuration();
+    }
+
+    get duration(): string {
+        return this._duration;
     }
 
     /**
@@ -98,6 +99,14 @@ export class BackupModel
     static canViewCloudBackupLocations(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.BACKUP_VIEW_CLOUD_BACKUP) : false; }
 
     /**
+     * Update and Set Duration in friendly form
+     */
+    private updateDuration(): void {
+        this._duration = moment.humanizeDurationBetweenTwoDates(this._endedAt, this._startedAt);
+        this._duration = this._duration || '-';
+    }
+
+    /**
      * Constructor
      */
     constructor(data = null) {
@@ -112,21 +121,12 @@ export class BackupModel
         this.sizeBytes = _.get(data, 'sizeBytes', 0);
 
         // startedAt
-        this.startedAt = _.get(data, 'startedAt');
-        if (this.startedAt) {
-            this.startedAt = moment(this.startedAt);
-        }
+        const startedAt = _.get(data, 'startedAt');
+        this.startedAt = startedAt ? moment(startedAt) : undefined;
 
         // endedAt
-        this.endedAt = _.get(data, 'endedAt');
-        if (this.endedAt) {
-            this.endedAt = moment(this.endedAt);
-        }
-
-        // set duration
-        this.duration = this.startedAt && this.endedAt ?
-            moment.duration(this.endedAt.diff(this.startedAt)) :
-            moment.duration();
+        const endedAt = _.get(data, 'endedAt');
+        this.endedAt = endedAt ? moment(endedAt) : undefined;
 
         this.user = _.get(data, 'user');
         if (!_.isEmpty(this.user)) {
