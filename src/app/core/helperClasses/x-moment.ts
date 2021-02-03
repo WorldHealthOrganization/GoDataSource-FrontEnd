@@ -36,12 +36,22 @@ export function moment(inp?: momentOriginal.MomentInput, format?: momentOriginal
 // extract the duration between two dates in friendly form
 moment.humanizeDurationBetweenTwoDates = (endDate: Moment, startDate: Moment): string => {
     // return if no dates are provided
-    if (!startDate || !endDate) {
+    if (
+        !startDate ||
+        !endDate
+    ) {
         return undefined;
     }
 
     // define the units of time
-    const unitsOfTime: string[] = ['y', 'M', 'd', 'h', 'm', 's'];
+    const unitsOfTime: MomentUnitOfTime.Base[] = [
+        'y',
+        'M',
+        'd',
+        'h',
+        'm',
+        's'
+    ];
 
     // calculate duration
     const diffDuration = moment.duration(endDate.diff(startDate));
@@ -54,6 +64,8 @@ moment.humanizeDurationBetweenTwoDates = (endDate: Moment, startDate: Moment): s
         if (value < 1) {
             return;
         }
+
+        // add the value
         formattedDuration = `${formattedDuration ? formattedDuration + ' ' : ''}${value}${item}`;
     });
 

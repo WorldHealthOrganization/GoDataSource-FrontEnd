@@ -45,15 +45,11 @@ export class BackupModel
         return this._sizeBytesHumanReadable;
     }
 
-    // duration
+    // startedAt
     private _startedAt: Moment;
-    private _endedAt: Moment;
-    private _duration: string;
-
     get startedAt(): Moment {
         return this._startedAt;
     }
-
     set startedAt(date: Moment) {
         // set value
         this._startedAt = date;
@@ -62,10 +58,11 @@ export class BackupModel
         this.updateDuration();
     }
 
+    // endedAt
+    private _endedAt: Moment;
     get endedAt(): Moment {
         return this._endedAt;
     }
-
     set endedAt(date: Moment) {
         // set value
         this._endedAt = date;
@@ -74,6 +71,8 @@ export class BackupModel
         this.updateDuration();
     }
 
+    // duration
+    private _duration: string;
     get duration(): string {
         return this._duration;
     }
@@ -97,14 +96,6 @@ export class BackupModel
      */
     static canSetAutomaticBackupSettings(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.BACKUP_AUTOMATIC_SETTINGS) : false; }
     static canViewCloudBackupLocations(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.BACKUP_VIEW_CLOUD_BACKUP) : false; }
-
-    /**
-     * Update and Set Duration in friendly form
-     */
-    private updateDuration(): void {
-        this._duration = moment.humanizeDurationBetweenTwoDates(this._endedAt, this._startedAt);
-        this._duration = this._duration || '-';
-    }
 
     /**
      * Constructor
@@ -153,4 +144,12 @@ export class BackupModel
      */
     canSetAutomaticBackupSettings(user: UserModel): boolean { return BackupModel.canSetAutomaticBackupSettings(user); }
     canViewCloudBackupLocations(user: UserModel): boolean { return BackupModel.canViewCloudBackupLocations(user); }
+
+    /**
+     * Update and Set Duration in friendly form
+     */
+    private updateDuration(): void {
+        this._duration = moment.humanizeDurationBetweenTwoDates(this._endedAt, this._startedAt);
+        this._duration = this._duration || '-';
+    }
 }
