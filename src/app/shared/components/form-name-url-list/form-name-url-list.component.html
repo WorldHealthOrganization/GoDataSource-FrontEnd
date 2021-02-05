@@ -40,6 +40,38 @@
                         [required]="required">
                     </app-form-input>
                 </div>
+
+                <div
+                    fxLayout="row" fxLayoutGap="20px">
+                     <app-form-select
+                        [name]="name + '[' + i + '][type]'"
+                        [(ngModel)]="values[i].type"
+                        [placeholder]="typePlaceholder"
+                        [disabled]="disabled"
+                        (optionChanged)="onChange()"
+                        [options]="outbreakMapServerTypesList$ | async"
+                        optionLabelKey="label"
+                        optionValueKey="value">
+                    </app-form-select>
+
+                    <div
+                        fxLayout="row" fxLayoutAlign="none center" fxLayoutGap="-20px">
+                        <!-- details popover -->
+                        <mde-popover
+                            #mappingMdePopover="mdePopover"
+                            class="mdePopover"
+                            mdePopoverTriggerOn="hover">
+                                    <span
+                                        [innerHTML]="typeTooltip | translate | safeHtml">
+                                    </span>
+                        </mde-popover>
+
+                        <!-- help button -->
+                        <span
+                            class="xt-icon xt-icon-xsmall"
+                            [mdePopoverTriggerFor]="mappingMdePopover">help</span>
+                    </div>
+                </div>
             </mat-card>
 
             <button

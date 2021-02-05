@@ -160,6 +160,22 @@ export class Constants {
         }
     };
 
+    // outbreak map servers
+    static OUTBREAK_MAP_SERVER_TYPES = {
+        TILE_TILE_ARC_GIS_REST: {
+            label: 'LNG_REFERENCE_DATA_OUTBREAK_MAP_SERVER_TYPE_TILE_TILE_ARC_GIS_REST',
+            value: 'LNG_REFERENCE_DATA_OUTBREAK_MAP_SERVER_TYPE_TILE_TILE_ARC_GIS_REST'
+        },
+        TILE_XYZ: {
+            label: 'LNG_REFERENCE_DATA_OUTBREAK_MAP_SERVER_TYPE_TILE_XYZ',
+            value: 'LNG_REFERENCE_DATA_OUTBREAK_MAP_SERVER_TYPE_TILE_XYZ'
+        },
+        VECTOR_TILE_VECTOR_TILE_LAYER: {
+            label: 'LNG_REFERENCE_DATA_OUTBREAK_MAP_SERVER_TYPE_VECTOR_TILE_VECTOR_TILE_LAYER',
+            value: 'LNG_REFERENCE_DATA_OUTBREAK_MAP_SERVER_TYPE_VECTOR_TILE_VECTOR_TILE_LAYER'
+        }
+    };
+
     static APP_PAGE = {
         LAB_RESULTS: {
             label: 'LNG_APP_PAGE_LAB_RESULTS',

@@ -11,8 +11,11 @@ import {
 import * as _ from 'lodash';
 import Map from 'ol/Map';
 import View from 'ol/View';
-import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
-import { Cluster, TileArcGISRest, Vector as VectorSource } from 'ol/source';
+import { Tile as TileLayer, Vector as VectorLayer} from 'ol/layer';
+import { Cluster, TileArcGISRest, Vector as VectorSource, XYZ } from 'ol/source';
+import VectorTileLayer from 'ol/layer/VectorTile';
+import VectorTileSource from 'ol/source/VectorTile';
+import MVT from 'ol/format/MVT';
 import { transform } from 'ol/proj';
 import { Select as InteractionSelect } from 'ol/interaction';
 import Feature from 'ol/Feature';
@@ -21,6 +24,7 @@ import { Circle as CircleStyle, Fill, Icon, Stroke, Style, Text } from 'ol/style
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { MapServerModel } from '../../../../core/models/map-server.model';
+import { Constants } from '../../../../core/models/constants';
 import { Observable, Subscriber, Subscription } from 'rxjs';
 import { addCommon as addCommonProjections } from 'ol/proj.js';
 import { v4 as uuid } from 'uuid';
@@ -450,12 +454,40 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                     this.layers = _.map(
                         _.filter(selectedOutbreak.arcGisServers, 'url'),
                         (mapServer: MapServerModel) => {
-                            return new TileLayer({
-                                source: new TileArcGISRest({
-                                    url: mapServer.url,
-                                    crossOrigin: 'anonymous'
-                                })
-                            });
+                            // create layer based on the map type
+                            switch (mapServer.type) {
+                                case Constants.OUTBREAK_MAP_SERVER_TYPES.TILE_XYZ.value:
+                                    // add '/tile/{z}/{y}/{x}' to url if not specified
+                                    return new TileLayer({
+                                        source: new XYZ({
+                                            url: mapServer.url + (!/\/tile\/{z}\/{y}\/{x}$/.test(mapServer.url) ? '/tile/{z}/{y}/{x}' : ''),
+                                            crossOrigin: 'anonymous'
+                                        })
+                                    });
+
+                                    break;
+                                case Constants.OUTBREAK_MAP_SERVER_TYPES.VECTOR_TILE_VECTOR_TILE_LAYER.value:
+                                    return new VectorTileLayer({
+                                        // add '/tile/{z}/{y}/{x}.pbf' to url if not specified
+                                        source: new VectorTileSource({
+                                            url: mapServer.url + (!/\/tile\/{z}\/{y}\/{x}.pbf$/.test(mapServer.url) ? '/tile/{z}/{y}/{x}.pbf' : ''),
+                                            format: new MVT({
+                                                featureClass: Feature
+                                            }),
+                                            rossOrigin: 'anonymous'
+                                        })
+                                    });
+
+                                    break;
+                                default:
+                                    // Constants.OUTBREAK_MAP_SERVER_TYPES.TILE_TILE_ARC_GIS_REST.values:
+                                    return new TileLayer({
+                                        source: new TileArcGISRest({
+                                            url: mapServer.url,
+                                            crossOrigin: 'anonymous'
+                                        })
+                                    });
+                            }
                         });
 
                     // wait for binding to take effect => ngIf
