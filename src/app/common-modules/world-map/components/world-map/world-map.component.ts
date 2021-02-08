@@ -11,14 +11,19 @@ import {
 import * as _ from 'lodash';
 import Map from 'ol/Map';
 import View from 'ol/View';
-import { Tile as TileLayer, Vector as VectorLayer} from 'ol/layer';
-import { Cluster, TileArcGISRest, Vector as VectorSource, XYZ } from 'ol/source';
-import VectorTileLayer from 'ol/layer/VectorTile';
-import VectorTileSource from 'ol/source/VectorTile';
-import MVT from 'ol/format/MVT';
+import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
+import {
+    Cluster,
+    TileArcGISRest,
+    Vector as VectorSource,
+    XYZ
+} from 'ol/source';
+import { VectorTileLayer } from 'ol/layer/VectorTile';
+import { VectorTileSource } from 'ol/source/VectorTile';
+import { MVT } from 'ol/format/MVT';
 import { transform } from 'ol/proj';
 import { Select as InteractionSelect } from 'ol/interaction';
-import Feature from 'ol/Feature';
+import { Feature } from 'ol/Feature';
 import { LineString, Point } from 'ol/geom';
 import { Circle as CircleStyle, Fill, Icon, Stroke, Style, Text } from 'ol/style';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
