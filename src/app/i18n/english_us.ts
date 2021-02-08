@@ -27,11 +27,9 @@ export const EnglishUsLang = {
             '<div style="padding-bottom: 10px"><span style="color: #770000; font-weight: bold;">[Tile - TileArcGISRest]</span> - Layer source that provide pre-rendered, tiled images in grids that are organized by zoom levels for specific resolutions.<div>' +
             '<div style="padding-bottom: 10px"><span style="color: #770000; font-weight: bold;">[Tile - XYZ]</span> - Layer source for tile data with URLs in a set XYZ format that are defined in a URL template. By default, this follows the widely-used Google grid where x 0 and y 0 are in the top left. Grids like TMS where x 0 and y 0 are in the bottom left can be used by using the {-y} placeholder in the URL template, so long as the source does not have a custom tile grid.' +
             '<div style="padding-bottom: 10px"><span style="color: #770000; font-weight: bold;">[VectorTile - VectorTileLayer]</span> - Layer source for vector tile data that is rendered client-side.<div>',
-        'LNG_REFERENCE_DATA_OUTBREAK_MAP_SERVER_TYPE_TILE_TILE_ARC_GIS_REST_DESCRIPTION': 'Layer source that provide pre-rendered, tiled images in grids that are organized by zoom levels for specific resolutions.',
+        'LNG_REFERENCE_DATA_OUTBREAK_MAP_SERVER_TYPE_TILE_TILE_ARC_GIS_REST': 'Tile - ArcGIS REST',
         'LNG_REFERENCE_DATA_OUTBREAK_MAP_SERVER_TYPE_TILE_XYZ': 'Tile - XYZ',
-        'LNG_REFERENCE_DATA_OUTBREAK_MAP_SERVER_TYPE_TILE_XYZ_DESCRIPTION': 'Layer source for tile data with URLs in a set XYZ format that are defined in a URL template. By default, this follows the widely-used Google grid where x 0 and y 0 are in the top left. Grids like TMS where x 0 and y 0 are in the bottom left can be used by using the {-y} placeholder in the URL template, so long as the source does not have a custom tile grid.',
-        'LNG_REFERENCE_DATA_OUTBREAK_MAP_SERVER_TYPE_VECTOR_TILE_VECTOR_TILE_LAYER': 'VectorTile - VectorTileLayer',
-        'LNG_REFERENCE_DATA_OUTBREAK_MAP_SERVER_TYPE_VECTOR_TILE_VECTOR_TILE_LAYER_DESCRIPTION': 'Layer source for vector tile data that.',
+        'LNG_REFERENCE_DATA_OUTBREAK_MAP_SERVER_TYPE_VECTOR_TILE_VECTOR_TILE_LAYER': 'VectorTile - VectorTileLayer'
 
         /**
          * REMOVE the tokens from below

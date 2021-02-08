@@ -23,8 +23,6 @@ export class NameUrlModel {
     }]
 })
 export class FormNameUrlListComponent extends ListBase<NameUrlModel> implements OnInit {
-    outbreakMapServerTypesList$: Observable<any[]>;
-
     @Input() required: boolean = false;
     @Input() disabled: boolean = false;
     @Input() namePlaceholder: string = '';
@@ -35,12 +33,15 @@ export class FormNameUrlListComponent extends ListBase<NameUrlModel> implements 
     @Input() typeTooltip: string;
     @Input() componentTitle: string;
 
+    // list of map types
+    outbreakMapServerTypesList$: Observable<any[]>;
+
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
         private dialogService: DialogService,
-        private genericDataService: GenericDataService,
+        private genericDataService: GenericDataService
     ) {
         super(controlContainer, validators, asyncValidators);
     }
