@@ -18,11 +18,10 @@ import {
     Vector as VectorSource,
     XYZ
 } from 'ol/source';
-import { VectorTileLayer } from 'ol/layer/VectorTile';
-import { VectorTileSource } from 'ol/source/VectorTile';
-import { MVT } from 'ol/format/MVT';
+import VectorTileLayer from 'ol/layer/VectorTile';
+import VectorTileSource from 'ol/source/VectorTile';
+import MVT from 'ol/format/MVT';
 import { transform } from 'ol/proj';
-import { Select as InteractionSelect } from 'ol/interaction';
 import Feature from 'ol/Feature';
 import { LineString, Point } from 'ol/geom';
 import { Circle as CircleStyle, Fill, Icon, Stroke, Style, Text } from 'ol/style';
@@ -388,11 +387,6 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * Select map features handler
-     */
-    private _clickSelect: InteractionSelect;
-
-    /**
      * Used to hide features
      */
     private hiddenFeatureStyle: Style = new Style();
@@ -476,10 +470,8 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                                         // add '/tile/{z}/{y}/{x}.pbf' to url if not specified
                                         source: new VectorTileSource({
                                             url: mapServer.url + (!/\/tile\/{z}\/{y}\/{x}.pbf$/.test(mapServer.url) ? '/tile/{z}/{y}/{x}.pbf' : ''),
-                                            format: new MVT({
-                                                featureClass: Feature
-                                            }),
-                                            rossOrigin: 'anonymous'
+                                            format: new MVT(),
+                                            crossOrigin: 'anonymous'
                                         })
                                     });
 
@@ -1149,27 +1141,11 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         });
 
         // EVENTS LISTENERS
-        // create click listener
-        this._clickSelect = new InteractionSelect({
-            multi: true,
-            style: (feature) => {
-                const properties = feature.getProperties();
-                return _.isEmpty(properties.features) ?
-                    feature.getStyle() :
-                    this.clusterStyleFeature(feature);
-            }
-        });
-        this._clickSelect.on('select', (data: {
-            deselected: any[],
-            selected: any[],
-            mapBrowserEvent: any
-        }) => {
+        this.map.on('click', (event) => {
             // determine feature with bigger priority
+            const selectedFeatures: Feature[] = this.map.getFeaturesAtPixel(event.pixel);
             let selectFeature: Feature;
-            _.each(data.selected, (feature: Feature) => {
-                // allow system to select again the same feature
-                this.clearSelectedItems();
-
+            _.each(selectedFeatures, (feature: Feature) => {
                 // get feature properties
                 const properties = feature.getProperties();
                 if (!_.isEmpty(properties.features)) {
@@ -1250,9 +1226,6 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                 );
             }
         });
-
-        // add events listeners
-        this.map.addInteraction(this._clickSelect);
         // END OF EVENTS LISTENERS
 
         // initialize map overlay
@@ -1342,13 +1315,6 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                 observer.complete();
             }
         });
-    }
-
-    /**
-     * Clear Selected items
-     */
-    private clearSelectedItems() {
-        this._clickSelect.getFeatures().clear();
     }
 
     /**
