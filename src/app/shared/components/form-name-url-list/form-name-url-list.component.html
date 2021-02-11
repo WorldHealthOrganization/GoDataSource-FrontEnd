@@ -51,7 +51,8 @@
                         (optionChanged)="onChange()"
                         [options]="outbreakMapServerTypesList$ | async"
                         optionLabelKey="label"
-                        optionValueKey="value">
+                        optionValueKey="value"
+                        [required]="required">
                     </app-form-select>
 
                     <div
