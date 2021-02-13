@@ -1,4 +1,5 @@
 export enum FieldValueType {
+    BOOLEAN = 'boolean',
     NUMBER = 'number',
     STRING = 'string',
     LNG_TOKEN = 'language-token',
@@ -12,6 +13,11 @@ export interface FieldValueDiff {
     property: string;
     oldValue: string;
     newValue: string;
+}
+
+export interface BooleanValue {
+    type: FieldValueType.BOOLEAN;
+    value: FieldValueDiff;
 }
 
 export interface NumberValue {
@@ -51,4 +57,4 @@ export interface ArrayValue {
     value: AuditLogValue[];
 }
 
-export type AuditLogValue = (NumberValue | StringValue | LanguageTokenValue | RichContentValue | DateValue | ObjectValue | ArrayValue);
+export type AuditLogValue = (BooleanValue | NumberValue | StringValue | LanguageTokenValue | RichContentValue | DateValue | ObjectValue | ArrayValue);
