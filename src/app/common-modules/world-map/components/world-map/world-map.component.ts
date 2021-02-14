@@ -27,7 +27,6 @@ import { LineString, Point } from 'ol/geom';
 import { Circle as CircleStyle, Fill, Icon, Stroke, Style, Text } from 'ol/style';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { MapServerModel } from '../../../../core/models/map-server.model';
 import { Constants } from '../../../../core/models/constants';
 import { Observable, Subscriber, Subscription } from 'rxjs';
 import { addCommon as addCommonProjections } from 'ol/proj.js';
@@ -35,6 +34,7 @@ import { v4 as uuid } from 'uuid';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components';
 import { MatDialogRef } from '@angular/material';
+import { applyStyle } from 'ol-mapbox-style';
 
 export class WorldMapPoint {
     constructor(
@@ -230,7 +230,10 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     /**
      * Map Tiles / Layers
      */
-    layers: TileLayer[] = [];
+    layers: {
+        styleLoaded: boolean,
+        layer: TileLayer | VectorTileLayer | VectorLayer
+    }[] = [];
 
     /**
      * Map handler
@@ -448,50 +451,98 @@ export class WorldMapComponent implements OnInit, OnDestroy {
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 // no outbreak yet ?
-                if (selectedOutbreak) {
-                    // set map layers
-                    this.layers = _.map(
-                        _.filter(selectedOutbreak.arcGisServers, 'url'),
-                        (mapServer: MapServerModel) => {
-                            // create layer based on the map type
-                            switch (mapServer.type) {
-                                case Constants.OUTBREAK_MAP_SERVER_TYPES.TILE_XYZ.value:
-                                    // add '/tile/{z}/{y}/{x}' to url if not specified
-                                    return new TileLayer({
-                                        source: new XYZ({
-                                            url: mapServer.url + (!/\/tile\/{z}\/{y}\/{x}$/.test(mapServer.url) ? '/tile/{z}/{y}/{x}' : ''),
-                                            crossOrigin: 'anonymous'
-                                        })
-                                    });
-
-                                    break;
-                                case Constants.OUTBREAK_MAP_SERVER_TYPES.VECTOR_TILE_VECTOR_TILE_LAYER.value:
-                                    return new VectorTileLayer({
-                                        // add '/tile/{z}/{y}/{x}.pbf' to url if not specified
-                                        source: new VectorTileSource({
-                                            url: mapServer.url + (!/\/tile\/{z}\/{y}\/{x}.pbf$/.test(mapServer.url) ? '/tile/{z}/{y}/{x}.pbf' : ''),
-                                            format: new MVT(),
-                                            crossOrigin: 'anonymous'
-                                        })
-                                    });
-
-                                    break;
-                                default:
-                                    // Constants.OUTBREAK_MAP_SERVER_TYPES.TILE_TILE_ARC_GIS_REST.values:
-                                    return new TileLayer({
-                                        source: new TileArcGISRest({
-                                            url: mapServer.url,
-                                            crossOrigin: 'anonymous'
-                                        })
-                                    });
-                            }
-                        });
-
-                    // wait for binding to take effect => ngIf
-                    setTimeout(() => {
-                        this.initializeMap();
-                    });
+                if (!selectedOutbreak) {
+                    return;
                 }
+
+                // construct layer data used by our map
+                this.layers = [];
+                (selectedOutbreak.arcGisServers || []).forEach((mapServer) => {
+                    // filter out bad layers
+                    if (!mapServer.url) {
+                        return;
+                    }
+
+                    // create layer based on the map type
+                    let layerData: {
+                        layer: TileLayer | VectorTileLayer | VectorLayer,
+                        styleLoaded: boolean
+                    };
+                    switch (mapServer.type) {
+                        case Constants.OUTBREAK_MAP_SERVER_TYPES.TILE_XYZ.value:
+                            // add '/tile/{z}/{y}/{x}' to url if not specified
+                            layerData = {
+                                styleLoaded: true,
+                                layer: new TileLayer({
+                                    source: new XYZ({
+                                        url: mapServer.url + (!/\/tile\/{z}\/{y}\/{x}$/.test(mapServer.url) ? '/tile/{z}/{y}/{x}' : ''),
+                                        crossOrigin: 'anonymous'
+                                    })
+                                })
+                            };
+
+                            // finished
+                            break;
+
+                        case Constants.OUTBREAK_MAP_SERVER_TYPES.VECTOR_TILE_VECTOR_TILE_LAYER.value:
+                            layerData = {
+                                styleLoaded: false,
+                                layer: new VectorTileLayer({
+                                    // add '/tile/{z}/{y}/{x}.pbf' to url if not specified
+                                    source: new VectorTileSource({
+                                        url: mapServer.url + (!/\/tile\/{z}\/{y}\/{x}.pbf$/.test(mapServer.url) ? '/tile/{z}/{y}/{x}.pbf' : ''),
+                                        format: new MVT(),
+                                        crossOrigin: 'anonymous'
+                                    })
+                                })
+                            };
+
+                            // load styles
+                            const path = mapServer.url + '/resources/styles/';
+                            fetch(path + 'root.json')
+                                .then(r => r.json())
+                                .then((glStyle) => {
+                                    // apply style
+                                    applyStyle(
+                                        layerData.layer,
+                                        glStyle,
+                                        'esri',
+                                        path
+                                    ).then(() => {
+                                        layerData.styleLoaded = true;
+
+                                        // try again to init map
+                                        this.initializeMap();
+                                    });
+                                });
+
+                            // finished
+                            break;
+
+                        default:
+                            // Constants.OUTBREAK_MAP_SERVER_TYPES.TILE_TILE_ARC_GIS_REST.values:
+                            layerData = {
+                                styleLoaded: true,
+                                layer: new TileLayer({
+                                    source: new TileArcGISRest({
+                                        url: mapServer.url,
+                                        crossOrigin: 'anonymous'
+                                    })
+                                })
+                            };
+
+                            // finished
+                            break;
+                    }
+
+                    // add layer to list
+                    this.layers.push(layerData);
+                });
+
+                // wait for binding to take effect => ngIf
+                setTimeout(() => {
+                    this.initializeMap();
+                });
             });
     }
 
@@ -1080,6 +1131,13 @@ export class WorldMapComponent implements OnInit, OnDestroy {
             return;
         }
 
+        // check if all layer styles were loaded
+        for (const layerData of this.layers) {
+            if (!layerData.styleLoaded) {
+                return;
+            }
+        }
+
         // initialize map elements
         this.mapView = new View({
             center: [0, 0],
@@ -1092,17 +1150,23 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         this.mapOverlayLayerSource = new VectorSource();
 
         // add overlay - markers & lines layer
-        this.layers.push(new VectorLayer({
-            source: this.mapOverlayLayerSource
-        }));
+        this.layers.push({
+            styleLoaded: true,
+            layer: new VectorLayer({
+                source: this.mapOverlayLayerSource
+            })
+        });
 
         // create overlay cluster layer source
         this.mapOverlayLayerSourceForCluster = new VectorSource();
 
         // add overlay - markers & lines layer
-        this.layers.push(new VectorLayer({
-            source: this.mapOverlayLayerSourceForCluster
-        }));
+        this.layers.push({
+            styleLoaded: true,
+            layer: new VectorLayer({
+                source: this.mapOverlayLayerSourceForCluster
+            })
+        });
 
         // initialize cluster layer source
         this.mapClusterLayerSource = new VectorSource();
@@ -1131,11 +1195,14 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         });
 
         // add cluster layer
-        this.layers.push(clusterVectorLayer);
+        this.layers.push({
+            styleLoaded: true,
+            layer: clusterVectorLayer
+        });
 
         // initialize map
         this.map = new Map({
-            layers: this.layers,
+            layers: this.layers.map((item) => item.layer),
             target: 'worldMap',
             view: this.mapView
         });
