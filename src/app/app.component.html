@@ -1,1 +1,17 @@
+<!-- Render page -->
 <router-outlet></router-outlet>
+
+<!-- Render demo logo if necessary -->
+<div
+    *ngIf="systemSettingsVersion?.demoInstance?.enabled"
+    class="demo-logo"
+    [style.opacity]="systemSettingsVersion.demoInstance.style?.opacity"
+    [style.background-color]="systemSettingsVersion.demoInstance.style?.backgroundColor">
+    <div
+        class="demo-logo-text"
+        [style.color]="systemSettingsVersion.demoInstance.style?.color"
+        [style.font-weight]="systemSettingsVersion.demoInstance.style?.fontWeight"
+        [style.font-size]="systemSettingsVersion.demoInstance.style?.fontSize">
+        {{ systemSettingsVersion.demoInstance.label }}
+    </div>
+</div>
