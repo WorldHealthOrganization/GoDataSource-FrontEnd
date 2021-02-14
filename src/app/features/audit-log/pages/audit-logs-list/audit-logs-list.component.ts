@@ -25,7 +25,11 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
     templateUrl: './audit-logs-list.component.html',
     styleUrls: ['./audit-logs-list.component.less']
 })
-export class AuditLogsListComponent extends ListComponent implements OnInit, OnDestroy {
+export class AuditLogsListComponent
+    extends ListComponent
+    implements OnInit, OnDestroy {
+
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_AUDIT_LOGS_TITLE', '.', true)
     ];

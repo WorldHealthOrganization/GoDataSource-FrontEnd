@@ -8,6 +8,7 @@ import { AuditLogValue, FieldValueType } from '../../types/field-value-type';
     styleUrls: ['./field-changes.component.less']
 })
 export class FieldChangesComponent {
+    // value
     @Input() value: AuditLogValue;
 
     // collapse diff? (for object and array type)
