@@ -1,5 +1,7 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { I18nService } from './core/services/helper/i18n.service';
+import { SystemSettingsDataService } from './core/services/data/system-settings.data.service';
+import { SystemSettingsVersionModel } from './core/models/system-settings-version.model';
 
 @Component({
     selector: 'app-root',
@@ -8,11 +10,20 @@ import { I18nService } from './core/services/helper/i18n.service';
     styleUrls: ['./app.component.less']
 })
 export class AppComponent implements OnInit {
+    // instance configuration
+    systemSettingsVersion: SystemSettingsVersionModel;
 
+    /**
+     * Constructor
+     */
     constructor(
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private systemSettingsDataService: SystemSettingsDataService
     ) {}
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // load the default language
         this.i18nService.loadUserLanguage().subscribe();
@@ -31,5 +42,12 @@ export class AppComponent implements OnInit {
         style.type = 'text/css';
         style.href = 'https://openlayers.org/en/v5.3.0/css/ol.css';
         document.head.appendChild(style);
+
+        // determine if this is a demo or production instance
+        this.systemSettingsDataService
+            .getAPIVersion()
+            .subscribe((systemSettingsVersion) => {
+                this.systemSettingsVersion = systemSettingsVersion;
+            });
     }
 }
