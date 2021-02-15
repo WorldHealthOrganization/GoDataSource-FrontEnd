@@ -215,21 +215,18 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         const needToInitMap: boolean = this._displayLoading && !displayLoading;
         this._displayLoading = displayLoading;
 
-        // wait for binding to take effect => ngIf
-        setTimeout(() => {
-            if (needToInitMap) {
-                this.map = null;
-                this.initializeMap();
-            }
-        });
+        // initialize map
+        if (needToInitMap) {
+            this.map = null;
+            this.initializeMap();
+        }
     }
     get displayLoading(): boolean {
         return this._displayLoading;
     }
 
-    /**
-     * Map Tiles / Layers
-     */
+    // Map Tiles / Layers
+    layersLoading: boolean = true;
     layers: {
         styleLoaded: boolean,
         layer: TileLayer | VectorTileLayer | VectorLayer
@@ -456,6 +453,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                 }
 
                 // construct layer data used by our map
+                this.layersLoading = true;
                 this.layers = [];
                 (selectedOutbreak.arcGisServers || []).forEach((mapServer) => {
                     // filter out bad layers
@@ -539,13 +537,14 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                     this.layers.push(layerData);
                 });
 
-                // wait for binding to take effect => ngIf
-                setTimeout(() => {
-                    this.initializeMap();
-                });
+                // initialize map
+                this.initializeMap();
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {
@@ -1132,182 +1131,187 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         }
 
         // check if all layer styles were loaded
+        this.layersLoading = false;
         for (const layerData of this.layers) {
             if (!layerData.styleLoaded) {
+                this.layersLoading = true;
                 return;
             }
         }
 
-        // initialize map elements
-        this.mapView = new View({
-            center: [0, 0],
-            zoom: 5,
-            minZoom: this.minZoom,
-            maxZoom: this.maxZoom
-        });
+        // wait for data to be binded so we can see the map dom element
+        setTimeout(() => {
+            // initialize map elements
+            this.mapView = new View({
+                center: [0, 0],
+                zoom: 5,
+                minZoom: this.minZoom,
+                maxZoom: this.maxZoom
+            });
 
-        // create overlay layer source
-        this.mapOverlayLayerSource = new VectorSource();
+            // create overlay layer source
+            this.mapOverlayLayerSource = new VectorSource();
 
-        // add overlay - markers & lines layer
-        this.layers.push({
-            styleLoaded: true,
-            layer: new VectorLayer({
-                source: this.mapOverlayLayerSource
-            })
-        });
+            // add overlay - markers & lines layer
+            this.layers.push({
+                styleLoaded: true,
+                layer: new VectorLayer({
+                    source: this.mapOverlayLayerSource
+                })
+            });
 
-        // create overlay cluster layer source
-        this.mapOverlayLayerSourceForCluster = new VectorSource();
+            // create overlay cluster layer source
+            this.mapOverlayLayerSourceForCluster = new VectorSource();
 
-        // add overlay - markers & lines layer
-        this.layers.push({
-            styleLoaded: true,
-            layer: new VectorLayer({
-                source: this.mapOverlayLayerSourceForCluster
-            })
-        });
+            // add overlay - markers & lines layer
+            this.layers.push({
+                styleLoaded: true,
+                layer: new VectorLayer({
+                    source: this.mapOverlayLayerSourceForCluster
+                })
+            });
 
-        // initialize cluster layer source
-        this.mapClusterLayerSource = new VectorSource();
+            // initialize cluster layer source
+            this.mapClusterLayerSource = new VectorSource();
 
-        // initialize cluster
-        this.mapClusterSource = new Cluster({
-            distance: this.clusterDistance,
-            source: this.mapClusterLayerSource
-        });
+            // initialize cluster
+            this.mapClusterSource = new Cluster({
+                distance: this.clusterDistance,
+                source: this.mapClusterLayerSource
+            });
 
-        // update items accordingly to cluster groups
-        this.mapClusterSource.on('addfeature', () => {
-            this.updateOverlayFeaturesAccordinglyToClusterGroups();
-        });
-        this.mapClusterSource.on('removefeature', () => {
-            this.updateOverlayFeaturesAccordinglyToClusterGroups();
-        });
+            // update items accordingly to cluster groups
+            this.mapClusterSource.on('addfeature', () => {
+                this.updateOverlayFeaturesAccordinglyToClusterGroups();
+            });
+            this.mapClusterSource.on('removefeature', () => {
+                this.updateOverlayFeaturesAccordinglyToClusterGroups();
+            });
 
-        // create cluster layer
-        const clusterVectorLayer = new VectorLayer({
-            source: this.mapClusterSource,
-            style: (feature: Feature): Style => {
-                // render cluster feature
-                return this.clusterStyleFeature(feature);
-            }
-        });
-
-        // add cluster layer
-        this.layers.push({
-            styleLoaded: true,
-            layer: clusterVectorLayer
-        });
-
-        // initialize map
-        this.map = new Map({
-            layers: this.layers.map((item) => item.layer),
-            target: 'worldMap',
-            view: this.mapView
-        });
-
-        // EVENTS LISTENERS
-        this.map.on('click', (event) => {
-            // determine feature with bigger priority
-            const selectedFeatures: Feature[] = this.map.getFeaturesAtPixel(event.pixel);
-            let selectFeature: Feature;
-            _.each(selectedFeatures, (feature: Feature) => {
-                // get feature properties
-                const properties = feature.getProperties();
-                if (!_.isEmpty(properties.features)) {
-                    if (
-                        properties.features.length === 1 &&
-                        properties.features[0].getProperties &&
-                        properties.features[0].getProperties() &&
-                        properties.features[0].getProperties().dataForEventListeners &&
-                        properties.features[0].getProperties().dataForEventListeners.selected
-                    ) {
-                        // single record
-                        if (properties.features[0].getProperties().dataForEventListeners instanceof WorldMapPath) {
-                            selectFeature = selectFeature ? selectFeature : properties.features[0];
-                        } else {
-                            // anything else is more important than a line
-                            selectFeature = properties.features[0];
-                        }
-                    } else {
-                        // determine all clickable items from group
-                        const groupItems: {
-                            [id: string]: WorldMapPath | WorldMapMarker
-                        } = {};
-                        properties.features.forEach((item) => {
-                            if (item.getProperties().dataForEventListeners.selected) {
-                                groupItems[item.getProperties().dataForEventListeners.id] = item.getProperties().dataForEventListeners;
-                            }
-                        });
-
-                        // go through cluster features and determine which overlay data should be hidden and which should be visible
-                        const overlayFeatures: Feature[] = this.mapOverlayLayerSource.getFeatures();
-                        (overlayFeatures || []).forEach((overlayFeature: Feature) => {
-                            // retrieve overlay feature properties
-                            const overlayProperties: any = overlayFeature.getProperties ? overlayFeature.getProperties() : null;
-
-                            // do we need to check if we should hide this feature ?
-                            if (
-                                !(overlayProperties.dataForEventListeners instanceof WorldMapPath) ||
-                                overlayProperties.clusterGroupFeature !== feature ||
-                                !overlayProperties.dataForEventListeners.hideOnMarkerCluster ||
-                                !overlayProperties.dataForEventListeners.selected
-                            ) {
-                                return;
-                            }
-
-                            // add feature to list of items to display in dialog
-                            groupItems[overlayProperties.dataForEventListeners.id] = overlayProperties.dataForEventListeners;
-                        });
-
-                        // do we have clickable items in this group ?
-                        if (!_.isEmpty(groupItems)) {
-                            // call method for handling groups
-                            this.displayChoseFromGroupDialog(Object.values(groupItems));
-                        }
-                    }
-                } else if (
-                    properties.dataForEventListeners &&
-                    properties.dataForEventListeners.selected
-                ) {
-                    // single record
-                    if (
-                        properties.dataForEventListeners instanceof WorldMapPath ||
-                        properties.dataForEventListeners instanceof WorldMapClusterLine
-                    ) {
-                        selectFeature = selectFeature ? selectFeature : feature;
-                    } else {
-                        // anything else is more important than a line
-                        selectFeature = feature;
-                    }
+            // create cluster layer
+            const clusterVectorLayer = new VectorLayer({
+                source: this.mapClusterSource,
+                style: (feature: Feature): Style => {
+                    // render cluster feature
+                    return this.clusterStyleFeature(feature);
                 }
             });
 
-            // trigger select
-            if (selectFeature) {
-                // call method
-                selectFeature.getProperties().dataForEventListeners.selected(
-                    this,
-                    selectFeature.getProperties().dataForEventListeners
-                );
+            // add cluster layer
+            this.layers.push({
+                styleLoaded: true,
+                layer: clusterVectorLayer
+            });
+
+            // initialize map
+            this.map = new Map({
+                layers: this.layers.map((item) => item.layer),
+                target: 'worldMap',
+                view: this.mapView
+            });
+
+            // EVENTS LISTENERS
+            this.map.on('click', (event) => {
+                // determine feature with bigger priority
+                const selectedFeatures: Feature[] = this.map.getFeaturesAtPixel(event.pixel);
+                let selectFeature: Feature;
+                _.each(selectedFeatures, (feature: Feature) => {
+                    // get feature properties
+                    const properties = feature.getProperties();
+                    if (!_.isEmpty(properties.features)) {
+                        if (
+                            properties.features.length === 1 &&
+                            properties.features[0].getProperties &&
+                            properties.features[0].getProperties() &&
+                            properties.features[0].getProperties().dataForEventListeners &&
+                            properties.features[0].getProperties().dataForEventListeners.selected
+                        ) {
+                            // single record
+                            if (properties.features[0].getProperties().dataForEventListeners instanceof WorldMapPath) {
+                                selectFeature = selectFeature ? selectFeature : properties.features[0];
+                            } else {
+                                // anything else is more important than a line
+                                selectFeature = properties.features[0];
+                            }
+                        } else {
+                            // determine all clickable items from group
+                            const groupItems: {
+                                [id: string]: WorldMapPath | WorldMapMarker
+                            } = {};
+                            properties.features.forEach((item) => {
+                                if (item.getProperties().dataForEventListeners.selected) {
+                                    groupItems[item.getProperties().dataForEventListeners.id] = item.getProperties().dataForEventListeners;
+                                }
+                            });
+
+                            // go through cluster features and determine which overlay data should be hidden and which should be visible
+                            const overlayFeatures: Feature[] = this.mapOverlayLayerSource.getFeatures();
+                            (overlayFeatures || []).forEach((overlayFeature: Feature) => {
+                                // retrieve overlay feature properties
+                                const overlayProperties: any = overlayFeature.getProperties ? overlayFeature.getProperties() : null;
+
+                                // do we need to check if we should hide this feature ?
+                                if (
+                                    !(overlayProperties.dataForEventListeners instanceof WorldMapPath) ||
+                                    overlayProperties.clusterGroupFeature !== feature ||
+                                    !overlayProperties.dataForEventListeners.hideOnMarkerCluster ||
+                                    !overlayProperties.dataForEventListeners.selected
+                                ) {
+                                    return;
+                                }
+
+                                // add feature to list of items to display in dialog
+                                groupItems[overlayProperties.dataForEventListeners.id] = overlayProperties.dataForEventListeners;
+                            });
+
+                            // do we have clickable items in this group ?
+                            if (!_.isEmpty(groupItems)) {
+                                // call method for handling groups
+                                this.displayChoseFromGroupDialog(Object.values(groupItems));
+                            }
+                        }
+                    } else if (
+                        properties.dataForEventListeners &&
+                        properties.dataForEventListeners.selected
+                    ) {
+                        // single record
+                        if (
+                            properties.dataForEventListeners instanceof WorldMapPath ||
+                            properties.dataForEventListeners instanceof WorldMapClusterLine
+                        ) {
+                            selectFeature = selectFeature ? selectFeature : feature;
+                        } else {
+                            // anything else is more important than a line
+                            selectFeature = feature;
+                        }
+                    }
+                });
+
+                // trigger select
+                if (selectFeature) {
+                    // call method
+                    selectFeature.getProperties().dataForEventListeners.selected(
+                        this,
+                        selectFeature.getProperties().dataForEventListeners
+                    );
+                }
+            });
+            // END OF EVENTS LISTENERS
+
+            // initialize map overlay
+            this.reinitializeOverlay();
+
+            // fit markers ?
+            if (this.fitMapOnMarkersChange) {
+                this.fitMarkerBounds();
+            } else {
+                // center location if we have something to center
+                this.refreshMapCenter();
             }
+
+            // update map size
+            this.updateMapSize();
         });
-        // END OF EVENTS LISTENERS
-
-        // initialize map overlay
-        this.reinitializeOverlay();
-
-        // fit markers ?
-        if (this.fitMapOnMarkersChange) {
-            this.fitMarkerBounds();
-        } else {
-            // center location if we have something to center
-            this.refreshMapCenter();
-        }
-
-        // update map size
-        this.updateMapSize();
     }
 
     /**
