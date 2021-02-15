@@ -36,6 +36,9 @@ import { DialogButton, DialogComponent, DialogConfiguration, DialogField, Dialog
 import { MatDialogRef } from '@angular/material';
 import { applyStyle } from 'ol-mapbox-style';
 
+/**
+ * Point used for rendering purposes
+ */
 export class WorldMapPoint {
     constructor(
         public latitude: number,
@@ -43,17 +46,27 @@ export class WorldMapPoint {
     ) {}
 }
 
+/**
+ * Marker Type
+ */
 export enum WorldMapMarkerType {
     IMAGE = 'image',
     CIRCLE = 'circle'
 }
 
+/**
+ * Marker top layer (layer used to render items on top of the outbreak layers - used to render markers, paths ...)
+ */
 export enum WorldMapMarkerLayer {
     OVERLAY = 'overlay',
     CLUSTER = 'cluster'
 }
 
+/**
+ * Map marker - e.g. group / case / contact ...
+ */
 export class WorldMapMarker {
+    // data
     id: string;
     point: WorldMapPoint;
     label: string;
@@ -66,6 +79,9 @@ export class WorldMapMarker {
     selected: (map: WorldMapComponent, data: WorldMapMarker) => void;
     data: any;
 
+    /**
+     * Constructor
+     */
     constructor(data: {
         // required
         point: WorldMapPoint,
@@ -92,12 +108,19 @@ export class WorldMapMarker {
     }
 }
 
+/**
+ * Map path - e.g. relationship, move from - to location
+ */
 export enum WorldMapPathType {
     LINE = 'line',
     ARROW = 'arrow'
 }
 
+/**
+ * Map path - e.g. relationship, move from - to location
+ */
 export class WorldMapPath {
+    // data
     id: string;
     points: (WorldMapPoint | WorldMapMarker)[];
     type: WorldMapPathType = WorldMapPathType.LINE;
@@ -110,6 +133,9 @@ export class WorldMapPath {
     hideOnMarkerCluster: boolean = false;
     label: string;
 
+    /**
+     * Constructor
+     */
     constructor(data: {
         // required
         points: (WorldMapPoint | WorldMapMarker)[],
@@ -143,11 +169,17 @@ export class WorldMapPath {
     }
 }
 
+/**
+ * Map cluster line - grouping lines together
+ */
 class WorldMapClusterLine {
     id: string;
     data: WorldMapPath[];
     selected: (map: WorldMapComponent, lines: WorldMapPath[]) => void;
 
+    /**
+     * Constructor
+     */
     constructor(data: {
         data: WorldMapPath[],
         selected?: (map: WorldMapComponent, clusterLine: WorldMapClusterLine) => void
@@ -170,9 +202,7 @@ class WorldMapClusterLine {
     styleUrls: ['./world-map.component.less']
 })
 export class WorldMapComponent implements OnInit, OnDestroy {
-    /**
-     * Map fill size ( Default w: 100%, h: 400px )
-     */
+    // Map fill size ( Default w: 100%, h: 400px )
     private _width: string = '100%';
     private _height: string = '400px';
     @Input() set width(width: string) {
@@ -196,19 +226,13 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         return this._height;
     }
 
-    /**
-     * Display disclaimer
-     */
+    // Display disclaimer
     @Input() displayDisclaimer: boolean = true;
 
-    /**
-     * Display disclaimer content
-     */
+    // Display disclaimer content
     displayDisclaimerContent: boolean = true;
 
-    /**
-     * Display spinner instead of map ?
-     */
+    // Display spinner instead of map ?
     private _displayLoading: boolean = false;
     @Input() set displayLoading(displayLoading: boolean) {
         // display loading
@@ -232,29 +256,19 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         layer: TileLayer | VectorTileLayer | VectorLayer
     }[] = [];
 
-    /**
-     * Map handler
-     */
+    // Map handler
     map: Map;
 
-    /**
-     * Map View
-     */
+    // Map View
     mapView: View;
 
-    /**
-     * Map Overlay Layer Source
-     */
+    // Map Overlay Layer Source
     mapOverlayLayerSource: VectorSource;
 
-    /**
-     * Map Overlay Layer Source used to draw cluster stuff ( grouped lines )
-     */
+    // Map Overlay Layer Source used to draw cluster stuff ( grouped lines )
     mapOverlayLayerSourceForCluster: VectorSource;
 
-    /**
-     * Merge distance
-     */
+    // Merge distance
     private _clusterDistance: number = 10;
     @Input() set clusterDistance(clusterDistance: number) {
         this._clusterDistance = clusterDistance;
@@ -266,36 +280,24 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         return this._clusterDistance;
     }
 
-    /**
-     * Map cluster vector source
-     */
+    // Map cluster vector source
     mapClusterLayerSource: VectorSource;
 
-    /**
-     * Cluster
-     */
+    // Cluster
     mapClusterSource: Cluster;
 
-    /**
-     * Style cache
-     */
+    // Style cache
     styleCache: {
         [key: string]: Style
     } = {};
 
-    /**
-     * Cluster size color
-     */
+    // Cluster size color
     @Input() clusterLabelColor: string = '#FFF';
 
-    /**
-     * Fit layer
-     */
+    // Fit layer
     @Input() fitLayer: WorldMapMarkerLayer = WorldMapMarkerLayer.OVERLAY;
 
-    /**
-     * Map Markers
-     */
+    // Map Markers
     private _markers: WorldMapMarker[] = [];
     @Input() set markers(markers: WorldMapMarker[]) {
         // set the new markers
@@ -313,9 +315,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         return this._markers;
     }
 
-    /**
-     * Map Lines
-     */
+    // Map Lines
     private _lines: WorldMapPath[] = [];
     @Input() set lines(lines: WorldMapPath[]) {
         // set the new lines
@@ -328,29 +328,19 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         return this._lines;
     }
 
-    /**
-     * Minimum map zoom level ( >= 1 )
-     */
+    // Minimum map zoom level ( >= 1 )
     @Input() minZoom: number;
 
-    /**
-     * Maximum map zoom level ( >= 1 )
-     */
+    // Maximum map zoom level ( >= 1 )
     @Input() maxZoom: number;
 
-    /**
-     * Zoom out / in map to fit markers whenever we set markers ?
-     */
+    // Zoom out / in map to fit markers whenever we set markers ?
     @Input() fitMapOnMarkersChange: boolean = false;
 
-    /**
-     * Marker bounds ( minx, miny, maxx, maxy )
-     */
+    // Marker bounds ( minx, miny, max, maxy )
     private markerBounds: number[];
 
-    /**
-     * Center map on specific point
-     */
+    // Center map on specific point
     private _centerLocation: WorldMapPoint;
     @Input() set centerLocation(value: WorldMapPoint) {
         // set center location
@@ -363,17 +353,13 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         return this._centerLocation;
     }
 
-    /**
-     * Center zoom when focusing on a specific point
-     */
+    // Center zoom when focusing on a specific point
     @Input() centerLocationZoom: number;
 
     // subscribers
     outbreakSubscriber: Subscription;
 
-    /**
-     * Display / Hide marker labels
-     */
+    // Display / Hide marker labels
     private _displayLabels: boolean = true;
     @Input() set displayLabels(displayLabels: boolean) {
         // set value
@@ -386,19 +372,13 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         return this._displayLabels;
     }
 
-    /**
-     * Used to hide features
-     */
+    // Used to hide features
     private hiddenFeatureStyle: Style = new Style();
 
-    /**
-     * Handler for cluster update
-     */
+    // Handler for cluster update
     private clusterUpdatePending: any;
 
-    /**
-     * Used to draw cluster lines
-     */
+    // Used to draw cluster lines
     @Input() clusterLineStyle: Style = new Style({
         stroke: new Stroke({
             color: '#00F',
@@ -407,26 +387,20 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         })
     });
 
-    /**
-     * Marker section title for group dialog
-     */
+    // Marker section title for group dialog
     @Input() groupMarkerTitle: string;
 
-    /**
-     * Path ( lines ) section title for group dialog
-     */
+    // Path ( lines ) section title for group dialog
     @Input() groupPathTitle: string;
 
-    /**
-     * It's full screen activated?
-     */
+    // It's full screen activated?
     fullScreenMode: boolean = false;
 
-    /**
-     * Event emitter for full screen toggle
-     * @type {EventEmitter<any>}
-     */
+    // Event emitter for full screen toggle
     @Output() fullScreenToggle = new EventEmitter<any>();
+
+    // group dialog
+    groupDataDialogHandler: MatDialogRef<DialogComponent>;
 
     /**
      * Constructor
@@ -1479,21 +1453,37 @@ export class WorldMapComponent implements OnInit, OnDestroy {
             });
         }
 
-        // display dialog to choose item from list
-        this.dialogService
-            .showInput(new DialogConfiguration({
-                message: 'LNG_PAGE_WORLD_MAP_GROUP_DIALOG_TITLE',
-                buttons: [
-                    new DialogButton({
-                        label: 'LNG_COMMON_BUTTON_CLOSE',
-                        clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
-                            dialogHandler.close();
-                        }
-                    })
-                ],
-                fieldsList: fieldList
-            }))
-            .subscribe();
+
+
+        // display dialog if necessary
+        if (this.groupDataDialogHandler) {
+            this.groupDataDialogHandler.componentInstance.addFields(
+                fieldList
+            );
+        } else {
+            // display dialog to choose item from list
+            this.groupDataDialogHandler = this.dialogService
+                .showInputDialog(new DialogConfiguration({
+                    message: 'LNG_PAGE_WORLD_MAP_GROUP_DIALOG_TITLE',
+                    buttons: [
+                        new DialogButton({
+                            label: 'LNG_COMMON_BUTTON_CLOSE',
+                            clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
+                                dialogHandler.close();
+                            }
+                        })
+                    ],
+                    fieldsList: fieldList
+                }));
+
+            // display dialog
+            this.groupDataDialogHandler
+                .afterClosed()
+                .subscribe(() => {
+                    // group dialog closed
+                    this.groupDataDialogHandler = undefined;
+                });
+        }
     }
 
     /**
