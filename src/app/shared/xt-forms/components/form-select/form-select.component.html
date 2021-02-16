@@ -87,14 +87,26 @@
             </mat-option>
         </mat-select>
 
+        <!-- Fancy tooltip -->
         <span
             *ngIf="tooltip"
-            #tooltipCtrl="matTooltip"
-            [matTooltip]="tooltip"
-            class="xt-icon form-icon"
-            (click)="displayTooltip($event, tooltipCtrl)">
-            help
+            class="form-icon-fancy">
+            <!-- details popover -->
+            <mde-popover
+                #mappingMdePopover="mdePopover"
+                class="mdePopover"
+                mdePopoverTriggerOn="hover">
+                <span
+                    [innerHTML]="tooltip">
+                </span>
+            </mde-popover>
+
+            <!-- help button -->
+            <span
+                class="xt-icon"
+                [mdePopoverTriggerFor]="mappingMdePopover">help</span>
         </span>
+
     </mat-form-field>
 
     <app-form-validation

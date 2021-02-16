@@ -3,17 +3,17 @@
 
     <form
         #groupForm="ngForm"
-        fxLayout="column"
-    >
+        fxLayout="column">
         <div
             *ngFor="let inputValue of values; let i = index; trackBy: trackByIndex"
             fxLayout="row" fxLayoutAlign="start center">
             <mat-card
                 class="page-section"
-                fxFlex fxLayout="column"
-            >
+                fxFlex fxLayout="column">
+
                 <div
                     fxLayout="row" fxLayoutGap="20px">
+                    <!-- Name -->
                     <app-form-input
                         [name]="name + '[' + i + '][name]'"
                         [(ngModel)]="values[i].name"
@@ -24,12 +24,24 @@
                         [required]="required">
                     </app-form-input>
 
-                    <div fxFlex><!-- placeholder --></div>
-                    <div fxFlex><!-- placeholder --></div>
-                    <div fxFlex><!-- placeholder --></div>
+                    <!-- Type -->
+                    <app-form-select
+                        [name]="name + '[' + i + '][type]'"
+                        [(ngModel)]="values[i].type"
+                        [placeholder]="typePlaceholder"
+                        [disabled]="disabled"
+                        (optionChanged)="onChange()"
+                        [options]="outbreakMapServerTypesList$ | async"
+                        optionLabelKey="label"
+                        optionValueKey="value"
+                        [required]="required"
+                        [tooltip]="typeTooltip">
+                    </app-form-select>
                 </div>
+
                 <div
                     fxLayout="row" fxLayoutGap="20px">
+                    <!-- URL -->
                     <app-form-input
                         [name]="name + '[' + i + '][url]'"
                         [(ngModel)]="values[i].url"
@@ -41,38 +53,6 @@
                     </app-form-input>
                 </div>
 
-                <div
-                    fxLayout="row" fxLayoutGap="20px">
-                     <app-form-select
-                        [name]="name + '[' + i + '][type]'"
-                        [(ngModel)]="values[i].type"
-                        [placeholder]="typePlaceholder"
-                        [disabled]="disabled"
-                        (optionChanged)="onChange()"
-                        [options]="outbreakMapServerTypesList$ | async"
-                        optionLabelKey="label"
-                        optionValueKey="value"
-                        [required]="required">
-                    </app-form-select>
-
-                    <div
-                        fxLayout="row" fxLayoutAlign="none center" fxLayoutGap="-20px">
-                        <!-- details popover -->
-                        <mde-popover
-                            #mappingMdePopover="mdePopover"
-                            class="mdePopover"
-                            mdePopoverTriggerOn="hover">
-                                    <span
-                                        [innerHTML]="typeTooltip | translate | safeHtml">
-                                    </span>
-                        </mde-popover>
-
-                        <!-- help button -->
-                        <span
-                            class="xt-icon xt-icon-xsmall"
-                            [mdePopoverTriggerFor]="mappingMdePopover">help</span>
-                    </div>
-                </div>
             </mat-card>
 
             <button
