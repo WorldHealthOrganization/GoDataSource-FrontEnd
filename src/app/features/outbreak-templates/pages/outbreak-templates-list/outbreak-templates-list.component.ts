@@ -28,7 +28,11 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
     templateUrl: './outbreak-templates-list.component.html',
     styleUrls: ['./outbreak-templates-list.component.less']
 })
-export class OutbreakTemplatesListComponent extends ListComponent implements OnInit, OnDestroy {
+export class OutbreakTemplatesListComponent
+    extends ListComponent
+    implements OnInit, OnDestroy {
+
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE', '.', true)
     ];
@@ -211,6 +215,9 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
         this.followUpsTeamAssignmentAlgorithm$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM);
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
+        // attach default projection
+        this.clearedQueryBuilder();
+
         // initialize Side Table Columns
         this.initializeSideTableColumns();
 
@@ -261,6 +268,19 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
         ];
     }
 
+    /**
+     * Attach default projection
+     */
+    clearedQueryBuilder(): void {
+        this.queryBuilder.fields(
+            'id',
+            'name',
+            'disease',
+            'generateFollowUpsTeamAssignmentAlgorithm',
+            'generateFollowUpsOverwriteExisting',
+            'generateFollowUpsKeepTeamAssignment'
+        );
+    }
 
     /**
      * Re(load) the Outbreak Templates list
