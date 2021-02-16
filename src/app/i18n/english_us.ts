@@ -29,7 +29,12 @@ export const EnglishUsLang = {
             '<div><span style="color: #770000; font-weight: bold;">[VectorTile - VectorTileLayer]</span> - Layer source for vector tile data that is rendered client-side.</div>',
         'LNG_REFERENCE_DATA_OUTBREAK_MAP_SERVER_TYPE_TILE_TILE_ARC_GIS_REST': 'Tile - ArcGIS REST',
         'LNG_REFERENCE_DATA_OUTBREAK_MAP_SERVER_TYPE_TILE_XYZ': 'Tile - XYZ',
-        'LNG_REFERENCE_DATA_OUTBREAK_MAP_SERVER_TYPE_VECTOR_TILE_VECTOR_TILE_LAYER': 'VectorTile - VectorTileLayer'
+        'LNG_REFERENCE_DATA_OUTBREAK_MAP_SERVER_TYPE_VECTOR_TILE_VECTOR_TILE_LAYER': 'VectorTile - VectorTileLayer',
+
+        /**
+         * uiCommonButtons
+         */
+        'LNG_COMMON_BUTTON_DRAG': 'Drag me'
 
         /**
          * REMOVE the tokens from below

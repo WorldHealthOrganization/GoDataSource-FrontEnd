@@ -1,5 +1,5 @@
-import { EventEmitter, Host, Inject, Input, Optional, Output, SkipSelf } from '@angular/core';
-import { ControlContainer, NG_ASYNC_VALIDATORS, NG_VALIDATORS } from '@angular/forms';
+import { EventEmitter, Input, Output } from '@angular/core';
+import { ControlContainer } from '@angular/forms';
 import { GroupValidator } from './group-validator';
 import * as _ from 'lodash';
 import { Observable } from 'rxjs';
@@ -29,9 +29,9 @@ export abstract class ListBase<T> extends GroupValidator<T[]> {
      * Constructor
      */
     protected constructor(
-        @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
-        @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
-        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>
+        controlContainer: ControlContainer,
+        validators: Array<any>,
+        asyncValidators: Array<any>
     ) {
         // parent
         super(controlContainer, validators, asyncValidators);
