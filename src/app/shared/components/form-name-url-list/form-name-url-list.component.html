@@ -23,7 +23,7 @@
                             fxLayout="row" fxLayoutGap="20px">
                             <!-- Name -->
                             <app-form-input
-                                [name]="name + '[' + i + '][name]'"
+                                [name]="name + '[' + i + '].name'"
                                 [(ngModel)]="values[i].name"
                                 [placeholder]="namePlaceholder"
                                 [tooltip]="nameTooltip"
@@ -34,7 +34,7 @@
 
                             <!-- Type -->
                             <app-form-select
-                                [name]="name + '[' + i + '][type]'"
+                                [name]="name + '[' + i + '].type'"
                                 [(ngModel)]="values[i].type"
                                 [placeholder]="typePlaceholder"
                                 [disabled]="disabled"
@@ -51,7 +51,7 @@
                             fxLayout="row" fxLayoutGap="20px">
                             <!-- URL -->
                             <app-form-input
-                                [name]="name + '[' + i + '][url]'"
+                                [name]="name + '[' + i + '].url'"
                                 [(ngModel)]="values[i].url"
                                 [placeholder]="urlPlaceholder"
                                 [tooltip]="urlTooltip"
