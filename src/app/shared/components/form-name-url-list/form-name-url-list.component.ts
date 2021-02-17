@@ -6,6 +6,7 @@ import { DialogService } from '../../../core/services/helper/dialog.service';
 import { GenericDataService } from '../../../core/services/data/generic.data.service';
 import { SortableListBase } from '../../xt-forms/core/sortable-list-base';
 import { CdkDragDrop, CdkDragStart, moveItemInArray } from '@angular/cdk/drag-drop';
+import { Constants } from '../../../core/models/constants';
 
 export class NameUrlModel {
     name: string;
@@ -38,8 +39,17 @@ export class FormNameUrlListComponent
     @Input() typeTooltip: string;
     @Input() componentTitle: string;
 
+    // vector styling
+    @Input() styleUrlPlaceholder: string = '';
+    @Input() styleUrlSourcePlaceholder: string = '';
+    @Input() styleUrlTooltip: string;
+    @Input() styleUrlSourceTooltip: string;
+
     // list of map types
     outbreakMapServerTypesList$: Observable<any[]>;
+
+    // constants
+    Constants = Constants;
 
     /**
      * Constructor

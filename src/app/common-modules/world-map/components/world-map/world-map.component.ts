@@ -479,7 +479,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                                         layerData.layer,
                                         glStyle,
                                         'esri',
-                                        path
+                                        path ? path : undefined
                                     ).then(() => {
                                         layerData.styleLoaded = true;
 
