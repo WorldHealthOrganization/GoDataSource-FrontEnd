@@ -23,7 +23,7 @@
                             fxLayout="row" fxLayoutGap="20px">
                             <!-- Name -->
                             <app-form-input
-                                [name]="name + '[' + i + '].name'"
+                                [name]="name + '[' + i + '][name]'"
                                 [(ngModel)]="values[i].name"
                                 [placeholder]="namePlaceholder"
                                 [tooltip]="nameTooltip"
@@ -34,7 +34,7 @@
 
                             <!-- Type -->
                             <app-form-select
-                                [name]="name + '[' + i + '].type'"
+                                [name]="name + '[' + i + '][type]'"
                                 [(ngModel)]="values[i].type"
                                 [placeholder]="typePlaceholder"
                                 [disabled]="disabled"
@@ -51,7 +51,7 @@
                             fxLayout="row" fxLayoutGap="20px">
                             <!-- URL -->
                             <app-form-input
-                                [name]="name + '[' + i + '].url'"
+                                [name]="name + '[' + i + '][url]'"
                                 [(ngModel)]="values[i].url"
                                 [placeholder]="urlPlaceholder"
                                 [tooltip]="urlTooltip"
@@ -68,25 +68,26 @@
                             <!-- Style URL -->
                             <app-form-input
                                 fxFlex="3 1 auto"
-                                [name]="name + '[' + i + '].styleUrl'"
+                                [name]="name + '[' + i + '][styleUrl]'"
                                 [(ngModel)]="values[i].styleUrl"
                                 [placeholder]="styleUrlPlaceholder"
                                 [tooltip]="styleUrlTooltip"
                                 [disabled]="disabled"
                                 (optionChanged)="onChange()"
                                 app-general-async-validator
-                                [asyncValidatorObservable]="styleUrlValidator">
+                                [asyncValidatorObservable]="initializeStyleUrlValidator(i)"
+                                [required]="false">
                             </app-form-input>
 
                             <!-- Style URL Source -->
                             <app-form-select
                                 fxFlex="1 1 auto"
-                                [name]="name + '[' + i + '].styleUrlSource'"
+                                [name]="name + '[' + i + '][styleUrlSource]'"
                                 [(ngModel)]="values[i].styleUrlSource"
                                 [placeholder]="styleUrlSourcePlaceholder"
                                 [disabled]="disabled"
                                 (optionChanged)="onChange()"
-                                [options]="[]"
+                                [options]="styleOptions[values[i].styleUrl]"
                                 optionLabelKey="label"
                                 optionValueKey="value"
                                 [required]="!!values[i].styleUrl"

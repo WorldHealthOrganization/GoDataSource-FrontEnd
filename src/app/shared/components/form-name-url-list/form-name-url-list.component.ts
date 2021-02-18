@@ -8,6 +8,8 @@ import { SortableListBase } from '../../xt-forms/core/sortable-list-base';
 import { CdkDragDrop, CdkDragStart, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Constants } from '../../../core/models/constants';
 import { IGeneralAsyncValidatorResponse } from '../../xt-forms/validators/general-async-validator.directive';
+import * as _ from 'lodash';
+import { LabelValuePair } from '../../../core/models/label-value-pair';
 
 export class NameUrlModel {
     name: string;
@@ -45,6 +47,8 @@ export class FormNameUrlListComponent
     @Input() styleUrlTooltip: string;
     @Input() styleUrlSourcePlaceholder: string = '';
     @Input() styleUrlSourceTooltip: string;
+    @Input() invalidStyleUrlError: string;
+    @Input() invalidStyleUrlResponseError: string;
 
     // list of map types
     outbreakMapServerTypesList$: Observable<any[]>;
@@ -52,8 +56,15 @@ export class FormNameUrlListComponent
     // constants
     Constants = Constants;
 
-    // style url validator
-    styleUrlValidator: Observable<boolean | IGeneralAsyncValidatorResponse>;
+    // used for style url validation
+    private styleUrlValidationCache: {
+        [url: string]: Observable<boolean | IGeneralAsyncValidatorResponse>
+    } = {};
+
+    // style options
+    styleOptions: {
+        [url: string]: LabelValuePair[]
+    } = {};
 
     /**
      * Constructor
@@ -95,13 +106,6 @@ export class FormNameUrlListComponent
                     }
                 });
         });
-
-        // style url validator
-        this.styleUrlValidator = new Observable((observer) => {
-            // get data from cache or execute validator
-            observer.next(false);
-            observer.complete();
-        });
     }
 
     /**
@@ -131,5 +135,85 @@ export class FormNameUrlListComponent
         if (this.isInvalidDragEvent) {
             document.dispatchEvent(new Event('mouseup'));
         }
+    }
+
+    /**
+     * Initialize style url validator
+     */
+    initializeStyleUrlValidator(itemIndex: number): Observable<boolean | IGeneralAsyncValidatorResponse> {
+        // determine url
+        const url: string = this.values[itemIndex].styleUrl;
+
+        // need to initialize url validation ?
+        if (this.styleUrlValidationCache[url] === undefined) {
+            this.styleUrlValidationCache[url] = new Observable((finishedObs) => {
+                // not a valid url ?
+                if (!(/https?:\/\/([\da-z.-]+)\.([a-z.]{2,6})(.*)/i.test(url))) {
+                    // not a valid url
+                    finishedObs.next({
+                        isValid: false,
+                        errMsg: this.invalidStyleUrlError
+                    });
+                    finishedObs.complete();
+
+                    // finished
+                    return;
+                }
+
+                // try to fetch sources
+                fetch(url)
+                    .then(r => r.json())
+                    .then((glStyle: {
+                        sources: {
+                            [name: string]: any
+                        }
+                    }) => {
+                        // did we retrieve the response looking to something similar to what we're expecting ?
+                        if (
+                            !glStyle ||
+                            !glStyle.sources ||
+                            !_.isObject(glStyle.sources)
+                        ) {
+                            // not a valid url
+                            finishedObs.next({
+                                isValid: false,
+                                errMsg: this.invalidStyleUrlResponseError
+                            });
+                            finishedObs.complete();
+
+                            // finished
+                            return;
+                        }
+
+                        // set style options
+                        this.styleOptions[url] = [];
+                        Object.keys(glStyle.sources).forEach((source: string) => {
+                            this.styleOptions[url].push(new LabelValuePair(
+                                source,
+                                source
+                            ));
+                        });
+
+                        // select the first source
+                        this.values[itemIndex].styleUrlSource = this.styleOptions[url].length < 1 ?
+                            undefined :
+                            this.styleOptions[url][0].value;
+
+                        // sources retrieved
+                        finishedObs.next(true);
+                        finishedObs.complete();
+                    })
+                    .catch(() => {
+                        finishedObs.next({
+                            isValid: false,
+                            errMsg: this.invalidStyleUrlResponseError
+                        });
+                        finishedObs.complete();
+                    });
+            });
+        }
+
+        // finished
+        return this.styleUrlValidationCache[url];
     }
 }

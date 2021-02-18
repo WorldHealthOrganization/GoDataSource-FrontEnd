@@ -469,24 +469,32 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                                 })
                             };
 
-                            // load styles
-                            const path = mapServer.url + '/resources/styles/';
-                            fetch(path + 'root.json')
-                                .then(r => r.json())
-                                .then((glStyle) => {
-                                    // apply style
-                                    applyStyle(
-                                        layerData.layer,
-                                        glStyle,
-                                        'esri',
-                                        path ? path : undefined
-                                    ).then(() => {
-                                        layerData.styleLoaded = true;
+                            // load styles if necessary
+                            if (
+                                !mapServer.styleUrl ||
+                                !mapServer.styleUrlSource
+                            ) {
+                                // mark style as being loaded
+                                layerData.styleLoaded = true;
+                            } else {
+                                fetch(mapServer.styleUrl)
+                                    .then(r => r.json())
+                                    .then((glStyle) => {
+                                        // apply style
+                                        applyStyle(
+                                            layerData.layer,
+                                            glStyle,
+                                            mapServer.styleUrlSource,
+                                            mapServer.styleUrl
+                                        ).then(() => {
+                                            // mark style as being loaded
+                                            layerData.styleLoaded = true;
 
-                                        // try again to init map
-                                        this.initializeMap();
+                                            // try again to init map
+                                            this.initializeMap();
+                                        });
                                     });
-                                });
+                            }
 
                             // finished
                             break;

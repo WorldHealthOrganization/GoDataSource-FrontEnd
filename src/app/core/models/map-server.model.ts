@@ -5,6 +5,8 @@ export class MapServerModel {
     name: string;
     url: string;
     type?: string;
+    styleUrl?: string;
+    styleUrlSource?: string;
 
     /**
      * Constructor
@@ -13,5 +15,7 @@ export class MapServerModel {
         this.name = _.get(data, 'name');
         this.url = _.get(data, 'url');
         this.type = _.get(data, 'type');
+        this.styleUrl = _.get(data, 'styleUrl');
+        this.styleUrlSource = _.get(data, 'styleUrlSource');
     }
 }
