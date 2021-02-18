@@ -73,7 +73,9 @@
                                 [placeholder]="styleUrlPlaceholder"
                                 [tooltip]="styleUrlTooltip"
                                 [disabled]="disabled"
-                                (optionChanged)="onChange()">
+                                (optionChanged)="onChange()"
+                                app-general-async-validator
+                                [asyncValidatorObservable]="styleUrlValidator">
                             </app-form-input>
 
                             <!-- Style URL Source -->
@@ -87,7 +89,7 @@
                                 [options]="[]"
                                 optionLabelKey="label"
                                 optionValueKey="value"
-                                [required]="values[i].styleUrl"
+                                [required]="!!values[i].styleUrl"
                                 [tooltip]="styleUrlSourceTooltip">
                             </app-form-select>
 

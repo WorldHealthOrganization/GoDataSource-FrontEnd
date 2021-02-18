@@ -7,6 +7,7 @@ import { GenericDataService } from '../../../core/services/data/generic.data.ser
 import { SortableListBase } from '../../xt-forms/core/sortable-list-base';
 import { CdkDragDrop, CdkDragStart, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Constants } from '../../../core/models/constants';
+import { IGeneralAsyncValidatorResponse } from '../../xt-forms/validators/general-async-validator.directive';
 
 export class NameUrlModel {
     name: string;
@@ -41,8 +42,8 @@ export class FormNameUrlListComponent
 
     // vector styling
     @Input() styleUrlPlaceholder: string = '';
-    @Input() styleUrlSourcePlaceholder: string = '';
     @Input() styleUrlTooltip: string;
+    @Input() styleUrlSourcePlaceholder: string = '';
     @Input() styleUrlSourceTooltip: string;
 
     // list of map types
@@ -50,6 +51,9 @@ export class FormNameUrlListComponent
 
     // constants
     Constants = Constants;
+
+    // style url validator
+    styleUrlValidator: Observable<boolean | IGeneralAsyncValidatorResponse>;
 
     /**
      * Constructor
@@ -90,6 +94,13 @@ export class FormNameUrlListComponent
                         observer.next();
                     }
                 });
+        });
+
+        // style url validator
+        this.styleUrlValidator = new Observable((observer) => {
+            // get data from cache or execute validator
+            observer.next(false);
+            observer.complete();
         });
     }
 
