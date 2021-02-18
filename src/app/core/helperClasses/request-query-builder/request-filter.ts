@@ -354,15 +354,9 @@ export class RequestFilter {
      * @param {string} property
      * @param value Object with 'from' and 'to' properties
      * @param {boolean} replace
-     * @param {boolean} includeEmpty
      * @returns {RequestFilter}
      */
-    byRange(
-        property: string,
-        value: any,
-        replace: boolean = true,
-        includeEmpty: boolean = false
-    ) {
+    byRange(property: string, value: any, replace: boolean = true) {
         const fromValue = _.get(value, 'from');
         const toValue = _.get(value, 'to');
 
@@ -374,13 +368,9 @@ export class RequestFilter {
             this.remove(property);
         } else {
             // filter by range (from / to)
-            this.where(
-                {
-                    [property]: RequestFilterGenerator.rangeCompare(value)
-                },
-                replace,
-                includeEmpty
-            );
+            this.where({
+                [property]: RequestFilterGenerator.rangeCompare(value)
+            }, replace);
         }
 
         return this;
@@ -436,9 +426,9 @@ export class RequestFilter {
 
             // single condition ( either years or months )
             this.where({
-                [`${property}.years`]: {
-                    [operator]: valueToCompare
-                }},
+                    [`${property}.years`]: {
+                        [operator]: valueToCompare
+                    }},
                 true
             );
         }
@@ -451,13 +441,11 @@ export class RequestFilter {
      * @param property
      * @param value
      * @param replace
-     * @param includeEmpty
      */
     byDateRange(
         property: string,
         value: any,
-        replace: boolean = true,
-        includeEmpty: boolean = false
+        replace: boolean = true
     ) {
         // no point in continuing if we got an empty value
         if (_.isEmpty(value)) {
@@ -478,8 +466,7 @@ export class RequestFilter {
         this.byRange(
             property,
             rangeValue,
-            replace,
-            includeEmpty
+            replace
         );
 
         // finished
@@ -576,48 +563,19 @@ export class RequestFilter {
      * Adds a "where" condition
      * Note: If 'replace' is set to 'false', it could add multiple conditions on the same property
      * Note: If 'replace' is set to 'true', if there is already another condition on the same property, it will be replaced
-     * Note: If 'includeEmpty' is set to 'false', the records with the empty property will be ignored
-     * Note: If 'includeEmpty' is set to 'true', the records with the empty property will be added in the results (if they match the rest of the conditions)
      * @param condition Loopback condition on a property
      * @param {boolean} replace
      * @returns {RequestFilter}
      */
-    where(condition: any, replace: boolean = false, includeEmpty: boolean = false) {
+    where(condition: any, replace: boolean = false) {
 
         if (replace) {
             // if there is already a condition on the same property, remove it
             this.removeCondition(condition);
         }
 
-        // check if the records with empty value should be included in the results
-        let fullCondition: any = {};
-        if (includeEmpty) {
-            Object.keys(condition).forEach((property) => {
-                fullCondition = {
-                    ...fullCondition,
-                    $or: [
-                        {
-                            [property]: {
-                                $exists: false
-                            }
-                        }, {
-                            [property]: {
-                                $type: 'null'
-                            }
-                        }, {
-                            [property]: {
-                                $eq: ''
-                            }
-                        }, {
-                            [property]: condition[property]
-                        }
-                    ]
-                }
-            });
-        }
-
         // add new condition
-        this.conditions.push(includeEmpty ? fullCondition : condition);
+        this.conditions.push(condition);
 
         return this;
     }

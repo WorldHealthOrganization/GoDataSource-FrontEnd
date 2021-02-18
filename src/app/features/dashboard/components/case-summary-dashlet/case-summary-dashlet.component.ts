@@ -238,12 +238,9 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
             // date
             if (this.globalFilterDate) {
                 qb.filter.byDateRange(
-                    'dateOfOnset',
-                    {
+                    'dateOfReporting', {
                         endDate: this.globalFilterDate.endOf('day').format()
-                    },
-                    true,
-                    true
+                    }
                 );
             }
 

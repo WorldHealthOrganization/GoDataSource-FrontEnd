@@ -436,7 +436,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             }),
             new FilterModel({
                 fieldName: 'date',
-                fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE',
+                fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE_OF_REPORTING',
                 type: FilterType.DATE,
                 required: true,
                 maxDate: moment(),
@@ -694,7 +694,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         // date
         if (this.globalFilterDate) {
             qb.filter.byDateRange(
-                'dateOfOnset', {
+                'dateOfReporting', {
                     endDate: this.globalFilterDate.endOf('day').format()
                 }
             );
