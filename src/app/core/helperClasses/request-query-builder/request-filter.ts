@@ -426,9 +426,9 @@ export class RequestFilter {
 
             // single condition ( either years or months )
             this.where({
-                    [`${property}.years`]: {
-                        [operator]: valueToCompare
-                    }},
+                [`${property}.years`]: {
+                    [operator]: valueToCompare
+                }},
                 true
             );
         }
