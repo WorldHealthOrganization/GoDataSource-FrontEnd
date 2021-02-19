@@ -55,7 +55,12 @@ export const EnglishUsLang = {
         /**
          * uiCommonButtons
          */
-        'LNG_COMMON_BUTTON_DRAG': 'Drag me'
+        'LNG_COMMON_BUTTON_DRAG': 'Drag me',
+
+        /**
+         * uiWorldMap
+         */
+        'LNG_PAGE_WORLD_MAP_OUTBREAK_MAP_SERVER_STYLE_INVALID_URL': 'Outbreak Map Servers aren\'t configure properly, please check the outbreak settings'
 
         /**
          * REMOVE the tokens from below

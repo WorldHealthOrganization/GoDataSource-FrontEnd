@@ -35,6 +35,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components';
 import { MatDialogRef } from '@angular/material';
 import { applyStyle } from 'ol-mapbox-style';
+import { SnackbarService } from "../../../../core/services/helper/snackbar.service";
 
 /**
  * Point used for rendering purposes
@@ -407,7 +408,8 @@ export class WorldMapComponent implements OnInit, OnDestroy {
      */
     constructor(
         private outbreakDataService: OutbreakDataService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private snackbarService: SnackbarService,
     ) {}
 
     /**
@@ -477,6 +479,10 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                                 // mark style as being loaded
                                 layerData.styleLoaded = true;
                             } else {
+                                // make sure that the path style Url ends with /
+                                const pathStyleUrl = mapServer.styleUrl + (!/\/$/.test(mapServer.styleUrl) ? '/' : '');
+
+                                // get and apply the style
                                 fetch(mapServer.styleUrl)
                                     .then(r => r.json())
                                     .then((glStyle) => {
@@ -485,13 +491,19 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                                             layerData.layer,
                                             glStyle,
                                             mapServer.styleUrlSource,
-                                            mapServer.styleUrl
+                                            pathStyleUrl
                                         ).then(() => {
                                             // mark style as being loaded
                                             layerData.styleLoaded = true;
 
                                             // try again to init map
                                             this.initializeMap();
+                                        }).catch(() => {
+                                            // hide loading
+                                            this.layersLoading = false;
+
+                                            // display an error
+                                            this.snackbarService.showNotice('LNG_PAGE_WORLD_MAP_OUTBREAK_MAP_SERVER_STYLE_INVALID_URL');
                                         });
                                     });
                             }
