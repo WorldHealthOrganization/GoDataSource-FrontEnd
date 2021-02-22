@@ -16,6 +16,7 @@ export const EnglishUsLang = {
          * uiBackupFields
          */
          'LNG_BACKUP_FIELD_LABEL_DURATION': 'Duration',
+         'LNG_BACKUP_FIELD_LABEL_DATE': 'Start Time (UTC)',
 
         /**
          * New group
