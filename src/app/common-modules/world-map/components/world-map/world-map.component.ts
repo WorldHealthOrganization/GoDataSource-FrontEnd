@@ -35,7 +35,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components';
 import { MatDialogRef } from '@angular/material';
 import { applyStyle } from 'ol-mapbox-style';
-import { SnackbarService } from "../../../../core/services/helper/snackbar.service";
+import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 
 /**
  * Point used for rendering purposes
