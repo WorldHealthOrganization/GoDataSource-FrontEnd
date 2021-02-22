@@ -27,13 +27,22 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
     // alternative name used for specifying indexes for questionnaire inputs and other places
     @Input() alternativeName: string;
 
+    // asyncValidators
+    get asyncValidators(): AsyncValidatorArray {
+        return this._asyncValidators;
+    }
+
+    /**
+     * Constructor
+     */
     protected constructor(
         protected controlContainer: ControlContainer,
         private validators: ValidatorArray,
-        private asyncValidators: AsyncValidatorArray
+        private _asyncValidators: AsyncValidatorArray
     ) {
         super();
 
+        // handle value changes
         this.registerOnTouched(() => {
             // run validations when element is changed
             this.validate(true);
