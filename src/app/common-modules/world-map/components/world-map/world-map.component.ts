@@ -499,11 +499,8 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                                             // try again to init map
                                             this.initializeMap();
                                         }).catch(() => {
-                                            // hide loading
-                                            this.layersLoading = false;
-
                                             // display an error
-                                            this.snackbarService.showNotice('LNG_PAGE_WORLD_MAP_OUTBREAK_MAP_SERVER_STYLE_INVALID_URL');
+                                            this.snackbarService.showError('LNG_PAGE_WORLD_MAP_OUTBREAK_MAP_SERVER_STYLE_INVALID_URL');
                                         });
                                     });
                             }
