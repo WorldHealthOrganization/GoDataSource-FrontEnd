@@ -314,7 +314,7 @@ export class DialogConfiguration {
     /**
      * Update field list css
      */
-    private updateFieldListLayoutCss() {
+    updateFieldListLayoutCss() {
         this.fieldsListLayoutCss = [];
         _.each(this.fieldsList, (field: DialogField, index: number) => {
             this.fieldsListLayoutCss.push(
@@ -604,5 +604,40 @@ export class DialogComponent implements OnDestroy {
         const childrenHeight: number = dialogMainMsgHeight + dialogMainMsgMarginBottom + dialogButtonsHeight;
         const heightUsed: number = maxContainerInstancePaddingTop + maxContainerInstancePaddingBottom + childrenHeight;
         this.dialogDataMaxHeight = `${maxContainerInstanceMaxHeight - heightUsed}px`;
+    }
+
+    /**
+     * Add more fields to list
+     */
+    addFields(newFields: DialogField[]): void {
+        // do we need to initialize fields ?
+        if (
+            !this.confirmData.fieldsList ||
+            this.confirmData.fieldsList.length < 1
+        ) {
+            this.confirmData.fieldsList = [];
+        }
+
+        // add to fields list
+        (newFields || []).forEach((field) => {
+            // add field
+            this.confirmData.fieldsList.push(field);
+
+            // init value if necessary
+            if (!this.dialogAnswerInputValue.value) {
+                this.dialogAnswerInputValue.value = {};
+            }
+
+            // any other value is allowed, this is why we don't use _.isEmpty
+            if (
+                field.value !== null &&
+                field.value !== undefined
+            ) {
+                this.dialogAnswerInputValue.value[field.name] = field.value;
+            }
+        });
+
+        // update fields layout
+        this.confirmData.updateFieldListLayoutCss();
     }
 }

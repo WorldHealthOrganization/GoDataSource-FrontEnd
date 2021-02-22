@@ -10,6 +10,7 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { components } from './components';
 import { validatorDirectives } from './validators';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { MdePopoverModule } from '@material-extended/mde';
 
 @NgModule({
     imports: [
@@ -17,6 +18,7 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
         FormsModule,
         FlexLayoutModule,
         AngularMaterialModule,
+        MdePopoverModule,
         Ng5SliderModule,
         NgxMatSelectSearchModule,
         TranslateModule,
@@ -32,6 +34,7 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
         FormsModule,
         FlexLayoutModule,
         AngularMaterialModule,
+        MdePopoverModule,
         Ng5SliderModule,
         ScrollingModule,
         ...components,

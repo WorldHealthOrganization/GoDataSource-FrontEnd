@@ -30,6 +30,9 @@ export class ViewMovementCaseComponent implements OnInit {
 
     @ViewChild('mapMovement') mapMovement: WorldMapMovementComponent;
 
+    // loading data
+    displayLoading: boolean = true;
+
     // authenticated user details
     authUser: UserModel;
 
@@ -68,6 +71,7 @@ export class ViewMovementCaseComponent implements OnInit {
                             this.initializeBreadcrumbs();
 
                             // movement data
+                            this.displayLoading = false;
                             this.movementAddresses = movementData;
                         });
                 });

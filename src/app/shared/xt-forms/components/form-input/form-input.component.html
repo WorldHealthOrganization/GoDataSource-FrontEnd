@@ -31,6 +31,16 @@
             [tabIndex]="tabIndex"
             [autocomplete]="autocomplete"/>
 
+        <!-- Spinner -->
+        <span
+            *ngIf="asyncValidators?.length > 0"
+            matSuffix>
+            <mat-spinner
+                [style.visibility]="control?.pending ? 'visible' : 'hidden'"
+                [diameter]="16">
+            </mat-spinner>
+        </span>
+
         <span
             *ngIf="tooltip"
             #tooltipCtrl="matTooltip"

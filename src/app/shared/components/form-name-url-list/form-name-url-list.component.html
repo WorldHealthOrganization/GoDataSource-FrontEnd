@@ -3,83 +3,125 @@
 
     <form
         #groupForm="ngForm"
-        fxLayout="column"
-    >
+        fxLayout="column">
         <div
-            *ngFor="let inputValue of values; let i = index; trackBy: trackByIndex"
-            fxLayout="row" fxLayoutAlign="start center">
-            <mat-card
-                class="page-section"
-                fxFlex fxLayout="column"
-            >
-                <div
-                    fxLayout="row" fxLayoutGap="20px">
-                    <app-form-input
-                        [name]="name + '[' + i + '][name]'"
-                        [(ngModel)]="values[i].name"
-                        [placeholder]="namePlaceholder"
-                        [tooltip]="nameTooltip"
-                        [disabled]="disabled"
-                        (optionChanged)="onChange()"
-                        [required]="required">
-                    </app-form-input>
+            cdkDropList [cdkDropListData]="value" (cdkDropListDropped)="dropTable($event)">
+            <div
+                *ngFor="let inputValue of values; let i = index; trackBy: trackByIndex"
+                cdkDrag (cdkDragStarted)="dragStarted($event)" [cdkDragData]="inputValue">
 
-                    <div fxFlex><!-- placeholder --></div>
-                    <div fxFlex><!-- placeholder --></div>
-                    <div fxFlex><!-- placeholder --></div>
-                </div>
+                <!-- Content -->
                 <div
-                    fxLayout="row" fxLayoutGap="20px">
-                    <app-form-input
-                        [name]="name + '[' + i + '][url]'"
-                        [(ngModel)]="values[i].url"
-                        [placeholder]="urlPlaceholder"
-                        [tooltip]="urlTooltip"
-                        [disabled]="disabled"
-                        (optionChanged)="onChange()"
-                        [required]="required">
-                    </app-form-input>
-                </div>
+                    fxLayout="row">
 
-                <div
-                    fxLayout="row" fxLayoutGap="20px">
-                     <app-form-select
-                        [name]="name + '[' + i + '][type]'"
-                        [(ngModel)]="values[i].type"
-                        [placeholder]="typePlaceholder"
-                        [disabled]="disabled"
-                        (optionChanged)="onChange()"
-                        [options]="outbreakMapServerTypesList$ | async"
-                        optionLabelKey="label"
-                        optionValueKey="value">
-                    </app-form-select>
+                    <!-- Data -->
+                    <mat-card
+                        class="page-section"
+                        fxFlex fxLayout="column">
 
+                        <div
+                            fxLayout="row" fxLayoutGap="20px">
+                            <!-- Name -->
+                            <app-form-input
+                                [name]="name + '[' + i + '][name]'"
+                                [(ngModel)]="values[i].name"
+                                [placeholder]="namePlaceholder"
+                                [tooltip]="nameTooltip"
+                                [disabled]="disabled"
+                                (optionChanged)="onChange()"
+                                [required]="required">
+                            </app-form-input>
+
+                            <!-- Type -->
+                            <app-form-select
+                                [name]="name + '[' + i + '][type]'"
+                                [(ngModel)]="values[i].type"
+                                [placeholder]="typePlaceholder"
+                                [disabled]="disabled"
+                                (optionChanged)="onChange()"
+                                [options]="outbreakMapServerTypesList$ | async"
+                                optionLabelKey="label"
+                                optionValueKey="value"
+                                [required]="required"
+                                [tooltip]="typeTooltip">
+                            </app-form-select>
+                        </div>
+
+                        <div
+                            fxLayout="row" fxLayoutGap="20px">
+                            <!-- URL -->
+                            <app-form-input
+                                [name]="name + '[' + i + '][url]'"
+                                [(ngModel)]="values[i].url"
+                                [placeholder]="urlPlaceholder"
+                                [tooltip]="urlTooltip"
+                                [disabled]="disabled"
+                                (optionChanged)="onChange()"
+                                [required]="required">
+                            </app-form-input>
+                        </div>
+
+                        <div
+                            *ngIf="values[i].type === Constants.OUTBREAK_MAP_SERVER_TYPES.VECTOR_TILE_VECTOR_TILE_LAYER.value"
+                            fxLayout="row" fxLayoutGap="20px">
+
+                            <!-- Style URL -->
+                            <app-form-input
+                                fxFlex="3 1 auto"
+                                [name]="name + '[' + i + '][styleUrl]'"
+                                [(ngModel)]="values[i].styleUrl"
+                                [placeholder]="styleUrlPlaceholder"
+                                [tooltip]="styleUrlTooltip"
+                                [disabled]="disabled"
+                                (optionChanged)="onChange()"
+                                app-general-async-validator
+                                [asyncValidatorObservable]="initializeStyleUrlValidator(i)"
+                                [required]="false">
+                            </app-form-input>
+
+                            <!-- Style URL Source -->
+                            <app-form-select
+                                fxFlex="1 1 auto"
+                                [name]="name + '[' + i + '][styleUrlSource]'"
+                                [(ngModel)]="values[i].styleUrlSource"
+                                [placeholder]="styleUrlSourcePlaceholder"
+                                [disabled]="disabled"
+                                (optionChanged)="onChange()"
+                                [options]="styleOptions[values[i].styleUrl]"
+                                optionLabelKey="label"
+                                optionValueKey="value"
+                                [required]="!!values[i].styleUrl"
+                                [tooltip]="styleUrlSourceTooltip">
+                            </app-form-select>
+
+                        </div>
+
+                    </mat-card>
+
+                    <!-- Buttons -->
                     <div
-                        fxLayout="row" fxLayoutAlign="none center" fxLayoutGap="-20px">
-                        <!-- details popover -->
-                        <mde-popover
-                            #mappingMdePopover="mdePopover"
-                            class="mdePopover"
-                            mdePopoverTriggerOn="hover">
-                                    <span
-                                        [innerHTML]="typeTooltip | translate | safeHtml">
-                                    </span>
-                        </mde-popover>
+                        *ngIf="!disabled"
+                        fxGrow="0" fxLayout="column" fxLayoutAlign="center">
 
-                        <!-- help button -->
-                        <span
-                            class="xt-icon xt-icon-xsmall"
-                            [mdePopoverTriggerFor]="mappingMdePopover">help</span>
+                        <!-- Drag Row -->
+                        <button
+                            cdkDragHandle
+                            type="button"
+                            mat-icon-button
+                            [matTooltip]="'LNG_COMMON_BUTTON_DRAG' | translate"
+                            (mousedown)="notInvalidDragZone()">
+                            <span class="xt-icon">drag</span>
+                        </button>
+
+                        <!-- Delete buttons -->
+                        <button
+                            type="button" mat-icon-button
+                            (click)="delete(i)">
+                            <span class="xt-icon">delete</span>
+                        </button>
                     </div>
                 </div>
-            </mat-card>
-
-            <button
-                *ngIf="!disabled"
-                type="button" mat-icon-button
-                (click)="delete(i)">
-                <span class="xt-icon">delete</span>
-            </button>
+            </div>
         </div>
 
         <div
