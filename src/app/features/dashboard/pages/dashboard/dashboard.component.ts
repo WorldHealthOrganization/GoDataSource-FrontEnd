@@ -436,7 +436,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             }),
             new FilterModel({
                 fieldName: 'date',
-                fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE_OF_REPORTING',
+                fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE',
                 type: FilterType.DATE,
                 required: true,
                 maxDate: moment(),
