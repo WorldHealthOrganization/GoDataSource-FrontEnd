@@ -1,5 +1,5 @@
 <div
-    *ngIf="!displayLoading && layers.length > 0"
+    *ngIf="!displayLoading && layers.length > 0 && !layersLoading"
     [style.width]="width"
     [style.height]="height"
     [ngClass]="{ 'full-screen-map' : fullScreenMode }">
@@ -17,7 +17,7 @@
 
 <!-- Still loading map -->
 <div
-    *ngIf="displayLoading || layers.length < 1"
+    *ngIf="displayLoading || layers.length < 1 || layersLoading"
     class="world-map-loading"
     [style.width]="width"
     [style.height]="height">
@@ -26,7 +26,7 @@
 
 <!-- Disclaimer -->
 <div
-    *ngIf="displayDisclaimer && !fullScreenMode"
+    *ngIf="displayDisclaimer && !fullScreenMode && !layersLoading"
     fxLayout="column"
     class="app-world-map-disclaimer">
     <!-- Show / Hide Disclaimer -->

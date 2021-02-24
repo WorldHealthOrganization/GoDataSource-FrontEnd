@@ -16,6 +16,7 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { ScrollingModule as ExperimentalScrollingModule } from '@angular/cdk-experimental/scrolling';
 import { MdePopoverModule } from '@material-extended/mde';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 // components
 import * as fromSharedComponents from './components';
@@ -25,6 +26,7 @@ import * as fromSharedPipes from './pipes';
 @NgModule({
     imports: [
         CommonModule,
+        DragDropModule,
         RouterModule,
         NgSelectModule,
         FormsModule,
@@ -49,6 +51,7 @@ import * as fromSharedPipes from './pipes';
     providers: [],
     exports: [
         CommonModule,
+        DragDropModule,
         RouterModule,
         NgSelectModule,
         FormsModule,

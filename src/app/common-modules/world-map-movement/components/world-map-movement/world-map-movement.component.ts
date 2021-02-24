@@ -25,13 +25,10 @@ export class WorldMapMovementComponent {
 
     selectedGeoPoint: WorldMapPoint;
 
-    constructor (
-        private dialogService: DialogService,
-        private i18nService: I18nService
-    ) {
+    // still loading data ?
+    @Input() displayLoading: boolean = false;
 
-    }
-
+    // addresses
     private _addresses: AddressModel[] = [];
     @Input() set addresses(items: AddressModel[]) {
         // init
@@ -88,6 +85,14 @@ export class WorldMapMovementComponent {
     get addresses(): AddressModel[] {
         return this._addresses;
     }
+
+    /**
+     * Constructor
+     */
+    constructor (
+        private dialogService: DialogService,
+        private i18nService: I18nService
+    ) {}
 
     /**
      * Change map position

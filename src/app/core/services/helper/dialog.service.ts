@@ -45,24 +45,6 @@ export class DialogService {
      * @param {{}} translateData
      * @returns {Observable<DialogAnswer>}
      */
-    showConfirm(
-        messageToken: DialogConfiguration | string,
-        translateData = {}
-    ): Observable<DialogAnswer> {
-        return this
-            .showConfirmDialog(
-                messageToken,
-                translateData
-            )
-            .afterClosed();
-    }
-
-    /**
-     * Show a Confirm Dialog
-     * @param {DialogConfiguration | string} messageToken - Can be either a message ( string ) or an object of type DialogConfiguration
-     * @param {{}} translateData
-     * @returns {Observable<DialogAnswer>}
-     */
     showConfirmDialog(
         messageToken: DialogConfiguration | string,
         translateData = {}
@@ -79,17 +61,35 @@ export class DialogService {
     }
 
     /**
+     * Show a Confirm Dialog
+     * @param {DialogConfiguration | string} messageToken - Can be either a message ( string ) or an object of type DialogConfiguration
+     * @param {{}} translateData
+     * @returns {Observable<DialogAnswer>}
+     */
+    showConfirm(
+        messageToken: DialogConfiguration | string,
+        translateData = {}
+    ): Observable<DialogAnswer> {
+        return this
+            .showConfirmDialog(
+                messageToken,
+                translateData
+            )
+            .afterClosed();
+    }
+
+    /**
      * Show o custom dialog with an input
      * @param {DialogConfiguration | string} messageToken
      * @param {boolean} required
      * @param {{}} translateData
      * @returns {Observable<DialogAnswer>}
      */
-    showInput(
+    showInputDialog(
         messageToken: DialogConfiguration | string,
         required: boolean = true,
         translateData = {}
-    ): Observable<DialogAnswer> {
+    ): MatDialogRef<DialogComponent> {
         // create input dialog configuration
         let dialogConf: DialogConfiguration = null;
         if (_.isString(messageToken)) {
@@ -113,6 +113,26 @@ export class DialogService {
         return this.dialog.open(
             DialogComponent,
             dialogMessage
+        );
+    }
+
+    /**
+     * Show o custom dialog with an input
+     * @param {DialogConfiguration | string} messageToken
+     * @param {boolean} required
+     * @param {{}} translateData
+     * @returns {Observable<DialogAnswer>}
+     */
+    showInput(
+        messageToken: DialogConfiguration | string,
+        required: boolean = true,
+        translateData = {}
+    ): Observable<DialogAnswer> {
+        // create input dialog configuration
+        return this.showInputDialog(
+            messageToken,
+            required,
+            translateData
         ).afterClosed();
     }
 

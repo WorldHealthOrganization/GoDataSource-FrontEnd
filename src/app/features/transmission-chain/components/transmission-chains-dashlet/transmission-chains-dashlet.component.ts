@@ -2403,11 +2403,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         // chain loaded
         this.mustLoadChain = false;
 
-        // configure data
-        if (this.transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value) {
-            // format chart
-            this.mapColorCriteria();
-        }
+        // format chart & geo map legend
+        this.mapColorCriteria();
 
         // same group, we don't need to retrieve anything from BE ?
         if (this.chainGroupId === this.selectedSnapshot) {
