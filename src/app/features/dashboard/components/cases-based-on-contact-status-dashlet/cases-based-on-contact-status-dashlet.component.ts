@@ -232,10 +232,9 @@ export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDest
                 'day'
             );
 
-            // set period interval to start of outbreak until current date
-            const startDate = moment(this.outbreak.startDate).startOf('day');
+            // set period interval until current date
             qb.filter.where({
-                periodInterval: [startDate, endDate]
+               periodInterval: [null, endDate]
             });
 
             // exclude discarded cases

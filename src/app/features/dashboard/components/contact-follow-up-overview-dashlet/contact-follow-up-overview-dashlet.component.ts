@@ -267,15 +267,10 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
                 );
             }
 
-            // start data
-            const reportData = {
-                startDate: this.outbreak.startDate
-            };
-
             // get data - start Date will be set to start of outbreak
             this.displayLoading = true;
             this.previousSubscriber = this.contactDataService
-                .getContactsFollowedUpReport(this.outbreakId, reportData, qb)
+                .getContactsFollowedUpReport(this.outbreakId, {}, qb)
                 .subscribe((results) => {
                     // convert data to chart data format
                     this.chartData = [];
