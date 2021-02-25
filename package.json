@@ -1,11 +1,12 @@
 {
     "name": "go-data-front-end",
-    "version": "2.36.0",
+    "version": "2.36.4",
     "license": "MIT",
     "scripts": {
         "ng": "ng",
         "start": "ng serve --disable-host-check --port 4550",
         "build": "node --max_old_space_size=4000 ./node_modules/@angular/cli/bin/ng build --prod",
+        "build-serve": "node --max_old_space_size=4000 ./node_modules/@angular/cli/bin/ng serve --prod --disable-host-check --port 4550",
         "test": "ng test",
         "test-debug": "ng run go-data-front-end:test-debug",
         "lint": "ng lint",
