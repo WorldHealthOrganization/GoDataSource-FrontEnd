@@ -1357,17 +1357,40 @@ export class WorldMapComponent implements OnInit, OnDestroy {
             // map initialized
             if (this.map) {
                 // wait for map render
-                this.map.once('rendercomplete', (event) => {
-                    const canvas = event.context.canvas;
-                    if (navigator.msSaveBlob) {
-                        observer.next(canvas.msToBlob());
+                this.map.once('rendercomplete', () => {
+                    const mapCanvas = document.createElement('canvas');
+                    const size = this.map.getSize();
+                    mapCanvas.width = size[0];
+                    mapCanvas.height = size[1];
+                    const mapContext = mapCanvas.getContext('2d');
+                    Array.prototype.forEach.call(
+                        document.querySelectorAll('.ol-layer canvas'),
+                        function (canvas) {
+                            if (canvas.width > 0) {
+                                const opacity = canvas.parentNode.style.opacity;
+                                mapContext.globalAlpha = opacity === '' ? 1 : Number(opacity);
+                                const canvasTransform = canvas.style.transform;
+                                // Get the transform parameters from the style's transform matrix
+                                const matrix = canvasTransform
+                                    .match(/^matrix\(([^\(]*)\)$/)[1]
+                                    .split(',')
+                                    .map(Number);
+                                // Apply the transform to the export map context
+                                CanvasRenderingContext2D.prototype.setTransform.apply(
+                                    mapContext,
+                                    matrix
+                                );
+                                mapContext.drawImage(canvas, 0, 0);
+                            }
+                        }
+                    );
+
+                    // create blob object
+                    mapCanvas.toBlob(function (blob) {
+                        observer.next(blob);
                         observer.complete();
-                    } else {
-                        canvas.toBlob(function (blob) {
-                            observer.next(blob);
-                            observer.complete();
-                        });
-                    }
+                    });
+
                 });
 
                 // render
