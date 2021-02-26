@@ -297,17 +297,15 @@ export class ContactDataService {
     /**
      * Contacts followed up report
      * @param {string} outbreakId
-     * @param reportData
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<MetricContactsFollowedUpReportModel[]>}
      */
     getContactsFollowedUpReport(
         outbreakId: string,
-        reportData: any,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<MetricContactsFollowedUpReportModel[]> {
         const filter = queryBuilder.buildQuery();
-        const obs = this.http.post(`outbreaks/${outbreakId}/contacts/follow-up-report?filter=${filter}`, reportData);
+        const obs = this.http.post(`outbreaks/${outbreakId}/contacts/follow-up-report?filter=${filter}`, {});
         return obs
             .pipe(
                 map(
