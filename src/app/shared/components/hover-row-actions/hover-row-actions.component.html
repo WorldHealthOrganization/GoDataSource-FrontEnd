@@ -25,13 +25,13 @@
             <!-- Link -->
             <a
                 *ngIf="buttonData.routerLink; else simpleButton"
-                (click)="clickedButton(buttonData)"
                 [routerLink]="buttonData.routerLink">
                 <button
                     mat-icon-button
                     color="accent"
                     type="button"
                     [ngClass]="buttonData.class"
+                    (click)="clickedButton(buttonData, $event)"
                     [matTooltip]="buttonData.iconTooltip | translate:buttonData.iconTooltipTranslateData ? buttonData.iconTooltipTranslateData(actionData) : null">
                     <span class="xt-icon">{{ buttonData.icon }}</span>
                 </button>

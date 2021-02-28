@@ -22,7 +22,7 @@ export class HoverRowAction {
     iconTooltipTranslateData: (item: any) => {
         [key: string]: any
     };
-    click: (item: any, handler: any, index: any) => void;
+    click: (item: any, handler: any, index: any) => void | boolean;
     class: string;
     visible: (item: any, index: any) => boolean;
 
@@ -46,7 +46,7 @@ export class HoverRowAction {
         iconTooltipTranslateData?: (item: any) => {
             [key: string]: any
         },
-        click?: (item: any, handler: any, index: any) => void,
+        click?: (item: any, handler: any, index: any) => void | boolean,
         type?: HoverRowActionType,
         menuOptions?: HoverRowAction[],
         menuOptionLabel?: string,
@@ -532,18 +532,28 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
      * Clicked Button or Menu option
      * @param buttonData
      */
-    clickedButton(buttonData: HoverRowAction) {
+    clickedButton(
+        buttonData: HoverRowAction,
+        event?: MouseEvent
+    ): void {
         // no click action attached ?
         if (!buttonData.click) {
             return;
         }
 
         // perform action
-        buttonData.click(
+        const clickResult: void | boolean = buttonData.click(
             this.actionData,
             this.actionHandler,
             this.actionIndex
         );
+        if (
+            event &&
+            clickResult === false
+        ) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
     }
 
     /**
