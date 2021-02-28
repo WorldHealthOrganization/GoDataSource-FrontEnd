@@ -32,6 +32,10 @@ export class HoverRowAction {
         [key: string]: any
     };
 
+    // link data
+    routerLink: string[];
+    linkGenerator?: (item: any) => string[];
+
     /**
      * Constructor
      */
@@ -50,7 +54,10 @@ export class HoverRowAction {
             [key: string]: any
         },
         class?: string,
-        visible?: (item: any, index: any) => boolean
+        visible?: (item: any, index: any) => boolean,
+
+        // link
+        linkGenerator?: (item: any) => string[];
     }) {
         Object.assign(this, data);
     }
@@ -89,11 +96,6 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
      * Minimum distance between current mouse cursor position and previous one to be taken in consideration ( to rerender data )
      */
     static readonly MIN_MOUSE_DISTANCE: number = 30;
-
-    /**
-     * During this time actions are inactive
-     */
-    static readonly ACTIONS_DEAD_TIME_SINCE_SHOWN_MS: number = 200;
 
     /**
      * Keep shown time
@@ -412,17 +414,30 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
         actionIndex: any = null,
         mouseEvent: MouseEvent = null
     ) {
+        // set data
+        this.actionData = actionData;
+
         // set actions
         if (!_.isEqual(this.actions, actions)) {
+            // go through each action and determine links
+            (actions || []).forEach((action) => {
+                // no link provided ?
+                action.routerLink = undefined;
+                if (!action.linkGenerator) {
+                    return;
+                }
+
+                // perform action
+                action.routerLink = action.linkGenerator(this.actionData);
+            });
+
+            // set data
             this.actions = actions;
             this.actionsReversed = actions ? _.cloneDeep(actions).reverse() : [];
         }
 
         // set handler
         this.actionHandler = handler;
-
-        // set data
-        this.actionData = actionData;
 
         // set index
         this.actionIndex = actionIndex;
@@ -518,8 +533,8 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
      * @param buttonData
      */
     clickedButton(buttonData: HoverRowAction) {
-        // actions disabled ?
-        if ((moment().valueOf() - this.shownTime) <= HoverRowActionsComponent.ACTIONS_DEAD_TIME_SINCE_SHOWN_MS) {
+        // no click action attached ?
+        if (!buttonData.click) {
             return;
         }
 
