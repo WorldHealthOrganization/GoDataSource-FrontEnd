@@ -32,7 +32,6 @@ import { throwError } from 'rxjs';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AddressType } from '../../../../core/models/address.model';
-import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ContactModel } from '../../../../core/models/contact.model';
@@ -484,7 +483,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         private genericDataService: GenericDataService,
         private clusterDataService: ClusterDataService,
         private userDataService: UserDataService,
-        private relationshipDataService: RelationshipDataService,
         private entityHelperService: EntityHelperService,
         private redirectService: RedirectService
     ) {

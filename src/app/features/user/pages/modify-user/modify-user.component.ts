@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
@@ -55,7 +55,6 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
      * Constructor
      */
     constructor(
-        private router: Router,
         protected route: ActivatedRoute,
         private userDataService: UserDataService,
         private userRoleDataService: UserRoleDataService,

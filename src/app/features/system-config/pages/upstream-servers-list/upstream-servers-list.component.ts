@@ -18,7 +18,6 @@ import { SystemSyncLogModel } from '../../../../core/models/system-sync-log.mode
 import { Constants } from '../../../../core/models/constants';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { Router } from '@angular/router';
 import { HoverRowActionsDirective } from '../../../../shared/directives/hover-row-actions/hover-row-actions.directive';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
@@ -121,7 +120,6 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
      */
     constructor(
         protected listHelperService: ListHelperService,
-        private router: Router,
         private authDataService: AuthDataService,
         private systemSettingsDataService: SystemSettingsDataService,
         private snackbarService: SnackbarService,

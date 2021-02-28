@@ -400,6 +400,7 @@ export class DialogComponent implements OnDestroy {
      */
     constructor(
         public dialogRef: MatDialogRef<DialogComponent>,
+        // tslint:disable-next-line:no-unused-variable
         @Inject(MAT_DIALOG_DATA) private data: DialogConfiguration
     ) {
         // set confirm data

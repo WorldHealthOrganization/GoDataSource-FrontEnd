@@ -1,6 +1,5 @@
 import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import * as _ from 'lodash';
-import * as moment from 'moment';
 
 /**
  * Action Type
@@ -105,11 +104,6 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
      * Minimum distance between current mouse cursor position and previous one to be taken in consideration ( to rerender data )
      */
     static readonly MIN_MOUSE_DISTANCE: number = 30;
-
-    /**
-     * Keep shown time
-     */
-    private shownTime: number = 0;
 
     /**
      * Constants
@@ -469,9 +463,6 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
 
         // check if we need to display row
         this.determineVisibleValue();
-
-        // set shown time
-        this.shownTime = moment().valueOf();
     }
 
     /**

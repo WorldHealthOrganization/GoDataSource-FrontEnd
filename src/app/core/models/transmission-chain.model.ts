@@ -226,7 +226,6 @@ export class TransmissionChainGroupModel {
     relationships: RelationshipModel[] = [];
 
     // chains
-    private originalChains = [];
     chains: TransmissionChainModel[] = [];
 
     /**
@@ -261,7 +260,6 @@ export class TransmissionChainGroupModel {
         });
 
         // map chains
-        this.originalChains = chains;
         this.chains = (chains || []).map((chainData) => {
             return new TransmissionChainModel(
                 chainData,

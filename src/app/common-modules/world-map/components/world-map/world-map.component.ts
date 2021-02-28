@@ -1530,6 +1530,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
      * Update map size
      */
     @HostListener('window:resize')
+    // tslint:disable-next-line:no-unused-variable
     private updateMapSizeOnWindowResize() {
         this.updateMapSize();
     }

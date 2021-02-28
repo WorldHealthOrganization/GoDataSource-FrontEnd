@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { NgForm } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
@@ -43,7 +43,6 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
         private helpDataService: HelpDataService,
         private formHelper: FormHelperService,
         private snackbarService: SnackbarService,
-        private router: Router,
         private authDataService: AuthDataService,
         private i18nService: I18nService,
         protected dialogService: DialogService

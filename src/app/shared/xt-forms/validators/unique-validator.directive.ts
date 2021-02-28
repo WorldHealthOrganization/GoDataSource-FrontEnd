@@ -32,7 +32,7 @@ export class UniqueValidatorDirective implements Validator {
     @Input() additionalControlsToCheck: { [ name: string ]: AbstractControl };
 
     constructor(
-        @Attribute('app-unique-validator') private appUniqueValidator: string
+        @Attribute('app-unique-validator') appUniqueValidator: string
     ) {
         if (appUniqueValidator) {
             this.regex = new RegExp(appUniqueValidator, 'i');

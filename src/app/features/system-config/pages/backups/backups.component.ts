@@ -19,7 +19,6 @@ import { MatDialogRef } from '@angular/material';
 import { catchError, share, tap } from 'rxjs/operators';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { throwError } from 'rxjs';
-import { Router } from '@angular/router';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -124,7 +123,6 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
      */
     constructor(
         protected listHelperService: ListHelperService,
-        private router: Router,
         private authDataService: AuthDataService,
         private dialogService: DialogService,
         private systemSettingsDataService: SystemSettingsDataService,

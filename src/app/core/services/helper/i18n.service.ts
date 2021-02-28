@@ -4,7 +4,6 @@ import { LanguageModel, LanguageTokenDetails } from '../../models/language.model
 import { StorageKey, StorageService } from './storage.service';
 import { LanguageDataService } from '../data/language.data.service';
 import { Observable } from 'rxjs';
-import { ModelHelperService } from './model-helper.service';
 import { UserDataService } from '../data/user.data.service';
 import { AuthDataService } from '../data/auth.data.service';
 import { catchError, map, mergeMap } from 'rxjs/operators';
@@ -28,7 +27,6 @@ export class I18nService {
         private translateService: TranslateService,
         private storageService: StorageService,
         private languageDataService: LanguageDataService,
-        private modelHelperService: ModelHelperService,
         private userDataService: UserDataService,
         private authDataService: AuthDataService
     ) {}

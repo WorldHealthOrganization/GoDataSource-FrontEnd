@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
@@ -60,7 +59,6 @@ export class AuditLogsListComponent
      */
     constructor(
         protected listHelperService: ListHelperService,
-        private dialogService: DialogService,
         private auditLogDataService: AuditLogDataService,
         private snackbarService: SnackbarService,
         private genericDataService: GenericDataService,

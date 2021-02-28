@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@ang
 import { MatSidenav } from '@angular/material';
 import { NgForm } from '@angular/forms';
 import * as _ from 'lodash';
-import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { FormHelperService } from '../../../core/services/helper/form-helper.service';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import { GlobalEntitySearchDataService } from '../../../core/services/data/global-entity-search.data.service';
@@ -40,7 +39,6 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
      * Constructor
      */
     constructor(
-        private authDataService: AuthDataService,
         private formHelper: FormHelperService,
         private snackbarService: SnackbarService,
         private globalEntitySearchDataService: GlobalEntitySearchDataService,

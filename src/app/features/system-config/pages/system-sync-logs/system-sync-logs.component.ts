@@ -22,7 +22,6 @@ import { SystemUpstreamServerModel } from '../../../../core/models/system-upstre
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { catchError, map, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import { Router } from '@angular/router';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
@@ -113,7 +112,6 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit, On
      */
     constructor(
         protected listHelperService: ListHelperService,
-        private router: Router,
         private authDataService: AuthDataService,
         private snackbarService: SnackbarService,
         private dialogService: DialogService,
