@@ -207,7 +207,10 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
         this.breadcrumbs = [];
 
         // do we have follow-up data
-        if (this.followUpData) {
+        if (
+            this.followUpData &&
+            this.followUpData.id
+        ) {
             switch (this.rootPage) {
                 case FollowUpPage.FOR_CONTACT:
                     // contacts list page

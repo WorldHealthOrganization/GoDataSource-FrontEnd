@@ -34,7 +34,13 @@ export class HoverRowAction {
 
     // link data
     routerLink: string[];
+    queryParams: {
+        [k: string]: any;
+    };
     linkGenerator?: (item: any) => string[];
+    queryParamsGenerator?: (item: any) => {
+        [k: string]: any;
+    };
 
     /**
      * Constructor
@@ -57,7 +63,10 @@ export class HoverRowAction {
         visible?: (item: any, index: any) => boolean,
 
         // link
-        linkGenerator?: (item: any) => string[];
+        linkGenerator?: (item: any) => string[],
+        queryParamsGenerator?: (item: any) => {
+            [k: string]: any;
+        }
     }) {
         Object.assign(this, data);
     }
@@ -421,14 +430,15 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
         if (!_.isEqual(this.actions, actions)) {
             // go through each action and determine links
             (actions || []).forEach((action) => {
-                // no link provided ?
-                action.routerLink = undefined;
-                if (!action.linkGenerator) {
-                    return;
-                }
+                // link
+                action.routerLink = action.linkGenerator ?
+                    action.linkGenerator(this.actionData) :
+                    undefined;
 
-                // perform action
-                action.routerLink = action.linkGenerator(this.actionData);
+                // query params
+                action.queryParams = action.queryParamsGenerator ?
+                    action.queryParamsGenerator(this.actionData) :
+                    undefined;
             });
 
             // set data

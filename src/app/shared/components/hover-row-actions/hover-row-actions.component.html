@@ -25,7 +25,8 @@
             <!-- Link -->
             <a
                 *ngIf="buttonData.routerLink; else simpleButton"
-                [routerLink]="buttonData.routerLink">
+                [routerLink]="buttonData.routerLink"
+                [queryParams]="buttonData.queryParams">
                 <button
                     mat-icon-button
                     color="accent"

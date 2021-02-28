@@ -167,8 +167,8 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CONTACT',
-            click: (item: ContactModel) => {
-                this.router.navigate(['/contacts', item.id, 'view']);
+            linkGenerator: (item: ContactModel): string[] => {
+                return ['/contacts', item.id, 'view'];
             },
             visible: (item: ContactModel): boolean => {
                 return !item.deleted &&
@@ -180,8 +180,8 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_LIST_CONTACTS_ACTION_MODIFY_CONTACT',
-            click: (item: ContactModel) => {
-                this.router.navigate(['/contacts', item.id, 'modify']);
+            linkGenerator: (item: ContactModel): string[] => {
+                return ['/contacts', item.id, 'modify'];
             },
             visible: (item: ContactModel): boolean => {
                 return !item.deleted &&

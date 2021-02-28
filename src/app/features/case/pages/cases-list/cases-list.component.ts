@@ -153,7 +153,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_CASE',
-            linkGenerator: (item: CaseModel) => {
+            linkGenerator: (item: CaseModel): string[] => {
                 return ['/cases', item.id, 'view'];
             },
             visible: (item: CaseModel): boolean => {
@@ -166,7 +166,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_LIST_CASES_ACTION_MODIFY_CASE',
-            linkGenerator: (item: CaseModel) => {
+            linkGenerator: (item: CaseModel): string[] => {
                 return ['/cases', item.id, 'modify'];
             },
             visible: (item: CaseModel): boolean => {
