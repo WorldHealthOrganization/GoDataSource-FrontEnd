@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { TransmissionChainGroupModel, TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
@@ -68,7 +68,6 @@ export class TransmissionChainsListComponent extends ListComponent implements On
      */
     constructor(
         protected listHelperService: ListHelperService,
-        private router: Router,
         private outbreakDataService: OutbreakDataService,
         private transmissionChainDataService: TransmissionChainDataService,
         private route: ActivatedRoute,

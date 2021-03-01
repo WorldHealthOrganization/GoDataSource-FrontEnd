@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -41,7 +41,6 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
      * Constructor
      */
     constructor(
-        private router: Router,
         protected route: ActivatedRoute,
         private userRoleDataService: UserRoleDataService,
         private snackbarService: SnackbarService,

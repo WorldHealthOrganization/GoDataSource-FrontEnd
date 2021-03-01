@@ -85,12 +85,15 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_VIEW_FOLLOW_UP',
-            click: (item: FollowUpModel) => {
-                this.router.navigate(['/contacts', item.personId, 'follow-ups', item.id, 'view'], {
-                    queryParams: {
-                        rootPage: this.rootPage
-                    }
-                });
+            linkGenerator: (item: FollowUpModel): string[] => {
+                return ['/contacts', item.personId, 'follow-ups', item.id, 'view'];
+            },
+            queryParamsGenerator: (): {
+                [k: string]: any;
+            } => {
+                return  {
+                    rootPage: this.rootPage
+                };
             },
             visible: (item: FollowUpModel): boolean => {
                 return !item.deleted &&

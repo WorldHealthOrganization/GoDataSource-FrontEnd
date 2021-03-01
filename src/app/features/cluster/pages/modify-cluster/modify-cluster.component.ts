@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -40,7 +40,6 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
      * Constructor
      */
     constructor(
-        private router: Router,
         protected route: ActivatedRoute,
         private authDataService: AuthDataService,
         private clusterDataService: ClusterDataService,

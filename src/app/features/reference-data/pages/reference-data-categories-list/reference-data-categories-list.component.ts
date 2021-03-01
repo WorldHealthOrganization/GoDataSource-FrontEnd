@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -53,8 +52,8 @@ export class ReferenceDataCategoriesListComponent extends ListComponent implemen
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_ACTION_VIEW_CATEGORY',
-            click: (item: ReferenceDataCategoryModel) => {
-                this.router.navigate(['/reference-data', item.id]);
+            linkGenerator: (item: ReferenceDataCategoryModel): string[] => {
+                return ['/reference-data', item.id];
             },
             visible: (item: ReferenceDataCategoryModel): boolean => {
                 return ReferenceDataEntryModel.canList(this.authUser);
@@ -67,7 +66,6 @@ export class ReferenceDataCategoriesListComponent extends ListComponent implemen
      */
     constructor(
         protected listHelperService: ListHelperService,
-        private router: Router,
         private referenceDataDataService: ReferenceDataDataService,
         private authDataService: AuthDataService,
         private i18nService: I18nService,

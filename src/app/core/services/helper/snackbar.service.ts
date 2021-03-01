@@ -34,7 +34,7 @@ export class SnackbarService {
         err,
         translateData = {},
         html: boolean = false
-    ) {
+    ): Subscription {
         const defaultApiErrorCode = 'LNG_API_ERROR_CODE_UNKNOWN_ERROR';
 
         // get the error message for the received API Error Code

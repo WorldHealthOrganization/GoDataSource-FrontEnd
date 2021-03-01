@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -7,7 +7,6 @@ import { NgForm, NgModel } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
@@ -87,7 +86,6 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
         private route: ActivatedRoute,
         private entityDataService: EntityDataService,
         private outbreakDataService: OutbreakDataService,
-        private genericDataService: GenericDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private relationshipDataService: RelationshipDataService,

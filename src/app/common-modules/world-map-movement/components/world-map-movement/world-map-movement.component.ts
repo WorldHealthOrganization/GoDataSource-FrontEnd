@@ -40,7 +40,6 @@ export class WorldMapMovementComponent {
         this.arrowLines = [ path ];
 
         // sort addresses
-        let previousAddress: AddressModel;
         this._addresses = _.chain(items).filter((item: AddressModel) => {
             return item.geoLocation &&
                 _.isNumber(item.geoLocation.lat) &&
@@ -68,9 +67,6 @@ export class WorldMapMovementComponent {
                     currentAddress.geoLocation.lat,
                     currentAddress.geoLocation.lng
                 ));
-
-                // return address item
-                previousAddress = currentAddress;
             }
 
             // finished

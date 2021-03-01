@@ -1,8 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute } from '@angular/router';
-import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DeviceDataService } from '../../../../core/services/data/device.data.service';
@@ -31,8 +29,6 @@ export class ViewHistorySystemDeviceComponent extends ViewModifyComponent implem
      */
     constructor(
         protected route: ActivatedRoute,
-        private snackbarService: SnackbarService,
-        private formHelper: FormHelperService,
         protected dialogService: DialogService,
         private deviceDataService: DeviceDataService,
         private authDataService: AuthDataService
