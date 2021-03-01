@@ -1102,7 +1102,7 @@ export abstract class ListComponent implements OnDestroy {
                 // date
                 if (globalFilters.date) {
                     globalQb.filter.byDateRange(
-                        'dateOfOnset', {
+                        'dateOfReporting', {
                             endDate: globalFilters.date.endOf('day').format()
                         }
                     );
@@ -1143,7 +1143,7 @@ export abstract class ListComponent implements OnDestroy {
                 // date
                 if (globalFilters.date) {
                     globalQb.filter.byDateRange(
-                        'dateOfOnset', {
+                        'dateOfReporting', {
                             endDate: globalFilters.date.endOf('day').format()
                         }
                     );
@@ -1182,7 +1182,7 @@ export abstract class ListComponent implements OnDestroy {
                 // date
                 if (globalFilters.date) {
                     globalQb.filter.byDateRange(
-                        'dateOfOnset', {
+                        'dateOfReporting', {
                             endDate: globalFilters.date.endOf('day').format()
                         }
                     );
@@ -1265,7 +1265,7 @@ export abstract class ListComponent implements OnDestroy {
                 // date
                 if (globalFilters.date) {
                     globalQb.filter.byDateRange(
-                        'dateOfOnset', {
+                        'dateOfReporting', {
                             endDate: globalFilters.date.endOf('day').format()
                         }
                     );
@@ -1314,7 +1314,7 @@ export abstract class ListComponent implements OnDestroy {
                 // date
                 if (globalFilters.date) {
                     this.appliedListFilterQueryBuilder.filter.byDateRange(
-                        'dateOfOnset', {
+                        'dateOfReporting', {
                             endDate: globalFilters.date.endOf('day').format()
                         }
                     );
@@ -1428,7 +1428,7 @@ export abstract class ListComponent implements OnDestroy {
                 // date
                 if (globalFilters.date) {
                     globalQb.filter.byDateRange(
-                        'dateOfOnset', {
+                        'dateOfReporting', {
                             endDate: globalFilters.date.endOf('day').format()
                         }
                     );
@@ -1469,7 +1469,7 @@ export abstract class ListComponent implements OnDestroy {
                 // date
                 if (globalFilters.date) {
                     globalQb.filter.byDateRange(
-                        'dateOfOnset', {
+                        'dateOfReporting', {
                             endDate: globalFilters.date.endOf('day').format()
                         }
                     );
@@ -1819,7 +1819,7 @@ export abstract class ListComponent implements OnDestroy {
                 // date
                 if (globalFilters.date) {
                     globalQb.filter.byDateRange(
-                        'dateOfOnset', {
+                        'dateOfReporting', {
                             endDate: globalFilters.date.endOf('day').format()
                         }
                     );

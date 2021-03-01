@@ -694,7 +694,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         // date
         if (this.globalFilterDate) {
             qb.filter.byDateRange(
-                'dateOfOnset', {
+                'dateOfReporting', {
                     endDate: this.globalFilterDate.endOf('day').format()
                 }
             );
