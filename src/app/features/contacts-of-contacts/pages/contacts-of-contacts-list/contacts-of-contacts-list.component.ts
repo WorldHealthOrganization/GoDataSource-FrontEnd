@@ -941,3 +941,4 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         });
     }
 }
+
