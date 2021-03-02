@@ -164,7 +164,7 @@ export class FollowUpModel
 
         if (includeContact) {
             // get person based on the received object
-            let person = _.get(
+            const person = _.get(
                 data,
                 (data instanceof FollowUpModel) ? 'person' : 'contact',
                 {}
