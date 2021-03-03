@@ -99,22 +99,35 @@
 </app-side-filters>
 
 <mat-card class="page-section page-content">
-    <div class="reset-filters">
-        <!-- Reset Filters -->
-        <button
-            type="button"
-            mat-raised-button
-            color="accent"
-            (click)="resetFiltersToSideFilters()">
-            {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
-        </button>
-        <button
-            type="button"
-            mat-raised-button
-            color="accent"
-            (click)="needsRefreshList(true)">
-            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
-        </button>
+    <!-- Table top info -->
+    <div
+        fxLayout="row">
+        <!-- Filters message -->
+        <div
+            fxFlex fxGrow="0" fxLayoutAlign="start center"
+            class="filters-applied">
+            {{ queryBuilder.isEmptyOnlyFilters() ? '' : ('LNG_COMMON_LABEL_FILTERS_USED' | translate) }}
+        </div>
+
+        <!-- Filter buttons -->
+        <div
+            fxFlex
+            class="reset-filters">
+            <button
+                type="button"
+                mat-raised-button
+                color="accent"
+                (click)="resetFiltersToSideFilters()">
+                {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+            </button>
+            <button
+                type="button"
+                mat-raised-button
+                color="accent"
+                (click)="needsRefreshList(true)">
+                {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+            </button>
+        </div>
     </div>
 
     <!-- Hover question effects / actions -->

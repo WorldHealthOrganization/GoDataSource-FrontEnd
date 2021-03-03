@@ -806,6 +806,12 @@ export abstract class ListComponent implements OnDestroy {
      * Initialize paginator
      */
     protected initPaginator(): void {
+        // initialize query paginator
+        this.queryBuilder.paginator.setPage({
+            pageSize: this.pageSize,
+            pageIndex: this.pageIndex
+        });
+
         // remember that paginator was initialized
         this.paginatorInitialized = true;
     }
@@ -2165,8 +2171,17 @@ export abstract class ListComponent implements OnDestroy {
     private updatePageIndex(): void {
         // set paginator page
         if (this.queryBuilder.paginator) {
-            this.pageIndex = this.queryBuilder.paginator.skip / this.queryBuilder.paginator.limit;
-            this.pageSize = this.queryBuilder.paginator.limit;
+            if (
+                this.queryBuilder.paginator.skip &&
+                this.queryBuilder.paginator.limit
+            ) {
+                this.pageIndex = this.queryBuilder.paginator.skip / this.queryBuilder.paginator.limit;
+            }
+
+            // set page size
+            if (this.queryBuilder.paginator.limit) {
+                this.pageSize = this.queryBuilder.paginator.limit;
+            }
         }
     }
 }

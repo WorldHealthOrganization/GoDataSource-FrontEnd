@@ -61,7 +61,12 @@ export const EnglishUsLang = {
         /**
          * uiWorldMap
          */
-        'LNG_PAGE_WORLD_MAP_OUTBREAK_MAP_SERVER_STYLE_INVALID_URL': 'Outbreak Map Servers aren\'t configure properly, please check the outbreak settings'
+        'LNG_PAGE_WORLD_MAP_OUTBREAK_MAP_SERVER_STYLE_INVALID_URL': 'Outbreak Map Servers aren\'t configure properly, please check the outbreak settings',
+
+        /**
+         * uiCommonLabels
+         */
+        'LNG_COMMON_LABEL_FILTERS_USED': '**Filters applied'
 
         /**
          * REMOVE the tokens from below

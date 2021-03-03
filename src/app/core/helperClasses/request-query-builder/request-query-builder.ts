@@ -253,20 +253,6 @@ export class RequestQueryBuilder {
     }
 
     /**
-     * Check if all child query builders are empty
-     */
-    allChildQueryBuildersAreEmpty(): boolean {
-        let isEmpty: boolean = true;
-        _.each(this.childrenQueryBuilders, (qb: RequestQueryBuilder) => {
-            if (!qb.isEmpty()) {
-                isEmpty = false;
-                return false;
-            }
-        });
-        return isEmpty;
-    }
-
-    /**
      * Build the query to be applied on Loopback requests
      * @returns {string}
      */
@@ -407,13 +393,51 @@ export class RequestQueryBuilder {
      * @returns {boolean}
      */
     isEmpty(): boolean {
+        // check if all child query builders are empty
+        let isEmptyChildrenBuilders: boolean = true;
+        _.each(this.childrenQueryBuilders, (qb: RequestQueryBuilder) => {
+            if (!qb.isEmpty()) {
+                isEmptyChildrenBuilders = false;
+                return false;
+            }
+        });
+
+        // empty ?
         return _.isEmpty(this.includedRelations) &&
             this.filter.isEmpty() &&
             this.sort.isEmpty() &&
             _.isEmpty(this.limitResultsNumber) &&
             this.paginator.isEmpty() &&
             _.isEmpty(this.fieldsInResponse) &&
-            this.allChildQueryBuildersAreEmpty();
+            isEmptyChildrenBuilders;
+    }
+
+    /**
+     * Check if filters are empty
+     */
+    isEmptyOnlyFilters(): boolean {
+        // check if all child query builders are empty
+        let isEmptyChildrenBuilders: boolean = true;
+        _.each(this.childrenQueryBuilders, (qb: RequestQueryBuilder) => {
+            if (!qb.isEmptyOnlyFilters()) {
+                isEmptyChildrenBuilders = false;
+                return false;
+            }
+        });
+
+        // include relationships
+        let isEmptyIncludeRelationships: boolean = true;
+        _.each(this.includedRelations, (rrb: RequestRelationBuilder) => {
+            if (!rrb.queryBuilder.isEmptyOnlyFilters()) {
+                isEmptyIncludeRelationships = false;
+                return false;
+            }
+        });
+
+        // empty filters ?
+        return this.filter.isEmpty() &&
+            isEmptyChildrenBuilders &&
+            isEmptyIncludeRelationships;
     }
 
     /**
