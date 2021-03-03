@@ -75,8 +75,8 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_VIEW_RELATIONSHIP',
-            click: (item: EntityModel) => {
-                this.router.navigate(['/relationships', this.entityType, this.entityId, this.relationshipTypeRoutePath, item.relationship.id, 'view']);
+            linkGenerator: (item: EntityModel): string[] => {
+                return ['/relationships', this.entityType, this.entityId, this.relationshipTypeRoutePath, item.relationship.id, 'view'];
             },
             visible: (item: EntityModel) => {
                 return !item.relationship.deleted &&
@@ -89,8 +89,8 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_MODIFY_RELATIONSHIP',
-            click: (item: EntityModel) => {
-                this.router.navigate(['/relationships', this.entityType, this.entityId, this.relationshipTypeRoutePath, item.relationship.id, 'modify']);
+            linkGenerator: (item: EntityModel): string[] => {
+                return ['/relationships', this.entityType, this.entityId, this.relationshipTypeRoutePath, item.relationship.id, 'modify'];
             },
             visible: (): boolean => {
                 return this.authUser &&

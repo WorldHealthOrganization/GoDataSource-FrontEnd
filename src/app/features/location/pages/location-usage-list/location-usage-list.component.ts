@@ -3,7 +3,7 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { LocationUsageModel, UsageDetails, UsageDetailsItem } from '../../../../core/models/location-usage.model';
 import { LocationModel } from '../../../../core/models/location.model';
@@ -54,8 +54,8 @@ export class LocationUsageListComponent extends ListComponent implements OnInit,
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_ACTION_VIEW',
-            click: (item: UsageDetailsItem) => {
-                this.router.navigateByUrl(item.viewUrl);
+            linkGenerator: (item: UsageDetailsItem): string[] => {
+                return [item.viewUrl];
             },
             visible: (item: UsageDetailsItem): boolean => {
                 return item.typePermissions &&
@@ -67,8 +67,8 @@ export class LocationUsageListComponent extends ListComponent implements OnInit,
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_ACTION_MODIFY',
-            click: (item: UsageDetailsItem) => {
-                this.router.navigateByUrl(item.modifyUrl);
+            linkGenerator: (item: UsageDetailsItem): string[] => {
+                return [item.modifyUrl];
             },
             visible: (item: UsageDetailsItem): boolean => {
                 return item.typePermissions &&
@@ -82,7 +82,6 @@ export class LocationUsageListComponent extends ListComponent implements OnInit,
      */
     constructor(
         protected listHelperService: ListHelperService,
-        private router: Router,
         private snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private locationDataService: LocationDataService,

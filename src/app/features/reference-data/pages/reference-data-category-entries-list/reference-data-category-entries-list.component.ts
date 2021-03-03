@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
@@ -49,8 +49,8 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_VIEW_ENTRY',
-            click: (item: ReferenceDataEntryModel) => {
-                this.router.navigate(['/reference-data', item.categoryId, item.id, 'view']);
+            linkGenerator: (item: ReferenceDataEntryModel): string[] => {
+                return ['/reference-data', item.categoryId, item.id, 'view'];
             },
             visible: (): boolean => {
                 return ReferenceDataEntryModel.canView(this.authUser);
@@ -61,8 +61,8 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_MODIFY_ENTRY',
-            click: (item: ReferenceDataEntryModel) => {
-                this.router.navigate(['/reference-data', item.categoryId, item.id, 'modify']);
+            linkGenerator: (item: ReferenceDataEntryModel): string[] => {
+                return ['/reference-data', item.categoryId, item.id, 'modify'];
             },
             visible: (): boolean => {
                 return ReferenceDataEntryModel.canModify(this.authUser);
@@ -95,7 +95,6 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
      */
     constructor(
         protected listHelperService: ListHelperService,
-        private router: Router,
         private route: ActivatedRoute,
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
