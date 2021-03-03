@@ -517,6 +517,7 @@ export class RequestQueryBuilder {
             serializedValueObject.includedRelations,
             (result: {[relationName: string]: RequestRelationBuilder}, value: ISerializedQueryBuilderRelation, key: string) => {
                 // create new relationship if necessary
+                // tslint:disable-next-line:no-use-before-declare
                 result[key] = new RequestRelationBuilder(
                     key,
                     () => {
