@@ -29,7 +29,7 @@ export class ResetInputOnSideFilterDirective {
 
             // update control value
             if (this._mustUpdateAfterPristine) {
-                (control.valueAccessor as ValueAccessorBase<any>).value = this._valueAfterPristine;
+                (control.valueAccessor as ValueAccessorBase<any>).writeValue(this._valueAfterPristine);
             }
         });
     }
@@ -76,7 +76,7 @@ export class ResetLocationOnSideFilterDirective {
 
             // update control value
             if (this._mustUpdateAfterPristine) {
-                component.value = this._valueAfterPristine;
+                component.writeValue(this._valueAfterPristine);
             }
         });
     }

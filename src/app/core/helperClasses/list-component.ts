@@ -2236,14 +2236,15 @@ export abstract class ListComponent implements OnDestroy {
         const currentUserCache: ICachedFilter = this.getCachedFilters();
         const currentUserCacheForCurrentPath: ICachedFilterItems = currentUserCache[this.getCachedFilterPageKey()];
         if (currentUserCacheForCurrentPath) {
+            // load search criteria
             this.queryBuilder.deserialize(currentUserCacheForCurrentPath.queryBuilder);
+
+            // load saved input values
+            this.loadCachedInputValues(currentUserCacheForCurrentPath);
+
+            // update page index
+            this.updatePageIndex();
         }
-
-        // load saved input values
-        this.loadCachedInputValues(currentUserCacheForCurrentPath);
-
-        // update page index
-        this.updatePageIndex();
     }
 
     /**
