@@ -19,12 +19,30 @@ import { ListHelperService } from '../services/helper/list-helper.service';
 import { SubscriptionLike } from 'rxjs/internal/types';
 import { StorageKey } from '../services/helper/storage.service';
 import { UserModel } from '../models/user.model';
+import { ValueAccessorBase } from '../../shared/xt-forms/core';
+
+/**
+ * Used by caching filter
+ */
+interface ICachedFilterItems {
+    queryBuilder: ISerializedQueryBuilder;
+    inputs: {
+        [inputName: string]: any
+    };
+}
 
 /**
  * Used by caching filter
  */
 interface ICachedFilter {
-    [filterKey: string]: ISerializedQueryBuilder;
+    [filterKey: string]: ICachedFilterItems;
+}
+
+/**
+ * Used by caching filter
+ */
+interface ICachedInputsValues {
+    [inputName: string]: any;
 }
 
 export abstract class ListComponent implements OnDestroy {
@@ -2132,17 +2150,46 @@ export abstract class ListComponent implements OnDestroy {
     }
 
     /**
+     * Retrieve input values
+     */
+    private getInputsValuesForCache(): ICachedInputsValues {
+        // initialize
+        const inputValues: ICachedInputsValues = {};
+
+        // determine filter input values
+        // keeping in mind that all filters should have ResetInputOnSideFilterDirective directives
+        (this.filterInputs || []).forEach((input: ResetInputOnSideFilterDirective) => {
+            inputValues[input.control.name] = input.control && input.control.valueAccessor instanceof ValueAccessorBase ?
+                (input.control.valueAccessor as ValueAccessorBase<any>).value :
+                input.control.value;
+        });
+
+        // determine location input values
+        // keeping in mind that all filters should have ResetLocationOnSideFilterDirective directives
+        (this.filterLocationInputs || []).forEach((input: ResetLocationOnSideFilterDirective) => {
+            inputValues[input.component.name] = input.component.value;
+        });
+
+        // finished
+        return inputValues;
+    }
+
+    /**
      * Update cached query
      */
     private updateCachedFilters(): void {
         // update filters
         const currentUserCache: ICachedFilter = this.getCachedFilters();
-        currentUserCache[this.getCachedFilterPageKey()] = this.queryBuilder.serialize();
+        currentUserCache[this.getCachedFilterPageKey()] = {
+            queryBuilder: this.queryBuilder.serialize(),
+            inputs: this.getInputsValuesForCache()
+        };
 
         // user information
         const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
 
         // update the new filter
+        // remove previous user data in case we have any...
         this.listHelperService.storageService.set(
             StorageKey.FILTERS, JSON.stringify({
                 [authUser.id]: currentUserCache
@@ -2151,15 +2198,49 @@ export abstract class ListComponent implements OnDestroy {
     }
 
     /**
+     * Load cached input values
+     */
+    private loadCachedInputValues(currentUserCacheForCurrentPath: ICachedFilterItems): void {
+        // wait for inputs to be rendered
+        setTimeout(() => {
+            // update filter input values
+            // keeping in mind that all filters should have ResetInputOnSideFilterDirective directives
+            (this.filterInputs || []).forEach((input: ResetInputOnSideFilterDirective) => {
+                if (
+                    input.control &&
+                    currentUserCacheForCurrentPath.inputs[input.control.name] !== undefined &&
+                    input.control.valueAccessor instanceof ValueAccessorBase
+                ) {
+                    input.updateToAfterPristineValueIsTaken(currentUserCacheForCurrentPath.inputs[input.control.name]);
+                }
+            });
+
+            // update filter input values
+            // keeping in mind that all filters should have ResetLocationOnSideFilterDirective directives
+            (this.filterLocationInputs || []).forEach((input: ResetLocationOnSideFilterDirective) => {
+                if (
+                    input.component &&
+                    currentUserCacheForCurrentPath.inputs[input.component.name] !== undefined
+                ) {
+                    input.updateToAfterPristineValueIsTaken(currentUserCacheForCurrentPath.inputs[input.component.name]);
+                }
+            });
+        });
+    }
+
+    /**
      * Load cached filters
      */
     private loadCachedFilters(): void {
         // load saved filters
         const currentUserCache: ICachedFilter = this.getCachedFilters();
-        const serializedQb: ISerializedQueryBuilder = currentUserCache[this.getCachedFilterPageKey()];
-        if (serializedQb) {
-            this.queryBuilder.deserialize(serializedQb);
+        const currentUserCacheForCurrentPath: ICachedFilterItems = currentUserCache[this.getCachedFilterPageKey()];
+        if (currentUserCacheForCurrentPath) {
+            this.queryBuilder.deserialize(currentUserCacheForCurrentPath.queryBuilder);
         }
+
+        // load saved input values
+        this.loadCachedInputValues(currentUserCacheForCurrentPath);
 
         // update page index
         this.updatePageIndex();
