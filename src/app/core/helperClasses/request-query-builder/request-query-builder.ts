@@ -101,6 +101,16 @@ export class RequestQueryBuilder {
     }
 
     /**
+     * Destroy listeners
+     */
+    public destroyListeners(): void {
+        if (this.triggerChangesListener) {
+            this.triggerChangesListener.unsubscribe();
+            this.triggerChangesListener = undefined;
+        }
+    }
+
+    /**
      * Trigger change listener
      */
     private triggerChangeListener(): void {

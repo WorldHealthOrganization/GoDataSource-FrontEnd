@@ -410,6 +410,9 @@ export abstract class ListComponent implements OnDestroy {
      * Release subscribers
      */
     private releaseSubscribers() {
+        // query builder
+        this.queryBuilder.destroyListeners();
+
         // location subscriber
         if (ListComponent.locationSubscription) {
             ListComponent.locationSubscription.unsubscribe();
