@@ -223,6 +223,7 @@
     </div>
 
     <mat-paginator
+        [pageIndex]="pageIndex"
         [length]="(cotSnapshotsListCount$ | async)?.count"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"

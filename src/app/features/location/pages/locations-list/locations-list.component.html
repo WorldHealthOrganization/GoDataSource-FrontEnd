@@ -402,6 +402,7 @@
             </div>
 
             <mat-paginator
+                [pageIndex]="pageIndex"
                 [length]="(locationsListCount$ | async)?.count"
                 [pageSize]="pageSize"
                 [pageSizeOptions]="pageSizeOptions"

@@ -328,6 +328,7 @@
 
     <mat-paginator
         *ngIf="!loading"
+        [pageIndex]="pageIndex"
         [length]="(backupsListCount$ | async)?.count"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"

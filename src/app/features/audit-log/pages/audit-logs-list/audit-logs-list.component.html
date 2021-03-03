@@ -249,6 +249,7 @@
     </div>
 
     <mat-paginator
+        [pageIndex]="pageIndex"
         [length]="(auditLogsListCount$ | async)?.count"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"

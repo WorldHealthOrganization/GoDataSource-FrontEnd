@@ -1089,6 +1089,7 @@
                         </div>
 
                         <mat-paginator
+                            [pageIndex]="pageIndex"
                             [length]="(importResultsListCount$ | async)?.count"
                             [pageSize]="pageSize"
                             [pageSizeOptions]="pageSizeOptions"

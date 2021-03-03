@@ -164,6 +164,7 @@
     </div>
 
     <mat-paginator
+        [pageIndex]="pageIndex"
         [length]="(clustersListCount$ | async)?.count"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"

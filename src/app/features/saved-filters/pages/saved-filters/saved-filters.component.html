@@ -148,6 +148,7 @@
     </div>
 
     <mat-paginator
+        [pageIndex]="pageIndex"
         [length]="(savedFiltersListCount$ | async)?.count"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"

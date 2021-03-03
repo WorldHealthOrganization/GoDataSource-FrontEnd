@@ -666,6 +666,7 @@
     </div>
 
     <mat-paginator
+        [pageIndex]="pageIndex"
         [length]="(labResultsListCount$ | async)?.count"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"

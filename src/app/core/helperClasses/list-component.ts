@@ -1,4 +1,4 @@
-import { RequestFilter, RequestFilterOperator, RequestQueryBuilder } from './request-query-builder';
+import { ISerializedQueryBuilder, RequestFilter, RequestFilterOperator, RequestQueryBuilder } from './request-query-builder';
 import * as _ from 'lodash';
 import { Subscriber } from 'rxjs';
 import { ApplyListFilter, Constants } from '../models/constants';
@@ -17,6 +17,15 @@ import { AddressType } from '../models/address.model';
 import { moment, Moment } from './x-moment';
 import { ListHelperService } from '../services/helper/list-helper.service';
 import { SubscriptionLike } from 'rxjs/internal/types';
+import { StorageKey } from '../services/helper/storage.service';
+import { UserModel } from '../models/user.model';
+
+/**
+ * Used by caching filter
+ */
+interface ICachedFilter {
+    [filterKey: string]: ISerializedQueryBuilder;
+}
 
 export abstract class ListComponent implements OnDestroy {
     // handle pop state changes
@@ -98,7 +107,9 @@ export abstract class ListComponent implements OnDestroy {
      * Query builder
      * @type {RequestQueryBuilder}
      */
-    public queryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
+    public queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(() => {
+        this.updateCachedFilters();
+    });
 
     /**
      * Applied list filter on this list page
@@ -122,6 +133,9 @@ export abstract class ListComponent implements OnDestroy {
 
     // flag set to true if the list is empty
     public isEmptyList: boolean;
+
+    // starting page
+    public pageIndex: number = 0;
 
     // Models for the checkbox functionality
     private checkboxModels: {
@@ -282,6 +296,9 @@ export abstract class ListComponent implements OnDestroy {
     protected constructor(
         protected listHelperService: ListHelperService
     ) {
+        // load saved filters
+        this.loadCachedFilters();
+
         // clone current breadcrumbs
         let currentBreadcrumbs;
         setTimeout(() => {
@@ -313,7 +330,9 @@ export abstract class ListComponent implements OnDestroy {
                     this.refreshingList = true;
 
                     // clear all filters
-                    this.queryBuilder = new RequestQueryBuilder();
+                    this.queryBuilder = new RequestQueryBuilder(() => {
+                        this.updateCachedFilters();
+                    });
 
                     // init paginator ?
                     if (this.paginatorInitialized) {
@@ -770,15 +789,23 @@ export abstract class ListComponent implements OnDestroy {
     }
 
     /**
-     * Initialize paginator
+     * Reset paginator
      */
-    protected initPaginator() {
+    protected resetPaginator(): void {
         // initialize query paginator
         this.queryBuilder.paginator.setPage({
             pageSize: this.pageSize,
             pageIndex: 0
         });
 
+        // update page index
+        this.updatePageIndex();
+    }
+
+    /**
+     * Initialize paginator
+     */
+    protected initPaginator(): void {
         // remember that paginator was initialized
         this.paginatorInitialized = true;
     }
@@ -789,6 +816,9 @@ export abstract class ListComponent implements OnDestroy {
     changePage(page: PageEvent) {
         // update API pagination params
         this.queryBuilder.paginator.setPage(page);
+
+        // update page index
+        this.updatePageIndex();
 
         // refresh list
         this.needsRefreshList(
@@ -870,6 +900,9 @@ export abstract class ListComponent implements OnDestroy {
 
         // reset table sort columns
         this.clearHeaderSort();
+
+        // reset paginator
+        this.resetPaginator();
 
         // add default filter criteria
         this.resetFiltersAddDefault();
@@ -2044,5 +2077,96 @@ export abstract class ListComponent implements OnDestroy {
 
         // set column configuration
         this.expandAllCellsForColumn[columnName] = expand;
+    }
+
+    /**
+     * Retrieve cached filters
+     */
+    private getCachedFilters(): ICachedFilter {
+        // user information
+        const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
+
+        // retrieve filters if there are any initialized
+        const cachedFilters: string = this.listHelperService.storageService.get(StorageKey.FILTERS);
+        let filters: {
+            [userId: string]: any
+        } = {};
+        if (cachedFilters) {
+            filters = JSON.parse(cachedFilters);
+        }
+
+        // we need to have data for this user, otherwise remove what we have
+        let currentUserCache: ICachedFilter = filters[authUser.id];
+        if (!currentUserCache) {
+            currentUserCache = {};
+        }
+
+        // finished
+        return currentUserCache;
+    }
+
+    /**
+     * Retrieve filter key for current page
+     */
+    private getCachedFilterPageKey(): string {
+        // get path
+        let filterKey: string = this.listHelperService.location.path();
+        const pathParamsIndex: number = filterKey.indexOf('?');
+        if (pathParamsIndex > -1) {
+            filterKey = filterKey.substr(0, pathParamsIndex);
+        }
+
+        // if apply list filter then we need to make sure we add it to our key so we don't break other pages by adding filters that we shouldn't
+        if (this.appliedListFilter) {
+            filterKey += `_${this.appliedListFilter}`;
+        }
+
+        // finished
+        return filterKey;
+    }
+
+    /**
+     * Update cached query
+     */
+    private updateCachedFilters(): void {
+        // update filters
+        const currentUserCache: ICachedFilter = this.getCachedFilters();
+        currentUserCache[this.getCachedFilterPageKey()] = this.queryBuilder.serialize();
+
+        // user information
+        const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
+
+        // update the new filter
+        this.listHelperService.storageService.set(
+            StorageKey.FILTERS, JSON.stringify({
+                [authUser.id]: currentUserCache
+            })
+        );
+    }
+
+    /**
+     * Load cached filters
+     */
+    private loadCachedFilters(): void {
+        // load saved filters
+        const currentUserCache: ICachedFilter = this.getCachedFilters();
+        const serializedQb: ISerializedQueryBuilder = currentUserCache[this.getCachedFilterPageKey()];
+        if (serializedQb) {
+            this.queryBuilder.deserialize(serializedQb);
+        }
+
+        // update page index
+        this.updatePageIndex();
+    }
+
+    /**
+     * Update page index
+     */
+    private updatePageIndex(): void {
+        // set paginator page
+        if (this.queryBuilder.paginator) {
+            this.pageIndex = this.queryBuilder.paginator.skip / this.queryBuilder.paginator.limit;
+            this.pageSize = this.queryBuilder.paginator.limit;
+        }
     }
 }

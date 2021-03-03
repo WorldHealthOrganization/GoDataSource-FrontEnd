@@ -1,29 +1,99 @@
 import * as _ from 'lodash';
-import { RequestFilter } from './request-filter';
-import { RequestSort } from './request-sort';
-import { RequestPaginator } from './request-paginator';
+import { ISerializedQueryFilter, RequestFilter } from './request-filter';
+import { ISerializedQuerySort, RequestSort } from './request-sort';
+import { ISerializedQueryPaginator, RequestPaginator } from './request-paginator';
 
+/**
+ * Serialized
+ */
+export interface ISerializedQueryBuilder {
+    filter: ISerializedQueryFilter;
+    sort: ISerializedQuerySort;
+    paginator: ISerializedQueryPaginator;
+    deleted: boolean;
+    limitResultsNumber: number;
+    fieldsInResponse: string[];
+    includedRelations: {
+        [relationName: string]: ISerializedQueryBuilderRelation
+    };
+    childrenQueryBuilders: {
+        [qbFilterKey: string]: ISerializedQueryBuilder
+    };
+}
+
+/**
+ * Serialized
+ */
+export interface ISerializedQueryBuilderRelation {
+    name: string;
+    filterParent: boolean;
+    justFilter: boolean;
+    queryBuilder: ISerializedQueryBuilder;
+}
+
+/**
+ * Query builder
+ */
 export class RequestQueryBuilder {
     // Relations to include
     public includedRelations: {
         [relationName: string]: RequestRelationBuilder
     } = {};
+
     // Where conditions
-    public filter: RequestFilter = new RequestFilter();
+    public filter: RequestFilter = new RequestFilter(() => {
+        // trigger change
+        this.triggerChangeListener();
+    });
+
     // Order fields
-    public sort: RequestSort = new RequestSort();
+    public sort: RequestSort = new RequestSort(() => {
+        // trigger change
+        this.triggerChangeListener();
+    });
+
     // Paginator
-    public paginator: RequestPaginator = new RequestPaginator();
+    public paginator: RequestPaginator = new RequestPaginator(() => {
+        // trigger change
+        this.triggerChangeListener();
+    });
+
     // Return deleted records ?
     private deleted: boolean = false;
+
     // Limit
     public limitResultsNumber: number;
+
     // Fields to retrieve
     private fieldsInResponse: string[] = [];
+
     // other custom query full query builders
     public childrenQueryBuilders: {
         [qbFilterKey: string]: RequestQueryBuilder
     } = {};
+
+    // changes listener
+    private changesListener: () => void;
+
+    /**
+     * Constructor
+     */
+    constructor(listener?: () => void) {
+        this.changesListener = listener;
+    }
+
+    /**
+     * Trigger change listener
+     */
+    private triggerChangeListener(): void {
+        // do we have a change listener ?
+        if (!this.changesListener) {
+            return;
+        }
+
+        // trigger change
+        this.changesListener();
+    }
 
     /**
      * #TODO Replace usage with RequestPaginator
@@ -32,8 +102,13 @@ export class RequestQueryBuilder {
      * @returns {RequestQueryBuilder}
      */
     limit(limit: number) {
+        // limit
         this.limitResultsNumber = limit;
 
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
         return this;
     }
 
@@ -50,7 +125,13 @@ export class RequestQueryBuilder {
         if (!this.includedRelations[relationName]) {
             // add new relation
             // tslint:disable-next-line:no-use-before-declare
-            this.includedRelations[relationName] = new RequestRelationBuilder(relationName);
+            this.includedRelations[relationName] = new RequestRelationBuilder(
+                relationName,
+                () => {
+                    // trigger change
+                    this.triggerChangeListener();
+                }
+            );
         }
 
         // do we need to keep data ?
@@ -59,6 +140,9 @@ export class RequestQueryBuilder {
         } else {
             // OTHERWISE let it how it was..don't change it to true...
         }
+
+        // trigger change
+        this.triggerChangeListener();
 
         // finished
         return this.includedRelations[relationName];
@@ -69,7 +153,11 @@ export class RequestQueryBuilder {
      * @param relationName
      */
     removeRelation(relationName: string) {
+        // delete
         delete this.includedRelations[relationName];
+
+        // trigger change
+        this.triggerChangeListener();
     }
 
     /**
@@ -78,8 +166,13 @@ export class RequestQueryBuilder {
      * @returns {RequestQueryBuilder}
      */
     fields(...fields: string[]) {
+        // projection
         this.fieldsInResponse = _.uniq([...this.fieldsInResponse, ...fields]);
 
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
         return this;
     }
 
@@ -88,7 +181,13 @@ export class RequestQueryBuilder {
      * @returns {RequestQueryBuilder}
      */
     includeDeleted() {
+        // delete ?
         this.deleted = true;
+
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
         return this;
     }
 
@@ -97,7 +196,13 @@ export class RequestQueryBuilder {
      * @returns {RequestQueryBuilder}
      */
     excludeDeleted() {
+        // delete ?
         this.deleted = false;
+
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
         return this;
     }
 
@@ -113,7 +218,11 @@ export class RequestQueryBuilder {
      * @param qbFilterKey
      */
     removeChildQueryBuilder(qbFilterKey: string) {
+        // delete
         delete this.childrenQueryBuilders[qbFilterKey];
+
+        // trigger change
+        this.triggerChangeListener();
     }
 
     /**
@@ -130,8 +239,14 @@ export class RequestQueryBuilder {
 
         // add query builder
         if (this.childrenQueryBuilders[qbFilterKey] === undefined) {
-            this.childrenQueryBuilders[qbFilterKey] = new RequestQueryBuilder();
+            this.childrenQueryBuilders[qbFilterKey] = new RequestQueryBuilder(() => {
+                // trigger change
+                this.triggerChangeListener();
+            });
         }
+
+        // trigger change
+        this.triggerChangeListener();
 
         // finished
         return this.childrenQueryBuilders[qbFilterKey];
@@ -280,6 +395,9 @@ export class RequestQueryBuilder {
             };
         }
 
+        // trigger change
+        this.triggerChangeListener();
+
         // serve
         return this;
     }
@@ -327,41 +445,164 @@ export class RequestQueryBuilder {
      * Clear children query builders
      */
     clearChildrenQueryBuilders() {
+        // clear
         this.childrenQueryBuilders = {};
+
+        // trigger change
+        this.triggerChangeListener();
     }
 
     /**
      * Clear filter and sort criterias
      */
     clear() {
+        // clear
         this.filter.clear();
         this.includedRelations = {};
         this.sort.clear();
         this.clearChildrenQueryBuilders();
         this.deleted = false;
+
+        // trigger change
+        this.triggerChangeListener();
+    }
+
+    /**
+     * Serialize query builder
+     */
+    serialize(): ISerializedQueryBuilder {
+        return {
+            filter: this.filter.serialize(),
+            sort: this.sort.serialize(),
+            paginator: this.paginator.serialize(),
+            deleted: this.deleted,
+            limitResultsNumber: this.limitResultsNumber,
+            fieldsInResponse: this.fieldsInResponse,
+            includedRelations: _.transform(
+                this.includedRelations,
+                (result: {[relationName: string]: ISerializedQueryBuilderRelation}, value: RequestRelationBuilder, key: string) => {
+                    result[key] = value.serialize();
+                },
+                {}
+            ),
+            childrenQueryBuilders: _.transform(
+                this.childrenQueryBuilders,
+                (result: {[qbFilterKey: string]: ISerializedQueryBuilder}, value: RequestQueryBuilder, key: string) => {
+                    result[key] = value.serialize();
+                },
+                {}
+            )
+        };
+    }
+
+    /**
+     * Replace query builder filters with saved ones
+     */
+    deserialize(
+        serializedValue: string | ISerializedQueryBuilder
+    ): void {
+        // deserialize
+        const serializedValueObject: ISerializedQueryBuilder = _.isString(serializedValue) ?
+            JSON.parse(serializedValue) :
+            serializedValue as ISerializedQueryBuilder;
+
+        // deserialize
+        this.filter.deserialize(serializedValueObject.filter);
+        this.sort.deserialize(serializedValueObject.sort);
+        this.paginator.deserialize(serializedValueObject.paginator);
+        this.deleted = serializedValueObject.deleted;
+        this.limitResultsNumber = serializedValueObject.limitResultsNumber;
+        this.fieldsInResponse = serializedValueObject.fieldsInResponse;
+        this.includedRelations = _.transform(
+            serializedValueObject.includedRelations,
+            (result: {[relationName: string]: RequestRelationBuilder}, value: ISerializedQueryBuilderRelation, key: string) => {
+                // create new relationship if necessary
+                result[key] = new RequestRelationBuilder(
+                    key,
+                    () => {
+                        // trigger change
+                        this.triggerChangeListener();
+                    }
+                );
+
+                // load data from cache into it
+                result[key].deserialize(value);
+            },
+            {}
+        );
+        this.childrenQueryBuilders = _.transform(
+            serializedValueObject.childrenQueryBuilders,
+            (result: {[qbFilterKey: string]: RequestQueryBuilder}, value: ISerializedQueryBuilder, key: string) => {
+                // create new relationship if necessary
+                result[key] = new RequestQueryBuilder(
+                    () => {
+                        // trigger change
+                        this.triggerChangeListener();
+                    }
+                );
+
+                // load data from cache into it
+                result[key].deserialize(value);
+            },
+            {}
+        );
     }
 }
 
+/**
+ * Relation builder
+ */
 export class RequestRelationBuilder {
+    // relation data
     public filterParent: boolean = true;
     public justFilter: boolean = true;
 
+    // query builder to be applied on the relation
+    queryBuilder: RequestQueryBuilder;
+
+    // changes listener
+    private changesListener: () => void;
+
+    /**
+     * Constructor
+     */
     constructor(
         // relation name
         public name: string,
-        // query builder to be applied on the relation
-        public queryBuilder?: RequestQueryBuilder
+
+        // changes listener
+        listener?: () => void
     ) {
-        if (!this.queryBuilder) {
-            this.queryBuilder = new RequestQueryBuilder();
+        // set listener
+        this.changesListener = listener;
+
+        // initialize query builder if necessary
+        this.queryBuilder = new RequestQueryBuilder(() => {
+            // trigger change
+            this.triggerChangeListener();
+        });
+    }
+
+    /**
+     * Trigger change listener
+     */
+    private triggerChangeListener(): void {
+        // do we have a change listener ?
+        if (!this.changesListener) {
+            return;
         }
+
+        // trigger change
+        this.changesListener();
     }
 
     /**
      * Generates a new "include" criteria for Loopback API
-     * @returns {{}}
      */
-    buildRelation() {
+    buildRelation(): {
+        relation: string,
+        scope: any
+    } {
         return {
             relation: this.name,
             scope: {
@@ -388,5 +629,38 @@ export class RequestRelationBuilder {
 
         // merge query builders
         this.queryBuilder.merge(requestRelationBuilder.queryBuilder);
+
+        // trigger change
+        this.triggerChangeListener();
+    }
+
+    /**
+     * Serialize query builder
+     */
+    serialize(): ISerializedQueryBuilderRelation {
+        return {
+            name: this.name,
+            filterParent: this.filterParent,
+            justFilter: this.justFilter,
+            queryBuilder: this.queryBuilder.serialize()
+        };
+    }
+
+    /**
+     * Replace query builder filters with saved ones
+     */
+    deserialize(
+        serializedValue: string | ISerializedQueryBuilderRelation
+    ): void {
+        // deserialize
+        const serializedValueObject: ISerializedQueryBuilderRelation = _.isString(serializedValue) ?
+            JSON.parse(serializedValue) :
+            serializedValue as ISerializedQueryBuilderRelation;
+
+        // update data
+        this.name = serializedValueObject.name;
+        this.filterParent = serializedValueObject.filterParent;
+        this.justFilter = serializedValueObject.justFilter;
+        this.queryBuilder.deserialize(serializedValueObject.queryBuilder);
     }
 }
