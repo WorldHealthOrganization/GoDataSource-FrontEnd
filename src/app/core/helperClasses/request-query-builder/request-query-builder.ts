@@ -2,6 +2,8 @@ import * as _ from 'lodash';
 import { ISerializedQueryFilter, RequestFilter } from './request-filter';
 import { ISerializedQuerySort, RequestSort } from './request-sort';
 import { ISerializedQueryPaginator, RequestPaginator } from './request-paginator';
+import { DebounceTimeCaller } from '../debounce-time-caller';
+import { Subscriber } from 'rxjs/index';
 
 /**
  * Serialized
@@ -74,25 +76,41 @@ export class RequestQueryBuilder {
 
     // changes listener
     private changesListener: () => void;
+    private triggerChangesListener: DebounceTimeCaller;
 
     /**
      * Constructor
      */
     constructor(listener?: () => void) {
+        // set listener
         this.changesListener = listener;
+        if (this.changesListener) {
+            this.triggerChangesListener = new DebounceTimeCaller(
+                new Subscriber<void>(() => {
+                    // do we have a change listener ?
+                    if (!this.changesListener) {
+                        return;
+                    }
+
+                    // trigger change
+                    this.changesListener();
+                }),
+                400
+            );
+        }
     }
 
     /**
      * Trigger change listener
      */
     private triggerChangeListener(): void {
-        // do we have a change listener ?
-        if (!this.changesListener) {
+        // nothing to do
+        if (!this.triggerChangesListener) {
             return;
         }
 
-        // trigger change
-        this.changesListener();
+        // trigger refresh
+        this.triggerChangesListener.call();
     }
 
     /**

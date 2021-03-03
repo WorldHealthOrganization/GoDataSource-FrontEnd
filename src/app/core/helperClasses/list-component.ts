@@ -1,4 +1,4 @@
-import { ISerializedQueryBuilder, RequestFilter, RequestFilterOperator, RequestQueryBuilder } from './request-query-builder';
+import { ISerializedQueryBuilder, RequestFilter, RequestFilterOperator, RequestQueryBuilder, RequestSortDirection } from './request-query-builder';
 import * as _ from 'lodash';
 import { Subscriber } from 'rxjs';
 import { ApplyListFilter, Constants } from '../models/constants';
@@ -6,7 +6,7 @@ import { FormRangeModel } from '../../shared/components/form-range/form-range.mo
 import { BreadcrumbItemModel } from '../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ResetInputOnSideFilterDirective, ResetLocationOnSideFilterDirective } from '../../shared/directives/reset-input-on-side-filter/reset-input-on-side-filter.directive';
-import { MatPaginator, MatSort, MatSortable, PageEvent } from '@angular/material';
+import { MatPaginator, MatSort, MatSortable, MatSortHeader, PageEvent } from '@angular/material';
 import { SideFiltersComponent } from '../../shared/components/side-filters/side-filters.component';
 import { DebounceTimeCaller } from './debounce-time-caller';
 import { MetricContactsSeenEachDays } from '../models/metrics/metric-contacts-seen-each-days.model';
@@ -24,11 +24,25 @@ import { ValueAccessorBase } from '../../shared/xt-forms/core';
 /**
  * Used by caching filter
  */
+interface ICachedSortItem {
+    active: string;
+    direction: RequestSortDirection;
+}
+
+/**
+ * Used by caching filter
+ */
 interface ICachedFilterItems {
+    // keep the actual query executed to bring data
     queryBuilder: ISerializedQueryBuilder;
+
+    // keep filters information
     inputs: {
         [inputName: string]: any
     };
+
+    // keep sort information
+    sort: ICachedSortItem;
 }
 
 /**
@@ -175,6 +189,9 @@ export abstract class ListComponent implements OnDestroy {
         checkedOnlyNotDeletedRecords: false,
         checkedRecords: {}
     };
+
+    // sort by disabled ?
+    private _sortByDisabled: boolean = false;
 
     /**
      * Did we check at least one record ?
@@ -480,6 +497,11 @@ export abstract class ListComponent implements OnDestroy {
             [property: string]: string[]
         }
     ) {
+        // sort by disabled ?
+        if (this._sortByDisabled) {
+            return;
+        }
+
         // sort information
         const property = _.get(data, 'active');
         const direction = _.get(data, 'direction');
@@ -2175,6 +2197,25 @@ export abstract class ListComponent implements OnDestroy {
     }
 
     /**
+     * Determine what columns are sorted by
+     */
+    private getTableSortForCache(): ICachedSortItem {
+        // nothing sorted by ?
+        if (
+            !this.matTableSort ||
+            !this.matTableSort.direction
+        ) {
+            return undefined;
+        }
+
+        // set sort values
+        return {
+            active: this.matTableSort.active,
+            direction: this.matTableSort.direction as RequestSortDirection
+        };
+    }
+
+    /**
      * Update cached query
      */
     private updateCachedFilters(): void {
@@ -2182,7 +2223,8 @@ export abstract class ListComponent implements OnDestroy {
         const currentUserCache: ICachedFilter = this.getCachedFilters();
         currentUserCache[this.getCachedFilterPageKey()] = {
             queryBuilder: this.queryBuilder.serialize(),
-            inputs: this.getInputsValuesForCache()
+            inputs: this.getInputsValuesForCache(),
+            sort: this.getTableSortForCache()
         };
 
         // user information
@@ -2201,6 +2243,11 @@ export abstract class ListComponent implements OnDestroy {
      * Load cached input values
      */
     private loadCachedInputValues(currentUserCacheForCurrentPath: ICachedFilterItems): void {
+        // nothing to load ?
+        if (_.isEmpty(currentUserCacheForCurrentPath.inputs)) {
+            return;
+        }
+
         // wait for inputs to be rendered
         setTimeout(() => {
             // update filter input values
@@ -2229,6 +2276,41 @@ export abstract class ListComponent implements OnDestroy {
     }
 
     /**
+     * Load cached sort column
+     */
+    private loadCachedSortColumn(currentUserCacheForCurrentPath: ICachedFilterItems): void {
+        // no sort applied ?
+        if (!currentUserCacheForCurrentPath.sort) {
+            return;
+        }
+
+        // wait for inputs to be rendered
+        setTimeout(() => {
+            // make sure we have the mat table visible
+            if (!this.matTableSort) {
+                return;
+            }
+
+            // reset state so that start is the first sort direction that you will see
+            this._sortByDisabled = true;
+            this.matTableSort.sort({
+                id: null,
+                start: currentUserCacheForCurrentPath.sort.direction,
+                disableClear: false
+            });
+            this.matTableSort.sort({
+                id: currentUserCacheForCurrentPath.sort.active,
+                start: currentUserCacheForCurrentPath.sort.direction,
+                disableClear: false
+            });
+
+            // ugly hack
+            (this.matTableSort.sortables.get(currentUserCacheForCurrentPath.sort.active) as MatSortHeader)._setAnimationTransitionState({ toState: 'active' });
+            this._sortByDisabled = false;
+        });
+    }
+
+    /**
      * Load cached filters
      */
     private loadCachedFilters(): void {
@@ -2241,6 +2323,9 @@ export abstract class ListComponent implements OnDestroy {
 
             // load saved input values
             this.loadCachedInputValues(currentUserCacheForCurrentPath);
+
+            // load sort column
+            this.loadCachedSortColumn(currentUserCacheForCurrentPath);
 
             // update page index
             this.updatePageIndex();
