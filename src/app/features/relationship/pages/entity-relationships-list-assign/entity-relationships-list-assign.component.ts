@@ -114,17 +114,14 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
         // side filters
         this.generateSideFilters();
 
-        this.route.queryParams
-            .subscribe((queryParams: { selectedTargetIds }) => {
-                if (_.isEmpty(queryParams.selectedTargetIds)) {
-                    this.snackbarService.showError('LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES');
-                    this.router.navigate(['..']);
-                } else {
-                    this.selectedTargetIds = JSON.parse(queryParams.selectedTargetIds);
+        if (_.isEmpty(this.route.snapshot.queryParams.selectedTargetIds)) {
+            this.snackbarService.showError('LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES');
+            this.router.navigate(['..']);
+        } else {
+            this.selectedTargetIds = JSON.parse(this.route.snapshot.queryParams.selectedTargetIds);
 
-                    this.onDataInitialized();
-                }
-            });
+            this.onDataInitialized();
+        }
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();

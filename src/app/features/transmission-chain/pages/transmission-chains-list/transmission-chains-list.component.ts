@@ -85,14 +85,11 @@ export class TransmissionChainsListComponent extends ListComponent implements On
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         // get query params
-        this.route.queryParams
-            .subscribe((queryParams: any) => {
-                this.queryParamsData = queryParams;
-                this.appliedListFilter = queryParams.applyListFilter;
+        this.queryParamsData = this.route.snapshot.queryParams;
+        this.appliedListFilter = this.queryParamsData.applyListFilter;
 
-                // init filters
-                this.resetFiltersAddDefault();
-            });
+        // init filters
+        this.resetFiltersAddDefault();
 
         // initialize pagination
         this.initPaginator();
