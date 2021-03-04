@@ -90,7 +90,14 @@
                                 [optionReadOnly]="true">
                             </app-form-select>
 
-                            <div fxFlex><!-- placeholder --></div>
+                            <app-form-slide-toggle
+                                name="dontCacheFilters"
+                                [(ngModel)]="user.dontCacheFilters"
+                                [label]="'LNG_USER_FIELD_LABEL_DONT_CACHE_FILTERS' | translate"
+                                tooltip="LNG_USER_FIELD_LABEL_DONT_CACHE_FILTERS_DESCRIPTION"
+                                [disabled]="true">
+                            </app-form-slide-toggle>
+
                             <div fxFlex><!-- placeholder --></div>
 
                         </div>

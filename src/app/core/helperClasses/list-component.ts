@@ -2085,7 +2085,23 @@ export abstract class ListComponent implements OnDestroy {
      * @param visibleColumns
      */
     applySideColumnsChanged(visibleColumns: string[]) {
+        // apply side columns
         this.visibleTableColumns = visibleColumns;
+
+        // disabled saved filters for current user ?
+        const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
+        if (authUser.dontCacheFilters) {
+            return;
+        }
+
+        // reload data into columns from cached filters
+        // load saved filters
+        const currentUserCache: ICachedFilter = this.getCachedFilters(true);
+        const currentUserCacheForCurrentPath: ICachedFilterItems = currentUserCache[this.getCachedFilterPageKey()];
+        if (currentUserCacheForCurrentPath) {
+            // load saved input values
+            this.loadCachedInputValues(currentUserCacheForCurrentPath);
+        }
     }
 
     /**
@@ -2272,6 +2288,12 @@ export abstract class ListComponent implements OnDestroy {
      * Update cached query
      */
     private updateCachedFilters(): void {
+        // disabled saved filters for current user ?
+        const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
+        if (authUser.dontCacheFilters) {
+            return;
+        }
+
         // update filters
         const currentUserCache: ICachedFilter = this.getCachedFilters(false);
         currentUserCache[this.getCachedFilterPageKey()] = {
@@ -2282,9 +2304,6 @@ export abstract class ListComponent implements OnDestroy {
                 this.sideFilter.toSaveData() :
                 null
         };
-
-        // user information
-        const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
 
         // update the new filter
         // remove previous user data in case we have any...
@@ -2392,6 +2411,12 @@ export abstract class ListComponent implements OnDestroy {
      * Load cached filters
      */
     private loadCachedFilters(): void {
+        // disabled saved filters for current user ?
+        const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
+        if (authUser.dontCacheFilters) {
+            return;
+        }
+
         // load saved filters
         const currentUserCache: ICachedFilter = this.getCachedFilters(true);
         const currentUserCacheForCurrentPath: ICachedFilterItems = currentUserCache[this.getCachedFilterPageKey()];
