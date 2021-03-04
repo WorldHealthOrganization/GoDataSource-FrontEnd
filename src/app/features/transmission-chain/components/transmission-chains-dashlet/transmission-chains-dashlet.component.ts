@@ -447,6 +447,17 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     private _updateSnapshotsSubscription: Subscription;
     private _updateSnapshotsTimer: NodeJS.Timer;
 
+    // show snapshot filters
+    showSnapshotFilters: boolean = false;
+    snapshotFilters: {
+        firstName?: string,
+        lastName?: string
+    } = {};
+    snapshotFiltersClone: {
+        firstName?: string,
+        lastName?: string
+    } = {};
+
     /**
      * Constructor
      */
@@ -730,6 +741,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 // close settings panel
                 this.showFilters = false;
                 this.showGraphConfiguration = false;
+                this.showSnapshotFilters = false;
 
                 // snapshot name
                 const snapshotName: string = answer.inputValue.value.snapshotName;
@@ -900,6 +912,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         this.showFilters = true;
         this.showGraphConfiguration = false;
         this.mustLoadChain = true;
+        this.showSnapshotFilters = false;
     }
 
     /**
@@ -907,7 +920,18 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      */
     showGraphConfigurationHideFilters(): void {
         this.showFilters = false;
+        this.showSnapshotFilters = false;
         this.showGraphConfiguration = true;
+        this.mustLoadChain = true;
+    }
+
+    /**
+     * Show snapshot filters
+     */
+    showSnapshotFiltersConf(): void {
+        this.showFilters = false;
+        this.showSnapshotFilters = true;
+        this.showGraphConfiguration = false;
         this.mustLoadChain = true;
     }
 
@@ -2399,9 +2423,14 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         // hide filters & confs
         this.showFilters = false;
         this.showGraphConfiguration = false;
+        this.showSnapshotFilters = false;
 
         // chain loaded
         this.mustLoadChain = false;
+
+        // original page size clone
+        const originalSnapshotFiltersClone = this.snapshotFiltersClone;
+        this.snapshotFiltersClone = _.cloneDeep(this.snapshotFilters);
 
         // format chart & geo map legend
         this.mapColorCriteria();
@@ -2409,11 +2438,15 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         // same group, we don't need to retrieve anything from BE ?
         if (this.chainGroupId === this.selectedSnapshot) {
             // must update pages ?
-            if (this.chainPageSize !== this.pageSize) {
+            if (
+                this.chainPageSize !== this.pageSize ||
+                !_.isEqual(this.snapshotFilters, originalSnapshotFiltersClone)
+            ) {
                 this.chainPageSize = this.pageSize;
                 this.chainPages = this.transmissionChainDataService.getChainOfTransmissionPages(
                     this.chainGroup,
-                    this.pageSize
+                    this.pageSize,
+                    this.snapshotFilters
                 );
             }
 
@@ -2498,7 +2531,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                     this.chainPageSize = this.pageSize;
                     this.chainPages = this.transmissionChainDataService.getChainOfTransmissionPages(
                         this.chainGroup,
-                        this.pageSize
+                        this.pageSize,
+                        this.snapshotFilters
                     );
 
                     // finished
@@ -2540,7 +2574,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                             this.chainPageSize = this.pageSize;
                             this.chainPages = this.transmissionChainDataService.getChainOfTransmissionPages(
                                 this.chainGroup,
-                                this.pageSize
+                                this.pageSize,
+                                this.snapshotFilters
                             );
 
                             // finished

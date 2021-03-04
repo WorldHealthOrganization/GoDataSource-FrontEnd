@@ -78,7 +78,12 @@ export const EnglishUsLang = {
          * uiUserFields
          */
         'LNG_USER_FIELD_LABEL_DONT_CACHE_FILTERS': 'Don\'t use cached filters',
-        'LNG_USER_FIELD_LABEL_DONT_CACHE_FILTERS_DESCRIPTION': 'When true, the system won\'t cache filter. So every time you come to a list page it will display the list without the previous filters that were applied last time when you accessed the page'
+        'LNG_USER_FIELD_LABEL_DONT_CACHE_FILTERS_DESCRIPTION': 'When true, the system won\'t cache filter. So every time you come to a list page it will display the list without the previous filters that were applied last time when you accessed the page',
+
+        /**
+         * uiChainsOfTransmissionGraph
+         */
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_SNAPSHOT_FILTERS': 'Snapshot Filters',
 
         /**
          * REMOVE the tokens from below
