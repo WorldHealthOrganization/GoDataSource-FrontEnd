@@ -90,16 +90,13 @@ export class ManageIconsListComponent extends ListComponent implements OnInit, O
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         // get the query params
-        this.route.queryParams
-            .subscribe((params: { categoryId?: string }) => {
-                // retrieve Reference Data Category info
-                if (!params.categoryId) {
-                    // update breadcrumbs
-                    this.initializeBreadcrumbs();
-                } else {
-                    this.retrieveCategory(params.categoryId);
-                }
-            });
+        // retrieve Reference Data Category info
+        if (!this.route.snapshot.queryParams.categoryId) {
+            // update breadcrumbs
+            this.initializeBreadcrumbs();
+        } else {
+            this.retrieveCategory(this.route.snapshot.queryParams.categoryId);
+        }
 
         // initialize pagination
         this.initPaginator();
