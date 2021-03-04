@@ -2135,7 +2135,7 @@ export abstract class ListComponent implements OnDestroy {
     /**
      * Retrieve cached filters
      */
-    private getCachedFilters(): ICachedFilter {
+    private getCachedFilters(forLoadingFilters: boolean): ICachedFilter {
         // user information
         const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
 
@@ -2152,6 +2152,35 @@ export abstract class ListComponent implements OnDestroy {
         let currentUserCache: ICachedFilter = filters[authUser.id];
         if (!currentUserCache) {
             currentUserCache = {};
+        }
+
+        // check if we have something in url, which has priority against storage
+        if (
+            this.listHelperService.route.snapshot.queryParams &&
+            this.listHelperService.route.snapshot.queryParams.cachedListFilters
+        ) {
+            try {
+                // retrieve data
+                const cachedListFilters: ICachedFilterItems = JSON.parse(this.listHelperService.route.snapshot.queryParams.cachedListFilters);
+
+                // validate cached url filter
+                if (
+                    cachedListFilters.sideFilters === undefined ||
+                    cachedListFilters.sort === undefined ||
+                    cachedListFilters.inputs === undefined ||
+                    cachedListFilters.queryBuilder === undefined
+                ) {
+                    // display only if we're loading data, for save it doesn't matter since we will overwrite it
+                    if (forLoadingFilters) {
+                        setTimeout(() => {
+                            this.listHelperService.snackbarService.showError('LNG_COMMON_LABEL__INVALID_URL_FILTERS');
+                        });
+                    }
+                } else {
+                    // apply filter
+                    currentUserCache[this.getCachedFilterPageKey()] = cachedListFilters;
+                }
+            } catch (e) {}
         }
 
         // finished
@@ -2212,7 +2241,7 @@ export abstract class ListComponent implements OnDestroy {
             !this.matTableSort ||
             !this.matTableSort.direction
         ) {
-            return undefined;
+            return null;
         }
 
         // set sort values
@@ -2223,11 +2252,28 @@ export abstract class ListComponent implements OnDestroy {
     }
 
     /**
+     * Save cache to url
+     */
+    private saveCacheToUrl(currentUserCache: ICachedFilterItems): void {
+        this.listHelperService.router.navigate(
+            [],
+            {
+                relativeTo: this.listHelperService.route,
+                // replaceUrl: true,
+                queryParamsHandling: 'merge',
+                queryParams: {
+                    cachedListFilters: JSON.stringify(currentUserCache)
+                }
+            }
+        );
+    }
+
+    /**
      * Update cached query
      */
     private updateCachedFilters(): void {
         // update filters
-        const currentUserCache: ICachedFilter = this.getCachedFilters();
+        const currentUserCache: ICachedFilter = this.getCachedFilters(false);
         currentUserCache[this.getCachedFilterPageKey()] = {
             queryBuilder: this.queryBuilder.serialize(),
             inputs: this.getInputsValuesForCache(),
@@ -2247,6 +2293,9 @@ export abstract class ListComponent implements OnDestroy {
                 [authUser.id]: currentUserCache
             })
         );
+
+        // save to url if possible
+        this.saveCacheToUrl(currentUserCache[this.getCachedFilterPageKey()]);
     }
 
     /**
@@ -2344,7 +2393,7 @@ export abstract class ListComponent implements OnDestroy {
      */
     private loadCachedFilters(): void {
         // load saved filters
-        const currentUserCache: ICachedFilter = this.getCachedFilters();
+        const currentUserCache: ICachedFilter = this.getCachedFilters(true);
         const currentUserCacheForCurrentPath: ICachedFilterItems = currentUserCache[this.getCachedFilterPageKey()];
         if (currentUserCacheForCurrentPath) {
             // load search criteria

@@ -67,6 +67,7 @@ export const EnglishUsLang = {
          * uiCommonLabels
          */
         'LNG_COMMON_LABEL_FILTERS_USED': '**Filters applied',
+        'LNG_COMMON_LABEL__INVALID_URL_FILTERS': 'Ignored invalid URL filters',
 
         /**
          * uiSideFilter
