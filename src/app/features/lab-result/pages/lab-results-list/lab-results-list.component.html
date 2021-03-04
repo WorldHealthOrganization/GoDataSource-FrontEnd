@@ -152,7 +152,7 @@
                     </div>
                     <div class="column-filter">
                         <app-form-input
-                            name="nameFilter"
+                            name="lastName"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByRelation('person').byText('lastName', $event)"
@@ -177,7 +177,7 @@
                     </div>
                     <div class="column-filter">
                         <app-form-input
-                            name="nameFilter"
+                            name="firstName"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByRelation('person').byText('firstName', $event)"
