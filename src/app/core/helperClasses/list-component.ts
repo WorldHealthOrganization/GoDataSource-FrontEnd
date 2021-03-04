@@ -2408,12 +2408,25 @@ export abstract class ListComponent implements OnDestroy {
     }
 
     /**
+     * Loaded cached filters
+     */
+    afterLoadCachedFilters(): void {
+        // NOTHING
+    }
+
+    /**
      * Load cached filters
      */
     private loadCachedFilters(): void {
         // disabled saved filters for current user ?
         const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
         if (authUser.dontCacheFilters) {
+            // trigger finish callback
+            setTimeout(() => {
+                this.afterLoadCachedFilters();
+            });
+
+            // finished
             return;
         }
 
@@ -2436,6 +2449,11 @@ export abstract class ListComponent implements OnDestroy {
             // update page index
             this.updatePageIndex();
         }
+
+        // trigger finish callback
+        setTimeout(() => {
+            this.afterLoadCachedFilters();
+        });
     }
 
     /**
