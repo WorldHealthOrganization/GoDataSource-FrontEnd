@@ -335,9 +335,6 @@ export abstract class ListComponent implements OnDestroy {
     protected constructor(
         protected listHelperService: ListHelperService
     ) {
-        // load saved filters
-        this.loadCachedFilters();
-
         // clone current breadcrumbs
         let currentBreadcrumbs;
         setTimeout(() => {
@@ -346,6 +343,9 @@ export abstract class ListComponent implements OnDestroy {
 
         // check filters
         this.checkListFilters();
+
+        // load saved filters
+        this.loadCachedFilters();
 
         // remove old subscription since we shouldn't have more than one list component visible at the same time ( at least not now )
         if (ListComponent.locationSubscription) {
