@@ -18,6 +18,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
     styleUrls: ['./my-profile.component.less']
 })
 export class MyProfileComponent extends ViewModifyComponent implements OnInit {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_MY_PROFILE_TITLE'),
     ];
@@ -28,9 +29,11 @@ export class MyProfileComponent extends ViewModifyComponent implements OnInit {
     // authenticated user
     authUser: UserModel;
 
+    // user data
     userId: string;
     user: UserModel = new UserModel();
 
+    // role data
     rolesList$: Observable<UserRoleModel[]>;
     outbreaksList$: Observable<OutbreakModel[]>;
 
