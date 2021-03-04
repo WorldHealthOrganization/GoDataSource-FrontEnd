@@ -160,7 +160,15 @@ export class TransmissionChainDataService {
         // get chains of transmission
         let snapshotFiltersFirstName: string;
         let snapshotFiltersLastName: string;
-        let chainGroupChains: TransmissionChainModel[] = chainGroup.chains;
+        let chainGroupChains: {
+            chainIndex: number,
+            chain: TransmissionChainModel
+        }[] = chainGroup.chains.map((chain, chainIndex) => {
+            return {
+                chainIndex,
+                chain
+            };
+        });
 
         // do we need to filter ?
         if (mustFilterSnapshot) {
@@ -169,13 +177,16 @@ export class TransmissionChainDataService {
             snapshotFiltersLastName = snapshotFilters.lastName ? snapshotFilters.lastName.toLowerCase() : null;
 
             // filter chains
-            const originalChains: TransmissionChainModel[] = chainGroupChains;
+            const originalChains: {
+                chainIndex: number,
+                chain: TransmissionChainModel
+            }[] = chainGroupChains;
             chainGroupChains = [];
-            originalChains.forEach((chain) => {
+            originalChains.forEach((chainInfo) => {
                 // determine if we can include this chain, at least one node matches the query
-                for (let chainIndex: number = 0; chainIndex < chain.chainRelations.length; chainIndex++) {
+                for (let chainRelationshipIndex: number = 0; chainRelationshipIndex < chainInfo.chain.chainRelations.length; chainRelationshipIndex++) {
                     // get chain data
-                    const chainRel = chain.chainRelations[chainIndex];
+                    const chainRel = chainInfo.chain.chainRelations[chainRelationshipIndex];
 
                     // not a proper relationship ?
                     if (
@@ -212,7 +223,7 @@ export class TransmissionChainDataService {
                     // must add chain to list of display ?
                     if (matchesAllConditions) {
                         // add chain to the list
-                        chainGroupChains.push(chain);
+                        chainGroupChains.push(chainInfo);
 
                         // no point in continuing since we need to add this chain
                         break;
@@ -227,7 +238,7 @@ export class TransmissionChainDataService {
         // #TODO so until we rewrite the graph component there is no point in stressing out that much with this since we will have to rewrite this entire function since it was written like ...
         // sort chains by size descending
         chainGroupChains.sort((chain1, chain2) => {
-            return chain2.chainRelations.length - chain1.chainRelations.length;
+            return chain2.chain.chainRelations.length - chain1.chain.chainRelations.length;
         });
 
         // go through edges and map them to determine isolated nodes
@@ -271,27 +282,27 @@ export class TransmissionChainDataService {
         // construct pages
         const pages: ITransmissionChainGroupPageModel[] = [];
         let currentPageIndex: number;
-        (chainGroupChains || []).forEach((chain, chainIndex) => {
+        (chainGroupChains || []).forEach((chain) => {
             // add new page ?
             currentPageIndex = pages.length - 1;
             if (
                 pages.length < 1 ||
-                pages[currentPageIndex].totalSize + chain.chainRelations.length > pageSize
+                pages[currentPageIndex].totalSize + chain.chain.chainRelations.length > pageSize
             ) {
                 // add next page
                 pages.push({
-                    chains: [chainIndex],
+                    chains: [chain.chainIndex],
                     isolatedNodes: null,
-                    totalSize: chain.chainRelations.length,
+                    totalSize: chain.chain.chainRelations.length,
                     pageIndex: pages.length,
                     pageLabel: (pages.length + 1).toString()
                 });
             } else {
                 // increase total size of page
-                pages[currentPageIndex].totalSize += chain.chainRelations.length;
+                pages[currentPageIndex].totalSize += chain.chain.chainRelations.length;
 
                 // add chain to the page list
-                pages[currentPageIndex].chains.push(chainIndex);
+                pages[currentPageIndex].chains.push(chain.chainIndex);
             }
         });
 
@@ -306,7 +317,7 @@ export class TransmissionChainDataService {
             pages[currentPageIndex].isolatedNodes = isolatedNodes.splice(0, size);
         }
 
-        // create pages from isolated nodes
+        // create pages from remaining isolated nodes
         while (isolatedNodes.length > 0) {
             // split isolated nodes
             const nodes = isolatedNodes.splice(0, pageSize);
