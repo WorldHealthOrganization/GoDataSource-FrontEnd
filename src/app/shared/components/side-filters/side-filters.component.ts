@@ -209,6 +209,13 @@ export class SideFiltersComponent {
             return;
         }
 
+        // nothing to save ?
+        const filterData: SavedFilterData = this.toSaveData();
+        if (_.isEmpty(filterData)) {
+            this.snackbarService.showNotice('LNG_SIDE_FILTERS_NOTICE_NOTHING_TO_SAVE');
+            return;
+        }
+
         // refresh
         const createFilter = () => {
             // create
@@ -235,14 +242,15 @@ export class SideFiltersComponent {
                     }), true)
                 .subscribe((answer: DialogAnswer) => {
                     if (answer.button === DialogAnswerButton.Yes) {
-                        this.savedFiltersService.createFilter(
-                            new SavedFilterModel({
-                                name: answer.inputValue.value.filterName,
-                                isPublic: answer.inputValue.value.isPublic,
-                                filterKey: this.savedFiltersType,
-                                filterData: this.toSaveData()
-                            })
-                        )
+                        this.savedFiltersService
+                            .createFilter(
+                                new SavedFilterModel({
+                                    name: answer.inputValue.value.filterName,
+                                    isPublic: answer.inputValue.value.isPublic,
+                                    filterKey: this.savedFiltersType,
+                                    filterData: filterData
+                                })
+                            )
                             .pipe(
                                 catchError((err) => {
                                     this.snackbarService.showApiError(err);
@@ -291,7 +299,7 @@ export class SideFiltersComponent {
                         // update
                         this.savedFiltersService.modifyFilter(
                             this.loadedFilter.id, {
-                                filterData: this.toSaveData()
+                                filterData: filterData
                             }
                         )
                             .pipe(
@@ -324,15 +332,24 @@ export class SideFiltersComponent {
      */
     toSaveData(): SavedFilterData {
         // exclude required filters
-        this.appliedFilters = _.filter(
+        // & empty filters
+        const appliedFilters: AppliedFilterModel[] = _.filter(
             this.appliedFilters,
-            (appliedFilter) => !appliedFilter.filter.required
+            (appliedFilter) => appliedFilter.filter && !appliedFilter.filter.required
         );
+
+        // nothing to save ?
+        if (
+            _.isEmpty(appliedFilters) &&
+            _.isEmpty(this.appliedSort)
+        ) {
+            return null;
+        }
 
         // construct save data
         return new SavedFilterData({
             appliedFilters: _.map(
-                this.appliedFilters,
+                appliedFilters,
                 (filter: AppliedFilterModel) => filter.sanitizeForSave()
             ),
             appliedFilterOperator: this.appliedFilterOperator,
@@ -344,6 +361,53 @@ export class SideFiltersComponent {
     }
 
     /**
+     * Generate filters from filter data
+     */
+    generateFiltersFromFilterData(filterData: SavedFilterData): void {
+        // wait for filters to become active ?
+        if (_.isEmpty(this.filterOptions)) {
+            // check later
+            setTimeout(() => {
+                this.generateFiltersFromFilterData(filterData);
+            }, 200);
+
+            // finished
+            return;
+        }
+
+        // clear filters
+        this.clear(false);
+
+        // load filter
+        this.appliedFilterOperator = filterData.appliedFilterOperator as RequestFilterOperator;
+        _.each(filterData.appliedFilters, (filter: SavedFilterDataAppliedFilter) => {
+            // search through our current filters for our own filter
+            const ourFilter = _.find(this.filterOptions, (filterOption: FilterModel) => filterOption.uniqueKey === filter.filter.uniqueKey);
+            if (ourFilter) {
+                // create filter
+                this.appliedFilters.push(new AppliedFilterModel({
+                    filter: ourFilter,
+                    comparator: filter.comparator as FilterComparator,
+                    value: filter.value,
+                    extraValues: filter.extraValues
+                }));
+            }
+        });
+
+        // sort
+        _.each(filterData.appliedSort, (sortCriteria: SavedFilterDataAppliedSort) => {
+            // search through our current sort criterias for our own sort criteria
+            const ourSort = _.find(this.sortOptions, (sortOption: SortModel) => sortOption.uniqueKey === sortCriteria.sort.uniqueKey);
+            if (ourSort) {
+                this.appliedSort.push(new AppliedSortModel({
+                    sort: ourSort,
+                    direction: sortCriteria.direction as RequestSortDirection
+                }));
+            }
+        });
+    }
+
+    /**
      * Apply a saved filter
      */
     loadSavedFilter(savedFilter: SavedFilterModel) {
@@ -351,34 +415,12 @@ export class SideFiltersComponent {
         this.loadedFilter = savedFilter;
 
         // do we have a filter selected ?
-        if (savedFilter) {
-            // load filter
-            this.clear(false);
-            this.appliedFilterOperator = savedFilter.filterData.appliedFilterOperator as RequestFilterOperator;
-            _.each(savedFilter.filterData.appliedFilters, (filter: SavedFilterDataAppliedFilter) => {
-                // search through our current filters for our own filter
-                const ourFilter = _.find(this.filterOptions, (filterOption: FilterModel) => filterOption.uniqueKey === filter.filter.uniqueKey);
-                if (ourFilter) {
-                    // create filter
-                    this.appliedFilters.push(new AppliedFilterModel({
-                        filter: ourFilter,
-                        comparator: filter.comparator as FilterComparator,
-                        value: filter.value,
-                        extraValues: filter.extraValues
-                    }));
-                }
-            });
-            _.each(savedFilter.filterData.appliedSort, (sortCriteria: SavedFilterDataAppliedSort) => {
-                // search through our current sort criterias for our own sort criteria
-                const ourSort = _.find(this.sortOptions, (sortOption: SortModel) => sortOption.uniqueKey === sortCriteria.sort.uniqueKey);
-                if (ourSort) {
-                    this.appliedSort.push(new AppliedSortModel({
-                        sort: ourSort,
-                        direction: sortCriteria.direction as RequestSortDirection
-                    }));
-                }
-            });
+        if (!savedFilter) {
+            return;
         }
+
+        // generate filters
+        this.generateFiltersFromFilterData(savedFilter.filterData);
     }
 
     /**

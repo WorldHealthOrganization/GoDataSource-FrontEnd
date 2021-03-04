@@ -20,6 +20,7 @@ import { SubscriptionLike } from 'rxjs/internal/types';
 import { StorageKey } from '../services/helper/storage.service';
 import { UserModel } from '../models/user.model';
 import { ValueAccessorBase } from '../../shared/xt-forms/core';
+import { SavedFilterData } from '../models/saved-filters.model';
 
 /**
  * Used by caching filter
@@ -43,6 +44,9 @@ interface ICachedFilterItems {
 
     // keep sort information
     sort: ICachedSortItem;
+
+    // side filters
+    sideFilters: SavedFilterData;
 }
 
 /**
@@ -2227,7 +2231,10 @@ export abstract class ListComponent implements OnDestroy {
         currentUserCache[this.getCachedFilterPageKey()] = {
             queryBuilder: this.queryBuilder.serialize(),
             inputs: this.getInputsValuesForCache(),
-            sort: this.getTableSortForCache()
+            sort: this.getTableSortForCache(),
+            sideFilters: this.sideFilter ?
+                this.sideFilter.toSaveData() :
+                null
         };
 
         // user information
@@ -2246,13 +2253,13 @@ export abstract class ListComponent implements OnDestroy {
      * Load cached input values
      */
     private loadCachedInputValues(currentUserCacheForCurrentPath: ICachedFilterItems): void {
-        // nothing to load ?
-        if (_.isEmpty(currentUserCacheForCurrentPath.inputs)) {
-            return;
-        }
-
         // wait for inputs to be rendered
         setTimeout(() => {
+            // nothing to load ?
+            if (_.isEmpty(currentUserCacheForCurrentPath.inputs)) {
+                return;
+            }
+
             // update filter input values
             // keeping in mind that all filters should have ResetInputOnSideFilterDirective directives
             (this.filterInputs || []).forEach((input: ResetInputOnSideFilterDirective) => {
@@ -2282,15 +2289,15 @@ export abstract class ListComponent implements OnDestroy {
      * Load cached sort column
      */
     private loadCachedSortColumn(currentUserCacheForCurrentPath: ICachedFilterItems): void {
-        // no sort applied ?
-        if (!currentUserCacheForCurrentPath.sort) {
-            return;
-        }
-
         // wait for inputs to be rendered
         setTimeout(() => {
+            // no sort applied ?
             // make sure we have the mat table visible
-            if (!this.matTableSort) {
+            if (
+                !currentUserCacheForCurrentPath.sort ||
+                !currentUserCacheForCurrentPath.sort.active ||
+                !this.matTableSort
+            ) {
                 return;
             }
 
@@ -2314,6 +2321,25 @@ export abstract class ListComponent implements OnDestroy {
     }
 
     /**
+     * Load side filters
+     */
+    private loadSideFilters(currentUserCacheForCurrentPath: ICachedFilterItems): void {
+        // wait for inputs to be rendered
+        setTimeout(() => {
+            // no side filters ?
+            if (
+                !currentUserCacheForCurrentPath.sideFilters ||
+                !this.sideFilter
+            ) {
+                return;
+            }
+
+            // load side filters
+            this.sideFilter.generateFiltersFromFilterData(new SavedFilterData(currentUserCacheForCurrentPath.sideFilters));
+        });
+    }
+
+    /**
      * Load cached filters
      */
     private loadCachedFilters(): void {
@@ -2329,6 +2355,9 @@ export abstract class ListComponent implements OnDestroy {
 
             // load sort column
             this.loadCachedSortColumn(currentUserCacheForCurrentPath);
+
+            // load side filters
+            this.loadSideFilters(currentUserCacheForCurrentPath);
 
             // update page index
             this.updatePageIndex();

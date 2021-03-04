@@ -66,7 +66,12 @@ export const EnglishUsLang = {
         /**
          * uiCommonLabels
          */
-        'LNG_COMMON_LABEL_FILTERS_USED': '**Filters applied'
+        'LNG_COMMON_LABEL_FILTERS_USED': '**Filters applied',
+
+        /**
+         * uiSideFilter
+         */
+        'LNG_SIDE_FILTERS_NOTICE_NOTHING_TO_SAVE': 'Nothing to save'
 
         /**
          * REMOVE the tokens from below
