@@ -2275,7 +2275,7 @@ export abstract class ListComponent implements OnDestroy {
             [],
             {
                 relativeTo: this.listHelperService.route,
-                // replaceUrl: true,
+                replaceUrl: true,
                 queryParamsHandling: 'merge',
                 queryParams: {
                     cachedListFilters: JSON.stringify(currentUserCache)
