@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpEventType } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
-import { ITransmissionChainGroupPageModel, TransmissionChainGroupModel } from '../../models/transmission-chain.model';
+import { ITransmissionChainGroupPageModel, TransmissionChainGroupModel, TransmissionChainModel } from '../../models/transmission-chain.model';
 import { MetricIndependentTransmissionChainsModel } from '../../models/metrics/metric-independent-transmission-chains.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { GraphNodeModel } from '../../models/graph-node.model';
@@ -145,13 +145,88 @@ export class TransmissionChainDataService {
      */
     getChainOfTransmissionPages(
         chainGroup: TransmissionChainGroupModel,
-        pageSize: number
+        pageSize: number,
+        snapshotFilters: {
+            firstName?: string,
+            lastName?: string
+        }
     ): ITransmissionChainGroupPageModel[] {
+        // must filter
+        const mustFilterSnapshot: boolean = snapshotFilters && (
+            !!snapshotFilters.firstName ||
+            !!snapshotFilters.lastName
+        );
+
+        // get chains of transmission
+        let snapshotFiltersFirstName: string;
+        let snapshotFiltersLastName: string;
+        let chainGroupChains: TransmissionChainModel[] = chainGroup.chains;
+
+        // do we need to filter ?
+        if (mustFilterSnapshot) {
+            // filter value
+            snapshotFiltersFirstName = snapshotFilters.firstName ? snapshotFilters.firstName.toLowerCase() : null;
+            snapshotFiltersLastName = snapshotFilters.lastName ? snapshotFilters.lastName.toLowerCase() : null;
+
+            // filter chains
+            const originalChains: TransmissionChainModel[] = chainGroupChains;
+            chainGroupChains = [];
+            originalChains.forEach((chain) => {
+                // determine if we can include this chain, at least one node matches the query
+                for (let chainIndex: number = 0; chainIndex < chain.chainRelations.length; chainIndex++) {
+                    // get chain data
+                    const chainRel = chain.chainRelations[chainIndex];
+
+                    // not a proper relationship ?
+                    if (
+                        !chainRel.entityIds ||
+                        chainRel.entityIds.length !== 2 ||
+                        !chainGroup.nodesMap[chainRel.entityIds[0]] ||
+                        !chainGroup.nodesMap[chainRel.entityIds[1]]
+                    ) {
+                        // jump over
+                        continue;
+                    }
+
+                    // check conditions
+                    const matchesAllConditions: boolean = (
+                        (
+                            (
+                                !snapshotFiltersFirstName ||
+                                chainGroup.nodesMap[chainRel.entityIds[0]].model.name.toLowerCase().indexOf(snapshotFiltersFirstName) > -1
+                            ) && (
+                                !snapshotFiltersLastName ||
+                                chainGroup.nodesMap[chainRel.entityIds[0]].model.name.toLowerCase().indexOf(snapshotFiltersLastName) > -1
+                            )
+                        ) || (
+                            (
+                                !snapshotFiltersFirstName ||
+                                chainGroup.nodesMap[chainRel.entityIds[1]].model.name.toLowerCase().indexOf(snapshotFiltersFirstName) > -1
+                            ) && (
+                                !snapshotFiltersLastName ||
+                                chainGroup.nodesMap[chainRel.entityIds[1]].model.name.toLowerCase().indexOf(snapshotFiltersLastName) > -1
+                            )
+                        )
+                    );
+
+                    // must add chain to list of display ?
+                    if (matchesAllConditions) {
+                        // add chain to the list
+                        chainGroupChains.push(chain);
+
+                        // no point in continuing since we need to add this chain
+                        break;
+                    }
+                }
+
+            });
+        }
+
         // if bubble graph we must split it into multiple pages
         // #TODO this should be integrated in the code bellow so we don't do again the logic that was done once...but that would mean that we need to rewrite some of the logic, which might cause other issues
         // #TODO so until we rewrite the graph component there is no point in stressing out that much with this since we will have to rewrite this entire function since it was written like ...
         // sort chains by size descending
-        chainGroup.chains.sort((chain1, chain2) => {
+        chainGroupChains.sort((chain1, chain2) => {
             return chain2.chainRelations.length - chain1.chainRelations.length;
         });
 
@@ -173,14 +248,30 @@ export class TransmissionChainDataService {
                 return;
             }
 
-            // isolated node
-            isolatedNodes.push(entityId);
+            // should filter ?
+            if (mustFilterSnapshot) {
+                if (
+                    (
+                        !snapshotFiltersFirstName ||
+                        chainGroup.nodesMap[entityId].model.name.toLowerCase().indexOf(snapshotFiltersFirstName) > -1
+                    ) && (
+                        !snapshotFiltersLastName ||
+                        chainGroup.nodesMap[entityId].model.name.toLowerCase().indexOf(snapshotFiltersLastName) > -1
+                    )
+                ) {
+                    // isolated node
+                    isolatedNodes.push(entityId);
+                }
+            } else {
+                // isolated node
+                isolatedNodes.push(entityId);
+            }
         });
 
         // construct pages
         const pages: ITransmissionChainGroupPageModel[] = [];
         let currentPageIndex: number;
-        (chainGroup.chains || []).forEach((chain, chainIndex) => {
+        (chainGroupChains || []).forEach((chain, chainIndex) => {
             // add new page ?
             currentPageIndex = pages.length - 1;
             if (

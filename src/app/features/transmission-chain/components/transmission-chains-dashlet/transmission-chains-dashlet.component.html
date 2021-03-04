@@ -9,6 +9,14 @@
             {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_GRAPH' | translate }}
         </button>
 
+        <!-- Show snapshot filters -->
+        <button
+            *ngIf="!showSnapshotFilters && selectedSnapshot && chainGroup && chainGroupId === selectedSnapshot"
+            mat-raised-button
+            (click)="showSnapshotFiltersConf()">
+            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_SNAPSHOT_FILTERS' | translate }}
+        </button>
+
         <!-- Generate new graph -->
         <button
             *ngIf="!showFilters && selectedOutbreak?.id === authUser?.activeOutbreakId  && showSnapshots"
@@ -265,6 +273,30 @@
                         [options]="edgeColorCriteriaOptions$ | async">
                     </app-form-radio>
                 </div>
+            </div>
+        </mat-card>
+    </div>
+
+    <!-- Snapshot filters -->
+    <div
+        *ngIf="showSnapshotFilters"
+        class="settings-container">
+        <mat-card fxLayout="column">
+            <div
+                fxLayout="row" fxLayoutGap="20px">
+                <!-- first name -->
+                <app-form-input
+                    name="snapshotFirstName"
+                    [(ngModel)]="snapshotFilters.firstName"
+                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_FIRST_NAME' | translate">
+                </app-form-input>
+
+                <!-- last name -->
+                <app-form-input
+                    name="snapshotLastName"
+                    [(ngModel)]="snapshotFilters.lastName"
+                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_LAST_NAME' | translate">
+                </app-form-input>
             </div>
         </mat-card>
     </div>
