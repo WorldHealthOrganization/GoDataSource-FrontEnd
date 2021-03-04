@@ -21,6 +21,7 @@ import { StorageKey } from '../services/helper/storage.service';
 import { UserModel } from '../models/user.model';
 import { ValueAccessorBase } from '../../shared/xt-forms/core';
 import { SavedFilterData } from '../models/saved-filters.model';
+import * as LzString from 'lz-string';
 
 /**
  * Used by caching filter
@@ -2161,7 +2162,7 @@ export abstract class ListComponent implements OnDestroy {
             [userId: string]: any
         } = {};
         if (cachedFilters) {
-            filters = JSON.parse(cachedFilters);
+            filters = JSON.parse(LzString.decompress(cachedFilters));
         }
 
         // we need to have data for this user, otherwise remove what we have
@@ -2308,9 +2309,9 @@ export abstract class ListComponent implements OnDestroy {
         // update the new filter
         // remove previous user data in case we have any...
         this.listHelperService.storageService.set(
-            StorageKey.FILTERS, JSON.stringify({
+            StorageKey.FILTERS, LzString.compress(JSON.stringify({
                 [authUser.id]: currentUserCache
-            })
+            }))
         );
 
         // save to url if possible
