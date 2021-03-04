@@ -51,8 +51,8 @@ export class RolesListComponent extends ListComponent implements OnInit, OnDestr
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_USER_ROLES_ACTION_VIEW_ROLE',
-            click: (item: UserRoleModel) => {
-                this.router.navigate(['/user-roles', item.id, 'view']);
+            linkGenerator: (item: UserRoleModel): string[] => {
+                return ['/user-roles', item.id, 'view'];
             },
             visible: (item: UserRoleModel): boolean => {
                 return UserRoleModel.canView(this.authUser);
@@ -63,8 +63,8 @@ export class RolesListComponent extends ListComponent implements OnInit, OnDestr
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_LIST_USER_ROLES_ACTION_MODIFY_ROLE',
-            click: (item: UserRoleModel) => {
-                this.router.navigate(['/user-roles', item.id, 'modify']);
+            linkGenerator: (item: UserRoleModel): string[] => {
+                return ['/user-roles', item.id, 'modify'];
             },
             visible: (item: UserRoleModel): boolean => {
                 return !this.authUser.hasRole(item.id) &&

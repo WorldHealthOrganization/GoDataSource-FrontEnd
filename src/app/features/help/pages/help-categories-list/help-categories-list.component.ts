@@ -48,8 +48,8 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_VIEW_HELP_CATEGORY',
-            click: (item: HelpCategoryModel) => {
-                this.router.navigate(['/help', 'categories', item.id, 'view']);
+            linkGenerator: (item: HelpCategoryModel): string[] => {
+                return ['/help', 'categories', item.id, 'view'];
             },
             visible: (item: HelpCategoryModel): boolean => {
                 return !item.deleted &&
@@ -61,8 +61,8 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_MODIFY_HELP_CATEGORY',
-            click: (item: HelpCategoryModel) => {
-                this.router.navigate(['/help', 'categories', item.id, 'modify']);
+            linkGenerator: (item: HelpCategoryModel): string[] => {
+                return ['/help', 'categories', item.id, 'modify'];
             },
             visible: (item: HelpCategoryModel): boolean => {
                 return !item.deleted &&

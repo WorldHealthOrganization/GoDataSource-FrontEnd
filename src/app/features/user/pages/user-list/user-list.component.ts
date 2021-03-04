@@ -15,7 +15,6 @@ import * as _ from 'lodash';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import { Router } from '@angular/router';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
@@ -63,8 +62,8 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_USERS_ACTION_VIEW_USER',
-            click: (item: UserModel) => {
-                this.router.navigate(['/users', item.id, 'view']);
+            linkGenerator: (item: UserModel): string[] => {
+                return ['/users', item.id, 'view'];
             },
             visible: (item: UserModel): boolean => {
                 return item.id !== this.authUser.id &&
@@ -76,8 +75,8 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_LIST_USERS_ACTION_MODIFY_USER',
-            click: (item: UserModel) => {
-                this.router.navigate(['/users', item.id, 'modify']);
+            linkGenerator: (item: UserModel): string[] => {
+                return ['/users', item.id, 'modify'];
             },
             visible: (item: UserModel): boolean => {
                 return item.id !== this.authUser.id &&
@@ -111,7 +110,6 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
      */
     constructor(
         protected listHelperService: ListHelperService,
-        private router: Router,
         private userDataService: UserDataService,
         private authDataService: AuthDataService,
         private snackbarService: SnackbarService,

@@ -1,6 +1,10 @@
 import * as _ from 'lodash';
 
+/**
+ * Saved side filter sort
+ */
 export class SavedFilterDataAppliedFilter {
+    // data
     filter: {
         uniqueKey: string
     };
@@ -8,6 +12,9 @@ export class SavedFilterDataAppliedFilter {
     value: any;
     extraValues: any;
 
+    /**
+     * Constructor
+     */
     constructor(data: {
         filter?: {
             uniqueKey: string
@@ -23,12 +30,19 @@ export class SavedFilterDataAppliedFilter {
     }
 }
 
+/**
+ * Saved side filter sort
+ */
 export class SavedFilterDataAppliedSort {
+    // data
     sort: {
         uniqueKey: string
     };
     direction: string;
 
+    /**
+     * Constructor
+     */
     constructor(data: {
         sort?: {
             uniqueKey: string
@@ -42,11 +56,18 @@ export class SavedFilterDataAppliedSort {
     }
 }
 
+/**
+ * Saved side filter data
+ */
 export class SavedFilterData {
+    // data
     appliedFilters: SavedFilterDataAppliedFilter[];
     appliedFilterOperator: string;
     appliedSort: SavedFilterDataAppliedSort[];
 
+    /**
+     * Constructor
+     */
     constructor(data: {
         appliedFilters?: SavedFilterDataAppliedFilter[],
         appliedFilterOperator?: any,
@@ -68,7 +89,11 @@ export class SavedFilterData {
     }
 }
 
+/**
+ * Saved side filter model
+ */
 export class SavedFilterModel {
+    // data
     id: string;
     name: string;
     isPublic: boolean;
@@ -76,6 +101,9 @@ export class SavedFilterModel {
     filterKey: string;
     filterData: SavedFilterData;
 
+    /**
+     * Constructor
+     */
     constructor(data: {
         id?: string,
         name?: string,

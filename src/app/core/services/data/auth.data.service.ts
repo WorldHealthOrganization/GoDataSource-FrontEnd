@@ -395,5 +395,8 @@ export class AuthDataService {
 
         // remove selected outbreak from local storage
         this.storageService.remove(StorageKey.SELECTED_OUTBREAK_ID);
+
+        // remove remember filters
+        this.storageService.remove(StorageKey.FILTERS);
     }
 }

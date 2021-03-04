@@ -370,6 +370,7 @@
             </div>
 
             <mat-paginator
+                [pageIndex]="pageIndex"
                 [length]="(entitiesListCount$ | async)?.count"
                 [pageSize]="pageSize"
                 [pageSizeOptions]="pageSizeOptions"

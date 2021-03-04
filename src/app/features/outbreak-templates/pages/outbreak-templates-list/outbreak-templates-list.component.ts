@@ -58,8 +58,8 @@ export class OutbreakTemplatesListComponent
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_VIEW_OUTBREAK_TEMPLATE',
-            click: (item: OutbreakTemplateModel) => {
-                this.router.navigate(['/outbreak-templates', item.id, 'view']);
+            linkGenerator: (item: OutbreakTemplateModel): string[] => {
+                return ['/outbreak-templates', item.id, 'view'];
             },
             visible: (): boolean => {
                 return OutbreakTemplateModel.canView(this.authUser);
@@ -70,8 +70,8 @@ export class OutbreakTemplatesListComponent
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_MODIFY_OUTBREAK_TEMPLATE',
-            click: (item: OutbreakTemplateModel) => {
-                this.router.navigate(['/outbreak-templates', item.id, 'modify']);
+            linkGenerator: (item: OutbreakTemplateModel): string[] => {
+                return ['/outbreak-templates', item.id, 'modify'];
             },
             visible: (): boolean => {
                 return OutbreakTemplateModel.canModify(this.authUser);

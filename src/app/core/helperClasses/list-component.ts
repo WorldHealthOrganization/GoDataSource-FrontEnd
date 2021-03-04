@@ -1,4 +1,4 @@
-import { RequestFilter, RequestFilterOperator, RequestQueryBuilder } from './request-query-builder';
+import { ISerializedQueryBuilder, RequestFilter, RequestFilterOperator, RequestQueryBuilder, RequestSortDirection } from './request-query-builder';
 import * as _ from 'lodash';
 import { Subscriber } from 'rxjs';
 import { ApplyListFilter, Constants } from '../models/constants';
@@ -6,7 +6,7 @@ import { FormRangeModel } from '../../shared/components/form-range/form-range.mo
 import { BreadcrumbItemModel } from '../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ResetInputOnSideFilterDirective, ResetLocationOnSideFilterDirective } from '../../shared/directives/reset-input-on-side-filter/reset-input-on-side-filter.directive';
-import { MatPaginator, MatSort, MatSortable, PageEvent } from '@angular/material';
+import { MatPaginator, MatSort, MatSortable, MatSortHeader, PageEvent } from '@angular/material';
 import { SideFiltersComponent } from '../../shared/components/side-filters/side-filters.component';
 import { DebounceTimeCaller } from './debounce-time-caller';
 import { MetricContactsSeenEachDays } from '../models/metrics/metric-contacts-seen-each-days.model';
@@ -17,6 +17,51 @@ import { AddressType } from '../models/address.model';
 import { moment, Moment } from './x-moment';
 import { ListHelperService } from '../services/helper/list-helper.service';
 import { SubscriptionLike } from 'rxjs/internal/types';
+import { StorageKey } from '../services/helper/storage.service';
+import { UserModel } from '../models/user.model';
+import { ValueAccessorBase } from '../../shared/xt-forms/core';
+import { SavedFilterData } from '../models/saved-filters.model';
+
+/**
+ * Used by caching filter
+ */
+interface ICachedSortItem {
+    active: string;
+    direction: RequestSortDirection;
+}
+
+/**
+ * Used by caching filter
+ */
+interface ICachedFilterItems {
+    // keep the actual query executed to bring data
+    queryBuilder: ISerializedQueryBuilder;
+
+    // keep filters information
+    inputs: {
+        [inputName: string]: any
+    };
+
+    // keep sort information
+    sort: ICachedSortItem;
+
+    // side filters
+    sideFilters: SavedFilterData;
+}
+
+/**
+ * Used by caching filter
+ */
+interface ICachedFilter {
+    [filterKey: string]: ICachedFilterItems;
+}
+
+/**
+ * Used by caching filter
+ */
+interface ICachedInputsValues {
+    [inputName: string]: any;
+}
 
 export abstract class ListComponent implements OnDestroy {
     // handle pop state changes
@@ -98,7 +143,9 @@ export abstract class ListComponent implements OnDestroy {
      * Query builder
      * @type {RequestQueryBuilder}
      */
-    public queryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
+    public queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(() => {
+        this.updateCachedFilters();
+    });
 
     /**
      * Applied list filter on this list page
@@ -123,6 +170,9 @@ export abstract class ListComponent implements OnDestroy {
     // flag set to true if the list is empty
     public isEmptyList: boolean;
 
+    // starting page
+    public pageIndex: number = 0;
+
     // Models for the checkbox functionality
     private checkboxModels: {
         multiCheck: boolean,
@@ -143,6 +193,9 @@ export abstract class ListComponent implements OnDestroy {
         checkedOnlyNotDeletedRecords: false,
         checkedRecords: {}
     };
+
+    // sort by disabled ?
+    private _sortByDisabled: boolean = false;
 
     /**
      * Did we check at least one record ?
@@ -282,6 +335,9 @@ export abstract class ListComponent implements OnDestroy {
     protected constructor(
         protected listHelperService: ListHelperService
     ) {
+        // load saved filters
+        this.loadCachedFilters();
+
         // clone current breadcrumbs
         let currentBreadcrumbs;
         setTimeout(() => {
@@ -313,7 +369,9 @@ export abstract class ListComponent implements OnDestroy {
                     this.refreshingList = true;
 
                     // clear all filters
-                    this.queryBuilder = new RequestQueryBuilder();
+                    this.queryBuilder = new RequestQueryBuilder(() => {
+                        this.updateCachedFilters();
+                    });
 
                     // init paginator ?
                     if (this.paginatorInitialized) {
@@ -356,6 +414,9 @@ export abstract class ListComponent implements OnDestroy {
      * Release subscribers
      */
     private releaseSubscribers() {
+        // query builder
+        this.queryBuilder.destroyListeners();
+
         // location subscriber
         if (ListComponent.locationSubscription) {
             ListComponent.locationSubscription.unsubscribe();
@@ -443,6 +504,11 @@ export abstract class ListComponent implements OnDestroy {
             [property: string]: string[]
         }
     ) {
+        // sort by disabled ?
+        if (this._sortByDisabled) {
+            return;
+        }
+
         // sort information
         const property = _.get(data, 'active');
         const direction = _.get(data, 'direction');
@@ -770,13 +836,27 @@ export abstract class ListComponent implements OnDestroy {
     }
 
     /**
-     * Initialize paginator
+     * Reset paginator
      */
-    protected initPaginator() {
+    protected resetPaginator(): void {
         // initialize query paginator
         this.queryBuilder.paginator.setPage({
             pageSize: this.pageSize,
             pageIndex: 0
+        });
+
+        // update page index
+        this.updatePageIndex();
+    }
+
+    /**
+     * Initialize paginator
+     */
+    protected initPaginator(): void {
+        // initialize query paginator
+        this.queryBuilder.paginator.setPage({
+            pageSize: this.pageSize,
+            pageIndex: this.pageIndex
         });
 
         // remember that paginator was initialized
@@ -789,6 +869,9 @@ export abstract class ListComponent implements OnDestroy {
     changePage(page: PageEvent) {
         // update API pagination params
         this.queryBuilder.paginator.setPage(page);
+
+        // update page index
+        this.updatePageIndex();
 
         // refresh list
         this.needsRefreshList(
@@ -870,6 +953,9 @@ export abstract class ListComponent implements OnDestroy {
 
         // reset table sort columns
         this.clearHeaderSort();
+
+        // reset paginator
+        this.resetPaginator();
 
         // add default filter criteria
         this.resetFiltersAddDefault();
@@ -2044,5 +2130,306 @@ export abstract class ListComponent implements OnDestroy {
 
         // set column configuration
         this.expandAllCellsForColumn[columnName] = expand;
+    }
+
+    /**
+     * Retrieve cached filters
+     */
+    private getCachedFilters(forLoadingFilters: boolean): ICachedFilter {
+        // user information
+        const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
+
+        // retrieve filters if there are any initialized
+        const cachedFilters: string = this.listHelperService.storageService.get(StorageKey.FILTERS);
+        let filters: {
+            [userId: string]: any
+        } = {};
+        if (cachedFilters) {
+            filters = JSON.parse(cachedFilters);
+        }
+
+        // we need to have data for this user, otherwise remove what we have
+        let currentUserCache: ICachedFilter = filters[authUser.id];
+        if (!currentUserCache) {
+            currentUserCache = {};
+        }
+
+        // check if we have something in url, which has priority against storage
+        if (
+            this.listHelperService.route.snapshot.queryParams &&
+            this.listHelperService.route.snapshot.queryParams.cachedListFilters
+        ) {
+            try {
+                // retrieve data
+                const cachedListFilters: ICachedFilterItems = JSON.parse(this.listHelperService.route.snapshot.queryParams.cachedListFilters);
+
+                // validate cached url filter
+                if (
+                    cachedListFilters.sideFilters === undefined ||
+                    cachedListFilters.sort === undefined ||
+                    cachedListFilters.inputs === undefined ||
+                    cachedListFilters.queryBuilder === undefined
+                ) {
+                    // display only if we're loading data, for save it doesn't matter since we will overwrite it
+                    if (forLoadingFilters) {
+                        setTimeout(() => {
+                            this.listHelperService.snackbarService.showError('LNG_COMMON_LABEL__INVALID_URL_FILTERS');
+                        });
+                    }
+                } else {
+                    // apply filter
+                    currentUserCache[this.getCachedFilterPageKey()] = cachedListFilters;
+                }
+            } catch (e) {}
+        }
+
+        // finished
+        return currentUserCache;
+    }
+
+    /**
+     * Retrieve filter key for current page
+     */
+    private getCachedFilterPageKey(): string {
+        // get path
+        let filterKey: string = this.listHelperService.location.path();
+        const pathParamsIndex: number = filterKey.indexOf('?');
+        if (pathParamsIndex > -1) {
+            filterKey = filterKey.substr(0, pathParamsIndex);
+        }
+
+        // if apply list filter then we need to make sure we add it to our key so we don't break other pages by adding filters that we shouldn't
+        if (this.appliedListFilter) {
+            filterKey += `_${this.appliedListFilter}`;
+        }
+
+        // finished
+        return filterKey;
+    }
+
+    /**
+     * Retrieve input values
+     */
+    private getInputsValuesForCache(): ICachedInputsValues {
+        // initialize
+        const inputValues: ICachedInputsValues = {};
+
+        // determine filter input values
+        // keeping in mind that all filters should have ResetInputOnSideFilterDirective directives
+        (this.filterInputs || []).forEach((input: ResetInputOnSideFilterDirective) => {
+            inputValues[input.control.name] = input.control && input.control.valueAccessor instanceof ValueAccessorBase ?
+                (input.control.valueAccessor as ValueAccessorBase<any>).value :
+                input.control.value;
+        });
+
+        // determine location input values
+        // keeping in mind that all filters should have ResetLocationOnSideFilterDirective directives
+        (this.filterLocationInputs || []).forEach((input: ResetLocationOnSideFilterDirective) => {
+            inputValues[input.component.name] = input.component.value;
+        });
+
+        // finished
+        return inputValues;
+    }
+
+    /**
+     * Determine what columns are sorted by
+     */
+    private getTableSortForCache(): ICachedSortItem {
+        // nothing sorted by ?
+        if (
+            !this.matTableSort ||
+            !this.matTableSort.direction
+        ) {
+            return null;
+        }
+
+        // set sort values
+        return {
+            active: this.matTableSort.active,
+            direction: this.matTableSort.direction as RequestSortDirection
+        };
+    }
+
+    /**
+     * Save cache to url
+     */
+    private saveCacheToUrl(currentUserCache: ICachedFilterItems): void {
+        this.listHelperService.router.navigate(
+            [],
+            {
+                relativeTo: this.listHelperService.route,
+                // replaceUrl: true,
+                queryParamsHandling: 'merge',
+                queryParams: {
+                    cachedListFilters: JSON.stringify(currentUserCache)
+                }
+            }
+        );
+    }
+
+    /**
+     * Update cached query
+     */
+    private updateCachedFilters(): void {
+        // update filters
+        const currentUserCache: ICachedFilter = this.getCachedFilters(false);
+        currentUserCache[this.getCachedFilterPageKey()] = {
+            queryBuilder: this.queryBuilder.serialize(),
+            inputs: this.getInputsValuesForCache(),
+            sort: this.getTableSortForCache(),
+            sideFilters: this.sideFilter ?
+                this.sideFilter.toSaveData() :
+                null
+        };
+
+        // user information
+        const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
+
+        // update the new filter
+        // remove previous user data in case we have any...
+        this.listHelperService.storageService.set(
+            StorageKey.FILTERS, JSON.stringify({
+                [authUser.id]: currentUserCache
+            })
+        );
+
+        // save to url if possible
+        this.saveCacheToUrl(currentUserCache[this.getCachedFilterPageKey()]);
+    }
+
+    /**
+     * Load cached input values
+     */
+    private loadCachedInputValues(currentUserCacheForCurrentPath: ICachedFilterItems): void {
+        // wait for inputs to be rendered
+        setTimeout(() => {
+            // nothing to load ?
+            if (_.isEmpty(currentUserCacheForCurrentPath.inputs)) {
+                return;
+            }
+
+            // update filter input values
+            // keeping in mind that all filters should have ResetInputOnSideFilterDirective directives
+            (this.filterInputs || []).forEach((input: ResetInputOnSideFilterDirective) => {
+                if (
+                    input.control &&
+                    currentUserCacheForCurrentPath.inputs[input.control.name] !== undefined &&
+                    input.control.valueAccessor instanceof ValueAccessorBase
+                ) {
+                    input.updateToAfterPristineValueIsTaken(currentUserCacheForCurrentPath.inputs[input.control.name]);
+                }
+            });
+
+            // update filter input values
+            // keeping in mind that all filters should have ResetLocationOnSideFilterDirective directives
+            (this.filterLocationInputs || []).forEach((input: ResetLocationOnSideFilterDirective) => {
+                if (
+                    input.component &&
+                    currentUserCacheForCurrentPath.inputs[input.component.name] !== undefined
+                ) {
+                    input.updateToAfterPristineValueIsTaken(currentUserCacheForCurrentPath.inputs[input.component.name]);
+                }
+            });
+        });
+    }
+
+    /**
+     * Load cached sort column
+     */
+    private loadCachedSortColumn(currentUserCacheForCurrentPath: ICachedFilterItems): void {
+        // wait for inputs to be rendered
+        setTimeout(() => {
+            // no sort applied ?
+            // make sure we have the mat table visible
+            if (
+                !currentUserCacheForCurrentPath.sort ||
+                !currentUserCacheForCurrentPath.sort.active ||
+                !this.matTableSort
+            ) {
+                return;
+            }
+
+            // reset state so that start is the first sort direction that you will see
+            this._sortByDisabled = true;
+            this.matTableSort.sort({
+                id: null,
+                start: currentUserCacheForCurrentPath.sort.direction,
+                disableClear: false
+            });
+            this.matTableSort.sort({
+                id: currentUserCacheForCurrentPath.sort.active,
+                start: currentUserCacheForCurrentPath.sort.direction,
+                disableClear: false
+            });
+
+            // ugly hack
+            (this.matTableSort.sortables.get(currentUserCacheForCurrentPath.sort.active) as MatSortHeader)._setAnimationTransitionState({ toState: 'active' });
+            this._sortByDisabled = false;
+        });
+    }
+
+    /**
+     * Load side filters
+     */
+    private loadSideFilters(currentUserCacheForCurrentPath: ICachedFilterItems): void {
+        // wait for inputs to be rendered
+        setTimeout(() => {
+            // no side filters ?
+            if (
+                !currentUserCacheForCurrentPath.sideFilters ||
+                !this.sideFilter
+            ) {
+                return;
+            }
+
+            // load side filters
+            this.sideFilter.generateFiltersFromFilterData(new SavedFilterData(currentUserCacheForCurrentPath.sideFilters));
+        });
+    }
+
+    /**
+     * Load cached filters
+     */
+    private loadCachedFilters(): void {
+        // load saved filters
+        const currentUserCache: ICachedFilter = this.getCachedFilters(true);
+        const currentUserCacheForCurrentPath: ICachedFilterItems = currentUserCache[this.getCachedFilterPageKey()];
+        if (currentUserCacheForCurrentPath) {
+            // load search criteria
+            this.queryBuilder.deserialize(currentUserCacheForCurrentPath.queryBuilder);
+
+            // load saved input values
+            this.loadCachedInputValues(currentUserCacheForCurrentPath);
+
+            // load sort column
+            this.loadCachedSortColumn(currentUserCacheForCurrentPath);
+
+            // load side filters
+            this.loadSideFilters(currentUserCacheForCurrentPath);
+
+            // update page index
+            this.updatePageIndex();
+        }
+    }
+
+    /**
+     * Update page index
+     */
+    private updatePageIndex(): void {
+        // set paginator page
+        if (this.queryBuilder.paginator) {
+            if (
+                this.queryBuilder.paginator.skip &&
+                this.queryBuilder.paginator.limit
+            ) {
+                this.pageIndex = this.queryBuilder.paginator.skip / this.queryBuilder.paginator.limit;
+            }
+
+            // set page size
+            if (this.queryBuilder.paginator.limit) {
+                this.pageSize = this.queryBuilder.paginator.limit;
+            }
+        }
     }
 }
