@@ -329,12 +329,6 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         return this._lines;
     }
 
-    // Minimum map zoom level ( >= 1 )
-    @Input() minZoom: number;
-
-    // Maximum map zoom level ( >= 1 )
-    @Input() maxZoom: number;
-
     // Zoom out / in map to fit markers whenever we set markers ?
     @Input() fitMapOnMarkersChange: boolean = false;
 
@@ -577,7 +571,10 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         ) {
             this.map.getView().fit(
                 this.markerBounds,
-                this.map.getSize()
+                {
+                    size: this.map.getSize(),
+                    maxZoom: 7
+                }
             );
         }
     }
@@ -1135,9 +1132,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
             // initialize map elements
             this.mapView = new View({
                 center: [0, 0],
-                zoom: 5,
-                minZoom: this.minZoom,
-                maxZoom: this.maxZoom
+                zoom: 5
             });
 
             // create overlay layer source
