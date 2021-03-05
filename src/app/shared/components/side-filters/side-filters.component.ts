@@ -376,7 +376,10 @@ export class SideFiltersComponent {
         }
 
         // clear filters
-        this.clear(false);
+        this.clear(
+            false,
+            false
+        );
 
         // load filter
         this.appliedFilterOperator = filterData.appliedFilterOperator as RequestFilterOperator;
@@ -440,26 +443,47 @@ export class SideFiltersComponent {
         return this.appliedFilterOperator === operator;
     }
 
+    /**
+     * Close side nav
+     */
     closeSideNav() {
         this.sideNav.close();
     }
 
+    /**
+     * Open side nav
+     */
     openSideNav() {
         this.sideNav.open();
     }
 
+    /**
+     * Get query builder
+     */
     getQueryBuilder(): RequestQueryBuilder {
         return this.queryBuilder ?
             _.cloneDeep(this.queryBuilder) :
             null;
     }
 
-    clear(addFirstItem: boolean = true) {
+    /**
+     * Clear
+     */
+    clear(
+        addFirstItem: boolean = true,
+        addValueItems: boolean = true
+    ) {
         this.appliedFilterOperator = RequestFilterOperator.AND;
         this.appliedSort = [];
-        this.addRequiredAndValueFilters(addFirstItem);
+        this.addRequiredAndValueFilters(
+            addFirstItem,
+            addValueItems
+        );
     }
 
+    /**
+     * Reset
+     */
     reset() {
         this.clear();
         this.loadedFilter = null;
@@ -471,15 +495,20 @@ export class SideFiltersComponent {
     /**
      * Add filters resulted from filter options
      */
-    private addRequiredAndValueFilters(addFirstItem: boolean = true) {
+    private addRequiredAndValueFilters(
+        addFirstItem: boolean = true,
+        addValueItems: boolean = true
+    ) {
         // reinitialize applied filters
         this.appliedFilters = [];
 
         // go through filter options and add an applied filter for all required & value options
         _.each(this.filterOptions, (option: FilterModel) => {
             if (
-                option.required ||
-                option.value
+                option.required || (
+                    option.value &&
+                    addValueItems
+                )
             ) {
                 // initialize filter
                 const filter: AppliedFilterModel = new AppliedFilterModel({

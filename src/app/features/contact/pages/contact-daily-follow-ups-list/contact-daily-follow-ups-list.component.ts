@@ -323,22 +323,26 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 // selected outbreak
                 this.selectedOutbreak = selectedOutbreak;
 
-                // initialize side filters
-                this.initializeSideFilters();
+                // do we have an outbreak ?
+                if (this.selectedOutbreak) {
+                    // initialize side filters
+                    this.initializeSideFilters();
 
-                // retrieve case data
-                if (this.caseId) {
-                    this.retrieveCaseData();
+                    // retrieve case data
+                    if (this.caseId) {
+                        this.retrieveCaseData();
+                    }
+
+                    // initialize print and export
+                    this.initializeFollowUpsExport();
+                    this.initializeFollowUpsPrint();
+
+                    // initialize pagination
+                    this.initPaginator();
+
+                    // ...and re-load the list when the Selected Outbreak is changed
+                    this.needsRefreshList(true);
                 }
-
-                // initialize print and export
-                this.initializeFollowUpsExport();
-                this.initializeFollowUpsPrint();
-
-                // initialize pagination
-                this.initPaginator();
-                // ...and re-load the list when the Selected Outbreak is changed
-                this.needsRefreshList(true);
             });
 
         // initialize Side Table Columns
@@ -912,11 +916,9 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     /**
      * Loaded cached filters
      */
-    afterLoadCachedFilters(): void {
-        setTimeout(() => {
-            // set default filter rules
-            this.initializeHeaderFilters();
-        });
+    beforeCacheLoadFilters(): void {
+        // set default filter rules
+        this.initializeHeaderFilters();
     }
 
     /**
@@ -1149,25 +1151,30 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         this.filterByDateField('date', value);
 
         // refresh dialog fields
-        this.genericDataService
-            .getRangeFollowUpGroupByOptions(true)
-            .subscribe((options) => {
-                this.printFollowUpsDialogExtraAPIData = {
-                    date: {
-                        startDate: moment(value).startOf('day'),
-                        endDate: moment(value).endOf('day')
-                    }
-                };
-                this.printFollowUpsDialogFields = [
-                    new DialogField({
-                        name: 'groupBy',
-                        placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON',
-                        inputOptions: options,
-                        value: Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE.value,
-                        required: true
-                    })
-                ];
-            });
+        setTimeout(() => {
+            this.genericDataService
+                .getRangeFollowUpGroupByOptions(true)
+                .subscribe((options) => {
+                    // print follow-up
+                    this.printFollowUpsDialogExtraAPIData = {
+                        date: {
+                            startDate: moment(value).startOf('day'),
+                            endDate: moment(value).endOf('day')
+                        }
+                    };
+
+                    // print follow-up
+                    this.printFollowUpsDialogFields = [
+                        new DialogField({
+                            name: 'groupBy',
+                            placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON',
+                            inputOptions: options,
+                            value: Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE.value,
+                            required: true
+                        })
+                    ];
+                });
+        });
     }
 
     /**
