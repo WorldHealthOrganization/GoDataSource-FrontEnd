@@ -128,7 +128,8 @@
                         [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate"
                         (optionChanged)="filterByFollowUpDate($event)"
                         app-reset-input-on-side-filter
-                        [resetToPristineValue]="false">
+                        [resetToPristineValue]="false"
+                        [disableCachedFilterOverwrite]="true">
                     </app-form-datepicker>
                 </div>
             </div>

@@ -2257,6 +2257,12 @@ export abstract class ListComponent implements OnDestroy {
         // determine filter input values
         // keeping in mind that all filters should have ResetInputOnSideFilterDirective directives
         (this.filterInputs || []).forEach((input: ResetInputOnSideFilterDirective) => {
+            // should we jump this one ?
+            if (input.disableCachedFilterOverwrite) {
+                return;
+            }
+
+            // update value
             inputValues[input.control.name] = input.control && input.control.valueAccessor instanceof ValueAccessorBase ?
                 (input.control.valueAccessor as ValueAccessorBase<any>).value :
                 input.control.value;
@@ -2265,6 +2271,12 @@ export abstract class ListComponent implements OnDestroy {
         // determine location input values
         // keeping in mind that all filters should have ResetLocationOnSideFilterDirective directives
         (this.filterLocationInputs || []).forEach((input: ResetLocationOnSideFilterDirective) => {
+            // should we jump this one ?
+            if (input.disableCachedFilterOverwrite) {
+                return;
+            }
+
+            // update value
             inputValues[input.component.name] = input.component.value;
         });
 
@@ -2536,10 +2548,11 @@ export abstract class ListComponent implements OnDestroy {
 
             // update page index
             this.updatePageIndex();
-
-            // trigger before actually refreshing page
-            this.beforeCacheLoadFilters();
         }
+
+        // trigger before actually refreshing page
+        // NO setTimeout because it will break some things
+        this.beforeCacheLoadFilters();
     }
 
     /**
