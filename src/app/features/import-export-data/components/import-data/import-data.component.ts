@@ -626,6 +626,9 @@ export class ImportDataComponent
         // list parent
         super(listHelperService);
 
+        // disable filter caching
+        this.disableFilterCashing = true;
+
         // fix mime issue - browser not supporting some of the mimes, empty was provided to mime Type which wasn't allowing user to upload teh files
         if (!(FileLikeObject.prototype as any)._createFromObjectPrev) {
             (FileLikeObject.prototype as any)._createFromObjectPrev = FileLikeObject.prototype._createFromObject;

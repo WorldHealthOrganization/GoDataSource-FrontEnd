@@ -81,7 +81,11 @@ export class ViewHelpDialogComponent extends ListComponent implements OnDestroy 
         private helpDataService: HelpDataService,
         private dialogService: DialogService
     ) {
+        // parent
         super(listHelperService);
+
+        // disable filter caching
+        this.disableFilterCashing = true;
 
         // retrieve help categories
         this.helpCategoriesList$ = this.helpDataService.getHelpCategoryList();

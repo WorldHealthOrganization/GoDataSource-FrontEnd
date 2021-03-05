@@ -13,6 +13,7 @@ export class ResetInputOnSideFilterDirective {
 
     // reset to pristine value
     @Input() resetToPristineValue: boolean = true;
+    @Input() disableCachedFilterOverwrite: boolean = false;
 
     // update value to what is set after pristine value is taken
     private _mustUpdateAfterPristine: boolean = false;
@@ -30,7 +31,10 @@ export class ResetInputOnSideFilterDirective {
             this._pristineValueHasBeenSet = true;
 
             // update control value
-            if (this._mustUpdateAfterPristine) {
+            if (
+                !this.disableCachedFilterOverwrite &&
+                this._mustUpdateAfterPristine
+            ) {
                 (control.valueAccessor as ValueAccessorBase<any>).writeValue(this._valueAfterPristine);
             }
         });
@@ -48,7 +52,9 @@ export class ResetInputOnSideFilterDirective {
      */
     public updateToAfterPristineValueIsTaken(value: any): void {
         if (this._pristineValueHasBeenSet) {
-            (this.control.valueAccessor as ValueAccessorBase<any>).writeValue(value);
+            if (!this.disableCachedFilterOverwrite) {
+                (this.control.valueAccessor as ValueAccessorBase<any>).writeValue(value);
+            }
         } else {
             this._mustUpdateAfterPristine = true;
             this._valueAfterPristine = value;
@@ -66,6 +72,7 @@ export class ResetLocationOnSideFilterDirective {
 
     // reset to pristine value
     @Input() resetToPristineValue: boolean = true;
+    @Input() disableCachedFilterOverwrite: boolean = false;
 
     // update value to what is set after pristine value is taken
     private _mustUpdateAfterPristine: boolean = false;
@@ -83,7 +90,10 @@ export class ResetLocationOnSideFilterDirective {
             this._pristineValueHasBeenSet = true;
 
             // update control value
-            if (this._mustUpdateAfterPristine) {
+            if (
+                !this.disableCachedFilterOverwrite &&
+                this._mustUpdateAfterPristine
+            ) {
                 component.writeValue(this._valueAfterPristine);
             }
         });
@@ -104,7 +114,9 @@ export class ResetLocationOnSideFilterDirective {
      */
     public updateToAfterPristineValueIsTaken(value: any): void {
         if (this._pristineValueHasBeenSet) {
-            this.component.writeValue(value);
+            if (!this.disableCachedFilterOverwrite) {
+                this.component.writeValue(value);
+            }
         } else {
             this._mustUpdateAfterPristine = true;
             this._valueAfterPristine = value;

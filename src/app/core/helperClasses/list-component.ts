@@ -323,6 +323,7 @@ export abstract class ListComponent implements OnDestroy {
     private _disableNextLoadCachedInputValues: boolean = false;
     private _nextTimerForLoadCachedInputValues: number;
     private _loadedCachedFilterPage: string;
+    protected disableFilterCashing: boolean = false;
 
     // refresh only after we finish changing data
     private triggerListCountRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
@@ -478,7 +479,9 @@ export abstract class ListComponent implements OnDestroy {
             this.paginatorInitialized
         ) {
             // re-calculate items count (filters have changed)
-            this.triggerListCountRefresh.call(instant);
+            if (this.triggerListCountRefresh) {
+                this.triggerListCountRefresh.call(instant);
+            }
 
             // move to the first page (if not already there)
             if (
@@ -492,7 +495,9 @@ export abstract class ListComponent implements OnDestroy {
         }
 
         // refresh list
-        this.triggerListRefresh.call(instant);
+        if (this.triggerListRefresh) {
+            this.triggerListRefresh.call(instant);
+        }
     }
 
     /**
@@ -1330,7 +1335,8 @@ export abstract class ListComponent implements OnDestroy {
             case Constants.APPLY_LIST_FILTER.CASES_LESS_CONTACTS:
                 // get the number of contacts if it was updated
                 const noLessContacts = _.get(queryParams, 'x', null);
-                  // get the correct query builder and merge with the existing one
+
+                // get the correct query builder and merge with the existing one
                 this.listHelperService.listFilterDataService
                     .filterCasesLessThanContacts(
                         globalFilters.date,
@@ -1815,7 +1821,7 @@ export abstract class ListComponent implements OnDestroy {
                 this.needsRefreshList(true);
                 break;
 
-             // Filter cases without date of reporting
+            // Filter cases without date of reporting
             case Constants.APPLY_LIST_FILTER.CASES_WITHOUT_DATE_OF_REPORTING_CHAIN:
                 // get the case ids that need to be updated
                 const caseDRIds = _.get(queryParams, 'caseIds', null);
@@ -2099,7 +2105,10 @@ export abstract class ListComponent implements OnDestroy {
 
         // disabled saved filters for current user ?
         const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
-        if (authUser.dontCacheFilters) {
+        if (
+            authUser.dontCacheFilters ||
+            this.disableFilterCashing
+        ) {
             return;
         }
 
@@ -2228,6 +2237,12 @@ export abstract class ListComponent implements OnDestroy {
             filterKey += `_${this.appliedListFilter}`;
         }
 
+        // remove ids from link so we don't have filters for each item because this would mean that we will fill storage really fast
+        filterKey = filterKey.replace(
+            /[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}/ig,
+            ''
+        );
+
         // finished
         return filterKey;
     }
@@ -2242,6 +2257,12 @@ export abstract class ListComponent implements OnDestroy {
         // determine filter input values
         // keeping in mind that all filters should have ResetInputOnSideFilterDirective directives
         (this.filterInputs || []).forEach((input: ResetInputOnSideFilterDirective) => {
+            // should we jump this one ?
+            if (input.disableCachedFilterOverwrite) {
+                return;
+            }
+
+            // update value
             inputValues[input.control.name] = input.control && input.control.valueAccessor instanceof ValueAccessorBase ?
                 (input.control.valueAccessor as ValueAccessorBase<any>).value :
                 input.control.value;
@@ -2250,6 +2271,12 @@ export abstract class ListComponent implements OnDestroy {
         // determine location input values
         // keeping in mind that all filters should have ResetLocationOnSideFilterDirective directives
         (this.filterLocationInputs || []).forEach((input: ResetLocationOnSideFilterDirective) => {
+            // should we jump this one ?
+            if (input.disableCachedFilterOverwrite) {
+                return;
+            }
+
+            // update value
             inputValues[input.component.name] = input.component.value;
         });
 
@@ -2308,7 +2335,10 @@ export abstract class ListComponent implements OnDestroy {
     private updateCachedFilters(): void {
         // disabled saved filters for current user ?
         const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
-        if (authUser.dontCacheFilters) {
+        if (
+            authUser.dontCacheFilters ||
+            this.disableFilterCashing
+        ) {
             return;
         }
 
@@ -2468,7 +2498,10 @@ export abstract class ListComponent implements OnDestroy {
     private loadCachedFilters(): void {
         // disabled saved filters for current user ?
         const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
-        if (authUser.dontCacheFilters) {
+        if (
+            authUser.dontCacheFilters ||
+            this.disableFilterCashing
+        ) {
             // trigger finish callback
             this.beforeCacheLoadFilters();
 
@@ -2515,10 +2548,11 @@ export abstract class ListComponent implements OnDestroy {
 
             // update page index
             this.updatePageIndex();
-
-            // trigger before actually refreshing page
-            this.beforeCacheLoadFilters();
         }
+
+        // trigger before actually refreshing page
+        // NO setTimeout because it will break some things
+        this.beforeCacheLoadFilters();
     }
 
     /**

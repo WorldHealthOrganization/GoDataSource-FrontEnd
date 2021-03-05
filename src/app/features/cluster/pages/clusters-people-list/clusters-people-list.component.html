@@ -77,7 +77,8 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField(['firstName', 'name'], $event)"
-                            [displayFilterIcon]="true">
+                            [displayFilterIcon]="true"
+                            app-reset-input-on-side-filter>
                         </app-form-input>
                     </div>
                 </div>
@@ -101,7 +102,8 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('lastName', $event)"
-                            [displayFilterIcon]="true">
+                            [displayFilterIcon]="true"
+                            app-reset-input-on-side-filter>
                         </app-form-input>
                     </div>
                 </div>
@@ -127,7 +129,8 @@
                             [min]="0"
                             [max]="Constants.DEFAULT_AGE_MAX_YEARS"
                             fromPlaceholder="LNG_AGE_FIELD_FILTER_LABEL_FROM"
-                            toPlaceholder="LNG_AGE_FIELD_FILTER_LABEL_TO">
+                            toPlaceholder="LNG_AGE_FIELD_FILTER_LABEL_TO"
+                            app-reset-input-on-side-filter>
                         </app-form-range>
                     </div>
                 </div>
@@ -155,7 +158,8 @@
                             multiple="true"
                             [allowSelectionOfDisabledItems]="true"
                             [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true">
+                            [displayFilterIcon]="true"
+                            app-reset-input-on-side-filter>
                         </app-form-select>
                     </div>
                 </div>
