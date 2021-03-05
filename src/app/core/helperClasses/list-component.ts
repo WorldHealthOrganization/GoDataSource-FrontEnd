@@ -319,6 +319,11 @@ export abstract class ListComponent implements OnDestroy {
         });
     }));
 
+    // disable next load from cache input values ?
+    private _disableNextLoadCachedInputValues: boolean = false;
+    private _nextTimerForLoadCachedInputValues: number;
+    private _loadedCachedFilterPage: string;
+
     // refresh only after we finish changing data
     private triggerListCountRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
         // disabled ?
@@ -384,6 +389,9 @@ export abstract class ListComponent implements OnDestroy {
 
                     // refresh filters
                     this.checkListFilters();
+
+                    // load cached filters if necessary
+                    this.loadCachedFiltersIfNecessary();
 
                     // refresh page
                     this.needsRefreshList(true);
@@ -2269,20 +2277,29 @@ export abstract class ListComponent implements OnDestroy {
     }
 
     /**
-     * Save cache to url
+     * Merge query params to url
      */
-    private saveCacheToUrl(currentUserCache: ICachedFilterItems): void {
+    private mergeQueryParamsToUrl(queryParams: {
+        [queryParamKey: string]: any
+    }): void {
         this.listHelperService.router.navigate(
             [],
             {
                 relativeTo: this.listHelperService.route,
                 replaceUrl: true,
                 queryParamsHandling: 'merge',
-                queryParams: {
-                    cachedListFilters: JSON.stringify(currentUserCache)
-                }
+                queryParams
             }
         );
+    }
+
+    /**
+     * Save cache to url
+     */
+    private saveCacheToUrl(currentUserCache: ICachedFilterItems): void {
+        this.mergeQueryParamsToUrl({
+            cachedListFilters: JSON.stringify(currentUserCache)
+        });
     }
 
     /**
@@ -2322,8 +2339,25 @@ export abstract class ListComponent implements OnDestroy {
      * Load cached input values
      */
     private loadCachedInputValues(currentUserCacheForCurrentPath: ICachedFilterItems): void {
+        // already waiting for execution ?
+        if (this._nextTimerForLoadCachedInputValues !== undefined) {
+            return;
+        }
+
         // wait for inputs to be rendered
-        setTimeout(() => {
+        this._nextTimerForLoadCachedInputValues = setTimeout(() => {
+            // reset call
+            this._nextTimerForLoadCachedInputValues = undefined;
+
+            // allow next reset
+            if (this._disableNextLoadCachedInputValues) {
+                // allow next reset
+                this._disableNextLoadCachedInputValues = false;
+
+                // finished
+                return;
+            }
+
             // nothing to load ?
             if (_.isEmpty(currentUserCacheForCurrentPath.inputs)) {
                 return;
@@ -2416,6 +2450,19 @@ export abstract class ListComponent implements OnDestroy {
     }
 
     /**
+     * Check if we need to load cached filters if necessary depending if we already loaded for this route or not
+     */
+    private loadCachedFiltersIfNecessary(): void {
+        // if we loaded cached filters for this page then we don't need to load it again
+        if (this._loadedCachedFilterPage === this.getCachedFilterPageKey()) {
+            return;
+        }
+
+        // load saved filters
+        this.loadCachedFilters();
+    }
+
+    /**
      * Load cached filters
      */
     private loadCachedFilters(): void {
@@ -2431,9 +2478,30 @@ export abstract class ListComponent implements OnDestroy {
             return;
         }
 
+        // set loaded cached filters value
+        // needs to be here, otherwise DONT_LOAD_STATIC_FILTERS_KEY won't work properly, since this method is called twice...
+        this._loadedCachedFilterPage = this.getCachedFilterPageKey();
+
+        // did we disabled loading cached filters for this page ?
+        if (this.listHelperService.route.snapshot.queryParams[Constants.DONT_LOAD_STATIC_FILTERS_KEY]) {
+            // next time load the saved filters
+            this.mergeQueryParamsToUrl({
+                [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: undefined
+            });
+
+            // disable next load from cache input values ?
+            this._disableNextLoadCachedInputValues = true;
+
+            // don't load the saved filters
+            return;
+        }
+
+        // allow next reset
+        this._disableNextLoadCachedInputValues = false;
+
         // load saved filters
         const currentUserCache: ICachedFilter = this.getCachedFilters(true);
-        const currentUserCacheForCurrentPath: ICachedFilterItems = currentUserCache[this.getCachedFilterPageKey()];
+        const currentUserCacheForCurrentPath: ICachedFilterItems = currentUserCache[this._loadedCachedFilterPage];
         if (currentUserCacheForCurrentPath) {
             // load search criteria
             this.queryBuilder.deserialize(currentUserCacheForCurrentPath.queryBuilder);

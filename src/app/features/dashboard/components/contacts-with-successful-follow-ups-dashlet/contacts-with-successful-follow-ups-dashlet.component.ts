@@ -23,7 +23,8 @@ export class ContactsWithSuccessfulFollowUpsDashletComponent extends DashletComp
 
     // params
     queryParams: any = {
-        applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWED_UP
+        applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWED_UP,
+        [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true
     };
 
     // loading data

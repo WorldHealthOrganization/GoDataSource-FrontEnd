@@ -26,7 +26,6 @@ export class CasesLessContactsDashletComponent extends DashletComponent implemen
     xLessContacts: number;
 
     // constants
-    Constants = Constants;
     CaseModel = CaseModel;
 
     // selected outbreak
@@ -43,6 +42,11 @@ export class CasesLessContactsDashletComponent extends DashletComponent implemen
     private triggerUpdateValues = new DebounceTimeCaller(new Subscriber<void>(() => {
         this.refreshData();
     }));
+
+    // query params
+    queryParams: {
+        [key: string]: any
+    };
 
     /**
      * Constructor
@@ -69,9 +73,13 @@ export class CasesLessContactsDashletComponent extends DashletComponent implemen
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak) {
+                    // trigger refresh
                     this.outbreakId = selectedOutbreak.id;
                     this.xLessContacts = selectedOutbreak.noLessContacts;
                     this.refreshDataCaller.call();
+
+                    // update query params
+                    this.updateQueryParams();
                 }
             });
     }
@@ -107,8 +115,23 @@ export class CasesLessContactsDashletComponent extends DashletComponent implemen
      * @param newXLessContacts
      */
     onChangeSetting(newXLessContacts) {
+        // update value
         this.xLessContacts = newXLessContacts;
         this.triggerUpdateValues.call();
+
+        // update query params
+        this.updateQueryParams();
+    }
+
+    /**
+     * Update query params
+     */
+    private updateQueryParams(): void {
+        this.queryParams = {
+            applyListFilter: Constants.APPLY_LIST_FILTER.CASES_LESS_CONTACTS,
+            [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
+            x: this.xLessContacts
+        };
     }
 
     /**

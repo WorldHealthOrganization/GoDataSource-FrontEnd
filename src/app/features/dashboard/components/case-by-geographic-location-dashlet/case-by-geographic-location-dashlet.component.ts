@@ -183,6 +183,7 @@ export class CasesByGeographicLocationDashletComponent implements OnInit, OnDest
                 queryParams: {
                     global: JSON.stringify(global),
                     applyListFilter: Constants.APPLY_LIST_FILTER.CASES_BY_LOCATION,
+                    [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
                     locationId: pressed.extra,
                 }
             });

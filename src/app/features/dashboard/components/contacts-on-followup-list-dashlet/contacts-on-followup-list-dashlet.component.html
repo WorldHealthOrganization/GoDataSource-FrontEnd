@@ -1,6 +1,6 @@
 <app-dashboard-custom-metric-dashlet
     [link]="ContactModel.canList(authUser) ? '/contacts' : ''"
-    [params]="getDashletParamsIncludingGlobalFilters({applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWUP_LIST})"
+    [params]="getDashletParamsIncludingGlobalFilters(queryParams)"
     [value]="contactsOnFollowUpListCount"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"

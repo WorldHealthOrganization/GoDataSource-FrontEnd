@@ -65,6 +65,9 @@ export class Constants {
         }
     };
 
+    // don't load cached filters ?
+    static DONT_LOAD_STATIC_FILTERS_KEY = 'dontLoadStaticFilters';
+
     // AGE constants
     static DEFAULT_AGE_MAX_YEARS = 150;
 

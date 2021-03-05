@@ -30,7 +30,6 @@ export class NewCasesPreviousDaysTransmissionChainsDashletComponent extends Dash
     xPreviousDays: number;
 
     // constants to be used for applyListFilters
-    Constants = Constants;
     CaseModel = CaseModel;
 
     // outbreak
@@ -47,6 +46,11 @@ export class NewCasesPreviousDaysTransmissionChainsDashletComponent extends Dash
     private triggerUpdateValues = new DebounceTimeCaller(new Subscriber<void>(() => {
         this.refreshData();
     }));
+
+    // query params
+    queryParams: {
+        [key: string]: any
+    };
 
     /**
      * Constructor
@@ -73,9 +77,13 @@ export class NewCasesPreviousDaysTransmissionChainsDashletComponent extends Dash
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak) {
+                    // refresh
                     this.outbreakId = selectedOutbreak.id;
                     this.xPreviousDays = selectedOutbreak.noDaysInChains;
                     this.refreshDataCaller.call();
+
+                    // update query params
+                    this.updateQueryParams();
                 }
             });
     }
@@ -114,6 +122,20 @@ export class NewCasesPreviousDaysTransmissionChainsDashletComponent extends Dash
         // get number of cases in previous x days in known transmission chains
         this.xPreviousDays = newXPreviousDays;
         this.triggerUpdateValues.call();
+
+        // update query params
+        this.updateQueryParams();
+    }
+
+    /**
+     * Update query params
+     */
+    private updateQueryParams(): void {
+        this.queryParams = {
+            applyListFilter: Constants.APPLY_LIST_FILTER.CASES_PREVIOUS_DAYS_CONTACTS,
+            [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
+            x: this.xPreviousDays
+        };
     }
 
     /**

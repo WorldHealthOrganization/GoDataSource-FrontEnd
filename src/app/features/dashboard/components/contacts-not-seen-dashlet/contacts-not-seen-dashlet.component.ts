@@ -27,7 +27,6 @@ export class ContactsNotSeenDashletComponent extends DashletComponent implements
     contactsNotSeenCount: number;
 
     // constants to be used for applyListFilters
-    Constants: any = Constants;
     ContactModel = ContactModel;
 
     // outbreak
@@ -44,6 +43,11 @@ export class ContactsNotSeenDashletComponent extends DashletComponent implements
     private triggerUpdateValues = new DebounceTimeCaller(new Subscriber<void>(() => {
         this.refreshData();
     }));
+
+    // query params
+    queryParams: {
+        [key: string]: any
+    };
 
     /**
      * Constructor
@@ -70,9 +74,13 @@ export class ContactsNotSeenDashletComponent extends DashletComponent implements
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak) {
+                    // trigger refresh
                     this.outbreakId = selectedOutbreak.id;
                     this.xDaysNotSeen = selectedOutbreak.noDaysNotSeen;
                     this.refreshDataCaller.call();
+
+                    // update query params
+                    this.updateQueryParams();
                 }
             });
     }
@@ -111,6 +119,20 @@ export class ContactsNotSeenDashletComponent extends DashletComponent implements
         // get number of not seen contacts
         this.xDaysNotSeen = newXDaysNotSeen;
         this.triggerUpdateValues.call();
+
+        // update query params
+        this.updateQueryParams();
+    }
+
+    /**
+     * Update query params
+     */
+    private updateQueryParams(): void {
+        this.queryParams = {
+            applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_NOT_SEEN,
+            [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
+            x: this.xDaysNotSeen
+        };
     }
 
     /**

@@ -20,7 +20,8 @@ export class ContactsSeenEachDayDashletComponent extends DashletComponent implem
 
     // params
     queryParams: any = {
-        applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_SEEN
+        applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_SEEN,
+        [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true
     };
 
     // for which date do we display data ?

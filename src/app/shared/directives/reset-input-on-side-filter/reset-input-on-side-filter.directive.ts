@@ -8,6 +8,7 @@ import { ValueAccessorBase } from '../../xt-forms/core';
 })
 export class ResetInputOnSideFilterDirective {
     // pristine value
+    private _pristineValueHasBeenSet: boolean = false;
     private pristineValue: any = undefined;
 
     // reset to pristine value
@@ -26,6 +27,7 @@ export class ResetInputOnSideFilterDirective {
         setTimeout(() => {
             // set pristine value
             this.pristineValue = control.value;
+            this._pristineValueHasBeenSet = true;
 
             // update control value
             if (this._mustUpdateAfterPristine) {
@@ -45,8 +47,12 @@ export class ResetInputOnSideFilterDirective {
      * Update input value after pristine value is taken
      */
     public updateToAfterPristineValueIsTaken(value: any): void {
-        this._mustUpdateAfterPristine = true;
-        this._valueAfterPristine = value;
+        if (this._pristineValueHasBeenSet) {
+            (this.control.valueAccessor as ValueAccessorBase<any>).writeValue(value);
+        } else {
+            this._mustUpdateAfterPristine = true;
+            this._valueAfterPristine = value;
+        }
     }
 }
 
@@ -55,6 +61,7 @@ export class ResetInputOnSideFilterDirective {
 })
 export class ResetLocationOnSideFilterDirective {
     // pristine value
+    private _pristineValueHasBeenSet: boolean = false;
     private pristineValue: any = undefined;
 
     // reset to pristine value
@@ -73,6 +80,7 @@ export class ResetLocationOnSideFilterDirective {
         setTimeout(() => {
             // set pristine value
             this.pristineValue = component.value;
+            this._pristineValueHasBeenSet = true;
 
             // update control value
             if (this._mustUpdateAfterPristine) {
@@ -95,7 +103,11 @@ export class ResetLocationOnSideFilterDirective {
      * Update input value after pristine value is taken
      */
     public updateToAfterPristineValueIsTaken(value: any): void {
-        this._mustUpdateAfterPristine = true;
-        this._valueAfterPristine = value;
+        if (this._pristineValueHasBeenSet) {
+            this.component.writeValue(value);
+        } else {
+            this._mustUpdateAfterPristine = true;
+            this._valueAfterPristine = value;
+        }
     }
 }

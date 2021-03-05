@@ -20,7 +20,6 @@ export class CasesHospitalisedDashletComponent extends DashletComponent implemen
     casesHospitalisedCount: number;
 
     // constants to be used for applyListFilters
-    Constants: any = Constants;
     CaseModel = CaseModel;
 
     // outbreak
@@ -28,6 +27,14 @@ export class CasesHospitalisedDashletComponent extends DashletComponent implemen
 
     // loading data
     displayLoading: boolean = false;
+
+    // query params
+    queryParams: {
+        [key: string]: any
+    } = {
+        applyListFilter: Constants.APPLY_LIST_FILTER.CASES_HOSPITALISED,
+        [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true
+    };
 
     /**
      * Constructor

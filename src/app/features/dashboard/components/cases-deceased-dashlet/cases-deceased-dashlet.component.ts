@@ -26,12 +26,19 @@ export class CasesDeceasedDashletComponent extends DashletComponent implements O
     displayLoading: boolean = false;
 
     // constants to be used for applyListFilter
-    Constants: any = Constants;
     CaseModel = CaseModel;
 
     // subscribers
     outbreakSubscriber: Subscription;
     previousSubscriber: Subscription;
+
+    // query params
+    queryParams: {
+        [key: string]: any
+    } = {
+        applyListFilter: Constants.APPLY_LIST_FILTER.CASES_DECEASED,
+        [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true
+    };
 
     /**
      * Constructor

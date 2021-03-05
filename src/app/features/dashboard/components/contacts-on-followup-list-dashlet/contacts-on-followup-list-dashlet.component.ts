@@ -22,7 +22,6 @@ export class ContactsOnFollowupListDashletComponent extends DashletComponent imp
     contactsOnFollowUpListCount: number = 0;
 
     // constants to be used for applyListFilters
-    Constants = Constants;
     ContactModel = ContactModel;
 
     // outbreak
@@ -37,6 +36,14 @@ export class ContactsOnFollowupListDashletComponent extends DashletComponent imp
     // subscribers
     outbreakSubscriber: Subscription;
     previousSubscriber: Subscription;
+
+    // query params
+    queryParams: {
+        [key: string]: any
+    } = {
+        applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWUP_LIST,
+        [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true
+    };
 
     /**
      * Constructor
