@@ -102,7 +102,11 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
         private authDataService: AuthDataService,
         private i18nService: I18nService
     ) {
+        // parent
         super(listHelperService);
+
+        // disable filter caching
+        this.disableFilterCashing = true;
     }
 
     /**

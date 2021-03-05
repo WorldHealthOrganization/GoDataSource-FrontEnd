@@ -323,6 +323,7 @@ export abstract class ListComponent implements OnDestroy {
     private _disableNextLoadCachedInputValues: boolean = false;
     private _nextTimerForLoadCachedInputValues: number;
     private _loadedCachedFilterPage: string;
+    protected disableFilterCashing: boolean = false;
 
     // refresh only after we finish changing data
     private triggerListCountRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
@@ -2104,7 +2105,10 @@ export abstract class ListComponent implements OnDestroy {
 
         // disabled saved filters for current user ?
         const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
-        if (authUser.dontCacheFilters) {
+        if (
+            authUser.dontCacheFilters ||
+            this.disableFilterCashing
+        ) {
             return;
         }
 
@@ -2319,7 +2323,10 @@ export abstract class ListComponent implements OnDestroy {
     private updateCachedFilters(): void {
         // disabled saved filters for current user ?
         const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
-        if (authUser.dontCacheFilters) {
+        if (
+            authUser.dontCacheFilters ||
+            this.disableFilterCashing
+        ) {
             return;
         }
 
@@ -2479,7 +2486,10 @@ export abstract class ListComponent implements OnDestroy {
     private loadCachedFilters(): void {
         // disabled saved filters for current user ?
         const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
-        if (authUser.dontCacheFilters) {
+        if (
+            authUser.dontCacheFilters ||
+            this.disableFilterCashing
+        ) {
             // trigger finish callback
             this.beforeCacheLoadFilters();
 
