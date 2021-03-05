@@ -2445,7 +2445,7 @@ export abstract class ListComponent implements OnDestroy {
     /**
      * Loaded cached filters
      */
-    afterLoadCachedFilters(): void {
+    beforeCacheLoadFilters(): void {
         // NOTHING
     }
 
@@ -2470,9 +2470,7 @@ export abstract class ListComponent implements OnDestroy {
         const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
         if (authUser.dontCacheFilters) {
             // trigger finish callback
-            setTimeout(() => {
-                this.afterLoadCachedFilters();
-            });
+            this.beforeCacheLoadFilters();
 
             // finished
             return;
@@ -2517,12 +2515,10 @@ export abstract class ListComponent implements OnDestroy {
 
             // update page index
             this.updatePageIndex();
-        }
 
-        // trigger finish callback
-        setTimeout(() => {
-            this.afterLoadCachedFilters();
-        });
+            // trigger before actually refreshing page
+            this.beforeCacheLoadFilters();
+        }
     }
 
     /**
