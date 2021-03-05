@@ -197,6 +197,7 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
                 queryParams: {
                     global: JSON.stringify(global),
                     applyListFilter: Constants.APPLY_LIST_FILTER.CASE_SUMMARY,
+                    [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
                     x: pressed.extra
                 }
             });

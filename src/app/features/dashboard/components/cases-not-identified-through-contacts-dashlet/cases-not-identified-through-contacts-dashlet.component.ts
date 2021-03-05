@@ -20,7 +20,6 @@ export class CasesNotIdentifiedThroughContactsDashletComponent extends DashletCo
     count: number = 0;
 
     // constants to be used for applyListFilters
-    Constants = Constants;
     CaseModel = CaseModel;
 
     // outbreak
@@ -32,6 +31,14 @@ export class CasesNotIdentifiedThroughContactsDashletComponent extends DashletCo
     // subscribers
     outbreakSubscriber: Subscription;
     previousSubscriber: Subscription;
+
+    // query params
+    queryParams: {
+        [key: string]: any
+    } = {
+        applyListFilter: Constants.APPLY_LIST_FILTER.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS,
+        [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true
+    };
 
     /**
      * Constructor

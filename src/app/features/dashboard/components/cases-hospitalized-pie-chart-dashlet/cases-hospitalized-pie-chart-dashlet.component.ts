@@ -165,7 +165,8 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
             {
                 queryParams: {
                     global: JSON.stringify(global),
-                    applyListFilter: pressed.extra
+                    applyListFilter: pressed.extra,
+                    [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true
                 }
             });
     }

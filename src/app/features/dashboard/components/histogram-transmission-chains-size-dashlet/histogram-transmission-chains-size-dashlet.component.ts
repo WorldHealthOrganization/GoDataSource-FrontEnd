@@ -14,6 +14,7 @@ import { Moment } from '../../../../core/helperClasses/x-moment';
 import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-histogram-transmission-chains-size-dashlet',
@@ -193,7 +194,8 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
 
         // extra params sent along with global filters
         const otherParams = {
-            sizeOfChainsFilter: event.name
+            sizeOfChainsFilter: event.name,
+            [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true
         };
 
         // construct global filter

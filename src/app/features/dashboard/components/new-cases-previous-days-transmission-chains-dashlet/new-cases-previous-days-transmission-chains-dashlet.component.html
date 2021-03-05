@@ -1,6 +1,6 @@
 <app-dashboard-custom-metric-dashlet
     [link]="CaseModel.canList(authUser) ? '/cases' : ''"
-    [params]="getDashletParamsIncludingGlobalFilters({applyListFilter: Constants.APPLY_LIST_FILTER.CASES_IN_THE_TRANSMISSION_CHAINS, x: xPreviousDays})"
+    [params]="getDashletParamsIncludingGlobalFilters(queryParams)"
     [value]="this.casesKnownTransmissionChainsCount + ' / ' + this.totalCases"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"
