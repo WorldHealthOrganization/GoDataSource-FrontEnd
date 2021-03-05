@@ -478,7 +478,9 @@ export abstract class ListComponent implements OnDestroy {
             this.paginatorInitialized
         ) {
             // re-calculate items count (filters have changed)
-            this.triggerListCountRefresh.call(instant);
+            if (this.triggerListCountRefresh) {
+                this.triggerListCountRefresh.call(instant);
+            }
 
             // move to the first page (if not already there)
             if (
@@ -492,7 +494,9 @@ export abstract class ListComponent implements OnDestroy {
         }
 
         // refresh list
-        this.triggerListRefresh.call(instant);
+        if (this.triggerListRefresh) {
+            this.triggerListRefresh.call(instant);
+        }
     }
 
     /**
@@ -1330,7 +1334,8 @@ export abstract class ListComponent implements OnDestroy {
             case Constants.APPLY_LIST_FILTER.CASES_LESS_CONTACTS:
                 // get the number of contacts if it was updated
                 const noLessContacts = _.get(queryParams, 'x', null);
-                  // get the correct query builder and merge with the existing one
+
+                // get the correct query builder and merge with the existing one
                 this.listHelperService.listFilterDataService
                     .filterCasesLessThanContacts(
                         globalFilters.date,
@@ -1815,7 +1820,7 @@ export abstract class ListComponent implements OnDestroy {
                 this.needsRefreshList(true);
                 break;
 
-             // Filter cases without date of reporting
+            // Filter cases without date of reporting
             case Constants.APPLY_LIST_FILTER.CASES_WITHOUT_DATE_OF_REPORTING_CHAIN:
                 // get the case ids that need to be updated
                 const caseDRIds = _.get(queryParams, 'caseIds', null);
@@ -2227,6 +2232,12 @@ export abstract class ListComponent implements OnDestroy {
         if (this.appliedListFilter) {
             filterKey += `_${this.appliedListFilter}`;
         }
+
+        // remove ids from link so we don't have filters for each item because this would mean that we will fill storage really fast
+        filterKey = filterKey.replace(
+            /[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}/ig,
+            ''
+        );
 
         // finished
         return filterKey;
