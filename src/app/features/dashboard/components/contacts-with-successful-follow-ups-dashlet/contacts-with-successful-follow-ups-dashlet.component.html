@@ -2,6 +2,7 @@
     [link]="ContactModel.canList(authUser) ? '/contacts' : ''"
     [params]="getDashletParamsIncludingGlobalFilters(queryParams)"
     [value]="contactsWithSuccessfulFollowup?.contactsWithSuccessfulFollowupsCount + ' / ' + contactsWithSuccessfulFollowup?.totalContactsWithFollowupsCount"
+    tooltip="LNG_PAGE_DASHBOARD_KPI_CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP_DESCRIPTION"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"
     (moveAfter)="onMoveAfter()"

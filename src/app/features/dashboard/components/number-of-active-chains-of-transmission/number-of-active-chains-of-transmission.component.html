@@ -2,6 +2,7 @@
     [link]="TransmissionChainModel.canList(authUser) ? '/transmission-chains/list' : ''"
     [params]="getDashletParamsIncludingGlobalFilters({applyListFilter: Constants.APPLY_LIST_FILTER.NO_OF_ACTIVE_TRANSMISSION_CHAINS})"
     [value]="numberOfActiveChains"
+    tooltip="LNG_PAGE_DASHBOARD_KPI_ACTIVE_CHAINS_DESCRIPTION"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"
     (moveAfter)="onMoveAfter()"

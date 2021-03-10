@@ -2,6 +2,7 @@
     [link]="CaseModel.canList(authUser) ? '/cases' : ''"
     [params]="getDashletParamsIncludingGlobalFilters(queryParams)"
     [value]="casesRefusingTreatmentCount"
+    tooltip="LNG_PAGE_DASHBOARD_KPI_CASES_REFUSING_TREATMENT_TITLE_DESCRIPTION"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"
     (moveAfter)="onMoveAfter()"

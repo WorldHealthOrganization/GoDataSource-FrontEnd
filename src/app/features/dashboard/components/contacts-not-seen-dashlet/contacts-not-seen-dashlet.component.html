@@ -2,6 +2,7 @@
     [link]="ContactModel.canList(authUser) ? '/contacts' : ''"
     [params]="getDashletParamsIncludingGlobalFilters(queryParams)"
     [value]="contactsNotSeenCount"
+    tooltip="LNG_PAGE_DASHBOARD_KPI_CONTACTS_NOT_SEEN_TITLE_BEFORE_VALUE_DESCRIPTION"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"
     (moveAfter)="onMoveAfter()"

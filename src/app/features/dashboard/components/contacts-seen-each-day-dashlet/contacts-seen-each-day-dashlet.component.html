@@ -2,6 +2,7 @@
     [link]="ContactModel.canList(authUser) ? '/contacts' : ''"
     [params]="getDashletParamsIncludingGlobalFilters(queryParams)"
     [value]="contactsSeenEachDay"
+    tooltip="LNG_PAGE_DASHBOARD_KPI_CONTACTS_SEEN_EACH_DAY_DESCRIPTION"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"
     (moveAfter)="onMoveAfter()"

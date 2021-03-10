@@ -2,6 +2,7 @@
     [link]="ContactModel.canList(authUser) ? '/contacts' : ''"
     [params]="getDashletParamsIncludingGlobalFilters(queryParams)"
     [value]="contactsOnFollowUpListCount"
+    tooltip="LNG_PAGE_DASHBOARD_KPI_CONTACTS_FOLLOWUP_LIST_TITLE_DESCRIPTION"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"
     (moveAfter)="onMoveAfter()"

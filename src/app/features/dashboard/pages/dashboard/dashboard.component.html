@@ -112,8 +112,17 @@
                             *ngIf="DashboardModel.canViewCaseSummaryDashlet(authUser)"
                             fxFlex="33">
                             <mat-card class="dashboard-gauge">
-                                <div class="other-kpi-header">
-                                    {{'LNG_PAGE_DASHBOARD_CASE_SUMMARY_TITLE' | translate}}
+                                <div
+                                    fxLayout="row"
+                                    class="other-kpi-header">
+                                    <div
+                                        fxFlex>
+                                        {{'LNG_PAGE_DASHBOARD_CASE_SUMMARY_TITLE' | translate}}
+                                    </div>
+                                    <app-fancy-tooltip
+                                        fxFlex fxGrow="0"
+                                        tooltip="LNG_PAGE_DASHBOARD_CASE_SUMMARY_TITLE_DESCRIPTION">
+                                    </app-fancy-tooltip>
                                 </div>
                                 <!-- case summary pie chart -->
                                 <div fxLayoutAlign="center">
@@ -131,8 +140,17 @@
                             fxFlex="33">
                             <!-- cases by geographic location - pie chart -->
                             <mat-card class="dashboard-gauge">
-                                <div class="other-kpi-header">
-                                    {{'LNG_PAGE_DASHBOARD_CASE_BY_GEOGRAPHIC_LOCATION_TITLE' | translate}}
+                                <div
+                                    fxLayout="row"
+                                    class="other-kpi-header">
+                                    <div
+                                        fxFlex>
+                                        {{'LNG_PAGE_DASHBOARD_CASE_BY_GEOGRAPHIC_LOCATION_TITLE' | translate}}
+                                    </div>
+                                    <app-fancy-tooltip
+                                        fxFlex fxGrow="0"
+                                        tooltip="LNG_PAGE_DASHBOARD_CASE_BY_GEOGRAPHIC_LOCATION_TITLE_DESCRIPTION">
+                                    </app-fancy-tooltip>
                                 </div>
                                 <div fxLayoutAlign="center">
                                     <app-case-by-geographic-location-dashlet
@@ -148,8 +166,17 @@
                             *ngIf="DashboardModel.canViewCaseHospitalizedPieChartDashlet(authUser)"
                             fxFlex="33">
                             <mat-card class="dashboard-gauge">
-                                <div class="other-kpi-header">
-                                    {{'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_TITLE' | translate}}
+                                <div
+                                    fxLayout="row"
+                                    class="other-kpi-header">
+                                    <div
+                                        fxFlex>
+                                        {{'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_TITLE' | translate}}
+                                    </div>
+                                    <app-fancy-tooltip
+                                        fxFlex fxGrow="0"
+                                        tooltip="LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_TITLE_DESCRIPTION">
+                                    </app-fancy-tooltip>
                                 </div>
                                 <!-- case hospitalization status pie chart -->
                                 <div fxLayoutAlign="center">
@@ -203,6 +230,7 @@
                     <!-- dropdown with view types -->
                     <app-form-select
                         name="epiCurveViewType"
+                        tooltip="LNG_PAGE_DASHBOARD_EPI_CURVE_TITLE_DESCRIPTION"
                         [(ngModel)]="epiCurveViewType"
                         required="true"
                         [options]="epiCurveViewTypes$ | async"
