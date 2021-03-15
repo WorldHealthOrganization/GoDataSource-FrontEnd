@@ -10,6 +10,9 @@ export class DashboardCustomMetricDashletComponent {
     // value to display in the box
     @Input() value: number;
 
+    // tooltip
+    @Input() tooltip: string;
+
     // link & link params
     @Input() link: string | string[];
     @Input() params: any;

@@ -2,6 +2,7 @@
     [link]="CaseModel.canList(authUser) ? '/cases' : ''"
     [params]="getDashletParamsIncludingGlobalFilters(queryParams)"
     [value]="casesLessContactsCount"
+    tooltip="LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE_BEFORE_VALUE_DESCRIPTION"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"
     (moveAfter)="onMoveAfter()"

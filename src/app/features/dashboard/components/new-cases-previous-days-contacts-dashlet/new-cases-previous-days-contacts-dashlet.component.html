@@ -2,6 +2,7 @@
     [link]="CaseModel.canList(authUser) ? '/cases' : ''"
     [params]="getDashletParamsIncludingGlobalFilters(queryParams)"
     [value]="casesAmongContactsCount + ' / ' + newCases"
+    tooltip="LNG_PAGE_DASHBOARD_KPI_CASES_NEW_PREVIOUS_DAYS_CONTACTS_BEFORE_VALUE_DESCRIPTION"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"
     (moveAfter)="onMoveAfter()"

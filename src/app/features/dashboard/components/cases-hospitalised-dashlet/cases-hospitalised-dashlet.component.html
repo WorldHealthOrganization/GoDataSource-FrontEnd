@@ -2,6 +2,7 @@
     [link]="CaseModel.canList(authUser) ? '/cases' : ''"
     [params]="getDashletParamsIncludingGlobalFilters(queryParams)"
     [value]="casesHospitalisedCount"
+    tooltip="LNG_PAGE_DASHBOARD_KPI_CASES_HOSPITALISED_TITLE_DESCRIPTION"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"
     (moveAfter)="onMoveAfter()"

@@ -1,1 +1,13 @@
-<div [id]="chartId"></div>
+<div>
+    <!-- Tooltip -->
+    <div fxLayoutAlign="end">
+        <app-fancy-tooltip
+            [tooltip]="tooltip">
+        </app-fancy-tooltip>
+    </div>
+
+    <!-- Chart -->
+    <div
+        [id]="chartId">
+    </div>
+</div>

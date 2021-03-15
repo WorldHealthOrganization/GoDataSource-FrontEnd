@@ -2,6 +2,7 @@
     [link]="TransmissionChainModel.canList(authUser) ? '/transmission-chains/list' : ''"
     [params]="getDashletParamsIncludingGlobalFilters(queryParams)"
     [value]="numOfNewChainsOfTransmissionFromRegContactsBecomeCases"
+    tooltip="LNG_PAGE_DASHBOARD_KPI_NEW_CHAINS_OF_TRANSMISSION_FROM_REGISTERED_CONTACTS_WHO_BECAME_CASES_DESCRIPTION"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"
     (moveAfter)="onMoveAfter()"
