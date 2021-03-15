@@ -7,6 +7,7 @@
         [chartDataColumns]="chartDataColumns"
         [lineData]="lineData"
         [chartDataCategories]="chartDataCategories"
+        tooltip="LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_TITLE_DESCRIPTION"
         [showLabels]="false"
         [xLabel]="'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_X_AXIS_LABEL' | translate"
         [yLabel]="'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_Y_AXIS_LABEL' | translate"
@@ -15,11 +16,6 @@
         [y2Max]="100"
         [y2Min]="0">
     </app-c3-combination-stacked-bar-chart>
-
-    <app-fancy-tooltip
-        fxFlex fxGrow="0"
-        tooltip="LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_TITLE_DESCRIPTION">
-    </app-fancy-tooltip>
 </div>
 
 <!-- No data -->

@@ -135,10 +135,8 @@ export const components: any[] = [
     NumberOfItemsLabelComponent,
     FormCaseCenterDaterangeComponent,
     FormCaseCenterDaterangeListComponent,
+    FancyTooltipComponent,
 
     // layout extensions
-    HoverRowActionsComponent,
-
-    // fancy tooltip
-    FancyTooltipComponent
+    HoverRowActionsComponent
 ];

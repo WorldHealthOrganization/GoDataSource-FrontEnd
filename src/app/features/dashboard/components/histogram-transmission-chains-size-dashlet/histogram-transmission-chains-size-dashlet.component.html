@@ -1,36 +1,41 @@
 <!-- Chart -->
 <ng-container
     *ngIf="!displayLoading && histogramResults?.length > 0">
-    <div fxLayout="column" fxFlex fxLayoutAlign="center">
-        <ngx-charts-bar-vertical
-            class="histogram-size-chains"
-            [scheme]="{ domain: [caseRefDataColor] }"
-            [results]="histogramResults"
-            [gradient]="false"
-            [xAxis]="true"
-            [yAxis]="true"
-            [legend]="false"
-            [showXAxisLabel]="true"
-            [showYAxisLabel]="true"
-            [yAxisTickFormatting]="axisFormat"
-            [xAxisLabel]="'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_LABEL' | translate"
-            [yAxisLabel]="'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_NUMBER_LABEL' | translate"
-            (select)="onSelectChart($event)">
-            <ng-template let-model="model">
-                <div>
-                    {{'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_LABEL' | translate}}: {{model.name}}
-                </div>
-                <div>
-                    {{'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_NUMBER_LABEL' | translate}}: {{model.value}}
-                </div>
-            </ng-template>
-        </ngx-charts-bar-vertical>
-    </div>
+    <div>
+        <!-- Tooltip -->
+        <div fxLayoutAlign="end">
+            <app-fancy-tooltip
+                tooltip="LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_TITLE_DESCRIPTION">
+            </app-fancy-tooltip>
+        </div>
 
-    <app-fancy-tooltip
-        fxFlex fxGrow="0"
-        tooltip="LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_TITLE_DESCRIPTION">
-    </app-fancy-tooltip>
+        <!-- Chart -->
+        <div fxLayoutAlign="center">
+            <ngx-charts-bar-vertical
+                class="histogram-size-chains"
+                [scheme]="{ domain: [caseRefDataColor] }"
+                [results]="histogramResults"
+                [gradient]="false"
+                [xAxis]="true"
+                [yAxis]="true"
+                [legend]="false"
+                [showXAxisLabel]="true"
+                [showYAxisLabel]="true"
+                [yAxisTickFormatting]="axisFormat"
+                [xAxisLabel]="'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_LABEL' | translate"
+                [yAxisLabel]="'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_NUMBER_LABEL' | translate"
+                (select)="onSelectChart($event)">
+                <ng-template let-model="model">
+                    <div>
+                        {{'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_LABEL' | translate}}: {{model.name}}
+                    </div>
+                    <div>
+                        {{'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_NUMBER_LABEL' | translate}}: {{model.value}}
+                    </div>
+                </ng-template>
+            </ngx-charts-bar-vertical>
+        </div>
+    </div>
 </ng-container>
 
 <!-- No data -->
