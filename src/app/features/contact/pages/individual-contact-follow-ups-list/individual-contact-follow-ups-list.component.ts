@@ -1,4 +1,11 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import {
+    Component,
+    ElementRef,
+    OnDestroy,
+    OnInit,
+    ViewChild,
+    ViewEncapsulation
+} from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -31,6 +38,8 @@ import { throwError } from 'rxjs/internal/observable/throwError';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { SearchMethod } from '../../../../core/helperClasses/request-query-builder/request-filter-generator';
+import { AddressFields } from '../../../../core/models/address.model';
 
 @Component({
     selector: 'app-individual-contact-follow-ups-list',
@@ -39,6 +48,9 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
     styleUrls: ['./individual-contact-follow-ups-list.component.less']
 })
 export class IndividualContactFollowUpsListComponent extends FollowUpsListComponent implements OnInit, OnDestroy {
+    @ViewChild('latitudeFilter') latitudeFilter: ElementRef;
+    @ViewChild('longitudeFilter') longitudeFilter: ElementRef;
+
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -70,6 +82,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
     ExportDataExtension = ExportDataExtension;
     ReferenceDataCategory = ReferenceDataCategory;
     FollowUpModel = FollowUpModel;
+    SearchMethod = SearchMethod;
 
     contactId: string;
     contactData: ContactModel;
@@ -406,8 +419,38 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER'
             }),
             new VisibleColumnModel({
-                field: 'fullAddress',
-                label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
+                field: 'address.emailAddress',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_EMAIL',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.addressLine1',
+                label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.city',
+                label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.geoLocation.lat',
+                label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.geoLocation.lng',
+                label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.postalCode',
+                label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.geoLocationAccurate',
+                label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
                 visible: false
             }),
             new VisibleColumnModel({
@@ -595,5 +638,39 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                     share()
                 );
         }
+    }
+    /**
+     * Filter by current address
+     */
+    filterByAddress(
+    ) {
+        // create the input values
+        let addressInputs: { [key: string]: string } = {};
+
+        // check for latitude
+        if (
+            this.latitudeFilter &&
+            this.latitudeFilter['innerValue']
+        ) {
+            addressInputs = {
+                ...addressInputs,
+                [AddressFields.LATITUDE]: this.latitudeFilter['innerValue']
+            };
+        }
+
+        // check for longitude
+        if (
+            this.longitudeFilter &&
+            this.longitudeFilter['innerValue']
+        ) {
+            addressInputs = {
+                ...addressInputs,
+                [AddressFields.LONGITUDE]: this.longitudeFilter['innerValue']
+            };
+        }
+
+        // filter the address by inputs
+        this.filterByAddressInputs(addressInputs, false);
+
     }
 }

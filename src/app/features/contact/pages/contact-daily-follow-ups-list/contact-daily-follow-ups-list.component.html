@@ -448,7 +448,7 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Area -->
+        <!-- Location -->
         <ng-container matColumnDef="area">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -483,7 +483,7 @@
                             name="emailFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('address.emailAddress', $event)"
+                            (optionChanged)="filterByTextField('address.emailAddress', $event, undefined, SearchMethod.REGEX)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -495,7 +495,7 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Full Address -->
+        <!-- Address -->
         <ng-container matColumnDef="fullAddress">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -503,12 +503,146 @@
                         {{ 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS' | translate }}
                     </div>
                     <div class="column-filter">
-                        <!-- placeholder -->
+                        <app-form-input
+                            name="addressLine1Filter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('address.addressLine1', $event, undefined, SearchMethod.REGEX)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
                     </div>
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
-                {{ item.address?.fullAddress }}
+                {{ item.address?.addressLine1 }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- City -->
+        <ng-container matColumnDef="address.city">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_ADDRESS_FIELD_LABEL_CITY' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="cityFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('address.city', $event, undefined, SearchMethod.REGEX)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
+                {{ item.address?.city }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Latitude -->
+        <ng-container matColumnDef="address.geoLocation.lat">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-input
+                            #latitudeFilter
+                            name="latitudeFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByAddress()"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
+                {{ item.address?.geoLocation?.lat }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Longitude -->
+        <ng-container matColumnDef="address.geoLocation.lng">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-input
+                            #longitudeFilter
+                            name="longitudeFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByAddress()"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
+                {{ item.address?.geoLocation?.lng }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Postal Code -->
+        <ng-container matColumnDef="address.postalCode">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="postalCodeFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('address.postalCode', $event, undefined, SearchMethod.REGEX)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
+                {{ item.address?.postalCode }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Coordinates are accurate? -->
+        <ng-container matColumnDef="address.geoLocationAccurate">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="geoLocationAccurateFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="yesNoOptionsList$ | async"
+                            (optionChanged)="filterByBooleanUsingExistField('address.geoLocationAccurate', $event.value)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
+                <app-yes-no-label
+                    [value]="item.address?.geoLocationAccurate">
+                </app-yes-no-label>
             </mat-cell>
         </ng-container>
 

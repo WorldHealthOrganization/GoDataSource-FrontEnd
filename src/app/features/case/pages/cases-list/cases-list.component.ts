@@ -1,4 +1,11 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import {
+    Component,
+    ElementRef,
+    OnDestroy,
+    OnInit,
+    ViewChild,
+    ViewEncapsulation
+} from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable, Subscription } from 'rxjs';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -31,7 +38,7 @@ import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
-import { AddressType } from '../../../../core/models/address.model';
+import { AddressFields } from '../../../../core/models/address.model';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ContactModel } from '../../../../core/models/contact.model';
@@ -47,6 +54,16 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
     styleUrls: ['./cases-list.component.less']
 })
 export class CasesListComponent extends ListComponent implements OnInit, OnDestroy {
+    @ViewChild('cityFilter') cityFilter: ElementRef;
+    @ViewChild('addressLine1Filter') addressLine1Filter: ElementRef;
+    @ViewChild('postalCodeFilter') postalCodeFilter: ElementRef;
+    @ViewChild('locationIdsFilter') locationIdsFilter: ElementRef;
+    @ViewChild('emailFilter') emailFilter: ElementRef;
+    @ViewChild('phoneNumberFilter') phoneNumberFilter: ElementRef;
+    @ViewChild('geoLocationAccurateFilter') geoLocationAccurateFilter: ElementRef;
+    @ViewChild('latitudeFilter') latitudeFilter: ElementRef;
+    @ViewChild('longitudeFilter') longitudeFilter: ElementRef;
+
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '.', true)
@@ -644,6 +661,36 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 visible: false
             }),
             new VisibleColumnModel({
+                field: 'addresses.addressLine1',
+                label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'addresses.city',
+                label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'addresses.geoLocation.lat',
+                label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'addresses.geoLocation.lng',
+                label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'addresses.postalCode',
+                label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'addresses.geoLocationAccurate',
+                label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
+                visible: false
+            }),
+            new VisibleColumnModel({
                 field: 'dateOfOnset',
                 label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET'
             }),
@@ -1156,6 +1203,123 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     }
 
     /**
+     * Filter by current address
+     */
+    filterByAddress(
+    ) {
+        // create the input values
+        let addressInputs: { [key: string]: string | string[] | boolean; } = {};
+
+        // check for address
+        if (
+            this.addressLine1Filter &&
+            this.addressLine1Filter['innerValue']
+        ) {
+            addressInputs = {
+                ...addressInputs,
+                [AddressFields.ADDRESS]: this.addressLine1Filter['innerValue']
+            };
+        }
+
+        // check for city
+        if (
+            this.cityFilter &&
+            this.cityFilter['innerValue']
+        ) {
+            addressInputs = {
+                ...addressInputs,
+                [AddressFields.CITY]: this.cityFilter['innerValue']
+            };
+        }
+
+        // check for email
+        if (
+            this.emailFilter &&
+            this.emailFilter['innerValue']
+        ) {
+            addressInputs = {
+                ...addressInputs,
+                [AddressFields.EMAIL]: this.emailFilter['innerValue']
+            };
+        }
+
+        // check for location
+        if (
+            this.locationIdsFilter &&
+            this.locationIdsFilter['innerValue']
+        ) {
+            const locationsIds = _.map(
+                this.locationIdsFilter['innerValue'],
+                (location) => {
+                    return location;
+                });
+
+            addressInputs = {
+                ...addressInputs,
+                [AddressFields.LOCATION]: locationsIds
+            };
+        }
+
+        // check for latitude
+        if (
+            this.latitudeFilter &&
+            this.latitudeFilter['innerValue']
+        ) {
+            addressInputs = {
+                ...addressInputs,
+                [AddressFields.LATITUDE]: this.latitudeFilter['innerValue']
+            };
+        }
+
+        // check for longitude
+        if (
+            this.longitudeFilter &&
+            this.longitudeFilter['innerValue']
+        ) {
+            addressInputs = {
+                ...addressInputs,
+                [AddressFields.LONGITUDE]: this.longitudeFilter['innerValue']
+            };
+        }
+
+        // check for geo location accurate
+        if (
+            this.geoLocationAccurateFilter
+        ) {
+            addressInputs = {
+                ...addressInputs,
+                [AddressFields.GEO_LOCATION_ACCURATE]: this.geoLocationAccurateFilter['innerValue']
+            };
+        }
+
+        // check for postal Code
+        if (
+            this.postalCodeFilter &&
+            this.postalCodeFilter['innerValue']
+        ) {
+            addressInputs = {
+                ...addressInputs,
+                [AddressFields.POSTAL_CODE]: this.postalCodeFilter['innerValue']
+            };
+        }
+
+        // check for phone number
+        if (
+            this.phoneNumberFilter &&
+            this.phoneNumberFilter['innerValue']
+        ) {
+            addressInputs = {
+                ...addressInputs,
+                [AddressFields.PHONE_NUMBER]: this.phoneNumberFilter['innerValue']
+            };
+        }
+
+        // filter the address by inputs
+        this.filterByAddressInputs(addressInputs);
+
+    }
+
+    /**
      * Filter by Not a Case classification
      * @param value
      */
@@ -1379,36 +1543,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             this.loadingDialog.close();
             this.loadingDialog = null;
         }
-    }
-
-    /**
-     * Filter by locations selected in location-drop-down
-     * @param locations
-     */
-    filterByLocation(locations) {
-        // remove previous condition
-        this.queryBuilder.filter.remove('addresses');
-        if (!_.isEmpty(locations)) {
-            // mapping all the locations to get the ids
-            const locationsIds = _.map(locations, (location) => {
-                return location.id;
-            });
-
-            // build query
-            this.queryBuilder.filter.where({
-                addresses: {
-                    elemMatch: {
-                        typeId: AddressType.CURRENT_ADDRESS,
-                        parentLocationIdFilter: {
-                            $in: locationsIds
-                        }
-                    }
-                }
-            });
-        }
-
-        // refresh list
-        this.needsRefreshList();
     }
 
     /**

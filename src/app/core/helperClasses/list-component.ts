@@ -1,4 +1,12 @@
-import { ISerializedQueryBuilder, RequestFilter, RequestFilterOperator, RequestQueryBuilder, RequestSortDirection } from './request-query-builder';
+import {
+    ISerializedQueryBuilder,
+    RequestFilter,
+    RequestFilterGenerator,
+    RequestFilterOperator,
+    RequestQueryBuilder,
+    RequestSortDirection,
+    SearchMethod
+} from './request-query-builder';
 import * as _ from 'lodash';
 import { Subscriber } from 'rxjs';
 import { ApplyListFilter, Constants } from '../models/constants';
@@ -13,7 +21,10 @@ import { MetricContactsSeenEachDays } from '../models/metrics/metric-contacts-se
 import { FormCheckboxComponent } from '../../shared/xt-forms/components/form-checkbox/form-checkbox.component';
 import { ContactFollowedUp, MetricContactsWithSuccessfulFollowUp } from '../models/metrics/metric.contacts-with-success-follow-up.model';
 import { VisibleColumnModel } from '../../shared/components/side-columns/model';
-import { AddressType } from '../models/address.model';
+import {
+    AddressType,
+    AddressFields
+} from '../models/address.model';
 import { moment, Moment } from './x-moment';
 import { ListHelperService } from '../services/helper/list-helper.service';
 import { SubscriptionLike } from 'rxjs/internal/types';
@@ -575,12 +586,13 @@ export abstract class ListComponent implements OnDestroy {
      * @param {string | string[]} property
      * @param {string} value
      * @param {RequestFilterOperator} operator
+     * @param {string} method
      */
     filterByTextField(
         property: string | string[],
         value: string,
         operator?: RequestFilterOperator,
-        useLike?: boolean
+        method?: string
     ) {
         // default values
         if (operator === undefined) {
@@ -600,7 +612,7 @@ export abstract class ListComponent implements OnDestroy {
                 property as string,
                 value,
                 true,
-                useLike
+                method
             );
         }
 
@@ -776,6 +788,223 @@ export abstract class ListComponent implements OnDestroy {
     filterByBooleanUsingExistField(property: string, value: any) {
         // filter by boolean using exist
         this.queryBuilder.filter.byBooleanUsingExist(property, value);
+
+        // refresh list
+        this.needsRefreshList();
+    }
+
+    /**
+     * Get upper interval limit
+     * @param {string} value
+     */
+    private getUpperIntervalLimit(value: string): number {
+        // get the number of decimals of the value
+        const decPart = value.split('.');
+        const precision = decPart[1] ? decPart[1].length : 0;
+
+        // calculate the upper interval limit
+        // e.g. add 0.001 to 56.482 and round up the value
+        const increment = 1 / +'1'.padEnd(precision + 1, '0');
+
+        // increment and return the limit
+        return +value >= 0 ?
+            +value + increment :
+            +value - increment;
+    }
+
+    /**
+     * Filter the address by inputs
+     * @param {objects} address inputs
+     * @param value
+     */
+    filterByAddressInputs(
+        fields: { [key: string]: string | string[] | boolean; },
+        hasMultipleAddress: boolean = true
+    ) {
+        // remove previous condition
+        if (hasMultipleAddress) {
+            this.queryBuilder.filter.remove('addresses');
+        } else {
+            this.queryBuilder.filter.remove('$or');
+        }
+
+        // create the query
+        let queryCurrentAddress: { [key: string]: any | any[]; } = {};
+        let queryAllAddresses: { [key: string]: any | any[]; } = {};
+
+        // loop through all fields
+        for (const propertyName in fields) {
+            // get the value
+            const value = fields[propertyName];
+
+            // get the property
+            const property = hasMultipleAddress ?
+                propertyName :
+                'address.' + propertyName;
+
+            // create the condition
+            switch (propertyName) {
+                case AddressFields.CITY:
+                case AddressFields.ADDRESS:
+                case AddressFields.POSTAL_CODE:
+                    if (value) {
+                        queryCurrentAddress = {
+                            ...queryCurrentAddress,
+                            [property]: RequestFilterGenerator.textStartWith(<string>value, SearchMethod.REGEX)
+                        };
+                    }
+
+                    break;
+                case AddressFields.LOCATION:
+                    if (
+                        Array.isArray(value) &&
+                        value.length > 0
+                    ) {
+                        queryCurrentAddress = {
+                            ...queryCurrentAddress,
+                            [AddressFields.LOCATION]: {
+                                $in: value
+                            }
+                        };
+                    }
+
+                    break;
+                case AddressFields.LATITUDE:
+                case AddressFields.LONGITUDE:
+                    if (value) {
+                        // TODO: refactor to use "aggregation" when mongodb will be upgraded to a version higher than 4
+                        // create a number range to match a number that "begins with" query
+                        // e.g. the 16.482 will looking for all values between [16.482, 16.483] and [116.482, 116.483]
+                        // e.g. the 1.482 will looking for all values between [1.482, 1.483], [14.82, 14.83] and [148.2, 148.3]
+                        const upperLimit = this.getUpperIntervalLimit(<string>value);
+                        // convert value to number
+                        const convertedValue = +value;
+                        const minValue = convertedValue >= 0 ? convertedValue : upperLimit;
+                        const maxValue = convertedValue >= 0 ? upperLimit : convertedValue;
+
+                        queryCurrentAddress = {
+                            ...queryCurrentAddress,
+                            $or: [
+                                {
+                                    // e.g. between [400, 500]
+                                    [property]: {
+                                        $gte: minValue % 100 * 100,
+                                        $lt: minValue === 0 ?
+                                            1 :
+                                            maxValue % 100 * 100
+                                    }
+                                },
+                                {
+                                    // e.g. between [40, 50]
+                                    [property]: {
+                                        $gte: minValue % 100 * 10,
+                                        $lt: minValue === 0 ?
+                                            1 :
+                                            maxValue % 100 * 10
+                                    }
+                                },
+                                {
+                                    // e.g. between [4, 5]
+                                    [property]: {
+                                        $gte: minValue % 100,
+                                        $lt: minValue === 0 ?
+                                            1 :
+                                            maxValue % 100
+                                    }
+                                },
+                            ]
+                        };
+                    }
+
+                    break;
+                case AddressFields.EMAIL:
+                    queryAllAddresses = {
+                        ...queryAllAddresses,
+                        [property]: RequestFilterGenerator.textStartWith(<string>value, SearchMethod.REGEX)
+                    };
+
+                    break;
+                case AddressFields.PHONE_NUMBER:
+                    if (value) {
+                        // build number pattern condition
+                        const phonePattern = RequestFilter.getPhoneNumberPattern(<string>value);
+
+                        // search by phone number or invalid phone
+                        queryAllAddresses = {
+                            ...queryAllAddresses,
+                            [property]: (!phonePattern) ?
+                                'INVALID PHONE' :
+                                {
+                                    '$regex': phonePattern
+                                }
+                        };
+                    }
+
+                    break;
+                case AddressFields.GEO_LOCATION_ACCURATE:
+                    if (value === false) {
+                        // create condition with OR criteria
+                        const orCondition = {
+                            $or: [
+                                {
+                                    [property]: {
+                                        $eq: value
+                                    }
+                                },
+                                {
+                                    [property]: {
+                                        $exists: value
+                                    }
+                                }
+                            ]
+                        };
+
+                        queryCurrentAddress = {
+                            ...queryCurrentAddress,
+                            ...orCondition
+                        };
+                    } else if (value === true) {
+                        queryCurrentAddress = {
+                            ...queryCurrentAddress,
+                            [property]: {
+                                $eq: true
+                            }
+                        };
+                    }
+
+                    break;
+            }
+        }
+
+        // add the conditions for the current address
+        if (Object.keys(queryCurrentAddress).length > 0) {
+            if (hasMultipleAddress) {
+                // add the current address as filter
+                queryCurrentAddress = {
+                    ...queryCurrentAddress,
+                    typeId: AddressType.CURRENT_ADDRESS
+                };
+
+                this.queryBuilder.filter.where({
+                    addresses: {
+                        elemMatch: queryCurrentAddress
+                    }
+                });
+            } else {
+                this.queryBuilder.filter.where(
+                    queryCurrentAddress
+                );
+            }
+        }
+
+        // add the conditions for all addresses
+        if (Object.keys(queryAllAddresses).length > 0) {
+            this.queryBuilder.filter.where({
+                addresses: {
+                    elemMatch: queryAllAddresses
+                }
+            });
+        }
 
         // refresh list
         this.needsRefreshList();

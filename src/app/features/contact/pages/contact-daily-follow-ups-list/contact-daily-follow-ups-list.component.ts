@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -36,6 +36,8 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { TeamModel } from '../../../../core/models/team.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { SearchMethod } from '../../../../core/helperClasses/request-query-builder/request-filter-generator';
+import { AddressFields } from '../../../../core/models/address.model';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -44,6 +46,9 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
     styleUrls: ['./contact-daily-follow-ups-list.component.less']
 })
 export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent implements OnInit, OnDestroy {
+    @ViewChild('latitudeFilter') latitudeFilter: ElementRef;
+    @ViewChild('longitudeFilter') longitudeFilter: ElementRef;
+
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -82,6 +87,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     ExportDataExtension = ExportDataExtension;
     ReferenceDataCategory = ReferenceDataCategory;
     FollowUpModel = FollowUpModel;
+    SearchMethod = SearchMethod;
 
     availableSideFilters: FilterModel[];
     // values for side filter
@@ -520,8 +526,33 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 label: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP'
             }),
             new VisibleColumnModel({
-                field: 'fullAddress',
-                label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
+                field: 'address.addressLine1',
+                label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.city',
+                label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.geoLocation.lat',
+                label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.geoLocation.lng',
+                label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.postalCode',
+                label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.geoLocationAccurate',
+                label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
                 visible: false
             }),
             new VisibleColumnModel({
@@ -698,7 +729,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
                     }),
                     new FilterModel({
-                        fieldName: 'addresses.phoneNumber',
+                        fieldName: 'phoneNumber',
                         fieldLabel: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER',
                         type: FilterType.TEXT,
                         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
@@ -1175,6 +1206,41 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                     ];
                 });
         });
+    }
+
+    /**
+     * Filter by current address
+     */
+    filterByAddress(
+    ) {
+        // create the input values
+        let addressInputs: { [key: string]: string } = {};
+
+        // check for latitude
+        if (
+            this.latitudeFilter &&
+            this.latitudeFilter['innerValue']
+        ) {
+            addressInputs = {
+                ...addressInputs,
+                [AddressFields.LATITUDE]: this.latitudeFilter['innerValue']
+            };
+        }
+
+        // check for longitude
+        if (
+            this.longitudeFilter &&
+            this.longitudeFilter['innerValue']
+        ) {
+            addressInputs = {
+                ...addressInputs,
+                [AddressFields.LONGITUDE]: this.longitudeFilter['innerValue']
+            };
+        }
+
+        // filter the address by inputs
+        this.filterByAddressInputs(addressInputs, false);
+
     }
 
     /**

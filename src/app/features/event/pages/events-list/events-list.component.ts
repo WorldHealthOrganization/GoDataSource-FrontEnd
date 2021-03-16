@@ -1,4 +1,11 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import {
+    Component,
+    ElementRef,
+    OnDestroy,
+    OnInit,
+    ViewChild,
+    ViewEncapsulation
+} from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable, throwError } from 'rxjs';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -31,6 +38,8 @@ import { EntityHelperService } from '../../../../core/services/helper/entity-hel
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { SearchMethod } from '../../../../core/helperClasses/request-query-builder/request-filter-generator';
+import { AddressFields } from '../../../../core/models/address.model';
 
 @Component({
     selector: 'app-events-list',
@@ -39,6 +48,9 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
     styleUrls: ['./events-list.component.less']
 })
 export class EventsListComponent extends ListComponent implements OnInit, OnDestroy {
+    @ViewChild('latitudeFilter') latitudeFilter: ElementRef;
+    @ViewChild('longitudeFilter') longitudeFilter: ElementRef;
+
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '.', true)
@@ -51,6 +63,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
     EventModel = EventModel;
     RelationshipModel = RelationshipModel;
     OutbreakModel = OutbreakModel;
+    SearchMethod = SearchMethod;
 
     // user list
     userList$: Observable<UserModel[]>;
@@ -352,11 +365,6 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                 visible: false
             }),
             new VisibleColumnModel({
-                field: 'address',
-                label: 'LNG_EVENT_FIELD_LABEL_ADDRESS',
-                visible: false
-            }),
-            new VisibleColumnModel({
                 field: 'address.emailAddress',
                 label: 'LNG_EVENT_FIELD_LABEL_EMAIL',
                 visible: false
@@ -405,6 +413,36 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                 field: 'updatedAt',
                 label: 'LNG_EVENT_FIELD_LABEL_UPDATED_AT',
                 visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.addressLine1',
+                label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.city',
+                label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.geoLocation.lat',
+                label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.geoLocation.lng',
+                label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.postalCode',
+                label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.geoLocationAccurate',
+                label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
+                visible: false
             })
         );
     }
@@ -417,6 +455,9 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             // retrieve created user & modified user information
             this.queryBuilder.include('createdByUser', true);
             this.queryBuilder.include('updatedByUser', true);
+
+            // retrieve location list
+            this.queryBuilder.include('location', true);
 
             // since some flags can do damage to other endpoints called with the same flag, we should make sure we don't send it
             // to do this, we clone the query filter before filtering by it
@@ -671,5 +712,40 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                 from: Constants.APP_PAGE.EVENTS.value
             }
         });
+    }
+
+    /**
+     * Filter by address
+     */
+    filterByAddress(
+    ) {
+        // create the input values
+        let addressInputs: { [key: string]: string } = {};
+
+        // check for latitude
+        if (
+            this.latitudeFilter &&
+            this.latitudeFilter['innerValue']
+        ) {
+            addressInputs = {
+                ...addressInputs,
+                [AddressFields.LATITUDE]: this.latitudeFilter['innerValue']
+            };
+        }
+
+        // check for longitude
+        if (
+            this.longitudeFilter &&
+            this.longitudeFilter['innerValue']
+        ) {
+            addressInputs = {
+                ...addressInputs,
+                [AddressFields.LONGITUDE]: this.longitudeFilter['innerValue']
+            };
+        }
+
+        // filter the address by inputs
+        this.filterByAddressInputs(addressInputs, false);
+
     }
 }
