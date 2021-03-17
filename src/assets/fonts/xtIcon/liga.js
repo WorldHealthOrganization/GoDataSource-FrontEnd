@@ -25,6 +25,8 @@
     var icons;
     if (!supportsProperty('fontFeatureSettings')) {
         icons = {
+            'drag': '&#xe933;',
+            'lab': '&#xe9aa;',
             'ellipse_shape': '&#xe92f;',
             'pentagon_shape': '&#xe930;',
             'rectangle_shape': '&#xe931;',
@@ -74,7 +76,6 @@
             'home': '&#xe901;',
             'info': '&#xe923;',
             'refresh': '&#xe92e;',
-            'lab': '&#xe9aa;',
             'arrowADown': '&#xe922;',
             'arrowAUp': '&#xe921;',
           '0': 0

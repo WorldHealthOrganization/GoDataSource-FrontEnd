@@ -1,6 +1,5 @@
 import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import * as _ from 'lodash';
-import * as moment from 'moment';
 
 /**
  * Action Type
@@ -22,7 +21,7 @@ export class HoverRowAction {
     iconTooltipTranslateData: (item: any) => {
         [key: string]: any
     };
-    click: (item: any, handler: any, index: any) => void;
+    click: (item: any, handler: any, index: any) => void | boolean;
     class: string;
     visible: (item: any, index: any) => boolean;
 
@@ -30,6 +29,16 @@ export class HoverRowAction {
     menuOptionLabel: string;
     menuOptionLabelTranslateData: (item: any) => {
         [key: string]: any
+    };
+
+    // link data
+    routerLink: string[];
+    queryParams: {
+        [k: string]: any;
+    };
+    linkGenerator?: (item: any) => string[];
+    queryParamsGenerator?: (item: any) => {
+        [k: string]: any;
     };
 
     /**
@@ -42,7 +51,7 @@ export class HoverRowAction {
         iconTooltipTranslateData?: (item: any) => {
             [key: string]: any
         },
-        click?: (item: any, handler: any, index: any) => void,
+        click?: (item: any, handler: any, index: any) => void | boolean,
         type?: HoverRowActionType,
         menuOptions?: HoverRowAction[],
         menuOptionLabel?: string,
@@ -50,7 +59,13 @@ export class HoverRowAction {
             [key: string]: any
         },
         class?: string,
-        visible?: (item: any, index: any) => boolean
+        visible?: (item: any, index: any) => boolean,
+
+        // link
+        linkGenerator?: (item: any) => string[],
+        queryParamsGenerator?: (item: any) => {
+            [k: string]: any;
+        }
     }) {
         Object.assign(this, data);
     }
@@ -89,16 +104,6 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
      * Minimum distance between current mouse cursor position and previous one to be taken in consideration ( to rerender data )
      */
     static readonly MIN_MOUSE_DISTANCE: number = 30;
-
-    /**
-     * During this time actions are inactive
-     */
-    static readonly ACTIONS_DEAD_TIME_SINCE_SHOWN_MS: number = 200;
-
-    /**
-     * Keep shown time
-     */
-    private shownTime: number = 0;
 
     /**
      * Constants
@@ -412,17 +417,31 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
         actionIndex: any = null,
         mouseEvent: MouseEvent = null
     ) {
+        // set data
+        this.actionData = actionData;
+
         // set actions
         if (!_.isEqual(this.actions, actions)) {
+            // go through each action and determine links
+            (actions || []).forEach((action) => {
+                // link
+                action.routerLink = action.linkGenerator ?
+                    action.linkGenerator(this.actionData) :
+                    undefined;
+
+                // query params
+                action.queryParams = action.queryParamsGenerator ?
+                    action.queryParamsGenerator(this.actionData) :
+                    undefined;
+            });
+
+            // set data
             this.actions = actions;
             this.actionsReversed = actions ? _.cloneDeep(actions).reverse() : [];
         }
 
         // set handler
         this.actionHandler = handler;
-
-        // set data
-        this.actionData = actionData;
 
         // set index
         this.actionIndex = actionIndex;
@@ -444,9 +463,6 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
 
         // check if we need to display row
         this.determineVisibleValue();
-
-        // set shown time
-        this.shownTime = moment().valueOf();
     }
 
     /**
@@ -517,18 +533,28 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
      * Clicked Button or Menu option
      * @param buttonData
      */
-    clickedButton(buttonData: HoverRowAction) {
-        // actions disabled ?
-        if ((moment().valueOf() - this.shownTime) <= HoverRowActionsComponent.ACTIONS_DEAD_TIME_SINCE_SHOWN_MS) {
+    clickedButton(
+        buttonData: HoverRowAction,
+        event?: MouseEvent
+    ): void {
+        // no click action attached ?
+        if (!buttonData.click) {
             return;
         }
 
         // perform action
-        buttonData.click(
+        const clickResult: void | boolean = buttonData.click(
             this.actionData,
             this.actionHandler,
             this.actionIndex
         );
+        if (
+            event &&
+            clickResult === false
+        ) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
     }
 
     /**

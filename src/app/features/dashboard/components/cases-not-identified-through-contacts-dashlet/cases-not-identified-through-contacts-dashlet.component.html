@@ -1,7 +1,8 @@
 <app-dashboard-custom-metric-dashlet
     [link]="CaseModel.canList(authUser) ? '/cases' : ''"
-    [params]="getDashletParamsIncludingGlobalFilters({applyListFilter: Constants.APPLY_LIST_FILTER.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS})"
+    [params]="getDashletParamsIncludingGlobalFilters(queryParams)"
     [value]="count"
+    tooltip="LNG_PAGE_DASHBOARD_KPI_CASES_NOT_IDENTIFIED_THROUGH_CONTACTS_DESCRIPTION"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"
     (moveAfter)="onMoveAfter()"

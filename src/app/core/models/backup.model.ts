@@ -3,6 +3,7 @@ import { UserModel } from './user.model';
 import { IPermissionBackup, IPermissionBasic, IPermissionRestorable } from './permission.interface';
 import { PERMISSION } from './permission.model';
 import { FileSize } from '../helperClasses/file-size';
+import { Moment, moment } from '../helperClasses/x-moment';
 
 export class BackupModel
     implements
@@ -44,6 +45,38 @@ export class BackupModel
         return this._sizeBytesHumanReadable;
     }
 
+    // startedAt
+    private _startedAt: Moment;
+    get startedAt(): Moment {
+        return this._startedAt;
+    }
+    set startedAt(date: Moment) {
+        // set value
+        this._startedAt = date;
+
+        // update duration
+        this.updateDuration();
+    }
+
+    // endedAt
+    private _endedAt: Moment;
+    get endedAt(): Moment {
+        return this._endedAt;
+    }
+    set endedAt(date: Moment) {
+        // set value
+        this._endedAt = date;
+
+        // update duration
+        this.updateDuration();
+    }
+
+    // duration
+    private _duration: string;
+    get duration(): string {
+        return this._duration;
+    }
+
     /**
      * Static Permissions - IPermissionBasic
      */
@@ -78,6 +111,14 @@ export class BackupModel
         this.userId = _.get(data, 'userId');
         this.sizeBytes = _.get(data, 'sizeBytes', 0);
 
+        // startedAt
+        const startedAt = _.get(data, 'startedAt');
+        this.startedAt = startedAt ? moment(startedAt) : undefined;
+
+        // endedAt
+        const endedAt = _.get(data, 'endedAt');
+        this.endedAt = endedAt ? moment(endedAt) : undefined;
+
         this.user = _.get(data, 'user');
         if (!_.isEmpty(this.user)) {
             this.user = new UserModel(this.user);
@@ -103,4 +144,12 @@ export class BackupModel
      */
     canSetAutomaticBackupSettings(user: UserModel): boolean { return BackupModel.canSetAutomaticBackupSettings(user); }
     canViewCloudBackupLocations(user: UserModel): boolean { return BackupModel.canViewCloudBackupLocations(user); }
+
+    /**
+     * Update and Set Duration in friendly form
+     */
+    private updateDuration(): void {
+        this._duration = moment.humanizeDurationBetweenTwoDates(this._endedAt, this._startedAt);
+        this._duration = this._duration || '-';
+    }
 }

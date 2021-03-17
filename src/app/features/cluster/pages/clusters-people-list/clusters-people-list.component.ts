@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Observable } from 'rxjs';
@@ -70,8 +70,8 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_ACTION_VIEW',
-            click: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel) => {
-                this.router.navigateByUrl(this.getItemRouterLink(item, 'view'));
+            linkGenerator: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): string[] => {
+                return [this.getItemRouterLink(item, 'view')];
             },
             visible: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): boolean => {
                 return !item.deleted &&
@@ -83,8 +83,8 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_ACTION_MODIFY',
-            click: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel) => {
-                this.router.navigateByUrl(this.getItemRouterLink(item, 'modify'));
+            linkGenerator: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): string[] => {
+                return [this.getItemRouterLink(item, 'modify')];
             },
             visible: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): boolean => {
                 return !item.deleted &&
@@ -101,7 +101,6 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
      */
     constructor(
         protected listHelperService: ListHelperService,
-        private router: Router,
         private route: ActivatedRoute,
         private outbreakDataService: OutbreakDataService,
         private clusterDataService: ClusterDataService,

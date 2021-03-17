@@ -125,9 +125,8 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_VIEW_LAB_RESULT',
-            click: (item: LabResultModel) => {
-                // case / contact lab result ?
-                this.router.navigate(['/lab-results', EntityModel.getLinkForEntityType(item.personType), item.personId, item.id, 'view']);
+            linkGenerator: (item: LabResultModel): string[] => {
+                return ['/lab-results', EntityModel.getLinkForEntityType(item.personType), item.personId, item.id, 'view'];
             },
             visible: (item: LabResultModel): boolean => {
                 return !item.deleted &&
@@ -147,9 +146,8 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_MODIFY_LAB_RESULT',
-            click: (item: LabResultModel) => {
-                // case / contact lab result ?
-                this.router.navigate(['/lab-results', EntityModel.getLinkForEntityType(item.personType), item.personId, item.id, 'modify']);
+            linkGenerator: (item: LabResultModel): string[] => {
+                return ['/lab-results', EntityModel.getLinkForEntityType(item.personType), item.personId, item.id, 'modify'];
             },
             visible: (item: LabResultModel): boolean => {
                 return !item.deleted &&

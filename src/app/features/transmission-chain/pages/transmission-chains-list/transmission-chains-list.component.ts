@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { TransmissionChainGroupModel, TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
@@ -68,7 +68,6 @@ export class TransmissionChainsListComponent extends ListComponent implements On
      */
     constructor(
         protected listHelperService: ListHelperService,
-        private router: Router,
         private outbreakDataService: OutbreakDataService,
         private transmissionChainDataService: TransmissionChainDataService,
         private route: ActivatedRoute,
@@ -86,14 +85,11 @@ export class TransmissionChainsListComponent extends ListComponent implements On
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         // get query params
-        this.route.queryParams
-            .subscribe((queryParams: any) => {
-                this.queryParamsData = queryParams;
-                this.appliedListFilter = queryParams.applyListFilter;
+        this.queryParamsData = this.route.snapshot.queryParams;
+        this.appliedListFilter = this.queryParamsData.applyListFilter;
 
-                // init filters
-                this.resetFiltersAddDefault();
-            });
+        // init filters
+        this.resetFiltersAddDefault();
 
         // initialize pagination
         this.initPaginator();
@@ -279,12 +275,6 @@ export class TransmissionChainsListComponent extends ListComponent implements On
                         qb
                     );
             } else {
-                // don't restrict relationships
-                qb.filter.flag(
-                    'dontLimitRelationships',
-                    true
-                );
-
                 // attach extra filter conditions
                 qb.filter.flag(
                     'countContacts',

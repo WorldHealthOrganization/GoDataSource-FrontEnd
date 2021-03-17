@@ -42,6 +42,7 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { CotSnapshotModel } from '../../../../core/models/cot-snapshot.model';
+import { AppMessages } from '../../../../core/enums/app-messages.enum';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -53,6 +54,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     static wheelSensitivity: number = 0.3;
 
     @Input() sizeOfChainsFilter: string = null;
+    @Input() snapshotId: string = null;
+    @Input() showPersonContacts: boolean = false;
+    @Input() showPersonContactsOfContacts: boolean = false;
     @Input() personId: string = null;
     @Input() selectedEntityType: EntityType = null;
 
@@ -93,6 +97,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     showEvents: boolean = true;
     showContacts: boolean = false;
     showContactsOfContacts: boolean = false;
+    showSnapshots: boolean = true;
     locationsListMap: {
         [idLocation: string]: LocationModel
     } = {};
@@ -444,6 +449,17 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     private _updateSnapshotsSubscription: Subscription;
     private _updateSnapshotsTimer: NodeJS.Timer;
 
+    // show snapshot filters
+    showSnapshotFilters: boolean = false;
+    snapshotFilters: {
+        firstName?: string,
+        lastName?: string
+    } = {};
+    snapshotFiltersClone: {
+        firstName?: string,
+        lastName?: string
+    } = {};
+
     /**
      * Constructor
      */
@@ -626,11 +642,47 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                                         });
                                     });
 
-                                // retrieve snapshots
-                                this.retrieveSnapshotsList(() => {
-                                    // hide loading
-                                    loadingDialog.close();
-                                });
+                                // load snapshot if selected
+                                if (this.snapshotId) {
+                                    // hide the snapshot list
+                                    this.showSnapshots = false;
+
+                                    // show contacts and contacts of contacts
+                                    this.showContacts = this.showPersonContacts;
+                                    this.showContactsOfContacts = this.showPersonContactsOfContacts;
+
+                                    // set the selected snapshot
+                                    this.selectedSnapshot = this.snapshotId;
+
+                                    // retrieve snapshot
+                                    this.transmissionChainDataService
+                                        .getSnapshot(this.selectedOutbreak.id, this.snapshotId)
+                                        .subscribe((entity) => {
+                                            // create option
+                                            const option: LabelValuePair = new LabelValuePair(
+                                                this.getSnapshotOptionLabel(entity),
+                                                entity.id
+                                            );
+
+                                            // map snapshot for easy access
+                                            this.snapshotOptionsMap[entity.id] = {
+                                                snapshot: entity,
+                                                option: option
+                                            };
+
+                                            // hide loading
+                                            loadingDialog.close();
+
+                                            // display graph
+                                            this.loadChainsOfTransmission();
+                                        });
+                                } else {
+                                    // retrieve snapshots
+                                    this.retrieveSnapshotsList(() => {
+                                        // hide loading
+                                        loadingDialog.close();
+                                    });
+                                }
                             }
                         });
                 });
@@ -691,6 +743,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 // close settings panel
                 this.showFilters = false;
                 this.showGraphConfiguration = false;
+                this.showSnapshotFilters = false;
 
                 // snapshot name
                 const snapshotName: string = answer.inputValue.value.snapshotName;
@@ -861,6 +914,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         this.showFilters = true;
         this.showGraphConfiguration = false;
         this.mustLoadChain = true;
+        this.showSnapshotFilters = false;
     }
 
     /**
@@ -868,7 +922,18 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      */
     showGraphConfigurationHideFilters(): void {
         this.showFilters = false;
+        this.showSnapshotFilters = false;
         this.showGraphConfiguration = true;
+        this.mustLoadChain = true;
+    }
+
+    /**
+     * Show snapshot filters
+     */
+    showSnapshotFiltersConf(): void {
+        this.showFilters = false;
+        this.showSnapshotFilters = true;
+        this.showGraphConfiguration = false;
         this.mustLoadChain = true;
     }
 
@@ -1545,6 +1610,20 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      */
     toggleEditMode() {
         this.changeEditMode.emit(this.editMode);
+
+        // show a descriptive message to user when editing CoT about fixed data
+        if (this.editMode) {
+            this.snackbarService.showNotice(
+                'LNG_GENERIC_WARNING_EDIT_COT',
+                {},
+                false,
+                AppMessages.APP_MESSAGE_UNRESPONSIVE_EDIT_COT
+            );
+        } else {
+            // hide message
+            this.snackbarService.hideMessage(AppMessages.APP_MESSAGE_UNRESPONSIVE_EDIT_COT);
+        }
+
     }
 
     /**
@@ -2243,6 +2322,94 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     }
 
     /**
+     * Retrieves the person chain of transmission
+     */
+    private chainsOfTransmissionGetPersonChain(chainGroup: TransmissionChainGroupModel): void {
+        // return if no person id is provided
+        if (!this.personId) {
+            return;
+        }
+
+        // go through all chains to remove the unrelated data
+        let usedEntityIdsMap: {
+            [entityId: string]: true
+        } = {};
+        _.each(chainGroup.chains, (chain) => {
+            // go through all chain relations
+            chain.chainRelations.forEach((rel) => {
+                // ignore if we have an invalid relation
+                if (
+                    !rel.entityIds ||
+                    rel.entityIds.length !== 2
+                ) {
+                    return;
+                }
+
+                // keep the person Ids
+                usedEntityIdsMap[rel.entityIds[0]] = true;
+                usedEntityIdsMap[rel.entityIds[1]] = true;
+            });
+
+            // keep the chain and exit if the person was found in the chain relation
+            if (usedEntityIdsMap[this.personId]) {
+                // we found the chain
+                chainGroup.chains = [chain];
+                return false;
+            }
+
+            // ignore the person Ids in the next check
+            usedEntityIdsMap = {};
+        });
+
+        // remove relationships
+        const remainingRelationships: RelationshipModel[] = [];
+        chainGroup.relationships.forEach((rel) => {
+            // ignore if we have an invalid relation
+            if (
+                !rel.persons ||
+                rel.persons.length !== 2
+            ) {
+                return;
+            }
+
+            // ignore if person id is not found
+            if (
+                !usedEntityIdsMap[rel.persons[0].id] &&
+                !usedEntityIdsMap[rel.persons[1].id]
+            ) {
+                return;
+            }
+
+            // keep the relationship
+            usedEntityIdsMap[rel.persons[0].id] = true;
+            usedEntityIdsMap[rel.persons[1].id] = true;
+            remainingRelationships.push(rel);
+
+            // #TODO check if we need to add others relationships because usedEntityIdsMap was changed
+        });
+
+        // use only the relationships related to person
+        chainGroup.relationships = remainingRelationships;
+
+        // go through all nodes map
+        const remainingNodesMap: {
+            [id: string]: EntityModel
+        } = {};
+        _.forEach(chainGroup.nodesMap, (node, entityId) => {
+            // ignore if the node is not related to the person node
+            if (!usedEntityIdsMap[entityId]) {
+                return;
+            }
+
+            // keep the node
+            remainingNodesMap[entityId] = node;
+        });
+
+        // use only the nodes related to person
+        chainGroup.nodesMap = remainingNodesMap;
+    }
+
+    /**
      * Retrieve snapshot / refresh graph
      */
     loadChainsOfTransmission(): void {
@@ -2258,24 +2425,30 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         // hide filters & confs
         this.showFilters = false;
         this.showGraphConfiguration = false;
+        this.showSnapshotFilters = false;
 
         // chain loaded
         this.mustLoadChain = false;
 
-        // configure data
-        if (this.transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value) {
-            // format chart
-            this.mapColorCriteria();
-        }
+        // original page size clone
+        const originalSnapshotFiltersClone = this.snapshotFiltersClone;
+        this.snapshotFiltersClone = _.cloneDeep(this.snapshotFilters);
+
+        // format chart & geo map legend
+        this.mapColorCriteria();
 
         // same group, we don't need to retrieve anything from BE ?
         if (this.chainGroupId === this.selectedSnapshot) {
             // must update pages ?
-            if (this.chainPageSize !== this.pageSize) {
+            if (
+                this.chainPageSize !== this.pageSize ||
+                !_.isEqual(this.snapshotFilters, originalSnapshotFiltersClone)
+            ) {
                 this.chainPageSize = this.pageSize;
                 this.chainPages = this.transmissionChainDataService.getChainOfTransmissionPages(
                     this.chainGroup,
-                    this.pageSize
+                    this.pageSize,
+                    this.snapshotFilters
                 );
             }
 
@@ -2325,6 +2498,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 })
             )
             .subscribe((chainGroup) => {
+                // remove the unrelated data if a person id is provided
+                this.chainsOfTransmissionGetPersonChain(chainGroup);
+
                 // determine locations that we need to retrieve
                 let locationIdsToRetrieve: any = {};
                 _.forEach(chainGroup.nodesMap, (node) => {
@@ -2358,7 +2534,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                     this.chainPageSize = this.pageSize;
                     this.chainPages = this.transmissionChainDataService.getChainOfTransmissionPages(
                         this.chainGroup,
-                        this.pageSize
+                        this.pageSize,
+                        this.snapshotFilters
                     );
 
                     // finished
@@ -2400,7 +2577,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                             this.chainPageSize = this.pageSize;
                             this.chainPages = this.transmissionChainDataService.getChainOfTransmissionPages(
                                 this.chainGroup,
-                                this.pageSize
+                                this.pageSize,
+                                this.snapshotFilters
                             );
 
                             // finished

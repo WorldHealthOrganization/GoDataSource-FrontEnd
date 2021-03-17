@@ -15,7 +15,7 @@ import { InconsistencyModel } from '../../../../core/models/inconsistency.model'
 import * as _ from 'lodash';
 import { InconsistencyIssueEnum } from '../../../../core/enums/inconsistency-issue.enum';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { catchError, share, tap } from 'rxjs/operators';
@@ -59,8 +59,8 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_ACTION_VIEW',
-            click: (item: CaseModel | ContactModel | EventModel) => {
-                this.router.navigateByUrl(this.getItemRouterLink(item, 'view'));
+            linkGenerator: (item: CaseModel | ContactModel | EventModel): string[] => {
+                return [this.getItemRouterLink(item, 'view')];
             },
             visible: (item: CaseModel | ContactModel | EventModel): boolean => {
                 return !item.deleted &&
@@ -73,8 +73,8 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_ACTION_MODIFY',
-            click: (item: CaseModel | ContactModel | EventModel) => {
-                this.router.navigateByUrl(this.getItemRouterLink(item, 'modify'));
+            linkGenerator: (item: CaseModel | ContactModel | EventModel): string[] => {
+                return [this.getItemRouterLink(item, 'modify')];
             },
             visible: (item: CaseModel | ContactModel | EventModel): boolean => {
                 return !item.deleted &&
@@ -91,7 +91,6 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
      */
     constructor(
         protected listHelperService: ListHelperService,
-        private router: Router,
         private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private authDataService: AuthDataService,

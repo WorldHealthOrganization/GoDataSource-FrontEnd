@@ -48,11 +48,12 @@
             [fitMapOnMarkersChange]="false"
             [centerLocation]="selectedGeoPoint"
             [markers]="markers"
-            [lines]="arrowLines">
+            [lines]="arrowLines"
+            [displayLoading]="displayLoading">
         </app-world-map>
 
         <div
-            *ngIf="addresses.length < 1"
+            *ngIf="!displayLoading && addresses.length < 1"
             class="movement-map-no-data">
             <span>
                 {{ 'LNG_WORLD_MAP_MOVEMENT_NO_DATA' | translate }}

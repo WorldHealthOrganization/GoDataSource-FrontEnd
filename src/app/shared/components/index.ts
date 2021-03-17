@@ -52,6 +52,7 @@ import { LocationDialogComponent } from './location-dialog/location-dialog.compo
 import { TopnavUnauthenticatedComponent } from './topnav-unauthenticated/topnav-unauthenticated.component';
 import { FormContactOfContactQuickComponent } from './form-contact-of-contact-quick/form-contact-of-contact-quick.component';
 import { MultipleSnackbarComponent } from './multiple-snackbar/multiple-snackbar.component';
+import { FancyTooltipComponent } from './fancy-tooltip/fancy-tooltip.component';
 
 // export necessary components individually
 export * from './multiple-snackbar/multiple-snackbar.component';
@@ -134,6 +135,7 @@ export const components: any[] = [
     NumberOfItemsLabelComponent,
     FormCaseCenterDaterangeComponent,
     FormCaseCenterDaterangeListComponent,
+    FancyTooltipComponent,
 
     // layout extensions
     HoverRowActionsComponent

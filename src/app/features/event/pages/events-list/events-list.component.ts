@@ -95,8 +95,8 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_EVENTS_ACTION_VIEW_EVENT',
-            click: (item: EventModel) => {
-                this.router.navigate(['/events', item.id, 'view']);
+            linkGenerator: (item: EventModel): string[] => {
+                return ['/events', item.id, 'view'];
             },
             visible: (item: EventModel): boolean => {
                 return !item.deleted &&
@@ -108,8 +108,8 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_LIST_EVENTS_ACTION_MODIFY_EVENT',
-            click: (item: EventModel) => {
-                this.router.navigate(['/events', item.id, 'modify']);
+            linkGenerator: (item: EventModel): string[] => {
+                return ['/events', item.id, 'modify'];
             },
             visible: (item: EventModel): boolean => {
                 return !item.deleted &&

@@ -65,6 +65,9 @@ export class Constants {
         }
     };
 
+    // don't load cached filters ?
+    static DONT_LOAD_STATIC_FILTERS_KEY = 'dontLoadStaticFilters';
+
     // AGE constants
     static DEFAULT_AGE_MAX_YEARS = 150;
 
@@ -157,6 +160,22 @@ export class Constants {
         HORIZONTAL: {
             label: 'LNG_OUTBREAK_QUESTIONNAIRE_ANSWERS_DISPLAY_ORIENTATION_HORIZONTAL',
             value: 'LNG_OUTBREAK_QUESTIONNAIRE_ANSWERS_DISPLAY_ORIENTATION_HORIZONTAL'
+        }
+    };
+
+    // outbreak map servers
+    static OUTBREAK_MAP_SERVER_TYPES = {
+        TILE_TILE_ARC_GIS_REST: {
+            label: 'LNG_REFERENCE_DATA_OUTBREAK_MAP_SERVER_TYPE_TILE_TILE_ARC_GIS_REST',
+            value: 'LNG_REFERENCE_DATA_OUTBREAK_MAP_SERVER_TYPE_TILE_TILE_ARC_GIS_REST'
+        },
+        TILE_XYZ: {
+            label: 'LNG_REFERENCE_DATA_OUTBREAK_MAP_SERVER_TYPE_TILE_XYZ',
+            value: 'LNG_REFERENCE_DATA_OUTBREAK_MAP_SERVER_TYPE_TILE_XYZ'
+        },
+        VECTOR_TILE_VECTOR_TILE_LAYER: {
+            label: 'LNG_REFERENCE_DATA_OUTBREAK_MAP_SERVER_TYPE_VECTOR_TILE_VECTOR_TILE_LAYER',
+            value: 'LNG_REFERENCE_DATA_OUTBREAK_MAP_SERVER_TYPE_VECTOR_TILE_VECTOR_TILE_LAYER'
         }
     };
 

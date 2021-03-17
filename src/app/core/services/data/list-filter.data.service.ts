@@ -4,7 +4,6 @@ import { OutbreakDataService } from './outbreak.data.service';
 import { FollowUpsDataService } from './follow-ups.data.service';
 import { Observable, of } from 'rxjs';
 import { OutbreakModel } from '../../models/outbreak.model';
-import { GenericDataService } from './generic.data.service';
 import { RelationshipDataService } from './relationship.data.service';
 import { MetricContactsLostToFollowUpModel } from '../../models/metrics/metric-contacts-lost-to-follow-up.model';
 import { Constants } from '../../models/constants';
@@ -21,7 +20,6 @@ export class ListFilterDataService {
     constructor(
         private outbreakDataService: OutbreakDataService,
         private followUpDataService: FollowUpsDataService,
-        private genericDataService: GenericDataService,
         private relationshipDataService: RelationshipDataService,
         private contactDataService: ContactDataService
     ) {}

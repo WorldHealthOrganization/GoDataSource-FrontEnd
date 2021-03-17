@@ -32,6 +32,14 @@ export class GenericDataService {
     }
 
     /**
+     * Retrieve the list of Outbreak Map Server Types
+     * @returns {Observable<any[]>}
+     */
+    getOutbreakMapServerTypesList(): Observable<any[]> {
+        return of(Object.values(Constants.OUTBREAK_MAP_SERVER_TYPES));
+    }
+
+    /**
      * Retrieve the list of Progress Options
      * @returns {Observable<any[]>}
      */

@@ -6,12 +6,22 @@ import * as _ from 'lodash';
 
 @Injectable()
 export class AuditLogsService {
-    getFieldValue(changedData: AuditLogChangeDataModel, recordType: string): AuditLogValue | null {
+    /**
+     * Get Field value
+     */
+    getFieldValue(
+        changedData: AuditLogChangeDataModel,
+        recordType: string
+    ): AuditLogValue | null {
         // get changed value data type
-        const changedValueType: FieldValueType = this.getChangedDataType(changedData, recordType);
+        const changedValueType: FieldValueType = this.getChangedDataType(
+            changedData,
+            recordType
+        );
 
         // get changed value in proper format for being displayed in UI
         switch (changedValueType) {
+            case FieldValueType.BOOLEAN:
             case FieldValueType.NUMBER:
             case FieldValueType.STRING:
             case FieldValueType.LNG_TOKEN:
@@ -98,7 +108,13 @@ export class AuditLogsService {
         return null;
     }
 
-    private getChangedDataType(changedData: AuditLogChangeDataModel, recordType: string): FieldValueType {
+    /**
+     * Get value type
+     */
+    private getChangedDataType(
+        changedData: AuditLogChangeDataModel,
+        recordType: string
+    ): FieldValueType {
         // get data type based on newValue or oldValue (if newValue is empty)
         let relevantValue = changedData.newValue;
         if (
@@ -109,6 +125,7 @@ export class AuditLogsService {
             relevantValue = changedData.oldValue;
         }
 
+        // string ?
         if (
             typeof relevantValue === 'string'
         ) {
@@ -150,14 +167,22 @@ export class AuditLogsService {
             return FieldValueType.STRING;
         }
 
+        // boolean ?
+        if (typeof relevantValue === 'boolean') {
+            return FieldValueType.BOOLEAN;
+        }
+
+        // number ?
         if (typeof relevantValue === 'number') {
             return FieldValueType.NUMBER;
         }
 
+        // array
         if (Array.isArray(relevantValue)) {
             return FieldValueType.ARRAY;
         }
 
+        // object
         if (typeof relevantValue === 'object') {
             return FieldValueType.OBJECT;
         }

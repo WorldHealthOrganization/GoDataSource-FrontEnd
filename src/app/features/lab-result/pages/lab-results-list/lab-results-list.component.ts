@@ -125,13 +125,15 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_VIEW_LAB_RESULT',
-            click: (item: LabResultModel) => {
-                // case / contact lab result ?
-                this.router.navigate(['/lab-results', EntityModel.getLinkForEntityType(item.personType), item.personId, item.id, 'view'], {
-                    queryParams: {
-                        fromLabResultsList: true
-                    }
-                });
+            linkGenerator: (item: LabResultModel): string[] => {
+                return ['/lab-results', EntityModel.getLinkForEntityType(item.personType), item.personId, item.id, 'view'];
+            },
+            queryParamsGenerator: (): {
+                [k: string]: any;
+            } => {
+                return {
+                    fromLabResultsList: true
+                };
             },
             visible: (item: LabResultModel): boolean => {
                 return !item.deleted &&
@@ -151,13 +153,15 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_MODIFY_LAB_RESULT',
-            click: (item: LabResultModel) => {
-                // case / contact lab result ?
-                this.router.navigate(['/lab-results', EntityModel.getLinkForEntityType(item.personType), item.personId, item.id, 'modify'], {
-                    queryParams: {
-                        fromLabResultsList: true
-                    }
-                });
+            linkGenerator: (item: LabResultModel): string[] => {
+                return ['/lab-results', EntityModel.getLinkForEntityType(item.personType), item.personId, item.id, 'modify'];
+            },
+            queryParamsGenerator: (): {
+                [k: string]: any;
+            } => {
+                return {
+                    fromLabResultsList: true
+                };
             },
             visible: (item: LabResultModel): boolean => {
                 return !item.deleted &&

@@ -40,6 +40,9 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
 
     backToCurrent: boolean = false;
 
+    // exclude locations
+    excludeLocations: string[];
+
     @ViewChild('locationBreadcrumbs') locationBreadcrumbs: LocationBreadcrumbsComponent;
     @ViewChild('latInput') latInput: NgModel;
     @ViewChild('lngInput') lngInput: NgModel;
@@ -98,6 +101,7 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
                     .subscribe((locationData: {}) => {
                         // location data
                         this.locationData = new LocationModel(locationData);
+                        this.updateLocationsForExclusion();
 
                         // update breadcrumbs
                         this.initializeBreadcrumbs();
@@ -193,6 +197,7 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
             .subscribe((modifiedLocation: LocationModel) => {
                 // update model
                 this.locationData = modifiedLocation;
+                this.updateLocationsForExclusion();
 
                 // mark form as pristine
                 form.form.markAsPristine();
@@ -289,5 +294,14 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
             value.length > 0 : (
                 value || value === 0
             );
+    }
+
+    /**
+     * Update locations used for exclusion
+     */
+    updateLocationsForExclusion(): void {
+        this.excludeLocations = this.locationData ?
+            [this.locationData.id] :
+            undefined;
     }
 }

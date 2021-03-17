@@ -4,6 +4,8 @@ import { ElementBase } from '../../core/index';
 import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { SafeHtml } from '@angular/platform-browser/src/security/dom_sanitization_service';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
     selector: 'app-form-select',
@@ -58,12 +60,22 @@ export class FormSelectComponent
     @Input() displayInvisibleItems: boolean = false;
 
     private _tooltipToken: string;
-    private _tooltip: string;
-    @Input() set tooltip(tooltip: string) {
-        this._tooltipToken = tooltip;
-        this._tooltip = this._tooltipToken ? this.i18nService.instant(this._tooltipToken) : this._tooltipToken;
+    private _tooltip: string | SafeHtml;
+    @Input() set tooltip(tooltip: string | SafeHtml) {
+        // keep original token for later use
+        this._tooltipToken = tooltip ? tooltip.toString() : tooltip as string;
+
+        // translate tokens if necessary
+        this._tooltip = this._tooltipToken ?
+            this.i18nService.instant(this._tooltipToken) :
+            this._tooltipToken;
+
+        // sanitize if necessary
+        this._tooltip = this._tooltip ?
+            this.sanitized.bypassSecurityTrustHtml(this._tooltip as string) :
+            this._tooltip;
     }
-    get tooltip(): string {
+    get tooltip(): string | SafeHtml {
         return this._tooltip;
     }
 
@@ -102,7 +114,8 @@ export class FormSelectComponent
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
-        protected i18nService: I18nService
+        protected i18nService: I18nService,
+        private sanitized: DomSanitizer
     ) {
         super(controlContainer, validators, asyncValidators);
 

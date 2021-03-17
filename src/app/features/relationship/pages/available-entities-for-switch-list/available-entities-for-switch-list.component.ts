@@ -153,18 +153,14 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
      */
     getQueryParams() {
         // read route query params
-        this.route.queryParams
-            .subscribe((queryParams: { selectedTargetIds, selectedPersonsIds, entityType }) => {
-                if (_.isEmpty(queryParams.selectedTargetIds)) {
-                    this.snackbarService.showError('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_NO_CONTACTS_SELECTED');
-
-                    this.router.navigate(['/contacts/follow-ups']);
-                } else {
-                    this.selectedRecordsIds = JSON.parse(queryParams.selectedTargetIds);
-                    this.selectedPeopleIds = JSON.parse(queryParams.selectedPersonsIds);
-                    this.entityType = JSON.parse(queryParams.entityType);
-                }
-            });
+        if (_.isEmpty(this.route.snapshot.queryParams.selectedTargetIds)) {
+            this.snackbarService.showError('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_NO_CONTACTS_SELECTED');
+            this.router.navigate(['/contacts/follow-ups']);
+        } else {
+            this.selectedRecordsIds = JSON.parse(this.route.snapshot.queryParams.selectedTargetIds);
+            this.selectedPeopleIds = JSON.parse(this.route.snapshot.queryParams.selectedPersonsIds);
+            this.entityType = JSON.parse(this.route.snapshot.queryParams.entityType);
+        }
     }
 
     /**

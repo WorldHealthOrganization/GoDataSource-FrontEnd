@@ -74,7 +74,8 @@
                                 [ngModel]="locationData.parentLocationId"
                                 [placeholder]="'LNG_LOCATION_FIELD_LABEL_PARENT_LOCATION' | translate"
                                 tooltip="LNG_LOCATION_FIELD_LABEL_PARENT_LOCATION_DESCRIPTION"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                [excludeLocationsIds]="excludeLocations">
                             </app-form-location-dropdown>
 
                             <div

@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { NgForm } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
@@ -41,7 +41,6 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
         private languageDataService: LanguageDataService,
         private formHelper: FormHelperService,
         private snackbarService: SnackbarService,
-        private router: Router,
         private cacheService: CacheService,
         private authDataService: AuthDataService,
         protected dialogService: DialogService

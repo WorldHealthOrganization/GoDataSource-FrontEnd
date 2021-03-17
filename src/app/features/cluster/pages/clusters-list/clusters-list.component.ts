@@ -56,8 +56,8 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_CLUSTERS_ACTION_VIEW_CLUSTER',
-            click: (item: ClusterModel) => {
-                this.router.navigate(['/clusters', item.id, 'view']);
+            linkGenerator: (item: ClusterModel): string[] => {
+                return ['/clusters', item.id, 'view'];
             },
             visible: (): boolean => {
                 return ClusterModel.canView(this.authUser);
@@ -68,8 +68,8 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_LIST_CLUSTERS_ACTION_MODIFY_CLUSTER',
-            click: (item: ClusterModel) => {
-                this.router.navigate(['/clusters', item.id, 'modify']);
+            linkGenerator: (item: ClusterModel): string[] => {
+                return ['/clusters', item.id, 'modify'];
             },
             visible: (): boolean => {
                 return this.authUser &&

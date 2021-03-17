@@ -27,7 +27,8 @@ export class ContactsBecomeCasesDashletComponent extends DashletComponent implem
 
     // params
     queryParams: any = {
-        applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_BECOME_CASES
+        applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_BECOME_CASES,
+        [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true
     };
 
     // outbreak
@@ -135,6 +136,20 @@ export class ContactsBecomeCasesDashletComponent extends DashletComponent implem
                 }
             });
 
+            // add global filters when fetch all cases
+            const qbAll = this.getGlobalFilterQB(
+                null,
+                'addresses.parentLocationIdFilter',
+                true
+            );
+
+            // exclude discarded cases
+            qbAll.filter.where({
+                classification: {
+                    neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+                }
+            });
+
             // release previous subscriber
             if (this.previousSubscriber) {
                 this.previousSubscriber.unsubscribe();
@@ -145,7 +160,7 @@ export class ContactsBecomeCasesDashletComponent extends DashletComponent implem
             this.displayLoading = true;
             this.previousSubscriber = forkJoin(
                 this.caseDataService.getCasesCount(this.outbreakId, qb),
-                this.caseDataService.getCasesCount(this.outbreakId)
+                this.caseDataService.getCasesCount(this.outbreakId, qbAll)
             )
                 .subscribe(([qbCountResult, countResult]) => {
                     this.contactsBecomeCasesCount = qbCountResult.count;

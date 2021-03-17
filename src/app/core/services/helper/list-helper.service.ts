@@ -4,6 +4,8 @@ import { ListFilterDataService } from '../data/list-filter.data.service';
 import { ActivatedRoute, PRIMARY_OUTLET, Router } from '@angular/router';
 import { RedirectService } from './redirect.service';
 import { Location } from '@angular/common';
+import { StorageService } from './storage.service';
+import { AuthDataService } from '../data/auth.data.service';
 
 @Injectable()
 export class ListHelperService {
@@ -17,7 +19,9 @@ export class ListHelperService {
         public route: ActivatedRoute,
         public redirectService: RedirectService,
         public router: Router,
-        public location: Location
+        public location: Location,
+        public storageService: StorageService,
+        public authDataService: AuthDataService
     ) {}
 
     /**

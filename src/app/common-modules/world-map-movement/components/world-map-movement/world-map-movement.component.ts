@@ -25,13 +25,10 @@ export class WorldMapMovementComponent {
 
     selectedGeoPoint: WorldMapPoint;
 
-    constructor (
-        private dialogService: DialogService,
-        private i18nService: I18nService
-    ) {
+    // still loading data ?
+    @Input() displayLoading: boolean = false;
 
-    }
-
+    // addresses
     private _addresses: AddressModel[] = [];
     @Input() set addresses(items: AddressModel[]) {
         // init
@@ -43,7 +40,6 @@ export class WorldMapMovementComponent {
         this.arrowLines = [ path ];
 
         // sort addresses
-        let previousAddress: AddressModel;
         this._addresses = _.chain(items).filter((item: AddressModel) => {
             return item.geoLocation &&
                 _.isNumber(item.geoLocation.lat) &&
@@ -71,9 +67,6 @@ export class WorldMapMovementComponent {
                     currentAddress.geoLocation.lat,
                     currentAddress.geoLocation.lng
                 ));
-
-                // return address item
-                previousAddress = currentAddress;
             }
 
             // finished
@@ -88,6 +81,14 @@ export class WorldMapMovementComponent {
     get addresses(): AddressModel[] {
         return this._addresses;
     }
+
+    /**
+     * Constructor
+     */
+    constructor (
+        private dialogService: DialogService,
+        private i18nService: I18nService
+    ) {}
 
     /**
      * Change map position

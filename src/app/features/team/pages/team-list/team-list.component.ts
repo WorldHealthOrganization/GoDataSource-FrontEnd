@@ -17,7 +17,6 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import { Router } from '@angular/router';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
@@ -62,8 +61,8 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_TEAMS_ACTION_VIEW_TEAM',
-            click: (item: TeamModel) => {
-                this.router.navigate(['/teams', item.id, 'view']);
+            linkGenerator: (item: TeamModel): string[] => {
+                return ['/teams', item.id, 'view'];
             },
             visible: (): boolean => {
                 return TeamModel.canView(this.authUser);
@@ -74,8 +73,8 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_LIST_TEAMS_ACTION_MODIFY_TEAM',
-            click: (item: TeamModel) => {
-                this.router.navigate(['/teams', item.id, 'modify']);
+            linkGenerator: (item: TeamModel): string[] => {
+                return ['/teams', item.id, 'modify'];
             },
             visible: (): boolean => {
                 return TeamModel.canModify(this.authUser);
@@ -107,7 +106,6 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
      */
     constructor(
         protected listHelperService: ListHelperService,
-        private router: Router,
         private authDataService: AuthDataService,
         private teamDataService: TeamDataService,
         private dialogService: DialogService,
