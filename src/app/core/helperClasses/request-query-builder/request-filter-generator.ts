@@ -42,11 +42,11 @@ export class RequestFilterGenerator {
         return useLike ?
             {
                 like: RequestFilterGenerator.escapeStringForRegex(value)
-                    .replace(/%/g, '.*')
-                    .replace(/\\\?/g, '.')
-                    .replace(/&/g, '%26')
-                    .replace(/#/g, '%23')
-                    .replace(/\+/g, '%2B'),
+                        .replace(/%/g, '.*')
+                        .replace(/\\\?/g, '.')
+                        .replace(/&/g, '%26')
+                        .replace(/#/g, '%23')
+                        .replace(/\+/g, '%2B'),
                 options: 'i'
             } : {
                 regexp: '/' +

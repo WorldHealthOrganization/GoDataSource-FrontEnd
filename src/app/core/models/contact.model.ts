@@ -424,5 +424,4 @@ export class ContactModel
             return acc;
         }, []);
     }
-
 }

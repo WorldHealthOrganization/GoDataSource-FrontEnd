@@ -333,5 +333,4 @@ export class ContactOfContactModel
             return acc;
         }, []);
     }
-
 }
