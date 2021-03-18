@@ -58,7 +58,6 @@ export class FormSelectComponent
     @Input() compareWith: (o1: any, o2: any) => boolean;
     @Input() allowSelectionOfDisabledItems: boolean = false;
     @Input() displayInvisibleItems: boolean = false;
-    @Input() delay: boolean = false;
 
     private _tooltipToken: string;
     private _tooltip: string | SafeHtml;
@@ -258,6 +257,9 @@ export class FormSelectComponent
             return;
         }
 
+        // clear previous search since that can overwrite this one since it is called later
+        this.clearFilterTimeoutCall();
+
         // filter options
         if (
             !this.enableFilterOptions ||
@@ -276,47 +278,30 @@ export class FormSelectComponent
             return;
         }
 
-        // apply delay
-        if (this.delay) {
-            // clear timeout interval and filter
-             this.clearFilterTimeoutCall();
-             this._filterTimeout = setTimeout(() => {
-                    return this.filterOptionsByValue(byValue);
-                 },
-                 this.filterOptionsDelayMs);
-        } else {
-            return this.filterOptionsByValue(byValue);
-        }
-    }
-
-    /**
-     * Filter options by value
-     */
-    private filterOptionsByValue(byValue?: string) {
-        // case sensitive
-        byValue = this.filterOptionsIsCaseSensitive ? byValue : byValue.toLowerCase();
-
         // filter
-        this.filteredOptions = this.options.filter((item: any): boolean => {
-            // nothing to filter ?
-            if (
-                !this.optionLabelKey ||
-                !item[this.optionLabelKey] ||
-                !this.optionVisibleKey ||
-                item[this.optionVisibleKey] === false
-            ) {
-                return false;
-            }
-
-            // prepare to filter
-            let translatedValue: string = this.i18nService.instant(item[this.optionLabelKey]);
-            translatedValue = this.filterOptionsIsCaseSensitive ? translatedValue : translatedValue.toLowerCase();
+        this._filterTimeout = setTimeout(() => {
+            // case sensitive
+            byValue = this.filterOptionsIsCaseSensitive ? byValue : byValue.toLowerCase();
 
             // filter
-            return this.filterOptionsComparator(byValue, translatedValue);
-        });
+            this.filteredOptions = this.options.filter((item: any): boolean => {
+                // nothing to filter ?
+                if (
+                    !this.optionLabelKey ||
+                    !item[this.optionLabelKey] ||
+                    !this.optionVisibleKey ||
+                    item[this.optionVisibleKey] === false
+                ) {
+                    return false;
+                }
 
-        // finished
-        return true;
+                // prepare to filter
+                let translatedValue: string = this.i18nService.instant(item[this.optionLabelKey]);
+                translatedValue = this.filterOptionsIsCaseSensitive ? translatedValue : translatedValue.toLowerCase();
+
+                // filter
+                return this.filterOptionsComparator(byValue, translatedValue);
+            });
+        }, this.filterOptionsDelayMs);
     }
 }
