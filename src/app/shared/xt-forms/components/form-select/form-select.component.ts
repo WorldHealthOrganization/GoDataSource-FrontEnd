@@ -257,6 +257,9 @@ export class FormSelectComponent
             return;
         }
 
+        // clear previous search since that can overwrite this one since it is called later
+        this.clearFilterTimeoutCall();
+
         // filter options
         if (
             !this.enableFilterOptions ||
@@ -275,8 +278,7 @@ export class FormSelectComponent
             return;
         }
 
-        // clear timeout interval and filter
-        this.clearFilterTimeoutCall();
+        // filter
         this._filterTimeout = setTimeout(() => {
             // case sensitive
             byValue = this.filterOptionsIsCaseSensitive ? byValue : byValue.toLowerCase();
