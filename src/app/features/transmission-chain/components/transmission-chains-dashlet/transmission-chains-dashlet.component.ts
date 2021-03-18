@@ -609,11 +609,13 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
                             // reset filters
                             this.showFilters = false;
-
-                            // reset page number and chain group data
+                            this.selectedSnapshot = undefined;
                             this.selectedChainPageIndex = null;
                             this.chainGroup = undefined;
                             this.chainPages = undefined;
+                            this.showGraphConfiguration = false;
+                            this.showSnapshotFilters = false;
+                            this.mustLoadChain = true;
 
                             // when we have data
                             if (
