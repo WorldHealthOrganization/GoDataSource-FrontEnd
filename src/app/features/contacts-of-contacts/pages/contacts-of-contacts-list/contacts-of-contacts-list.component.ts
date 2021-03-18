@@ -39,7 +39,6 @@ import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { AddressFields } from '../../../../core/models/address.model';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.model';
@@ -62,8 +61,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     @ViewChild('emailFilter') emailFilter: ElementRef;
     @ViewChild('phoneNumberFilter') phoneNumberFilter: ElementRef;
     @ViewChild('geoLocationAccurateFilter') geoLocationAccurateFilter: ElementRef;
-    @ViewChild('latitudeFilter') latitudeFilter: ElementRef;
-    @ViewChild('longitudeFilter') longitudeFilter: ElementRef;
 
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
@@ -915,7 +912,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         ) {
             addressInputs = {
                 ...addressInputs,
-                [AddressFields.ADDRESS]: this.addressLine1Filter['innerValue']
+                addressLine1: this.addressLine1Filter['innerValue']
             };
         }
 
@@ -926,7 +923,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         ) {
             addressInputs = {
                 ...addressInputs,
-                [AddressFields.CITY]: this.cityFilter['innerValue']
+                city: this.cityFilter['innerValue']
             };
         }
 
@@ -937,7 +934,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         ) {
             addressInputs = {
                 ...addressInputs,
-                [AddressFields.EMAIL]: this.emailFilter['innerValue']
+                emailAddress: this.emailFilter['innerValue']
             };
         }
 
@@ -954,29 +951,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
             addressInputs = {
                 ...addressInputs,
-                [AddressFields.LOCATION]: locationsIds
-            };
-        }
-
-        // check for latitude
-        if (
-            this.latitudeFilter &&
-            this.latitudeFilter['innerValue']
-        ) {
-            addressInputs = {
-                ...addressInputs,
-                [AddressFields.LATITUDE]: this.latitudeFilter['innerValue']
-            };
-        }
-
-        // check for longitude
-        if (
-            this.longitudeFilter &&
-            this.longitudeFilter['innerValue']
-        ) {
-            addressInputs = {
-                ...addressInputs,
-                [AddressFields.LONGITUDE]: this.longitudeFilter['innerValue']
+                parentLocationIdFilter: locationsIds
             };
         }
 
@@ -986,7 +961,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         ) {
             addressInputs = {
                 ...addressInputs,
-                [AddressFields.GEO_LOCATION_ACCURATE]: this.geoLocationAccurateFilter['innerValue']
+                geoLocationAccurate: this.geoLocationAccurateFilter['innerValue']
             };
         }
 
@@ -997,7 +972,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         ) {
             addressInputs = {
                 ...addressInputs,
-                [AddressFields.POSTAL_CODE]: this.postalCodeFilter['innerValue']
+                postalCode: this.postalCodeFilter['innerValue']
             };
         }
 
@@ -1008,7 +983,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         ) {
             addressInputs = {
                 ...addressInputs,
-                [AddressFields.PHONE_NUMBER]: this.phoneNumberFilter['innerValue']
+                phoneNumber: this.phoneNumberFilter['innerValue']
             };
         }
 

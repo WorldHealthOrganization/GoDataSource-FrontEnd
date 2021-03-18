@@ -1,13 +1,6 @@
 import * as _ from 'lodash';
 import { moment } from '../x-moment';
 
-// search methods
-export enum SearchMethod {
-    LIKE = 'like',
-    REGEX = 'regex',
-    REGEXP = 'regexp',
-}
-
 export class RequestFilterGenerator {
     /**
      * Escape string
@@ -49,11 +42,11 @@ export class RequestFilterGenerator {
         return useLike ?
             {
                 like: RequestFilterGenerator.escapeStringForRegex(value)
-                        .replace(/%/g, '.*')
-                        .replace(/\\\?/g, '.')
-                        .replace(/&/g, '%26')
-                        .replace(/#/g, '%23')
-                        .replace(/\+/g, '%2B'),
+                    .replace(/%/g, '.*')
+                    .replace(/\\\?/g, '.')
+                    .replace(/&/g, '%26')
+                    .replace(/#/g, '%23')
+                    .replace(/\+/g, '%2B'),
                 options: 'i'
             } : {
                 regexp: '/' +
@@ -69,39 +62,31 @@ export class RequestFilterGenerator {
 
     /**
      * Text starts with provided value ( case insensitive )
-     * @param {string} value
-     * @param {string} method
      */
     static textStartWith(
         value: string,
-        method?: string
+        useLike?: boolean
     ): any {
-        // escape the value
-        const escapedValue = RequestFilterGenerator.escapeStringForRegex(value)
-            .replace(/%/g, '.*')
-            .replace(/\\\?/g, '.')
-            .replace(/&/g, '%26')
-            .replace(/#/g, '%23')
-            .replace(/\+/g, '%2B');
-
-        // return condition by method
-        switch (method) {
-            case SearchMethod.REGEX:
-                return {
-                    $regex: '^' + escapedValue,
-                    $options: 'i'
-                };
-            case SearchMethod.LIKE:
-                return {
-                    like: '^' + escapedValue,
-                    options: 'i'
-                };
-            default:
-                // regexp
-                return {
-                    regexp: '/^' + escapedValue + '/i'
-                };
-        }
+        return useLike ?
+            {
+                like: '^' +
+                    RequestFilterGenerator.escapeStringForRegex(value)
+                        .replace(/%/g, '.*')
+                        .replace(/\\\?/g, '.')
+                        .replace(/&/g, '%26')
+                        .replace(/#/g, '%23')
+                        .replace(/\+/g, '%2B'),
+                options: 'i'
+            } : {
+                regexp: '/^' +
+                    RequestFilterGenerator.escapeStringForRegex(value)
+                        .replace(/%/g, '.*')
+                        .replace(/\\\?/g, '.')
+                        .replace(/&/g, '%26')
+                        .replace(/#/g, '%23')
+                        .replace(/\+/g, '%2B') +
+                    '/i'
+            };
     }
 
     /**

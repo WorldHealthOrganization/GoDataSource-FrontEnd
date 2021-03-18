@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnDestroy, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -36,8 +36,6 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { TeamModel } from '../../../../core/models/team.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { SearchMethod } from '../../../../core/helperClasses/request-query-builder/request-filter-generator';
-import { AddressFields } from '../../../../core/models/address.model';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -46,9 +44,6 @@ import { AddressFields } from '../../../../core/models/address.model';
     styleUrls: ['./contact-daily-follow-ups-list.component.less']
 })
 export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent implements OnInit, OnDestroy {
-    @ViewChild('latitudeFilter') latitudeFilter: ElementRef;
-    @ViewChild('longitudeFilter') longitudeFilter: ElementRef;
-
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -87,7 +82,6 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     ExportDataExtension = ExportDataExtension;
     ReferenceDataCategory = ReferenceDataCategory;
     FollowUpModel = FollowUpModel;
-    SearchMethod = SearchMethod;
 
     availableSideFilters: FilterModel[];
     // values for side filter
@@ -1206,41 +1200,6 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                     ];
                 });
         });
-    }
-
-    /**
-     * Filter by current address
-     */
-    filterByAddress(
-    ) {
-        // create the input values
-        let addressInputs: { [key: string]: string } = {};
-
-        // check for latitude
-        if (
-            this.latitudeFilter &&
-            this.latitudeFilter['innerValue']
-        ) {
-            addressInputs = {
-                ...addressInputs,
-                [AddressFields.LATITUDE]: this.latitudeFilter['innerValue']
-            };
-        }
-
-        // check for longitude
-        if (
-            this.longitudeFilter &&
-            this.longitudeFilter['innerValue']
-        ) {
-            addressInputs = {
-                ...addressInputs,
-                [AddressFields.LONGITUDE]: this.longitudeFilter['innerValue']
-            };
-        }
-
-        // filter the address by inputs
-        this.filterByAddressInputs(addressInputs, false);
-
     }
 
     /**

@@ -9,19 +9,6 @@ export enum AddressType {
     CURRENT_ADDRESS = 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_USUAL_PLACE_OF_RESIDENCE'
 }
 
-// addresses fields
-export enum AddressFields {
-    ADDRESS = 'addressLine1',
-    CITY = 'city',
-    LOCATION = 'parentLocationIdFilter',
-    GEO_LOCATION_ACCURATE = 'geoLocationAccurate',
-    EMAIL = 'emailAddress',
-    LATITUDE = 'geoLocation.coordinates.1',
-    LONGITUDE = 'geoLocation.coordinates.0',
-    PHONE_NUMBER = 'phoneNumber',
-    POSTAL_CODE = 'postalCode'
-}
-
 export class AddressModel {
     typeId: string;
     city: string;

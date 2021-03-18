@@ -156,14 +156,14 @@ export class RequestFilter {
      * @param {string} property
      * @param {string} value
      * @param {boolean} replace
-     * @param {string} method
+     * @param {boolean} useLike
      * @returns {RequestFilter}
      */
     byText(
         property: string,
         value: string,
         replace: boolean = true,
-        method?: string
+        useLike?: boolean
     ): RequestFilter {
         // do we need to remove condition ?
         if (_.isEmpty(value)) {
@@ -173,7 +173,7 @@ export class RequestFilter {
             this.where({
                 [property]: RequestFilterGenerator.textStartWith(
                     value,
-                    method
+                    useLike
                 )
             }, replace);
         }

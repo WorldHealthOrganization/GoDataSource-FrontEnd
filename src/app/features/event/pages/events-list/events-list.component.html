@@ -261,7 +261,7 @@
                             name="addressLine1Filter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('address.addressLine1', $event, undefined, SearchMethod.LIKE)"
+                            (optionChanged)="filterByTextField('address.addressLine1', $event, undefined, true)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -283,7 +283,7 @@
                             name="emailFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('address.emailAddress', $event, undefined, SearchMethod.LIKE)"
+                            (optionChanged)="filterByTextField('address.emailAddress', $event, undefined, true)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -332,7 +332,7 @@
                             name="cityFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('address.city', $event, undefined, SearchMethod.LIKE)"
+                            (optionChanged)="filterByTextField('address.city', $event, undefined, true)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -352,15 +352,7 @@
                         {{'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            #latitudeFilter
-                            name="latitudeFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByAddress()"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+                        <!-- placeholder -->
                     </div>
                 </div>
             </mat-header-cell>
@@ -377,15 +369,7 @@
                         {{'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            #longitudeFilter
-                            name="longitudeFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByAddress()"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+                        <!-- placeholder -->
                     </div>
                 </div>
             </mat-header-cell>
@@ -406,7 +390,7 @@
                             name="postalCodeFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('address.postalCode', $event, undefined, SearchMethod.LIKE)"
+                            (optionChanged)="filterByTextField('address.postalCode', $event, undefined, true)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>

@@ -444,15 +444,7 @@
                         {{'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            #latitudeFilter
-                            name="latitudeFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByAddress()"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+                        <!-- placeholder -->
                     </div>
                 </div>
             </mat-header-cell>
@@ -469,15 +461,7 @@
                         {{'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            #longitudeFilter
-                            name="longitudeFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByAddress()"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+                        <!-- placeholder -->
                     </div>
                 </div>
             </mat-header-cell>
@@ -560,9 +544,7 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item" [style.color]="getCaseClassificationColor(item)" [class.record-alert]="item.alerted">
-                <ng-container *ngFor="let emailAddress of item.emailAddresses">
-                    {{emailAddress}}<br/>
-                </ng-container>
+                {{ item.mainAddress?.emailAddress }}
             </mat-cell>
         </ng-container>
 
@@ -709,9 +691,7 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item" [style.color]="getCaseClassificationColor(item)" [class.record-alert]="item.alerted">
-                <ng-container *ngFor="let phoneNumber of item.phoneNumbers">
-                    {{phoneNumber}}<br/>
-                </ng-container>
+                {{ item.mainAddress?.phoneNumber }}
             </mat-cell>
         </ng-container>
 

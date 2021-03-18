@@ -39,7 +39,6 @@ import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
-import { AddressFields } from '../../../../core/models/address.model';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
@@ -64,8 +63,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
    @ViewChild('emailFilter') emailFilter: ElementRef;
    @ViewChild('phoneNumberFilter') phoneNumberFilter: ElementRef;
    @ViewChild('geoLocationAccurateFilter') geoLocationAccurateFilter: ElementRef;
-   @ViewChild('latitudeFilter') latitudeFilter: ElementRef;
-   @ViewChild('longitudeFilter') longitudeFilter: ElementRef;
 
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
@@ -1435,7 +1432,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         ) {
             addressInputs = {
                 ...addressInputs,
-                [AddressFields.ADDRESS]: this.addressLine1Filter['innerValue']
+                addressLine1: this.addressLine1Filter['innerValue']
             };
         }
 
@@ -1446,7 +1443,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         ) {
             addressInputs = {
                 ...addressInputs,
-                [AddressFields.CITY]: this.cityFilter['innerValue']
+                city: this.cityFilter['innerValue']
             };
         }
 
@@ -1457,7 +1454,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         ) {
             addressInputs = {
                 ...addressInputs,
-                [AddressFields.EMAIL]: this.emailFilter['innerValue']
+                emailAddress: this.emailFilter['innerValue']
             };
         }
 
@@ -1474,29 +1471,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
 
             addressInputs = {
                 ...addressInputs,
-                [AddressFields.LOCATION]: locationsIds
-            };
-        }
-
-        // check for latitude
-        if (
-            this.latitudeFilter &&
-            this.latitudeFilter['innerValue']
-        ) {
-            addressInputs = {
-                ...addressInputs,
-                [AddressFields.LATITUDE]: this.latitudeFilter['innerValue']
-            };
-        }
-
-        // check for longitude
-        if (
-            this.longitudeFilter &&
-            this.longitudeFilter['innerValue']
-        ) {
-            addressInputs = {
-                ...addressInputs,
-                [AddressFields.LONGITUDE]: this.longitudeFilter['innerValue']
+                parentLocationIdFilter: locationsIds
             };
         }
 
@@ -1506,7 +1481,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         ) {
             addressInputs = {
                 ...addressInputs,
-                [AddressFields.GEO_LOCATION_ACCURATE]: this.geoLocationAccurateFilter['innerValue']
+                geoLocationAccurate: this.geoLocationAccurateFilter['innerValue']
             };
         }
 
@@ -1517,7 +1492,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         ) {
             addressInputs = {
                 ...addressInputs,
-                [AddressFields.POSTAL_CODE]: this.postalCodeFilter['innerValue']
+                postalCode: this.postalCodeFilter['innerValue']
             };
         }
 
@@ -1528,7 +1503,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         ) {
             addressInputs = {
                 ...addressInputs,
-                [AddressFields.PHONE_NUMBER]: this.phoneNumberFilter['innerValue']
+                phoneNumber: this.phoneNumberFilter['innerValue']
             };
         }
 

@@ -483,7 +483,7 @@
                             name="emailFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('address.emailAddress', $event, undefined, SearchMethod.REGEX)"
+                            (optionChanged)="filterByTextField('address.emailAddress', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -496,7 +496,7 @@
         </ng-container>
 
         <!-- Address -->
-        <ng-container matColumnDef="fullAddress">
+        <ng-container matColumnDef="address.addressLine1">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div class="column-header">
@@ -507,7 +507,7 @@
                             name="addressLine1Filter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('address.addressLine1', $event, undefined, SearchMethod.REGEX)"
+                            (optionChanged)="filterByTextField('address.addressLine1', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -531,7 +531,7 @@
                             name="cityFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('address.city', $event, undefined, SearchMethod.REGEX)"
+                            (optionChanged)="filterByTextField('address.city', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -551,15 +551,7 @@
                         {{'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            #latitudeFilter
-                            name="latitudeFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByAddress()"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+                        <!-- placeholder -->
                     </div>
                 </div>
             </mat-header-cell>
@@ -576,15 +568,7 @@
                         {{'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            #longitudeFilter
-                            name="longitudeFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByAddress()"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+                        <!-- placeholder -->
                     </div>
                 </div>
             </mat-header-cell>
@@ -605,7 +589,7 @@
                             name="postalCodeFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('address.postalCode', $event, undefined, SearchMethod.REGEX)"
+                            (optionChanged)="filterByTextField('address.postalCode', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
