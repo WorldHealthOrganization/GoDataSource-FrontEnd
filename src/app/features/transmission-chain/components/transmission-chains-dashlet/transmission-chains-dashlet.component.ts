@@ -77,7 +77,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     // chain pages
     chainPageSize: number;
     chainPages: ITransmissionChainGroupPageModel[];
-    selectedChainPageIndex: number = 0;
+    selectedChainPageIndex: number = null;
 
     // page size
     pageSize: number = 250;
@@ -248,8 +248,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             [id: string]: number
         }
     } = {};
-    // show/hide map
-    showMap: boolean = true;
     // show/hide legend?
     showLegend: boolean = true;
     // toggle edit mode
@@ -611,6 +609,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
                             // reset filters
                             this.showFilters = false;
+
+                            // reset page number and chain group data
+                            this.selectedChainPageIndex = null;
+                            this.chainGroup = undefined;
+                            this.chainPages = undefined;
 
                             // when we have data
                             if (
@@ -2452,6 +2455,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 );
             }
 
+            // reset the page number
+            this.selectedChainPageIndex = null;
+
             // update view
             this.updateView();
 
@@ -2465,8 +2471,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         });
         this.chainGroup = undefined;
         this.chainPages = undefined;
-        this.selectedChainPageIndex = this.transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value ? 0 : -1;
-        this.showMap = this.transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value;
+        this.selectedChainPageIndex = null;
         this.chainGroupId = this.selectedSnapshot;
         this.transmissionChainDataService
             .getCalculatedIndependentTransmissionChains(
@@ -2595,7 +2600,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      * Page size changed
      */
     pageSizeChanged(pageSize: number) {
-        this.checkShowMap();
         this.pageSize = pageSize;
         this.mustLoadChain = true;
     }
@@ -2608,7 +2612,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
 
         // update view
-        this.checkShowMap();
         this.updateView();
 
         // hide loading
@@ -2616,14 +2619,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             loadingDialog.close();
         });
     }
-
-    /**
-     * Checks the map display
-     */
-    private checkShowMap(): void {
-        this.showMap = this.transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value || +this.selectedChainPageIndex > -1;
-    }
-
 }
 
 
