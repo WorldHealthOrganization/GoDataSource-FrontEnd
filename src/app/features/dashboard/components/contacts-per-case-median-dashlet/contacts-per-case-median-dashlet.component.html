@@ -1,6 +1,7 @@
 <app-dashboard-custom-metric-dashlet
     [params]="getDashletParamsIncludingGlobalFilters()"
     [value]="medianNoContactsPerCase"
+    tooltip="LNG_PAGE_DASHBOARD_KPI_CONTACTS_PER_CASE_MEDIAN_TITLE_DESCRIPTION"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"
     (moveAfter)="onMoveAfter()"

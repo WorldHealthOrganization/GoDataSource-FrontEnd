@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { IPermissionChildModel, PermissionModel } from '../../models/permission.model';
 import { Observable } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
-import { CacheService } from '../helper/cache.service';
 import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { map, share, switchMap } from 'rxjs/operators';
@@ -20,7 +19,6 @@ export class UserRoleDataService {
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService,
-        private cacheService: CacheService,
         private i18nService: I18nService
     ) {
         this.userRoleList$ = this.http.get('roles').pipe(share());

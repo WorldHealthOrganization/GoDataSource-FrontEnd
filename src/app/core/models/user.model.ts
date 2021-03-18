@@ -237,6 +237,9 @@ export class UserModel
     roles: UserRoleModel[] = [];
     disregardGeographicRestrictions: boolean;
 
+    // no saved filters to be used by this user ?
+    dontCacheFilters: boolean;
+
     // used to determine if permissions changed from last time we used this key
     private _permissionIdsHash: number;
     get permissionIdsHash(): number {
@@ -313,6 +316,7 @@ export class UserModel
         this.institutionName = _.get(data, 'institutionName');
         this.telephoneNumbers = _.get(data, 'telephoneNumbers', {});
         this.disregardGeographicRestrictions = _.get(data, 'disregardGeographicRestrictions', false);
+        this.dontCacheFilters = _.get(data, 'dontCacheFilters', false);
 
         // initialize all settings
         this.initializeSettings(data);

@@ -1,7 +1,8 @@
 <app-dashboard-custom-metric-dashlet
     [link]="CaseModel.canList(authUser) ? '/cases' : ''"
-    [params]="getDashletParamsIncludingGlobalFilters({applyListFilter: Constants.APPLY_LIST_FILTER.CASES_IN_THE_TRANSMISSION_CHAINS, x: xPreviousDays})"
+    [params]="getDashletParamsIncludingGlobalFilters(queryParams)"
     [value]="this.casesKnownTransmissionChainsCount + ' / ' + this.totalCases"
+    tooltip="LNG_PAGE_DASHBOARD_KPI_NEW_CASES_PREVIOUS_DAYS_TRANSMISSION_CHAINS_BEFORE_VALUE_DESCRIPTION"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"
     (moveAfter)="onMoveAfter()"

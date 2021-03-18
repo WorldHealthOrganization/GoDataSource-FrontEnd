@@ -142,7 +142,11 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         private dialogService: DialogService,
         private teamDataService: TeamDataService
     ) {
+        // parent
         super(listHelperService);
+
+        // disable filter caching
+        this.disableFilterCashing = true;
     }
 
     /**

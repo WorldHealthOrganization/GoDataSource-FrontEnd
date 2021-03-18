@@ -26,12 +26,19 @@ export class CasesPendingLabResultsDashletComponent extends DashletComponent imp
     displayLoading: boolean = false;
 
     // constants to be used for applyListFilters
-    Constants: any = Constants;
     CaseModel = CaseModel;
 
     // subscribers
     outbreakSubscriber: Subscription;
     previousSubscriber: Subscription;
+
+    // query params
+    queryParams: {
+        [key: string]: any
+    } = {
+        applyListFilter: Constants.APPLY_LIST_FILTER.CASES_PENDING_LAB_RESULT,
+        [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true
+    };
 
     /**
      * Constructor
@@ -100,7 +107,7 @@ export class CasesPendingLabResultsDashletComponent extends DashletComponent imp
             // date
             if (this.globalFilterDate) {
                 qb.filter.byDateRange(
-                    'dateOfOnset', {
+                    'dateOfReporting', {
                         endDate: this.globalFilterDate.endOf('day').format()
                     }
                 );

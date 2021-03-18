@@ -163,7 +163,13 @@ export class FollowUpModel
         this.fillLocation = _.isEmpty(this.fillLocation) ? undefined : new FillLocationModel(this.fillLocation);
 
         if (includeContact) {
-            const person = _.get(data, 'contact', {});
+            // get person based on the received object
+            const person = _.get(
+                data,
+                (data instanceof FollowUpModel) ? 'person' : 'contact',
+                {}
+            );
+
             if (person.type === EntityType.CASE) {
                 this.person = new CaseModel(person);
             } else {

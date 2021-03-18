@@ -29,7 +29,6 @@ export class NewCasesPreviousDaysContactsDashletComponent extends DashletCompone
     xDaysAmongContacts: number;
 
     // constants to be used for applyListFilters
-    Constants = Constants;
     CaseModel = CaseModel;
 
     // outbreak
@@ -46,6 +45,11 @@ export class NewCasesPreviousDaysContactsDashletComponent extends DashletCompone
     private triggerUpdateValues = new DebounceTimeCaller(new Subscriber<void>(() => {
         this.refreshData();
     }));
+
+    // query params
+    queryParams: {
+        [key: string]: any
+    };
 
     /**
      * Constructor
@@ -72,9 +76,13 @@ export class NewCasesPreviousDaysContactsDashletComponent extends DashletCompone
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak) {
+                    // refresh
                     this.outbreakId = selectedOutbreak.id;
                     this.xDaysAmongContacts = selectedOutbreak.noDaysAmongContacts;
                     this.refreshDataCaller.call();
+
+                    // update query params
+                    this.updateQueryParams();
                 }
             });
     }
@@ -110,8 +118,23 @@ export class NewCasesPreviousDaysContactsDashletComponent extends DashletCompone
      * @param newXDaysAmongContacts
      */
     onChangeSetting(newXDaysAmongContacts) {
+        // update value
         this.xDaysAmongContacts = newXDaysAmongContacts;
         this.triggerUpdateValues.call();
+
+        // update query params
+        this.updateQueryParams();
+    }
+
+    /**
+     * Update query params
+     */
+    private updateQueryParams(): void {
+        this.queryParams = {
+            applyListFilter: Constants.APPLY_LIST_FILTER.CASES_PREVIOUS_DAYS_CONTACTS,
+            [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
+            x: this.xDaysAmongContacts
+        };
     }
 
     /**

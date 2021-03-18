@@ -183,6 +183,7 @@ export class CasesByGeographicLocationDashletComponent implements OnInit, OnDest
                 queryParams: {
                     global: JSON.stringify(global),
                     applyListFilter: Constants.APPLY_LIST_FILTER.CASES_BY_LOCATION,
+                    [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
                     locationId: pressed.extra,
                 }
             });
@@ -205,7 +206,7 @@ export class CasesByGeographicLocationDashletComponent implements OnInit, OnDest
             // date
             if (this.globalFilterDate) {
                 qb.filter.byDateRange(
-                    'dateOfOnset', {
+                    'dateOfReporting', {
                         endDate: this.globalFilterDate.endOf('day').format()
                     }
                 );

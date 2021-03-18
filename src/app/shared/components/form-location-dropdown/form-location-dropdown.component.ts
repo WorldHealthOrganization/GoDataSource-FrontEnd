@@ -83,6 +83,25 @@ export class FormLocationDropdownComponent
     }
     @Input() useOutbreakLocations: boolean = false;
 
+    // used to exclude locations if necessary
+    private _excludeLocationsIds: string[];
+    private excludeLocationsIdsMap: {
+        [locationId: string]: true
+    } = {};
+    @Input() set excludeLocationsIds(excludeLocationsIds: string[]) {
+        // keep track of what was sent
+        this._excludeLocationsIds = excludeLocationsIds;
+
+        // map for easy access
+        this.excludeLocationsIdsMap = {};
+        (this.excludeLocationsIds || []).forEach((locationId) => {
+            this.excludeLocationsIdsMap[locationId] = true;
+        });
+    }
+    get excludeLocationsIds(): string[] {
+        return this._excludeLocationsIds;
+    }
+
     @Output() itemChanged = new EventEmitter<LocationAutoItem | undefined | LocationAutoItem[]>();
     @Output() locationsLoaded = new EventEmitter<LocationAutoItem[]>();
 
@@ -429,6 +448,12 @@ export class FormLocationDropdownComponent
                     // get first item that we need to check and remove it from array
                     const currentItem: HierarchicalLocationModel = listToCheck.shift();
 
+                    // if this item is excluded, the don't render it and don't render its children as well
+                    // children won't be rendered because they are added to render list after the parent
+                    if (this.excludeLocationsIdsMap[currentItem.location.id]) {
+                        continue;
+                    }
+
                     // create auto complete item
                     const locationAI = new LocationAutoItem(
                         currentItem.location.id,
@@ -437,7 +462,7 @@ export class FormLocationDropdownComponent
                                 ` ( ${currentItem.location.synonymsAsString} )` :
                                 ''
                         ),
-                        currentItem.location.parentLocationId ?
+                        currentItem.location.parentLocationId && levels[currentItem.location.parentLocationId] !== undefined ?
                             levels[currentItem.location.parentLocationId] + 1 :
                             0,
                         !currentItem.location.active || currentItem.location.disabled,
@@ -516,6 +541,10 @@ export class FormLocationDropdownComponent
 
         // add location condition & refresh
         if (this.needToRetrieveBackData) {
+            // in case list isn't already closed - happens in specific condition, then we need to close it
+            this.locationHandler.close();
+
+            // retrieve the correct list
             this.addLocationConditionAndRefresh();
         }
     }

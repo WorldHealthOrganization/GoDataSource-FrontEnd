@@ -74,8 +74,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_VIEW_OUTBREAK',
-            click: (item: OutbreakModel) => {
-                this.router.navigate(['/outbreaks', item.id, 'view']);
+            linkGenerator: (item: OutbreakModel): string[] => {
+                return ['/outbreaks', item.id, 'view'];
             },
             visible: (item: OutbreakModel): boolean => {
                 return !item.deleted &&
@@ -87,8 +87,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_MODIFY_OUTBREAK',
-            click: (item: OutbreakModel) => {
-                this.router.navigate(['/outbreaks', item.id, 'modify']);
+            linkGenerator: (item: OutbreakModel): string[] => {
+                return ['/outbreaks', item.id, 'modify'];
             },
             visible: (item: OutbreakModel): boolean => {
                 return !item.deleted &&
@@ -642,6 +642,11 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
                             // translate questionnaire questions - Case Form
                             if (!_.isEmpty(outbreak.caseInvestigationTemplate)) {
                                 translateQuestionnaire(outbreak.caseInvestigationTemplate);
+                            }
+
+                            // translate questionnaire questions - Contact Form
+                            if (!_.isEmpty(outbreak.contactInvestigationTemplate)) {
+                                translateQuestionnaire(outbreak.contactInvestigationTemplate);
                             }
 
                             // translate questionnaire questions - Lab Results Form

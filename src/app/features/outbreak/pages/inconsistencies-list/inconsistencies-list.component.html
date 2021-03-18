@@ -53,7 +53,8 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField(['firstName', 'name'], $event)"
-                            [displayFilterIcon]="true">
+                            [displayFilterIcon]="true"
+                            app-reset-input-on-side-filter>
                         </app-form-input>
                     </div>
                 </div>
@@ -77,7 +78,8 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('lastName', $event)"
-                            [displayFilterIcon]="true">
+                            [displayFilterIcon]="true"
+                            app-reset-input-on-side-filter>
                         </app-form-input>
                     </div>
                 </div>

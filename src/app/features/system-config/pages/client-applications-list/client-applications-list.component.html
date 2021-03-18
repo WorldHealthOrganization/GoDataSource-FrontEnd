@@ -185,6 +185,7 @@
     </div>
 
     <mat-paginator
+        [pageIndex]="pageIndex"
         [length]="clientApplicationsServerListCount?.count"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"

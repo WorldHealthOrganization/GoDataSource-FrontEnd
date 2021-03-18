@@ -7,17 +7,38 @@ export enum RequestFilterOperator {
     OR = 'or'
 }
 
+/**
+ * Serialized
+ */
+export interface ISerializedQueryFilter {
+    conditions: any[];
+    operator: RequestFilterOperator;
+    flags: { [key: string]: any };
+    generateConditionsOnFirstLevel: boolean;
+    _deleted: boolean;
+}
+
+/**
+ * Query filters
+ */
 export class RequestFilter {
     // conditions to filter by
     private conditions: any[] = [];
+
     // operator to be applied between conditions
     private operator: RequestFilterOperator = RequestFilterOperator.AND;
+
     // flags
     private flags: { [key: string]: any } = {};
+
     // migrate conditions to first level
     private generateConditionsOnFirstLevel: boolean = false;
+
     // flag to include all records (deleted and not deleted)
     private _deleted: boolean;
+
+    // changes listener
+    private changesListener: () => void;
 
     /**
      * Escape string
@@ -56,11 +77,37 @@ export class RequestFilter {
     }
 
     /**
+     * Constructor
+     */
+    constructor(listener?: () => void) {
+        this.changesListener = listener;
+    }
+
+    /**
+     * Trigger change listener
+     */
+    private triggerChangeListener(): void {
+        // do we have a change listener ?
+        if (!this.changesListener) {
+            return;
+        }
+
+        // trigger change
+        this.changesListener();
+    }
+
+    /**
      * Include deleted records
      * @returns {RequestFilter}
      */
-    includeDeletedRecordsWhereField() {
+    includeDeletedRecordsWhereField(): RequestFilter {
+        // deleted ?
         this._deleted = true;
+
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
         return this;
     }
 
@@ -70,8 +117,14 @@ export class RequestFilter {
      * @param value
      * @returns {RequestFilter}
      */
-    flag(property: string, value: any) {
+    flag(property: string, value: any): RequestFilter {
+        // flag
         this.flags[property] = value;
+
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
         return this;
     }
 
@@ -80,8 +133,14 @@ export class RequestFilter {
      * @param property
      * @returns {RequestFilter}
      */
-    removeFlag(property: string) {
+    removeFlag(property: string): RequestFilter {
+        // flag
         delete this.flags[property];
+
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
         return this;
     }
 
@@ -105,7 +164,7 @@ export class RequestFilter {
         value: string,
         replace: boolean = true,
         useLike?: boolean
-    ) {
+    ): RequestFilter {
         // do we need to remove condition ?
         if (_.isEmpty(value)) {
             this.remove(property);
@@ -119,6 +178,10 @@ export class RequestFilter {
             }, replace);
         }
 
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
         return this;
     }
 
@@ -135,7 +198,7 @@ export class RequestFilter {
         value: string,
         replace: boolean = true,
         operator: RequestFilterOperator = RequestFilterOperator.OR
-    ) {
+    ): RequestFilter {
         // construct or condition if necessary
         const condition = {
             [operator]: _.map(properties, (prop) => ({
@@ -151,6 +214,10 @@ export class RequestFilter {
             this.where(condition, replace);
         }
 
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
         return this;
     }
 
@@ -167,7 +234,7 @@ export class RequestFilter {
         value: string,
         replace: boolean = true,
         useLike?: boolean
-    ) {
+    ): RequestFilter {
         // do we need to remove condition ?
         if (_.isEmpty(value)) {
             this.remove(property);
@@ -180,6 +247,11 @@ export class RequestFilter {
                 )
             }, replace);
         }
+
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
         return this;
     }
 
@@ -195,7 +267,7 @@ export class RequestFilter {
         value: string,
         replace: boolean = true,
         regexMethod: string = 'regex'
-    ) {
+    ): RequestFilter {
         // do we need to remove condition ?
         if (_.isEmpty(value)) {
             this.remove(property);
@@ -209,18 +281,18 @@ export class RequestFilter {
                 this.where({
                     [property]: 'INVALID PHONE'
                 }, replace);
-
-                // finished
-                return this;
+            } else {
+                // search by phone number
+                this.where({
+                    [property]: {
+                        [regexMethod]: phonePattern
+                    }
+                }, replace);
             }
-
-            // search by phone number
-            this.where({
-                [property]: {
-                    [regexMethod]: phonePattern
-                }
-            }, replace);
         }
+
+        // trigger change
+        this.triggerChangeListener();
 
         // finished
         return this;
@@ -238,7 +310,7 @@ export class RequestFilter {
         value: string | number,
         replace: boolean = true,
         caseInsensitive: boolean = false
-    ) {
+    ): RequestFilter {
         if (
             _.isEmpty(value) &&
             !_.isNumber(value)
@@ -261,6 +333,10 @@ export class RequestFilter {
             }
         }
 
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
         return this;
     }
 
@@ -271,7 +347,11 @@ export class RequestFilter {
      * @param {boolean} replace
      * @returns {RequestFilter}
      */
-    byBoolean(property: string, value: boolean | null | undefined, replace: boolean = true) {
+    byBoolean(
+        property: string,
+        value: boolean | null | undefined,
+        replace: boolean = true
+    ): RequestFilter {
         // handle property removal
         const removeCondition = () => {
             // remove filter
@@ -307,6 +387,10 @@ export class RequestFilter {
             }
         }
 
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
         return this;
     }
 
@@ -316,7 +400,10 @@ export class RequestFilter {
      * @param {boolean} value
      * @param {boolean} replace
      */
-    byBooleanUsingExist(property: string, value: boolean | null | undefined) {
+    byBooleanUsingExist(
+        property: string,
+        value: boolean | null | undefined
+    ): RequestFilter {
         // create condition with OR criteria
         const orCondition = {
             or: [
@@ -347,6 +434,12 @@ export class RequestFilter {
                 }
             });
         }
+
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
+        return this;
     }
 
     /**
@@ -356,7 +449,11 @@ export class RequestFilter {
      * @param {boolean} replace
      * @returns {RequestFilter}
      */
-    byRange(property: string, value: any, replace: boolean = true) {
+    byRange(
+        property: string,
+        value: any,
+        replace: boolean = true
+    ): RequestFilter {
         const fromValue = _.get(value, 'from');
         const toValue = _.get(value, 'to');
 
@@ -373,6 +470,10 @@ export class RequestFilter {
             }, replace);
         }
 
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
         return this;
     }
 
@@ -383,7 +484,11 @@ export class RequestFilter {
      * @param {boolean} replace
      * @returns {RequestFilter}
      */
-    byAgeRange(property: string, value: any, replace: boolean = true) {
+    byAgeRange(
+        property: string,
+        value: any,
+        replace: boolean = true
+    ): RequestFilter {
         // remove conditions
         this.remove(`${property}.months`);
         this.remove(`${property}.years`);
@@ -433,6 +538,10 @@ export class RequestFilter {
             );
         }
 
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
         return this;
     }
 
@@ -446,7 +555,7 @@ export class RequestFilter {
         property: string,
         value: any,
         replace: boolean = true
-    ) {
+    ): RequestFilter {
         // no point in continuing if we got an empty value
         if (_.isEmpty(value)) {
             this.remove(property);
@@ -469,6 +578,9 @@ export class RequestFilter {
             replace
         );
 
+        // trigger change
+        this.triggerChangeListener();
+
         // finished
         return this;
     }
@@ -481,7 +593,12 @@ export class RequestFilter {
      * @param {boolean} replace
      * @returns {RequestFilter}
      */
-    bySelect(property: string, values: any | any[], replace: boolean = true, valueKey: string = 'value') {
+    bySelect(
+        property: string,
+        values: any | any[],
+        replace: boolean = true,
+        valueKey: string = 'value'
+    ): RequestFilter {
         // sanitize the 'values' to filter by
         if (!_.isArray(values)) {
             values = [values];
@@ -513,6 +630,10 @@ export class RequestFilter {
             }, replace);
         }
 
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
         return this;
     }
 
@@ -522,11 +643,14 @@ export class RequestFilter {
      */
     byHasValue(
         property: string
-    ) {
+    ): RequestFilter {
         // filter no values
         this.where({
             [property]: RequestFilterGenerator.hasValue()
         });
+
+        // trigger change
+        this.triggerChangeListener();
 
         // finished
         return this;
@@ -538,11 +662,14 @@ export class RequestFilter {
      */
     byNotHavingValue(
         property: string
-    ) {
+    ): RequestFilter {
         // filter no values
         this.where(
             RequestFilterGenerator.doesntHaveValue(property)
         );
+
+        // trigger change
+        this.triggerChangeListener();
 
         // finished
         return this;
@@ -553,9 +680,16 @@ export class RequestFilter {
      * @param {RequestFilterOperator} operator
      * @return {RequestFilter}
      */
-    setOperator(operator: RequestFilterOperator) {
+    setOperator(
+        operator: RequestFilterOperator
+    ): RequestFilter {
+        // operator
         this.operator = operator;
 
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
         return this;
     }
 
@@ -567,8 +701,11 @@ export class RequestFilter {
      * @param {boolean} replace
      * @returns {RequestFilter}
      */
-    where(condition: any, replace: boolean = false) {
-
+    where(
+        condition: any,
+        replace: boolean = false
+    ): RequestFilter {
+        // where condition
         if (replace) {
             // if there is already a condition on the same property, remove it
             this.removeCondition(condition);
@@ -577,6 +714,10 @@ export class RequestFilter {
         // add new condition
         this.conditions.push(condition);
 
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
         return this;
     }
 
@@ -585,7 +726,11 @@ export class RequestFilter {
      * @param {string} property
      * @returns {RequestFilter}
      */
-    remove(property: string, operator: string = null) {
+    remove(
+        property: string,
+        operator: string = null
+    ): RequestFilter {
+        // remove conditions
         this.conditions = _.filter(this.conditions, (condition) => {
             const prop = Object.keys(condition)[0];
 
@@ -606,6 +751,10 @@ export class RequestFilter {
             }
         });
 
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
         return this;
     }
 
@@ -615,10 +764,11 @@ export class RequestFilter {
      * @param condition
      * @returns {RequestFilter}
      */
-    removeCondition(condition: any) {
+    removeCondition(
+        condition: any
+    ): RequestFilter {
         // get the property that the condition applies to
         const property = Object.keys(condition)[0];
-
         if (
             property !== RequestFilterOperator.AND &&
             property !== RequestFilterOperator.OR
@@ -637,6 +787,10 @@ export class RequestFilter {
             this.removeOperation(operator, properties);
         }
 
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
         return this;
     }
 
@@ -646,13 +800,14 @@ export class RequestFilter {
      * @param condition
      * @returns {RequestFilter}
      */
-    removeExactCondition(condition: any) {
+    removeExactCondition(
+        condition: any
+    ): RequestFilter {
         // sanitize condition
         condition = condition || {};
 
         // get the property that the condition applies to
         const property = Object.keys(condition)[0];
-
         if (property.length > 0) {
             // get the operator
             const operator = Object.keys(condition[property])[0];
@@ -661,6 +816,12 @@ export class RequestFilter {
                 this.remove(property, operator);
             }
         }
+
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
+        return this;
     }
 
     /**
@@ -689,7 +850,11 @@ export class RequestFilter {
      * @param {string[]} properties
      * @returns {RequestFilter}
      */
-    removeOperation(operator: RequestFilterOperator, properties: string[]) {
+    removeOperation(
+        operator: RequestFilterOperator,
+        properties: string[]
+    ): RequestFilter {
+        // remove operation
         this.conditions = _.filter(this.conditions, (condition) => {
             const prop = Object.keys(condition)[0];
 
@@ -704,6 +869,10 @@ export class RequestFilter {
             return !_.isEqual(conditionProperties, properties);
         });
 
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
         return this;
     }
 
@@ -711,10 +880,15 @@ export class RequestFilter {
      * Remove all conditions
      * @returns {RequestFilter}
      */
-    clear() {
+    clear(): RequestFilter {
+        // clear
         this.conditions = [];
         this.flags = {};
 
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
         return this;
     }
 
@@ -730,16 +904,28 @@ export class RequestFilter {
     /**
      * Generate conditions on first level
      */
-    firstLevelConditions() {
+    firstLevelConditions(): RequestFilter {
+        // generate first level condition ?
         this.generateConditionsOnFirstLevel = true;
+
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
         return this;
     }
 
     /**
      * Generate conditions on multilevel ( add operator, etc ... )
      */
-    multiLevelConditions() {
+    multiLevelConditions(): RequestFilter {
+        // multiple level condition ?
         this.generateConditionsOnFirstLevel = false;
+
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
         return this;
     }
 
@@ -751,7 +937,7 @@ export class RequestFilter {
     generateCondition(
         stringified: boolean = false,
         ignoreFlags: boolean = false
-    ) {
+    ): any {
         // first level conditions ?
         let condition;
         if (this.generateConditionsOnFirstLevel) {
@@ -782,6 +968,7 @@ export class RequestFilter {
             );
         }
 
+        // finished
         return stringified ? JSON.stringify(condition) : condition;
     }
 
@@ -792,7 +979,11 @@ export class RequestFilter {
      * @param {boolean} includeWhere
      * @returns {{}}
      */
-    generateFirstCondition(stringified: boolean = false, includeWhere: boolean = false ) {
+    generateFirstCondition(
+        stringified: boolean = false,
+        includeWhere: boolean = false
+    ): any {
+        // setup
         let returnCondition: any;
         const condition = this.isEmpty() || this.conditions.length < 1 ?
             {} : this.conditions[0];
@@ -802,6 +993,40 @@ export class RequestFilter {
         } else {
             returnCondition = condition;
         }
+
+        // finished
         return stringified ? JSON.stringify(returnCondition) : returnCondition;
+    }
+
+    /**
+     * Serialize query builder
+     */
+    serialize(): ISerializedQueryFilter {
+        return {
+            conditions: this.conditions,
+            operator: this.operator,
+            flags: this.flags,
+            generateConditionsOnFirstLevel: this.generateConditionsOnFirstLevel,
+            _deleted: this._deleted
+        };
+    }
+
+    /**
+     * Replace query builder filters with saved ones
+     */
+    deserialize(
+        serializedValue: string | ISerializedQueryFilter
+    ): void {
+        // deserialize
+        const serializedValueObject: ISerializedQueryFilter = _.isString(serializedValue) ?
+            JSON.parse(serializedValue) :
+            serializedValue as ISerializedQueryFilter;
+
+        // update data
+        this.conditions = serializedValueObject.conditions;
+        this.operator = serializedValueObject.operator;
+        this.flags = serializedValueObject.flags;
+        this.generateConditionsOnFirstLevel = serializedValueObject.generateConditionsOnFirstLevel;
+        this._deleted = serializedValueObject._deleted;
     }
 }

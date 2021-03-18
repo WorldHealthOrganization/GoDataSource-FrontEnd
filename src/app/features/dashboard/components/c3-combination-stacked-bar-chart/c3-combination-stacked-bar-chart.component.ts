@@ -24,6 +24,7 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
     @Input() y2Max: number;
     @Input() y2Min: number;
     @Input() initialZoomRanges: [number, number];
+    @Input() tooltip: string;
 
     chart: any;
 

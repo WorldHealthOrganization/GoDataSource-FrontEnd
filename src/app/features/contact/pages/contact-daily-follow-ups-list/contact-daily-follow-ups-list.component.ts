@@ -114,13 +114,16 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_VIEW_FOLLOW_UP',
-            click: (item: FollowUpModel) => {
-                this.router.navigate(['/contacts', item.personId, 'follow-ups', item.id, 'view'], {
-                    queryParams: {
-                        rootPage: this.rootPage,
-                        rootCaseId: this.caseId
-                    }
-                });
+            linkGenerator: (item: FollowUpModel): string[] => {
+                return ['/contacts', item.personId, 'follow-ups', item.id, 'view'];
+            },
+            queryParamsGenerator: (): {
+                [k: string]: any;
+            } => {
+                return {
+                    rootPage: this.rootPage,
+                    rootCaseId: this.caseId
+                };
             },
             visible: (item: FollowUpModel): boolean => {
                 return !item.deleted &&
@@ -132,13 +135,16 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MODIFY_FOLLOW_UP',
-            click: (item: FollowUpModel) => {
-                this.router.navigate(['/contacts', item.personId, 'follow-ups', item.id, 'modify'], {
-                    queryParams: {
-                        rootPage: this.rootPage,
-                        rootCaseId: this.caseId
-                    }
-                });
+            linkGenerator: (item: FollowUpModel): string[] => {
+                return ['/contacts', item.personId, 'follow-ups', item.id, 'modify'];
+            },
+            queryParamsGenerator: (): {
+                [k: string]: any;
+            } => {
+                return {
+                    rootPage: this.rootPage,
+                    rootCaseId: this.caseId
+                };
             },
             visible: (item: FollowUpModel): boolean => {
                 return !item.deleted &&
@@ -269,74 +275,74 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         this.yesNoOptionsWithoutAllList$ = this.genericDataService.getFilterYesNoOptions(true);
         this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
 
-        // retrieve query params
-        this.route.queryParams
-            .subscribe((queryParams: {
-                fromWorkload: boolean,
-                date: string,
-                team: string,
-                status: string[]
-            }) => {
-                // from team workload ?
-                if (queryParams.fromWorkload) {
-                    this.teamWorkloadData = {
-                        date: moment(queryParams.date),
-                        team: queryParams.team,
-                        status: queryParams.status ?
-                            queryParams.status :
-                            null,
-                    };
+        // page query params
+        const queryParams: {
+            fromWorkload: boolean,
+            date: string,
+            team: string,
+            status: string[]
+        } = this.route.snapshot.queryParams as any;
+
+        // from team workload ?
+        if (queryParams.fromWorkload) {
+            this.teamWorkloadData = {
+                date: moment(queryParams.date),
+                team: queryParams.team,
+                status: queryParams.status ?
+                    queryParams.status :
+                    null,
+            };
+        }
+
+        // retrieve route params
+        const routeParams: {
+            caseId: string
+        } = this.route.snapshot.params as any;
+
+        // case Id arrives only from cases list, view & modify pages
+        // coming directly to daily page doesn't provide us with a case id
+        this.caseId = routeParams.caseId;
+
+        // no need to retrieve any data? then we can initialize breadcrumbs
+        if (!this.caseId) {
+            this.initializeBreadcrumbs();
+        } else {
+            this.rootPage = FollowUpPage.CASE_RELATED;
+        }
+
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
+
+        // subscribe to the Selected Outbreak
+        this.outbreakSubscriber = this.outbreakDataService
+            .getSelectedOutbreakSubject()
+            .subscribe((selectedOutbreak: OutbreakModel) => {
+                // selected outbreak
+                this.selectedOutbreak = selectedOutbreak;
+
+                // do we have an outbreak ?
+                if (this.selectedOutbreak) {
+                    // initialize side filters
+                    this.initializeSideFilters();
+
+                    // retrieve case data
+                    if (this.caseId) {
+                        this.retrieveCaseData();
+                    }
+
+                    // initialize print and export
+                    this.initializeFollowUpsExport();
+                    this.initializeFollowUpsPrint();
+
+                    // initialize pagination
+                    this.initPaginator();
+
+                    // ...and re-load the list when the Selected Outbreak is changed
+                    this.needsRefreshList(true);
                 }
-
-                // set default filter rules
-                this.initializeHeaderFilters();
-
-                // retrieve route params
-                this.route.params
-                    .subscribe((routeParams: { caseId }) => {
-                        // case Id arrives only from cases list, view & modify pages
-                        // coming directly to daily page doesn't provide us with a case id
-                        this.caseId = routeParams.caseId;
-
-
-                        // no need to retrieve any data? then we can initialize breadcrumbs
-                        if (!this.caseId) {
-                            this.initializeBreadcrumbs();
-                        } else {
-                            this.rootPage = FollowUpPage.CASE_RELATED;
-                        }
-
-                        // outbreak subscriber
-                        if (this.outbreakSubscriber) {
-                            this.outbreakSubscriber.unsubscribe();
-                            this.outbreakSubscriber = null;
-                        }
-
-                        // subscribe to the Selected Outbreak
-                        this.outbreakSubscriber = this.outbreakDataService
-                            .getSelectedOutbreakSubject()
-                            .subscribe((selectedOutbreak: OutbreakModel) => {
-                                // selected outbreak
-                                this.selectedOutbreak = selectedOutbreak;
-
-                                // initialize side filters
-                                this.initializeSideFilters();
-
-                                // retrieve case data
-                                if (this.caseId) {
-                                    this.retrieveCaseData();
-                                }
-
-                                // initialize print and export
-                                this.initializeFollowUpsExport();
-                                this.initializeFollowUpsPrint();
-
-                                // initialize pagination
-                                this.initPaginator();
-                                // ...and re-load the list when the Selected Outbreak is changed
-                                this.needsRefreshList(true);
-                            });
-                    });
             });
 
         // initialize Side Table Columns
@@ -908,6 +914,14 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     }
 
     /**
+     * Loaded cached filters
+     */
+    beforeCacheLoadFilters(): void {
+        // set default filter rules
+        this.initializeHeaderFilters();
+    }
+
+    /**
      * Initialize header filters
      */
     initializeHeaderFilters() {
@@ -943,6 +957,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             this.selectedTeamIdFilterValue = this.teamIdFilterValue;
         }
 
+        // filter
         this.filterByFollowUpDate(this.dateFilterDefaultValue);
     }
 
@@ -1136,25 +1151,30 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         this.filterByDateField('date', value);
 
         // refresh dialog fields
-        this.genericDataService
-            .getRangeFollowUpGroupByOptions(true)
-            .subscribe((options) => {
-                this.printFollowUpsDialogExtraAPIData = {
-                    date: {
-                        startDate: moment(value).startOf('day'),
-                        endDate: moment(value).endOf('day')
-                    }
-                };
-                this.printFollowUpsDialogFields = [
-                    new DialogField({
-                        name: 'groupBy',
-                        placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON',
-                        inputOptions: options,
-                        value: Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE.value,
-                        required: true
-                    })
-                ];
-            });
+        setTimeout(() => {
+            this.genericDataService
+                .getRangeFollowUpGroupByOptions(true)
+                .subscribe((options) => {
+                    // print follow-up
+                    this.printFollowUpsDialogExtraAPIData = {
+                        date: {
+                            startDate: moment(value).startOf('day'),
+                            endDate: moment(value).endOf('day')
+                        }
+                    };
+
+                    // print follow-up
+                    this.printFollowUpsDialogFields = [
+                        new DialogField({
+                            name: 'groupBy',
+                            placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON',
+                            inputOptions: options,
+                            value: Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE.value,
+                            required: true
+                        })
+                    ];
+                });
+        });
     }
 
     /**

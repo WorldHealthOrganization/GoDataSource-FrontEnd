@@ -24,7 +24,6 @@ export class ContactsLostToFollowUpDashletComponent extends DashletComponent imp
     noContactsLostToFollowUp: number;
 
     // provide constants to template
-    Constants = Constants;
     ContactModel = ContactModel;
 
     // outbreak
@@ -36,6 +35,14 @@ export class ContactsLostToFollowUpDashletComponent extends DashletComponent imp
     // subscribers
     outbreakSubscriber: Subscription;
     previousSubscriber: Subscription;
+
+    // query params
+    queryParams: {
+        [key: string]: any
+    } = {
+        applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_LOST_TO_FOLLOW_UP,
+        [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true
+    };
 
     /**
      * Constructor

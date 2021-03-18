@@ -26,6 +26,9 @@ export class ViewMovementContactOfContactComponent implements OnInit {
     contactOfContactData: ContactOfContactModel = new ContactOfContactModel();
     movementAddresses: AddressModel[] = [];
 
+    // loading data
+    displayLoading: boolean = true;
+
     @ViewChild('mapMovement') mapMovement: WorldMapMovementComponent;
 
     // constants
@@ -69,6 +72,7 @@ export class ViewMovementContactOfContactComponent implements OnInit {
                             this.initializeBreadcrumbs();
 
                             // movement data
+                            this.displayLoading = false;
                             this.movementAddresses = movementData;
                         });
                 });

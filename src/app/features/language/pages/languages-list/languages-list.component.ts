@@ -48,8 +48,8 @@ export class LanguagesListComponent extends ListComponent implements OnInit, OnD
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_LANGUAGES_ACTION_VIEW_LANGUAGE',
-            click: (item: LanguageModel) => {
-                this.router.navigate(['/languages', item.id, 'view']);
+            linkGenerator: (item: LanguageModel): string[] => {
+                return ['/languages', item.id, 'view'];
             },
             visible: (item: LanguageModel): boolean => {
                 return LanguageModel.canView(this.authUser);
@@ -60,8 +60,8 @@ export class LanguagesListComponent extends ListComponent implements OnInit, OnD
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_LIST_LANGUAGES_ACTION_MODIFY_LANGUAGE',
-            click: (item: LanguageModel) => {
-                this.router.navigate(['/languages', item.id, 'modify']);
+            linkGenerator: (item: LanguageModel): string[] => {
+                return ['/languages', item.id, 'modify'];
             },
             visible: (item: LanguageModel): boolean => {
                 return !item.readOnly &&

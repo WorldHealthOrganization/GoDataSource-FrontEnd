@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpEventType } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
-import { ITransmissionChainGroupPageModel, TransmissionChainGroupModel } from '../../models/transmission-chain.model';
+import { ITransmissionChainGroupPageModel, TransmissionChainGroupModel, TransmissionChainModel } from '../../models/transmission-chain.model';
 import { MetricIndependentTransmissionChainsModel } from '../../models/metrics/metric-independent-transmission-chains.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { GraphNodeModel } from '../../models/graph-node.model';
@@ -145,14 +145,100 @@ export class TransmissionChainDataService {
      */
     getChainOfTransmissionPages(
         chainGroup: TransmissionChainGroupModel,
-        pageSize: number
+        pageSize: number,
+        snapshotFilters: {
+            firstName?: string,
+            lastName?: string
+        }
     ): ITransmissionChainGroupPageModel[] {
+        // must filter
+        const mustFilterSnapshot: boolean = snapshotFilters && (
+            !!snapshotFilters.firstName ||
+            !!snapshotFilters.lastName
+        );
+
+        // get chains of transmission
+        let snapshotFiltersFirstName: string;
+        let snapshotFiltersLastName: string;
+        let chainGroupChains: {
+            chainIndex: number,
+            chain: TransmissionChainModel
+        }[] = chainGroup.chains.map((chain, chainIndex) => {
+            return {
+                chainIndex,
+                chain
+            };
+        });
+
+        // do we need to filter ?
+        if (mustFilterSnapshot) {
+            // filter value
+            snapshotFiltersFirstName = snapshotFilters.firstName ? snapshotFilters.firstName.toLowerCase() : null;
+            snapshotFiltersLastName = snapshotFilters.lastName ? snapshotFilters.lastName.toLowerCase() : null;
+
+            // filter chains
+            const originalChains: {
+                chainIndex: number,
+                chain: TransmissionChainModel
+            }[] = chainGroupChains;
+            chainGroupChains = [];
+            originalChains.forEach((chainInfo) => {
+                // determine if we can include this chain, at least one node matches the query
+                for (let chainRelationshipIndex: number = 0; chainRelationshipIndex < chainInfo.chain.chainRelations.length; chainRelationshipIndex++) {
+                    // get chain data
+                    const chainRel = chainInfo.chain.chainRelations[chainRelationshipIndex];
+
+                    // not a proper relationship ?
+                    if (
+                        !chainRel.entityIds ||
+                        chainRel.entityIds.length !== 2 ||
+                        !chainGroup.nodesMap[chainRel.entityIds[0]] ||
+                        !chainGroup.nodesMap[chainRel.entityIds[1]]
+                    ) {
+                        // jump over
+                        continue;
+                    }
+
+                    // check conditions
+                    const matchesAllConditions: boolean = (
+                        (
+                            (
+                                !snapshotFiltersFirstName ||
+                                chainGroup.nodesMap[chainRel.entityIds[0]].model.name.toLowerCase().indexOf(snapshotFiltersFirstName) > -1
+                            ) && (
+                                !snapshotFiltersLastName ||
+                                chainGroup.nodesMap[chainRel.entityIds[0]].model.name.toLowerCase().indexOf(snapshotFiltersLastName) > -1
+                            )
+                        ) || (
+                            (
+                                !snapshotFiltersFirstName ||
+                                chainGroup.nodesMap[chainRel.entityIds[1]].model.name.toLowerCase().indexOf(snapshotFiltersFirstName) > -1
+                            ) && (
+                                !snapshotFiltersLastName ||
+                                chainGroup.nodesMap[chainRel.entityIds[1]].model.name.toLowerCase().indexOf(snapshotFiltersLastName) > -1
+                            )
+                        )
+                    );
+
+                    // must add chain to list of display ?
+                    if (matchesAllConditions) {
+                        // add chain to the list
+                        chainGroupChains.push(chainInfo);
+
+                        // no point in continuing since we need to add this chain
+                        break;
+                    }
+                }
+
+            });
+        }
+
         // if bubble graph we must split it into multiple pages
         // #TODO this should be integrated in the code bellow so we don't do again the logic that was done once...but that would mean that we need to rewrite some of the logic, which might cause other issues
         // #TODO so until we rewrite the graph component there is no point in stressing out that much with this since we will have to rewrite this entire function since it was written like ...
         // sort chains by size descending
-        chainGroup.chains.sort((chain1, chain2) => {
-            return chain2.chainRelations.length - chain1.chainRelations.length;
+        chainGroupChains.sort((chain1, chain2) => {
+            return chain2.chain.chainRelations.length - chain1.chain.chainRelations.length;
         });
 
         // go through edges and map them to determine isolated nodes
@@ -173,34 +259,50 @@ export class TransmissionChainDataService {
                 return;
             }
 
-            // isolated node
-            isolatedNodes.push(entityId);
+            // should filter ?
+            if (mustFilterSnapshot) {
+                if (
+                    (
+                        !snapshotFiltersFirstName ||
+                        chainGroup.nodesMap[entityId].model.name.toLowerCase().indexOf(snapshotFiltersFirstName) > -1
+                    ) && (
+                        !snapshotFiltersLastName ||
+                        chainGroup.nodesMap[entityId].model.name.toLowerCase().indexOf(snapshotFiltersLastName) > -1
+                    )
+                ) {
+                    // isolated node
+                    isolatedNodes.push(entityId);
+                }
+            } else {
+                // isolated node
+                isolatedNodes.push(entityId);
+            }
         });
 
         // construct pages
         const pages: ITransmissionChainGroupPageModel[] = [];
         let currentPageIndex: number;
-        (chainGroup.chains || []).forEach((chain, chainIndex) => {
+        (chainGroupChains || []).forEach((chain) => {
             // add new page ?
             currentPageIndex = pages.length - 1;
             if (
                 pages.length < 1 ||
-                pages[currentPageIndex].totalSize + chain.chainRelations.length > pageSize
+                pages[currentPageIndex].totalSize + chain.chain.chainRelations.length > pageSize
             ) {
                 // add next page
                 pages.push({
-                    chains: [chainIndex],
+                    chains: [chain.chainIndex],
                     isolatedNodes: null,
-                    totalSize: chain.chainRelations.length,
+                    totalSize: chain.chain.chainRelations.length,
                     pageIndex: pages.length,
                     pageLabel: (pages.length + 1).toString()
                 });
             } else {
                 // increase total size of page
-                pages[currentPageIndex].totalSize += chain.chainRelations.length;
+                pages[currentPageIndex].totalSize += chain.chain.chainRelations.length;
 
                 // add chain to the page list
-                pages[currentPageIndex].chains.push(chainIndex);
+                pages[currentPageIndex].chains.push(chain.chainIndex);
             }
         });
 
@@ -215,7 +317,7 @@ export class TransmissionChainDataService {
             pages[currentPageIndex].isolatedNodes = isolatedNodes.splice(0, size);
         }
 
-        // create pages from isolated nodes
+        // create pages from remaining isolated nodes
         while (isolatedNodes.length > 0) {
             // split isolated nodes
             const nodes = isolatedNodes.splice(0, pageSize);
@@ -747,6 +849,22 @@ export class TransmissionChainDataService {
 
         // finished
         return graphData;
+    }
+
+    /**
+     * Retrieve a COT snapshot for an Outbreak
+     * @param {string} outbreakId
+     * @param {string} cotSnapshotId
+     * @returns {Observable<CotSnapshotModel>}
+     */
+    getSnapshot(
+        outbreakId: string,
+        cotSnapshotId: string
+    ): Observable<CotSnapshotModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`outbreaks/${outbreakId}/transmission-chains/${cotSnapshotId}`),
+            CotSnapshotModel
+        );
     }
 
     /**

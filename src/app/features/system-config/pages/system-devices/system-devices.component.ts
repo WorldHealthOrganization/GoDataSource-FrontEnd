@@ -46,8 +46,8 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_VIEW',
-            click: (item: DeviceModel) => {
-                this.router.navigate(['/system-config', 'devices', item.id, 'view']);
+            linkGenerator: (item: DeviceModel): string[] => {
+                return ['/system-config', 'devices', item.id, 'view'];
             },
             visible: (): boolean => {
                 return DeviceModel.canView(this.authUser);
@@ -58,8 +58,8 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_MODIFY',
-            click: (item: DeviceModel) => {
-                this.router.navigate(['/system-config', 'devices', item.id, 'modify']);
+            linkGenerator: (item: DeviceModel): string[] => {
+                return ['/system-config', 'devices', item.id, 'modify'];
             },
             visible: (): boolean => {
                 return DeviceModel.canModify(this.authUser);

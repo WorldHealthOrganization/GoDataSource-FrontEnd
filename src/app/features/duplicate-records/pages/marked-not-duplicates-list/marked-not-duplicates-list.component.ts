@@ -13,7 +13,7 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { catchError, share, tap } from 'rxjs/operators';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
@@ -70,12 +70,12 @@ export class MarkedNotDuplicatesListComponent
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_VIEW_ENTITY',
-            click: (item: CaseModel | ContactModel | ContactOfContactModel) => {
-                this.router.navigate([
+            linkGenerator: (item: CaseModel | ContactModel | ContactOfContactModel): string[] => {
+                return [
                     `/${EntityModel.getLinkForEntityType(item.type)}`,
                     item.id,
                     'view'
-                ]);
+                ];
             },
             visible: (item: CaseModel | ContactModel | ContactOfContactModel): boolean => {
                 return !item.deleted &&
@@ -83,16 +83,16 @@ export class MarkedNotDuplicatesListComponent
             }
         }),
 
-        // Modify Case
+        // Modify Entity
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_MODIFY_ENTITY',
-            click: (item: CaseModel | ContactModel | ContactOfContactModel) => {
-                this.router.navigate([
+            linkGenerator: (item: CaseModel | ContactModel | ContactOfContactModel): string[] => {
+                return [
                     `/${EntityModel.getLinkForEntityType(item.type)}`,
                     item.id,
                     'modify'
-                ]);
+                ];
             },
             visible: (item: CaseModel | ContactModel | ContactOfContactModel): boolean => {
                 return !item.deleted &&
@@ -138,7 +138,6 @@ export class MarkedNotDuplicatesListComponent
         private referenceDataDataService: ReferenceDataDataService,
         private route: ActivatedRoute,
         private entityDataService: EntityDataService,
-        private router: Router,
         private dialogService: DialogService,
         private caseDataService: CaseDataService,
         private contactDataService: ContactDataService,

@@ -9,7 +9,7 @@ import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../..
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
@@ -49,8 +49,8 @@ export class HelpItemsListComponent extends ListComponent implements OnInit, OnD
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_HELP_ITEMS_ACTION_VIEW_ITEM',
-            click: (item: HelpItemModel) => {
-                this.router.navigate(['/help', 'categories', item.categoryId, 'items', item.id, 'view']);
+            linkGenerator: (item: HelpItemModel): string[] => {
+                return ['/help', 'categories', item.categoryId, 'items', item.id, 'view'];
             },
             visible: (): boolean => {
                 return HelpItemModel.canView(this.authUser);
@@ -61,8 +61,8 @@ export class HelpItemsListComponent extends ListComponent implements OnInit, OnD
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_LIST_HELP_ITEMS_ACTION_MODIFY_ITEM',
-            click: (item: HelpItemModel) => {
-                this.router.navigate(['/help', 'categories', item.categoryId, 'items', item.id, 'modify']);
+            linkGenerator: (item: HelpItemModel): string[] => {
+                return ['/help', 'categories', item.categoryId, 'items', item.id, 'modify'];
             },
             visible: (): boolean => {
                 return HelpItemModel.canModify(this.authUser);
@@ -107,7 +107,6 @@ export class HelpItemsListComponent extends ListComponent implements OnInit, OnD
      */
     constructor(
         protected listHelperService: ListHelperService,
-        private router: Router,
         private helpDataService: HelpDataService,
         private authDataService: AuthDataService,
         private snackbarService: SnackbarService,

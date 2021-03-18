@@ -77,7 +77,12 @@
                                 tooltip="LNG_USER_FIELD_LABEL_DISREGARD_GEOGRAPHIC_RESTRICTIONS_DESCRIPTION">
                             </app-form-slide-toggle>
 
-                            <div fxFlex><!-- placeholder --></div>
+                            <app-form-slide-toggle
+                                name="dontCacheFilters"
+                                [(ngModel)]="newUser.dontCacheFilters"
+                                [label]="'LNG_USER_FIELD_LABEL_DONT_CACHE_FILTERS' | translate"
+                                tooltip="LNG_USER_FIELD_LABEL_DONT_CACHE_FILTERS_DESCRIPTION">
+                            </app-form-slide-toggle>
                         </div>
 
                         <div

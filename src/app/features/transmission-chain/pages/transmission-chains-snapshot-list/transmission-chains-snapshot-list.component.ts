@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { Router } from '@angular/router';
 import { Observable, Subscription, throwError } from 'rxjs';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -85,7 +84,6 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent imple
      */
     constructor(
         protected listHelperService: ListHelperService,
-        private router: Router,
         private authDataService: AuthDataService,
         private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,

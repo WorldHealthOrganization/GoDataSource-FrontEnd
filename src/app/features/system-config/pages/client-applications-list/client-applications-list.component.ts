@@ -18,7 +18,6 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { environment } from '../../../../../environments/environment';
 import { catchError } from 'rxjs/operators';
 import { throwError, of, forkJoin } from 'rxjs';
-import { Router } from '@angular/router';
 import { HoverRowActionsDirective } from '../../../../shared/directives/hover-row-actions/hover-row-actions.directive';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
@@ -129,7 +128,6 @@ export class ClientApplicationsListComponent extends ListComponent implements On
      */
     constructor(
         protected listHelperService: ListHelperService,
-        private router: Router,
         private authDataService: AuthDataService,
         private systemSettingsDataService: SystemSettingsDataService,
         private snackbarService: SnackbarService,

@@ -1,5 +1,4 @@
 import { Component, ViewEncapsulation } from '@angular/core';
-import { CacheService } from '../../../../core/services/helper/cache.service';
 import { Router } from '@angular/router';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ImportDataExtension } from '../../components/import-data/model';
@@ -29,7 +28,6 @@ export class ImportSyncPackageComponent {
      * Constructor
      */
     constructor(
-        private cacheService: CacheService,
         private router: Router,
         private authDataService: AuthDataService,
         private redirectService: RedirectService

@@ -12,31 +12,45 @@
 </app-total-number-of-records>
 
 <mat-card class="page-section page-content">
-    <div class="top-section-wrapper">
-        <!--Color Legend-->
-        <div>
-            <app-color-list-legend [referenceDataCategory]="ReferenceDataCategory.PERSON_TYPE">
-            </app-color-list-legend>
+
+    <!-- Table top info -->
+    <div
+        fxLayout="row">
+        <!-- Filters message -->
+        <div
+            fxFlex fxGrow="0" fxLayoutAlign="start center"
+            class="filters-applied">
+            {{ queryBuilder.isEmptyOnlyFilters() ? '' : ('LNG_COMMON_LABEL_FILTERS_USED' | translate) }}
         </div>
 
-        <div class="reset-filters">
-            <!--Reset Filters-->
+        <div
+            fxFlex
+            class="top-section-wrapper">
+            <!--Color Legend-->
             <div>
-                <button
-                    type="button"
-                    mat-raised-button
-                    color="accent"
-                    (click)="resetFiltersToSideFilters()">
-                    {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
-                </button>
+                <app-color-list-legend [referenceDataCategory]="ReferenceDataCategory.PERSON_TYPE">
+                </app-color-list-legend>
+            </div>
 
-                <button
-                    type="button"
-                    mat-raised-button
-                    color="accent"
-                    (click)="needsRefreshList(true)">
-                    {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
-                </button>
+            <div class="reset-filters">
+                <!--Reset Filters-->
+                <div>
+                    <button
+                        type="button"
+                        mat-raised-button
+                        color="accent"
+                        (click)="resetFiltersToSideFilters()">
+                        {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+                    </button>
+
+                    <button
+                        type="button"
+                        mat-raised-button
+                        color="accent"
+                        (click)="needsRefreshList(true)">
+                        {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -63,7 +77,8 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField(['firstName', 'name'], $event)"
-                            [displayFilterIcon]="true">
+                            [displayFilterIcon]="true"
+                            app-reset-input-on-side-filter>
                         </app-form-input>
                     </div>
                 </div>
@@ -87,7 +102,8 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('lastName', $event)"
-                            [displayFilterIcon]="true">
+                            [displayFilterIcon]="true"
+                            app-reset-input-on-side-filter>
                         </app-form-input>
                     </div>
                 </div>
@@ -113,7 +129,8 @@
                             [min]="0"
                             [max]="Constants.DEFAULT_AGE_MAX_YEARS"
                             fromPlaceholder="LNG_AGE_FIELD_FILTER_LABEL_FROM"
-                            toPlaceholder="LNG_AGE_FIELD_FILTER_LABEL_TO">
+                            toPlaceholder="LNG_AGE_FIELD_FILTER_LABEL_TO"
+                            app-reset-input-on-side-filter>
                         </app-form-range>
                     </div>
                 </div>
@@ -141,7 +158,8 @@
                             multiple="true"
                             [allowSelectionOfDisabledItems]="true"
                             [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true">
+                            [displayFilterIcon]="true"
+                            app-reset-input-on-side-filter>
                         </app-form-select>
                     </div>
                 </div>
@@ -265,6 +283,7 @@
     </div>
 
     <mat-paginator
+        [pageIndex]="pageIndex"
         [length]="(clusterPeopleListCount$ | async)?.count"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"

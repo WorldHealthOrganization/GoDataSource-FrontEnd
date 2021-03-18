@@ -1,17 +1,18 @@
 @font-face {
   font-family: 'xtIcon';
   src:
-    url('fonts/xtIcon.ttf?73rrbf') format('truetype'),
-    url('fonts/xtIcon.woff?73rrbf') format('woff'),
-    url('fonts/xtIcon.svg?73rrbf#xtIcon') format('svg');
+    url('fonts/xtIcon.ttf?md2qbc') format('truetype'),
+    url('fonts/xtIcon.woff?md2qbc') format('woff'),
+    url('fonts/xtIcon.svg?md2qbc#xtIcon') format('svg');
   font-weight: normal;
   font-style: normal;
+  font-display: block;
 }
 
 .xt-icon {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: 'xtIcon' !important;
-  speak: none;
+  speak: never;
   font-style: normal;
   font-weight: normal;
   font-variant: normal;
@@ -33,6 +34,12 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.xtIconmove:before {
+  content: "\e933";
+}
+.xtIconlab:before {
+  content: "\e9aa";
+}
 .xtIconellipse:before {
   content: "\e92f";
 }
@@ -180,9 +187,6 @@
 }
 .xtIconsync:before {
   content: "\e92e";
-}
-.xtIconlab:before {
-  content: "\e9aa";
 }
 .xtIconarrow-down:before {
   content: "\e922";

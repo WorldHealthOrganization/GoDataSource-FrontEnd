@@ -76,8 +76,8 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_LOCATIONS_ACTION_VIEW_LOCATION',
-            click: (item: LocationModel) => {
-                this.router.navigate(['/locations', item.id, 'view']);
+            linkGenerator: (item: LocationModel): string[] => {
+                return ['/locations', item.id, 'view'];
             },
             visible: (): boolean => {
                 return LocationModel.canView(this.authUser);
@@ -88,8 +88,8 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_LIST_LOCATIONS_ACTION_MODIFY_LOCATION',
-            click: (item: LocationModel) => {
-                this.router.navigate(['/locations', item.id, 'modify']);
+            linkGenerator: (item: LocationModel): string[] => {
+                return ['/locations', item.id, 'modify'];
             },
             visible: (): boolean => {
                 return LocationModel.canModify(this.authUser);

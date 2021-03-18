@@ -1,7 +1,8 @@
 <app-dashboard-custom-metric-dashlet
     [link]="CaseModel.canList(authUser) ? '/cases' : ''"
-    [params]="getDashletParamsIncludingGlobalFilters({ applyListFilter: Constants.APPLY_LIST_FILTER.CASES_LESS_CONTACTS, x: xLessContacts })"
+    [params]="getDashletParamsIncludingGlobalFilters(queryParams)"
     [value]="casesLessContactsCount"
+    tooltip="LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE_BEFORE_VALUE_DESCRIPTION"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"
     (moveAfter)="onMoveAfter()"

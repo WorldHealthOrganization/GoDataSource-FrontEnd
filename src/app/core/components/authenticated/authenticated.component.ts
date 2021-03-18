@@ -4,7 +4,6 @@ import { AuthDataService } from '../../services/data/auth.data.service';
 import { UserModel } from '../../models/user.model';
 import { MatDialogRef, MatSidenav } from '@angular/material';
 import { OutbreakDataService } from '../../services/data/outbreak.data.service';
-import { SnackbarService } from '../../services/helper/snackbar.service';
 import { ReferenceDataDataService } from '../../services/data/reference-data.data.service';
 import { HelpDataService } from '../../services/data/help.data.service';
 import * as _ from 'lodash';
@@ -111,7 +110,6 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
     constructor(
         private router: Router,
         private authDataService: AuthDataService,
-        private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private helpDataService: HelpDataService,

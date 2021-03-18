@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
@@ -25,7 +24,11 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
     templateUrl: './audit-logs-list.component.html',
     styleUrls: ['./audit-logs-list.component.less']
 })
-export class AuditLogsListComponent extends ListComponent implements OnInit, OnDestroy {
+export class AuditLogsListComponent
+    extends ListComponent
+    implements OnInit, OnDestroy {
+
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_AUDIT_LOGS_TITLE', '.', true)
     ];
@@ -56,7 +59,6 @@ export class AuditLogsListComponent extends ListComponent implements OnInit, OnD
      */
     constructor(
         protected listHelperService: ListHelperService,
-        private dialogService: DialogService,
         private auditLogDataService: AuditLogDataService,
         private snackbarService: SnackbarService,
         private genericDataService: GenericDataService,

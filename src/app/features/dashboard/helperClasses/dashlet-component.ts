@@ -7,6 +7,7 @@ import * as _ from 'lodash';
 import { Moment } from '../../../core/helperClasses/x-moment';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../core/models/user.model';
+import { Constants } from '../../../core/models/constants';
 
 export abstract class DashletComponent {
     // authenticated user
@@ -134,6 +135,7 @@ export abstract class DashletComponent {
 
         // finished
         return {
+            [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
             global: JSON.stringify(global),
             ...otherParams
         };
