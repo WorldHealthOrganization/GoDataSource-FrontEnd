@@ -162,7 +162,6 @@ export class FormSelectVscrollComponent
             !byValue ||
             !this.optionLabelKey
         ) {
-
             // all visible options
             this.filteredOptions = this.options;
 
