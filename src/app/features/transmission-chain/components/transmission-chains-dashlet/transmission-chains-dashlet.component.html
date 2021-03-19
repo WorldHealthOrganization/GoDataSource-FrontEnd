@@ -385,7 +385,7 @@
                     [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE' | translate"
                     required="true"
                     [options]="chainPages"
-                    [clearable]="false"
+                    [clearable]="true"
                     optionLabelKey="pageLabel"
                     optionValueKey="pageIndex"
                     (ngModelChange)="changedPage()">
@@ -399,7 +399,9 @@
 
 <!-- cytoscape element -->
 <div
-    *ngIf="chainGroup && !mustLoadChain"
+    *ngIf="chainGroup &&
+        !mustLoadChain &&
+        selectedChainPageIndex !== null"
     class="cytoscape-graph-element">
     <div class="cytoscape-graph-container">
         <!-- legend -->

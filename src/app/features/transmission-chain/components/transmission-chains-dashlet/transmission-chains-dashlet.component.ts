@@ -77,7 +77,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     // chain pages
     chainPageSize: number;
     chainPages: ITransmissionChainGroupPageModel[];
-    selectedChainPageIndex: number = 0;
+    selectedChainPageIndex: number = null;
 
     // page size
     pageSize: number = 250;
@@ -609,6 +609,13 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
                             // reset filters
                             this.showFilters = false;
+                            this.selectedSnapshot = undefined;
+                            this.selectedChainPageIndex = null;
+                            this.chainGroup = undefined;
+                            this.chainPages = undefined;
+                            this.showGraphConfiguration = false;
+                            this.showSnapshotFilters = false;
+                            this.mustLoadChain = true;
 
                             // when we have data
                             if (
@@ -2450,6 +2457,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 );
             }
 
+            // reset the page number
+            this.selectedChainPageIndex = null;
+
             // update view
             this.updateView();
 
@@ -2463,7 +2473,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         });
         this.chainGroup = undefined;
         this.chainPages = undefined;
-        this.selectedChainPageIndex = 0;
+        this.selectedChainPageIndex = null;
         this.chainGroupId = this.selectedSnapshot;
         this.transmissionChainDataService
             .getCalculatedIndependentTransmissionChains(
