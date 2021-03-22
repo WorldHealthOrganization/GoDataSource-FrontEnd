@@ -1,11 +1,4 @@
-import {
-    Component,
-    ElementRef,
-    OnDestroy,
-    OnInit,
-    ViewChild,
-    ViewEncapsulation
-} from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable, Subscription } from 'rxjs';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -53,14 +46,6 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
     styleUrls: ['./cases-list.component.less']
 })
 export class CasesListComponent extends ListComponent implements OnInit, OnDestroy {
-    @ViewChild('cityFilter') cityFilter: ElementRef;
-    @ViewChild('addressLine1Filter') addressLine1Filter: ElementRef;
-    @ViewChild('postalCodeFilter') postalCodeFilter: ElementRef;
-    @ViewChild('locationIdsFilter') locationIdsFilter: ElementRef;
-    @ViewChild('emailFilter') emailFilter: ElementRef;
-    @ViewChild('phoneNumberFilter') phoneNumberFilter: ElementRef;
-    @ViewChild('geoLocationAccurateFilter') geoLocationAccurateFilter: ElementRef;
-
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '.', true)
@@ -1197,101 +1182,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
         // add new filter
         this.filterBySelectField('classification', values, 'value', false);
-    }
-
-    /**
-     * Filter by current address
-     */
-    filterByAddress(
-    ) {
-        // create the input values
-        let addressInputs: { [key: string]: string | string[] | boolean; } = {};
-
-        // check for address
-        if (
-            this.addressLine1Filter &&
-            this.addressLine1Filter['innerValue']
-        ) {
-            addressInputs = {
-                ...addressInputs,
-                addressLine1: this.addressLine1Filter['innerValue']
-            };
-        }
-
-        // check for city
-        if (
-            this.cityFilter &&
-            this.cityFilter['innerValue']
-        ) {
-            addressInputs = {
-                ...addressInputs,
-                city: this.cityFilter['innerValue']
-            };
-        }
-
-        // check for email
-        if (
-            this.emailFilter &&
-            this.emailFilter['innerValue']
-        ) {
-            addressInputs = {
-                ...addressInputs,
-                emailAddress: this.emailFilter['innerValue']
-            };
-        }
-
-        // check for location
-        if (
-            this.locationIdsFilter &&
-            this.locationIdsFilter['innerValue']
-        ) {
-            const locationsIds = _.map(
-                this.locationIdsFilter['innerValue'],
-                (location) => {
-                    return location;
-                });
-
-            addressInputs = {
-                ...addressInputs,
-                parentLocationIdFilter: locationsIds
-            };
-        }
-
-        // check for geo location accurate
-        if (
-            this.geoLocationAccurateFilter
-        ) {
-            addressInputs = {
-                ...addressInputs,
-                geoLocationAccurate: this.geoLocationAccurateFilter['innerValue']
-            };
-        }
-
-        // check for postal Code
-        if (
-            this.postalCodeFilter &&
-            this.postalCodeFilter['innerValue']
-        ) {
-            addressInputs = {
-                ...addressInputs,
-                postalCode: this.postalCodeFilter['innerValue']
-            };
-        }
-
-        // check for phone number
-        if (
-            this.phoneNumberFilter &&
-            this.phoneNumberFilter['innerValue']
-        ) {
-            addressInputs = {
-                ...addressInputs,
-                phoneNumber: this.phoneNumberFilter['innerValue']
-            };
-        }
-
-        // filter the address by inputs
-        this.filterByAddressInputs(addressInputs);
-
     }
 
     /**

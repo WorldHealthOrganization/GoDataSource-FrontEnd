@@ -494,7 +494,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_AREA'
             }),
             new VisibleColumnModel({
-                field: 'phoneNumber',
+                field: 'address.phoneNumber',
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER'
             }),
             new VisibleColumnModel({
@@ -776,7 +776,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         childQueryBuilderKey: 'case'
                     }),
                     new FilterModel({
-                        fieldName: 'addresses.phoneNumber',
+                        fieldName: 'address.phoneNumber',
                         fieldLabel: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
                         type: FilterType.TEXT,
                         relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',

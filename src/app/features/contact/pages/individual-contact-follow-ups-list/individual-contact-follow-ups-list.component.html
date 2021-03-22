@@ -273,9 +273,9 @@
                     <div class="column-filter">
                         <app-form-location-dropdown
                             name="locationFilter"
-                            ngModel
+                            [(ngModel)]="addressParentLocationIds"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (itemChanged)="filterBySelectField('address.parentLocationIdFilter', $event, 'id')"
+                            (itemChanged)="filterByAddress('address', false, addressModel, addressParentLocationIds)"
                             multiple="true"
                             app-reset-input-on-side-filter
                             [useOutbreakLocations]="true">
@@ -296,9 +296,9 @@
                     <div class="column-filter">
                         <app-form-input
                             name="phoneNumberFilter"
-                            ngModel
+                            [(ngModel)]="addressModel.phoneNumber"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByPhoneNumber('address.phoneNumber', $event, '$regex')"
+                            (optionChanged)="filterByAddress('address', false, addressModel, addressParentLocationIds)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -320,9 +320,9 @@
                     <div class="column-filter">
                         <app-form-input
                             name="addressLine1Filter"
-                            ngModel
+                            [(ngModel)]="addressModel.addressLine1"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('address.addressLine1', $event)"
+                            (optionChanged)="filterByAddress('address', false, addressModel, addressParentLocationIds)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -342,9 +342,9 @@
                     <div class="column-filter">
                         <app-form-input
                             name="emailFilter"
-                            ngModel
+                            [(ngModel)]="addressModel.emailAddress"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('address.emailAddress', $event)"
+                            (optionChanged)="filterByAddress('address', false, addressModel, addressParentLocationIds)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -366,9 +366,9 @@
                     <div class="column-filter">
                         <app-form-input
                             name="cityFilter"
-                            ngModel
+                            [(ngModel)]="addressModel.city"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('address.city', $event)"
+                            (optionChanged)="filterByAddress('address', false, addressModel, addressParentLocationIds)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -424,9 +424,9 @@
                     <div class="column-filter">
                         <app-form-input
                             name="postalCodeFilter"
-                            ngModel
+                            [(ngModel)]="addressModel.postalCode"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('address.postalCode', $event)"
+                            (optionChanged)="filterByAddress('address', false, addressModel, addressParentLocationIds)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -448,10 +448,10 @@
                     <div class="column-filter">
                         <app-form-select
                             name="geoLocationAccurateFilter"
-                            ngModel
+                            [(ngModel)]="addressModel.geoLocationAccurate"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="yesNoOptionsList$ | async"
-                            (optionChanged)="filterByBooleanUsingExistField('address.geoLocationAccurate', $event.value)"
+                            (optionChanged)="filterByAddress('address', false, addressModel, addressParentLocationIds)"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
                             [displayFilterIcon]="true"

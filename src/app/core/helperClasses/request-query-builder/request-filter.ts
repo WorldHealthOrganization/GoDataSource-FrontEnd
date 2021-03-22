@@ -825,6 +825,127 @@ export class RequestFilter {
     }
 
     /**
+     * Remove child conditions that match path (path may or not contain the index from an array, if it does it will remove only that item index if it matches, if it doesn't it will remove all items that match)
+     * Usages:
+     * - path = 'and.and.address' | 'and.and.addresses'
+     * - path = 'and.and.0.address' | 'and.and.0.addresses'
+     */
+    removePathCondition(
+        path: string
+    ): RequestFilter {
+        // if path empty we have nothing to remove
+        if (!path) {
+            return this;
+        }
+
+        // determine path elements
+        const pathElements: string[] = path.split('.');
+
+        // recursive check of element
+        const checkPathElement = (
+            condition: any,
+            localPathElementIndex: number
+        ): void => {
+            // no condition to check / remove ?
+            if (!condition) {
+                return;
+            }
+
+            // go through all conditions and check if we have one that matches out path element
+            const conditionProperties: string[] = Object.keys(condition);
+            conditionProperties.forEach((conditionKey) => {
+                // not our condition that we need to remove ?
+                if (
+                    conditionKey !== pathElements[localPathElementIndex] &&
+                    !conditionKey.startsWith(`${pathElements[localPathElementIndex]}.`)
+                ) {
+                    return;
+                }
+
+                // this is the condition that we need to remove ?
+                if (localPathElementIndex + 1 === pathElements.length) {
+                    // remove condition
+                    delete condition[conditionKey];
+
+                    // finished
+                    return;
+                }
+
+                // if array then we need to threat it in two different ways
+                // - path may or not contain the index from an array, if it does it will remove only that item index if it matches
+                // - if it doesn't it will remove all items that match
+                if (_.isArray(condition[conditionKey])) {
+                    if (_.get(condition[conditionKey], pathElements[localPathElementIndex + 1]) === undefined) {
+                        (condition[conditionKey] as any[]).forEach((childCondition: any, childIndex: number) => {
+                            // check child
+                            checkPathElement(
+                                childCondition,
+                                localPathElementIndex + 1
+                            );
+
+                            // if child condition was removed then we need to check parent if empty and remove it too
+                            if (_.isEmpty(childCondition)) {
+                                delete condition[conditionKey][childIndex];
+                            }
+                        });
+                    } else {
+                        // this is the condition that we need to remove ?
+                        if (localPathElementIndex + 2 === pathElements.length) {
+                            // remove condition
+                            delete condition[pathElements[localPathElementIndex + 1]];
+
+                            // finished
+                            return;
+                        } else {
+                            // check child
+                            checkPathElement(
+                                condition[conditionKey][pathElements[localPathElementIndex + 1]],
+                                localPathElementIndex + 2
+                            );
+                        }
+                    }
+
+                    // remove empty deleted items
+                    condition[conditionKey] = [...condition[conditionKey]].filter((childCondition) => !_.isEmpty(childCondition));
+                } else {
+                    // need to look further - recursive into condition children for remaining path elements ?
+                    checkPathElement(
+                        condition[conditionKey],
+                        localPathElementIndex++
+                    );
+                }
+
+                // if child condition was removed then we need to check parent if empty and remove it too
+                if (_.isEmpty(condition[conditionKey])) {
+                    delete condition[conditionKey];
+                }
+            });
+        };
+
+        // go through condition and see if we can find our path
+        (this.conditions || []).forEach((condition: any, conditionIndex) => {
+            checkPathElement(
+                condition,
+                0
+            );
+
+            // if child condition was removed then we need to check parent if empty and remove it too
+            if (_.isEmpty(condition)) {
+                delete this.conditions[conditionIndex];
+            }
+        });
+
+        // remove empty deleted items
+        this.conditions = [...this.conditions].filter((childCondition) => !_.isEmpty(childCondition));
+
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
+        return this;
+    }
+
+    /**
      * Check if a key is used in a condition
      * @param property
      */

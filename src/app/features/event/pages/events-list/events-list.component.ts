@@ -402,6 +402,11 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                 visible: false
             }),
             new VisibleColumnModel({
+                field: 'location',
+                label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
+                visible: false
+            }),
+            new VisibleColumnModel({
                 field: 'address.addressLine1',
                 label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
                 visible: false

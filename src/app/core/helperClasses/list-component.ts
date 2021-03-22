@@ -13,7 +13,10 @@ import { MetricContactsSeenEachDays } from '../models/metrics/metric-contacts-se
 import { FormCheckboxComponent } from '../../shared/xt-forms/components/form-checkbox/form-checkbox.component';
 import { ContactFollowedUp, MetricContactsWithSuccessfulFollowUp } from '../models/metrics/metric.contacts-with-success-follow-up.model';
 import { VisibleColumnModel } from '../../shared/components/side-columns/model';
-import { AddressType } from '../models/address.model';
+import {
+    AddressModel,
+    AddressType
+} from '../models/address.model';
 import { moment, Moment } from './x-moment';
 import { ListHelperService } from '../services/helper/list-helper.service';
 import { SubscriptionLike } from 'rxjs/internal/types';
@@ -72,6 +75,12 @@ export abstract class ListComponent implements OnDestroy {
      * Breadcrumbs
      */
     public breadcrumbs: BreadcrumbItemModel[];
+
+    // address model needed for filters
+    addressModel: AddressModel = new AddressModel({
+        geoLocationAccurate: null
+    });
+    addressParentLocationIds: string[] = [];
 
     /**
      * Determine all children that we need to reset when side filters are being applied
@@ -782,120 +791,30 @@ export abstract class ListComponent implements OnDestroy {
     }
 
     /**
-     * Filter the address by inputs
-     * @param {object} address inputs
+     * Filter by current address
      */
-    filterByAddressInputs(
-        fields: { [key: string]: string | string[] | boolean; }
+    filterByAddress(
+        property: string,
+        isArray: boolean,
+        addressModel: AddressModel,
+        addressParentLocationIds: string[],
+        useLike: boolean = false
     ) {
-        // remove previous condition
-        this.queryBuilder.filter.remove('addresses');
+        // remove the previous conditions
+        this.queryBuilder.filter.removePathCondition('address');
+        this.queryBuilder.filter.removePathCondition('addresses');
+        this.queryBuilder.filter.removePathCondition('and.address');
+        this.queryBuilder.filter.removePathCondition('and.addresses');
 
-        // create the query
-        let query: { [key: string]: any | any[]; } = {};
+        // create a query builder
+        const searchQb: RequestQueryBuilder = AddressModel.buildAddressFilter(property, isArray, addressModel, addressParentLocationIds, useLike);
 
-        // loop through all fields
-        for (const property in fields) {
-            // get the value
-            const value = fields[property];
-
-            // create the condition
-            switch (property) {
-                case 'addressLine1':
-                case 'city':
-                case 'postalCode':
-                case 'emailAddress':
-                    if (value) {
-                        query = {
-                            ...query,
-                            [property]:  {
-                                // text start with
-                                $regex: '^' + RequestFilter.escapeStringForRegex(<string>value),
-                                $options: 'i'
-                            }
-                        };
-                    }
-
-                    break;
-                case 'parentLocationIdFilter':
-                    if (
-                        Array.isArray(value) &&
-                        value.length > 0
-                    ) {
-                        query = {
-                            ...query,
-                            parentLocationIdFilter: {
-                                $in: value
-                            }
-                        };
-                    }
-
-                    break;
-                case 'phoneNumber':
-                    if (value) {
-                        // build number pattern condition
-                        const phonePattern = RequestFilter.getPhoneNumberPattern(<string>value);
-
-                        // search by phone number or invalid phone
-                        query = {
-                            ...query,
-                            [property]: (!phonePattern) ?
-                                'INVALID PHONE' :
-                                {
-                                    '$regex': phonePattern
-                                }
-                        };
-                    }
-
-                    break;
-                case 'geoLocationAccurate':
-                    if (value === false) {
-                        // create condition with OR criteria
-                        const orCondition = {
-                            $or: [
-                                {
-                                    [property]: {
-                                        $eq: value
-                                    }
-                                },
-                                {
-                                    [property]: {
-                                        $exists: value
-                                    }
-                                }
-                            ]
-                        };
-
-                        query = {
-                            ...query,
-                            ...orCondition
-                        };
-                    } else if (value === true) {
-                        query = {
-                            ...query,
-                            [property]: {
-                                $eq: true
-                            }
-                        };
-                    }
-
-                    break;
-            }
-        }
-
-        // add the conditions for the current address
-        if (Object.keys(query).length > 0) {
-            // add the current address as filter
-            query = {
-                typeId: AddressType.CURRENT_ADDRESS,
-                ...query
-            };
-
-            this.queryBuilder.filter.where({
-                addresses: {
-                    elemMatch: query
-                }
-            });
+        // add condition if we were able to create it
+        if (
+            searchQb &&
+            !searchQb.isEmpty()
+        ) {
+            this.queryBuilder.merge(searchQb);
         }
 
         // refresh list
