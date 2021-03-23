@@ -31,6 +31,7 @@ import { EntityHelperService } from '../../../../core/services/helper/entity-hel
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { AddressModel } from '../../../../core/models/address.model';
 
 @Component({
     selector: 'app-events-list',
@@ -51,6 +52,12 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
     EventModel = EventModel;
     RelationshipModel = RelationshipModel;
     OutbreakModel = OutbreakModel;
+
+    // address model needed for filters
+    filterAddressModel: AddressModel = new AddressModel({
+        geoLocationAccurate: null
+    });
+    filterAddressParentLocationIds: string[] = [];
 
     // user list
     userList$: Observable<UserModel[]>;

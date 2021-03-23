@@ -36,6 +36,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { TeamModel } from '../../../../core/models/team.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { AddressModel } from '../../../../core/models/address.model';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -51,6 +52,12 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     authUser: UserModel;
     // contacts outbreak
     selectedOutbreak: OutbreakModel;
+
+    // address model needed for filters
+    filterAddressModel: AddressModel = new AddressModel({
+        geoLocationAccurate: null
+    });
+    filterAddressParentLocationIds: string[] = [];
 
     // user list
     userList$: Observable<UserModel[]>;
@@ -494,7 +501,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_AREA'
             }),
             new VisibleColumnModel({
-                field: 'address.phoneNumber',
+                field: 'phoneNumber',
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER'
             }),
             new VisibleColumnModel({
@@ -723,7 +730,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
                     }),
                     new FilterModel({
-                        fieldName: 'phoneNumber',
+                        fieldName: 'addresses.phoneNumber',
                         fieldLabel: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER',
                         type: FilterType.TEXT,
                         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
@@ -776,7 +783,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         childQueryBuilderKey: 'case'
                     }),
                     new FilterModel({
-                        fieldName: 'address.phoneNumber',
+                        fieldName: 'addresses.phoneNumber',
                         fieldLabel: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
                         type: FilterType.TEXT,
                         relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',

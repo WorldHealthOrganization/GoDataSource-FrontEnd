@@ -31,6 +31,7 @@ import { throwError } from 'rxjs/internal/observable/throwError';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { AddressModel } from '../../../../core/models/address.model';
 
 @Component({
     selector: 'app-individual-contact-follow-ups-list',
@@ -46,6 +47,12 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
     authUser: UserModel;
     // contacts outbreak
     selectedOutbreak: OutbreakModel;
+
+    // address model needed for filters
+    filterAddressModel: AddressModel = new AddressModel({
+        geoLocationAccurate: null
+    });
+    filterAddressParentLocationIds: string[] = [];
 
     // user list
     userList$: Observable<UserModel[]>;

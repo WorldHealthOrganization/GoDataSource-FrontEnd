@@ -38,6 +38,7 @@ import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { AddressModel } from '../../../../core/models/address.model';
 
 @Component({
     selector: 'app-cases-list',
@@ -58,6 +59,12 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     // list of existing cases
     casesList$: Observable<CaseModel[]>;
     casesListCount$: Observable<IBasicCount>;
+
+    // address model needed for filters
+    filterAddressModel: AddressModel = new AddressModel({
+        geoLocationAccurate: null
+    });
+    filterAddressParentLocationIds: string[] = [];
 
     // don't display pills by default
     showCountPills: boolean = false;

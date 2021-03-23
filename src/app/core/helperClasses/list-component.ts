@@ -76,12 +76,6 @@ export abstract class ListComponent implements OnDestroy {
      */
     public breadcrumbs: BreadcrumbItemModel[];
 
-    // address model needed for filters
-    addressModel: AddressModel = new AddressModel({
-        geoLocationAccurate: null
-    });
-    addressParentLocationIds: string[] = [];
-
     /**
      * Determine all children that we need to reset when side filters are being applied
      */
@@ -807,7 +801,13 @@ export abstract class ListComponent implements OnDestroy {
         this.queryBuilder.filter.removePathCondition('and.addresses');
 
         // create a query builder
-        const searchQb: RequestQueryBuilder = AddressModel.buildAddressFilter(property, isArray, addressModel, addressParentLocationIds, useLike);
+        const searchQb: RequestQueryBuilder = AddressModel.buildAddressFilter(
+            property,
+            isArray,
+            addressModel,
+            addressParentLocationIds,
+            useLike
+        );
 
         // add condition if we were able to create it
         if (

@@ -41,6 +41,7 @@ import { ContactOfContactModel } from '../../../../core/models/contact-of-contac
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
+import { AddressModel } from '../../../../core/models/address.model';
 
 @Component({
     selector: 'app-contacts-list',
@@ -76,6 +77,12 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
 
     // contacts outbreak
     selectedOutbreak: OutbreakModel;
+
+    // address model needed for filters
+    filterAddressModel: AddressModel = new AddressModel({
+        geoLocationAccurate: null
+    });
+    filterAddressParentLocationIds: string[] = [];
 
     // gender list
     genderList$: Observable<any[]>;
