@@ -1,6 +1,10 @@
 import * as _ from 'lodash';
 import { LocationModel } from './location.model';
-import { RequestFilter, RequestQueryBuilder } from '../helperClasses/request-query-builder';
+import {
+    RequestFilter,
+    RequestFilterGenerator,
+    RequestQueryBuilder
+} from '../helperClasses/request-query-builder';
 import { moment } from '../helperClasses/x-moment';
 
 // addresses types
@@ -180,6 +184,167 @@ export class AddressModel {
             qb.filter.where({
                 $and: conditions
             }, false);
+        }
+
+        // finished
+        return qb;
+    }
+
+    /**
+     * Create query builder that will filter an address
+     */
+    static buildAddressFilter(
+        property: string,
+        isArray: boolean,
+        addressModel: AddressModel,
+        addressParentLocationIds: string[],
+        useLike: boolean = false
+    ): RequestQueryBuilder {
+        // initialize query builder
+        const qb = new RequestQueryBuilder();
+
+        // create a query that collects the address inputs
+        const query: { [key: string]: {} } = {};
+
+        // collect the address inputs to create the query
+        if (isArray) {
+            // check for address
+            if (addressModel.addressLine1) {
+                query.addressLine1 = {
+                    // text start with
+                    $regex: '^' + RequestFilter.escapeStringForRegex(addressModel.addressLine1),
+                    $options: 'i'
+                };
+            }
+
+            // check for city
+            if (addressModel.city) {
+                query.city = {
+                    // text start with
+                    $regex: '^' + RequestFilter.escapeStringForRegex(addressModel.city),
+                    $options: 'i'
+                };
+            }
+
+            // check for email address
+            if (addressModel.emailAddress) {
+                query.emailAddress = {
+                    // text start with
+                    $regex: '^' + RequestFilter.escapeStringForRegex(addressModel.emailAddress),
+                    $options: 'i'
+                };
+            }
+
+            // check for postalCode
+            if (addressModel.postalCode) {
+                query.postalCode = {
+                    // text start with
+                    $regex: '^' + RequestFilter.escapeStringForRegex(addressModel.postalCode),
+                    $options: 'i'
+                };
+            }
+
+            // check for phone number
+            if (addressModel.phoneNumber) {
+                // build number pattern condition
+                const phonePattern = RequestFilter.getPhoneNumberPattern(addressModel.phoneNumber);
+
+                query.phoneNumber = !phonePattern ?
+                    'INVALID PHONE' :
+                    {
+                        $regex: phonePattern
+                    };
+            }
+
+            // check for locations
+            if (
+                addressParentLocationIds &&
+                addressParentLocationIds.length > 0
+            ) {
+                query.parentLocationIdFilter = {
+                    $in: addressParentLocationIds
+                };
+            }
+
+            // check for geo location accurate
+            if (
+                addressModel.geoLocationAccurate === false ||
+                addressModel.geoLocationAccurate === true
+            ) {
+                query.geoLocationAccurate = {
+                    [addressModel.geoLocationAccurate === false ? '$ne' : '$eq']: true
+                };
+            }
+        } else {
+            // check for address
+            if (addressModel.addressLine1) {
+                query[`${property}.addressLine1`] = RequestFilterGenerator.textStartWith(addressModel.addressLine1, useLike);
+            }
+
+            // check for city
+            if (addressModel.city) {
+                query[`${property}.city`] = RequestFilterGenerator.textStartWith(addressModel.city, useLike);
+            }
+
+            // check for email address
+            if (addressModel.emailAddress) {
+                query[`${property}.emailAddress`] = RequestFilterGenerator.textStartWith(addressModel.emailAddress, useLike);
+            }
+
+            // check for postal code
+            if (addressModel.postalCode) {
+                query[`${property}.postalCode`] = RequestFilterGenerator.textStartWith(addressModel.postalCode, useLike);
+            }
+
+            // check for geo location accurate
+            if (
+                addressModel.geoLocationAccurate === false ||
+                addressModel.geoLocationAccurate === true
+            ) {
+                query[`${property}.geoLocationAccurate`] = {
+                    [addressModel.geoLocationAccurate === false ? 'ne' : 'eq']: true
+                };
+            }
+
+            // check for phone number
+            if (addressModel.phoneNumber) {
+                // build number pattern condition
+                const phonePattern = RequestFilter.getPhoneNumberPattern(addressModel.phoneNumber);
+
+                query[`${property}.phoneNumber`] = !phonePattern ?
+                    'INVALID PHONE' :
+                    {
+                        [useLike ? 'regex' : '$regex']: phonePattern
+                    };
+            }
+
+            // check for locations
+            if (
+                addressParentLocationIds &&
+                addressParentLocationIds.length > 0
+            ) {
+                query[`${property}.parentLocationIdFilter`] = {
+                    inq: addressParentLocationIds
+                };
+            }
+        }
+
+        // check if there are conditions to add
+        if (Object.keys(query).length > 0) {
+            // add the conditions for the current address only
+            if (isArray) {
+                // add the conditions for the current address only
+                query.typeId = AddressType.CURRENT_ADDRESS;
+
+                // add the conditions
+                qb.filter.where({
+                    [property]: {
+                        elemMatch: query
+                    }
+                });
+            } else {
+                qb.filter.where(query);
+            }
         }
 
         // finished

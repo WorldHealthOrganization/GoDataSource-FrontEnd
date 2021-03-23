@@ -1,4 +1,4 @@
- import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable, throwError } from 'rxjs';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -32,7 +32,6 @@ import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { AddressType } from '../../../../core/models/address.model';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.model';
@@ -40,6 +39,7 @@ import { RiskLevelModel } from '../../../../core/models/risk-level.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
  import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
  import {IBasicCount} from '../../../../core/models/basic-count.interface';
+import { AddressModel } from '../../../../core/models/address.model';
 
 @Component({
     selector: 'app-contacts-of-contacts-list',
@@ -57,6 +57,12 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     Constants = Constants;
     ContactOfContactModel = ContactOfContactModel;
     OutbreakModel = OutbreakModel;
+
+    // address model needed for filters
+    filterAddressModel: AddressModel = new AddressModel({
+        geoLocationAccurate: null
+    });
+    filterAddressParentLocationIds: string[] = [];
 
     // authenticated user
     authUser: UserModel;
@@ -398,6 +404,41 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             new VisibleColumnModel({
                 field: 'location',
                 label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_LOCATION'
+            }),
+            new VisibleColumnModel({
+                field: 'addresses.addressLine1',
+                label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'addresses.city',
+                label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'addresses.emailAddress',
+                label: 'LNG_CONTACT_FIELD_LABEL_EMAIL',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'addresses.geoLocation.lat',
+                label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'addresses.geoLocation.lng',
+                label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'addresses.postalCode',
+                label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'addresses.geoLocationAccurate',
+                label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'age',
@@ -846,36 +887,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });
-    }
-
-    /**
-     * Filter by locations selected in location-drop-down
-     * @param locations
-     */
-    filterByLocation(locations) {
-        // remove previous condition
-        this.queryBuilder.filter.remove('addresses');
-        if (!_.isEmpty(locations)) {
-            // mapping all the locations to get the ids
-            const locationsIds = _.map(locations, (location) => {
-                return location.id;
-            });
-
-            // build query
-            this.queryBuilder.filter.where({
-                addresses: {
-                    elemMatch: {
-                        typeId: AddressType.CURRENT_ADDRESS,
-                        parentLocationIdFilter: {
-                            $in: locationsIds
-                        }
-                    }
-                }
-            });
-        }
-
-        // refresh list
-        this.needsRefreshList();
     }
 
     /**

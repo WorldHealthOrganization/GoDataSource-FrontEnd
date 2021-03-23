@@ -31,7 +31,6 @@ import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
-import { AddressType } from '../../../../core/models/address.model';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ContactModel } from '../../../../core/models/contact.model';
@@ -39,6 +38,7 @@ import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { AddressModel } from '../../../../core/models/address.model';
 
 @Component({
     selector: 'app-cases-list',
@@ -59,6 +59,12 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     // list of existing cases
     casesList$: Observable<CaseModel[]>;
     casesListCount$: Observable<IBasicCount>;
+
+    // address model needed for filters
+    filterAddressModel: AddressModel = new AddressModel({
+        geoLocationAccurate: null
+    });
+    filterAddressParentLocationIds: string[] = [];
 
     // don't display pills by default
     showCountPills: boolean = false;
@@ -641,6 +647,36 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             new VisibleColumnModel({
                 field: 'addresses.emailAddress',
                 label: 'LNG_CASE_FIELD_LABEL_EMAIL',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'addresses.addressLine1',
+                label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'addresses.city',
+                label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'addresses.geoLocation.lat',
+                label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'addresses.geoLocation.lng',
+                label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'addresses.postalCode',
+                label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'addresses.geoLocationAccurate',
+                label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
                 visible: false
             }),
             new VisibleColumnModel({
@@ -1379,36 +1415,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             this.loadingDialog.close();
             this.loadingDialog = null;
         }
-    }
-
-    /**
-     * Filter by locations selected in location-drop-down
-     * @param locations
-     */
-    filterByLocation(locations) {
-        // remove previous condition
-        this.queryBuilder.filter.remove('addresses');
-        if (!_.isEmpty(locations)) {
-            // mapping all the locations to get the ids
-            const locationsIds = _.map(locations, (location) => {
-                return location.id;
-            });
-
-            // build query
-            this.queryBuilder.filter.where({
-                addresses: {
-                    elemMatch: {
-                        typeId: AddressType.CURRENT_ADDRESS,
-                        parentLocationIdFilter: {
-                            $in: locationsIds
-                        }
-                    }
-                }
-            });
-        }
-
-        // refresh list
-        this.needsRefreshList();
     }
 
     /**

@@ -36,6 +36,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { TeamModel } from '../../../../core/models/team.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { AddressModel } from '../../../../core/models/address.model';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -51,6 +52,12 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     authUser: UserModel;
     // contacts outbreak
     selectedOutbreak: OutbreakModel;
+
+    // address model needed for filters
+    filterAddressModel: AddressModel = new AddressModel({
+        geoLocationAccurate: null
+    });
+    filterAddressParentLocationIds: string[] = [];
 
     // user list
     userList$: Observable<UserModel[]>;
@@ -520,8 +527,33 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 label: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP'
             }),
             new VisibleColumnModel({
-                field: 'fullAddress',
-                label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
+                field: 'address.addressLine1',
+                label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.city',
+                label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.geoLocation.lat',
+                label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.geoLocation.lng',
+                label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.postalCode',
+                label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.geoLocationAccurate',
+                label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
                 visible: false
             }),
             new VisibleColumnModel({

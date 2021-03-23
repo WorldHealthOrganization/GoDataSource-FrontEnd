@@ -31,6 +31,7 @@ import { EntityHelperService } from '../../../../core/services/helper/entity-hel
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { AddressModel } from '../../../../core/models/address.model';
 
 @Component({
     selector: 'app-events-list',
@@ -51,6 +52,12 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
     EventModel = EventModel;
     RelationshipModel = RelationshipModel;
     OutbreakModel = OutbreakModel;
+
+    // address model needed for filters
+    filterAddressModel: AddressModel = new AddressModel({
+        geoLocationAccurate: null
+    });
+    filterAddressParentLocationIds: string[] = [];
 
     // user list
     userList$: Observable<UserModel[]>;
@@ -352,11 +359,6 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                 visible: false
             }),
             new VisibleColumnModel({
-                field: 'address',
-                label: 'LNG_EVENT_FIELD_LABEL_ADDRESS',
-                visible: false
-            }),
-            new VisibleColumnModel({
                 field: 'address.emailAddress',
                 label: 'LNG_EVENT_FIELD_LABEL_EMAIL',
                 visible: false
@@ -405,6 +407,41 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                 field: 'updatedAt',
                 label: 'LNG_EVENT_FIELD_LABEL_UPDATED_AT',
                 visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'location',
+                label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.addressLine1',
+                label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.city',
+                label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.geoLocation.lat',
+                label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.geoLocation.lng',
+                label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.postalCode',
+                label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'address.geoLocationAccurate',
+                label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
+                visible: false
             })
         );
     }
@@ -417,6 +454,9 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             // retrieve created user & modified user information
             this.queryBuilder.include('createdByUser', true);
             this.queryBuilder.include('updatedByUser', true);
+
+            // retrieve location list
+            this.queryBuilder.include('location', true);
 
             // since some flags can do damage to other endpoints called with the same flag, we should make sure we don't send it
             // to do this, we clone the query filter before filtering by it

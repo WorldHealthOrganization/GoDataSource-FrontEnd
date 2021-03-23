@@ -13,7 +13,10 @@ import { MetricContactsSeenEachDays } from '../models/metrics/metric-contacts-se
 import { FormCheckboxComponent } from '../../shared/xt-forms/components/form-checkbox/form-checkbox.component';
 import { ContactFollowedUp, MetricContactsWithSuccessfulFollowUp } from '../models/metrics/metric.contacts-with-success-follow-up.model';
 import { VisibleColumnModel } from '../../shared/components/side-columns/model';
-import { AddressType } from '../models/address.model';
+import {
+    AddressModel,
+    AddressType
+} from '../models/address.model';
 import { moment, Moment } from './x-moment';
 import { ListHelperService } from '../services/helper/list-helper.service';
 import { SubscriptionLike } from 'rxjs/internal/types';
@@ -776,6 +779,43 @@ export abstract class ListComponent implements OnDestroy {
     filterByBooleanUsingExistField(property: string, value: any) {
         // filter by boolean using exist
         this.queryBuilder.filter.byBooleanUsingExist(property, value);
+
+        // refresh list
+        this.needsRefreshList();
+    }
+
+    /**
+     * Filter by current address
+     */
+    filterByAddress(
+        property: string,
+        isArray: boolean,
+        addressModel: AddressModel,
+        addressParentLocationIds: string[],
+        useLike: boolean = false
+    ) {
+        // remove the previous conditions
+        this.queryBuilder.filter.removePathCondition('address');
+        this.queryBuilder.filter.removePathCondition('addresses');
+        this.queryBuilder.filter.removePathCondition('and.address');
+        this.queryBuilder.filter.removePathCondition('and.addresses');
+
+        // create a query builder
+        const searchQb: RequestQueryBuilder = AddressModel.buildAddressFilter(
+            property,
+            isArray,
+            addressModel,
+            addressParentLocationIds,
+            useLike
+        );
+
+        // add condition if we were able to create it
+        if (
+            searchQb &&
+            !searchQb.isEmpty()
+        ) {
+            this.queryBuilder.merge(searchQb);
+        }
 
         // refresh list
         this.needsRefreshList();
