@@ -21,7 +21,7 @@
                         *ngIf="ContactModel.canView(authUser) && relatedPersonData"
                         class="follow-ups-title"
                         fxLayout="row" fxLayoutGap="20px">
-                        <div>{{ relatedPersonData.type === EntityType.CASE ? 'LNG_FOLLOW_UP_FIELD_LABEL_CASE' : 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT' | translate }}</div>
+                        <div>{{ (relatedPersonData.type === EntityType.CASE ? 'LNG_FOLLOW_UP_FIELD_LABEL_CASE' : 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT') | translate }}</div>
                         <a
                             [routerLink]="[relatedPersonData.type === EntityType.CASE ? '/cases' : '/contacts', relatedPersonData.id, 'view']">
                             {{ relatedPersonData.name }}
