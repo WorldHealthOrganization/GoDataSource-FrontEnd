@@ -15,7 +15,6 @@ import * as fromPages from './pages';
     ],
     declarations: [
         ...fromPages.pageComponents
-    ],
-    entryComponents: []
+    ]
 })
 export class SavedFiltersModule { }

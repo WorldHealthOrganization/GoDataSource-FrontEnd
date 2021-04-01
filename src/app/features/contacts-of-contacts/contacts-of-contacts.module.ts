@@ -12,8 +12,7 @@ import { WorldMapMovementModule } from '../../common-modules/world-map-movement/
     ],
     declarations: [
         ...fromPages.pageComponents
-    ],
-    entryComponents: []
+    ]
 })
 export class ContactsOfContactsModule {
 }

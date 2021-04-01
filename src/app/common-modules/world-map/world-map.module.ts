@@ -15,8 +15,7 @@ import * as fromComponents from './components';
     providers: [],
     exports: [
         ...fromComponents.components
-    ],
-    entryComponents: []
+    ]
 })
 export class WorldMapModule {
 }

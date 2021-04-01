@@ -20,8 +20,7 @@ import * as fromServices from './services';
     ],
     providers: [
         ...fromServices.services
-    ],
-    entryComponents: []
+    ]
 })
 export class OutbreakModule {
 }
