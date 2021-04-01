@@ -8,7 +8,6 @@ import { TranslateModule } from '@ngx-translate/core';
 import { XtFormsModule } from './xt-forms/xt-forms.module';
 import { AngularMaterialModule } from './angular-material/angular-material.module';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { MglTimelineModule } from 'angular-mgl-timeline';
 import { FileUploadModule } from 'ng2-file-upload';
 import { NgxWigModule } from 'ngx-wig';
 import { HotTableModule } from '@handsontable/angular';
@@ -35,7 +34,6 @@ import * as fromSharedPipes from './pipes';
         AngularMaterialModule,
         TranslateModule,
         MdePopoverModule,
-        MglTimelineModule,
         FileUploadModule,
         NgxWigModule,
         NgxMatSelectSearchModule,
@@ -60,7 +58,6 @@ import * as fromSharedPipes from './pipes';
         XtFormsModule,
         AngularMaterialModule,
         MdePopoverModule,
-        MglTimelineModule,
         ScrollingModule,
         ExperimentalScrollingModule,
         ...fromSharedDirectives.directives,

@@ -33,7 +33,6 @@
         "@ng-select/ng-select": "2.20.5",
         "@ngx-translate/core": "11.0.1",
         "@swimlane/ngx-charts": "10.1.0",
-        "angular-mgl-timeline": "0.3.2",
         "buffer": "5.2.1",
         "c3": "0.7.8",
         "core-js": "2.6.5",
