@@ -64,10 +64,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     @Output() edgeTapped = new EventEmitter<GraphEdgeModel>();
     @Output() changeEditMode = new EventEmitter<boolean>();
 
-    @ViewChild('cyItem', { static: false }) cyRef: ElementRef;
+    @ViewChild('cyItem') cyRef: ElementRef;
 
     // needed to export geo map image from parent component
-    @ViewChild('worldMap', { static: false }) worldMap: WorldMapComponent;
+    @ViewChild('worldMap') worldMap: WorldMapComponent;
 
     // constants
     Constants = Constants;

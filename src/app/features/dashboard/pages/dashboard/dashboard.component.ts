@@ -290,7 +290,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     globalFilterLocationId: string;
     globalFilterClassificationId: string[] = [];
 
-    @ViewChild('kpiSection', { static: false }) private kpiSection: ElementRef;
+    @ViewChild('kpiSection') private kpiSection: ElementRef;
     @ViewChildren('kpiSectionGroup') private kpiSectionGroup: QueryList<MatExpansionPanel>;
 
     // subscribers

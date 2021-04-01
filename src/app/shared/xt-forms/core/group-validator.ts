@@ -1,5 +1,5 @@
 import { ElementBase } from './element-base';
-import { AfterViewInit, EventEmitter, Host, Inject, Optional, Output, SkipSelf, ViewChild } from '@angular/core';
+import { AfterViewInit, EventEmitter, Host, Inject, Optional, Output, SkipSelf, ViewChild, Directive } from '@angular/core';
 import { ControlContainer, NG_ASYNC_VALIDATORS, NG_VALIDATORS, NgForm, NgModel } from '@angular/forms';
 import { ValueAccessorBase } from './value-accessor-base';
 import * as _ from 'lodash';
@@ -8,9 +8,10 @@ import { NgSelectComponent } from '@ng-select/ng-select';
 /**
  * Base class to be extended by custom form controls to handle groups of atomic form components
  */
+@Directive()
 export abstract class GroupValidator<T> extends ElementBase<T> implements AfterViewInit {
     // Group Form
-    @ViewChild('groupForm', { static: false }) groupForm: NgForm;
+    @ViewChild('groupForm') groupForm: NgForm;
 
     // handler for when one of the group value has changed
     @Output() groupValidated = new EventEmitter<void>();

@@ -255,9 +255,9 @@ export class ImportDataComponent
     possibleSourceDestinationLevels: LabelValuePair[];
 
     // search filters
-    @ViewChild('filterBySourceInput', { static: false }) filterBySourceInput: NgModel;
+    @ViewChild('filterBySourceInput') filterBySourceInput: NgModel;
     filterBySourceInputValue: string = '';
-    @ViewChild('filterByDestinationInput', { static: false }) filterByDestinationInput: NgModel;
+    @ViewChild('filterByDestinationInput') filterByDestinationInput: NgModel;
     filterByDestinationInputValue: string = '';
 
     // visible columns handler
@@ -337,13 +337,13 @@ export class ImportDataComponent
     @Input() decryptPasswordAlias: string = 'decryptPassword';
 
     // scrollable viewport
-    @ViewChild('virtualScrollViewport', { static: false }) virtualScrollViewport: CdkVirtualScrollViewport;
+    @ViewChild('virtualScrollViewport') virtualScrollViewport: CdkVirtualScrollViewport;
 
     // table data max height
     importDataBodyRowsMaxHeight: SafeStyle = undefined;
 
     // mapped data table element
-    @ViewChild('mappedDataTable', { static: false }) mappedDataTable: ElementRef;
+    @ViewChild('mappedDataTable') mappedDataTable: ElementRef;
 
     // element that is editable now
     elementInEditMode: ImportableMapField | IMappedOption;

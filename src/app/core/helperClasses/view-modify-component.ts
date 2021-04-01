@@ -2,6 +2,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ConfirmOnFormChanges } from '../services/guards/page-change-confirmation-guard.service';
 import { DialogService } from '../services/helper/dialog.service';
 import { LoadingDialogModel } from '../../shared/components';
+import { Directive } from "@angular/core";
 
 /**
  * View / Modify Action Types
@@ -14,6 +15,7 @@ export enum ViewModifyComponentAction {
 /**
  * Base class to be extended by components that need to implement view / modify behaviour
  */
+@Directive()
 export abstract class ViewModifyComponent extends ConfirmOnFormChanges {
     // read-only ?
     public viewOnly: boolean = false;

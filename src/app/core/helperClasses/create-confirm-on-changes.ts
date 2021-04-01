@@ -3,10 +3,12 @@ import { IPermissionBasic } from '../models/permission.interface';
 import { UserModel } from '../models/user.model';
 import { Router } from '@angular/router';
 import { RedirectService } from '../services/helper/redirect.service';
+import { Directive } from "@angular/core";
 
 /**
  * Add methods specific to create component & extends ConfirmOnFormChanges functionality
  */
+@Directive()
 export abstract class CreateConfirmOnChanges
     extends ConfirmOnFormChanges {
 

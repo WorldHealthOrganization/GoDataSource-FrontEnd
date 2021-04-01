@@ -18,7 +18,7 @@ export class WorldMapMovementComponent {
     @Input() width: string = '100%';
     @Input() height: string = '400px';
 
-    @ViewChild(WorldMapComponent, { static: false }) worldMapComponent: WorldMapComponent;
+    @ViewChild(WorldMapComponent) worldMapComponent: WorldMapComponent;
 
     markers: WorldMapMarker[] = [];
     arrowLines: WorldMapPath[] = [];
