@@ -1,11 +1,12 @@
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnDestroy, ViewChild, OnInit, Renderer2 } from '@angular/core';
+// import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnDestroy, ViewChild, OnInit, Renderer2 } from '@angular/core';
+import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { ElementBase } from '../../xt-forms/core';
 // import { BUTTONS, NgxWigComponent } from 'ngx-wig';
 // import { NgxWigCustomLibraryButtons, TButtonExtended } from './definitions/ngx-wig-custom-library-buttons';
-import * as _ from 'lodash';
-import { Subscription } from 'rxjs/internal/Subscription';
-import { I18nService } from '../../../core/services/helper/i18n.service';
+// import * as _ from 'lodash';
+// import { Subscription } from 'rxjs/internal/Subscription';
+// import { I18nService } from '../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-form-ngx-wig',
@@ -33,9 +34,9 @@ export class FormNgxWigComponent extends ElementBase<string> /*implements OnInit
     // private languageListener: Subscription;
     //
     // // input
-    // @Input() buttons: string;
+    @Input() buttons: string;
     @Input() name: string;
-    // @Input() disabled: boolean;
+    @Input() disabled: boolean;
     //
     // /**
     //  * WYSIWYG component
@@ -52,15 +53,15 @@ export class FormNgxWigComponent extends ElementBase<string> /*implements OnInit
     //     return this._ngxWig;
     // }
     //
-    // constructor(
-    //     @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
-    //     @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
-    //     @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
-    //     private renderer2: Renderer2,
-    //     private i18nService: I18nService
-    // ) {
-    //     super(controlContainer, validators, asyncValidators);
-    // }
+    constructor(
+        @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
+        @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
+        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
+        // private renderer2: Renderer2,
+        // private i18nService: I18nService
+    ) {
+        super(controlContainer, validators, asyncValidators);
+    }
     //
     // /**
     //  * Init
