@@ -1,5 +1,5 @@
 import { Component, Inject, OnDestroy, ViewEncapsulation } from '@angular/core';
-import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from '@angular/material';
+import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from '@angular/material/snack-bar';
 import { DebounceTimeCaller } from '../../../core/helperClasses/debounce-time-caller';
 import { Subscriber } from 'rxjs';
 import { v4 as uuid } from 'uuid';

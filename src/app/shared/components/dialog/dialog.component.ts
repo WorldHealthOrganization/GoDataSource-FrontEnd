@@ -1,5 +1,5 @@
 import { Component, Inject, OnDestroy, ViewChild, ViewEncapsulation } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import * as _ from 'lodash';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { NgForm } from '@angular/forms';

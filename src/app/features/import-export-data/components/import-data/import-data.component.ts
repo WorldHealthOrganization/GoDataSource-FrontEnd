@@ -24,7 +24,7 @@ import {
 } from '../../../../core/models/saved-import-mapping.model';
 import { Observable, Subscriber } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
-import { MatDialogRef } from '@angular/material';
+import { MatDialogRef } from '@angular/material/dialog';
 import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { DomSanitizer, SafeStyle } from '@angular/platform-browser';

@@ -1,5 +1,5 @@
 import { Component, Inject, OnDestroy, ViewChild, ViewEncapsulation } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { RelationshipDataService } from '../../../core/services/data/relationship.data.service';

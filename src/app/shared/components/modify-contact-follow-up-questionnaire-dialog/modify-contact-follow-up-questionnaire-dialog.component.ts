@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FollowUpModel } from '../../../core/models/follow-up.model';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { DialogAnswer, DialogAnswerButton, DialogAnswerInputValue } from '../dialog/dialog.component';

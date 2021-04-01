@@ -6,7 +6,7 @@ import { ContactModel } from '../../../core/models/contact.model';
 import { DialogAnswer, DialogAnswerButton, DialogField, LoadingDialogModel, ModifyContactFollowUpQuestionnaireData, ModifyContactFollowUpQuestionnaireDialogComponent } from '../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../core/services/helper/dialog.service';
 import { FollowUpsDataService } from '../../../core/services/data/follow-ups.data.service';
-import { MatTable } from '@angular/material';
+import { MatTable } from '@angular/material/table';
 import { Constants } from '../../../core/models/constants';
 import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';

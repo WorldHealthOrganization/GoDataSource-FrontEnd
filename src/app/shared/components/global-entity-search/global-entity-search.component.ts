@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { MatSidenav } from '@angular/material';
+import { MatSidenav } from '@angular/material/sidenav';
 import { NgForm } from '@angular/forms';
 import * as _ from 'lodash';
 import { FormHelperService } from '../../../core/services/helper/form-helper.service';

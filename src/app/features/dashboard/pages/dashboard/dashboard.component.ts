@@ -29,7 +29,7 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { MatExpansionPanel } from '@angular/material';
+import { MatExpansionPanel } from '@angular/material/expansion';
 
 interface IKpiGroup {
     id: DashboardKpiGroup;

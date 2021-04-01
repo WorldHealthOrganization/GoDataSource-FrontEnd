@@ -33,7 +33,7 @@ import { addCommon as addCommonProjections } from 'ol/proj.js';
 import { v4 as uuid } from 'uuid';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components';
-import { MatDialogRef } from '@angular/material';
+import { MatDialogRef } from '@angular/material/dialog';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OlMapboxStyleHack } from '../../../../core/helperClasses/hacks/ol/ol-mapbox-style-hack';
 

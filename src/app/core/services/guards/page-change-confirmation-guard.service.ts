@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import { DialogService } from '../helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton, DialogComponent } from '../../../shared/components/dialog/dialog.component';
 import { NgForm } from '@angular/forms';
-import { MatDialogRef } from '@angular/material';
+import { MatDialogRef } from '@angular/material/dialog';
 
 /**
  * Extended by components that use ngForms to determine the dirtiness of a component & need confirmation before leaving a page

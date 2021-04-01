@@ -1,5 +1,5 @@
 import { Component, Inject, OnDestroy, ViewEncapsulation } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
 import { HelpItemModel } from '../../../core/models/help-item.model';
 import { ListComponent } from '../../../core/helperClasses/list-component';

@@ -9,7 +9,7 @@ import {
 } from '../../../shared/components/dialog/dialog.component';
 import { DialogService } from './dialog.service';
 import { ViewCotNodeDialogComponent } from '../../../shared/components/view-cot-node-dialog/view-cot-node-dialog.component';
-import { MatDialogRef } from '@angular/material';
+import { MatDialogRef } from '@angular/material/dialog';
 import * as _ from 'lodash';
 import { ViewCotEdgeDialogComponent } from '../../../shared/components/view-cot-edge-dialog/view-cot-edge-dialog.component';
 import { LoadingDialogModel } from '../../../shared/components/loading-dialog/loading-dialog.component';

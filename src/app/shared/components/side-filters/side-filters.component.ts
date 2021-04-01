@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
-import { MatDialogRef, MatSidenav } from '@angular/material';
+import { MatDialogRef } from '@angular/material/dialog';
+import { MatSidenav } from '@angular/material/sidenav';
 import { AppliedFilterModel, AppliedSortModel, FilterComparator, FilterModel, FilterType, QuestionSideFilterModel, QuestionWhichAnswer, SortModel } from './model';
 import { RequestFilterGenerator, RequestFilterOperator, RequestQueryBuilder, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
 import { NgForm } from '@angular/forms';

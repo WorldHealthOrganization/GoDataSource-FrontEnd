@@ -8,7 +8,7 @@ import {
 } from './validate';
 import { ErrorMessage } from './error-message';
 import { ElementBaseFailure } from './element-base-failure';
-import { MatTooltip } from '@angular/material';
+import { MatTooltip } from '@angular/material/tooltip';
 import { debounceTime } from 'rxjs/operators';
 
 /**

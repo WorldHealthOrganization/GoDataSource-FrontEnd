@@ -4,7 +4,8 @@ import { ElementBase } from '../../core/index';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { v4 as uuid } from 'uuid';
 import * as _ from 'lodash';
-import { MatOptionSelectionChange, MatSelect } from '@angular/material';
+import { MatOptionSelectionChange } from '@angular/material/core';
+import { MatSelect } from '@angular/material/select';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subscription } from 'rxjs/internal/Subscription';
 

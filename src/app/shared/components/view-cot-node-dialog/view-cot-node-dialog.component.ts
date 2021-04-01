@@ -1,5 +1,5 @@
 import { Component, Inject, OnDestroy, ViewChild, ViewEncapsulation } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 import { CaseModel } from '../../../core/models/case.model';
 import { EventModel } from '../../../core/models/event.model';
