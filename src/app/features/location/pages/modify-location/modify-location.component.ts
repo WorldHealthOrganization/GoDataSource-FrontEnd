@@ -43,9 +43,9 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
     // exclude locations
     excludeLocations: string[];
 
-    @ViewChild('locationBreadcrumbs') locationBreadcrumbs: LocationBreadcrumbsComponent;
-    @ViewChild('latInput') latInput: NgModel;
-    @ViewChild('lngInput') lngInput: NgModel;
+    @ViewChild('locationBreadcrumbs', { static: true }) locationBreadcrumbs: LocationBreadcrumbsComponent;
+    @ViewChild('latInput', { static: true }) latInput: NgModel;
+    @ViewChild('lngInput', { static: true }) lngInput: NgModel;
 
     /**
      * Constructor

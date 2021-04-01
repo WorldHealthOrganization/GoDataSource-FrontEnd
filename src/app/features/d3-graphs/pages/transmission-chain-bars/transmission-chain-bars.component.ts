@@ -87,7 +87,7 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
     caseOutcomeList$: Observable<LabelValuePair[]>;
     dateRangeCentreNameList$: Observable<LabelValuePair[]>;
 
-    @ViewChild('chart') chartContainer: ElementRef;
+    @ViewChild('chart', { static: true }) chartContainer: ElementRef;
 
     // Map of center token names
     centerTokenToNameMap: {

@@ -84,7 +84,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
     contactIdMaskValidator: Observable<boolean>;
 
     displayRefresh: boolean = false;
-    @ViewChild('visualId') visualId: NgModel;
+    @ViewChild('visualId', { static: true }) visualId: NgModel;
 
     /**
      * Constructor

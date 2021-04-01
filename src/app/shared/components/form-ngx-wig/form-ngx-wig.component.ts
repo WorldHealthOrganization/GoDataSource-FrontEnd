@@ -41,7 +41,7 @@ export class FormNgxWigComponent extends ElementBase<string> implements OnInit, 
      * WYSIWYG component
      */
     private _ngxWig: NgxWigComponent;
-    @ViewChild('ngxWig') set ngxWig(ngxWig: NgxWigComponent) {
+    @ViewChild('ngxWig', { static: true }) set ngxWig(ngxWig: NgxWigComponent) {
         // keep reference
         this._ngxWig = ngxWig;
 

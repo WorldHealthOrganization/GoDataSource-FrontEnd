@@ -57,7 +57,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
         new BreadcrumbItemModel('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE', null, true)
     ];
 
-    @ViewChild(TransmissionChainsDashletComponent) cotDashletChild;
+    @ViewChild(TransmissionChainsDashletComponent, { static: true }) cotDashletChild;
 
     outbreakSubscriber: Subscription;
 

@@ -28,7 +28,7 @@ export class ViewMovementCaseComponent implements OnInit {
     caseData: CaseModel = new CaseModel();
     movementAddresses: AddressModel[] = [];
 
-    @ViewChild('mapMovement') mapMovement: WorldMapMovementComponent;
+    @ViewChild('mapMovement', { static: true }) mapMovement: WorldMapMovementComponent;
 
     // loading data
     displayLoading: boolean = true;

@@ -27,8 +27,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { MatDialogRef } from '@angular/material';
 import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import { DomSanitizer } from '@angular/platform-browser';
-import { SafeStyle } from '@angular/platform-browser/src/security/dom_sanitization_service';
+import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 import { HoverRowActionsDirective } from '../../../../shared/directives/hover-row-actions/hover-row-actions.directive';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
@@ -256,9 +255,9 @@ export class ImportDataComponent
     possibleSourceDestinationLevels: LabelValuePair[];
 
     // search filters
-    @ViewChild('filterBySourceInput') filterBySourceInput: NgModel;
+    @ViewChild('filterBySourceInput', { static: false }) filterBySourceInput: NgModel;
     filterBySourceInputValue: string = '';
-    @ViewChild('filterByDestinationInput') filterByDestinationInput: NgModel;
+    @ViewChild('filterByDestinationInput', { static: false }) filterByDestinationInput: NgModel;
     filterByDestinationInputValue: string = '';
 
     // visible columns handler
@@ -338,13 +337,13 @@ export class ImportDataComponent
     @Input() decryptPasswordAlias: string = 'decryptPassword';
 
     // scrollable viewport
-    @ViewChild('virtualScrollViewport') virtualScrollViewport: CdkVirtualScrollViewport;
+    @ViewChild('virtualScrollViewport', { static: false }) virtualScrollViewport: CdkVirtualScrollViewport;
 
     // table data max height
     importDataBodyRowsMaxHeight: SafeStyle = undefined;
 
     // mapped data table element
-    @ViewChild('mappedDataTable') mappedDataTable: ElementRef;
+    @ViewChild('mappedDataTable', { static: false }) mappedDataTable: ElementRef;
 
     // element that is editable now
     elementInEditMode: ImportableMapField | IMappedOption;

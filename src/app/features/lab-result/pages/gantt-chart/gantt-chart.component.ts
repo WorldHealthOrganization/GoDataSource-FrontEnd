@@ -44,7 +44,7 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
     globalFilterLocationId: string;
     loadingDialog: LoadingDialogModel;
 
-    @ViewChild('ganttChart') private ganttChart: GanttChartDelayOnsetDashletComponent;
+    @ViewChild('ganttChart', { static: false }) private ganttChart: GanttChartDelayOnsetDashletComponent;
 
     ganttChartTypes: Observable<any[]>;
     ganttChartType: any;

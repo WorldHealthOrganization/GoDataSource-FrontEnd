@@ -33,7 +33,7 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
     loadingDialog: LoadingDialogModel;
 
     // Side Nav
-    @ViewChild('sideNav') sideNav: MatSidenav;
+    @ViewChild('sideNav', { static: true }) sideNav: MatSidenav;
 
     /**
      * Constructor

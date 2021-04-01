@@ -39,7 +39,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
     static REFRESH_DISABLE_SECONDS = 7;
 
     // slide nav menu
-    @ViewChild('snav') sideNav: MatSidenav;
+    @ViewChild('snav', { static: false }) sideNav: MatSidenav;
 
     // authenticated user
     authUser: UserModel;

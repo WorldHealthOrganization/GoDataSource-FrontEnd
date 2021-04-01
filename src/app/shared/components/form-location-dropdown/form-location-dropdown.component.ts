@@ -117,7 +117,7 @@ export class FormLocationDropdownComponent
         return this._tooltip;
     }
 
-    @ViewChild('locationHandler') locationHandler: NgSelectComponent;
+    @ViewChild('locationHandler', { static: true }) locationHandler: NgSelectComponent;
 
     locationItems: LocationAutoItem[];
     locationMap: {

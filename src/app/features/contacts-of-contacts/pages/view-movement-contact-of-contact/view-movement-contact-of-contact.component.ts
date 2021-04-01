@@ -29,7 +29,7 @@ export class ViewMovementContactOfContactComponent implements OnInit {
     // loading data
     displayLoading: boolean = true;
 
-    @ViewChild('mapMovement') mapMovement: WorldMapMovementComponent;
+    @ViewChild('mapMovement', { static: true }) mapMovement: WorldMapMovementComponent;
 
     // constants
     ContactOfContactModel = ContactOfContactModel;

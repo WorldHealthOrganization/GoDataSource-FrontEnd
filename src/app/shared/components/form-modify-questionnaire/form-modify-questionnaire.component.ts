@@ -162,22 +162,22 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     @Input() cleanQuestionAndAnswerFlagsOnSave: boolean = true;
 
     // Edit Mode - Question Form
-    @ViewChild('questionForm') questionForm: NgForm;
+    @ViewChild('questionForm', { static: false }) questionForm: NgForm;
 
     // Edit Mode - Question Answer Form
-    @ViewChild('answerForm') answerForm: NgForm;
+    @ViewChild('answerForm', { static: false }) answerForm: NgForm;
 
     // Used to mark question form dirty
-    @ViewChild('inputQuestionForMakingFormDirty') inputQuestionForMakingFormDirty: NgModel;
+    @ViewChild('inputQuestionForMakingFormDirty', { static: false }) inputQuestionForMakingFormDirty: NgModel;
 
     // Used to make answer form dirty
-    @ViewChild('inputAnswerForMakingFormDirty') inputAnswerForMakingFormDirty: NgModel;
+    @ViewChild('inputAnswerForMakingFormDirty', { static: false }) inputAnswerForMakingFormDirty: NgModel;
 
     // Question text input
-    @ViewChild('questionText') questionText: FormInputComponent;
+    @ViewChild('questionText', { static: false }) questionText: FormInputComponent;
 
     // Question Answer label input
-    @ViewChild('answerLabel') answerLabel: FormInputComponent;
+    @ViewChild('answerLabel', { static: false }) answerLabel: FormInputComponent;
 
     // Breadcrumbs initialization event - called when breadcrumbs can be initialized
     @Output() initBreadcrumbs = new EventEmitter<FormModifyQuestionnaireBreadcrumbsData>();

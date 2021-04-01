@@ -173,7 +173,7 @@ export class FormDateRangeSliderComponent extends ElementBase<FormDateRangeSlide
     /**
      * Slider Element
      */
-    @ViewChild('sliderElement') sliderElement;
+    @ViewChild('sliderElement', { static: true }) sliderElement;
 
     /**
      * Tooltip

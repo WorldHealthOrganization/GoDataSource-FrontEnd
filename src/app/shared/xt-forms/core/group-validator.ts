@@ -10,7 +10,7 @@ import { NgSelectComponent } from '@ng-select/ng-select';
  */
 export abstract class GroupValidator<T> extends ElementBase<T> implements AfterViewInit {
     // Group Form
-    @ViewChild('groupForm') groupForm: NgForm;
+    @ViewChild('groupForm', { static: false }) groupForm: NgForm;
 
     // handler for when one of the group value has changed
     @Output() groupValidated = new EventEmitter<void>();

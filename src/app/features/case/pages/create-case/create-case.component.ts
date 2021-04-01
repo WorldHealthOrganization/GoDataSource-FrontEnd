@@ -44,8 +44,8 @@ export class CreateCaseComponent
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
-    @ViewChild('personalForm') personalForm: NgForm;
-    @ViewChild('infectionForm') infectionForm: NgForm;
+    @ViewChild('personalForm', { static: true }) personalForm: NgForm;
+    @ViewChild('infectionForm', { static: true }) infectionForm: NgForm;
 
     caseData: CaseModel = new CaseModel();
     // case UID (coming from query params, optionally)

@@ -93,7 +93,7 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
     @HostBinding('class.form-element-host') isFormElement = true;
 
     // handler to mat select
-    @ViewChild('selectGroup', { read: MatSelect }) matSelect: MatSelect;
+    @ViewChild('selectGroup', { read: MatSelect, static: true }) matSelect: MatSelect;
 
     // input data
     @Input() placeholder: string;

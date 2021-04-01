@@ -65,7 +65,7 @@ export class SideColumnsComponent {
     visibleSaveTableColumns: string[] = [];
 
     // Side Nav
-    @ViewChild('sideNav') sideNav: MatSidenav;
+    @ViewChild('sideNav', { static: true }) sideNav: MatSidenav;
 
     // visible column event handler
     @Output() visibleColumnsChanged = new EventEmitter<string[]>();

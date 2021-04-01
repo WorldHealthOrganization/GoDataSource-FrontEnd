@@ -91,7 +91,7 @@ export class SideFiltersComponent {
     /**
      * Form
      */
-    @ViewChild('form') form: NgForm;
+    @ViewChild('form', { static: false }) form: NgForm;
 
     /**
      * Fixed filters ( can' add other filters, can't change operator..etc) ?
@@ -147,7 +147,7 @@ export class SideFiltersComponent {
         )
     ];
 
-    @ViewChild('sideNav') sideNav: MatSidenav;
+    @ViewChild('sideNav', { static: false }) sideNav: MatSidenav;
 
     // loaded filter
     loadedFilter: SavedFilterModel;

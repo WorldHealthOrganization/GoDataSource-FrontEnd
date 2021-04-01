@@ -350,11 +350,11 @@ export class DialogComponent implements OnDestroy {
     dialogAnswerInputValue: DialogAnswerInputValue = new DialogAnswerInputValue();
 
     // form
-    @ViewChild('form') form: NgForm;
+    @ViewChild('form', { static: true }) form: NgForm;
 
     // used to determine data size since we can't do it with flex without a min-height
-    @ViewChild('dialogMainMsg') dialogMainMsg: any;
-    @ViewChild('dialogButtons') dialogButtons: any;
+    @ViewChild('dialogMainMsg', { static: true }) dialogMainMsg: any;
+    @ViewChild('dialogButtons', { static: true }) dialogButtons: any;
 
     // constants
     DialogFieldType = DialogFieldType;

@@ -228,7 +228,7 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
     /**
      * Actions row
      */
-    @ViewChild('actionsRow') actionsRow: ElementRef;
+    @ViewChild('actionsRow', { static: true }) actionsRow: ElementRef;
 
     /**
      * Used to keep function scope

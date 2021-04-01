@@ -82,7 +82,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     caseIdMaskValidator: Observable<boolean | IGeneralAsyncValidatorResponse>;
 
     displayRefresh: boolean = false;
-    @ViewChild('visualId') visualId: NgModel;
+    @ViewChild('visualId', { static: true }) visualId: NgModel;
 
     /**
      * Constructor

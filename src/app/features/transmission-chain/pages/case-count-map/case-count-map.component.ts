@@ -48,7 +48,7 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
 
     clusterDistance: number = 10;
 
-    @ViewChild('worldMap') worldMap: WorldMapComponent;
+    @ViewChild('worldMap', { static: false }) worldMap: WorldMapComponent;
 
     // subscribers
     outbreakSubscriber: Subscription;

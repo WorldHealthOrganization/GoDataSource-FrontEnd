@@ -67,8 +67,8 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     // follow-up dates
     followUpDates: string[] = [];
 
-    @ViewChild('targetedInput') targetedInput: any;
-    @ViewChild('teamInput') teamInput: any;
+    @ViewChild('targetedInput', { static: true }) targetedInput: any;
+    @ViewChild('teamInput', { static: true }) teamInput: any;
 
     /**
      * Constructor

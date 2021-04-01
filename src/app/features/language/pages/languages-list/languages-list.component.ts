@@ -39,7 +39,7 @@ export class LanguagesListComponent extends ListComponent implements OnInit, OnD
     languagesList$: Observable<LanguageModel[]>;
     languagesListCount$: Observable<IBasicCount>;
 
-    @ViewChild('topNav') topNav: TopnavComponent;
+    @ViewChild('topNav', { static: true }) topNav: TopnavComponent;
 
     loadingDialog: LoadingDialogModel;
 

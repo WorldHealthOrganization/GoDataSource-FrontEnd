@@ -128,7 +128,7 @@ export class HotTableWrapperComponent implements OnInit {
     @Output() afterBecameDirty = new EventEmitter<IHotTableWrapperEvent>();
 
     // children components
-    @ViewChild('sheetTable') sheetTable: HotTableComponent;
+    @ViewChild('sheetTable', { static: true }) sheetTable: HotTableComponent;
 
     // local constants used by component template
     SheetCellType = SheetCellType;

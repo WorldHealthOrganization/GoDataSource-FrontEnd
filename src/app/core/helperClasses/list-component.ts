@@ -89,17 +89,17 @@ export abstract class ListComponent implements OnDestroy {
     /**
      * Retrieve Mat Table sort handler
      */
-    @ViewChild('table', { read: MatSort }) matTableSort: MatSort;
+    @ViewChild('table', { static: false, read: MatSort }) matTableSort: MatSort;
 
     /**
      * Retrieve Side Filters
      */
-    @ViewChild(SideFiltersComponent) sideFilter: SideFiltersComponent;
+    @ViewChild(SideFiltersComponent, { static: false }) sideFilter: SideFiltersComponent;
 
     /**
      * Retrieve Paginator
      */
-    @ViewChild(MatPaginator) paginator: MatPaginator;
+    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
 
     /**
      * Individual checkboxes selects

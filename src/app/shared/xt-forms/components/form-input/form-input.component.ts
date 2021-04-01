@@ -74,7 +74,7 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
 
     @Input() displayRefresh: boolean = false;
 
-    @ViewChild('inputElement') inputElement: ElementRef;
+    @ViewChild('inputElement', { static: true }) inputElement: ElementRef;
 
     @Output() optionChanged = new EventEmitter<any>();
     @Output() initialized = new EventEmitter<any>();

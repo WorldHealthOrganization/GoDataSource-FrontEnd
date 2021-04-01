@@ -67,7 +67,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
     ReferenceDataCategory = ReferenceDataCategory;
     UserSettings = UserSettings;
 
-    @ViewChild('topNav') topNav: TopnavComponent;
+    @ViewChild('topNav', { static: true }) topNav: TopnavComponent;
 
     recordActions: HoverRowAction[] = [
         // View Outbreak
