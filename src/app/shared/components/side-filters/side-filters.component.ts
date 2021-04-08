@@ -544,7 +544,7 @@ export class SideFiltersComponent {
         const sortableFields = _.filter(this.filterOptions, (filter: FilterModel) => filter.sortable);
         _.each(sortableFields, (filter: FilterModel) => {
             // add only if no already in the list
-            if (!_.includes(this.sortOptions, {fieldName: filter.fieldName})) {
+            if (!_.find(this.sortOptions, { fieldName: filter.fieldName })) {
                 this.sortOptions.push(new SortModel(
                     filter.fieldName,
                     filter.fieldLabel
@@ -555,7 +555,7 @@ export class SideFiltersComponent {
         // add filter extra sort fields
         _.each(this.extraSortOptions, (sort: SortModel) => {
             // add only if no already in the list
-            if (!_.includes(this.sortOptions, {fieldName: sort.fieldName})) {
+            if (!_.find(this.sortOptions, { fieldName: sort.fieldName })) {
                 this.sortOptions.push(sort);
             }
         });
