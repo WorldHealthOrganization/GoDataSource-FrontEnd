@@ -188,6 +188,15 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
         this.initializeUploader();
     }
 
+    // Alternative name
+    private _alternativeName: string;
+    @Input() set alternativeName(value: string) {
+        this._alternativeName = value;
+    }
+    get alternativeName(): string {
+        return this._alternativeName ? this._alternativeName : this.name;
+    }
+
     /**
      * Constructor
      */
