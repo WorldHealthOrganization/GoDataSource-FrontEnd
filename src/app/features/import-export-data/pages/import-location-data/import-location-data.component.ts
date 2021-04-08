@@ -38,6 +38,10 @@ export class ImportLocationDataComponent {
         'name'
     ];
 
+    fieldsWithoutTokens = {
+        'identifiers[]': 'LNG_LOCATION_FIELD_LABEL_IDENTIFIERS'
+    };
+
     addressFields = {
         'parentLocationId': true
     };
