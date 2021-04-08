@@ -16,6 +16,7 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { ScrollingModule as ExperimentalScrollingModule } from '@angular/cdk-experimental/scrolling';
 import { MdePopoverModule } from '@material-extended/mde';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { MglTimelineModule } from 'angular-mgl-timeline';
 
 // components
 import * as fromSharedComponents from './components';
@@ -35,6 +36,7 @@ import * as fromSharedPipes from './pipes';
         TranslateModule,
         MdePopoverModule,
         FileUploadModule,
+        MglTimelineModule,
         // NgxWigModule,
         NgxMatSelectSearchModule,
         HotTableModule.forRoot(),
@@ -58,6 +60,7 @@ import * as fromSharedPipes from './pipes';
         XtFormsModule,
         AngularMaterialModule,
         MdePopoverModule,
+        MglTimelineModule,
         ScrollingModule,
         ExperimentalScrollingModule,
         ...fromSharedDirectives.directives,
