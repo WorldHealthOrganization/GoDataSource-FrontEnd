@@ -9,7 +9,7 @@ import { XtFormsModule } from './xt-forms/xt-forms.module';
 import { AngularMaterialModule } from './angular-material/angular-material.module';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { FileUploadModule } from 'ng2-file-upload';
-// import { NgxWigModule } from 'ngx-wig';
+import { NgxWigModule } from 'ngx-wig';
 import { HotTableModule } from '@handsontable/angular';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { ScrollingModule } from '@angular/cdk/scrolling';
@@ -37,7 +37,7 @@ import * as fromSharedPipes from './pipes';
         MdePopoverModule,
         FileUploadModule,
         MglTimelineModule,
-        // NgxWigModule,
+        NgxWigModule,
         NgxMatSelectSearchModule,
         HotTableModule.forRoot(),
         ScrollingModule,
