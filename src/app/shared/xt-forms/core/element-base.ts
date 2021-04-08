@@ -26,7 +26,13 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
     private validationResultErrMsgs: ElementBaseFailure[];
 
     // alternative name used for specifying indexes for questionnaire inputs and other places
-    @Input() alternativeName: string;
+    protected _alternativeName: string;
+    @Input() set alternativeName(value: string) {
+        this._alternativeName = value;
+    }
+    get alternativeName(): string {
+        return this._alternativeName ? this._alternativeName : this.name;
+    }
 
     // asyncValidators
     get asyncValidators(): AsyncValidatorArray {
