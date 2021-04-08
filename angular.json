@@ -39,7 +39,11 @@
                             "node_modules/@ng-select/ng-select/themes/material.theme.css",
                             "src/styles/general.less"
                         ],
-                        "scripts": []
+                        "scripts": [],
+                        "allowedCommonJsDependencies": [
+                            "file-saver",
+                            "lodash"
+                        ]
                     },
                     "configurations": {
                         "production": {
