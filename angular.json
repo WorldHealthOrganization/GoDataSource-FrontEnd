@@ -42,9 +42,13 @@
                         "scripts": [],
                         "allowedCommonJsDependencies": [
                             "@handsontable/formulajs",
+                            "c3",
                             "core-js",
                             "cytoscape",
+                            "cytoscape-cola",
+                            "cytoscape-dagre",
                             "file-saver",
+                            "isemail",
                             "lodash",
                             "pikaday",
                             "rxjs"
