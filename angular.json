@@ -41,8 +41,13 @@
                         ],
                         "scripts": [],
                         "allowedCommonJsDependencies": [
+                            "@handsontable/formulajs",
+                            "core-js",
+                            "cytoscape",
                             "file-saver",
-                            "lodash"
+                            "lodash",
+                            "pikaday",
+                            "rxjs"
                         ]
                     },
                     "configurations": {
