@@ -138,7 +138,6 @@ export class HotTableWrapperComponent implements OnInit {
 
     // callbacks
     afterChangeCallback: (
-        sheetCore: Handsontable.default,
         changes: any[],
         source: string
     ) => void;
@@ -389,11 +388,13 @@ export class HotTableWrapperComponent implements OnInit {
      * 'Handsontable' hook before running validation on a cell
      */
     beforeValidateSheet(
-        sheetCore: Handsontable.default,
-        value: string, row: number,
+        value: string,
+        row: number,
         column: number
     ) {
         // determine if row is empty
+        // this in this case is the handsontable core
+        const sheetCore: Handsontable.default = this as any;
         const columnValues: any[] = sheetCore.getDataAtRow(row);
         columnValues[column] = value;
 
@@ -409,11 +410,10 @@ export class HotTableWrapperComponent implements OnInit {
     /**
      * After removing row
      */
-    afterRemoveRow(
-        sheetCore: Handsontable.default,
-        row: number
-    ) {
+    afterRemoveRow(row: number) {
         // determine if row is empty
+        // this in this case is the handsontable core
+        const sheetCore: Handsontable.default = this as any;
         const countedRows: number = sheetCore.countRows();
         while (row < countedRows) {
             // validate row
@@ -439,7 +439,6 @@ export class HotTableWrapperComponent implements OnInit {
      * Data changed trigger
      */
     afterChangeTrigger(): (
-        sheetCore: Handsontable.default,
         changes: any[],
         source: string
     ) => void {
@@ -450,11 +449,11 @@ export class HotTableWrapperComponent implements OnInit {
 
         // create functions
         this.afterChangeCallback = (
-            sheetCore: Handsontable.default,
             changes: any[],
             source: string
         ) => {
             // trigger after change
+            const sheetCore: Handsontable.default = (this.sheetTable as any).hotInstance;
             this.afterChange.emit({
                 type: IHotTableWrapperEventType.AfterChange,
                 typeSpecificData: {
@@ -465,7 +464,7 @@ export class HotTableWrapperComponent implements OnInit {
                 sheetTable: this.sheetTable
             });
 
-            // check if we need to trigger bacame dirty
+            // check if we need to trigger became dirty
             this.checkForDirty({
                 sheetCore: sheetCore,
                 changes: changes,
