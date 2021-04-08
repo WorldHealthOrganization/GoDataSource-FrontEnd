@@ -501,7 +501,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                     this.hotTableWrapper.getData()
                         .subscribe((dataResponse: {
                             data: any[],
-                            sheetCore: Handsontable
+                            sheetCore: Handsontable.default
                         }) => {
                             // add id
                             (dataResponse.data || []).forEach((contactData, index: number) => {

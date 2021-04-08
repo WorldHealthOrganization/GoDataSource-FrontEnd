@@ -35,7 +35,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components';
 import { MatDialogRef } from '@angular/material/dialog';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { OlMapboxStyleHack } from '../../../../core/helperClasses/hacks/ol/ol-mapbox-style-hack';
+import { applyStyle } from 'ol-mapbox-style';
 
 /**
  * Point used for rendering purposes
@@ -481,7 +481,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                                     .then(r => r.json())
                                     .then((glStyle) => {
                                         // apply style
-                                        OlMapboxStyleHack.applyStyle(
+                                        applyStyle(
                                             layerData.layer,
                                             glStyle,
                                             mapServer.styleUrlSource,

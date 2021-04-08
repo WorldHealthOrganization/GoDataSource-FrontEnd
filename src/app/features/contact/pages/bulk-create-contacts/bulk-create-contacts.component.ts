@@ -540,7 +540,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                         .getData()
                         .subscribe((dataResponse: {
                             data: any[],
-                            sheetCore: Handsontable
+                            sheetCore: Handsontable.default
                         }) => {
                             // no data to save ?
                             if (_.isEmpty(dataResponse.data)) {

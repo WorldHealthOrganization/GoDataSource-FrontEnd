@@ -4,8 +4,7 @@ import { ElementBase } from '../../core/index';
 import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { SafeHtml } from '@angular/platform-browser/src/security/dom_sanitization_service';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
     selector: 'app-form-select',

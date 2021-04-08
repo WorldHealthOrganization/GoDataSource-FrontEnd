@@ -445,7 +445,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
     // keep snapshot update subscription
     private _updateSnapshotsSubscription: Subscription;
-    private _updateSnapshotsTimer: NodeJS.Timer;
+    private _updateSnapshotsTimer: any;
 
     // show snapshot filters
     showSnapshotFilters: boolean = false;

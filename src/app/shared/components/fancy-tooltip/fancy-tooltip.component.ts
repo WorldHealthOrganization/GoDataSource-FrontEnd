@@ -1,7 +1,6 @@
 import { Component, Input, OnDestroy } from '@angular/core';
 import { I18nService } from '../../../core/services/helper/i18n.service';
-import { SafeHtml } from '@angular/platform-browser/src/security/dom_sanitization_service';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
