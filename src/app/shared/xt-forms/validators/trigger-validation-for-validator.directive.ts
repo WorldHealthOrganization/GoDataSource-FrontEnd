@@ -1,6 +1,10 @@
 import { Directive, forwardRef, Attribute } from '@angular/core';
 import { Validator, AbstractControl, NG_VALIDATORS } from '@angular/forms';
 
+/**
+ * When running the validation for the current form element, do also trigger
+ *  the validations for other (target) elements within the same form
+ */
 @Directive({
     selector: '[app-trigger-validation-for][ngModel]',
     providers: [
@@ -11,11 +15,6 @@ import { Validator, AbstractControl, NG_VALIDATORS } from '@angular/forms';
         }
     ]
 })
-
-/**
- * When running the validation for the current form element, do also trigger
- *  the validations for other (target) elements within the same form
- */
 export class TriggerValidationForValidatorDirective implements Validator {
     constructor(
         @Attribute('app-trigger-validation-for') public target: string

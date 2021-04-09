@@ -1,4 +1,4 @@
-import { EventEmitter, Input, Output, Directive } from '@angular/core';
+import { EventEmitter, Input, Output } from '@angular/core';
 import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
 import { DebounceTimeCaller } from '../../../core/helperClasses/debounce-time-caller';
 import { Subscriber } from 'rxjs';
@@ -9,7 +9,9 @@ import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../core/models/user.model';
 import { Constants } from '../../../core/models/constants';
 
-@Directive()
+/**
+ * Dashlet
+ */
 export abstract class DashletComponent {
     // authenticated user
     authUser: UserModel;

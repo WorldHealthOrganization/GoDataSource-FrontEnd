@@ -4,7 +4,7 @@ import { Subscriber } from 'rxjs';
 import { ApplyListFilter, Constants } from '../models/constants';
 import { FormRangeModel } from '../../shared/components/form-range/form-range.model';
 import { BreadcrumbItemModel } from '../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { OnDestroy, QueryList, ViewChild, ViewChildren, Directive } from '@angular/core';
+import { OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ResetInputOnSideFilterDirective, ResetLocationOnSideFilterDirective } from '../../shared/directives/reset-input-on-side-filter/reset-input-on-side-filter.directive';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort, MatSortable, MatSortHeader } from '@angular/material/sort';
@@ -68,7 +68,9 @@ interface ICachedInputsValues {
     [inputName: string]: any;
 }
 
-@Directive()
+/**
+ * List component
+ */
 export abstract class ListComponent implements OnDestroy {
     // handle pop state changes
     private static locationSubscription: SubscriptionLike;
