@@ -1467,13 +1467,13 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         this.showLoadingDialog();
 
         // make all requests in parallel
-        forkJoin(
+        forkJoin([
             // retrieve follow-up statuses
             this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS),
 
             // count contacts
             this.contactDataService.getContactsList(this.selectedOutbreak.id, countQueryBuilder)
-        ).subscribe((
+        ]).subscribe((
             [statuses, records]: [LabelValuePair[], ContactModel[]]
         ) => {
             // hide loading

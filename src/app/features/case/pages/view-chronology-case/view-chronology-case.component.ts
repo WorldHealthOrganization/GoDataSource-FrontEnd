@@ -71,7 +71,7 @@ export class ViewChronologyCaseComponent implements OnInit {
                             const qb = new RequestQueryBuilder();
                             qb.include('people', true);
 
-                            forkJoin(
+                            forkJoin([
                                 // get relationships
                                 this.relationshipDataService
                                     .getEntityRelationships(
@@ -80,6 +80,7 @@ export class ViewChronologyCaseComponent implements OnInit {
                                         this.caseData.id,
                                         qb
                                     ),
+
                                 // lab sample taken and lab result dates
                                 this.labResultDataService
                                     .getEntityLabResults(
@@ -87,7 +88,7 @@ export class ViewChronologyCaseComponent implements OnInit {
                                         EntityModel.getLinkForEntityType(EntityType.CASE),
                                         this.caseData.id
                                     )
-                            ).subscribe(([
+                            ]).subscribe(([
                                 relationshipData,
                                 labResults
                             ]: [

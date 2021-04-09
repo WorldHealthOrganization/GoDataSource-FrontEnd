@@ -158,15 +158,15 @@ export class ContactsBecomeCasesDashletComponent extends DashletComponent implem
 
             // retrieve data
             this.displayLoading = true;
-            this.previousSubscriber = forkJoin(
+            this.previousSubscriber = forkJoin([
                 this.caseDataService.getCasesCount(this.outbreakId, qb),
                 this.caseDataService.getCasesCount(this.outbreakId, qbAll)
-            )
-                .subscribe(([qbCountResult, countResult]) => {
-                    this.contactsBecomeCasesCount = qbCountResult.count;
-                    this.casesCount = countResult.count;
-                    this.displayLoading = false;
-                });
+            ])
+            .subscribe(([qbCountResult, countResult]) => {
+                this.contactsBecomeCasesCount = qbCountResult.count;
+                this.casesCount = countResult.count;
+                this.displayLoading = false;
+            });
         }
     }
 }

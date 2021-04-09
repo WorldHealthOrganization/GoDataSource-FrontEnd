@@ -82,7 +82,7 @@ export class ViewChronologyContactComponent implements OnInit {
                             const qqb = new RequestQueryBuilder();
                             qqb.include('people', true);
 
-                            forkJoin(
+                            forkJoin([
                                 // get relationships
                                 this.relationshipDataService
                                     .getEntityRelationships(
@@ -91,17 +91,20 @@ export class ViewChronologyContactComponent implements OnInit {
                                         this.contactData.id,
                                         qqb
                                     ),
-                                this.followUpsDataService
-                                    .getFollowUpsList(selectedOutbreak.id, qb),
+
+                                // get follow-ups
+                                this.followUpsDataService.getFollowUpsList(selectedOutbreak.id, qb),
+
+                                // get lab results
                                 !selectedOutbreak.isContactLabResultsActive ?
-                                        of<LabResultModel[]>([]) :
-                                        this.labResultDataService
-                                            .getEntityLabResults(
-                                                selectedOutbreak.id,
-                                                EntityModel.getLinkForEntityType(EntityType.CONTACT),
-                                                this.contactData.id
-                                            )
-                            ).subscribe(([
+                                    of<LabResultModel[]>([]) :
+                                    this.labResultDataService
+                                        .getEntityLabResults(
+                                            selectedOutbreak.id,
+                                            EntityModel.getLinkForEntityType(EntityType.CONTACT),
+                                            this.contactData.id
+                                        )
+                            ]).subscribe(([
                                 relationshipsData,
                                 followUps,
                                 labResults

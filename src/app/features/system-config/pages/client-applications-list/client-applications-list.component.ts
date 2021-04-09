@@ -205,61 +205,61 @@ export class ClientApplicationsListComponent extends ListComponent implements On
             this.outbreakDataService.getOutbreaksListReduced() :
             of([]);
 
-        forkJoin(
+        forkJoin([
             outbreaksList$,
             this.systemSettingsDataService.getSystemSettings()
+        ])
+        .pipe(
+            catchError((err) => {
+                this.snackbarService.showApiError(err);
+                finishCallback([]);
+                return throwError(err);
+            })
         )
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    finishCallback([]);
-                    return throwError(err);
-                })
-            )
-            .subscribe(([outbreaksList, systemSettings]: [OutbreakModel[], SystemSettingsModel]) => {
-                // map outbreaks
-                const mappedOutbreaks = _.groupBy(outbreaksList, 'id');
+        .subscribe(([outbreaksList, systemSettings]: [OutbreakModel[], SystemSettingsModel]) => {
+            // map outbreaks
+            const mappedOutbreaks = _.groupBy(outbreaksList, 'id');
 
-                // get settings
-                this.settings = systemSettings;
-                let clientApplications = _.get(this.settings, 'clientApplications');
-                clientApplications = clientApplications ? clientApplications : [];
-                this.clientApplicationsServerListAll = _.map(
-                    clientApplications,
-                    (item: SystemClientApplicationModel) => {
-                        // set outbreak
-                        item.outbreaks = _.transform(
-                            item.outbreakIDs,
-                            (result, outbreakID: string) => {
-                                // outbreak not deleted ?
-                                if (!_.isEmpty(mappedOutbreaks[outbreakID])) {
-                                    result.push(mappedOutbreaks[outbreakID][0]);
-                                }
-                            },
-                            []
-                        );
-
-                        // finished
-                        return item;
-                    });
-
-                // display only items from this page
-                if (this.queryBuilder.paginator) {
-                    this.clientApplicationsServerList = this.clientApplicationsServerListAll.slice(
-                        this.queryBuilder.paginator.skip,
-                        this.queryBuilder.paginator.skip + this.queryBuilder.paginator.limit
+            // get settings
+            this.settings = systemSettings;
+            let clientApplications = _.get(this.settings, 'clientApplications');
+            clientApplications = clientApplications ? clientApplications : [];
+            this.clientApplicationsServerListAll = _.map(
+                clientApplications,
+                (item: SystemClientApplicationModel) => {
+                    // set outbreak
+                    item.outbreaks = _.transform(
+                        item.outbreakIDs,
+                        (result, outbreakID: string) => {
+                            // outbreak not deleted ?
+                            if (!_.isEmpty(mappedOutbreaks[outbreakID])) {
+                                result.push(mappedOutbreaks[outbreakID][0]);
+                            }
+                        },
+                        []
                     );
-                }
 
-                // refresh the total count
-                this.refreshListCount();
+                    // finished
+                    return item;
+                });
 
-                // flag if list is empty
-                this.checkEmptyList(this.clientApplicationsServerList);
+            // display only items from this page
+            if (this.queryBuilder.paginator) {
+                this.clientApplicationsServerList = this.clientApplicationsServerListAll.slice(
+                    this.queryBuilder.paginator.skip,
+                    this.queryBuilder.paginator.skip + this.queryBuilder.paginator.limit
+                );
+            }
 
-                // finished
-                finishCallback(this.clientApplicationsServerList);
-            });
+            // refresh the total count
+            this.refreshListCount();
+
+            // flag if list is empty
+            this.checkEmptyList(this.clientApplicationsServerList);
+
+            // finished
+            finishCallback(this.clientApplicationsServerList);
+        });
     }
 
     /**

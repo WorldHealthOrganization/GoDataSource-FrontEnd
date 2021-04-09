@@ -57,23 +57,23 @@ export class ViewMovementCaseComponent implements OnInit {
             this.outbreakDataService
                 .getSelectedOutbreak()
                 .subscribe((selectedOutbreak: OutbreakModel) => {
-                    forkJoin(
+                    forkJoin([
                         this.caseDataService.getCase(selectedOutbreak.id, params.caseId),
                         this.caseDataService.getCaseMovement(selectedOutbreak.id, params.caseId)
-                    )
-                        .subscribe((
-                            [caseData, movementData]: [CaseModel, AddressModel[]]
-                        ) => {
-                            // case data
-                            this.caseData = caseData;
+                    ])
+                    .subscribe((
+                        [caseData, movementData]: [CaseModel, AddressModel[]]
+                    ) => {
+                        // case data
+                        this.caseData = caseData;
 
-                            // initialize page breadcrumbs
-                            this.initializeBreadcrumbs();
+                        // initialize page breadcrumbs
+                        this.initializeBreadcrumbs();
 
-                            // movement data
-                            this.displayLoading = false;
-                            this.movementAddresses = movementData;
-                        });
+                        // movement data
+                        this.displayLoading = false;
+                        this.movementAddresses = movementData;
+                    });
                 });
         });
 

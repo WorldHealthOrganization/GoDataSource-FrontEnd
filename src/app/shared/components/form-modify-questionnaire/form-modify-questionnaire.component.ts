@@ -222,15 +222,15 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             });
 
         // retrieve data
-        forkJoin(
+        forkJoin([
             this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.QUESTION_CATEGORY),
             this.genericDataService.getAnswerTypesList(),
             this.genericDataService.getAnswersDisplayOrientationsList()
-        ).subscribe(([
-                         questionCategoriesList,
-                         answerTypesInstantList,
-                         answersDisplayInstantList
-                     ]: [
+        ]).subscribe(([
+             questionCategoriesList,
+             answerTypesInstantList,
+             answersDisplayInstantList
+        ]: [
             LabelValuePair[],
             any[],
             any[]

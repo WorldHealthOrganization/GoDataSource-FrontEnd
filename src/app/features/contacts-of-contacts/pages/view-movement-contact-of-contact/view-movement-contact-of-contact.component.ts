@@ -58,23 +58,23 @@ export class ViewMovementContactOfContactComponent implements OnInit {
             this.outbreakDataService
                 .getSelectedOutbreak()
                 .subscribe((selectedOutbreak: OutbreakModel) => {
-                    forkJoin(
+                    forkJoin([
                         this.contactsOfContactsDataService.getContactOfContact(selectedOutbreak.id, params.contactOfContactId),
                         this.contactsOfContactsDataService.getContactOfContactMovement(selectedOutbreak.id, params.contactOfContactId)
-                    )
-                        .subscribe((
-                            [contactOfContactData, movementData]: [ContactOfContactModel, AddressModel[]]
-                        ) => {
-                            // contact of contact  data
-                            this.contactOfContactData = contactOfContactData;
+                    ])
+                    .subscribe((
+                        [contactOfContactData, movementData]: [ContactOfContactModel, AddressModel[]]
+                    ) => {
+                        // contact of contact  data
+                        this.contactOfContactData = contactOfContactData;
 
-                            // initialize page breadcrumbs
-                            this.initializeBreadcrumbs();
+                        // initialize page breadcrumbs
+                        this.initializeBreadcrumbs();
 
-                            // movement data
-                            this.displayLoading = false;
-                            this.movementAddresses = movementData;
-                        });
+                        // movement data
+                        this.displayLoading = false;
+                        this.movementAddresses = movementData;
+                    });
                 });
         });
 

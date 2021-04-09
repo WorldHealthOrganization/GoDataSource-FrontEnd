@@ -1811,11 +1811,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         }
 
         // determine map nodes
-        forkJoin(
+        forkJoin([
             this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE),
             this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CERTAINTY_LEVEL),
             this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION)
-        ).subscribe(([
+        ]).subscribe(([
             personTypes,
             certaintyLevels,
             caseClassification
