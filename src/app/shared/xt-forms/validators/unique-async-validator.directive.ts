@@ -3,6 +3,9 @@ import { AbstractControl, NG_ASYNC_VALIDATORS, ValidationErrors } from '@angular
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+/**
+ * Async validator
+ */
 @Directive({
     selector: '[app-unique-async-validator][ngModel]',
     providers: [
@@ -13,10 +16,6 @@ import { map } from 'rxjs/operators';
         }
     ]
 })
-
-/**
- * Async validator
- */
 export class UniqueAsyncValidatorDirective {
 
     constructor(

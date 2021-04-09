@@ -1,5 +1,5 @@
 import { ListComponent } from '../../../core/helperClasses/list-component';
-import { OnDestroy, OnInit, Directive } from '@angular/core';
+import { Directive, OnDestroy, OnInit } from '@angular/core';
 import { EntityType } from '../../../core/models/entity-type';
 import { UserModel } from '../../../core/models/user.model';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
@@ -16,7 +16,11 @@ import { catchError } from 'rxjs/operators';
 import { ListHelperService } from '../../../core/services/helper/list-helper.service';
 import { ContactOfContactModel } from '../../../core/models/contact-of-contact.model';
 
+/**
+ * Relationship list
+ */
 @Directive()
+// tslint:disable-next-line:directive-class-suffix
 export abstract class RelationshipsListComponent extends ListComponent implements OnInit, OnDestroy {
     // Entities Map for specific data
     entityMap: {

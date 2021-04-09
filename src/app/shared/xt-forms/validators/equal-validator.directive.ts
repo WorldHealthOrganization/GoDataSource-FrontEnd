@@ -1,8 +1,10 @@
 import { Directive, forwardRef, Attribute } from '@angular/core';
 import { Validator, AbstractControl, NG_VALIDATORS } from '@angular/forms';
-
 import * as _ from 'lodash';
 
+/**
+ * Custom form validation for fields that should have the same value (e.g. password and confirm password)
+ */
 @Directive({
     selector: '[app-equal-validator][ngModel]',
     providers: [
@@ -13,10 +15,6 @@ import * as _ from 'lodash';
         }
     ]
 })
-
-/**
- * Custom form validation for fields that should have the same value (e.g. password and confirm password)
- */
 export class EqualValidatorDirective implements Validator {
     constructor(
         @Attribute('app-equal-validator') public equalValidator: string

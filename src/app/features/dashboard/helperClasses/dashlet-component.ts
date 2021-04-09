@@ -1,4 +1,4 @@
-import { EventEmitter, Input, Output } from '@angular/core';
+import { Directive, EventEmitter, Input, Output } from '@angular/core';
 import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
 import { DebounceTimeCaller } from '../../../core/helperClasses/debounce-time-caller';
 import { Subscriber } from 'rxjs';
@@ -12,6 +12,8 @@ import { Constants } from '../../../core/models/constants';
 /**
  * Dashlet
  */
+@Directive()
+// tslint:disable-next-line:directive-class-suffix
 export abstract class DashletComponent {
     // authenticated user
     authUser: UserModel;

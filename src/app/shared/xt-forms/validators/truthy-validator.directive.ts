@@ -1,6 +1,9 @@
 import { Directive, forwardRef, Attribute } from '@angular/core';
 import { Validator, AbstractControl, NG_VALIDATORS } from '@angular/forms';
 
+/**
+ * Custom form validation for fields that need to be truthy (e.g. Terms and Conditions checkbox must always be checked)
+ */
 @Directive({
     selector: '[app-truthy-validator][ngModel]',
     providers: [
@@ -11,10 +14,6 @@ import { Validator, AbstractControl, NG_VALIDATORS } from '@angular/forms';
         }
     ]
 })
-
-/**
- * Custom form validation for fields that need to be truthy (e.g. Terms and Conditions checkbox must always be checked)
- */
 export class TruthyValidatorDirective implements Validator {
     constructor(
         @Attribute('app-truthy-validator') public errorMessageKey: string

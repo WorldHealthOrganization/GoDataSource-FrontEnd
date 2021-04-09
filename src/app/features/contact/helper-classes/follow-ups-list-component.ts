@@ -13,7 +13,7 @@ import * as _ from 'lodash';
 import { Router } from '@angular/router';
 import { TeamModel } from '../../../core/models/team.model';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
-import { OnDestroy, OnInit } from '@angular/core';
+import { Directive, OnDestroy, OnInit } from '@angular/core';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { Observable } from 'rxjs';
 import { TeamDataService } from '../../../core/services/data/team.data.service';
@@ -25,6 +25,8 @@ import { ListHelperService } from '../../../core/services/helper/list-helper.ser
 /**
  * Follow-up list component
  */
+@Directive()
+// tslint:disable-next-line:directive-class-suffix
 export abstract class FollowUpsListComponent extends ListComponent implements OnInit, OnDestroy {
     // authenticated user
     authUser: UserModel;

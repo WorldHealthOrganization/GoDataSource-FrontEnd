@@ -1,8 +1,10 @@
 import { Directive, forwardRef, Attribute } from '@angular/core';
 import { Validator, AbstractControl, NG_VALIDATORS } from '@angular/forms';
-
 import * as _ from 'lodash';
 
+/**
+ * Custom form validation for checking file extensions
+ */
 @Directive({
     selector: '[app-file-extension-validator][ngModel]',
     providers: [
@@ -13,10 +15,6 @@ import * as _ from 'lodash';
         }
     ]
 })
-
-/**
- * Custom form validation for checking file extensions
- */
 export class FileExtensionValidatorDirective implements Validator {
     constructor(
         @Attribute('app-file-extension-validator') public fileExtensions: string

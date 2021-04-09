@@ -1,8 +1,10 @@
 import { Directive, forwardRef, Attribute } from '@angular/core';
 import { Validator, AbstractControl, NG_VALIDATORS } from '@angular/forms';
-
 import * as _ from 'lodash';
 
+/**
+ * Custom form validation for fields that should not have the same value (e.g. security questions)
+ */
 @Directive({
     selector: '[app-not-equal-validator][ngModel]',
     providers: [
@@ -13,10 +15,6 @@ import * as _ from 'lodash';
         }
     ]
 })
-
-/**
- * Custom form validation for fields that should not have the same value (e.g. security questions)
- */
 export class NotEqualValidatorDirective implements Validator {
     constructor(
         @Attribute('app-not-equal-validator') public notEqualValidator: string

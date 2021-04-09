@@ -2,6 +2,9 @@ import { Directive, forwardRef, Input } from '@angular/core';
 import { Validator, AbstractControl, NG_VALIDATORS } from '@angular/forms';
 import * as _ from 'lodash';
 
+/**
+ * Check if a form field is a valid e-mail address
+ */
 @Directive({
     selector: '[app-not-number-validator][ngModel]',
     providers: [
@@ -12,10 +15,6 @@ import * as _ from 'lodash';
         }
     ]
 })
-
-/**
- * Check if a form field is a valid e-mail address
- */
 export class NotNumberValidatorDirective implements Validator {
     @Input() notNumberValidatorDisabled: boolean = false;
 

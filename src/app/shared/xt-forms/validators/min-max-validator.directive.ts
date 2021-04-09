@@ -1,8 +1,10 @@
 import { Directive, forwardRef, Input } from '@angular/core';
 import { Validator, AbstractControl, NG_VALIDATORS } from '@angular/forms';
-
 import * as _ from 'lodash';
 
+/**
+ * Check if a form field has valid numbers
+ */
 @Directive({
     selector: '[app-min-max-validator][ngModel]',
     providers: [
@@ -13,10 +15,6 @@ import * as _ from 'lodash';
         }
     ]
 })
-
-/**
- * Check if a form field has valid numbers
- */
 export class MinMaxValidatorDirective implements Validator {
     @Input() minNumber: number;
     @Input() maxNumber: number;
