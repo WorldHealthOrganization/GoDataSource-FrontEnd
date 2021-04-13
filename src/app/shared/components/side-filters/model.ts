@@ -85,6 +85,7 @@ export class QuestionSideFilterModel extends QuestionModel {
 
 // Model for Available Filter
 export class SortModel {
+    // ref to self
     self: SortModel;
 
     /**
@@ -92,6 +93,9 @@ export class SortModel {
      */
     uniqueKey: string;
 
+    /**
+     * Constructor
+     */
     constructor(
         // name of the field that the sort applies to
         public fieldName: string,
@@ -124,6 +128,9 @@ export class AppliedSortModel {
     // direction
     public direction: RequestSortDirection = RequestSortDirection.ASC;
 
+    /**
+     * Constructor
+     */
     constructor(data?: {
         sort: SortModel,
         direction: RequestSortDirection
@@ -151,7 +158,7 @@ export class AppliedSortModel {
 
 // Model for Available Filter
 export class FilterModel {
-
+    // ref to self
     self: FilterModel;
 
     // name of the field that the filter applies to

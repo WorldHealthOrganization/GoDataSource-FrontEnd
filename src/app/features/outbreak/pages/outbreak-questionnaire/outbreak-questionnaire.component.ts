@@ -81,7 +81,7 @@ export class OutbreakQuestionnaireComponent extends ConfirmOnFormChanges impleme
     /**
      * Questionnaire
      */
-    @ViewChild('questionnaire') questionnaire: FormModifyQuestionnaireComponent;
+    @ViewChild('questionnaire', { static: true }) questionnaire: FormModifyQuestionnaireComponent;
 
     /**
      * Constructor

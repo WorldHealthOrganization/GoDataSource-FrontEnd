@@ -14,7 +14,7 @@ import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, Dialog
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { MatDialogRef } from '@angular/material';
+import { MatDialogRef } from '@angular/material/dialog';
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';

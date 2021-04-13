@@ -62,7 +62,7 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
     authUser: UserModel;
     UserSettings = UserSettings;
 
-    @ViewChild('locationFilter') locationFilter: FormLocationDropdownComponent;
+    @ViewChild('locationFilter', { static: true }) locationFilter: FormLocationDropdownComponent;
 
     // export
     hierarchicalLocationsDataExportFileName: string = moment().format('YYYY-MM-DD');

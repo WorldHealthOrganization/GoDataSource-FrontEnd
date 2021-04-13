@@ -8,7 +8,6 @@ import { TranslateModule } from '@ngx-translate/core';
 import { XtFormsModule } from './xt-forms/xt-forms.module';
 import { AngularMaterialModule } from './angular-material/angular-material.module';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { MglTimelineModule } from 'angular-mgl-timeline';
 import { FileUploadModule } from 'ng2-file-upload';
 import { NgxWigModule } from 'ngx-wig';
 import { HotTableModule } from '@handsontable/angular';
@@ -17,6 +16,7 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { ScrollingModule as ExperimentalScrollingModule } from '@angular/cdk-experimental/scrolling';
 import { MdePopoverModule } from '@material-extended/mde';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { MglTimelineModule } from 'angular-mgl-timeline';
 
 // components
 import * as fromSharedComponents from './components';
@@ -35,8 +35,8 @@ import * as fromSharedPipes from './pipes';
         AngularMaterialModule,
         TranslateModule,
         MdePopoverModule,
-        MglTimelineModule,
         FileUploadModule,
+        MglTimelineModule,
         NgxWigModule,
         NgxMatSelectSearchModule,
         HotTableModule.forRoot(),

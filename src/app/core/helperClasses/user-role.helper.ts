@@ -4,7 +4,7 @@ import { GroupEventDataAction, IGroupEventData, IGroupOptionEventData, ISelectGr
 import { IPermissionChildModel, PERMISSION, PermissionModel } from '../models/permission.model';
 import { DialogService } from '../services/helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration } from '../../shared/components';
-import { MatDialogRef } from '@angular/material';
+import { MatDialogRef } from '@angular/material/dialog';
 import * as _ from 'lodash';
 
 export class UserRoleHelper {

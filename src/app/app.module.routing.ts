@@ -14,7 +14,7 @@ const routes: Routes = [
     // Authentication Module routes
     {
         path: ModulePath.AuthenticationModule,
-        loadChildren: './features/authentication/authentication.module#AuthenticationModule',
+        loadChildren: () => import('./features/authentication/authentication.module').then(m => m.AuthenticationModule),
         resolve: {
             language: LanguageResolver
         }
@@ -31,7 +31,7 @@ const routes: Routes = [
             // Account Module routes
             {
                 path: ModulePath.AccountModule,
-                loadChildren: './features/account/account.module#AccountModule',
+                loadChildren: () => import('./features/account/account.module').then(m => m.AccountModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -45,7 +45,7 @@ const routes: Routes = [
             // User Module routes
             {
                 path: ModulePath.UserModule,
-                loadChildren: './features/user/user.module#UserModule',
+                loadChildren: () => import('./features/user/user.module').then(m => m.UserModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -64,7 +64,7 @@ const routes: Routes = [
             // User Role Module routes
             {
                 path: ModulePath.UserRoleModule,
-                loadChildren: './features/user-role/user-role.module#UserRoleModule',
+                loadChildren: () => import('./features/user-role/user-role.module').then(m => m.UserRoleModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -83,7 +83,7 @@ const routes: Routes = [
             // Saved Filters
             {
                 path: ModulePath.SavedFiltersModule,
-                loadChildren: './features/saved-filters/saved-filters.module#SavedFiltersModule',
+                loadChildren: () => import('./features/saved-filters/saved-filters.module').then(m => m.SavedFiltersModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -110,7 +110,7 @@ const routes: Routes = [
             // Cloud Backup Module routes
             {
                 path: ModulePath.CloudBackupModule,
-                loadChildren: './features/cloud-backup/cloud-backup.module#CloudBackupModule',
+                loadChildren: () => import('./features/cloud-backup/cloud-backup.module').then(m => m.CloudBackupModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -124,7 +124,7 @@ const routes: Routes = [
             // Saved Import Mapping Module routes
             {
                 path: ModulePath.SavedImportMappingModule,
-                loadChildren: './features/saved-import-mapping/saved-import-mapping.module#SavedImportMappingModule',
+                loadChildren: () => import('./features/saved-import-mapping/saved-import-mapping.module').then(m => m.SavedImportMappingModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -147,7 +147,7 @@ const routes: Routes = [
             // Terms of use Module routes
             {
                 path: ModulePath.TermsOfUseModule,
-                loadChildren: './features/terms-of-use/terms-of-use.module#TermsOfUseModule',
+                loadChildren: () => import('./features/terms-of-use/terms-of-use.module').then(m => m.TermsOfUseModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -156,7 +156,7 @@ const routes: Routes = [
             // Version
             {
                 path: ModulePath.VersionModule,
-                loadChildren: './features/version/version.module#VersionModule',
+                loadChildren: () => import('./features/version/version.module').then(m => m.VersionModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -165,7 +165,7 @@ const routes: Routes = [
             // Outbreak Module routes
             {
                 path: ModulePath.OutbreakModule,
-                loadChildren: './features/outbreak/outbreak.module#OutbreakModule',
+                loadChildren: () => import('./features/outbreak/outbreak.module').then(m => m.OutbreakModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -188,7 +188,7 @@ const routes: Routes = [
             // Outbreak Templates Module routes
             {
                 path: ModulePath.OutbreakTemplatesModule,
-                loadChildren: './features/outbreak-templates/outbreak-templates.module#OutbreakTemplatesModule',
+                loadChildren: () => import('./features/outbreak-templates/outbreak-templates.module').then(m => m.OutbreakTemplatesModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -210,7 +210,7 @@ const routes: Routes = [
             // Contact Module routes
             {
                 path: ModulePath.ContactModule,
-                loadChildren: './features/contact/contact.module#ContactModule',
+                loadChildren: () => import('./features/contact/contact.module').then(m => m.ContactModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -244,7 +244,7 @@ const routes: Routes = [
             // Contacts of contacts Module routes
             {
                 path: ModulePath.ContactsOfContactsModule,
-                loadChildren: './features/contacts-of-contacts/contacts-of-contacts.module#ContactsOfContactsModule',
+                loadChildren: () => import('./features/contacts-of-contacts/contacts-of-contacts.module').then(m => m.ContactsOfContactsModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -272,7 +272,7 @@ const routes: Routes = [
             // Case Module routes
             {
                 path: ModulePath.CaseModule,
-                loadChildren: './features/case/case.module#CaseModule',
+                loadChildren: () => import('./features/case/case.module').then(m => m.CaseModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -298,7 +298,7 @@ const routes: Routes = [
             // Event Module routes
             {
                 path: ModulePath.EventModule,
-                loadChildren: './features/event/event.module#EventModule',
+                loadChildren: () => import('./features/event/event.module').then(m => m.EventModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -322,7 +322,7 @@ const routes: Routes = [
             // Lab Result Module routes
             {
                 path: ModulePath.LabResultModule,
-                loadChildren: './features/lab-result/lab-result.module#LabResultModule',
+                loadChildren: () => import('./features/lab-result/lab-result.module').then(m => m.LabResultModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -353,7 +353,7 @@ const routes: Routes = [
             // Duplicate records routes
             {
                 path: ModulePath.DuplicateRecordsModule,
-                loadChildren: './features/duplicate-records/duplicate-records.module#DuplicateRecordsModule',
+                loadChildren: () => import('./features/duplicate-records/duplicate-records.module').then(m => m.DuplicateRecordsModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -376,7 +376,7 @@ const routes: Routes = [
             // Cluster Module routes
             {
                 path: ModulePath.ClusterModule,
-                loadChildren: './features/cluster/cluster.module#ClusterModule',
+                loadChildren: () => import('./features/cluster/cluster.module').then(m => m.ClusterModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -396,7 +396,7 @@ const routes: Routes = [
             // Relationship Module routes
             {
                 path: ModulePath.RelationshipModule,
-                loadChildren: './features/relationship/relationship.module#RelationshipModule',
+                loadChildren: () => import('./features/relationship/relationship.module').then(m => m.RelationshipModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -430,7 +430,7 @@ const routes: Routes = [
             // Reference Data Module routes
             {
                 path: ModulePath.ReferenceDataModule,
-                loadChildren: './features/reference-data/reference-data.module#ReferenceDataModule',
+                loadChildren: () => import('./features/reference-data/reference-data.module').then(m => m.ReferenceDataModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -452,7 +452,7 @@ const routes: Routes = [
             // Locations Module routes
             {
                 path: ModulePath.LocationModule,
-                loadChildren: './features/location/location.module#LocationModule',
+                loadChildren: () => import('./features/location/location.module').then(m => m.LocationModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -472,7 +472,7 @@ const routes: Routes = [
             // Teams Module routes
             {
                 path: ModulePath.TeamModule,
-                loadChildren: './features/team/team.module#TeamModule',
+                loadChildren: () => import('./features/team/team.module').then(m => m.TeamModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -492,7 +492,7 @@ const routes: Routes = [
             // Dashboard Module routes
             {
                 path: ModulePath.DashboardModule,
-                loadChildren: './features/dashboard/dashboard.module#DashboardModule',
+                loadChildren: () => import('./features/dashboard/dashboard.module').then(m => m.DashboardModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -504,7 +504,7 @@ const routes: Routes = [
             // Transmission Chain Module routes
             {
                 path: ModulePath.TransmissionChainModule,
-                loadChildren: './features/transmission-chain/transmission-chain.module#TransmissionChainModule',
+                loadChildren: () => import('./features/transmission-chain/transmission-chain.module').then(m => m.TransmissionChainModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -527,7 +527,7 @@ const routes: Routes = [
             // D3 Graphs Module routes
             {
                 path: ModulePath.D3GraphsModule,
-                loadChildren: './features/d3-graphs/d3-graphs.module#D3GraphsModule',
+                loadChildren: () => import('./features/d3-graphs/d3-graphs.module').then(m => m.D3GraphsModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -541,7 +541,7 @@ const routes: Routes = [
             // Import / Export Data Module routes
             {
                 path: ModulePath.ImportExportDataModule,
-                loadChildren: './features/import-export-data/import-export-data.module#ImportExportDataModule',
+                loadChildren: () => import('./features/import-export-data/import-export-data.module').then(m => m.ImportExportDataModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -566,7 +566,7 @@ const routes: Routes = [
             // System settings Module routes
             {
                 path: ModulePath.SystemConfigModule,
-                loadChildren: './features/system-config/system-config.module#SystemConfigModule',
+                loadChildren: () => import('./features/system-config/system-config.module').then(m => m.SystemConfigModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -591,7 +591,7 @@ const routes: Routes = [
             // Audit Logs Module routes
             {
                 path: ModulePath.AuditLogModule,
-                loadChildren: './features/audit-log/audit-log.module#AuditLogModule',
+                loadChildren: () => import('./features/audit-log/audit-log.module').then(m => m.AuditLogModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -605,7 +605,7 @@ const routes: Routes = [
             // Language Module routes
             {
                 path: ModulePath.LanguageModule,
-                loadChildren: './features/language/language.module#LanguageModule',
+                loadChildren: () => import('./features/language/language.module').then(m => m.LanguageModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -624,7 +624,7 @@ const routes: Routes = [
             // Help Module routes
             {
                 path: ModulePath.HelpModule,
-                loadChildren: './features/help/help.module#HelpModule',
+                loadChildren: () => import('./features/help/help.module').then(m => m.HelpModule),
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
@@ -648,4 +648,4 @@ const routes: Routes = [
 
 ];
 
-export const routing: ModuleWithProviders = RouterModule.forRoot(routes);
+export const routing: ModuleWithProviders<RouterModule> = RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' });

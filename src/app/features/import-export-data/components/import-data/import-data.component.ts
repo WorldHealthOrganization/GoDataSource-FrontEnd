@@ -24,11 +24,10 @@ import {
 } from '../../../../core/models/saved-import-mapping.model';
 import { Observable, Subscriber } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
-import { MatDialogRef } from '@angular/material';
+import { MatDialogRef } from '@angular/material/dialog';
 import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import { DomSanitizer } from '@angular/platform-browser';
-import { SafeStyle } from '@angular/platform-browser/src/security/dom_sanitization_service';
+import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 import { HoverRowActionsDirective } from '../../../../shared/directives/hover-row-actions/hover-row-actions.directive';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';

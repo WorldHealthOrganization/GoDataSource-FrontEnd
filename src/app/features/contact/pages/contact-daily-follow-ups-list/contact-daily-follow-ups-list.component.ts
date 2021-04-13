@@ -105,7 +105,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     // which follow-ups list page are we visiting?
     rootPage: FollowUpPage = FollowUpPage.DAILY;
 
-    @ViewChild('followUpDate', {read: NgModel}) followUpDateElem: NgModel;
+    @ViewChild('followUpDate', { read: NgModel, static: true }) followUpDateElem: NgModel;
 
     // subscribers
     outbreakSubscriber: Subscription;

@@ -41,7 +41,7 @@ export class CreateRoleComponent
     availablePermissions$: Observable<any[]>;
 
     // handle select permission group
-    @ViewChild('selectedPermissions') selectedPermissions: FormSelectGroupsComponent;
+    @ViewChild('selectedPermissions', { static: true }) selectedPermissions: FormSelectGroupsComponent;
 
     /**
      * Constructor

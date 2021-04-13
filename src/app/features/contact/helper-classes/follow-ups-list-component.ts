@@ -6,14 +6,14 @@ import { ContactModel } from '../../../core/models/contact.model';
 import { DialogAnswer, DialogAnswerButton, DialogField, LoadingDialogModel, ModifyContactFollowUpQuestionnaireData, ModifyContactFollowUpQuestionnaireDialogComponent } from '../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../core/services/helper/dialog.service';
 import { FollowUpsDataService } from '../../../core/services/data/follow-ups.data.service';
-import { MatTable } from '@angular/material';
+import { MatTable } from '@angular/material/table';
 import { Constants } from '../../../core/models/constants';
 import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
 import { Router } from '@angular/router';
 import { TeamModel } from '../../../core/models/team.model';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
-import { OnDestroy, OnInit } from '@angular/core';
+import { Directive, OnDestroy, OnInit } from '@angular/core';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { Observable } from 'rxjs';
 import { TeamDataService } from '../../../core/services/data/team.data.service';
@@ -22,6 +22,11 @@ import { catchError, share } from 'rxjs/operators';
 import { moment } from '../../../core/helperClasses/x-moment';
 import { ListHelperService } from '../../../core/services/helper/list-helper.service';
 
+/**
+ * Follow-up list component
+ */
+@Directive()
+// tslint:disable-next-line:directive-class-suffix
 export abstract class FollowUpsListComponent extends ListComponent implements OnInit, OnDestroy {
     // authenticated user
     authUser: UserModel;

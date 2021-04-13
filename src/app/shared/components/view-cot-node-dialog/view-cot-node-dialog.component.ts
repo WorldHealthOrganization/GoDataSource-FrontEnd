@@ -1,5 +1,5 @@
 import { Component, Inject, OnDestroy, ViewChild, ViewEncapsulation } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 import { CaseModel } from '../../../core/models/case.model';
 import { EventModel } from '../../../core/models/event.model';
@@ -57,8 +57,8 @@ export class ViewCotNodeDialogComponent implements OnDestroy {
     EntityType = EntityType;
 
     // used to determine data size since we can't do it with flex without a min-height
-    @ViewChild('dialogTitle') dialogTitle: any;
-    @ViewChild('dialogButtons') dialogButtons: any;
+    @ViewChild('dialogTitle', { static: true }) dialogTitle: any;
+    @ViewChild('dialogButtons', { static: true }) dialogButtons: any;
 
     // dialog data max height
     private _timerHandler: any;

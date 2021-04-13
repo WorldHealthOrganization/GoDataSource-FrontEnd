@@ -15,7 +15,7 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { SystemBackupDataService } from '../../../../core/services/data/system-backup.data.service';
 import * as _ from 'lodash';
 import { Constants } from '../../../../core/models/constants';
-import { MatDialogRef } from '@angular/material';
+import { MatDialogRef } from '@angular/material/dialog';
 import { catchError, share, tap } from 'rxjs/operators';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { throwError } from 'rxjs';

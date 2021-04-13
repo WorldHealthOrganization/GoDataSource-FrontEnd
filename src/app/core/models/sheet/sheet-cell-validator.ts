@@ -76,7 +76,7 @@ export class SheetCellValidator {
         switch (validationType) {
             case SheetCellValidationType.DROPDOWN:
                 // 'handsontable' built-in validator for Dropdowns
-                return (Handsontable as any).validators.DropdownValidator;
+                return Handsontable.default.validators.DropdownValidator;
 
             case SheetCellValidationType.DATE:
                 // custom validator for dates

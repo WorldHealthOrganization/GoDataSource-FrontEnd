@@ -1,5 +1,5 @@
 import { Component, Inject, ViewEncapsulation } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 import { HelpDataService } from '../../../core/services/data/help.data.service';
 import { HelpItemModel } from '../../../core/models/help-item.model';

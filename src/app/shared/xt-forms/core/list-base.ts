@@ -1,4 +1,4 @@
-import { EventEmitter, Input, Output } from '@angular/core';
+import { Directive, EventEmitter, Input, Output } from '@angular/core';
 import { ControlContainer } from '@angular/forms';
 import { GroupValidator } from './group-validator';
 import * as _ from 'lodash';
@@ -7,6 +7,8 @@ import { Observable } from 'rxjs';
 /**
  * Base class to be extended by components that implement lists of group components or single components
  */
+@Directive()
+// tslint:disable-next-line:directive-class-suffix
 export abstract class ListBase<T> extends GroupValidator<T[]> {
     static _identifier: number = 0;
 

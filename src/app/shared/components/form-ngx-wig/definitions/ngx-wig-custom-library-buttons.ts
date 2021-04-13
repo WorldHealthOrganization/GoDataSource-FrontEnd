@@ -1,10 +1,10 @@
 import { commandFunction, NgxWigComponent, TButton } from 'ngx-wig';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswer, DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType } from '../../dialog/dialog.component.js';
+import { DialogAnswer, DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType } from '../../dialog/dialog.component';
 import { Observable } from 'rxjs/internal/Observable';
 import { of } from 'rxjs/internal/observable/of';
-import { Inject, Renderer2 } from '@angular/core';
+import { Inject, Injectable, Renderer2 } from '@angular/core';
 import * as _ from 'lodash';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 
@@ -85,6 +85,7 @@ export class TButtonExtended implements TButton {
  * Handles custom buttons for our wysiwyg
  * @param i18nService
  */
+@Injectable()
 export class NgxWigCustomLibraryButtons {
     // constants
     static readonly SELECTION_RANGE_PATH = 'ngxWigEditable.nativeElement.selectionRange';

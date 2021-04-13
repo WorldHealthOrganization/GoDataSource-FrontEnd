@@ -36,8 +36,8 @@ export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges 
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
-    @ViewChild('inputForMakingFormDirty') inputForMakingFormDirty;
-    @ViewChild('hotTableWrapper') hotTableWrapper: HotTableWrapperComponent;
+    @ViewChild('inputForMakingFormDirty', { static: true }) inputForMakingFormDirty;
+    @ViewChild('hotTableWrapper', { static: true }) hotTableWrapper: HotTableWrapperComponent;
 
     // selected outbreak
     selectedOutbreak: OutbreakModel;
@@ -465,7 +465,7 @@ export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges 
                         .getData()
                         .subscribe((dataResponse: {
                             data: any[],
-                            sheetCore: Handsontable
+                            sheetCore: Handsontable.default
                         }) => {
                             // no data to save ?
                             if (_.isEmpty(dataResponse.data)) {

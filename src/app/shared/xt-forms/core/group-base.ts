@@ -1,10 +1,12 @@
-import { EventEmitter, Host, Inject, Input, Optional, Output, SkipSelf } from '@angular/core';
+import { Directive, EventEmitter, Host, Inject, Input, Optional, Output, SkipSelf } from '@angular/core';
 import { ControlContainer, NG_ASYNC_VALIDATORS, NG_VALIDATORS } from '@angular/forms';
 import { GroupValidator } from './group-validator';
 
 /**
  * Base class to be extended by custom form controls to handle groups of atomic form components
  */
+@Directive()
+// tslint:disable-next-line:directive-class-suffix
 export abstract class GroupBase<T> extends GroupValidator<T> {
     static _identifier: number = 0;
 

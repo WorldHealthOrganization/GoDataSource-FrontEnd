@@ -7,7 +7,6 @@ import { LocationSheetColumn, DateSheetColumn, DropdownSheetColumn, IntegerSheet
 import { SheetCellType } from '../../../core/models/sheet/sheet-cell-type';
 import { Constants } from '../../../core/models/constants';
 import { I18nService } from '../../../core/services/helper/i18n.service';
-import { GridSettings } from 'handsontable';
 import { Observable } from 'rxjs/internal/Observable';
 import { Subscriber } from 'rxjs/internal-compatibility';
 import { catchError, map, tap } from 'rxjs/operators';
@@ -28,7 +27,7 @@ import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 export interface InvalidTableData {
     isValid: boolean;
     invalidColumns: {
-        [row: number]: GridSettings[]
+        [row: number]: Handsontable.default.CellProperties[]
     };
 }
 
@@ -44,7 +43,7 @@ export enum IHotTableWrapperEventType {
  * After Change event data
  */
 export interface IHotTableWrapperEventTypeAfterChange {
-    sheetCore: Handsontable;
+    sheetCore: Handsontable.default;
     changes: any[];
     source: string;
 }
@@ -128,7 +127,7 @@ export class HotTableWrapperComponent implements OnInit {
     @Output() afterBecameDirty = new EventEmitter<IHotTableWrapperEvent>();
 
     // children components
-    @ViewChild('sheetTable') sheetTable: HotTableComponent;
+    @ViewChild('sheetTable', { static: true }) sheetTable: HotTableComponent;
 
     // local constants used by component template
     SheetCellType = SheetCellType;
@@ -139,7 +138,6 @@ export class HotTableWrapperComponent implements OnInit {
 
     // callbacks
     afterChangeCallback: (
-        sheetCore: Handsontable,
         changes: any[],
         source: string
     ) => void;
@@ -208,11 +206,11 @@ export class HotTableWrapperComponent implements OnInit {
     validateTable(): Observable<InvalidTableData> {
         return new Observable((observer: Subscriber<InvalidTableData>) => {
             // validate all cells
-            const sheetCore: Handsontable = (this.sheetTable as any).hotInstance;
+            const sheetCore: Handsontable.default = (this.sheetTable as any).hotInstance;
             sheetCore.validateCells((valid) => {
                 // if not valid, then we need to determine what rows / columns are invalid
                 const invalidColumns: {
-                    [row: number]: GridSettings[]
+                    [row: number]: Handsontable.default.CellProperties[]
                 } = {};
                 const countedRows: number = sheetCore.countRows();
                 let row: number = 0;
@@ -221,7 +219,7 @@ export class HotTableWrapperComponent implements OnInit {
                     if (!sheetCore.isEmptyRow(row)) {
                         _.each(
                             sheetCore.getCellMetaAtRow(row),
-                            (column: GridSettings) => {
+                            (column: Handsontable.default.CellProperties) => {
                                 if (column.valid === false) {
                                     // initialize
                                     if (invalidColumns[row] === undefined) {
@@ -252,9 +250,12 @@ export class HotTableWrapperComponent implements OnInit {
     /**
      * Get contacts data from table, ready to be sent in the API call for creating the contacts
      */
-    getData(): Observable<{ data: any[], sheetCore: Handsontable}> {
+    getData(): Observable<{
+        data: any[],
+        sheetCore: Handsontable.default
+    }> {
         // get the label-value map of Reference Data dropdowns (so we can replaced the labels used in the Sheet with the actual values)
-        const sheetCore: Handsontable = (this.sheetTable as any).hotInstance;
+        const sheetCore: Handsontable.default = (this.sheetTable as any).hotInstance;
         return this.getDropDownsLabelValueMap()
             .pipe(
                 map((dropdownsMap) => {
@@ -316,7 +317,7 @@ export class HotTableWrapperComponent implements OnInit {
     ) {
         return _.map(
             response.invalidColumns,
-            (columns: GridSettings[], row: string) => {
+            (columns: Handsontable.default.CellProperties[], row: string) => {
                 // initialize
                 const data: {
                     row: number,
@@ -329,7 +330,7 @@ export class HotTableWrapperComponent implements OnInit {
                 // merge columns into just one error message
                 _.each(
                     columns,
-                    (column: GridSettings) => {
+                    (column: Handsontable.default.CellProperties) => {
                         data.columns += `${data.columns.length < 1 ? '' : ', '}${column.title}`;
                     }
                 );
@@ -387,11 +388,13 @@ export class HotTableWrapperComponent implements OnInit {
      * 'Handsontable' hook before running validation on a cell
      */
     beforeValidateSheet(
-        sheetCore: Handsontable,
-        value: string, row: number,
+        value: string,
+        row: number,
         column: number
     ) {
         // determine if row is empty
+        // this in this case is the handsontable core
+        const sheetCore: Handsontable.default = this as any;
         const columnValues: any[] = sheetCore.getDataAtRow(row);
         columnValues[column] = value;
 
@@ -407,8 +410,10 @@ export class HotTableWrapperComponent implements OnInit {
     /**
      * After removing row
      */
-    afterRemoveRow(sheetCore: Handsontable, row: number) {
+    afterRemoveRow(row: number) {
         // determine if row is empty
+        // this in this case is the handsontable core
+        const sheetCore: Handsontable.default = this as any;
         const countedRows: number = sheetCore.countRows();
         while (row < countedRows) {
             // validate row
@@ -434,7 +439,6 @@ export class HotTableWrapperComponent implements OnInit {
      * Data changed trigger
      */
     afterChangeTrigger(): (
-        sheetCore: Handsontable,
         changes: any[],
         source: string
     ) => void {
@@ -445,11 +449,11 @@ export class HotTableWrapperComponent implements OnInit {
 
         // create functions
         this.afterChangeCallback = (
-            sheetCore: Handsontable,
             changes: any[],
             source: string
         ) => {
             // trigger after change
+            const sheetCore: Handsontable.default = (this.sheetTable as any).hotInstance;
             this.afterChange.emit({
                 type: IHotTableWrapperEventType.AfterChange,
                 typeSpecificData: {
@@ -460,7 +464,7 @@ export class HotTableWrapperComponent implements OnInit {
                 sheetTable: this.sheetTable
             });
 
-            // check if we need to trigger bacame dirty
+            // check if we need to trigger became dirty
             this.checkForDirty({
                 sheetCore: sheetCore,
                 changes: changes,

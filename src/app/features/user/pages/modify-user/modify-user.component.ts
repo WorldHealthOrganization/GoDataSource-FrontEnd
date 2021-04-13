@@ -88,10 +88,10 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
             this.userId = params.userId;
 
             // retrieve user and system information
-            forkJoin(
+            forkJoin([
                 this.systemSettingsDataService.getAPIVersionNoCache(),
                 this.userDataService.getUser(this.userId)
-            ).subscribe(([tokenInfo, user]) => {
+            ]).subscribe(([tokenInfo, user]) => {
                 // determine if we should ask for old password
                 this.askForOldPassword = !tokenInfo.skipOldPasswordForUserModify;
 

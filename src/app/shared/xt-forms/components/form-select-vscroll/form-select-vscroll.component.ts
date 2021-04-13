@@ -22,7 +22,7 @@ export class FormSelectVscrollComponent
     @HostBinding('class.form-element-host') isFormElement = true;
 
     // virtual scroll
-    @ViewChild(CdkVirtualScrollViewport) cdkVirtualScrollViewport: CdkVirtualScrollViewport;
+    @ViewChild(CdkVirtualScrollViewport, { static: true }) cdkVirtualScrollViewport: CdkVirtualScrollViewport;
 
     // component conf
     @Input() placeholder: string;

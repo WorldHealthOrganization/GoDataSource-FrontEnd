@@ -1,5 +1,5 @@
 import { Component, Inject, ViewEncapsulation } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DialogAnswer, DialogAnswerButton, DialogAnswerInputValue } from '../dialog/dialog.component';
 import { LocationModel } from '../../../core/models/location.model';
 import { LocationAutoItem } from '../form-location-dropdown/form-location-dropdown.component';

@@ -75,7 +75,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
     contactOfContactIdMaskValidator: Observable<boolean>;
 
     displayRefresh: boolean = false;
-    @ViewChild('visualId') visualId: NgModel;
+    @ViewChild('visualId', { static: true }) visualId: NgModel;
 
     /**
      * Constructor

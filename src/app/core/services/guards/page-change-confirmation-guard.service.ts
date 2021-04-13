@@ -1,15 +1,17 @@
 import { ActivatedRouteSnapshot, CanDeactivate, RouterStateSnapshot } from '@angular/router';
-import { HostListener, Injectable, QueryList, ViewChildren } from '@angular/core';
+import { Directive, HostListener, Injectable, QueryList, ViewChildren } from '@angular/core';
 import { Observable, Observer } from 'rxjs';
 import * as _ from 'lodash';
 import { DialogService } from '../helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton, DialogComponent } from '../../../shared/components/dialog/dialog.component';
 import { NgForm } from '@angular/forms';
-import { MatDialogRef } from '@angular/material';
+import { MatDialogRef } from '@angular/material/dialog';
 
 /**
  * Extended by components that use ngForms to determine the dirtiness of a component & need confirmation before leaving a page
  */
+@Directive()
+// tslint:disable-next-line:directive-class-suffix
 export class ConfirmOnFormChanges {
     // disable all dirty dialogs
     private static _allConfirmDisabled: boolean = false;

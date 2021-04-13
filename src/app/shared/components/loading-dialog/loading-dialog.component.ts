@@ -1,6 +1,6 @@
 import { Component, Inject, ViewEncapsulation } from '@angular/core';
 import { Subscriber } from 'rxjs';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DialogComponent } from '..';
 
 export class LoadingDialogDataModel {

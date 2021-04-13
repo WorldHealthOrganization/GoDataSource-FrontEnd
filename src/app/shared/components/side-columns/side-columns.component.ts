@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
-import { MatSidenav } from '@angular/material';
+import { MatSidenav } from '@angular/material/sidenav';
 import { VisibleColumnModel } from './model';
 import { NgForm } from '@angular/forms';
 import { UserModel, UserSettings } from '../../../core/models/user.model';
@@ -65,7 +65,7 @@ export class SideColumnsComponent {
     visibleSaveTableColumns: string[] = [];
 
     // Side Nav
-    @ViewChild('sideNav') sideNav: MatSidenav;
+    @ViewChild('sideNav', { static: true }) sideNav: MatSidenav;
 
     // visible column event handler
     @Output() visibleColumnsChanged = new EventEmitter<string[]>();

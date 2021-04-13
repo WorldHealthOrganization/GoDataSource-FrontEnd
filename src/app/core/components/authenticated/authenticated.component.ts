@@ -2,7 +2,8 @@ import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@ang
 import { NavigationEnd, NavigationStart, RouteConfigLoadEnd, RouteConfigLoadStart, Router } from '@angular/router';
 import { AuthDataService } from '../../services/data/auth.data.service';
 import { UserModel } from '../../models/user.model';
-import { MatDialogRef, MatSidenav } from '@angular/material';
+import { MatDialogRef } from '@angular/material/dialog';
+import { MatSidenav } from '@angular/material/sidenav';
 import { OutbreakDataService } from '../../services/data/outbreak.data.service';
 import { ReferenceDataDataService } from '../../services/data/reference-data.data.service';
 import { HelpDataService } from '../../services/data/help.data.service';

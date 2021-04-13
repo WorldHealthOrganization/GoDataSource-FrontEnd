@@ -16,7 +16,7 @@ import { ElementBase } from '../../core/index';
 import { MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { MatDatepicker } from '@angular/material';
+import { MatDatepicker } from '@angular/material/datepicker';
 import { Moment } from '../../../../core/helperClasses/x-moment';
 import { Subscription } from 'rxjs/internal/Subscription';
 

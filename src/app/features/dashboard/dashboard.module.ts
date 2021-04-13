@@ -18,8 +18,7 @@ import * as fromComponents from './components';
     declarations: [
         ...fromPages.pageComponents,
         ...fromComponents.components
-    ],
-    entryComponents: []
+    ]
 })
 export class DashboardModule {
 }

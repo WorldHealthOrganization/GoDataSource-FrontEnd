@@ -28,7 +28,7 @@ export class ViewMovementContactComponent implements OnInit {
     // loading data
     displayLoading: boolean = true;
 
-    @ViewChild('mapMovement') mapMovement: WorldMapMovementComponent;
+    @ViewChild('mapMovement', { static: true }) mapMovement: WorldMapMovementComponent;
 
     // constants
     ContactModel = ContactModel;
@@ -57,23 +57,23 @@ export class ViewMovementContactComponent implements OnInit {
             this.outbreakDataService
                 .getSelectedOutbreak()
                 .subscribe((selectedOutbreak: OutbreakModel) => {
-                    forkJoin(
+                    forkJoin([
                         this.contactDataService.getContact(selectedOutbreak.id, params.contactId),
                         this.contactDataService.getContactMovement(selectedOutbreak.id, params.contactId)
-                    )
-                        .subscribe((
-                            [contactData, movementData]: [ContactModel, AddressModel[]]
-                        ) => {
-                            // contact data
-                            this.contactData = contactData;
+                    ])
+                    .subscribe((
+                        [contactData, movementData]: [ContactModel, AddressModel[]]
+                    ) => {
+                        // contact data
+                        this.contactData = contactData;
 
-                            // initialize page breadcrumbs
-                            this.initializeBreadcrumbs();
+                        // initialize page breadcrumbs
+                        this.initializeBreadcrumbs();
 
-                            // movement data
-                            this.displayLoading = false;
-                            this.movementAddresses = movementData;
-                        });
+                        // movement data
+                        this.displayLoading = false;
+                        this.movementAddresses = movementData;
+                    });
                 });
         });
 

@@ -256,28 +256,28 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
 
             // retrieve data
             this.displayLoading = true;
-            this.previousSubscriber = forkJoin(
+            this.previousSubscriber = forkJoin([
                 this.caseDataService.getHospitalisedCasesCount(this.outbreakId, this.globalFilterDate, qb),
                 this.caseDataService.getIsolatedCasesCount(this.outbreakId, this.globalFilterDate, qb),
                 this.caseDataService.getNotHospitalisedCasesCount(this.outbreakId, this.globalFilterDate, qb)
+            ])
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                })
             )
-                .pipe(
-                    catchError((err) => {
-                        this.snackbarService.showApiError(err);
-                        return throwError(err);
-                    })
-                )
-                .subscribe(([hospitalizedCountResults, isolatedCountResults, caseNotHospitalizationCount]) => {
-                    // construct chart
-                    this.caseHospitalizationSummaryResults = this.buildChartData(
-                        hospitalizedCountResults.count,
-                        isolatedCountResults.count,
-                        caseNotHospitalizationCount.count
-                    );
+            .subscribe(([hospitalizedCountResults, isolatedCountResults, caseNotHospitalizationCount]) => {
+                // construct chart
+                this.caseHospitalizationSummaryResults = this.buildChartData(
+                    hospitalizedCountResults.count,
+                    isolatedCountResults.count,
+                    caseNotHospitalizationCount.count
+                );
 
-                    // finished
-                    this.displayLoading = false;
-                });
+                // finished
+                this.displayLoading = false;
+            });
         }
     }
 }

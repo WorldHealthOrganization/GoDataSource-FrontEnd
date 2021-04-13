@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
-import { MatDialogRef, MatSidenav } from '@angular/material';
+import { MatDialogRef } from '@angular/material/dialog';
+import { MatSidenav } from '@angular/material/sidenav';
 import { AppliedFilterModel, AppliedSortModel, FilterComparator, FilterModel, FilterType, QuestionSideFilterModel, QuestionWhichAnswer, SortModel } from './model';
 import { RequestFilterGenerator, RequestFilterOperator, RequestQueryBuilder, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
 import { NgForm } from '@angular/forms';
@@ -543,7 +544,7 @@ export class SideFiltersComponent {
         const sortableFields = _.filter(this.filterOptions, (filter: FilterModel) => filter.sortable);
         _.each(sortableFields, (filter: FilterModel) => {
             // add only if no already in the list
-            if (!_.includes(this.sortOptions, {fieldName: filter.fieldName})) {
+            if (!_.find(this.sortOptions, { fieldName: filter.fieldName })) {
                 this.sortOptions.push(new SortModel(
                     filter.fieldName,
                     filter.fieldLabel
@@ -554,7 +555,7 @@ export class SideFiltersComponent {
         // add filter extra sort fields
         _.each(this.extraSortOptions, (sort: SortModel) => {
             // add only if no already in the list
-            if (!_.includes(this.sortOptions, {fieldName: sort.fieldName})) {
+            if (!_.find(this.sortOptions, { fieldName: sort.fieldName })) {
                 this.sortOptions.push(sort);
             }
         });

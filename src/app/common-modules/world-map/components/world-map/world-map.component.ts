@@ -29,13 +29,13 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Constants } from '../../../../core/models/constants';
 import { Observable, Subscriber, Subscription } from 'rxjs';
-import { addCommon as addCommonProjections } from 'ol/proj.js';
+import { addCommon as addCommonProjections } from 'ol/proj';
 import { v4 as uuid } from 'uuid';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components';
-import { MatDialogRef } from '@angular/material';
+import { MatDialogRef } from '@angular/material/dialog';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { OlMapboxStyleHack } from '../../../../core/helperClasses/hacks/ol/ol-mapbox-style-hack';
+import { applyStyle } from 'ol-mapbox-style';
 
 /**
  * Point used for rendering purposes
@@ -481,7 +481,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                                     .then(r => r.json())
                                     .then((glStyle) => {
                                         // apply style
-                                        OlMapboxStyleHack.applyStyle(
+                                        applyStyle(
                                             layerData.layer,
                                             glStyle,
                                             mapServer.styleUrlSource,

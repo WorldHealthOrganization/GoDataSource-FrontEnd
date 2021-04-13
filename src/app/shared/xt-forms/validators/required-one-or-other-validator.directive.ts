@@ -1,8 +1,10 @@
 import { Directive, forwardRef, Input } from '@angular/core';
 import { Validator, AbstractControl, NG_VALIDATORS } from '@angular/forms';
-
 import * as _ from 'lodash';
 
+/**
+ * Custom form validation for too fields, from which at least one should be filled
+ */
 @Directive({
     selector: '[app-required-one-or-other-validator][ngModel]',
     providers: [
@@ -13,10 +15,6 @@ import * as _ from 'lodash';
         }
     ]
 })
-
-/**
- * Custom form validation for too fields, from which at least one should be filled
- */
 export class RequiredOneOrOtherValidatorDirective implements Validator {
     @Input() requiredOtherField: string;
 

@@ -1,5 +1,5 @@
 import { Component, Inject, OnDestroy, ViewChild, ViewEncapsulation } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { RelationshipDataService } from '../../../core/services/data/relationship.data.service';
@@ -44,8 +44,8 @@ export class ViewCotEdgeDialogComponent implements OnDestroy {
     loading: boolean = true;
 
     // used to determine data size since we can't do it with flex without a min-height
-    @ViewChild('dialogTitle') dialogTitle: any;
-    @ViewChild('dialogButtons') dialogButtons: any;
+    @ViewChild('dialogTitle', { static: true }) dialogTitle: any;
+    @ViewChild('dialogButtons', { static: true }) dialogButtons: any;
 
     // dialog data max height
     private _timerHandler: any;

@@ -87,7 +87,7 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
     caseOutcomeList$: Observable<LabelValuePair[]>;
     dateRangeCentreNameList$: Observable<LabelValuePair[]>;
 
-    @ViewChild('chart') chartContainer: ElementRef;
+    @ViewChild('chart', { static: true }) chartContainer: ElementRef;
 
     // Map of center token names
     centerTokenToNameMap: {
@@ -175,10 +175,10 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
         this.loadingData = true;
 
         // retrieve center names & chain bar data
-        forkJoin(
+        forkJoin([
             this.dateRangeCentreNameList$,
             this.transmissionChainBarsDataService.getTransmissionChainBarsData(this.selectedOutbreak.id, this.queryBuilder)
-        ).subscribe(([centerNames, graphData]) => {
+        ]).subscribe(([centerNames, graphData]) => {
             // map center names
             centerNames.forEach((center) => {
                 this.centerTokenToNameMap[center.value] = this.i18nService.instant(center.label);

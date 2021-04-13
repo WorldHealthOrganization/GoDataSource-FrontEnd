@@ -1,7 +1,7 @@
 import { RouterModule, Routes } from '@angular/router';
 import * as fromPages from './pages';
-import { ModuleWithProviders } from '@angular/compiler/src/core';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
+import { ModuleWithProviders } from '@angular/core';
 
 const routes: Routes = [
     {
@@ -11,4 +11,4 @@ const routes: Routes = [
     }
 ];
 
-export const routing: ModuleWithProviders = RouterModule.forChild(routes);
+export const routing: ModuleWithProviders<RouterModule> = RouterModule.forChild(routes);
