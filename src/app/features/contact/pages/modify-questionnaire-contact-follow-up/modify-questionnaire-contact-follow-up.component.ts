@@ -37,6 +37,7 @@ export class ModifyQuestionnaireContactFollowUpComponent extends ViewModifyCompo
     followUpData: FollowUpModel = new FollowUpModel();
 
     rootPage: string;
+    rootCaseId: string;
 
     // constants
     FollowUpModel = FollowUpModel;
@@ -77,8 +78,9 @@ export class ModifyQuestionnaireContactFollowUpComponent extends ViewModifyCompo
                 this.retrieveFollowUpData();
             });
 
-        this.route.queryParams.subscribe((params: {rootPage}) => {
+        this.route.queryParams.subscribe((params: { rootPage, rootCaseId }) => {
             this.rootPage = params.rootPage;
+            this.rootCaseId = params.rootCaseId;
         });
 
         // retrieve outbreak
@@ -122,7 +124,7 @@ export class ModifyQuestionnaireContactFollowUpComponent extends ViewModifyCompo
                         'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
                         `/contacts/${this.followUpData.person.id}/follow-ups/${this.followUpData.id}/modify`,
                         false,
-                        {rootPage: this.rootPage}
+                        { rootPage: this.rootPage, rootCaseId: this.rootCaseId }
                     )
                 );
             }
