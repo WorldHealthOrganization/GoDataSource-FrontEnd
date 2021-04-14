@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import * as Handsontable from 'handsontable';
 import * as _ from 'lodash';
 import { SheetCellValidator } from '../../../core/models/sheet/sheet-cell-validator';
@@ -72,8 +72,120 @@ export interface IHotTableWrapperEvent {
  */
 export enum HotTableWrapperDialogVisibility {
     Not_Visible,
-    Loading,
     Visible
+}
+
+/**
+ * Location renderer
+ */
+class CustomLocationEditor extends Handsontable.default.editors.BaseEditor {
+    // data
+    locationDialogVisible: HotTableWrapperDialogVisibility = HotTableWrapperDialogVisibility.Not_Visible;
+
+    /**
+     * Begin editing
+     */
+    beginEditing(
+        initialValue?: any,
+        event?: Event
+    ): void {
+        // dialog either already visible or we don't need to show it ?
+        if (this.locationDialogVisible === HotTableWrapperDialogVisibility.Visible) {
+            return;
+        }
+
+        // show dialog
+        const wrapper: HotTableWrapperComponent = HotTableWrapperComponent.WRAPPERS[this.hot.rootElement.id];
+        this.locationDialogVisible = HotTableWrapperDialogVisibility.Visible;
+        wrapper.dialogService.showCustomDialog(
+            LocationDialogComponent, {
+                ...LocationDialogComponent.DEFAULT_CONFIG,
+                ...{
+                    data: {
+                        message: 'LNG_FORM_HOT_TABLE_WRAPPER_CHANGE_LOCATION_DIALOG_TITLE',
+                        locationId: this.originalValue ?
+                            this.originalValue :
+                            undefined,
+                        required: wrapper.sheetColumns && wrapper.sheetColumns[this.col] && wrapper.sheetColumns[this.col].required,
+                        useOutbreakLocations: wrapper.sheetColumns && wrapper.sheetColumns[this.col] && (wrapper.sheetColumns[this.col] as LocationSheetColumn).useOutbreakLocations
+                    }
+                }
+            }
+        ).subscribe((answer: DialogAnswer) => {
+            if (answer.button === DialogAnswerButton.Yes) {
+                // check if we need to init location data
+                let selectedLocation: LocationModel;
+                if (
+                    (selectedLocation = answer.inputValue.value as LocationModel) &&
+                    selectedLocation.id &&
+                    !wrapper.cachedLocations[selectedLocation.id]
+                ) {
+                    wrapper.cachedLocations[selectedLocation.id] = selectedLocation;
+                }
+
+                // update spreedsheet data
+                this.instance.setDataAtCell(
+                    this.row,
+                    this.col,
+                    selectedLocation ?
+                        selectedLocation.id :
+                        ''
+                );
+            }
+
+            // dialog not visible anymore
+            this.locationDialogVisible = HotTableWrapperDialogVisibility.Not_Visible;
+        });
+    }
+
+    /**
+     * Close
+     */
+    close(): void {
+        // NOTHING
+    }
+
+    /**
+     * Focus
+     */
+    focus(): void {
+        // NOTHING
+    }
+
+    /**
+     * Get value
+     */
+    getValue(): any {
+        return this.originalValue;
+    }
+
+    /**
+     * Is opened
+     */
+    isOpened(): boolean {
+        return this.locationDialogVisible !== HotTableWrapperDialogVisibility.Not_Visible;
+    }
+
+    /**
+     * Is waiting
+     */
+    isWaiting(): boolean {
+        return this.locationDialogVisible !== HotTableWrapperDialogVisibility.Not_Visible;
+    }
+
+    /**
+     * Open
+     */
+    open(event?: Event): void {
+        // NOTHING
+    }
+
+    /**
+     * Set value
+     */
+    setValue(newValue?: any): void {
+        this.originalValue = newValue;
+    }
 }
 
 @Component({
@@ -82,7 +194,20 @@ export enum HotTableWrapperDialogVisibility {
     templateUrl: './hot-table-wrapper.component.html',
     styleUrls: ['./hot-table-wrapper.component.less']
 })
-export class HotTableWrapperComponent implements OnInit {
+export class HotTableWrapperComponent
+    implements OnInit, OnDestroy {
+
+    // used to determine wrapper id
+    private static _hotId: number = 1;
+
+    // used to access wrapper from outside
+    static WRAPPERS: {
+        [wrapperId: string]: HotTableWrapperComponent
+    } = {};
+
+    // wrapper id
+    hotId: string = `hotWrapper_${HotTableWrapperComponent._hotId++}`;
+
     // input
     @Input() widthReduction: number = 0;
     @Input() startRows: number = 1;
@@ -132,6 +257,7 @@ export class HotTableWrapperComponent implements OnInit {
     // local constants used by component template
     SheetCellType = SheetCellType;
     Constants = Constants;
+    CustomLocationEditor = CustomLocationEditor;
 
     // local variables
     sheetWidth: number = window.innerWidth - this.widthReduction;
@@ -150,20 +276,8 @@ export class HotTableWrapperComponent implements OnInit {
         value: any,
         cellProperties: any
     ) => void;
-    locationEditorCallback: (
-        instance
-    ) => void;
 
     // cache locations that we need to display here
-    preparedData: {
-        row: number,
-        col: number,
-        prop: string,
-        td: HTMLTableCellElement,
-        originalValue: any,
-        cellProperties: any
-    };
-    locationDialogVisible: HotTableWrapperDialogVisibility = HotTableWrapperDialogVisibility.Not_Visible;
     getLocationsListSubscriber: Subscription;
     loadingLocations: boolean = false;
     cachedLocations: {
@@ -177,7 +291,7 @@ export class HotTableWrapperComponent implements OnInit {
         private i18nService: I18nService,
         private locationDataService: LocationDataService,
         private snackbarService: SnackbarService,
-        private dialogService: DialogService
+        public dialogService: DialogService
     ) {}
 
     /**
@@ -187,8 +301,16 @@ export class HotTableWrapperComponent implements OnInit {
         // set spreadsheet width
         this.setSheetWidth();
 
-        // initialize hot table process messages
-        this.processHotTableWrapperMessages();
+        // set wrapper
+        HotTableWrapperComponent.WRAPPERS[this.hotId] = this;
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release wrapper
+        delete HotTableWrapperComponent.WRAPPERS[this.hotId];
     }
 
     /**
@@ -668,183 +790,5 @@ export class HotTableWrapperComponent implements OnInit {
 
         // return newly created function
         return this.locationRendererCallback;
-    }
-
-    /**
-     * Edit location
-     */
-    locationEditor(): (
-        instance
-    ) => void {
-        // return cached function
-        if (this.locationEditorCallback) {
-            return this.locationEditorCallback;
-        }
-
-        // editor
-        this.locationEditorCallback = (
-            instance
-        ) => {
-            // finished
-            return {
-                // properties
-                cellProperties: {
-                    // NOTHING
-                },
-
-                // Prepare
-                prepare: (
-                    row: number,
-                    col: number,
-                    prop: string,
-                    td: HTMLTableCellElement,
-                    originalValue: any,
-                    cellProperties: any
-                ) => {
-                    // keep data for later use
-                    this.preparedData = {
-                        row: row,
-                        col: col,
-                        prop: prop,
-                        td: td,
-                        originalValue: originalValue,
-                        cellProperties: cellProperties
-                    };
-                },
-
-                // Begin editing
-                beginEditing: (
-                    initialValue?: any
-                ) => {
-                    // already visible ?
-                    if (this.locationDialogVisible !== HotTableWrapperDialogVisibility.Not_Visible) {
-                        return;
-                    }
-
-                    // dialog visible
-                    this.locationDialogVisible = HotTableWrapperDialogVisibility.Loading;
-                },
-
-                // Finish editing
-                finishEditing: (
-                    revertToOriginal?: boolean,
-                    ctrlDown?: boolean,
-                    callback?: (value: boolean) => void
-                ) => {
-                    // NOTHING
-                },
-
-                // discard editor
-                discardEditor: (
-                    validationResult: boolean
-                ) => {
-                    // NOTHING
-                },
-
-                // save value
-                saveValue: (
-                    value: any,
-                    ctrlDown: boolean
-                ) => {
-                    // NOTHING
-                },
-
-                // is opened
-                isOpened: (): boolean => {
-                    return this.locationDialogVisible !== HotTableWrapperDialogVisibility.Not_Visible;
-                },
-
-                // is waiting
-                isWaiting: (): boolean => {
-                    return this.locationDialogVisible !== HotTableWrapperDialogVisibility.Not_Visible;
-                },
-
-                // enable full edit mode
-                enableFullEditMode: () => {
-                    // NOTHING
-                },
-
-                // focus
-                focus: () => {
-                    // NOTHING
-                }
-            };
-        };
-
-        // return newly created function
-        return this.locationEditorCallback;
-    }
-
-    /**
-     * Display location dialog
-     */
-    private showLocationDialog() {
-        // dialog either already visible or we don't need to show it ?
-        if (this.locationDialogVisible !== HotTableWrapperDialogVisibility.Loading) {
-            return;
-        }
-
-        // show dialog
-        this.locationDialogVisible = HotTableWrapperDialogVisibility.Visible;
-        this.dialogService.showCustomDialog(
-            LocationDialogComponent, {
-                ...LocationDialogComponent.DEFAULT_CONFIG,
-                ...{
-                    data: {
-                        message: 'LNG_FORM_HOT_TABLE_WRAPPER_CHANGE_LOCATION_DIALOG_TITLE',
-                        locationId: this.preparedData && this.preparedData.originalValue ?
-                            this.preparedData.originalValue :
-                            undefined,
-                        required: this.sheetColumns && this.sheetColumns[this.preparedData.col] && this.sheetColumns[this.preparedData.col].required,
-                        useOutbreakLocations: this.sheetColumns && this.sheetColumns[this.preparedData.col] && (this.sheetColumns[this.preparedData.col] as LocationSheetColumn).useOutbreakLocations
-                    }
-                }
-            }
-        ).subscribe((answer: DialogAnswer) => {
-            if (answer.button === DialogAnswerButton.Yes) {
-                // check if we need to init location data
-                let selectedLocation: LocationModel;
-                if (
-                    (selectedLocation = answer.inputValue.value as LocationModel) &&
-                    selectedLocation.id &&
-                    !this.cachedLocations[selectedLocation.id]
-                ) {
-                    this.cachedLocations[selectedLocation.id] = selectedLocation;
-                }
-
-                // update spreedsheet data
-                if (
-                    this.sheetTable &&
-                    this.preparedData
-                ) {
-                    (this.sheetTable as any).hotInstance.setDataAtCell(
-                        this.preparedData.row,
-                        this.preparedData.col,
-                        selectedLocation ?
-                            selectedLocation.id :
-                            ''
-                    );
-                }
-            }
-
-            // dialog not visible anymore
-            this.locationDialogVisible = HotTableWrapperDialogVisibility.Not_Visible;
-        });
-    }
-
-    /**
-     * Hack to process hot table messages since angular can't render properly some components when called by this widget
-     */
-    private processHotTableWrapperMessages() {
-        // display dialog ?
-        this.showLocationDialog();
-
-        // handle messages once more
-        setTimeout(
-            () => {
-                this.processHotTableWrapperMessages();
-            },
-            100
-        );
     }
 }

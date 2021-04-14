@@ -22,6 +22,9 @@ export abstract class AbstractSheetColumn {
     // async validators
     asyncValidators: SheetColumnAsyncValidator[] = [];
 
+    /**
+     * Constructor
+     */
     constructor(
         // column type (check Handsontable documentation)
         public type: SheetCellType
@@ -192,10 +195,16 @@ export class LocationSheetColumn extends AbstractSheetColumn {
     // outbreak locations ?
     useOutbreakLocations: boolean = false;
 
+    /**
+     * Constructor
+     */
     constructor() {
         super(SheetCellType.LOCATION);
     }
 
+    /**
+     * Set outbreak locations
+     */
     setUseOutbreakLocations(useOutbreakLocations: boolean) {
         this.useOutbreakLocations = useOutbreakLocations;
         return this;
