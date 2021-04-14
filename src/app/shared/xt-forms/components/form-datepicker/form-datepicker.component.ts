@@ -19,6 +19,8 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { Moment } from '../../../../core/helperClasses/x-moment';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { StorageKey, StorageService } from '../../../../core/services/helper/storage.service';
+import { LanguageAbvHelper } from '../../../../core/helperClasses/language-abv.helper';
 
 // Define format to be used into datepicker
 export const DEFAULT_FORMAT = {
@@ -108,13 +110,19 @@ export class FormDatepickerComponent extends ElementBase<string> implements OnDe
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private dateAdapter: DateAdapter<any>,
+        private storageService: StorageService
     ) {
         super(controlContainer, validators, asyncValidators);
 
-        // on language change..we need to translate again the token
+        // set the selected language locale
+        this.dateAdapter.setLocale(LanguageAbvHelper.getLocale(this.i18nService.getSelectedLanguageId()));
+
+        // on language change..we need to translate again the token and change the locale
         this.languageSubscription = this.i18nService.languageChangedEvent.subscribe(() => {
             this.tooltip = this._tooltipToken;
+            this.dateAdapter.setLocale(LanguageAbvHelper.getLocale(this.storageService.get(StorageKey.SELECTED_LANGUAGE_ID)));
         });
     }
 
