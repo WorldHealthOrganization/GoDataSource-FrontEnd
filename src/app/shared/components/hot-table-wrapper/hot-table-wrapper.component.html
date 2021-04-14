@@ -1,5 +1,6 @@
 <hot-table
     #sheetTable
+    [hotId]="hotId"
     [colHeaders]="true"
     [data]="data"
     [rowHeaders]="true"
@@ -14,7 +15,8 @@
     [renderAllRows]="true"
     [beforeValidate]="beforeValidateSheet"
     [afterRemoveRow]="afterRemoveRow"
-    [afterChange]="afterChangeTrigger()">
+    [afterChange]="afterChangeTrigger()"
+    licenseKey="non-commercial-and-evaluation">
 
     <ng-container *ngFor="let column of sheetColumns">
         <!-- Text column -->
@@ -57,7 +59,7 @@
             *ngIf="column.type === SheetCellType.LOCATION"
             [title]="(column.title | translate) + (column.required ? ' *' : '')"
             [renderer]="locationRenderer()"
-            [editor]="locationEditor()"
+            [editor]="CustomLocationEditor"
             [validator]="column.validationFunc">
         </hot-column>
     </ng-container>
