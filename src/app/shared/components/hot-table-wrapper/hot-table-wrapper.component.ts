@@ -95,6 +95,7 @@ class CustomLocationEditor extends Handsontable.default.editors.BaseEditor {
         }
 
         // show dialog
+        // tslint:disable-next-line:no-use-before-declare
         const wrapper: HotTableWrapperComponent = HotTableWrapperComponent.WRAPPERS[this.hot.rootElement.id];
         this.locationDialogVisible = HotTableWrapperDialogVisibility.Visible;
         wrapper.dialogService.showCustomDialog(
