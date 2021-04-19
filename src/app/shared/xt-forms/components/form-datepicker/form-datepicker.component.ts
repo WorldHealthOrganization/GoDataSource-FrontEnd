@@ -13,7 +13,7 @@ import {
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { Constants } from '../../../../core/models/constants';
 import { ElementBase } from '../../core/index';
-import { MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
+import { MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { MatDatepicker } from '@angular/material/datepicker';
