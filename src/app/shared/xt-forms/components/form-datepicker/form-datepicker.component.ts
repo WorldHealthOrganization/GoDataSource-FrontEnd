@@ -19,7 +19,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { Moment } from '../../../../core/helperClasses/x-moment';
 import { Subscription } from 'rxjs/internal/Subscription';
-import {CustomDateAdapter} from '../../../angular-material/adapter/custom-date-adapter';
+import { CustomDateAdapter } from '../../../angular-material/adapter/custom-date-adapter';
 
 // Define format to be used into datepicker
 export const DEFAULT_FORMAT = {
@@ -66,7 +66,8 @@ export const DEFAULT_FORMAT = {
             useClass: CustomDateAdapter,
             deps: [
                 MAT_DATE_LOCALE,
-                MAT_MOMENT_DATE_ADAPTER_OPTIONS
+                MAT_MOMENT_DATE_ADAPTER_OPTIONS,
+                I18nService
             ]
         }
     ]
