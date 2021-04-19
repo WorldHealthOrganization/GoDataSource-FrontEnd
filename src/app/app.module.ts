@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { LOCALE_ID, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
@@ -22,7 +22,11 @@ import { CoreModule } from './core/core.module';
     declarations: [
         AppComponent
     ],
-    providers: [],
+    providers: [
+        {
+            provide: LOCALE_ID, useValue: 'en-GB'
+        }
+    ],
     bootstrap: [AppComponent]
 })
 export class AppModule {
