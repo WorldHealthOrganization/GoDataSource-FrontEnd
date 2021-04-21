@@ -313,7 +313,8 @@ export class ImportDataComponent
             imported: {
                 model: string,
                 success: string,
-                failed: string
+                failed: string,
+                failedNo: number
             }
         }
     };
@@ -2001,7 +2002,8 @@ export class ImportDataComponent
                                                         {
                                                             model: importLogModel.result.details.model,
                                                             success: importLogModel.result.details.success ? importLogModel.result.details.success.toLocaleString('en') : '0',
-                                                            failed: importLogModel.result.details.failed ? importLogModel.result.details.failed.toLocaleString('en') : '0'
+                                                            failed: importLogModel.result.details.failed ? importLogModel.result.details.failed.toLocaleString('en') : '0',
+                                                            failedNo: importLogModel.result.details.failed ? importLogModel.result.details.failed : 0
                                                         } :
                                                         null
                                                 }
@@ -2013,7 +2015,7 @@ export class ImportDataComponent
                                             // trigger error list refresh
                                             if (
                                                 (this.errMsgDetails.details as any).imported &&
-                                                (this.errMsgDetails.details as any).imported.failed > 0
+                                                (this.errMsgDetails.details as any).imported.failedNo > 0
                                             ) {
                                                 this.needsRefreshList(true);
                                             }
