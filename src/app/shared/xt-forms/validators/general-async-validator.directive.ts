@@ -36,43 +36,46 @@ export class GeneralAsyncValidatorDirective {
      * Validate
      */
     validate(control: AbstractControl): Observable<ValidationErrors | null> {
-        if (
-            !this.asyncValidatorObservable ||
-            _.isEmpty(control.value) || (
-                this.validateOnlyWhenDirty &&
-                !control.dirty
-            )
-        ) {
-            return of(null);
-        } else {
-            return timer(Constants.DEFAULT_DEBOUNCE_TIME_MILLISECONDS)
-                .pipe(
-                    switchMap(() => {
-                        return this.asyncValidatorObservable
-                            .pipe(
-                                map((isValid: boolean | IGeneralAsyncValidatorResponse) => {
-                                    if (_.isBoolean(isValid)) {
-                                        return isValid ?
-                                            null : {
-                                                generalAsyncValidatorDirective: {
-                                                    err: this.asyncValidatorErrMsg,
-                                                    details: this.asyncValidatorErrMsgTranslateData
-                                                }
-                                            };
-                                    } else {
-                                        const data: IGeneralAsyncValidatorResponse = isValid as IGeneralAsyncValidatorResponse;
-                                        return data.isValid ?
-                                            null : {
-                                                generalAsyncValidatorDirective: {
-                                                    err: data.errMsg ? data.errMsg : this.asyncValidatorErrMsg,
-                                                    details: data.errMsgData ? data.errMsgData : this.asyncValidatorErrMsgTranslateData
-                                                }
-                                            };
-                                    }
-                                })
-                            );
-                    })
-                );
-        }
+        // wait for binding
+        return timer(Constants.DEFAULT_DEBOUNCE_TIME_MILLISECONDS)
+            .pipe(
+                switchMap(() => {
+                    // nothing to validate ?
+                    if (
+                        !this.asyncValidatorObservable ||
+                        _.isEmpty(control.value) || (
+                            this.validateOnlyWhenDirty &&
+                            !control.dirty
+                        )
+                    ) {
+                        return of(null);
+                    }
+
+                    // execute validator
+                    return this.asyncValidatorObservable
+                        .pipe(
+                            map((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                                if (_.isBoolean(isValid)) {
+                                    return isValid ?
+                                        null : {
+                                            generalAsyncValidatorDirective: {
+                                                err: this.asyncValidatorErrMsg,
+                                                details: this.asyncValidatorErrMsgTranslateData
+                                            }
+                                        };
+                                } else {
+                                    const data: IGeneralAsyncValidatorResponse = isValid as IGeneralAsyncValidatorResponse;
+                                    return data.isValid ?
+                                        null : {
+                                            generalAsyncValidatorDirective: {
+                                                err: data.errMsg ? data.errMsg : this.asyncValidatorErrMsg,
+                                                details: data.errMsgData ? data.errMsgData : this.asyncValidatorErrMsgTranslateData
+                                            }
+                                        };
+                                }
+                            })
+                        );
+                })
+            );
     }
 }
