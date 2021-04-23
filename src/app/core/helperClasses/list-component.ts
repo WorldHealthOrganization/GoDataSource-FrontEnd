@@ -1842,7 +1842,7 @@ export abstract class ListComponent implements OnDestroy {
                 this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
                 this.appliedListFilterQueryBuilder.filter.where({
                     id: {
-                        'inq': caseIds
+                        'inq': Array.isArray(caseIds) ? caseIds : [caseIds]
                     }
                 }, true);
                 this.mergeListFilterToMainFilter();
@@ -1859,7 +1859,7 @@ export abstract class ListComponent implements OnDestroy {
                 this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
                 this.appliedListFilterQueryBuilder.filter.where({
                     id: {
-                        'inq': caseLCIds
+                        'inq': Array.isArray(caseLCIds) ? caseLCIds : [caseLCIds]
                     }
                 }, true);
                 this.mergeListFilterToMainFilter();
@@ -1876,7 +1876,7 @@ export abstract class ListComponent implements OnDestroy {
                 this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
                 this.appliedListFilterQueryBuilder.filter.where({
                     id: {
-                        'inq': caseDRIds
+                        'inq': Array.isArray(caseDRIds) ? caseDRIds : [caseDRIds]
                     }
                 }, true);
                 this.mergeListFilterToMainFilter();
@@ -1893,7 +1893,7 @@ export abstract class ListComponent implements OnDestroy {
                 this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
                 this.appliedListFilterQueryBuilder.filter.where({
                     id: {
-                        'inq': contactIds
+                        'inq': Array.isArray(contactIds) ? contactIds : [contactIds]
                     }
                 }, true);
                 this.mergeListFilterToMainFilter();
@@ -1910,7 +1910,7 @@ export abstract class ListComponent implements OnDestroy {
                 this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
                 this.appliedListFilterQueryBuilder.filter.where({
                     id: {
-                        'inq': contactDRIds
+                        'inq': Array.isArray(contactDRIds) ? contactDRIds : [contactDRIds]
                     }
                 }, true);
                 this.mergeListFilterToMainFilter();
@@ -1927,7 +1927,7 @@ export abstract class ListComponent implements OnDestroy {
                 this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
                 this.appliedListFilterQueryBuilder.filter.where({
                     id: {
-                        'inq': eventIds
+                        'inq': Array.isArray(eventIds) ? eventIds : [eventIds]
                     }
                 }, true);
                 this.mergeListFilterToMainFilter();
@@ -1944,7 +1944,7 @@ export abstract class ListComponent implements OnDestroy {
                 this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
                 this.appliedListFilterQueryBuilder.filter.where({
                     id: {
-                        'inq': eventDRIds
+                        'inq': Array.isArray(eventDRIds) ? eventDRIds : [eventDRIds]
                     }
                 }, true);
                 this.mergeListFilterToMainFilter();
