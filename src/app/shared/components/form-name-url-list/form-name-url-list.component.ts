@@ -197,8 +197,15 @@ export class FormNameUrlListComponent
 
                         // select the first source
                         this.values[itemIndex].styleUrlSource = this.styleOptions[url].length < 1 ?
-                            undefined :
-                            this.styleOptions[url][0].value;
+                            undefined : (
+                                this.values[itemIndex].styleUrlSource ?
+                                    (
+                                        glStyle.sources[this.values[itemIndex].styleUrlSource] ?
+                                            this.values[itemIndex].styleUrlSource :
+                                            this.styleOptions[url][0].value
+                                    ) :
+                                    this.styleOptions[url][0].value
+                            );
 
                         // sources retrieved
                         finishedObs.next(true);
