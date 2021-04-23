@@ -145,8 +145,9 @@ export class FormNameUrlListComponent
         const url: string = this.values[itemIndex].styleUrl;
 
         // need to initialize url validation ?
-        if (this.styleUrlValidationCache[url] === undefined) {
-            this.styleUrlValidationCache[url] = new Observable((finishedObs) => {
+        const cacheKey: string = `${itemIndex}_${url}`;
+        if (this.styleUrlValidationCache[cacheKey] === undefined) {
+            this.styleUrlValidationCache[cacheKey] = new Observable((finishedObs) => {
                 // not a valid url ?
                 if (!(/https?:\/\/([\da-z.-]+)\.([a-z.]{2,6})(.*)/i.test(url))) {
                     // not a valid url
@@ -214,6 +215,6 @@ export class FormNameUrlListComponent
         }
 
         // finished
-        return this.styleUrlValidationCache[url];
+        return this.styleUrlValidationCache[cacheKey];
     }
 }
