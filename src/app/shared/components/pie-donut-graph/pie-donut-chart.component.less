@@ -1,0 +1,51 @@
+.app-pie-donut-chart-main {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    padding: 5px;
+
+    .app-pie-donut-chart-main-left {
+
+        // title
+        .app-pie-donut-chart-main-left-title {
+            font-size: 20px;
+        }
+
+        // Legend
+        .app-pie-donut-chart-main-left-legend {
+            margin-top: 40px;
+
+            // Legend title
+            .app-pie-donut-chart-main-left-legend-title {
+                font-size: 16px;
+                font-weight: bold;
+                text-transform: capitalize;
+                margin-bottom: 5px;
+            }
+
+            // legend items
+            .app-pie-donut-chart-main-left-legend-items {
+                font-size: 16px;
+
+                .app-pie-donut-chart-main-left-legend-items-item {
+                    cursor: pointer;
+                }
+            }
+        }
+
+    }
+
+    // graph
+    .app-pie-donut-chart-main-graph {
+        // hack to force resize down
+        overflow: hidden;
+
+        // graph
+        .app-pie-donut-chart-main-graph-pie {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+    }
+}

@@ -53,6 +53,7 @@ import { TopnavUnauthenticatedComponent } from './topnav-unauthenticated/topnav-
 import { FormContactOfContactQuickComponent } from './form-contact-of-contact-quick/form-contact-of-contact-quick.component';
 import { MultipleSnackbarComponent } from './multiple-snackbar/multiple-snackbar.component';
 import { FancyTooltipComponent } from './fancy-tooltip/fancy-tooltip.component';
+import { PieDonutChartComponent } from './pie-donut-graph/pie-donut-chart.component';
 
 // export necessary components individually
 export * from './multiple-snackbar/multiple-snackbar.component';
@@ -138,5 +139,8 @@ export const components: any[] = [
     FancyTooltipComponent,
 
     // layout extensions
-    HoverRowActionsComponent
+    HoverRowActionsComponent,
+
+    // Graphs
+    PieDonutChartComponent
 ];
