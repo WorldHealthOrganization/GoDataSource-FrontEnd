@@ -2,6 +2,7 @@ import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MatMomentDateAdapterOptions } from '@angular/material-moment-adapter/adapter/moment-date-adapter';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { Moment } from 'moment';
+import * as moment from 'moment';
 
 export class CustomDateAdapter extends MomentDateAdapter {
 
@@ -178,6 +179,41 @@ export class CustomDateAdapter extends MomentDateAdapter {
     getYearName(date: Moment): string {
         // for now we won't translate this since it depends of date and might complicate things (too many language tokens)
         return super.getYearName(date);
+    }
+
+    /**
+     * Configure moment for custom translations
+     */
+    private configureMoment(): void {
+        moment.updateLocale(
+            'custom', {
+                months: this.getMonthNames('long'),
+                monthsShort: this.getMonthNames('short')
+            }
+        );
+    }
+
+    /**
+     * Format date
+     */
+    format(date: Moment, displayFormat: string): string {
+        // retrieve current locale
+        const currentLocale: string = moment.locale();
+
+        // configure custom locale with custom month names
+        this.configureMoment();
+        moment.locale('custom');
+
+        // format date
+        const formattedDate: string = date ?
+            moment(date.toISOString()).format(displayFormat) :
+            '';
+
+        // reset back to previous locale
+        moment.locale(currentLocale);
+
+        // finished
+        return formattedDate;
     }
 
 }
