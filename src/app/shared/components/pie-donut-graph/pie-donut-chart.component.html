@@ -4,7 +4,7 @@
 
     <!-- Left side -->
     <div
-        fxFlex="200px"
+        fxFlex="220px"
         class="app-pie-donut-chart-main-left">
 
         <!-- Title -->
@@ -33,14 +33,25 @@
                     *ngFor="let item of data"
                     fxLayout="row" fxLayoutGap="10px"
                     class="app-pie-donut-chart-main-left-legend-items-item"
+                    [class.app-pie-donut-chart-main-left-legend-items-item-selected]="_graph?.selectedArc?.details.id === item.id"
                     (mouseenter)="findAndSelectArc(item)"
-                    (mouseleave)="findAndDeselectArc(item)"
+                    (mouseleave)="findAndDeselectArc()"
                     (click)="clickItem.emit(item)">
 
                     <!-- Legend item color -->
                     <div
                         fxFlex="5px"
                         [style.backgroundColor]="item.color">
+                    </div>
+
+                    <!-- Legend item visible -->
+                    <div
+                        fxFlex="20px" fxLayoutAlign="center center">
+                        <mat-checkbox
+                            ngModel
+                            name="name"
+                            (click)="$event.stopPropagation()">
+                        </mat-checkbox>
                     </div>
 
                     <!-- Legend item value -->

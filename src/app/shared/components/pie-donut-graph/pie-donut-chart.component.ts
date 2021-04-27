@@ -148,7 +148,8 @@ export class PieDonutChartComponent
         container: Selection<any, any, HTMLElement, any>,
         svg: Selection<any, any, any, any>,
         defs: Selection<any, any, any, any>,
-        arcs: IArcsWithExtraDetails[]
+        arcs: IArcsWithExtraDetails[],
+        selectedArc: IArcsWithExtraDetails
     } = {
         // graph settings
         settings: {
@@ -163,7 +164,7 @@ export class PieDonutChartComponent
                 donutRadiusMultiplier: 0.8,
                 linesInnerRadius: 10,
                 selected: {
-                    radiusIncrease: 5,
+                    radiusIncrease: 7,
                     speed: 200
                 }
             },
@@ -184,7 +185,8 @@ export class PieDonutChartComponent
         container: null,
         svg: null,
         defs: null,
-        arcs: []
+        arcs: [],
+        selectedArc: null
     };
 
     /**
@@ -296,6 +298,7 @@ export class PieDonutChartComponent
 
         // clear generated arcs
         this._graph.arcs = [];
+        this._graph.selectedArc = null;
     }
 
     /**
@@ -354,6 +357,12 @@ export class PieDonutChartComponent
      * Animate in
      */
     private mouseIn(item: IArcsWithExtraDetails): void {
+        // deselect previous item
+        this.mouseOut();
+
+        // set selected item
+        this._graph.selectedArc = item;
+
         // arc generators
         const donutRadius: number = this.getDonutRadius();
         const donutArcD3Selected = d3.arc()
@@ -364,49 +373,57 @@ export class PieDonutChartComponent
             .outerRadius(donutRadius + this._graph.settings.donut.selected.radiusIncrease);
 
         // animate arc
-        d3.select(`#arc${item.details.id}`)
+        d3.select(`#arc${this._graph.selectedArc.details.id}`)
             .transition()
             .duration(this._graph.settings.donut.selected.speed)
             .attr(
                 'd',
-                donutArcD3Selected(item.arc)
+                donutArcD3Selected(this._graph.selectedArc.arc)
             );
 
         // animate lines
-        d3.select(`#arcLine${item.details.id}`)
+        d3.select(`#arcLine${this._graph.selectedArc.details.id}`)
             .transition()
             .duration(this._graph.settings.donut.selected.speed)
             .attr(
                 'd',
-                linesArcD3Selected(item.arc)
+                linesArcD3Selected(this._graph.selectedArc.arc)
             );
     }
 
     /**
      * Animate out
      */
-    private mouseOut(item: IArcsWithExtraDetails): void {
+    private mouseOut(): void {
+        // nothing to deselect ?
+        if (!this._graph.selectedArc) {
+            return;
+        }
+
         // arc generators
         const donutArcD3 = this.getDonutArcD3();
         const linesArcD3 = this.getLinesArcD3();
 
         // animate arc
-        d3.select(`#arc${item.details.id}`)
+        d3.select(`#arc${this._graph.selectedArc.details.id}`)
             .transition()
             .duration(this._graph.settings.donut.selected.speed)
             .attr(
                 'd',
-                donutArcD3(item.arc)
+                donutArcD3(this._graph.selectedArc.arc)
             );
 
         // animate lines
-        d3.select(`#arcLine${item.details.id}`)
+        d3.select(`#arcLine${this._graph.selectedArc.details.id}`)
             .transition()
             .duration(this._graph.settings.donut.selected.speed)
             .attr(
                 'd',
-                linesArcD3(item.arc)
+                linesArcD3(this._graph.selectedArc.arc)
             );
+
+        // deselect arc
+        this._graph.selectedArc = null;
     }
 
     /**
@@ -498,17 +515,14 @@ export class PieDonutChartComponent
                 'mouseout',
                 function () {
                     // animate
-                    self.mouseOut((this as any).__data__);
+                    self.mouseOut();
                 }
             )
             .on(
                 'click',
                 function () {
-                    // arc data
-                    const item: IArcsWithExtraDetails = (this as any).__data__;
-
                     // trigger click event
-                    self.clickItem.emit(item.details);
+                    self.clickItem.emit((this as any).__data__.details);
                 }
             );
 
@@ -629,16 +643,7 @@ export class PieDonutChartComponent
     /**
      * Find and deselect graph arc
      */
-    findAndDeselectArc(item: PieDonutChartData): void {
-        // find arc item
-        const arc: IArcsWithExtraDetails = this.findArcFromChartDataItem(item);
-
-        // nothing to animate ?
-        if (!arc) {
-            return;
-        }
-
-        // mouse in
-        this.mouseOut(arc);
+    findAndDeselectArc(): void {
+        this.mouseOut();
     }
 }
