@@ -54,7 +54,7 @@ export class PieDonutChartComponent
     private static DEFAULT_GRAPH_SHADOW_MULTIPLIER: number = 0.8;
 
     // chart id generator
-    chartId: string = uuid();
+    chartId: string = `chart${uuid()}`;
 
     // Chart container
     private _chartContainer: ElementRef;
@@ -435,7 +435,9 @@ export class PieDonutChartComponent
             .outerRadius(donutRadius + this._graph.settings.donut.selected.radiusIncrease);
 
         // animate arc
-        d3.select(`#arc${this._graph.selectedArc.details.id}`)
+        d3
+            .select(`#${this.chartId}`)
+            .select(`#arc${this._graph.selectedArc.details.id}`)
             .transition()
             .duration(this._graph.settings.donut.selected.speed)
             .attr(
@@ -444,7 +446,9 @@ export class PieDonutChartComponent
             );
 
         // animate lines
-        d3.select(`#arcLine${this._graph.selectedArc.details.id}`)
+        d3
+            .select(`#${this.chartId}`)
+            .select(`#arcLine${this._graph.selectedArc.details.id}`)
             .transition()
             .duration(this._graph.settings.donut.selected.speed)
             .attr(
@@ -454,7 +458,7 @@ export class PieDonutChartComponent
 
         // see legend
         if (scrollLegendItem) {
-            const legendItem = document.getElementById('legend' + this._graph.selectedArc.details.id);
+            const legendItem = document.querySelector(`#${this.chartId} #legend${this._graph.selectedArc.details.id}`);
             if (
                 legendItem &&
                 legendItem.scrollIntoView
@@ -483,7 +487,9 @@ export class PieDonutChartComponent
         const linesArcD3 = this.getLinesArcD3(donutRadius);
 
         // animate arc
-        d3.select(`#arc${this._graph.selectedArc.details.id}`)
+        d3
+            .select(`#${this.chartId}`)
+            .select(`#arc${this._graph.selectedArc.details.id}`)
             .transition()
             .duration(this._graph.settings.donut.selected.speed)
             .attr(
@@ -492,7 +498,9 @@ export class PieDonutChartComponent
             );
 
         // animate lines
-        d3.select(`#arcLine${this._graph.selectedArc.details.id}`)
+        d3
+            .select(`#${this.chartId}`)
+            .select(`#arcLine${this._graph.selectedArc.details.id}`)
             .transition()
             .duration(this._graph.settings.donut.selected.speed)
             .attr(
