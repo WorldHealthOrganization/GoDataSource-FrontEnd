@@ -110,6 +110,9 @@ export class PieDonutChartComponent
     // graph legend title
     @Input() legendTitle: string;
 
+    // total
+    @Input() graphTotal: string;
+
     // click item
     @Output() clickItem = new EventEmitter<PieDonutChartData>();
 
@@ -636,7 +639,7 @@ export class PieDonutChartComponent
     private drawPieDonutChart(): void {
         // determine pie radius - max to fit graph boundaries
         const donutRadius: number = this.getDonutRadius();
-        const translate: string = 'translate(' + (this._graph.size.width - donutRadius - this._graph.settings.margin) + ', ' + (this._graph.size.height / 2) + ')';
+        const translate: string = 'translate(' + (this._graph.size.width / 2) + ', ' + (this._graph.size.height / 2) + ')';
 
         // draw shadows
         this.drawPieDonutChartShadow(

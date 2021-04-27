@@ -82,12 +82,22 @@
 
     <!-- Chart -->
     <div
-        fxFlex
+        fxFlex fxLayout="column" fxLayoutGap="2px"
         class="app-pie-donut-chart-main-graph">
+
+        <!-- Graph -->
         <div
             #chart
             [id]="chartId"
             class="app-pie-donut-chart-main-graph-pie">
+        </div>
+
+        <!-- Total -->
+        <div
+            *ngIf="graphTotal"
+            fxGrow="0" fxFlexAlign="center"
+            class="app-pie-donut-chart-main-graph-total">
+            {{ graphTotal }}
         </div>
     </div>
 
