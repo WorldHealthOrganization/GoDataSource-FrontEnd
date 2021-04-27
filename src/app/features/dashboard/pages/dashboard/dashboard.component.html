@@ -96,8 +96,7 @@
             fxLayout="column">
             <!-- Pie Charts -->
             <mat-expansion-panel
-                *ngIf="DashboardModel.canViewCaseSummaryDashlet(authUser) || DashboardModel.canViewCasePerLocationLevelDashlet(authUser) || DashboardModel.canViewCaseHospitalizedPieChartDashlet(authUser)"
-                class="mat-expansion-panel-no-padding">
+                *ngIf="DashboardModel.canViewCaseSummaryDashlet(authUser) || DashboardModel.canViewCasePerLocationLevelDashlet(authUser) || DashboardModel.canViewCaseHospitalizedPieChartDashlet(authUser)">
                 <!-- Header -->
                 <mat-expansion-panel-header>
                     <div class="other-kpi-header">
@@ -107,13 +106,15 @@
 
                 <!-- Dashlets -->
                 <ng-template matExpansionPanelContent>
-                    <div fxLayout="row" fxLayoutAlign="space-between">
-
+                    <div
+                        fxLayout="row"
+                        fxLayoutGap="10px">
                         <!-- Summary -->
                         <div
                             *ngIf="DashboardModel.canViewCaseSummaryDashlet(authUser)"
                             fxFlex="33">
-                            <mat-card class="dashboard-gauge">
+                            <mat-card
+                                class="dashboard-gauge">
                                 <app-case-summary-dashlet
                                     [globalFilterDate]="globalFilterDate"
                                     [globalFilterLocationId]="globalFilterLocationId"
@@ -126,7 +127,8 @@
                         <div
                             *ngIf="DashboardModel.canViewCasePerLocationLevelDashlet(authUser)"
                             fxFlex="33">
-                            <mat-card class="dashboard-gauge">
+                            <mat-card
+                                class="dashboard-gauge">
                                 <app-case-by-geographic-location-dashlet
                                     [globalFilterDate]="globalFilterDate"
                                     [globalFilterLocationId]="globalFilterLocationId"
@@ -139,7 +141,8 @@
                         <div
                             *ngIf="DashboardModel.canViewCaseHospitalizedPieChartDashlet(authUser)"
                             fxFlex="33">
-                            <mat-card class="dashboard-gauge">
+                            <mat-card
+                                class="dashboard-gauge">
                                 <app-cases-hospitalized-pie-chart-dashlet
                                     [globalFilterDate]="globalFilterDate"
                                     [globalFilterLocationId]="globalFilterLocationId"
