@@ -22,7 +22,9 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
     templateUrl: './case-summary-dashlet.component.html',
     styleUrls: ['./case-summary-dashlet.component.less']
 })
-export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
+export class CaseSummaryDashletComponent
+    implements OnInit, OnDestroy {
+
     // data
     data: PieDonutChartData[] = [];
 

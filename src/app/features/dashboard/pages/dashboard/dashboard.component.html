@@ -122,30 +122,16 @@
                             </mat-card>
                         </div>
 
+                        <!-- Location -->
                         <div
                             *ngIf="DashboardModel.canViewCasePerLocationLevelDashlet(authUser)"
                             fxFlex="33">
-                            <!-- cases by geographic location - pie chart -->
                             <mat-card class="dashboard-gauge">
-                                <div
-                                    fxLayout="row"
-                                    class="other-kpi-header">
-                                    <div
-                                        fxFlex>
-                                        {{'LNG_PAGE_DASHBOARD_CASE_BY_GEOGRAPHIC_LOCATION_TITLE' | translate}}
-                                    </div>
-                                    <app-fancy-tooltip
-                                        fxFlex fxGrow="0"
-                                        tooltip="LNG_PAGE_DASHBOARD_CASE_BY_GEOGRAPHIC_LOCATION_TITLE_DESCRIPTION">
-                                    </app-fancy-tooltip>
-                                </div>
-                                <div fxLayoutAlign="center">
-                                    <app-case-by-geographic-location-dashlet
-                                        [globalFilterDate]="globalFilterDate"
-                                        [globalFilterLocationId]="globalFilterLocationId"
-                                        [globalFilterClassificationId]="globalFilterClassificationId">
-                                    </app-case-by-geographic-location-dashlet>
-                                </div>
+                                <app-case-by-geographic-location-dashlet
+                                    [globalFilterDate]="globalFilterDate"
+                                    [globalFilterLocationId]="globalFilterLocationId"
+                                    [globalFilterClassificationId]="globalFilterClassificationId">
+                                </app-case-by-geographic-location-dashlet>
                             </mat-card>
                         </div>
 
