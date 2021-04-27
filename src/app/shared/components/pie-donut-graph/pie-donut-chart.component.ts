@@ -445,6 +445,11 @@ export class PieDonutChartComponent
         // set selected item
         this._graph.selectedArc = item;
 
+        // no need to animate for 0 values
+        if (this._graph.selectedArc.details.value === 0) {
+            return;
+        }
+
         // arc generators
         const donutRadius: number = this.getDonutRadius();
         const donutArcD3Selected = d3.arc()
