@@ -20,6 +20,7 @@ export class PieDonutChartData {
     readonly color: string;
     readonly value: number;
     readonly id: string;
+    checked: boolean = true;
 
     /**
      * Create data object
@@ -48,6 +49,9 @@ export class PieDonutChartData {
 })
 export class PieDonutChartComponent
     implements OnInit, OnDestroy {
+
+    // constants
+    private static DEFAULT_GRAPH_SHADOW_MULTIPLIER: number = 0.8;
 
     // chart id generator
     chartId: string = uuid();
@@ -135,6 +139,11 @@ export class PieDonutChartComponent
                 color: string,
                 width: number,
                 opacity: number
+            },
+            sizeChange: {
+                animation: {
+                    speed: number
+                }
             }
         },
 
@@ -149,7 +158,12 @@ export class PieDonutChartComponent
         svg: Selection<any, any, any, any>,
         defs: Selection<any, any, any, any>,
         arcs: IArcsWithExtraDetails[],
-        selectedArc: IArcsWithExtraDetails
+        selectedArc: IArcsWithExtraDetails,
+        previous: {
+            donutRadius: number,
+            donutRadiusShadow: number
+        },
+        dataToRender: PieDonutChartData[]
     } = {
         // graph settings
         settings: {
@@ -161,7 +175,7 @@ export class PieDonutChartComponent
                 }
             },
             donut: {
-                donutRadiusMultiplier: 0.8,
+                donutRadiusMultiplier: PieDonutChartComponent.DEFAULT_GRAPH_SHADOW_MULTIPLIER,
                 linesInnerRadius: 10,
                 selected: {
                     radiusIncrease: 7,
@@ -172,6 +186,11 @@ export class PieDonutChartComponent
                 color: '#CDCDCD',
                 width: 10,
                 opacity: 0.6
+            },
+            sizeChange: {
+                animation: {
+                    speed: 200
+                }
             }
         },
 
@@ -186,7 +205,12 @@ export class PieDonutChartComponent
         svg: null,
         defs: null,
         arcs: [],
-        selectedArc: null
+        selectedArc: null,
+        previous: {
+            donutRadius: 30,
+            donutRadiusShadow: 30 * PieDonutChartComponent.DEFAULT_GRAPH_SHADOW_MULTIPLIER
+        },
+        dataToRender: []
     };
 
     /**
@@ -322,7 +346,7 @@ export class PieDonutChartComponent
         translate: string
     ): void {
         // create shadow filter
-        const shadowFilter = this._graph.defs
+        this._graph.defs
             .append('filter')
             .attr(
                 'id',
@@ -335,15 +359,17 @@ export class PieDonutChartComponent
         const groupShadow = this._graph.svg.append('g');
         groupShadow.attr('transform', translate);
 
-        // drop inner shadow
+        // radius
         const shadowOuterRadius: number = donutRadius * this._graph.settings.donut.donutRadiusMultiplier;
-        groupShadow
+
+        // drop inner shadow
+        const shadowPath = groupShadow
             .append('path')
             .attr('d', d3.arc()
                 .startAngle(0)
                 .endAngle(360)
-                .innerRadius(shadowOuterRadius - this._graph.settings.shadow.width)
-                .outerRadius(shadowOuterRadius)
+                .innerRadius(this._graph.previous.donutRadiusShadow - this._graph.settings.shadow.width)
+                .outerRadius(this._graph.previous.donutRadiusShadow)
             )
             .attr(
                 'fill',
@@ -351,6 +377,22 @@ export class PieDonutChartComponent
             )
             .attr('filter', 'url(#blurFilter)')
             .style('opacity', this._graph.settings.shadow.opacity);
+
+        // animate
+        shadowPath
+            .transition()
+            .duration(this._graph.settings.sizeChange.animation.speed)
+            .attr(
+                'd',
+                d3.arc()
+                    .startAngle(0)
+                    .endAngle(360)
+                    .innerRadius(shadowOuterRadius - this._graph.settings.shadow.width)
+                    .outerRadius(shadowOuterRadius)
+            );
+
+        // update donut radius
+        this._graph.previous.donutRadiusShadow = shadowOuterRadius;
     }
 
     /**
@@ -401,8 +443,9 @@ export class PieDonutChartComponent
         }
 
         // arc generators
-        const donutArcD3 = this.getDonutArcD3();
-        const linesArcD3 = this.getLinesArcD3();
+        const donutRadius: number = this.getDonutRadius();
+        const donutArcD3 = this.getDonutArcD3(donutRadius);
+        const linesArcD3 = this.getLinesArcD3(donutRadius);
 
         // animate arc
         d3.select(`#arc${this._graph.selectedArc.details.id}`)
@@ -429,8 +472,7 @@ export class PieDonutChartComponent
     /**
      * Get donut arc d3
      */
-    private getDonutArcD3(): any {
-        const donutRadius: number = this.getDonutRadius();
+    private getDonutArcD3(donutRadius: number): any {
         return d3.arc()
             .innerRadius(donutRadius * this._graph.settings.donut.donutRadiusMultiplier)
             .outerRadius(donutRadius);
@@ -439,8 +481,7 @@ export class PieDonutChartComponent
     /**
      * Get lines arc d3
      */
-    private getLinesArcD3(): any {
-        const donutRadius: number = this.getDonutRadius();
+    private getLinesArcD3(donutRadius: number): any {
         return d3.arc()
             .innerRadius(this._graph.settings.donut.linesInnerRadius)
             .outerRadius(donutRadius);
@@ -454,13 +495,13 @@ export class PieDonutChartComponent
     ): void {
         // determine donut arcs
         const pie = d3.pie();
-        const arcs = pie(this.data.map((item) => item.value));
+        const arcs = pie(this._graph.dataToRender.map((item) => item.value));
 
         // change data into a proper format supported by d3
         this._graph.arcs = [];
         arcs.forEach((arc, index) => {
             this._graph.arcs.push({
-                details: this.data[index],
+                details: this._graph.dataToRender[index],
                 arc
             });
         });
@@ -472,11 +513,17 @@ export class PieDonutChartComponent
 
         // define arc renderers
         const self = this;
-        const donutArcD3 = this.getDonutArcD3();
-        const linesArcD3 = this.getLinesArcD3();
+        const donutRadius: number = this.getDonutRadius();
+        const donutArcD3Previous = this.getDonutArcD3(this._graph.previous.donutRadius);
+        const donutArcD3 = this.getDonutArcD3(donutRadius);
+        const linesArcD3Previous = this.getLinesArcD3(this._graph.previous.donutRadius);
+        const linesArcD3 = this.getLinesArcD3(donutRadius);
+
+        // update donut radius
+        this._graph.previous.donutRadius = donutRadius;
 
         // render outer arc
-        groupArcsData
+        const arcPath = groupArcsData
             .append('path')
             .style(
                 'cursor',
@@ -495,10 +542,9 @@ export class PieDonutChartComponent
             .attr(
                 'd',
                 (item): any => {
-                    return donutArcD3(item.arc);
+                    return donutArcD3Previous(item.arc);
                 }
-            )
-            .attr(
+            ).attr(
                 'fill',
                 (d: IArcsWithExtraDetails): any => {
                     return d.details.color;
@@ -526,8 +572,19 @@ export class PieDonutChartComponent
                 }
             );
 
+        // animate
+        arcPath
+            .transition()
+            .duration(this._graph.settings.sizeChange.animation.speed)
+            .attr(
+                'd',
+                (item): any => {
+                    return donutArcD3(item.arc);
+                }
+            );
+
         // render inner arc
-        groupArcsData
+        const linePath = groupArcsData
             .append('path')
             .attr(
                 'id',
@@ -538,7 +595,7 @@ export class PieDonutChartComponent
             .attr(
                 'd',
                 (item): any => {
-                    return linesArcD3(item.arc);
+                    return linesArcD3Previous(item.arc);
                 }
             )
             .attr(
@@ -552,6 +609,17 @@ export class PieDonutChartComponent
             .style(
                 'stroke-width',
                 this._graph.settings.arc.border.width
+            );
+
+        // animate
+        linePath
+            .transition()
+            .duration(this._graph.settings.sizeChange.animation.speed)
+            .attr(
+                'd',
+                (item): any => {
+                    return linesArcD3(item.arc);
+                }
             );
     }
 
@@ -600,6 +668,14 @@ export class PieDonutChartComponent
             return;
         }
 
+        // determine data that we need to render
+        this._graph.dataToRender = this.data.filter((item) => item.checked);
+
+        // nothing to draw ?
+        if (this._graph.dataToRender.length < 1) {
+            return;
+        }
+
         // init graph base
         this.initGraphBase();
 
@@ -645,5 +721,19 @@ export class PieDonutChartComponent
      */
     findAndDeselectArc(): void {
         this.mouseOut();
+    }
+
+    /**
+     * Check / uncheck item
+     */
+    checkUncheckItem(
+        item: PieDonutChartData,
+        checkedValue: boolean
+    ): void {
+        // check / uncheck
+        item.checked = checkedValue;
+
+        // show / hide chart arcs
+        this.redrawGraph();
     }
 }
