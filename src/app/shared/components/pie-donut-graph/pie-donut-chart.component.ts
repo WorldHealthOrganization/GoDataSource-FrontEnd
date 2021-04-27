@@ -97,6 +97,11 @@ export class PieDonutChartComponent
             data :
             [];
 
+        // sort array descending
+        this._data.sort((item1, item2): number => {
+            return item2.value - item1.value;
+        });
+
         // redraw
         this.redrawGraph();
     }
