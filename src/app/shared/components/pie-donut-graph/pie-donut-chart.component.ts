@@ -27,19 +27,9 @@ export class PieDonutChartData {
      * Assign colors to data
      */
     static assignColorDomain(data: PieDonutChartData[]): void {
-        // create domain
-        const colorDomain = d3
-            .scaleLinear()
-            .domain([1, data.length])
-            .interpolate(d3.interpolateHcl as any)
-            .range([
-                d3.rgb('#007AFF'),
-                d3.rgb('#FFF500')
-            ] as any);
-
         // go through items and assign color
         data.forEach((item, index) => {
-           item.color = colorDomain(index).toString();
+           item.color = '#' + Math.floor(Math.random() * 16777215).toString(16);
         });
     }
 
