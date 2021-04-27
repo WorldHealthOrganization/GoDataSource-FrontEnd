@@ -1,11 +1,8 @@
-import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
-import { MetricChartDataModel } from '../../../../core/models/metrics/metric-chart-data.model';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { Subscriber, Subscription } from 'rxjs';
@@ -16,16 +13,19 @@ import { Moment } from '../../../../core/helperClasses/x-moment';
 import { CaseModel } from '../../../../core/models/case.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
+import { PieDonutChartData } from '../../../../shared/components/pie-donut-graph/pie-donut-chart.component';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 
 @Component({
     selector: 'app-case-summary-dashlet',
-    encapsulation: ViewEncapsulation.None,
     templateUrl: './case-summary-dashlet.component.html',
     styleUrls: ['./case-summary-dashlet.component.less']
 })
-export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
-    caseSummaryResults: any = [];
-    customColors = [];
+export class CaseSummaryDashletComponent
+    implements OnInit, OnDestroy {
+
+    // data
+    data: PieDonutChartData[] = [];
 
     // Global filters => Date
     private _globalFilterDate: Moment;
@@ -85,7 +85,6 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
         private outbreakDataService: OutbreakDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private caseDataService: CaseDataService,
-        private i18nService: I18nService,
         private router: Router,
         private authDataService: AuthDataService
     ) {}
@@ -97,15 +96,8 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
-        // case classification
-        this.displayLoading = true;
-        this.caseClassificationSubscriber = this.referenceDataDataService
-            .getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION)
-            .subscribe((caseClassifications) => {
-                this.setCustomColors(caseClassifications);
-            });
-
         // outbreak
+        this.displayLoading = true;
         this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
@@ -146,30 +138,9 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * Build chart data object
-     * @returns {MetricChartDataModel[]}
-     */
-    buildChartData(groupedCases: {
-        [classification: string]: {
-            caseIDs: string[],
-            count: number
-        }
-    }) {
-        return _.transform(groupedCases, (result, caseData: { count: number }, classification: string) => {
-            if (classification !== Constants.CASE_CLASSIFICATION.NOT_A_CASE) {
-                result.push(new MetricChartDataModel({
-                    name: this.i18nService.instant(classification),
-                    value: caseData.count,
-                    extra: classification
-                }));
-            }
-        }, []);
-    }
-
-    /**
      * Redirect to cases page when user click on a piece of pie chart to display the cases that represent the part of pie chart
      */
-    onDoughnutPress(pressed) {
+    onDoughnutPress(item: PieDonutChartData): void {
         // we need case list permission to redirect
         if (!CaseModel.canList(this.authUser)) {
             return;
@@ -198,28 +169,9 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
                     global: JSON.stringify(global),
                     applyListFilter: Constants.APPLY_LIST_FILTER.CASE_SUMMARY,
                     [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
-                    x: pressed.extra
+                    x: item.key
                 }
             });
-    }
-
-    /**
-     * Set custom colors of the chart - based on those chosen in ref data
-     */
-    setCustomColors(caseClassifications) {
-        // construct colors
-        const customColors = [];
-        if (!_.isEmpty(caseClassifications)) {
-            _.forEach(caseClassifications.entries, (entry) => {
-                const customColor: MetricChartDataModel = new MetricChartDataModel();
-                customColor.name = this.i18nService.instant(entry.value);
-                customColor.value = entry.colorCode;
-                customColors.push(customColor);
-            });
-        }
-
-        // set colors
-        this.customColors = customColors;
     }
 
     /**
@@ -275,8 +227,63 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
             this.previousSubscriber = this.caseDataService
                 .getCasesGroupedByClassification(this.outbreakId, qb)
                 .subscribe((groupedCases) => {
-                    this.caseSummaryResults = this.buildChartData(groupedCases.classification);
-                    this.displayLoading = false;
+                    // format data
+                    this.data = [];
+                    if (
+                        groupedCases &&
+                        groupedCases.classification
+                    ) {
+                        _.each(
+                            groupedCases.classification,
+                            (
+                                classificationData: {
+                                    count: number
+                                },
+                                classificationKey: string
+                            ) => {
+                                this.data.push(new PieDonutChartData({
+                                    key: classificationKey,
+                                    color: null,
+                                    label: classificationKey,
+                                    value: classificationData.count
+                                }));
+                            }
+                        );
+                    }
+
+                    // nothing else to do ?
+                    if (this.data.length < 1) {
+                        // finished
+                        this.displayLoading = false;
+                        return;
+                    }
+
+                    // case classification subscriber
+                    if (this.caseClassificationSubscriber) {
+                        this.caseClassificationSubscriber.unsubscribe();
+                        this.caseClassificationSubscriber = null;
+                    }
+
+                    // retrieve color
+                    this.caseClassificationSubscriber = this.referenceDataDataService
+                        .getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION)
+                        .subscribe((caseClassifications) => {
+                            // go through data and map color
+                            const classificationColorMap: {
+                                [classificationKey: string]: string
+                            } = {};
+                            caseClassifications.entries.forEach((entry) => {
+                                classificationColorMap[entry.value] = entry.colorCode;
+                            });
+
+                            // put colors into data elements
+                            this.data.forEach((dataItem) => {
+                                dataItem.color = classificationColorMap[dataItem.key];
+                            });
+
+                            // finished
+                            this.displayLoading = false;
+                        });
                 });
         }
     }
