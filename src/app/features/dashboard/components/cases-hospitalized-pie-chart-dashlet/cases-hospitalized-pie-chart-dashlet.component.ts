@@ -4,7 +4,6 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { Subscription, Subscriber, throwError, forkJoin } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { catchError } from 'rxjs/operators';
@@ -85,7 +84,6 @@ export class CasesHospitalizedPieChartDashletComponent
     constructor(
         private outbreakDataService: OutbreakDataService,
         private caseDataService: CaseDataService,
-        private i18nService: I18nService,
         protected snackbarService: SnackbarService,
         private router: Router,
         private authDataService: AuthDataService

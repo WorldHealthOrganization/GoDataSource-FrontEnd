@@ -3,7 +3,6 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { Subscriber, Subscription } from 'rxjs';
@@ -86,7 +85,6 @@ export class CaseSummaryDashletComponent
         private outbreakDataService: OutbreakDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private caseDataService: CaseDataService,
-        private i18nService: I18nService,
         private router: Router,
         private authDataService: AuthDataService
     ) {}
