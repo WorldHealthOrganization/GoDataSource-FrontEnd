@@ -15,11 +15,12 @@
     <!-- Left side -->
     <div
         *ngIf="!loadingData"
-        [fxFlex]="data?.length > 0 ? '45%' : undefined"
+        [fxFlex]="data?.length > 0 ? '45%' : '1 1 0'" fxLayout="column"
         class="app-pie-donut-chart-main-left">
 
         <!-- Title -->
         <div
+            fxGrow="0"
             class="app-pie-donut-chart-main-left-title">
             <span
                 [matTooltip]="graphTitle | translate">
@@ -30,14 +31,18 @@
         <!-- No Data -->
         <div
             *ngIf="!loadingData && (!data || data.length < 1) && noDataLabel"
-            fxFlex fxFlexAlign="center"
+            fxFlex fxLayoutAlign="center center"
             class="app-pie-donut-chart-main-no-data">
-            {{ noDataLabel | translate }}
+            <span
+                fxGrow="0">
+                {{ noDataLabel | translate }}
+            </span>
         </div>
 
         <!-- Legend -->
         <div
             *ngIf="data?.length > 0"
+            fxFlex
             class="app-pie-donut-chart-main-left-legend">
 
             <!-- Legend -->

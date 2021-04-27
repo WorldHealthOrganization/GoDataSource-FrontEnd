@@ -135,30 +135,16 @@
                             </mat-card>
                         </div>
 
+                        <!-- Hospitalized -->
                         <div
                             *ngIf="DashboardModel.canViewCaseHospitalizedPieChartDashlet(authUser)"
                             fxFlex="33">
                             <mat-card class="dashboard-gauge">
-                                <div
-                                    fxLayout="row"
-                                    class="other-kpi-header">
-                                    <div
-                                        fxFlex>
-                                        {{'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_TITLE' | translate}}
-                                    </div>
-                                    <app-fancy-tooltip
-                                        fxFlex fxGrow="0"
-                                        tooltip="LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_TITLE_DESCRIPTION">
-                                    </app-fancy-tooltip>
-                                </div>
-                                <!-- case hospitalization status pie chart -->
-                                <div fxLayoutAlign="center">
-                                    <app-cases-hospitalized-pie-chart-dashlet
-                                        [globalFilterDate]="globalFilterDate"
-                                        [globalFilterLocationId]="globalFilterLocationId"
-                                        [globalFilterClassificationId]="globalFilterClassificationId">
-                                    </app-cases-hospitalized-pie-chart-dashlet>
-                                </div>
+                                <app-cases-hospitalized-pie-chart-dashlet
+                                    [globalFilterDate]="globalFilterDate"
+                                    [globalFilterLocationId]="globalFilterLocationId"
+                                    [globalFilterClassificationId]="globalFilterClassificationId">
+                                </app-cases-hospitalized-pie-chart-dashlet>
                             </mat-card>
                         </div>
                     </div>

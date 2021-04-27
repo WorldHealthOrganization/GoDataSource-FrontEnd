@@ -1,8 +1,7 @@
-import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
-import { MetricChartDataModel } from '../../../../core/models/metrics/metric-chart-data.model';
 import { Subscription, Subscriber, throwError, forkJoin } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -16,15 +15,19 @@ import { Moment } from '../../../../core/helperClasses/x-moment';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { CaseModel } from '../../../../core/models/case.model';
+import { PieDonutChartData } from '../../../../shared/components/pie-donut-graph/pie-donut-chart.component';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-cases-hospitalized-pie-chart-dashlet',
-    encapsulation: ViewEncapsulation.None,
     templateUrl: './cases-hospitalized-pie-chart-dashlet.component.html',
     styleUrls: ['./cases-hospitalized-pie-chart-dashlet.component.less']
 })
-export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDestroy {
-    caseHospitalizationSummaryResults: any = [];
+export class CasesHospitalizedPieChartDashletComponent
+    implements OnInit, OnDestroy {
+
+    // data
+    data: PieDonutChartData[] = [];
 
     // Global filters => Date
     private _globalFilterDate: Moment;
@@ -132,7 +135,7 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
     /**
      * Redirect to cases page when user click on a piece of pie chart to display the cases that represent the part of pie chart
      */
-    onDoughnutPress(pressed) {
+    onDoughnutPress(item: PieDonutChartData) {
         // we need case list permission to redirect
         if (!CaseModel.canList(this.authUser)) {
             return;
@@ -165,45 +168,10 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
             {
                 queryParams: {
                     global: JSON.stringify(global),
-                    applyListFilter: pressed.extra,
+                    applyListFilter: item.key,
                     [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true
                 }
             });
-    }
-
-    /**
-     * Build chart data object
-     * @returns {MetricChartDataModel[]}
-     */
-    buildChartData(caseHospitalizationCount, caseIsolationCount, caseNotHospitalizationCount) {
-        const caseHospitalizationSummaryResults: MetricChartDataModel[] = [];
-
-        // check for no data
-        if (
-            caseHospitalizationCount === 0 &&
-            caseIsolationCount === 0 &&
-            caseNotHospitalizationCount === 0
-        ) {
-            return caseHospitalizationSummaryResults;
-        }
-
-        caseHospitalizationSummaryResults.push(new MetricChartDataModel({
-            value: caseHospitalizationCount,
-            name: this.i18nService.instant('LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_HOSPITALIZED_LABEL'),
-            extra: Constants.APPLY_LIST_FILTER.CASES_HOSPITALISED
-        }));
-        caseHospitalizationSummaryResults.push(new MetricChartDataModel({
-            value: caseIsolationCount,
-            name: this.i18nService.instant('LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_ISOLATED_LABEL'),
-            extra: Constants.APPLY_LIST_FILTER.CASES_ISOLATED
-        }));
-        caseHospitalizationSummaryResults.push(new MetricChartDataModel({
-            value: caseNotHospitalizationCount,
-            name: this.i18nService.instant('LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_NOT_HOSPITALIZED_LABEL'),
-            extra: Constants.APPLY_LIST_FILTER.CASES_NOT_HOSPITALISED
-        }));
-
-        return caseHospitalizationSummaryResults;
     }
 
     /**
@@ -267,13 +235,39 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
                     return throwError(err);
                 })
             )
-            .subscribe(([hospitalizedCountResults, isolatedCountResults, caseNotHospitalizationCount]) => {
-                // construct chart
-                this.caseHospitalizationSummaryResults = this.buildChartData(
-                    hospitalizedCountResults.count,
-                    isolatedCountResults.count,
-                    caseNotHospitalizationCount.count
-                );
+            .subscribe(([
+                hospitalizedCountResults,
+                isolatedCountResults,
+                caseNotHospitalizationCount
+            ]: [
+                IBasicCount,
+                IBasicCount,
+                IBasicCount
+            ]) => {
+                // create data
+                this.data = [
+                    new PieDonutChartData({
+                        key: Constants.APPLY_LIST_FILTER.CASES_HOSPITALISED,
+                        color: null,
+                        label: 'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_HOSPITALIZED_LABEL',
+                        value: hospitalizedCountResults.count
+                    }),
+                    new PieDonutChartData({
+                        key: Constants.APPLY_LIST_FILTER.CASES_ISOLATED,
+                        color: null,
+                        label: 'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_ISOLATED_LABEL',
+                        value: isolatedCountResults.count
+                    }),
+                    new PieDonutChartData({
+                        key: Constants.APPLY_LIST_FILTER.CASES_NOT_HOSPITALISED,
+                        color: null,
+                        label: 'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_NOT_HOSPITALIZED_LABEL',
+                        value: caseNotHospitalizationCount.count
+                    })
+                ];
+
+                // assign colors
+                PieDonutChartData.assignColorDomain(this.data);
 
                 // finished
                 this.displayLoading = false;
