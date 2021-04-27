@@ -3,9 +3,19 @@
     class="app-pie-donut-chart-main"
     fxFlex fxLayout="row" fxLayoutGap="10px">
 
+    <!-- Loading data -->
+    <div
+        *ngIf="loadingData"
+        fxFlex fxLayoutAlign="center center">
+        <mat-spinner
+            [diameter]="32">
+        </mat-spinner>
+    </div>
+
     <!-- Left side -->
     <div
-        fxFlex="220px"
+        *ngIf="!loadingData"
+        fxFlex="40%"
         class="app-pie-donut-chart-main-left">
 
         <!-- Title -->
@@ -89,6 +99,7 @@
 
     <!-- Chart -->
     <div
+        *ngIf="!loadingData"
         fxFlex fxLayout="column" fxLayoutGap="2px"
         class="app-pie-donut-chart-main-graph">
 
