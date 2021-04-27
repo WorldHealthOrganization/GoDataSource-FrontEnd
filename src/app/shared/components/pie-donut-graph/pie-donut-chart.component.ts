@@ -16,10 +16,11 @@ interface IArcsWithExtraDetails {
  */
 export class PieDonutChartData {
     // data
+    readonly key: string;
     readonly label: string;
-    readonly color: string;
     readonly value: number;
     readonly id: string;
+    color: string;
     checked: boolean = true;
 
     /**
@@ -27,6 +28,7 @@ export class PieDonutChartData {
      */
     constructor(data: {
         // data
+        key: string,
         label: string,
         color: string,
         value: number
@@ -117,6 +119,9 @@ export class PieDonutChartComponent
 
     // description
     @Input() description: string;
+
+    // graph no data label
+    @Input() noDataLabel: string;
 
     // click item
     @Output() clickItem = new EventEmitter<PieDonutChartData>();
@@ -282,7 +287,7 @@ export class PieDonutChartComponent
 
         // determine graph size
         const width: number = this.chartContainer.nativeElement.clientWidth;
-        const height: number = this.chartContainer.nativeElement.clientHeight - 4;
+        const height: number = this.chartContainer.nativeElement.clientHeight - 5;
 
         // size changed, if so we need to redraw ?
         if (

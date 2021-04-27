@@ -108,30 +108,17 @@
                 <!-- Dashlets -->
                 <ng-template matExpansionPanelContent>
                     <div fxLayout="row" fxLayoutAlign="space-between">
+
+                        <!-- Summary -->
                         <div
                             *ngIf="DashboardModel.canViewCaseSummaryDashlet(authUser)"
                             fxFlex="33">
                             <mat-card class="dashboard-gauge">
-                                <div
-                                    fxLayout="row"
-                                    class="other-kpi-header">
-                                    <div
-                                        fxFlex>
-                                        {{'LNG_PAGE_DASHBOARD_CASE_SUMMARY_TITLE' | translate}}
-                                    </div>
-                                    <app-fancy-tooltip
-                                        fxFlex fxGrow="0"
-                                        tooltip="LNG_PAGE_DASHBOARD_CASE_SUMMARY_TITLE_DESCRIPTION">
-                                    </app-fancy-tooltip>
-                                </div>
-                                <!-- case summary pie chart -->
-                                <div fxLayoutAlign="center">
-                                    <app-case-summary-dashlet
-                                        [globalFilterDate]="globalFilterDate"
-                                        [globalFilterLocationId]="globalFilterLocationId"
-                                        [globalFilterClassificationId]="globalFilterClassificationId">
-                                    </app-case-summary-dashlet>
-                                </div>
+                                <app-case-summary-dashlet
+                                    [globalFilterDate]="globalFilterDate"
+                                    [globalFilterLocationId]="globalFilterLocationId"
+                                    [globalFilterClassificationId]="globalFilterClassificationId">
+                                </app-case-summary-dashlet>
                             </mat-card>
                         </div>
 
