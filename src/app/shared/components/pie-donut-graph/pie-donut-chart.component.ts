@@ -27,9 +27,27 @@ export class PieDonutChartData {
      * Assign colors to data
      */
     static assignColorDomain(data: PieDonutChartData[]): void {
+        // colors map
+        const colors: string[] = [
+            '#800080',
+            '#008080',
+            '#000080',
+            '#808000',
+            '#800000',
+            '#FF00FF',
+            '#0000FF',
+            '#00FFFF',
+            '#008000',
+            '#00FF00',
+            '#FFFF00',
+            '#FF0000',
+            '#000000',
+            '#808080'
+        ];
+
         // go through items and assign color
         data.forEach((item, index) => {
-           item.color = '#' + Math.floor(Math.random() * 16777215).toString(16);
+           item.color = colors[index % colors.length];
         });
     }
 
