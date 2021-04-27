@@ -107,11 +107,11 @@ export class PieDonutChartComponent
     // graph title
     @Input() graphTitle: string;
 
-    // graph legend title
-    @Input() legendTitle: string;
-
     // total
     @Input() graphTotal: string;
+
+    // description
+    @Input() description: string;
 
     // click item
     @Output() clickItem = new EventEmitter<PieDonutChartData>();
@@ -120,7 +120,7 @@ export class PieDonutChartComponent
     private _periodicChecker: number;
 
     // graph internal elements
-    private _graph: {
+    _graph: {
         // graph settings
         settings: {
             margin: number,
@@ -166,7 +166,10 @@ export class PieDonutChartComponent
             donutRadius: number,
             donutRadiusShadow: number
         },
-        dataToRender: PieDonutChartData[]
+        dataToRender: PieDonutChartData[],
+        rendered: {
+            total: number
+        }
     } = {
         // graph settings
         settings: {
@@ -213,7 +216,10 @@ export class PieDonutChartComponent
             donutRadius: 30,
             donutRadiusShadow: 30 * PieDonutChartComponent.DEFAULT_GRAPH_SHADOW_MULTIPLIER
         },
-        dataToRender: []
+        dataToRender: [],
+        rendered: {
+            total: 0
+        }
     };
 
     /**
@@ -401,7 +407,18 @@ export class PieDonutChartComponent
     /**
      * Animate in
      */
-    private mouseIn(item: IArcsWithExtraDetails): void {
+    private mouseIn(
+        item: IArcsWithExtraDetails,
+        scrollLegendItem: boolean
+    ): void {
+        // same item already selected ?
+        if (
+            this._graph.selectedArc &&
+            item.details.id === this._graph.selectedArc.details.id
+        ) {
+            return;
+        }
+
         // deselect previous item
         this.mouseOut();
 
@@ -434,6 +451,21 @@ export class PieDonutChartComponent
                 'd',
                 linesArcD3Selected(this._graph.selectedArc.arc)
             );
+
+        // see legend
+        if (scrollLegendItem) {
+            const legendItem = document.getElementById('legend' + this._graph.selectedArc.details.id);
+            if (
+                legendItem &&
+                legendItem.scrollIntoView
+            ) {
+                legendItem.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest',
+                    inline: 'start'
+                });
+            }
+        }
     }
 
     /**
@@ -552,27 +584,6 @@ export class PieDonutChartComponent
                 (d: IArcsWithExtraDetails): any => {
                     return d.details.color;
                 }
-            )
-            .on(
-                'mouseover',
-                function () {
-                    // animate
-                    self.mouseIn((this as any).__data__);
-                }
-            )
-            .on(
-                'mouseout',
-                function () {
-                    // animate
-                    self.mouseOut();
-                }
-            )
-            .on(
-                'click',
-                function () {
-                    // trigger click event
-                    self.clickItem.emit((this as any).__data__.details);
-                }
             );
 
         // animate
@@ -601,9 +612,10 @@ export class PieDonutChartComponent
                     return linesArcD3Previous(item.arc);
                 }
             )
+            // transparent, and not NONE, because we need to use mouseover
             .attr(
                 'fill',
-                'none'
+                'transparent'
             )
             .attr(
                 'stroke',
@@ -612,6 +624,30 @@ export class PieDonutChartComponent
             .style(
                 'stroke-width',
                 this._graph.settings.arc.border.width
+            )
+            .on(
+                'mouseover',
+                function () {
+                    // animate
+                    self.mouseIn(
+                        (this as any).__data__,
+                        true
+                    );
+                }
+            )
+            .on(
+                'mouseout',
+                function () {
+                    // animate
+                    self.mouseOut();
+                }
+            )
+            .on(
+                'click',
+                function () {
+                    // trigger click event
+                    self.clickItem.emit((this as any).__data__.details);
+                }
             );
 
         // animate
@@ -679,6 +715,19 @@ export class PieDonutChartComponent
             return;
         }
 
+        // wait for binding before determining total otherwise we get expression changed error
+        setTimeout(() => {
+            // reset
+            this._graph.rendered = {
+                total: 0
+            };
+
+            // deter,ine total
+            this._graph.dataToRender.forEach((item) => {
+                this._graph.rendered.total += item.value;
+            });
+        });
+
         // init graph base
         this.initGraphBase();
 
@@ -716,7 +765,10 @@ export class PieDonutChartComponent
         }
 
         // mouse in
-        this.mouseIn(arc);
+        this.mouseIn(
+            arc,
+            false
+        );
     }
 
     /**

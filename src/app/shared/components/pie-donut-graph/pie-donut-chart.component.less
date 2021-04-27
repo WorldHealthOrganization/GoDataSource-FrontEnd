@@ -9,29 +9,25 @@
 
         // title
         .app-pie-donut-chart-main-left-title {
-            font-size: 20px;
+            font-size: 25px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
         }
 
         // Legend
         .app-pie-donut-chart-main-left-legend {
-            margin-top: 40px;
-
-            // Legend title
-            .app-pie-donut-chart-main-left-legend-title {
-                font-size: 16px;
-                font-weight: bold;
-                text-transform: capitalize;
-                margin-bottom: 5px;
-            }
+            margin-top: 20px;
 
             // legend items
             .app-pie-donut-chart-main-left-legend-items {
                 font-size: 16px;
-                max-height: 190px;
+                max-height: 260px;
                 overflow: auto;
 
                 .app-pie-donut-chart-main-left-legend-items-item {
                     cursor: pointer;
+                    color: #777;
 
                     .app-pie-donut-chart-main-left-legend-items-item-check {
                         display: inline-block;
@@ -39,8 +35,14 @@
                         height: 16px;
                     }
 
+                    .app-pie-donut-chart-main-left-legend-items-item-text {
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
+                        overflow: hidden;
+                    }
+
                     &.app-pie-donut-chart-main-left-legend-items-item-selected {
-                        color: #777;
+                        color: black;
                     }
                 }
             }
