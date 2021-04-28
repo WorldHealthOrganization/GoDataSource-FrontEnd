@@ -9,6 +9,7 @@ import { Selection } from 'd3-selection';
 interface IArcsWithExtraDetails {
     details: PieDonutChartData;
     arc: any;
+    previousArc?: any;
 }
 
 /**
@@ -190,6 +191,11 @@ export class PieDonutChartComponent
                 animation: {
                     speed: number
                 }
+            },
+            renderedArcsChange: {
+                animation: {
+                    speed: number
+                }
             }
         },
 
@@ -207,7 +213,10 @@ export class PieDonutChartComponent
         selectedArc: IArcsWithExtraDetails,
         previous: {
             donutRadius: number,
-            donutRadiusShadow: number
+            donutRadiusShadow: number,
+            arcs: {
+                [arcId: string]: IArcsWithExtraDetails
+            }
         },
         dataToRender: PieDonutChartData[],
         rendered: {
@@ -240,6 +249,11 @@ export class PieDonutChartComponent
                 animation: {
                     speed: 200
                 }
+            },
+            renderedArcsChange: {
+                animation: {
+                    speed: 750
+                }
             }
         },
 
@@ -257,7 +271,8 @@ export class PieDonutChartComponent
         selectedArc: null,
         previous: {
             donutRadius: PieDonutChartComponent.DEFAULT_GRAPH_DONUT_INITIAL_SIZE,
-            donutRadiusShadow: PieDonutChartComponent.DEFAULT_GRAPH_DONUT_INITIAL_SIZE * PieDonutChartComponent.DEFAULT_GRAPH_SHADOW_MULTIPLIER
+            donutRadiusShadow: PieDonutChartComponent.DEFAULT_GRAPH_DONUT_INITIAL_SIZE * PieDonutChartComponent.DEFAULT_GRAPH_SHADOW_MULTIPLIER,
+            arcs: {}
         },
         dataToRender: [],
         rendered: {
@@ -380,7 +395,8 @@ export class PieDonutChartComponent
         if (!partialClear) {
             this._graph.previous = {
                 donutRadius: PieDonutChartComponent.DEFAULT_GRAPH_DONUT_INITIAL_SIZE,
-                donutRadiusShadow: PieDonutChartComponent.DEFAULT_GRAPH_DONUT_INITIAL_SIZE * PieDonutChartComponent.DEFAULT_GRAPH_SHADOW_MULTIPLIER
+                donutRadiusShadow: PieDonutChartComponent.DEFAULT_GRAPH_DONUT_INITIAL_SIZE * PieDonutChartComponent.DEFAULT_GRAPH_SHADOW_MULTIPLIER,
+                arcs: {}
             };
         }
     }
@@ -603,7 +619,10 @@ export class PieDonutChartComponent
         arcs.forEach((arc, index) => {
             this._graph.arcs.push({
                 details: this._graph.dataToRender[index],
-                arc
+                arc,
+                previousArc: this._graph.previous.arcs[this._graph.dataToRender[index].id] ?
+                    this._graph.previous.arcs[this._graph.dataToRender[index].id].previousArc :
+                    undefined
             });
         });
 
@@ -624,7 +643,7 @@ export class PieDonutChartComponent
         this._graph.previous.donutRadius = donutRadius;
 
         // render outer arc
-        let animateArcPath: boolean = false;
+        let sizeChanged: boolean = false;
         const arcPath = groupArcsData
             .append('path')
             .style(
@@ -647,10 +666,26 @@ export class PieDonutChartComponent
                     // starting arc same as ending arc, do we need to animate ?
                     const initialArcData: string = donutArcD3Previous(item.arc);
                     if (
-                        !animateArcPath &&
+                        !sizeChanged &&
                         initialArcData !== donutArcD3(item.arc)
                     ) {
-                        animateArcPath = true;
+                        sizeChanged = true;
+                    }
+
+                    // init arc if necessary
+                    if (!this._graph.previous.arcs[item.details.id]) {
+                        this._graph.previous.arcs[item.details.id] = item;
+                    }
+
+                    // set initial previous arc if history not found
+                    if (!this._graph.previous.arcs[item.details.id].previousArc) {
+                        this._graph.previous.arcs[item.details.id].previousArc = Object.assign(
+                            {},
+                            item.arc,
+                            {
+                                startAngle: item.arc.endAngle
+                            }
+                        );
                     }
 
                     // starting arc
@@ -664,7 +699,7 @@ export class PieDonutChartComponent
             );
 
         // animate only if necessary
-        if (animateArcPath) {
+        if (sizeChanged) {
             arcPath
                 .transition()
                 .duration(this._graph.settings.sizeChange.animation.speed)
@@ -672,6 +707,28 @@ export class PieDonutChartComponent
                     'd',
                     (item): any => {
                         return donutArcD3(item.arc);
+                    }
+                );
+        } else {
+            arcPath
+                .transition()
+                .duration(this._graph.settings.renderedArcsChange.animation.speed)
+                .attrTween(
+                    'd',
+                    (item): any => {
+                        // interpolate
+                        const d3Interpolate = d3.interpolate(
+                            this._graph.previous.arcs[item.details.id]?.previousArc,
+                            item.arc
+                        );
+
+                        // remember previous position
+                        // handled bellow in line animation
+
+                        // animate
+                        return function(t) {
+                            return donutArcD3(d3Interpolate(t));
+                        };
                     }
                 );
         }
@@ -730,7 +787,7 @@ export class PieDonutChartComponent
             );
 
         // animate only if necessary
-        if (animateArcPath) {
+        if (sizeChanged) {
             linePath
                 .transition()
                 .duration(this._graph.settings.sizeChange.animation.speed)
@@ -738,6 +795,31 @@ export class PieDonutChartComponent
                     'd',
                     (item): any => {
                         return linesArcD3(item.arc);
+                    }
+                );
+        } else {
+            linePath
+                .transition()
+                .duration(this._graph.settings.renderedArcsChange.animation.speed)
+                .attrTween(
+                    'd',
+                    (item): any => {
+                        // interpolate
+                        const d3Interpolate = d3.interpolate(
+                            this._graph.previous.arcs[item.details.id]?.previousArc,
+                            item.arc
+                        );
+
+                        // remember previous position
+                        // handled bellow in line animation
+                        if (this._graph.previous.arcs[item.details.id]) {
+                            this._graph.previous.arcs[item.details.id].previousArc = item.arc;
+                        }
+
+                        // animate
+                        return function(t) {
+                            return linesArcD3(d3Interpolate(t));
+                        };
                     }
                 );
         }
@@ -791,11 +873,6 @@ export class PieDonutChartComponent
         // determine data that we need to render
         this._graph.dataToRender = this.data.filter((item) => item.checked);
 
-        // nothing to draw ?
-        if (this._graph.dataToRender.length < 1) {
-            return;
-        }
-
         // wait for binding before determining total otherwise we get expression changed error
         setTimeout(() => {
             // reset
@@ -808,6 +885,11 @@ export class PieDonutChartComponent
                 this._graph.rendered.total += item.value;
             });
         });
+
+        // nothing to draw ?
+        if (this._graph.dataToRender.length < 1) {
+            return;
+        }
 
         // init graph base
         this.initGraphBase();
@@ -868,6 +950,11 @@ export class PieDonutChartComponent
     ): void {
         // check / uncheck
         item.checked = checkedValue;
+
+        // remove from previous if necessary
+        if (!item.checked) {
+            delete this._graph.previous.arcs[item.id];
+        }
 
         // show / hide chart arcs
         this.redrawGraph(true);
