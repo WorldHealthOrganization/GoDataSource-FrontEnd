@@ -794,6 +794,12 @@ export class PieDonutChartComponent
                 .attr(
                     'd',
                     (item): any => {
+                        // remember previous position
+                        if (this._graph.previous.arcs[item.details.id]) {
+                            this._graph.previous.arcs[item.details.id].previousArc = item.arc;
+                        }
+
+                        // finish
                         return linesArcD3(item.arc);
                     }
                 );
@@ -811,7 +817,6 @@ export class PieDonutChartComponent
                         );
 
                         // remember previous position
-                        // handled bellow in line animation
                         if (this._graph.previous.arcs[item.details.id]) {
                             this._graph.previous.arcs[item.details.id].previousArc = item.arc;
                         }
