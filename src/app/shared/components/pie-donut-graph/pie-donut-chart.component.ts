@@ -81,6 +81,8 @@ export class PieDonutChartComponent
     implements OnInit, OnDestroy {
 
     // constants
+    private static MIN_WIDTH_DIFFERENCE_BEFORE_RERENDER: number = 10;
+    private static DEFAULT_GRAPH_DONUT_INITIAL_SIZE: number = 30;
     private static DEFAULT_GRAPH_SHADOW_MULTIPLIER: number = 0.8;
 
     // chart id generator
@@ -92,8 +94,11 @@ export class PieDonutChartComponent
         // set data
         this._chartContainer = chartContainer;
 
-        // redraw
-        this.redrawGraph();
+        // redraw after elements are rendered accordingly to new bindings
+        // loading spinner was removed from dom after graph became visible even if chart is on else in *ngIf which was causing multiple size changes
+        setTimeout(() => {
+            this.redrawGraph(false);
+        });
     }
     get chartContainer(): ElementRef {
         return this._chartContainer;
@@ -106,7 +111,7 @@ export class PieDonutChartComponent
         this._loadingData = loadingData;
 
         // redraw
-        this.redrawGraph();
+        this.redrawGraph(false);
     }
     get loadingData(): boolean {
         return this._loadingData;
@@ -133,7 +138,7 @@ export class PieDonutChartComponent
         });
 
         // redraw
-        this.redrawGraph();
+        this.redrawGraph(false);
     }
     get data(): PieDonutChartData[] {
         return this._data;
@@ -251,8 +256,8 @@ export class PieDonutChartComponent
         arcs: [],
         selectedArc: null,
         previous: {
-            donutRadius: 30,
-            donutRadiusShadow: 30 * PieDonutChartComponent.DEFAULT_GRAPH_SHADOW_MULTIPLIER
+            donutRadius: PieDonutChartComponent.DEFAULT_GRAPH_DONUT_INITIAL_SIZE,
+            donutRadiusShadow: PieDonutChartComponent.DEFAULT_GRAPH_DONUT_INITIAL_SIZE * PieDonutChartComponent.DEFAULT_GRAPH_SHADOW_MULTIPLIER
         },
         dataToRender: [],
         rendered: {
@@ -319,8 +324,8 @@ export class PieDonutChartComponent
 
         // size changed, if so we need to redraw ?
         if (
-            this._graph.size.width !== width ||
-            this._graph.size.height !== height
+            Math.abs(this._graph.size.width - width) > PieDonutChartComponent.MIN_WIDTH_DIFFERENCE_BEFORE_RERENDER ||
+            Math.abs(this._graph.size.height - height) > PieDonutChartComponent.MIN_WIDTH_DIFFERENCE_BEFORE_RERENDER
         ) {
             // update size
             this._graph.size.width = width;
@@ -328,7 +333,7 @@ export class PieDonutChartComponent
 
             // re-render graph
             if (redrawOnChange) {
-                this.render();
+                this.render(true);
             }
         }
     }
@@ -336,7 +341,7 @@ export class PieDonutChartComponent
     /**
      * Redraw graph
      */
-    redrawGraph(): void {
+    redrawGraph(partialClear: boolean): void {
         // do we have the item where we need to redraw graph ?
         // or still waiting for data ?
         if (
@@ -350,7 +355,7 @@ export class PieDonutChartComponent
         this.updateGraphSize(false);
 
         // draw
-        this.render();
+        this.render(partialClear);
     }
 
     /**
@@ -363,13 +368,21 @@ export class PieDonutChartComponent
     /**
      * Clear graph
      */
-    private clear(): void {
+    private clear(partialClear: boolean): void {
         // clear current graph before redrawing
         this._graph.container.selectAll('*').remove();
 
         // clear generated arcs
         this._graph.arcs = [];
         this._graph.selectedArc = null;
+
+        // full clear ?
+        if (!partialClear) {
+            this._graph.previous = {
+                donutRadius: PieDonutChartComponent.DEFAULT_GRAPH_DONUT_INITIAL_SIZE,
+                donutRadiusShadow: PieDonutChartComponent.DEFAULT_GRAPH_DONUT_INITIAL_SIZE * PieDonutChartComponent.DEFAULT_GRAPH_SHADOW_MULTIPLIER
+            };
+        }
     }
 
     /**
@@ -743,12 +756,12 @@ export class PieDonutChartComponent
     /**
      * Render graph
      */
-    private render(): void {
+    private render(partialClear: boolean): void {
         // determine
         this.determineGraphContainer();
 
         // clear graph
-        this.clear();
+        this.clear(partialClear);
 
         // nothing to draw ?
         if (
@@ -840,6 +853,6 @@ export class PieDonutChartComponent
         item.checked = checkedValue;
 
         // show / hide chart arcs
-        this.redrawGraph();
+        this.redrawGraph(true);
     }
 }
