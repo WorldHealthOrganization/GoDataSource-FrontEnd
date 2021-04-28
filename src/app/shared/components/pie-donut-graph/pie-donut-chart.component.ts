@@ -9,6 +9,7 @@ import { Selection } from 'd3-selection';
 interface IArcsWithExtraDetails {
     details: PieDonutChartData;
     arc: any;
+    previousArc?: any;
 }
 
 /**
@@ -81,6 +82,8 @@ export class PieDonutChartComponent
     implements OnInit, OnDestroy {
 
     // constants
+    private static MIN_WIDTH_DIFFERENCE_BEFORE_RERENDER: number = 10;
+    private static DEFAULT_GRAPH_DONUT_INITIAL_SIZE: number = 30;
     private static DEFAULT_GRAPH_SHADOW_MULTIPLIER: number = 0.8;
 
     // chart id generator
@@ -92,8 +95,11 @@ export class PieDonutChartComponent
         // set data
         this._chartContainer = chartContainer;
 
-        // redraw
-        this.redrawGraph();
+        // redraw after elements are rendered accordingly to new bindings
+        // loading spinner was removed from dom after graph became visible even if chart is on else in *ngIf which was causing multiple size changes
+        setTimeout(() => {
+            this.redrawGraph(false);
+        });
     }
     get chartContainer(): ElementRef {
         return this._chartContainer;
@@ -106,7 +112,7 @@ export class PieDonutChartComponent
         this._loadingData = loadingData;
 
         // redraw
-        this.redrawGraph();
+        this.redrawGraph(false);
     }
     get loadingData(): boolean {
         return this._loadingData;
@@ -133,7 +139,7 @@ export class PieDonutChartComponent
         });
 
         // redraw
-        this.redrawGraph();
+        this.redrawGraph(false);
     }
     get data(): PieDonutChartData[] {
         return this._data;
@@ -185,6 +191,11 @@ export class PieDonutChartComponent
                 animation: {
                     speed: number
                 }
+            },
+            renderedArcsChange: {
+                animation: {
+                    speed: number
+                }
             }
         },
 
@@ -202,7 +213,10 @@ export class PieDonutChartComponent
         selectedArc: IArcsWithExtraDetails,
         previous: {
             donutRadius: number,
-            donutRadiusShadow: number
+            donutRadiusShadow: number,
+            arcs: {
+                [arcId: string]: IArcsWithExtraDetails
+            }
         },
         dataToRender: PieDonutChartData[],
         rendered: {
@@ -229,11 +243,16 @@ export class PieDonutChartComponent
             shadow: {
                 color: '#CDCDCD',
                 width: 10,
-                opacity: 0.6
+                opacity: 0.5
             },
             sizeChange: {
                 animation: {
                     speed: 200
+                }
+            },
+            renderedArcsChange: {
+                animation: {
+                    speed: 750
                 }
             }
         },
@@ -251,8 +270,9 @@ export class PieDonutChartComponent
         arcs: [],
         selectedArc: null,
         previous: {
-            donutRadius: 30,
-            donutRadiusShadow: 30 * PieDonutChartComponent.DEFAULT_GRAPH_SHADOW_MULTIPLIER
+            donutRadius: PieDonutChartComponent.DEFAULT_GRAPH_DONUT_INITIAL_SIZE,
+            donutRadiusShadow: PieDonutChartComponent.DEFAULT_GRAPH_DONUT_INITIAL_SIZE * PieDonutChartComponent.DEFAULT_GRAPH_SHADOW_MULTIPLIER,
+            arcs: {}
         },
         dataToRender: [],
         rendered: {
@@ -319,8 +339,8 @@ export class PieDonutChartComponent
 
         // size changed, if so we need to redraw ?
         if (
-            this._graph.size.width !== width ||
-            this._graph.size.height !== height
+            Math.abs(this._graph.size.width - width) > PieDonutChartComponent.MIN_WIDTH_DIFFERENCE_BEFORE_RERENDER ||
+            Math.abs(this._graph.size.height - height) > PieDonutChartComponent.MIN_WIDTH_DIFFERENCE_BEFORE_RERENDER
         ) {
             // update size
             this._graph.size.width = width;
@@ -328,7 +348,7 @@ export class PieDonutChartComponent
 
             // re-render graph
             if (redrawOnChange) {
-                this.render();
+                this.render(true);
             }
         }
     }
@@ -336,7 +356,7 @@ export class PieDonutChartComponent
     /**
      * Redraw graph
      */
-    redrawGraph(): void {
+    redrawGraph(partialClear: boolean): void {
         // do we have the item where we need to redraw graph ?
         // or still waiting for data ?
         if (
@@ -350,7 +370,7 @@ export class PieDonutChartComponent
         this.updateGraphSize(false);
 
         // draw
-        this.render();
+        this.render(partialClear);
     }
 
     /**
@@ -363,13 +383,22 @@ export class PieDonutChartComponent
     /**
      * Clear graph
      */
-    private clear(): void {
+    private clear(partialClear: boolean): void {
         // clear current graph before redrawing
         this._graph.container.selectAll('*').remove();
 
         // clear generated arcs
         this._graph.arcs = [];
         this._graph.selectedArc = null;
+
+        // full clear ?
+        if (!partialClear) {
+            this._graph.previous = {
+                donutRadius: PieDonutChartComponent.DEFAULT_GRAPH_DONUT_INITIAL_SIZE,
+                donutRadiusShadow: PieDonutChartComponent.DEFAULT_GRAPH_DONUT_INITIAL_SIZE * PieDonutChartComponent.DEFAULT_GRAPH_SHADOW_MULTIPLIER,
+                arcs: {}
+            };
+        }
     }
 
     /**
@@ -425,18 +454,20 @@ export class PieDonutChartComponent
             .attr('filter', 'url(#blurFilter)')
             .style('opacity', this._graph.settings.shadow.opacity);
 
-        // animate
-        shadowPath
-            .transition()
-            .duration(this._graph.settings.sizeChange.animation.speed)
-            .attr(
-                'd',
-                d3.arc()
-                    .startAngle(0)
-                    .endAngle(360)
-                    .innerRadius(shadowOuterRadius - this._graph.settings.shadow.width)
-                    .outerRadius(shadowOuterRadius)
-            );
+        // animate only if necessary
+        if (this._graph.previous.donutRadiusShadow !== shadowOuterRadius) {
+            shadowPath
+                .transition()
+                .duration(this._graph.settings.sizeChange.animation.speed)
+                .attr(
+                    'd',
+                    d3.arc()
+                        .startAngle(0)
+                        .endAngle(360)
+                        .innerRadius(shadowOuterRadius - this._graph.settings.shadow.width)
+                        .outerRadius(shadowOuterRadius)
+                );
+        }
 
         // update donut radius
         this._graph.previous.donutRadiusShadow = shadowOuterRadius;
@@ -588,7 +619,10 @@ export class PieDonutChartComponent
         arcs.forEach((arc, index) => {
             this._graph.arcs.push({
                 details: this._graph.dataToRender[index],
-                arc
+                arc,
+                previousArc: this._graph.previous.arcs[this._graph.dataToRender[index].id] ?
+                    this._graph.previous.arcs[this._graph.dataToRender[index].id].previousArc :
+                    undefined
             });
         });
 
@@ -609,6 +643,7 @@ export class PieDonutChartComponent
         this._graph.previous.donutRadius = donutRadius;
 
         // render outer arc
+        let sizeChanged: boolean = false;
         const arcPath = groupArcsData
             .append('path')
             .style(
@@ -628,7 +663,33 @@ export class PieDonutChartComponent
             .attr(
                 'd',
                 (item): any => {
-                    return donutArcD3Previous(item.arc);
+                    // starting arc same as ending arc, do we need to animate ?
+                    const initialArcData: string = donutArcD3Previous(item.arc);
+                    if (
+                        !sizeChanged &&
+                        initialArcData !== donutArcD3(item.arc)
+                    ) {
+                        sizeChanged = true;
+                    }
+
+                    // init arc if necessary
+                    if (!this._graph.previous.arcs[item.details.id]) {
+                        this._graph.previous.arcs[item.details.id] = item;
+                    }
+
+                    // set initial previous arc if history not found
+                    if (!this._graph.previous.arcs[item.details.id].previousArc) {
+                        this._graph.previous.arcs[item.details.id].previousArc = Object.assign(
+                            {},
+                            item.arc,
+                            {
+                                startAngle: item.arc.endAngle
+                            }
+                        );
+                    }
+
+                    // starting arc
+                    return initialArcData;
                 }
             ).attr(
                 'fill',
@@ -637,16 +698,40 @@ export class PieDonutChartComponent
                 }
             );
 
-        // animate
-        arcPath
-            .transition()
-            .duration(this._graph.settings.sizeChange.animation.speed)
-            .attr(
-                'd',
-                (item): any => {
-                    return donutArcD3(item.arc);
-                }
-            );
+        // animate only if necessary
+        if (sizeChanged) {
+            arcPath
+                .transition()
+                .duration(this._graph.settings.sizeChange.animation.speed)
+                .attr(
+                    'd',
+                    (item): any => {
+                        return donutArcD3(item.arc);
+                    }
+                );
+        } else {
+            arcPath
+                .transition()
+                .duration(this._graph.settings.renderedArcsChange.animation.speed)
+                .attrTween(
+                    'd',
+                    (item): any => {
+                        // interpolate
+                        const d3Interpolate = d3.interpolate(
+                            this._graph.previous.arcs[item.details.id]?.previousArc,
+                            item.arc
+                        );
+
+                        // remember previous position
+                        // handled bellow in line animation
+
+                        // animate
+                        return function(t) {
+                            return donutArcD3(d3Interpolate(t));
+                        };
+                    }
+                );
+        }
 
         // render inner arc
         const linePath = groupArcsData
@@ -701,16 +786,43 @@ export class PieDonutChartComponent
                 }
             );
 
-        // animate
-        linePath
-            .transition()
-            .duration(this._graph.settings.sizeChange.animation.speed)
-            .attr(
-                'd',
-                (item): any => {
-                    return linesArcD3(item.arc);
-                }
-            );
+        // animate only if necessary
+        if (sizeChanged) {
+            linePath
+                .transition()
+                .duration(this._graph.settings.sizeChange.animation.speed)
+                .attr(
+                    'd',
+                    (item): any => {
+                        return linesArcD3(item.arc);
+                    }
+                );
+        } else {
+            linePath
+                .transition()
+                .duration(this._graph.settings.renderedArcsChange.animation.speed)
+                .attrTween(
+                    'd',
+                    (item): any => {
+                        // interpolate
+                        const d3Interpolate = d3.interpolate(
+                            this._graph.previous.arcs[item.details.id]?.previousArc,
+                            item.arc
+                        );
+
+                        // remember previous position
+                        // handled bellow in line animation
+                        if (this._graph.previous.arcs[item.details.id]) {
+                            this._graph.previous.arcs[item.details.id].previousArc = item.arc;
+                        }
+
+                        // animate
+                        return function(t) {
+                            return linesArcD3(d3Interpolate(t));
+                        };
+                    }
+                );
+        }
     }
 
     /**
@@ -743,12 +855,12 @@ export class PieDonutChartComponent
     /**
      * Render graph
      */
-    private render(): void {
+    private render(partialClear: boolean): void {
         // determine
         this.determineGraphContainer();
 
         // clear graph
-        this.clear();
+        this.clear(partialClear);
 
         // nothing to draw ?
         if (
@@ -760,11 +872,6 @@ export class PieDonutChartComponent
 
         // determine data that we need to render
         this._graph.dataToRender = this.data.filter((item) => item.checked);
-
-        // nothing to draw ?
-        if (this._graph.dataToRender.length < 1) {
-            return;
-        }
 
         // wait for binding before determining total otherwise we get expression changed error
         setTimeout(() => {
@@ -778,6 +885,11 @@ export class PieDonutChartComponent
                 this._graph.rendered.total += item.value;
             });
         });
+
+        // nothing to draw ?
+        if (this._graph.dataToRender.length < 1) {
+            return;
+        }
 
         // init graph base
         this.initGraphBase();
@@ -839,7 +951,12 @@ export class PieDonutChartComponent
         // check / uncheck
         item.checked = checkedValue;
 
+        // remove from previous if necessary
+        if (!item.checked) {
+            delete this._graph.previous.arcs[item.id];
+        }
+
         // show / hide chart arcs
-        this.redrawGraph();
+        this.redrawGraph(true);
     }
 }
