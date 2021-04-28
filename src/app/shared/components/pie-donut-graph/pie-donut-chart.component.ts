@@ -501,12 +501,10 @@ export class PieDonutChartComponent
 
         // arc generators
         const donutRadius: number = this.getDonutRadius();
-        const donutArcD3Selected = d3.arc()
-            .innerRadius((donutRadius + this._graph.settings.donut.selected.radiusIncrease) * this._graph.settings.donut.donutRadiusMultiplier)
-            .outerRadius(donutRadius + this._graph.settings.donut.selected.radiusIncrease);
-        const linesArcD3Selected = d3.arc()
-            .innerRadius(this._graph.settings.donut.linesInnerRadius)
-            .outerRadius(donutRadius + this._graph.settings.donut.selected.radiusIncrease);
+        const donutArcD3 = this.getDonutArcD3(donutRadius);
+        const donutArcD3Selected = this.getDonutArcD3Selected(donutRadius);
+        const linesArcD3 = this.getLinesArcD3(donutRadius);
+        const linesArcD3Selected = this.getLinesArcD3Selected(donutRadius);
 
         // animate arc
         d3
@@ -514,9 +512,20 @@ export class PieDonutChartComponent
             .select(`#arc${this._graph.selectedArc.details.id}`)
             .transition()
             .duration(this._graph.settings.donut.selected.speed)
-            .attr(
+            .attrTween(
                 'd',
-                donutArcD3Selected(this._graph.selectedArc.arc)
+                (animateItem: IArcsWithExtraDetails): any => {
+                    // interpolate
+                    const d3Interpolate = d3.interpolate(
+                        donutArcD3(animateItem.arc),
+                        donutArcD3Selected(animateItem.arc)
+                    );
+
+                    // animate
+                    return (t) => {
+                        return d3Interpolate(t);
+                    };
+                }
             );
 
         // animate lines
@@ -525,9 +534,20 @@ export class PieDonutChartComponent
             .select(`#arcLine${this._graph.selectedArc.details.id}`)
             .transition()
             .duration(this._graph.settings.donut.selected.speed)
-            .attr(
+            .attrTween(
                 'd',
-                linesArcD3Selected(this._graph.selectedArc.arc)
+                (animateItem: IArcsWithExtraDetails): any => {
+                    // interpolate
+                    const d3Interpolate = d3.interpolate(
+                        linesArcD3(animateItem.arc),
+                        linesArcD3Selected(animateItem.arc)
+                    );
+
+                    // animate
+                    return (t) => {
+                        return d3Interpolate(t);
+                    };
+                }
             );
 
         // see legend
@@ -558,7 +578,9 @@ export class PieDonutChartComponent
         // arc generators
         const donutRadius: number = this.getDonutRadius();
         const donutArcD3 = this.getDonutArcD3(donutRadius);
+        const donutArcD3Selected = this.getDonutArcD3Selected(donutRadius);
         const linesArcD3 = this.getLinesArcD3(donutRadius);
+        const linesArcD3Selected = this.getLinesArcD3Selected(donutRadius);
 
         // animate arc
         d3
@@ -566,9 +588,20 @@ export class PieDonutChartComponent
             .select(`#arc${this._graph.selectedArc.details.id}`)
             .transition()
             .duration(this._graph.settings.donut.selected.speed)
-            .attr(
+            .attrTween(
                 'd',
-                donutArcD3(this._graph.selectedArc.arc)
+                (animateItem: IArcsWithExtraDetails): any => {
+                    // interpolate
+                    const d3Interpolate = d3.interpolate(
+                        donutArcD3Selected(animateItem.arc),
+                        donutArcD3(animateItem.arc)
+                    );
+
+                    // animate
+                    return (t) => {
+                        return d3Interpolate(t);
+                    };
+                }
             );
 
         // animate lines
@@ -577,9 +610,20 @@ export class PieDonutChartComponent
             .select(`#arcLine${this._graph.selectedArc.details.id}`)
             .transition()
             .duration(this._graph.settings.donut.selected.speed)
-            .attr(
+            .attrTween(
                 'd',
-                linesArcD3(this._graph.selectedArc.arc)
+                (animateItem: IArcsWithExtraDetails): any => {
+                    // interpolate
+                    const d3Interpolate = d3.interpolate(
+                        linesArcD3Selected(animateItem.arc),
+                        linesArcD3(animateItem.arc)
+                    );
+
+                    // animate
+                    return (t) => {
+                        return d3Interpolate(t);
+                    };
+                }
             );
 
         // deselect arc
@@ -596,12 +640,30 @@ export class PieDonutChartComponent
     }
 
     /**
+     * Get donut arc d3 selected
+     */
+    private getDonutArcD3Selected(donutRadius: number): any {
+        return d3.arc()
+            .innerRadius((donutRadius + this._graph.settings.donut.selected.radiusIncrease) * this._graph.settings.donut.donutRadiusMultiplier)
+            .outerRadius(donutRadius + this._graph.settings.donut.selected.radiusIncrease);
+    }
+
+    /**
      * Get lines arc d3
      */
     private getLinesArcD3(donutRadius: number): any {
         return d3.arc()
             .innerRadius(this._graph.settings.donut.linesInnerRadius)
             .outerRadius(donutRadius);
+    }
+
+    /**
+     * Get lines arc d3 selected
+     */
+    private getLinesArcD3Selected(donutRadius: number): any {
+        return d3.arc()
+            .innerRadius(this._graph.settings.donut.linesInnerRadius)
+            .outerRadius(donutRadius + this._graph.settings.donut.selected.radiusIncrease);
     }
 
     /**
