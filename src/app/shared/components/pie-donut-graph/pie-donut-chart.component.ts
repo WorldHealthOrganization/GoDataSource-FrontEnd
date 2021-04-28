@@ -234,7 +234,7 @@ export class PieDonutChartComponent
             shadow: {
                 color: '#CDCDCD',
                 width: 10,
-                opacity: 0.6
+                opacity: 0.5
             },
             sizeChange: {
                 animation: {
@@ -438,18 +438,20 @@ export class PieDonutChartComponent
             .attr('filter', 'url(#blurFilter)')
             .style('opacity', this._graph.settings.shadow.opacity);
 
-        // animate
-        shadowPath
-            .transition()
-            .duration(this._graph.settings.sizeChange.animation.speed)
-            .attr(
-                'd',
-                d3.arc()
-                    .startAngle(0)
-                    .endAngle(360)
-                    .innerRadius(shadowOuterRadius - this._graph.settings.shadow.width)
-                    .outerRadius(shadowOuterRadius)
-            );
+        // animate only if necessary
+        if (this._graph.previous.donutRadiusShadow !== shadowOuterRadius) {
+            shadowPath
+                .transition()
+                .duration(this._graph.settings.sizeChange.animation.speed)
+                .attr(
+                    'd',
+                    d3.arc()
+                        .startAngle(0)
+                        .endAngle(360)
+                        .innerRadius(shadowOuterRadius - this._graph.settings.shadow.width)
+                        .outerRadius(shadowOuterRadius)
+                );
+        }
 
         // update donut radius
         this._graph.previous.donutRadiusShadow = shadowOuterRadius;
@@ -622,6 +624,7 @@ export class PieDonutChartComponent
         this._graph.previous.donutRadius = donutRadius;
 
         // render outer arc
+        let animateArcPath: boolean = false;
         const arcPath = groupArcsData
             .append('path')
             .style(
@@ -641,7 +644,17 @@ export class PieDonutChartComponent
             .attr(
                 'd',
                 (item): any => {
-                    return donutArcD3Previous(item.arc);
+                    // starting arc same as ending arc, do we need to animate ?
+                    const initialArcData: string = donutArcD3Previous(item.arc);
+                    if (
+                        !animateArcPath &&
+                        initialArcData !== donutArcD3(item.arc)
+                    ) {
+                        animateArcPath = true;
+                    }
+
+                    // starting arc
+                    return initialArcData;
                 }
             ).attr(
                 'fill',
@@ -650,16 +663,18 @@ export class PieDonutChartComponent
                 }
             );
 
-        // animate
-        arcPath
-            .transition()
-            .duration(this._graph.settings.sizeChange.animation.speed)
-            .attr(
-                'd',
-                (item): any => {
-                    return donutArcD3(item.arc);
-                }
-            );
+        // animate only if necessary
+        if (animateArcPath) {
+            arcPath
+                .transition()
+                .duration(this._graph.settings.sizeChange.animation.speed)
+                .attr(
+                    'd',
+                    (item): any => {
+                        return donutArcD3(item.arc);
+                    }
+                );
+        }
 
         // render inner arc
         const linePath = groupArcsData
@@ -714,16 +729,18 @@ export class PieDonutChartComponent
                 }
             );
 
-        // animate
-        linePath
-            .transition()
-            .duration(this._graph.settings.sizeChange.animation.speed)
-            .attr(
-                'd',
-                (item): any => {
-                    return linesArcD3(item.arc);
-                }
-            );
+        // animate only if necessary
+        if (animateArcPath) {
+            linePath
+                .transition()
+                .duration(this._graph.settings.sizeChange.animation.speed)
+                .attr(
+                    'd',
+                    (item): any => {
+                        return linesArcD3(item.arc);
+                    }
+                );
+        }
     }
 
     /**
