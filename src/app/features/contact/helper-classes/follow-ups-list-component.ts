@@ -21,6 +21,8 @@ import { throwError } from 'rxjs';
 import { catchError, share } from 'rxjs/operators';
 import { moment } from '../../../core/helperClasses/x-moment';
 import { ListHelperService } from '../../../core/services/helper/list-helper.service';
+import { ExportFieldsGroupsDataService } from '../../../core/services/data/export-fields-groups.data.service';
+import { ExportFieldsGroupModel } from '../../../core/models/export-fields-group.model';
 
 /**
  * Follow-up list component
@@ -32,6 +34,15 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
     authUser: UserModel;
     // contacts outbreak
     selectedOutbreak: OutbreakModel;
+
+    // list of export fields groups
+    fieldsGroupList$: Observable<ExportFieldsGroupModel>;
+    fieldsGroupList: LabelValuePair[];
+    fieldsGroupListRequired: {
+        [optionValue: string]: {
+            [requiredOptionValue: string]: boolean
+        };
+    };
 
     // teams list
     teamsList$: Observable<TeamModel[]>;
@@ -82,7 +93,8 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
         protected followUpsDataService: FollowUpsDataService,
         protected router: Router,
         protected i18nService: I18nService,
-        protected teamDataService: TeamDataService
+        protected teamDataService: TeamDataService,
+        protected exportFieldsGroupsDataService: ExportFieldsGroupsDataService
     ) {
         super(listHelperService);
     }
@@ -129,6 +141,27 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
                 ...this.teamsListLoadedForHeaderSearch
             ];
         });
+
+        // retrieve the list of export fields groups
+        this.fieldsGroupList$ = this.exportFieldsGroupsDataService.getExportFieldsGroups('followUp').pipe(share());
+        this.fieldsGroupList$
+            .subscribe((fieldsGroupList) => {
+                // add the fetched options
+                this.fieldsGroupList = [];
+                this.fieldsGroupListRequired = {};
+                Object.keys(fieldsGroupList || {}).map(item => {
+                    // add fields group
+                    this.fieldsGroupList.push(
+                        new LabelValuePair(
+                            item,
+                            item
+                        )
+                    );
+
+                    // add required options
+                    this.fieldsGroupListRequired[item] = fieldsGroupList[item];
+                });
+            });
     }
 
     /**
@@ -368,8 +401,11 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
+            displayFieldsGroupList: true,
             displayUseQuestionVariable: true,
             anonymizeFields: this.anonymizeFields,
+            fieldsGroupList: this.fieldsGroupList,
+            fieldsGroupListRequired: this.fieldsGroupListRequired,
             exportStart: () => {
                 this.showLoadingDialog();
             },

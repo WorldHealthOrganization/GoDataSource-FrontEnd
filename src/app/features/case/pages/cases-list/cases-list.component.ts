@@ -39,6 +39,8 @@ import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { AddressModel } from '../../../../core/models/address.model';
+import { ExportFieldsGroupsDataService } from '../../../../core/services/data/export-fields-groups.data.service';
+import { ExportFieldsGroupModel } from '../../../../core/models/export-fields-group.model';
 
 @Component({
     selector: 'app-cases-list',
@@ -71,6 +73,23 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
     // user list
     userList$: Observable<UserModel[]>;
+
+    // list of export fields groups
+    fieldsGroupList$: Observable<ExportFieldsGroupModel>;
+    fieldsGroupList: LabelValuePair[];
+    fieldsGroupListRequired: {
+        [optionValue: string]: {
+            [requiredOptionValue: string]: boolean
+        };
+    };
+
+    fieldsGroupListRelationships$: Observable<ExportFieldsGroupModel>;
+    fieldsGroupListRelationships: LabelValuePair[];
+    fieldsGroupListRelationshipsRequired: {
+        [optionValue: string]: {
+            [requiredOptionValue: string]: boolean
+        };
+    };
 
     caseClassifications$: Observable<any>;
     // cases grouped by classification
@@ -490,7 +509,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         private clusterDataService: ClusterDataService,
         private userDataService: UserDataService,
         private entityHelperService: EntityHelperService,
-        private redirectService: RedirectService
+        private redirectService: RedirectService,
+        private exportFieldsGroupsDataService: ExportFieldsGroupsDataService
     ) {
         super(listHelperService);
     }
@@ -567,6 +587,48 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 this.initPaginator();
                 // ...and re-load the list when the Selected Outbreak is changed
                 this.needsRefreshList(true);
+            });
+
+        // retrieve the list of export fields groups for model
+        this.fieldsGroupList$ = this.exportFieldsGroupsDataService.getExportFieldsGroups('case').pipe(share());
+        this.fieldsGroupList$
+            .subscribe((fieldsGroupList) => {
+                // add the fetched options
+                this.fieldsGroupList = [];
+                this.fieldsGroupListRequired = {};
+                Object.keys(fieldsGroupList || {}).map(item => {
+                    // add fields group
+                    this.fieldsGroupList.push(
+                        new LabelValuePair(
+                            item,
+                            item
+                        )
+                    );
+
+                    // add required options
+                    this.fieldsGroupListRequired[item] = fieldsGroupList[item];
+                });
+            });
+
+        // retrieve the list of export fields groups for relationships
+        this.fieldsGroupListRelationships$ = this.exportFieldsGroupsDataService.getExportFieldsGroups('relationship').pipe(share());
+        this.fieldsGroupListRelationships$
+            .subscribe((fieldsGroupList) => {
+                // add the fetched options
+                this.fieldsGroupListRelationships = [];
+                this.fieldsGroupListRelationshipsRequired = {};
+                Object.keys(fieldsGroupList || {}).map(item => {
+                    // add fields group
+                    this.fieldsGroupListRelationships.push(
+                        new LabelValuePair(
+                            item,
+                            item
+                        )
+                    );
+
+                    // add required options
+                    this.fieldsGroupListRelationshipsRequired[item] = fieldsGroupList[item];
+                });
             });
 
         // initialize Side Table Columns
@@ -1234,8 +1296,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
+            displayFieldsGroupList: true,
             displayUseQuestionVariable: true,
             anonymizeFields: this.anonymizeFields,
+            fieldsGroupList: this.fieldsGroupList,
+            fieldsGroupListRequired: this.fieldsGroupListRequired,
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });
@@ -1275,8 +1340,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
+            displayFieldsGroupList: true,
             allowedExportTypes: this.allowedExportTypes,
             anonymizeFields: this.anonymizeFields,
+            fieldsGroupList: this.fieldsGroupListRelationships,
+            fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });
@@ -1313,8 +1381,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
+            displayFieldsGroupList: true,
             allowedExportTypes: this.allowedExportTypes,
             anonymizeFields: this.anonymizeFields,
+            fieldsGroupList: this.fieldsGroupListRelationships,
+            fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });

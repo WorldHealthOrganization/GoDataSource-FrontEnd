@@ -37,6 +37,7 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { TeamModel } from '../../../../core/models/team.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { AddressModel } from '../../../../core/models/address.model';
+import { ExportFieldsGroupsDataService } from '../../../../core/services/data/export-fields-groups.data.service';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -242,6 +243,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         protected router: Router,
         protected i18nService: I18nService,
         protected teamDataService: TeamDataService,
+        protected exportFieldsGroupsDataService: ExportFieldsGroupsDataService,
         private snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
@@ -253,7 +255,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     ) {
         super(
             listHelperService, dialogService, followUpsDataService,
-            router, i18nService, teamDataService
+            router, i18nService, teamDataService, exportFieldsGroupsDataService
         );
     }
 

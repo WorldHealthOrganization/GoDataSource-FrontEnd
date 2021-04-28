@@ -32,6 +32,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { AddressModel } from '../../../../core/models/address.model';
+import { ExportFieldsGroupsDataService } from '../../../../core/services/data/export-fields-groups.data.service';
 
 @Component({
     selector: 'app-individual-contact-follow-ups-list',
@@ -208,6 +209,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
         protected router: Router,
         protected i18nService: I18nService,
         protected teamDataService: TeamDataService,
+        protected exportFieldsGroupsDataService: ExportFieldsGroupsDataService,
         private snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
@@ -219,7 +221,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
     ) {
         super(
             listHelperService, dialogService, followUpsDataService,
-            router, i18nService, teamDataService
+            router, i18nService, teamDataService, exportFieldsGroupsDataService
         );
     }
 

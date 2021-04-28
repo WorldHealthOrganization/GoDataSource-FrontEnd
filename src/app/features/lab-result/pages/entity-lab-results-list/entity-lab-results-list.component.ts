@@ -33,6 +33,8 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ExportFieldsGroupsDataService } from '../../../../core/services/data/export-fields-groups.data.service';
+import { ExportFieldsGroupModel } from '../../../../core/models/export-fields-group.model';
 
 @Component({
     selector: 'app-entity-lab-results-list',
@@ -52,6 +54,15 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
 
     // user list
     userList$: Observable<UserModel[]>;
+
+    // list of export fields groups
+    fieldsGroupList$: Observable<ExportFieldsGroupModel>;
+    fieldsGroupList: LabelValuePair[];
+    fieldsGroupListRequired: {
+        [optionValue: string]: {
+            [requiredOptionValue: string]: boolean
+        };
+    };
 
     // loading dialog handler
     loadingDialog: LoadingDialogModel;
@@ -272,7 +283,8 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
         private referenceDataDataService: ReferenceDataDataService,
         private genericDataService: GenericDataService,
         private userDataService: UserDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private exportFieldsGroupsDataService: ExportFieldsGroupsDataService
     ) {
         super(listHelperService);
     }
@@ -349,6 +361,27 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
                                 this.initPaginator();
                                 // ...and load the list of items
                                 this.needsRefreshList(true);
+                        });
+                    });
+
+                // retrieve the list of export fields groups for model
+                this.fieldsGroupList$ = this.exportFieldsGroupsDataService.getExportFieldsGroups('LabResult').pipe(share());
+                this.fieldsGroupList$
+                    .subscribe((fieldsGroupList) => {
+                        // add the fetched options
+                        this.fieldsGroupList = [];
+                        this.fieldsGroupListRequired = {};
+                        Object.keys(fieldsGroupList || {}).map(item => {
+                            // add fields group
+                            this.fieldsGroupList.push(
+                                new LabelValuePair(
+                                    item,
+                                    item
+                                )
+                            );
+
+                            // add required options
+                            this.fieldsGroupListRequired[item] = fieldsGroupList[item];
                         });
                     });
             });

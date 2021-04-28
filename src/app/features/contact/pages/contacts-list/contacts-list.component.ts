@@ -42,6 +42,8 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { AddressModel } from '../../../../core/models/address.model';
+import { ExportFieldsGroupsDataService } from '../../../../core/services/data/export-fields-groups.data.service';
+import { ExportFieldsGroupModel } from '../../../../core/models/export-fields-group.model';
 
 @Component({
     selector: 'app-contacts-list',
@@ -74,6 +76,23 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
 
     // user list
     userList$: Observable<UserModel[]>;
+
+    // list of export fields groups
+    fieldsGroupList$: Observable<ExportFieldsGroupModel>;
+    fieldsGroupList: LabelValuePair[];
+    fieldsGroupListRequired: {
+        [optionValue: string]: {
+            [requiredOptionValue: string]: boolean
+        };
+    };
+
+    fieldsGroupListRelationships$: Observable<ExportFieldsGroupModel>;
+    fieldsGroupListRelationships: LabelValuePair[];
+    fieldsGroupListRelationshipsRequired: {
+        [optionValue: string]: {
+            [requiredOptionValue: string]: boolean
+        };
+    };
 
     // contacts outbreak
     selectedOutbreak: OutbreakModel;
@@ -498,7 +517,8 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         private i18nService: I18nService,
         private userDataService: UserDataService,
         private entityHelperService: EntityHelperService,
-        private teamDataService: TeamDataService
+        private teamDataService: TeamDataService,
+        private exportFieldsGroupsDataService: ExportFieldsGroupsDataService
     ) {
         super(listHelperService);
     }
@@ -624,6 +644,48 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                 this.initPaginator();
                 // ...and re-load the list when the Selected Outbreak is changed
                 this.needsRefreshList(true);
+            });
+
+        // retrieve the list of export fields groups
+        this.fieldsGroupList$ = this.exportFieldsGroupsDataService.getExportFieldsGroups('contact').pipe(share());
+        this.fieldsGroupList$
+            .subscribe((fieldsGroupList) => {
+                // add the fetched options
+                this.fieldsGroupList = [];
+                this.fieldsGroupListRequired = {};
+                Object.keys(fieldsGroupList || {}).map(item => {
+                    // add fields group
+                    this.fieldsGroupList.push(
+                        new LabelValuePair(
+                            item,
+                            item
+                        )
+                    );
+
+                    // add required options
+                    this.fieldsGroupListRequired[item] = fieldsGroupList[item];
+                });
+            });
+
+        // retrieve the list of export fields groups for relationships
+        this.fieldsGroupListRelationships$ = this.exportFieldsGroupsDataService.getExportFieldsGroups('relationship').pipe(share());
+        this.fieldsGroupListRelationships$
+            .subscribe((fieldsGroupList) => {
+                // add the fetched options
+                this.fieldsGroupListRelationships = [];
+                this.fieldsGroupListRelationshipsRequired = {};
+                Object.keys(fieldsGroupList || {}).map(item => {
+                    // add fields group
+                    this.fieldsGroupListRelationships.push(
+                        new LabelValuePair(
+                            item,
+                            item
+                        )
+                    );
+
+                    // add required options
+                    this.fieldsGroupListRelationshipsRequired[item] = fieldsGroupList[item];
+                });
             });
 
         // initialize Side Table Columns
@@ -1251,8 +1313,11 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
+            displayFieldsGroupList: true,
             displayUseQuestionVariable: true,
             anonymizeFields: this.anonymizeFields,
+            fieldsGroupList: this.fieldsGroupList,
+            fieldsGroupListRequired: this.fieldsGroupListRequired,
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });
@@ -1329,8 +1394,11 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
+            displayFieldsGroupList: true,
             allowedExportTypes: this.allowedExportTypes,
             anonymizeFields: this.anonymizeFields,
+            fieldsGroupList: this.fieldsGroupListRelationships,
+            fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });
@@ -1402,8 +1470,11 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
+            displayFieldsGroupList: true,
             allowedExportTypes: this.allowedExportTypes,
             anonymizeFields: this.anonymizeFields,
+            fieldsGroupList: this.fieldsGroupListRelationships,
+            fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });

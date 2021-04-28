@@ -32,6 +32,8 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ExportFieldsGroupsDataService } from '../../../../core/services/data/export-fields-groups.data.service';
+import { ExportFieldsGroupModel } from '../../../../core/models/export-fields-group.model';
 
 @Component({
     selector: 'app-lab-results',
@@ -60,6 +62,15 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
 
     // user list
     userList$: Observable<UserModel[]>;
+
+    // list of export fields groups
+    fieldsGroupList$: Observable<ExportFieldsGroupModel>;
+    fieldsGroupList: LabelValuePair[];
+    fieldsGroupListRequired: {
+        [optionValue: string]: {
+            [requiredOptionValue: string]: boolean
+        };
+    };
 
     // authenticated user
     authUser: UserModel;
@@ -283,7 +294,8 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
         private referenceDataDataService: ReferenceDataDataService,
         private genericDataService: GenericDataService,
         private userDataService: UserDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private exportFieldsGroupsDataService: ExportFieldsGroupsDataService
     ) {
         super(listHelperService);
     }
@@ -352,6 +364,27 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
                 this.initPaginator();
                 // ...and re-load the list when the Selected Outbreak is changed
                 this.needsRefreshList(true);
+            });
+
+        // retrieve the list of export fields groups
+        this.fieldsGroupList$ = this.exportFieldsGroupsDataService.getExportFieldsGroups('labResult').pipe(share());
+        this.fieldsGroupList$
+            .subscribe((fieldsGroupList) => {
+                // add the fetched options
+                this.fieldsGroupList = [];
+                this.fieldsGroupListRequired = {};
+                Object.keys(fieldsGroupList || {}).map(item => {
+                    // add fields group
+                    this.fieldsGroupList.push(
+                        new LabelValuePair(
+                            item,
+                            item
+                        )
+                    );
+
+                    // add required options
+                    this.fieldsGroupListRequired[item] = fieldsGroupList[item];
+                });
             });
     }
 

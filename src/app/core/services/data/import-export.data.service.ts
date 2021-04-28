@@ -36,6 +36,8 @@ export class ImportExportDataService {
             fileType: string,
             encryptPassword?: string,
             anonymizeFields?: string[],
+            fieldsGroupAll?: boolean,
+            fieldsGroupList?: string[],
             useQuestionVariable?: boolean,
             [otherData: string]: any
         },
@@ -58,6 +60,20 @@ export class ImportExportDataService {
         if (!_.isEmpty(data.anonymizeFields)) {
             completeURL += '&anonymizeFields=' + JSON.stringify(data.anonymizeFields);
             delete data.anonymizeFields;
+        }
+
+        // fields groups
+        if (!_.isEmpty(data.fieldsGroupList)) {
+            // send the fields group list
+            if (data.fieldsGroupAll !== true) {
+                completeURL += '&fieldsGroupList=' + JSON.stringify(data.fieldsGroupList);
+                delete data.fieldsGroupList;
+            }
+        }
+
+        if (!_.isUndefined(data.fieldsGroupAll)) {
+            // do not send the checkbox all value to api
+            delete data.fieldsGroupAll;
         }
 
         // add flag useQuestionVariable
