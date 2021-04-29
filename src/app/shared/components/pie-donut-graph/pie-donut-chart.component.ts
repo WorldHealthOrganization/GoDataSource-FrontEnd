@@ -4,12 +4,24 @@ import * as d3 from 'd3';
 import { Selection } from 'd3-selection';
 
 /**
+ * Arc
+ */
+interface IArcsWithExtraDetailsArc {
+    data: any;
+    endAngle: number;
+    index: number;
+    padAngle: number;
+    startAngle: number;
+    value: number;
+}
+
+/**
  * Arc Details
  */
 interface IArcsWithExtraDetails {
     details: PieDonutChartData;
-    arc: any;
-    previousArc?: any;
+    arc: IArcsWithExtraDetailsArc;
+    previousArc?: IArcsWithExtraDetailsArc;
 }
 
 /**
