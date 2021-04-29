@@ -304,8 +304,8 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
             return;
         }
 
-        // // overwrite scroll into view
-        this.matSelect['_scrollActiveOptionIntoView'] = () => {};
+        // overwrite scroll into view
+        this.matSelect['_scrollOptionIntoView'] = () => {};
     }
 
     /**
