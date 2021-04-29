@@ -605,6 +605,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                         )
                     );
 
+                    // sort by translated tokens
+                    this.fieldsGroupList = this.fieldsGroupList.sort((item1, item2) => {
+                        const a = item1.label ? this.i18nService.instant(item1.label) : '';
+                        const b = item2.label ? this.i18nService.instant(item2.label) : '';
+                        return a.localeCompare(b);
+                    });
+
                     // add required options
                     this.fieldsGroupListRequired[item] = fieldsGroupList[item];
                 });
@@ -625,6 +632,20 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                             item
                         )
                     );
+
+                    // sort by translated tokens
+                    this.fieldsGroupListRelationships = this.fieldsGroupListRelationships.sort((item1, item2) => {
+                        const a = item1.label ? this.i18nService.instant(item1.label) : '';
+                        const b = item2.label ? this.i18nService.instant(item2.label) : '';
+                        return a.localeCompare(b);
+                    });
+
+                    // sort by translated tokens
+                    this.fieldsGroupListRelationships = this.fieldsGroupListRelationships.sort((item1, item2) => {
+                        const a = item1.label ? this.i18nService.instant(item1.label) : '';
+                        const b = item2.label ? this.i18nService.instant(item2.label) : '';
+                        return a.localeCompare(b);
+                    });
 
                     // add required options
                     this.fieldsGroupListRelationshipsRequired[item] = fieldsGroupList[item];

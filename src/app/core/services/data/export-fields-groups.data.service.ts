@@ -19,7 +19,6 @@ export class ExportFieldsGroupsDataService {
      * @returns {Observable<ExportFieldsGroupModel>}
      */
     getExportFieldsGroups(model: string): Observable<ExportFieldsGroupModel> {
-        // getExportFieldsGroups(model: string): Observable<any> {
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/export-fields-group?model=${model}`),
             ExportFieldsGroupModel
