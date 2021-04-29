@@ -39,8 +39,7 @@ import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { AddressModel } from '../../../../core/models/address.model';
-import { ExportFieldsGroupsDataService } from '../../../../core/services/data/export-fields-groups.data.service';
-import { ExportFieldsGroupModel } from '../../../../core/models/export-fields-group.model';
+import { IExportFieldsGroupRequired } from '../../../../core/models/export-fields-group.model';
 
 @Component({
     selector: 'app-cases-list',
@@ -75,21 +74,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     userList$: Observable<UserModel[]>;
 
     // list of export fields groups
-    fieldsGroupList$: Observable<ExportFieldsGroupModel>;
     fieldsGroupList: LabelValuePair[];
-    fieldsGroupListRequired: {
-        [optionValue: string]: {
-            [requiredOptionValue: string]: boolean
-        };
-    };
+    fieldsGroupListRequired: IExportFieldsGroupRequired;
 
-    fieldsGroupListRelationships$: Observable<ExportFieldsGroupModel>;
     fieldsGroupListRelationships: LabelValuePair[];
-    fieldsGroupListRelationshipsRequired: {
-        [optionValue: string]: {
-            [requiredOptionValue: string]: boolean
-        };
-    };
+    fieldsGroupListRelationshipsRequired: IExportFieldsGroupRequired;
 
     caseClassifications$: Observable<any>;
     // cases grouped by classification
@@ -509,8 +498,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         private clusterDataService: ClusterDataService,
         private userDataService: UserDataService,
         private entityHelperService: EntityHelperService,
-        private redirectService: RedirectService,
-        private exportFieldsGroupsDataService: ExportFieldsGroupsDataService
+        private redirectService: RedirectService
     ) {
         super(listHelperService);
     }
@@ -590,66 +578,17 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             });
 
         // retrieve the list of export fields groups for model
-        this.fieldsGroupList$ = this.exportFieldsGroupsDataService.getExportFieldsGroups('case').pipe(share());
-        this.fieldsGroupList$
+        this.outbreakDataService.getExportFieldsGroups('case')
             .subscribe((fieldsGroupList) => {
-                // add the fetched options
-                this.fieldsGroupList = [];
-                this.fieldsGroupListRequired = {};
-                Object.keys(fieldsGroupList || {}).map(item => {
-                    // add fields group
-                    this.fieldsGroupList.push(
-                        new LabelValuePair(
-                            item,
-                            item
-                        )
-                    );
-
-                    // sort by translated tokens
-                    this.fieldsGroupList = this.fieldsGroupList.sort((item1, item2) => {
-                        const a = item1.label ? this.i18nService.instant(item1.label) : '';
-                        const b = item2.label ? this.i18nService.instant(item2.label) : '';
-                        return a.localeCompare(b);
-                    });
-
-                    // add required options
-                    this.fieldsGroupListRequired[item] = fieldsGroupList[item];
-                });
+                this.fieldsGroupList = fieldsGroupList.toLabelValuePair(this.i18nService);
+                this.fieldsGroupListRequired = fieldsGroupList.toRequiredList();
             });
 
         // retrieve the list of export fields groups for relationships
-        this.fieldsGroupListRelationships$ = this.exportFieldsGroupsDataService.getExportFieldsGroups('relationship').pipe(share());
-        this.fieldsGroupListRelationships$
+        this.outbreakDataService.getExportFieldsGroups('relationship')
             .subscribe((fieldsGroupList) => {
-                // add the fetched options
-                this.fieldsGroupListRelationships = [];
-                this.fieldsGroupListRelationshipsRequired = {};
-                Object.keys(fieldsGroupList || {}).map(item => {
-                    // add fields group
-                    this.fieldsGroupListRelationships.push(
-                        new LabelValuePair(
-                            item,
-                            item
-                        )
-                    );
-
-                    // sort by translated tokens
-                    this.fieldsGroupListRelationships = this.fieldsGroupListRelationships.sort((item1, item2) => {
-                        const a = item1.label ? this.i18nService.instant(item1.label) : '';
-                        const b = item2.label ? this.i18nService.instant(item2.label) : '';
-                        return a.localeCompare(b);
-                    });
-
-                    // sort by translated tokens
-                    this.fieldsGroupListRelationships = this.fieldsGroupListRelationships.sort((item1, item2) => {
-                        const a = item1.label ? this.i18nService.instant(item1.label) : '';
-                        const b = item2.label ? this.i18nService.instant(item2.label) : '';
-                        return a.localeCompare(b);
-                    });
-
-                    // add required options
-                    this.fieldsGroupListRelationshipsRequired[item] = fieldsGroupList[item];
-                });
+                this.fieldsGroupListRelationships = fieldsGroupList.toLabelValuePair(this.i18nService);
+                this.fieldsGroupListRelationshipsRequired = fieldsGroupList.toRequiredList();
             });
 
         // initialize Side Table Columns

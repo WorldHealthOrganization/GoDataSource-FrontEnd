@@ -36,7 +36,6 @@ export class ImportExportDataService {
             fileType: string,
             encryptPassword?: string,
             anonymizeFields?: string[],
-            fieldsGroupAll?: boolean,
             fieldsGroupList?: string[],
             useQuestionVariable?: boolean,
             [otherData: string]: any
@@ -65,10 +64,8 @@ export class ImportExportDataService {
         // fields groups
         if (!_.isEmpty(data.fieldsGroupList)) {
             // send the fields group list
-            if (data.fieldsGroupAll !== true) {
-                completeURL += '&fieldsGroupList=' + JSON.stringify(data.fieldsGroupList);
-                delete data.fieldsGroupList;
-            }
+            completeURL += '&fieldsGroupList=' + JSON.stringify(data.fieldsGroupList);
+            delete data.fieldsGroupList;
         }
 
         if (!_.isUndefined(data.fieldsGroupAll)) {

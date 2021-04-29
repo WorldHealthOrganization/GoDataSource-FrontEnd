@@ -4,6 +4,7 @@ import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { DialogService, ExportDataExtension } from '../../../core/services/helper/dialog.service';
 import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
 import { DialogAnswer, DialogField } from '../dialog/dialog.component';
+import { IExportFieldsGroupRequired } from '../../../core/models/export-fields-group.model';
 
 @Component({
     selector: 'app-export-button',
@@ -29,11 +30,7 @@ export class ExportButtonComponent {
     @Input() displayFieldsGroupList: boolean;
     @Input() anonymizeFields: LabelValuePair[];
     @Input() fieldsGroupList: LabelValuePair[];
-    @Input() fieldsGroupListRequired: {
-        [optionValue: string]: {
-            [requiredOptionValue: string]: boolean
-        };
-    };
+    @Input() fieldsGroupListRequired: IExportFieldsGroupRequired;
     @Input() url: string;
     @Input() yesLabel: string;
     @Input() fileName: string;

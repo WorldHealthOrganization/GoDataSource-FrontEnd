@@ -15,6 +15,7 @@ import * as FileSaver from 'file-saver';
 import { LoadingDialogComponent, LoadingDialogDataModel, LoadingDialogModel } from '../../../shared/components/loading-dialog/loading-dialog.component';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { IExportFieldsGroupRequired } from '../../../core/models/export-fields-group.model';
 
 export enum ExportDataExtension {
     CSV = 'csv',
@@ -162,11 +163,7 @@ export class DialogService {
         fieldsGroupListPlaceholder?: string,
         anonymizeFields?: LabelValuePair[],
         fieldsGroupList?: LabelValuePair[],
-        fieldsGroupListRequired?:  {
-            [optionValue: string]: {
-                [requiredOptionValue: string]: boolean
-            };
-        },
+        fieldsGroupListRequired?: IExportFieldsGroupRequired,
         displayUseQuestionVariable?: boolean,
         useQuestionVariablePlaceholder?: string,
         useQuestionVariableDescription?: string,
@@ -310,6 +307,14 @@ export class DialogService {
                     inputOptionsMultiple: true,
                     required: true,
                     visible: (fieldsData): boolean => {
+                        // if checkbox all is checked, clear the select
+                        if (
+                            fieldsData.fieldsGroupAll &&
+                            fieldsData.fieldsGroupList
+                        ) {
+                            delete fieldsData.fieldsGroupList;
+                        }
+
                         return !fieldsData.fieldsGroupAll;
                     }
                 })

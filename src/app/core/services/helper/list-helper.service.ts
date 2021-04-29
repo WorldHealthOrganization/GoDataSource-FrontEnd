@@ -6,6 +6,7 @@ import { RedirectService } from './redirect.service';
 import { Location } from '@angular/common';
 import { StorageService } from './storage.service';
 import { AuthDataService } from '../data/auth.data.service';
+import { OutbreakDataService } from '../data/outbreak.data.service';
 
 @Injectable()
 export class ListHelperService {
@@ -21,7 +22,8 @@ export class ListHelperService {
         public router: Router,
         public location: Location,
         public storageService: StorageService,
-        public authDataService: AuthDataService
+        public authDataService: AuthDataService,
+        public outbreakDataService: OutbreakDataService
     ) {}
 
     /**

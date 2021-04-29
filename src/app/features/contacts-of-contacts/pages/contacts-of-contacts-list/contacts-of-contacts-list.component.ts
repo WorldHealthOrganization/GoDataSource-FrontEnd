@@ -40,8 +40,7 @@ import { ContactOfContactModel } from '../../../../core/models/contact-of-contac
  import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
  import {IBasicCount} from '../../../../core/models/basic-count.interface';
 import { AddressModel } from '../../../../core/models/address.model';
-import { ExportFieldsGroupsDataService } from '../../../../core/services/data/export-fields-groups.data.service';
-import { ExportFieldsGroupModel } from '../../../../core/models/export-fields-group.model';
+import { IExportFieldsGroupRequired } from '../../../../core/models/export-fields-group.model';
 
 @Component({
     selector: 'app-contacts-of-contacts-list',
@@ -82,21 +81,12 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     userList$: Observable<UserModel[]>;
 
     // list of export fields groups
-    fieldsGroupList$: Observable<ExportFieldsGroupModel>;
     fieldsGroupList: LabelValuePair[];
-    fieldsGroupListRequired: {
-        [optionValue: string]: {
-            [requiredOptionValue: string]: boolean
-        };
-    };
+    fieldsGroupListRequired: IExportFieldsGroupRequired;
 
-    fieldsGroupListRelationships$: Observable<ExportFieldsGroupModel>;
     fieldsGroupListRelationships: LabelValuePair[];
-    fieldsGroupListRelationshipsRequired: {
-        [optionValue: string]: {
-            [requiredOptionValue: string]: boolean
-        };
-    };
+    fieldsGroupListRelationshipsRequired: IExportFieldsGroupRequired;
+
     // contacts outbreak
     selectedOutbreak: OutbreakModel;
 
@@ -307,8 +297,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         private dialogService: DialogService,
         private i18nService: I18nService,
         private userDataService: UserDataService,
-        private entityHelperService: EntityHelperService,
-        private exportFieldsGroupsDataService: ExportFieldsGroupsDataService
+        private entityHelperService: EntityHelperService
     ) {
         super(listHelperService);
     }
@@ -380,59 +369,17 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             });
 
         // retrieve the list of export fields groups
-        this.fieldsGroupList$ = this.exportFieldsGroupsDataService.getExportFieldsGroups('ContactOfContact').pipe(share());
-        this.fieldsGroupList$
+        this.outbreakDataService.getExportFieldsGroups('ContactOfContact')
             .subscribe((fieldsGroupList) => {
-                // add the fetched options
-                this.fieldsGroupList = [];
-                this.fieldsGroupListRequired = {};
-                Object.keys(fieldsGroupList || {}).map(item => {
-                    // add fields group
-                    this.fieldsGroupList.push(
-                        new LabelValuePair(
-                            item,
-                            item
-                        )
-                    );
-
-                    // sort by translated tokens
-                    this.fieldsGroupList = this.fieldsGroupList.sort((item1, item2) => {
-                        const a = item1.label ? this.i18nService.instant(item1.label) : '';
-                        const b = item2.label ? this.i18nService.instant(item2.label) : '';
-                        return a.localeCompare(b);
-                    });
-
-                    // add required options
-                    this.fieldsGroupListRequired[item] = fieldsGroupList[item];
-                });
+                this.fieldsGroupList = fieldsGroupList.toLabelValuePair(this.i18nService);
+                this.fieldsGroupListRequired = fieldsGroupList.toRequiredList();
             });
 
         // retrieve the list of export fields groups for relationships
-        this.fieldsGroupListRelationships$ = this.exportFieldsGroupsDataService.getExportFieldsGroups('relationship').pipe(share());
-        this.fieldsGroupListRelationships$
+        this.outbreakDataService.getExportFieldsGroups('relationship')
             .subscribe((fieldsGroupList) => {
-                // add the fetched options
-                this.fieldsGroupListRelationships = [];
-                this.fieldsGroupListRelationshipsRequired = {};
-                Object.keys(fieldsGroupList || {}).map(item => {
-                    // add fields group
-                    this.fieldsGroupListRelationships.push(
-                        new LabelValuePair(
-                            item,
-                            item
-                        )
-                    );
-
-                    // sort by translated tokens
-                    this.fieldsGroupListRelationships = this.fieldsGroupListRelationships.sort((item1, item2) => {
-                        const a = item1.label ? this.i18nService.instant(item1.label) : '';
-                        const b = item2.label ? this.i18nService.instant(item2.label) : '';
-                        return a.localeCompare(b);
-                    });
-
-                    // add required options
-                    this.fieldsGroupListRelationshipsRequired[item] = fieldsGroupList[item];
-                });
+                this.fieldsGroupListRelationships = fieldsGroupList.toLabelValuePair(this.i18nService);
+                this.fieldsGroupListRelationshipsRequired = fieldsGroupList.toRequiredList();
             });
 
         // initialize Side Table Columns

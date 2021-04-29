@@ -33,8 +33,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { ExportFieldsGroupsDataService } from '../../../../core/services/data/export-fields-groups.data.service';
-import { ExportFieldsGroupModel } from '../../../../core/models/export-fields-group.model';
+import { IExportFieldsGroupRequired } from '../../../../core/models/export-fields-group.model';
 
 @Component({
     selector: 'app-entity-lab-results-list',
@@ -56,13 +55,8 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
     userList$: Observable<UserModel[]>;
 
     // list of export fields groups
-    fieldsGroupList$: Observable<ExportFieldsGroupModel>;
     fieldsGroupList: LabelValuePair[];
-    fieldsGroupListRequired: {
-        [optionValue: string]: {
-            [requiredOptionValue: string]: boolean
-        };
-    };
+    fieldsGroupListRequired: IExportFieldsGroupRequired;
 
     // loading dialog handler
     loadingDialog: LoadingDialogModel;
@@ -283,8 +277,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
         private referenceDataDataService: ReferenceDataDataService,
         private genericDataService: GenericDataService,
         private userDataService: UserDataService,
-        private i18nService: I18nService,
-        private exportFieldsGroupsDataService: ExportFieldsGroupsDataService
+        private i18nService: I18nService
     ) {
         super(listHelperService);
     }
@@ -365,31 +358,10 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
                     });
 
                 // retrieve the list of export fields groups for model
-                this.fieldsGroupList$ = this.exportFieldsGroupsDataService.getExportFieldsGroups('LabResult').pipe(share());
-                this.fieldsGroupList$
+                this.outbreakDataService.getExportFieldsGroups('LabResult')
                     .subscribe((fieldsGroupList) => {
-                        // add the fetched options
-                        this.fieldsGroupList = [];
-                        this.fieldsGroupListRequired = {};
-                        Object.keys(fieldsGroupList || {}).map(item => {
-                            // add fields group
-                            this.fieldsGroupList.push(
-                                new LabelValuePair(
-                                    item,
-                                    item
-                                )
-                            );
-
-                            // sort by translated tokens
-                            this.fieldsGroupList = this.fieldsGroupList.sort((item1, item2) => {
-                                const a = item1.label ? this.i18nService.instant(item1.label) : '';
-                                const b = item2.label ? this.i18nService.instant(item2.label) : '';
-                                return a.localeCompare(b);
-                            });
-
-                            // add required options
-                            this.fieldsGroupListRequired[item] = fieldsGroupList[item];
-                        });
+                        this.fieldsGroupList = fieldsGroupList.toLabelValuePair(this.i18nService);
+                        this.fieldsGroupListRequired = fieldsGroupList.toRequiredList();
                     });
             });
 
