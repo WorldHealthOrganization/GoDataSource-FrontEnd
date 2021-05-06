@@ -365,6 +365,11 @@ export class DialogService {
         }))
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
+                    // do not send the checkbox all value to api
+                    if (!_.isUndefined(answer.inputValue.value.fieldsGroupAll)) {
+                        delete answer.inputValue.value.fieldsGroupAll;
+                    }
+
                     // call export start
                     if (data.exportStart) {
                         data.exportStart();

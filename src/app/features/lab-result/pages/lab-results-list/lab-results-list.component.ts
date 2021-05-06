@@ -32,7 +32,10 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { IExportFieldsGroupRequired } from '../../../../core/models/export-fields-group.model';
+import {
+    IExportFieldsGroupRequired,
+    ExportFieldsGroupModelNameEnum
+} from '../../../../core/models/export-fields-group.model';
 
 @Component({
     selector: 'app-lab-results',
@@ -360,7 +363,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
             });
 
         // retrieve the list of export fields groups
-        this.outbreakDataService.getExportFieldsGroups('labResult')
+        this.outbreakDataService.getExportFieldsGroups(ExportFieldsGroupModelNameEnum.LAB_RESULT)
             .subscribe((fieldsGroupList) => {
                 this.fieldsGroupList = fieldsGroupList.toLabelValuePair(this.i18nService);
                 this.fieldsGroupListRequired = fieldsGroupList.toRequiredList();

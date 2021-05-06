@@ -68,11 +68,6 @@ export class ImportExportDataService {
             delete data.fieldsGroupList;
         }
 
-        if (!_.isUndefined(data.fieldsGroupAll)) {
-            // do not send the checkbox all value to api
-            delete data.fieldsGroupAll;
-        }
-
         // add flag useQuestionVariable
         if (!_.isUndefined(data.useQuestionVariable)) {
             queryBuilder.filter.flag(

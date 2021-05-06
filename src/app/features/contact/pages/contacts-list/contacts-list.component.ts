@@ -42,7 +42,10 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { AddressModel } from '../../../../core/models/address.model';
-import { IExportFieldsGroupRequired } from '../../../../core/models/export-fields-group.model';
+import {
+    IExportFieldsGroupRequired,
+    ExportFieldsGroupModelNameEnum
+} from '../../../../core/models/export-fields-group.model';
 
 @Component({
     selector: 'app-contacts-list',
@@ -635,14 +638,14 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             });
 
         // retrieve the list of export fields groups
-        this.outbreakDataService.getExportFieldsGroups('contact')
+        this.outbreakDataService.getExportFieldsGroups(ExportFieldsGroupModelNameEnum.CONTACT)
             .subscribe((fieldsGroupList) => {
                 this.fieldsGroupList = fieldsGroupList.toLabelValuePair(this.i18nService);
                 this.fieldsGroupListRequired = fieldsGroupList.toRequiredList();
             });
 
         // retrieve the list of export fields groups for relationships
-        this.outbreakDataService.getExportFieldsGroups('relationship')
+        this.outbreakDataService.getExportFieldsGroups(ExportFieldsGroupModelNameEnum.RELATIONSHIP)
             .subscribe((fieldsGroupList) => {
                 this.fieldsGroupListRelationships = fieldsGroupList.toLabelValuePair(this.i18nService);
                 this.fieldsGroupListRelationshipsRequired = fieldsGroupList.toRequiredList();

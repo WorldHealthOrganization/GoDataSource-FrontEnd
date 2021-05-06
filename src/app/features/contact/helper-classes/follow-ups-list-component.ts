@@ -21,8 +21,11 @@ import { throwError } from 'rxjs';
 import { catchError, share } from 'rxjs/operators';
 import { moment } from '../../../core/helperClasses/x-moment';
 import { ListHelperService } from '../../../core/services/helper/list-helper.service';
-import { IExportFieldsGroupRequired } from '../../../core/models/export-fields-group.model';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
+import {
+    IExportFieldsGroupRequired,
+    ExportFieldsGroupModelNameEnum
+} from '../../../core/models/export-fields-group.model';
 
 /**
  * Follow-up list component
@@ -138,7 +141,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
         });
 
         // retrieve the list of export fields groups
-        this.outbreakDataService.getExportFieldsGroups('followUp')
+        this.outbreakDataService.getExportFieldsGroups(ExportFieldsGroupModelNameEnum.FOLLOWUP)
             .subscribe((fieldsGroupList) => {
                 this.fieldsGroupList = fieldsGroupList.toLabelValuePair(this.i18nService);
                 this.fieldsGroupListRequired = fieldsGroupList.toRequiredList();

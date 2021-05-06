@@ -33,7 +33,10 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { IExportFieldsGroupRequired } from '../../../../core/models/export-fields-group.model';
+import {
+    IExportFieldsGroupRequired,
+    ExportFieldsGroupModelNameEnum
+} from '../../../../core/models/export-fields-group.model';
 
 @Component({
     selector: 'app-entity-lab-results-list',
@@ -358,7 +361,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
                     });
 
                 // retrieve the list of export fields groups for model
-                this.outbreakDataService.getExportFieldsGroups('LabResult')
+                this.outbreakDataService.getExportFieldsGroups(ExportFieldsGroupModelNameEnum.LAB_RESULT)
                     .subscribe((fieldsGroupList) => {
                         this.fieldsGroupList = fieldsGroupList.toLabelValuePair(this.i18nService);
                         this.fieldsGroupListRequired = fieldsGroupList.toRequiredList();
