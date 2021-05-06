@@ -12,10 +12,7 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
-        /**
-         * uiDashboardPage
-         */
-        'LNG_PAGE_DASHBOARD_PIE_CHART_TOTAL_LABEL': 'TOTAL - {{total}}',
+
 
 
 
