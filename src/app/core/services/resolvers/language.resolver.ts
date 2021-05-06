@@ -9,7 +9,9 @@ import { throwError } from 'rxjs/internal/observable/throwError';
 import { AuthDataService } from '../data/auth.data.service';
 
 @Injectable()
-export class LanguageResolver implements Resolve<any> {
+export class LanguageResolver
+    implements Resolve<any> {
+
     /**
      * Constructor
      */
@@ -33,8 +35,9 @@ export class LanguageResolver implements Resolve<any> {
                 // display loading
                 const loadingDialog = this.dialogService.showLoadingDialog();
 
-                // load language
-                const languageSubscriber = this.i18nService.waitForLanguageInitialization()
+                // load language - need to initialize like this because otherwise in some situations languageSubscriber variable isn't found when token expired
+                let languageSubscriber;
+                languageSubscriber = this.i18nService.waitForLanguageInitialization()
                     .pipe(
                         catchError((err) => {
                             // unsubscribe - hack for observable that isn't a subject..it  still being called
