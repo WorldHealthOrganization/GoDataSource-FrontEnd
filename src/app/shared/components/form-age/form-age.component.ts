@@ -121,10 +121,15 @@ export class FormAgeComponent extends GroupBase<AgeModel> {
      * Age Model
      */
     get age(): AgeModel {
-        if (this.value && this.value.months > 0) {
-            this._ageType = AgeType.MONTHS;
-        } else {
-            this._ageType = AgeType.YEARS;
+        // do not change age type if no value is provided
+        if (this.value) {
+            if (this.value.months > 0) {
+                this._ageType = AgeType.MONTHS;
+            }
+
+            if (this.value.years > 0) {
+                this._ageType = AgeType.YEARS;
+            }
         }
 
         // finished
