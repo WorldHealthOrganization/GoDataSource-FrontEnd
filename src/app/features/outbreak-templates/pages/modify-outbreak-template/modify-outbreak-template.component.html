@@ -102,6 +102,7 @@
                                 [disabled]="viewOnly"
                                 type="number">
                             </app-form-input>
+
                             <app-form-input
                                 name="frequencyOfFollowUpPerDay"
                                 [(ngModel)]="outbreakTemplate.frequencyOfFollowUpPerDay"
@@ -111,6 +112,17 @@
                                 [disabled]="viewOnly"
                                 type="number">
                             </app-form-input>
+
+                            <app-form-input
+                                name="intervalOfFollowUp"
+                                [(ngModel)]="outbreakTemplate.intervalOfFollowUp"
+                                [placeholder]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_INTERVAL_OF_FOLLOW_UPS' | translate"
+                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_INTERVAL_OF_FOLLOW_UPS_DESCRIPTION"
+                                [disabled]="viewOnly"
+                                app-regex-validator
+                                regexExpr="^\s*([1-9][0-9]*)(\s*,\s*([1-9][0-9]*))*$">
+                            </app-form-input>
+
                             <app-form-input
                                 name="noDaysAmongContacts"
                                 [(ngModel)]="outbreakTemplate.noDaysAmongContacts"
@@ -120,6 +132,11 @@
                                 [disabled]="viewOnly"
                                 type="number">
                             </app-form-input>
+
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+
                             <app-form-input
                                 name="noDaysInChains"
                                 [(ngModel)]="outbreakTemplate.noDaysInChains"
@@ -129,9 +146,7 @@
                                 [disabled]="viewOnly"
                                 type="number">
                             </app-form-input>
-                        </div>
 
-                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="noDaysNotSeen"
                                 [(ngModel)]="outbreakTemplate.noDaysNotSeen"
@@ -141,6 +156,7 @@
                                 [disabled]="viewOnly"
                                 type="number">
                             </app-form-input>
+
                             <app-form-input
                                 name="noLessContacts"
                                 [(ngModel)]="outbreakTemplate.noLessContacts"
@@ -150,6 +166,7 @@
                                 [disabled]="viewOnly"
                                 type="number">
                             </app-form-input>
+
                             <app-form-input
                                 name="longPeriodsBetweenCaseOnset"
                                 [(ngModel)]="outbreakTemplate.longPeriodsBetweenCaseOnset"
@@ -159,6 +176,10 @@
                                 [disabled]="viewOnly"
                                 type="number">
                             </app-form-input>
+
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="noDaysNewContacts"
                                 [(ngModel)]="outbreakTemplate.noDaysNewContacts"
@@ -167,9 +188,7 @@
                                 type="number"
                                 [disabled]="viewOnly">
                             </app-form-input>
-                        </div>
 
-                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-slide-toggle
                                 name="isContactLabResultsActive"
                                 [(ngModel)]="outbreakTemplate.isContactLabResultsActive"
@@ -194,7 +213,6 @@
                                 [disabled]="viewOnly">
                             </app-form-slide-toggle>
 
-                            <div fxFlex><!-- placeholder --></div>
                         </div>
                     </div>
                 </mat-card>

@@ -16,6 +16,7 @@ export class OutbreakTemplateModel
     disease: string;
     periodOfFollowup: number;
     frequencyOfFollowUpPerDay: number;
+    intervalOfFollowUp: string;
     noDaysAmongContacts: number;
     noDaysInChains: number;
     noDaysNotSeen: number;
@@ -71,6 +72,7 @@ export class OutbreakTemplateModel
         this.disease = _.get(data, 'disease');
         this.periodOfFollowup = _.get(data, 'periodOfFollowup');
         this.frequencyOfFollowUpPerDay = _.get(data, 'frequencyOfFollowUpPerDay');
+        this.intervalOfFollowUp = _.get(data, 'intervalOfFollowUp');
         this.noDaysAmongContacts = _.get(data, 'noDaysAmongContacts');
         this.noDaysInChains = _.get(data, 'noDaysInChains');
         this.noDaysNotSeen = _.get(data, 'noDaysNotSeen');

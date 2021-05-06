@@ -162,6 +162,7 @@
                 <mat-card class="page-section">
                     <div fxLayout="column">
                         <div fxLayout="row" fxLayoutGap="20px">
+
                             <app-form-input
                                 name="periodOfFollowup"
                                 [(ngModel)]="newOutbreak.periodOfFollowup"
@@ -170,6 +171,7 @@
                                 required="true"
                                 type="number">
                             </app-form-input>
+
                             <app-form-input
                                 name="frequencyOfFollowUpPerDay"
                                 [(ngModel)]="newOutbreak.frequencyOfFollowUpPerDay"
@@ -178,6 +180,16 @@
                                 required="true"
                                 type="number">
                             </app-form-input>
+
+                            <app-form-input
+                                name="intervalOfFollowUp"
+                                [(ngModel)]="newOutbreak.intervalOfFollowUp"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_INTERVAL_OF_FOLLOW_UPS' | translate"
+                                tooltip="LNG_OUTBREAK_FIELD_LABEL_INTERVAL_OF_FOLLOW_UPS_DESCRIPTION"
+                                app-regex-validator
+                                regexExpr="^\s*([1-9][0-9]*)(\s*,\s*([1-9][0-9]*))*$">
+                            </app-form-input>
+
                             <app-form-input
                                 name="noDaysAmongContacts"
                                 [(ngModel)]="newOutbreak.noDaysAmongContacts"
@@ -186,6 +198,11 @@
                                 required="true"
                                 type="number">
                             </app-form-input>
+
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+
                             <app-form-input
                                 name="noDaysInChains"
                                 [(ngModel)]="newOutbreak.noDaysInChains"
@@ -194,9 +211,7 @@
                                 required="true"
                                 type="number">
                             </app-form-input>
-                        </div>
 
-                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="noDaysNotSeen"
                                 [(ngModel)]="newOutbreak.noDaysNotSeen"
@@ -205,6 +220,7 @@
                                 required="true"
                                 type="number">
                             </app-form-input>
+
                             <app-form-input
                                 name="noLessContacts"
                                 [(ngModel)]="newOutbreak.noLessContacts"
@@ -213,6 +229,7 @@
                                 required="true"
                                 type="number">
                             </app-form-input>
+
                             <app-form-input
                                 name="longPeriodsBetweenCaseOnset"
                                 [(ngModel)]="newOutbreak.longPeriodsBetweenCaseOnset"
@@ -221,6 +238,10 @@
                                 required="true"
                                 type="number">
                             </app-form-input>
+
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="noDaysNewContacts"
                                 [(ngModel)]="newOutbreak.noDaysNewContacts"
@@ -228,9 +249,7 @@
                                 tooltip="LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT_DESCRIPTION"
                                 type="number">
                             </app-form-input>
-                        </div>
 
-                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-select
                                 name="reportingGeographicalLevelId"
                                 [(ngModel)]="newOutbreak.reportingGeographicalLevelId"
@@ -257,12 +276,21 @@
                                 tooltip="LNG_OUTBREAK_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED_DESCRIPTION">
                             </app-form-slide-toggle>
 
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+
                             <app-form-slide-toggle
                                 name="isContactsOfContactsActive"
                                 [(ngModel)]="newOutbreak.isContactsOfContactsActive"
                                 [label]="'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_OF_CONTACT_ACTIVE' | translate"
                                 tooltip="LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_OF_CONTACT_ACTIVE_DESCRIPTION">
                             </app-form-slide-toggle>
+
+                            <div fxFlex> <!--Placeholder --> </div>
+                            <div fxFlex> <!--Placeholder --> </div>
+                            <div fxFlex> <!--Placeholder --> </div>
+
                         </div>
                     </div>
                 </mat-card>
