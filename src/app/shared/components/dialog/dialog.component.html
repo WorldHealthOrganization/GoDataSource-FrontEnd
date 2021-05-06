@@ -95,6 +95,21 @@
                                 </app-form-input>
                             </div>
 
+                            <!-- Regex Input -->
+                            <div
+                                *ngIf="field.fieldType === DialogFieldType.REGEX_INPUT">
+                                <app-form-input
+                                    [name]="field.name"
+                                    [(ngModel)]="dialogAnswerInputValue.value[field.name]"
+                                    [placeholder]="field.placeholder | translate:confirmData?.translateData"
+                                    [tooltip]="field.description"
+                                    [required]="field.required"
+                                    [disabled]="field.disabled"
+                                    app-regex-validator
+                                    [regexExpr]="field.regex">
+                                </app-form-input>
+                            </div>
+
                             <!-- Number -->
                             <div
                                 *ngIf="field.fieldType === DialogFieldType.TEXT && field.type === 'number'">

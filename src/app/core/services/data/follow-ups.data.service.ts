@@ -36,7 +36,8 @@ export class FollowUpsDataService {
         endDate: any,
         targeted: boolean,
         overwriteExistingFollowUps: boolean,
-        keepTeamAssignment: boolean
+        keepTeamAssignment: boolean,
+        intervalOfFollowUp: string
     ): Observable<ContactFollowUpsModel> {
         // construct generate options
         const options: {
@@ -44,12 +45,14 @@ export class FollowUpsDataService {
             endDate: any,
             targeted: boolean,
             overwriteExistingFollowUps: boolean,
-            keepTeamAssignment?: boolean
+            keepTeamAssignment?: boolean,
+            intervalOfFollowUp?: string
         } = {
             startDate: startDate,
             endDate: endDate,
             targeted: targeted,
-            overwriteExistingFollowUps: overwriteExistingFollowUps
+            overwriteExistingFollowUps: overwriteExistingFollowUps,
+            intervalOfFollowUp
         };
 
         // keepTeamAssignment is relevant only if overwriteExistingFollowUps is disabled
