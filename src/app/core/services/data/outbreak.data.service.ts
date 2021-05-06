@@ -21,7 +21,10 @@ import { IBasicCount } from '../../models/basic-count.interface';
 import { ContactOfContactModel } from '../../models/contact-of-contact.model';
 import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache';
 import { AppMessages } from '../../enums/app-messages.enum';
-import { ExportFieldsGroupModel } from '../../models/export-fields-group.model';
+import {
+    ExportFieldsGroupModel,
+    ExportFieldsGroupModelNameEnum
+} from '../../models/export-fields-group.model';
 
 @Injectable()
 export class OutbreakDataService {
@@ -472,7 +475,7 @@ export class OutbreakDataService {
      * Retrieve export fields group
      * @returns {Observable<ExportFieldsGroupModel>}
      */
-    getExportFieldsGroups(model: string): Observable<ExportFieldsGroupModel> {
+    getExportFieldsGroups(model: ExportFieldsGroupModelNameEnum): Observable<ExportFieldsGroupModel> {
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/export-fields-group?model=${model}`),
             ExportFieldsGroupModel
