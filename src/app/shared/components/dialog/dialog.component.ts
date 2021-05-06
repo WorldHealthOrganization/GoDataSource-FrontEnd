@@ -122,7 +122,8 @@ export enum DialogFieldType {
     URL = 'url',
     ACTION = 'action',
     SECTION_TITLE = 'section-title',
-    CHECKBOX_LIST = 'checkbox-list'
+    CHECKBOX_LIST = 'checkbox-list',
+    REGEX_INPUT = 'regex-input'
 }
 
 /**
@@ -144,6 +145,7 @@ export class DialogField {
     public disabled: boolean = false;
     public description: string;
     public fieldType: DialogFieldType = DialogFieldType.TEXT;
+    public regex: string;
 
     // data
     data: any;
@@ -189,6 +191,7 @@ export class DialogField {
         disabled?: boolean,
         description?: string,
         fieldType?: DialogFieldType,
+        regex?: string,
 
         // data
         data?: any,

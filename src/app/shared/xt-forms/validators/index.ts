@@ -14,6 +14,7 @@ import { GeneralAsyncValidatorDirective } from './general-async-validator.direct
 import { HasPropertyDirective } from './has-property.directive';
 import { NotNumberValidatorDirective } from './not-number-validator.directive';
 import { GroupOptionRequirementsValidator } from './group-option-requirements-validator.directive';
+import { RegexValidatorDirective } from './regex-validator.directive';
 
 export const validatorDirectives: any[] = [
     EmailValidatorDirective,
@@ -31,5 +32,6 @@ export const validatorDirectives: any[] = [
     GeneralAsyncValidatorDirective,
     HasPropertyDirective,
     NotNumberValidatorDirective,
-    GroupOptionRequirementsValidator
+    GroupOptionRequirementsValidator,
+    RegexValidatorDirective
 ];

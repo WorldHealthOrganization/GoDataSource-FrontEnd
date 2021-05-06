@@ -121,6 +121,12 @@ export class ErrorMessage {
                     (this.validator[this.key] as any).err,
                     (this.validator[this.key] as any).details
                 );
+            case 'regexNotMatched':
+                return new ElementBaseFailure(
+                    (this.validator[this.key] as any).msg ?
+                        (this.validator[this.key] as any).msg :
+                        'LNG_FORM_VALIDATION_ERROR_INVALID_REGEX'
+                );
         }
 
         // Get default message if no validator matched

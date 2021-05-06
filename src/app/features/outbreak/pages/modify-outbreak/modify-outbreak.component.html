@@ -208,6 +208,16 @@
                             </app-form-input>
 
                             <app-form-input
+                                name="intervalOfFollowUp"
+                                [(ngModel)]="outbreak.intervalOfFollowUp"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_INTERVAL_OF_FOLLOW_UPS' | translate"
+                                tooltip="LNG_OUTBREAK_FIELD_LABEL_INTERVAL_OF_FOLLOW_UPS_DESCRIPTION"
+                                [disabled]="viewOnly"
+                                app-regex-validator
+                                regexExpr="^\s*([1-9][0-9]*)(\s*,\s*([1-9][0-9]*))*$">
+                            </app-form-input>
+
+                            <app-form-input
                                 name="noDaysAmongContacts"
                                 [(ngModel)]="outbreak.noDaysAmongContacts"
                                 [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS' | translate"
@@ -217,6 +227,9 @@
                                 type="number">
                             </app-form-input>
 
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="noDaysInChains"
                                 [(ngModel)]="outbreak.noDaysInChains"
@@ -226,9 +239,7 @@
                                 [disabled]="viewOnly"
                                 type="number">
                             </app-form-input>
-                        </div>
 
-                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="noDaysNotSeen"
                                 [(ngModel)]="outbreak.noDaysNotSeen"
@@ -259,6 +270,9 @@
                                 type="number">
                             </app-form-input>
 
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="noDaysNewContacts"
                                 [(ngModel)]="outbreak.noDaysNewContacts"
@@ -268,9 +282,6 @@
                                 [disabled]="viewOnly">
                             </app-form-input>
 
-                        </div>
-
-                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-select
                                 name="reportingGeographicalLevelId"
                                 [(ngModel)]="outbreak.reportingGeographicalLevelId"
@@ -300,6 +311,10 @@
                                 [disabled]="viewOnly">
                             </app-form-slide-toggle>
 
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+
                             <app-form-slide-toggle
                                 name="isContactsOfContactsActive"
                                 [(ngModel)]="outbreak.isContactsOfContactsActive"
@@ -308,7 +323,12 @@
                                 [disabled]="viewOnly">
                             </app-form-slide-toggle>
 
+                            <div fxFlex> <!--Placeholder --> </div>
+                            <div fxFlex> <!--Placeholder --> </div>
+                            <div fxFlex> <!--Placeholder --> </div>
+
                         </div>
+
                     </div>
                 </mat-card>
 

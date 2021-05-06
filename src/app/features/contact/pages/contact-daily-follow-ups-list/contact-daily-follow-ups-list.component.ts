@@ -1131,6 +1131,15 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                                 visible: (dialogFieldsValues: any): boolean => {
                                     return !dialogFieldsValues.overwriteExistingFollowUps;
                                 }
+                            }),
+                            new DialogField({
+                                name: 'intervalOfFollowUp',
+                                placeholder: 'LNG_OUTBREAK_FIELD_LABEL_INTERVAL_OF_FOLLOW_UPS',
+                                description: 'LNG_OUTBREAK_FIELD_LABEL_INTERVAL_OF_FOLLOW_UPS_DESCRIPTION',
+                                required: false,
+                                value: this.selectedOutbreak.intervalOfFollowUp,
+                                fieldType: DialogFieldType.REGEX_INPUT,
+                                regex: '^\\s*([1-9][0-9]*)(\\s*,\\s*([1-9][0-9]*))*$'
                             })
                         ]
                     }))
@@ -1147,7 +1156,8 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                                     answer.inputValue.value.dates.endDate,
                                     answer.inputValue.value.targeted,
                                     answer.inputValue.value.overwriteExistingFollowUps,
-                                    answer.inputValue.value.keepTeamAssignment
+                                    answer.inputValue.value.keepTeamAssignment,
+                                    answer.inputValue.value.intervalOfFollowUp
                                 )
                                 .pipe(
                                     catchError((err) => {
