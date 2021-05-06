@@ -67,8 +67,11 @@
                         [allowedExportTypes]="allowedExportTypes"
                         [displayEncrypt]="true"
                         [displayAnonymize]="true"
+                        [displayFieldsGroupList]="true"
                         [displayUseQuestionVariable]="true"
                         [anonymizeFields]="anonymizeFields"
+                        [fieldsGroupList]="fieldsGroupList"
+                        [fieldsGroupListRequired]="fieldsGroupListRequired"
                         [queryBuilder]="queryBuilder"
                         (exportStart)="showLoadingDialog()"
                         (exportFinished)="closeLoadingDialog()">

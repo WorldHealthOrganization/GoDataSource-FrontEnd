@@ -32,6 +32,10 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import {
+    IExportFieldsGroupRequired,
+    ExportFieldsGroupModelNameEnum
+} from '../../../../core/models/export-fields-group.model';
 
 @Component({
     selector: 'app-lab-results',
@@ -60,6 +64,10 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
 
     // user list
     userList$: Observable<UserModel[]>;
+
+    // list of export fields groups
+    fieldsGroupList: LabelValuePair[];
+    fieldsGroupListRequired: IExportFieldsGroupRequired;
 
     // authenticated user
     authUser: UserModel;
@@ -352,6 +360,13 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
                 this.initPaginator();
                 // ...and re-load the list when the Selected Outbreak is changed
                 this.needsRefreshList(true);
+            });
+
+        // retrieve the list of export fields groups
+        this.outbreakDataService.getExportFieldsGroups(ExportFieldsGroupModelNameEnum.LAB_RESULT)
+            .subscribe((fieldsGroupList) => {
+                this.fieldsGroupList = fieldsGroupList.toLabelValuePair(this.i18nService);
+                this.fieldsGroupListRequired = fieldsGroupList.toRequiredList();
             });
     }
 

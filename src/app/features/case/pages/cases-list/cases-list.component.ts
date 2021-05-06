@@ -39,6 +39,10 @@ import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { AddressModel } from '../../../../core/models/address.model';
+import {
+    IExportFieldsGroupRequired,
+    ExportFieldsGroupModelNameEnum
+} from '../../../../core/models/export-fields-group.model';
 
 @Component({
     selector: 'app-cases-list',
@@ -71,6 +75,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
     // user list
     userList$: Observable<UserModel[]>;
+
+    // list of export fields groups
+    fieldsGroupList: LabelValuePair[];
+    fieldsGroupListRequired: IExportFieldsGroupRequired;
+
+    fieldsGroupListRelationships: LabelValuePair[];
+    fieldsGroupListRelationshipsRequired: IExportFieldsGroupRequired;
 
     caseClassifications$: Observable<any>;
     // cases grouped by classification
@@ -567,6 +578,20 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 this.initPaginator();
                 // ...and re-load the list when the Selected Outbreak is changed
                 this.needsRefreshList(true);
+            });
+
+        // retrieve the list of export fields groups for model
+        this.outbreakDataService.getExportFieldsGroups(ExportFieldsGroupModelNameEnum.CASE)
+            .subscribe((fieldsGroupList) => {
+                this.fieldsGroupList = fieldsGroupList.toLabelValuePair(this.i18nService);
+                this.fieldsGroupListRequired = fieldsGroupList.toRequiredList();
+            });
+
+        // retrieve the list of export fields groups for relationships
+        this.outbreakDataService.getExportFieldsGroups(ExportFieldsGroupModelNameEnum.RELATIONSHIP)
+            .subscribe((fieldsGroupList) => {
+                this.fieldsGroupListRelationships = fieldsGroupList.toLabelValuePair(this.i18nService);
+                this.fieldsGroupListRelationshipsRequired = fieldsGroupList.toRequiredList();
             });
 
         // initialize Side Table Columns
@@ -1234,8 +1259,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
+            displayFieldsGroupList: true,
             displayUseQuestionVariable: true,
             anonymizeFields: this.anonymizeFields,
+            fieldsGroupList: this.fieldsGroupList,
+            fieldsGroupListRequired: this.fieldsGroupListRequired,
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });
@@ -1275,8 +1303,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
+            displayFieldsGroupList: true,
             allowedExportTypes: this.allowedExportTypes,
             anonymizeFields: this.anonymizeFields,
+            fieldsGroupList: this.fieldsGroupListRelationships,
+            fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });
@@ -1313,8 +1344,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
+            displayFieldsGroupList: true,
             allowedExportTypes: this.allowedExportTypes,
             anonymizeFields: this.anonymizeFields,
+            fieldsGroupList: this.fieldsGroupListRelationships,
+            fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });

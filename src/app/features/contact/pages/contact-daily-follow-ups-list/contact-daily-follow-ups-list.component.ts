@@ -242,9 +242,9 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         protected router: Router,
         protected i18nService: I18nService,
         protected teamDataService: TeamDataService,
+        protected outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
         private authDataService: AuthDataService,
-        private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private route: ActivatedRoute,
@@ -253,7 +253,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     ) {
         super(
             listHelperService, dialogService, followUpsDataService,
-            router, i18nService, teamDataService
+            router, i18nService, teamDataService, outbreakDataService
         );
     }
 

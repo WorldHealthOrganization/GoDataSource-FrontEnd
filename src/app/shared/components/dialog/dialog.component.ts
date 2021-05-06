@@ -7,6 +7,7 @@ import { Constants } from '../../../core/models/constants';
 import { Observable } from 'rxjs';
 import { moment, Moment } from '../../../core/helperClasses/x-moment';
 import { SafeHtml } from '@angular/platform-browser';
+import { IExportFieldsGroupRequired } from '../../../core/models/export-fields-group.model';
 
 /**
  * Dialog Answer Constant
@@ -133,6 +134,7 @@ export class DialogField {
     public inputOptions: LabelValuePair[];
     public inputOptionsMultiple: boolean = false;
     public inputOptionsClearable: boolean = true;
+    public inputOptionsRequiredMap: IExportFieldsGroupRequired;
     public required: boolean = false;
     public min: number;
     public max: number;
@@ -177,6 +179,7 @@ export class DialogField {
         inputOptions?: LabelValuePair[],
         inputOptionsMultiple?: boolean,
         inputOptionsClearable?: boolean,
+        inputOptionsRequiredMap?: IExportFieldsGroupRequired,
         required?: boolean,
         min?: number,
         max?: number,
@@ -516,6 +519,44 @@ export class DialogComponent implements OnDestroy {
         value: Moment
     ) {
         this.dialogAnswerInputValue.value[fieldName] = value ? moment(value).toISOString() : value;
+    }
+
+    /**
+     * Manages the required options in the dialog dropdowns
+     * @param control
+     * @returns void
+     */
+    checkRequiredOptions(control: any): void {
+        // do not continue if the dropdown control is not multi select or doesn't have required options
+        if (
+            !control.inputOptionsMultiple ||
+            _.isEmpty(control.inputOptionsRequiredMap)
+        ) {
+            return;
+        }
+
+        // update the checked values
+        const checkedValues = this.dialogAnswerInputValue.value[control.name];
+
+        // map checkedValues
+        const checkedValuesMap = {};
+        checkedValues.forEach((field) => {
+            checkedValuesMap[field] = true;
+        });
+
+        checkedValues.forEach((field) => {
+            if (!control.inputOptionsRequiredMap[field]) {
+                return;
+            }
+            control.inputOptionsRequiredMap[field].forEach((requiredField) => {
+                if (!checkedValuesMap[requiredField]) {
+                    checkedValuesMap[requiredField] = true;
+                }
+            });
+        });
+
+        // update the checked values
+        this.dialogAnswerInputValue.value[control.name] = Object.keys(checkedValuesMap);
     }
 
     /**

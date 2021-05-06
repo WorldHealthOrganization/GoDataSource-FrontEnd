@@ -36,6 +36,7 @@ export class ImportExportDataService {
             fileType: string,
             encryptPassword?: string,
             anonymizeFields?: string[],
+            fieldsGroupList?: string[],
             useQuestionVariable?: boolean,
             [otherData: string]: any
         },
@@ -58,6 +59,13 @@ export class ImportExportDataService {
         if (!_.isEmpty(data.anonymizeFields)) {
             completeURL += '&anonymizeFields=' + JSON.stringify(data.anonymizeFields);
             delete data.anonymizeFields;
+        }
+
+        // fields groups
+        if (!_.isEmpty(data.fieldsGroupList)) {
+            // send the fields group list
+            completeURL += '&fieldsGroupList=' + JSON.stringify(data.fieldsGroupList);
+            delete data.fieldsGroupList;
         }
 
         // add flag useQuestionVariable

@@ -4,6 +4,7 @@ import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { DialogService, ExportDataExtension } from '../../../core/services/helper/dialog.service';
 import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
 import { DialogAnswer, DialogField } from '../dialog/dialog.component';
+import { IExportFieldsGroupRequired } from '../../../core/models/export-fields-group.model';
 
 @Component({
     selector: 'app-export-button',
@@ -22,9 +23,14 @@ export class ExportButtonComponent {
     @Input() extensionPlaceholder: string;
     @Input() encryptPlaceholder: string;
     @Input() anonymizePlaceholder: string;
+    @Input() fieldsGroupAllPlaceholder: string;
+    @Input() fieldsGroupListPlaceholder: string;
     @Input() displayEncrypt: boolean;
     @Input() displayAnonymize: boolean;
+    @Input() displayFieldsGroupList: boolean;
     @Input() anonymizeFields: LabelValuePair[];
+    @Input() fieldsGroupList: LabelValuePair[];
+    @Input() fieldsGroupListRequired: IExportFieldsGroupRequired;
     @Input() url: string;
     @Input() yesLabel: string;
     @Input() fileName: string;
@@ -59,12 +65,17 @@ export class ExportButtonComponent {
             extensionPlaceholder: this.extensionPlaceholder,
             encryptPlaceholder: this.encryptPlaceholder,
             anonymizePlaceholder: this.anonymizePlaceholder,
+            fieldsGroupAllPlaceholder: this.fieldsGroupAllPlaceholder,
+            fieldsGroupListPlaceholder: this.fieldsGroupListPlaceholder,
             displayEncrypt: this.displayEncrypt,
             displayAnonymize: this.displayAnonymize,
+            displayFieldsGroupList: this.displayFieldsGroupList,
             displayUseQuestionVariable: this.displayUseQuestionVariable,
             useQuestionVariablePlaceholder: this.useQuestionVariablePlaceholder,
             useQuestionVariableDescription: this.useQuestionVariableDescription,
             anonymizeFields: this.anonymizeFields,
+            fieldsGroupList: this.fieldsGroupList,
+            fieldsGroupListRequired: this.fieldsGroupListRequired,
             url: this.url,
             fileType: this.fileType,
             allowedExportTypes: this.allowedExportTypes,

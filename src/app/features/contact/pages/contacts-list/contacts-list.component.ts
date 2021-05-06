@@ -42,6 +42,10 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { AddressModel } from '../../../../core/models/address.model';
+import {
+    IExportFieldsGroupRequired,
+    ExportFieldsGroupModelNameEnum
+} from '../../../../core/models/export-fields-group.model';
 
 @Component({
     selector: 'app-contacts-list',
@@ -74,6 +78,13 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
 
     // user list
     userList$: Observable<UserModel[]>;
+
+    // list of export fields groups
+    fieldsGroupList: LabelValuePair[];
+    fieldsGroupListRequired: IExportFieldsGroupRequired;
+
+    fieldsGroupListRelationships: LabelValuePair[];
+    fieldsGroupListRelationshipsRequired: IExportFieldsGroupRequired;
 
     // contacts outbreak
     selectedOutbreak: OutbreakModel;
@@ -624,6 +635,20 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                 this.initPaginator();
                 // ...and re-load the list when the Selected Outbreak is changed
                 this.needsRefreshList(true);
+            });
+
+        // retrieve the list of export fields groups
+        this.outbreakDataService.getExportFieldsGroups(ExportFieldsGroupModelNameEnum.CONTACT)
+            .subscribe((fieldsGroupList) => {
+                this.fieldsGroupList = fieldsGroupList.toLabelValuePair(this.i18nService);
+                this.fieldsGroupListRequired = fieldsGroupList.toRequiredList();
+            });
+
+        // retrieve the list of export fields groups for relationships
+        this.outbreakDataService.getExportFieldsGroups(ExportFieldsGroupModelNameEnum.RELATIONSHIP)
+            .subscribe((fieldsGroupList) => {
+                this.fieldsGroupListRelationships = fieldsGroupList.toLabelValuePair(this.i18nService);
+                this.fieldsGroupListRelationshipsRequired = fieldsGroupList.toRequiredList();
             });
 
         // initialize Side Table Columns
@@ -1251,8 +1276,11 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
+            displayFieldsGroupList: true,
             displayUseQuestionVariable: true,
             anonymizeFields: this.anonymizeFields,
+            fieldsGroupList: this.fieldsGroupList,
+            fieldsGroupListRequired: this.fieldsGroupListRequired,
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });
@@ -1329,8 +1357,11 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
+            displayFieldsGroupList: true,
             allowedExportTypes: this.allowedExportTypes,
             anonymizeFields: this.anonymizeFields,
+            fieldsGroupList: this.fieldsGroupListRelationships,
+            fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });
@@ -1402,8 +1433,11 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
+            displayFieldsGroupList: true,
             allowedExportTypes: this.allowedExportTypes,
             anonymizeFields: this.anonymizeFields,
+            fieldsGroupList: this.fieldsGroupListRelationships,
+            fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });

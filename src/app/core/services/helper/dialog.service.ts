@@ -15,6 +15,7 @@ import * as FileSaver from 'file-saver';
 import { LoadingDialogComponent, LoadingDialogDataModel, LoadingDialogModel } from '../../../shared/components/loading-dialog/loading-dialog.component';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { IExportFieldsGroupRequired } from '../../../core/models/export-fields-group.model';
 
 export enum ExportDataExtension {
     CSV = 'csv',
@@ -155,9 +156,14 @@ export class DialogService {
         displayEncrypt?: boolean,
         encryptPlaceholder?: string,
         displayAnonymize?: boolean,
+        displayFieldsGroupList?: boolean,
         anonymizeFieldsKey?: string,
         anonymizePlaceholder?: string,
+        fieldsGroupAllPlaceholder?: string,
+        fieldsGroupListPlaceholder?: string,
         anonymizeFields?: LabelValuePair[],
+        fieldsGroupList?: LabelValuePair[],
+        fieldsGroupListRequired?: IExportFieldsGroupRequired,
         displayUseQuestionVariable?: boolean,
         useQuestionVariablePlaceholder?: string,
         useQuestionVariableDescription?: string,
@@ -204,6 +210,15 @@ export class DialogService {
         if (!data.anonymizePlaceholder) {
             data.anonymizePlaceholder = 'LNG_COMMON_LABEL_EXPORT_ANONYMIZE_FIELDS';
         }
+
+        if (!data.fieldsGroupAllPlaceholder) {
+            data.fieldsGroupAllPlaceholder = 'LNG_COMMON_LABEL_EXPORT_FIELDS_GROUPS_ALL';
+        }
+
+        if (!data.fieldsGroupListPlaceholder) {
+            data.fieldsGroupListPlaceholder = 'LNG_COMMON_LABEL_EXPORT_FIELDS_GROUPS';
+        }
+
         if (!data.yesLabel) {
             data.yesLabel = 'LNG_COMMON_LABEL_EXPORT';
         }
@@ -272,6 +287,40 @@ export class DialogService {
             );
         }
 
+        // add export fields Groups
+        if (data.displayFieldsGroupList) {
+            fieldsList.push(
+                new DialogField({
+                    name: 'fieldsGroupAll',
+                    placeholder: data.fieldsGroupAllPlaceholder,
+                    fieldType: DialogFieldType.BOOLEAN,
+                    value: true
+                })
+            );
+
+            fieldsList.push(
+                new DialogField({
+                    name: 'fieldsGroupList',
+                    placeholder: data.fieldsGroupListPlaceholder,
+                    inputOptions: data.fieldsGroupList,
+                    inputOptionsRequiredMap: data.fieldsGroupListRequired,
+                    inputOptionsMultiple: true,
+                    required: true,
+                    visible: (fieldsData): boolean => {
+                        // if checkbox all is checked, clear the select
+                        if (
+                            fieldsData.fieldsGroupAll &&
+                            fieldsData.fieldsGroupList
+                        ) {
+                            delete fieldsData.fieldsGroupList;
+                        }
+
+                        return !fieldsData.fieldsGroupAll;
+                    }
+                })
+            );
+        }
+
         // add field for use question variable
         if (data.displayUseQuestionVariable) {
             fieldsList.push(
@@ -316,6 +365,11 @@ export class DialogService {
         }))
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
+                    // do not send the checkbox all value to api
+                    if (!_.isUndefined(answer.inputValue.value.fieldsGroupAll)) {
+                        delete answer.inputValue.value.fieldsGroupAll;
+                    }
+
                     // call export start
                     if (data.exportStart) {
                         data.exportStart();

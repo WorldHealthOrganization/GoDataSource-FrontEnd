@@ -21,6 +21,11 @@ import { throwError } from 'rxjs';
 import { catchError, share } from 'rxjs/operators';
 import { moment } from '../../../core/helperClasses/x-moment';
 import { ListHelperService } from '../../../core/services/helper/list-helper.service';
+import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
+import {
+    IExportFieldsGroupRequired,
+    ExportFieldsGroupModelNameEnum
+} from '../../../core/models/export-fields-group.model';
 
 /**
  * Follow-up list component
@@ -32,6 +37,10 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
     authUser: UserModel;
     // contacts outbreak
     selectedOutbreak: OutbreakModel;
+
+    // list of export fields groups
+    fieldsGroupList: LabelValuePair[];
+    fieldsGroupListRequired: IExportFieldsGroupRequired;
 
     // teams list
     teamsList$: Observable<TeamModel[]>;
@@ -82,7 +91,8 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
         protected followUpsDataService: FollowUpsDataService,
         protected router: Router,
         protected i18nService: I18nService,
-        protected teamDataService: TeamDataService
+        protected teamDataService: TeamDataService,
+        protected outbreakDataService: OutbreakDataService
     ) {
         super(listHelperService);
     }
@@ -129,6 +139,13 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
                 ...this.teamsListLoadedForHeaderSearch
             ];
         });
+
+        // retrieve the list of export fields groups
+        this.outbreakDataService.getExportFieldsGroups(ExportFieldsGroupModelNameEnum.FOLLOWUP)
+            .subscribe((fieldsGroupList) => {
+                this.fieldsGroupList = fieldsGroupList.toLabelValuePair(this.i18nService);
+                this.fieldsGroupListRequired = fieldsGroupList.toRequiredList();
+            });
     }
 
     /**
@@ -368,8 +385,11 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
+            displayFieldsGroupList: true,
             displayUseQuestionVariable: true,
             anonymizeFields: this.anonymizeFields,
+            fieldsGroupList: this.fieldsGroupList,
+            fieldsGroupListRequired: this.fieldsGroupListRequired,
             exportStart: () => {
                 this.showLoadingDialog();
             },
