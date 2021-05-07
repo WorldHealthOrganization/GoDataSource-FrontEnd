@@ -232,6 +232,11 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         })
     ];
 
+    // date filter
+    dateFilterValue: Moment;
+    displayMissedFollowUps: boolean = false;
+    displayMissedFollowUpsNoDays: number = 5;
+
     /**
      * Constructor
      */
@@ -483,6 +488,10 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             new VisibleColumnModel({
                 field: 'contact.visualId',
                 label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID'
+            }),
+            new VisibleColumnModel({
+                field: 'date',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE'
             }),
             new VisibleColumnModel({
                 field: 'team',
@@ -961,6 +970,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         if (this.teamWorkloadData) {
             // date
             this.dateFilterDefaultValue = this.teamWorkloadData.date.clone().startOf('day');
+            this.dateFilterValue = this.dateFilterDefaultValue;
 
             // team
             this.selectedTeamIdFilterValue = this.teamWorkloadData.team ?
@@ -986,6 +996,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             }
         } else {
             this.dateFilterDefaultValue = moment().startOf('day');
+            this.dateFilterValue = this.dateFilterDefaultValue;
             this.selectedTeamIdFilterValue = this.teamIdFilterValue;
         }
 
@@ -1189,8 +1200,59 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
      * @param value
      */
     filterByFollowUpDate(value: Moment) {
-        // send filter further
-        this.filterByDateField('date', value);
+        // remember filter
+        this.dateFilterValue = value;
+
+        // cleanup
+        this.queryBuilder.filter.removePathCondition('date');
+        this.queryBuilder.filter.removePathCondition('or.date');
+        this.queryBuilder.filter.removePathCondition('or.statusId');
+
+        // do we need to remove filter ?
+        if (!value) {
+            // send filter further
+            this.filterByDateField('date', value);
+
+            // reset values
+            this.displayMissedFollowUps = false;
+        } else {
+            // do we need to retrieve missed follow-ups too ?
+            if (
+                this.displayMissedFollowUps &&
+                this.displayMissedFollowUpsNoDays > 0
+            ) {
+                this.queryBuilder.filter.where({
+                    or: [{
+                        date: {
+                            between: [
+                                moment(value).startOf('day'),
+                                moment(value).endOf('day')
+                            ]
+                        }
+                    }, {
+                        statusId: {
+                            inq: [
+                                'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_NOT_PERFORMED',
+                                'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_MISSED',
+                                'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_NOT_ATTEMPTED'
+                            ]
+                        },
+                        date: {
+                            between: [
+                                moment(value).add(-this.displayMissedFollowUpsNoDays, 'days').startOf('day'),
+                                moment(value).endOf('day')
+                            ]
+                        }
+                    }]
+                });
+
+                // refresh
+                this.needsRefreshList();
+            } else {
+                // retrieve follow-ups from specific day
+                this.filterByDateField('date', value);
+            }
+        }
 
         // refresh dialog fields
         setTimeout(() => {

@@ -119,6 +119,8 @@
             fxFlex fxLayout="column">
             <div
                 fxFlex fxLayout="row" fxLayoutGap="20px" fxLayoutAlign="start center">
+
+                <!-- Date filter -->
                 <div
                     class="search-filter-details">
                     {{ 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_SHOW_FOLLOW_UPS_FOR_DATE' | translate }}
@@ -135,6 +137,31 @@
                         [disableCachedFilterOverwrite]="true">
                     </app-form-datepicker>
                 </div>
+
+                <!-- Not performed follow-ups -->
+                <ng-container
+                    *ngIf="!!dateFilterValue">
+
+                    <!-- Enable missed follow-ups filter -->
+                    <mat-slide-toggle
+                        labelPosition="before"
+                        [(ngModel)]="displayMissedFollowUps"
+                        (ngModelChange)="filterByFollowUpDate(dateFilterValue)">
+                        {{ 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_SHOW_MISSED_FOLLOW_UPS' | translate }}
+                    </mat-slide-toggle>
+
+                    <!-- Number of days -->
+                    <div>
+                        <app-form-input
+                            *ngIf="displayMissedFollowUps"
+                            [(ngModel)]="displayMissedFollowUpsNoDays"
+                            (ngModelChange)="filterByFollowUpDate(dateFilterValue)"
+                            [placeholder]="'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_SHOW_MISSED_FOLLOW_UPS_NO_DAYS' | translate"
+                            type="number">
+                        </app-form-input>
+                    </div>
+
+                </ng-container>
             </div>
         </div>
 
@@ -302,6 +329,19 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.person?.firstName }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Follow-up date -->
+        <ng-container matColumnDef="date">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate }}</div>
+                    <div class="column-filter"></div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
+                {{ item.date | dateDefault }}
             </mat-cell>
         </ng-container>
 
