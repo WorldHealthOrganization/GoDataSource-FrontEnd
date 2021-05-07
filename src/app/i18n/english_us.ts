@@ -12,7 +12,11 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
-
+        /**
+         * uiFollowUpsListPage
+         */
+        'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_SHOW_MISSED_FOLLOW_UPS': 'Display missed follow-ups',
+        'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_SHOW_MISSED_FOLLOW_UPS_NO_DAYS': 'Last n days'
 
 
 
