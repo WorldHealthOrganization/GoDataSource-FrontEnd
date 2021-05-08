@@ -235,7 +235,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     // date filter
     dateFilterValue: Moment;
     displayMissedFollowUps: boolean = false;
-    displayMissedFollowUpsNoDays: number = 5;
+    displayMissedFollowUpsNoDays: number = 1;
 
     /**
      * Constructor
