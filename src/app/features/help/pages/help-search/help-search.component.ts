@@ -62,11 +62,10 @@ export class HelpSearchComponent extends ListComponent implements OnInit, OnDest
         private helpDataService: HelpDataService,
         private snackbarService: SnackbarService
     ) {
-        // parent
-        super(listHelperService);
-
-        // disable filter caching
-        this.disableFilterCashing = true;
+        super(
+            listHelperService,
+            true
+        );
     }
 
     /**
