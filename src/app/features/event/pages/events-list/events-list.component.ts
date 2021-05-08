@@ -32,6 +32,10 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { AddressModel } from '../../../../core/models/address.model';
+import {
+    IExportFieldsGroupRequired,
+    ExportFieldsGroupModelNameEnum
+} from '../../../../core/models/export-fields-group.model';
 
 @Component({
     selector: 'app-events-list',
@@ -61,6 +65,10 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
 
     // user list
     userList$: Observable<UserModel[]>;
+
+    // list of export fields groups
+    fieldsGroupListRelationships: LabelValuePair[];
+    fieldsGroupListRelationshipsRequired: IExportFieldsGroupRequired;
 
     // list of existing events
     eventsList$: Observable<EventModel[]>;
@@ -310,6 +318,13 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                 this.initPaginator();
                 // ...and re-load the list when the Selected Outbreak is changed
                 this.needsRefreshList(true);
+            });
+
+        // retrieve the list of export fields groups for relationships
+        this.outbreakDataService.getExportFieldsGroups(ExportFieldsGroupModelNameEnum.RELATIONSHIP)
+            .subscribe((fieldsGroupList) => {
+                this.fieldsGroupListRelationships = fieldsGroupList.toLabelValuePair(this.i18nService);
+                this.fieldsGroupListRelationshipsRequired = fieldsGroupList.toRequiredList();
             });
 
         // initialize Side Table Columns
@@ -598,8 +613,11 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
+            displayFieldsGroupList: true,
             allowedExportTypes: this.allowedExportTypes,
             anonymizeFields: this.anonymizeFields,
+            fieldsGroupList: this.fieldsGroupListRelationships,
+            fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });
@@ -636,8 +654,11 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
+            displayFieldsGroupList: true,
             allowedExportTypes: this.allowedExportTypes,
             anonymizeFields: this.anonymizeFields,
+            fieldsGroupList: this.fieldsGroupListRelationships,
+            fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });
