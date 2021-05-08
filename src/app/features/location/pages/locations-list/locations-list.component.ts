@@ -161,7 +161,10 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
         private referenceDataDataService: ReferenceDataDataService,
         private userDataService: UserDataService
     ) {
-        super(listHelperService);
+        super(
+            listHelperService,
+            true
+        );
     }
 
     /**

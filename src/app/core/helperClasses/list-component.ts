@@ -332,7 +332,7 @@ export abstract class ListComponent implements OnDestroy {
     private _disableNextLoadCachedInputValues: boolean = false;
     private _nextTimerForLoadCachedInputValues: number;
     private _loadedCachedFilterPage: string;
-    protected disableFilterCashing: boolean = false;
+    private _disableFilterCaching: boolean = false;
 
     // refresh only after we finish changing data
     private triggerListCountRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
@@ -349,7 +349,8 @@ export abstract class ListComponent implements OnDestroy {
      * Constructor
      */
     protected constructor(
-        protected listHelperService: ListHelperService
+        protected listHelperService: ListHelperService,
+        disableFilterCaching: boolean = false
     ) {
         // clone current breadcrumbs
         let currentBreadcrumbs;
@@ -361,6 +362,7 @@ export abstract class ListComponent implements OnDestroy {
         this.checkListFilters();
 
         // load saved filters
+        this._disableFilterCaching = disableFilterCaching;
         this.loadCachedFilters();
 
         // remove old subscription since we shouldn't have more than one list component visible at the same time ( at least not now )
@@ -2153,7 +2155,7 @@ export abstract class ListComponent implements OnDestroy {
         const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
         if (
             authUser.dontCacheFilters ||
-            this.disableFilterCashing
+            this._disableFilterCaching
         ) {
             return;
         }
@@ -2383,7 +2385,7 @@ export abstract class ListComponent implements OnDestroy {
         const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
         if (
             authUser.dontCacheFilters ||
-            this.disableFilterCashing
+            this._disableFilterCaching
         ) {
             return;
         }
@@ -2546,7 +2548,7 @@ export abstract class ListComponent implements OnDestroy {
         const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
         if (
             authUser.dontCacheFilters ||
-            this.disableFilterCashing
+            this._disableFilterCaching
         ) {
             // trigger finish callback
             this.beforeCacheLoadFilters();

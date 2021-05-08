@@ -624,10 +624,10 @@ export class ImportDataComponent
         private importResultDataService: ImportResultDataService
     ) {
         // list parent
-        super(listHelperService);
-
-        // disable filter caching
-        this.disableFilterCashing = true;
+        super(
+            listHelperService,
+            true
+        );
 
         // fix mime issue - browser not supporting some of the mimes, empty was provided to mime Type which wasn't allowing user to upload teh files
         if (!(FileLikeObject.prototype as any)._createFromObjectPrev) {

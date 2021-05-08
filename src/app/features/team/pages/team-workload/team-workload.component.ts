@@ -76,11 +76,10 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
         private teamDataService: TeamDataService,
         private authDataService: AuthDataService
     ) {
-        // parent
-        super(listHelperService);
-
-        // disable filter caching
-        this.disableFilterCashing = true;
+        super(
+            listHelperService,
+            true
+        );
     }
 
     /**
