@@ -40,7 +40,10 @@ import { EntityType } from '../../../../core/models/entity-type';
     templateUrl: './contact-range-follow-ups-list.component.html',
     styleUrls: ['./contact-range-follow-ups-list.component.less']
 })
-export class ContactRangeFollowUpsListComponent extends ListComponent implements OnInit, OnDestroy {
+export class ContactRangeFollowUpsListComponent
+    extends ListComponent
+    implements OnInit, OnDestroy {
+
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -99,14 +102,18 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         dateOfLastContact: any,
         dateOfTheEndOfTheFollowUp: any,
         locationIds: string[],
-        teamIds: string[]
+        teamIds: string[],
+        displayMissedFollowUps: boolean
+        displayMissedFollowUpsNoDays: number
     } = {
         contactName: null,
         visualId: null,
         dateOfLastContact: null,
         dateOfTheEndOfTheFollowUp: null,
         locationIds: [],
-        teamIds: []
+        teamIds: [],
+        displayMissedFollowUps: false,
+        displayMissedFollowUpsNoDays: 1
     };
 
     /**
@@ -295,7 +302,10 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
             let minDate: Moment;
             let maxDate: Moment;
             this.followUpsDataService
-                .getRangeFollowUpsList(this.selectedOutbreak.id, this.queryBuilder)
+                .getRangeFollowUpsList(
+                    this.selectedOutbreak.id,
+                    this.queryBuilder
+                )
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
@@ -416,19 +426,59 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         // set the new value
         this.sliderDateFilterValue = value;
 
-        // filter
-        this.queryBuilder.filter.byDateRange(
-            'date', {
-                startDate: moment(this.sliderDateFilterValue.low).startOf('day'),
-                endDate: moment(this.sliderDateFilterValue.high).endOf('day')
-            }
-        );
+        // cleanup
+        this.queryBuilder.filter.removePathCondition('date');
+        this.queryBuilder.filter.removePathCondition('or.date');
+        this.queryBuilder.filter.removePathCondition('or.statusId');
 
-        // set export data
-        this.exportRangeExtraAPIData = {
-            startDate: moment(this.sliderDateFilterValue.low).startOf('day'),
-            endDate: moment(this.sliderDateFilterValue.high).endOf('day')
-        };
+        // determine limits
+        const startDate: Moment = moment(this.sliderDateFilterValue.low).startOf('day');
+        const endDate: Moment = moment(this.sliderDateFilterValue.high).endOf('day');
+
+        // do we need to account for missed follow-ups ?
+        if (
+            this.filters.displayMissedFollowUps &&
+            this.filters.displayMissedFollowUpsNoDays > 0
+        ) {
+            this.queryBuilder.filter.where({
+                or: [{
+                    date: {
+                        between: [
+                            startDate,
+                            endDate
+                        ]
+                    }
+                }, {
+                    statusId: {
+                        inq: [
+                            'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_NOT_PERFORMED',
+                            'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_MISSED',
+                            'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_NOT_ATTEMPTED'
+                        ]
+                    },
+                    date: {
+                        between: [
+                            moment(startDate).add(-this.filters.displayMissedFollowUpsNoDays, 'days').startOf('day'),
+                            endDate
+                        ]
+                    }
+                }]
+            });
+        } else {
+            // filter
+            this.queryBuilder.filter.byDateRange(
+                'date', {
+                    startDate,
+                    endDate
+                }
+            );
+
+            // set export data
+            this.exportRangeExtraAPIData = {
+                startDate,
+                endDate
+            };
+        }
 
         // refresh list
         this.needsRefreshList(instant);
@@ -445,7 +495,9 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
             dateOfLastContact: null,
             dateOfTheEndOfTheFollowUp: null,
             locationIds: [],
-            teamIds: []
+            teamIds: [],
+            displayMissedFollowUps: false,
+            displayMissedFollowUpsNoDays: 1
         };
 
         // reset applied filters

@@ -16,7 +16,13 @@ export const EnglishUsLang = {
          * uiFollowUpsListPage
          */
         'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_SHOW_MISSED_FOLLOW_UPS': 'Display missed follow-ups',
-        'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_SHOW_MISSED_FOLLOW_UPS_NO_DAYS': 'Last n days'
+        'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_SHOW_MISSED_FOLLOW_UPS_NO_DAYS': 'In the last n days',
+
+        /**
+         * uiRangeFollowUpsListPage
+         */
+        'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_LABEL_SHOW_MISSED_FOLLOW_UPS': 'Display missed follow-ups',
+        'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_LABEL_SHOW_MISSED_FOLLOW_UPS_NO_DAYS': 'In the last n days'
 
 
 
