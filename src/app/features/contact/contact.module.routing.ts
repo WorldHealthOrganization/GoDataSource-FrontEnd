@@ -86,6 +86,18 @@ const routes: Routes = [
             PageChangeConfirmationGuard
         ]
     },
+    // View Case Questionnaire
+    {
+        path: ':contactId/history',
+        component: fromPages.ModifyQuestionnaireContactComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.CONTACT_VIEW
+            ],
+            action: ViewModifyComponentAction.HISTORY
+        }
+    },
     // Bulk Add Contacts
     {
         path: 'create-bulk',
@@ -164,6 +176,17 @@ const routes: Routes = [
     // Follow-ups list from a contact
     {
         path: 'contact-related-follow-ups/:contactId',
+        component: fromPages.IndividualContactFollowUpsListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.FOLLOW_UP_LIST
+            ]
+        }
+    },
+    // Follow-ups list from a case
+    {
+        path: 'case-follow-ups/:caseId',
         component: fromPages.IndividualContactFollowUpsListComponent,
         canActivate: [AuthGuard],
         data: {

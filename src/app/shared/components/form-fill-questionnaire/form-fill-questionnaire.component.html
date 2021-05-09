@@ -11,6 +11,12 @@
                 fxLayout="column" fxLayoutGap="5px"
             >
                 <div
+                    *ngIf="!!warningTitle"
+                    class="questionnaire-warning">
+                    {{warningTitle}}
+                </div>
+
+                <div
                     *ngFor="let categoryData of questionsGroupedByCategory"
                     fxLayout="column" fxLayoutAlign="start stretch"
                 >

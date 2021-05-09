@@ -92,6 +92,10 @@ export class ContactModel
         [variable: string]: IAnswerData[];
     };
 
+    questionnaireAnswersCase: {
+        [variable: string]: IAnswerData[];
+    };
+
     inconsistencies: InconsistencyModel[];
     relationship: any;
 
@@ -268,6 +272,7 @@ export class ContactModel
         this.pregnancyStatus = _.get(data, 'pregnancyStatus');
 
         this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
+        this.questionnaireAnswersCase = _.get(data, 'questionnaireAnswersCase', {});
 
         this.riskLevel = _.get(data, 'riskLevel');
         this.riskReason = _.get(data, 'riskReason');
@@ -423,5 +428,12 @@ export class ContactModel
             }
             return acc;
         }, []);
+    }
+
+    /**
+     * Check if contact has questionnaire answers registered as case
+     */
+    get hasQuestionnaireAnswersCase(): boolean {
+        return !_.isEmpty(this.questionnaireAnswersCase);
     }
 }

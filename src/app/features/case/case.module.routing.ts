@@ -86,6 +86,18 @@ const routes: Routes = [
             PageChangeConfirmationGuard
         ]
     },
+    // View Contact Questionnaire
+    {
+        path: ':caseId/history',
+        component: fromPages.ModifyQuestionnaireCaseComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.CASE_VIEW
+            ],
+            action: ViewModifyComponentAction.HISTORY
+        }
+    },
     // View Case movement
     {
         path: ':caseId/movement',

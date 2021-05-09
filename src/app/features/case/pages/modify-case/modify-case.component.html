@@ -538,5 +538,27 @@
             [routerLink]="['/contacts/case-related-follow-ups', caseId]">
             {{ 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS' | translate }}
         </button>
+
+        <ng-container *ngIf="caseData?.wasContact">
+            <div class="page-tabs-navbar-placeholder"></div>
+
+            <div class="history-title">{{'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CASE_WAS_CONTACT_TITLE' | translate}}</div>
+
+            <button
+                *ngIf="caseData?.hasQuestionnaireAnswersContact"
+                type="button"
+                mat-raised-button
+                [routerLink]="['/cases', caseId, 'history']">
+                {{'LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE' | translate}}
+            </button>
+
+            <button
+                *ngIf="FollowUpModel.canList(authUser)"
+                mat-raised-button
+                type="button"
+                [routerLink]="['/contacts/case-follow-ups', caseId]">
+                {{ 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CONTACT_FOLLOW_UPS' | translate }}
+            </button>
+        </ng-container>
     </div>
 </form>

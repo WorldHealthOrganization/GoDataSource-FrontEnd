@@ -51,6 +51,7 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
     // skip validation for required questions?
     @Input() skipRequired: boolean = false;
     @Input() componentTitle: string;
+    @Input() warningTitle: string;
 
     private _parentDate: string | Moment;
     @Input() set parentDate(parentDate: string | Moment) {

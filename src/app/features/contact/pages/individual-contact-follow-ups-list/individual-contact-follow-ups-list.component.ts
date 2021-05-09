@@ -32,6 +32,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { AddressModel } from '../../../../core/models/address.model';
+import { CaseDataService } from '../../../../core/services/data/case.data.service';
 
 @Component({
     selector: 'app-individual-contact-follow-ups-list',
@@ -40,6 +41,9 @@ import { AddressModel } from '../../../../core/models/address.model';
     styleUrls: ['./individual-contact-follow-ups-list.component.less']
 })
 export class IndividualContactFollowUpsListComponent extends FollowUpsListComponent implements OnInit, OnDestroy {
+    // needed for case/contact questionnaire history
+    history: boolean = false;
+
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -78,8 +82,9 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
     ReferenceDataCategory = ReferenceDataCategory;
     FollowUpModel = FollowUpModel;
 
-    contactId: string;
-    contactData: ContactModel;
+    recordId: string;
+    recordData: ContactModel | CaseModel;
+    isContact: boolean = true;
 
     // which follow-ups list page are we visiting?
     rootPage: FollowUpPage = FollowUpPage.FOR_CONTACT;
@@ -120,7 +125,8 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                 });
             },
             visible: (item: FollowUpModel): boolean => {
-                return !item.deleted &&
+                return !this.history &&
+                    !item.deleted &&
                     this.authUser &&
                     this.selectedOutbreak &&
                     this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
@@ -140,7 +146,8 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                         this.deleteFollowUp(item);
                     },
                     visible: (item: FollowUpModel): boolean => {
-                        return !item.deleted &&
+                        return !this.history &&
+                            !item.deleted &&
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
@@ -156,7 +163,8 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                         this.restoreFollowUp(item);
                     },
                     visible: (item: FollowUpModel): boolean => {
-                        return item.deleted &&
+                        return !this.history &&
+                            item.deleted &&
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
@@ -170,7 +178,8 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                     type: HoverRowActionType.DIVIDER,
                     visible: (item: FollowUpModel): boolean => {
                         // visible only if at least one of the previous...
-                        return !item.deleted &&
+                        return !this.history &&
+                            !item.deleted &&
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
@@ -186,7 +195,8 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                         this.modifyQuestionnaire(item);
                     },
                     visible: (item: FollowUpModel): boolean => {
-                        return !item.deleted &&
+                        return !this.history &&
+                            !item.deleted &&
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
@@ -215,6 +225,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
         private referenceDataDataService: ReferenceDataDataService,
         private route: ActivatedRoute,
         private contactDataService: ContactDataService,
+        private caseDataService: CaseDataService,
         private userDataService: UserDataService
     ) {
         super(
@@ -243,8 +254,16 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
         this.yesNoOptionsWithoutAllList$ = this.genericDataService.getFilterYesNoOptions(true);
 
         this.route.params
-            .subscribe((params: { contactId }) => {
-                this.contactId = params.contactId;
+            .subscribe((params: { contactId, caseId }) => {
+                // check model
+                if (params.contactId) {
+                    this.recordId = params.contactId;
+                } else {
+                    this.recordId = params.caseId;
+                    this.isContact = false;
+                    this.history = true;
+                    this.rootPage = FollowUpPage.FOR_CASE;
+                }
 
                 // outbreak subscriber
                 if (this.outbreakSubscriber) {
@@ -262,8 +281,8 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                         // initialize side filters
                         this.initializeSideFilters();
 
-                        // retrieve contact data
-                        this.retrieveContactData();
+                        // retrieve contact/case data
+                        this.retrieveData();
 
                         // initialize print and export
                         this.initializeFollowUpsExport();
@@ -295,19 +314,25 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
     }
 
     /**
-     * Retrieve contact data
+     * Retrieve contact/case data
      */
-    retrieveContactData() {
+    retrieveData() {
         if (
             this.selectedOutbreak &&
             this.selectedOutbreak.id &&
-            this.contactId
+            this.recordId
         ) {
-            // retrieve contact data
-            this.contactDataService
-                .getContact(this.selectedOutbreak.id, this.contactId)
-                .subscribe((contactData: ContactModel) => {
-                    this.contactData = contactData;
+            // get data
+            let entityData$;
+            if (this.isContact) {
+                entityData$ = this.contactDataService.getContact(this.selectedOutbreak.id, this.recordId);
+            } else {
+                entityData$ = this.caseDataService.getCase(this.selectedOutbreak.id, this.recordId);
+            }
+
+            if (entityData$) {
+                entityData$.subscribe((recordData: ContactModel | CaseModel) => {
+                    this.recordData = recordData;
 
                     // initialize print options
                     this.printFollowUpsDialogFields = [
@@ -315,10 +340,10 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                             name: 'contactId',
                             placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_CONTACT_BUTTON',
                             inputOptions: [({
-                                label: contactData.name,
-                                value: this.contactId
+                                label: recordData.name,
+                                value: this.recordId
                             }) as any],
-                            value: this.contactId,
+                            value: this.recordId,
                             required: true,
                             disabled: true
                         }),
@@ -335,6 +360,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                     // initialize breadcrumbs
                     this.initializeBreadcrumbs();
                 });
+            }
         }
     }
 
@@ -345,28 +371,37 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
         // init
         this.breadcrumbs = [];
 
-        // add contact breadcrumbs
-        if (ContactModel.canList(this.authUser)) {
-            this.breadcrumbs.push(new BreadcrumbItemModel(
-                'LNG_PAGE_LIST_CONTACTS_TITLE',
-                '/contacts'
-            ));
+        // add contact/case breadcrumbs
+        if (this.isContact) {
+            if (ContactModel.canList(this.authUser)) {
+                this.breadcrumbs.push(new BreadcrumbItemModel(
+                    'LNG_PAGE_LIST_CONTACTS_TITLE',
+                    '/contacts'
+                ));
+            }
+        } else {
+            if (CaseModel.canList(this.authUser)) {
+                this.breadcrumbs.push(new BreadcrumbItemModel(
+                    'LNG_PAGE_LIST_CASES_TITLE',
+                    '/cases'
+                ));
+            }
         }
 
-        // add contact data ?
+        // add record data ?
         if (
-            this.contactData &&
+            this.recordData &&
             CaseModel.canView(this.authUser)
         ) {
             this.breadcrumbs.push(new BreadcrumbItemModel(
-                this.contactData.name,
-                `/contacts/${this.contactData.id}/view`
+                this.recordData.name,
+                this.isContact ? `/contacts/${this.recordData.id}/view` : `/cases/${this.recordData.id}/view`
             ));
         }
 
         // add follow-ups breadcrumbs
         this.breadcrumbs.push(new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
+            history ? 'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE' : 'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
             '.',
             true
         ));
@@ -554,12 +589,12 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
     refreshList(finishCallback: (records: any[]) => void) {
         if (
             this.selectedOutbreak &&
-            this.contactId
+            this.recordId
         ) {
             // add contact id
             this.queryBuilder.filter.byEquality(
                 'personId',
-                this.contactId
+                this.recordId
             );
 
             // make sure we always sort by something
@@ -606,7 +641,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
     refreshListCount() {
         if (
             this.selectedOutbreak &&
-            this.contactId
+            this.recordId
         ) {
             // include related people in response
             const qb = new RequestQueryBuilder();
@@ -615,7 +650,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
             // add contact id
             qb.filter.byEquality(
                 'personId',
-                this.contactId
+                this.recordId
             );
 
             // remove paginator from query builder

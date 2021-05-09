@@ -16,9 +16,10 @@
                 <app-form-fill-questionnaire
                     *ngIf="!!caseData?.id"
                     name="questionnaireAnswers"
-                    [ngModel]="caseData.questionnaireAnswers"
-                    [questions]="selectedOutbreak.caseInvestigationTemplate"
+                    [ngModel]="history ? caseData.questionnaireAnswersContact : caseData.questionnaireAnswers"
+                    [questions]="history ? selectedOutbreak.contactInvestigationTemplate : selectedOutbreak.caseInvestigationTemplate"
                     [disabled]="viewOnly"
+                    [warningTitle]="history ? ('LNG_QUESTIONNAIRE_REGISTERED_AS_CONTACT_MESSAGE' | translate: { personName: caseData?.name }) : ''"
                     [componentTitle]="'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE' | translate">
                 </app-form-fill-questionnaire>
             </mat-tab>
@@ -32,7 +33,9 @@
             <ng-container
                 *app-selected-outbreak-is-active>
                 <button
-                    *ngIf="viewOnly && CaseModel.canModify(authUser)"
+                    *ngIf="!history &&
+                        viewOnly &&
+                        CaseModel.canModify(authUser)"
                     type="button"
                     mat-raised-button color="accent"
                     [routerLink]="['/cases', caseId, 'modify-questionnaire']">
@@ -40,7 +43,8 @@
                 </button>
 
                 <button
-                    *ngIf="!viewOnly"
+                    *ngIf="!history &&
+                        !viewOnly"
                     class="button-with-spinner"
                     mat-raised-button color="accent">
                     {{'LNG_COMMON_BUTTON_SAVE' | translate}}

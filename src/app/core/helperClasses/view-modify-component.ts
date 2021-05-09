@@ -8,7 +8,8 @@ import { LoadingDialogModel } from '../../shared/components';
  */
 export enum ViewModifyComponentAction {
     VIEW = 'view',
-    MODIFY = 'modify'
+    MODIFY = 'modify',
+    HISTORY = 'history'
 }
 
 /**
@@ -17,6 +18,9 @@ export enum ViewModifyComponentAction {
 export abstract class ViewModifyComponent extends ConfirmOnFormChanges {
     // read-only ?
     public viewOnly: boolean = false;
+
+    // needed for case/contact questionnaire history
+    public history: boolean = false;
 
     // handler to loading dialog
     private _showLoadingDialog: boolean;
@@ -35,7 +39,11 @@ export abstract class ViewModifyComponent extends ConfirmOnFormChanges {
         // determine what kind of view we should display
         route.data.subscribe((data: { action: ViewModifyComponentAction }) => {
             // since we have only two types this should be enough for now
-            this.viewOnly = data.action === ViewModifyComponentAction.VIEW;
+            this.viewOnly = data.action === ViewModifyComponentAction.VIEW ||
+                data.action === ViewModifyComponentAction.HISTORY;
+
+            // check history
+            this.history = data.action === ViewModifyComponentAction.HISTORY;
         });
     }
 

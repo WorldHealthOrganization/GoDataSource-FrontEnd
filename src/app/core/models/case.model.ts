@@ -25,6 +25,7 @@ import {
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
+import { IFollowUpHistory } from './contact.model';
 
 export class CaseModel
     extends BaseModel
@@ -64,6 +65,10 @@ export class CaseModel
     questionnaireAnswers: {
         [variable: string]: IAnswerData[];
     };
+
+    questionnaireAnswersContact: {
+        [variable: string]: IAnswerData[];
+    };
     type: EntityType = EntityType.CASE;
     dateOfReporting: string;
     dateOfLastContact: string;
@@ -76,6 +81,17 @@ export class CaseModel
 
     numberOfContacts: number;
     numberOfExposures: number;
+
+    followUp: {
+        originalStartDate: string,
+        startDate: string,
+        endDate: string,
+        status: string
+    };
+
+    followUpHistory: IFollowUpHistory[];
+
+    followUpTeamId: string;
 
     visualId: string;
 
@@ -289,6 +305,7 @@ export class CaseModel
         this.outcomeId = _.get(data, 'outcomeId');
 
         this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
+        this.questionnaireAnswersContact = _.get(data, 'questionnaireAnswersContact', {});
 
         this.relationships = _.get(data, 'relationships', []);
         this.dateBecomeContact = _.get(data, 'dateBecomeContact');
@@ -309,6 +326,11 @@ export class CaseModel
         _.each(this.matchedDuplicateRelationships, (matchedRelationship, index) => {
             this.matchedDuplicateRelationships[index] = new EntityMatchedRelationshipModel(matchedRelationship);
         });
+
+        this.followUpTeamId = _.get(data, 'followUpTeamId');
+
+        this.followUp = _.get(data, 'followUp', {});
+        this.followUpHistory = _.get(data, 'followUpHistory', []);
     }
 
     /**
@@ -436,5 +458,12 @@ export class CaseModel
             }
             return acc;
         }, []);
+    }
+
+    /**
+     * Check if case has questionnaire answers registered as contact
+     */
+    get hasQuestionnaireAnswersContact(): boolean {
+        return !_.isEmpty(this.questionnaireAnswersContact);
     }
 }

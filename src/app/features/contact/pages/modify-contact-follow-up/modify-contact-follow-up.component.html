@@ -18,7 +18,14 @@
                 <!-- Details section -->
                 <mat-card class="page-section" fxLayout="column">
                     <div
-                        *ngIf="ContactModel.canView(authUser) && relatedPersonData"
+                        *ngIf="history">
+                        {{ 'LNG_PAGE_MODIFY_FOLLOW_UP_REGISTERED_AS_CONTACT_MESSAGE' | translate: { personName: relatedPersonData?.name } }}
+                    </div>
+
+                    <div
+                        *ngIf="!history &&
+                            ContactModel.canView(authUser) &&
+                            relatedPersonData"
                         class="follow-ups-title"
                         fxLayout="row" fxLayoutGap="20px">
                         <div>{{ (relatedPersonData.type === EntityType.CASE ? 'LNG_FOLLOW_UP_FIELD_LABEL_CASE' : 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT') | translate }}</div>
@@ -172,7 +179,10 @@
         <div class="page-tabs-navbar-placeholder"></div>
 
         <button
-            *ngIf="viewOnly && FollowUpModel.canModify(authUser) && !Constants.isDateInTheFuture(followUpData.date)"
+            *ngIf="!history &&
+                viewOnly &&
+                FollowUpModel.canModify(authUser) &&
+                !Constants.isDateInTheFuture(followUpData.date)"
             mat-raised-button type="button" color="accent"
             [routerLink]="['/contacts', contactId, 'follow-ups', followUpId, 'modify']"
             [queryParams]="{rootPage: rootPage, rootCaseId: rootCaseId}"
@@ -180,7 +190,10 @@
             {{'LNG_COMMON_BUTTON_EDIT'| translate}}
         </button>
 
-        <ng-container *ngIf="!viewOnly">
+        <ng-container
+            *ngIf="!history &&
+                !viewOnly">
+
             <button mat-raised-button color="accent">
                 {{'LNG_COMMON_BUTTON_SAVE' | translate}}
             </button>
@@ -208,8 +221,8 @@
             *ngIf="ContactModel.canView(authUser)"
             mat-raised-button
             type="button"
-            [routerLink]="['/contacts', contactId, 'view']">
-            {{ 'LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_VIEW_CONTACT' | translate }}
+            [routerLink]="[history || (relatedPersonData && relatedPersonData.type === EntityType.CASE) ? '/cases' : '/contacts', contactId, 'view']">
+            {{ (history || (relatedPersonData && relatedPersonData.type === EntityType.CASE) ? 'LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_VIEW_CASE' : 'LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_VIEW_CONTACT') | translate }}
         </button>
     </div>
 </form>

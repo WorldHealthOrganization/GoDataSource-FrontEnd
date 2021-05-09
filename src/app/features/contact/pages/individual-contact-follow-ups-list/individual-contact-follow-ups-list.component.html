@@ -6,9 +6,10 @@
             <div class="topnav-actions">
                 <ng-container *app-selected-outbreak-is-active>
                     <button
-                        *ngIf="FollowUpModel.canCreate(authUser)"
+                        *ngIf="!history &&
+                            FollowUpModel.canCreate(authUser)"
                         mat-raised-button color="accent"
-                        [routerLink]="['/contacts', contactData?.id, 'follow-ups', 'create']">
+                        [routerLink]="['/contacts', recordData?.id, 'follow-ups', 'create']">
                         {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                     </button>
                 </ng-container>
@@ -84,6 +85,11 @@
 
 <mat-card class="page-section page-content">
     <div
+        *ngIf="history">
+        {{ 'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_MESSAGE' | translate: { personName: recordData?.name } }}
+    </div>
+
+    <div
         fxLayout="row" fxLayoutAlign="start center">
         <!-- Contact information -->
         <div
@@ -95,7 +101,7 @@
                     {{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT' | translate }}
                 </div>
                 <div>
-                    {{ contactData?.dateOfLastContact | dateDefault}}
+                    {{ recordData?.dateOfLastContact | dateDefault}}
                 </div>
             </div>
             <div
@@ -105,7 +111,7 @@
                     {{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP' | translate }}
                 </div>
                 <div>
-                    {{ contactData?.followUp?.endDate | dateDefault }}
+                    {{ recordData?.followUp?.endDate | dateDefault }}
                 </div>
             </div>
         </div>
@@ -174,7 +180,8 @@
                                 <mat-divider></mat-divider>
 
                                 <button
-                                    *ngIf="FollowUpModel.canBulkModify(authUser)"
+                                    *ngIf="!history &&
+                                        FollowUpModel.canBulkModify(authUser)"
                                     mat-menu-item
                                     (click)="modifySelectedFollowUps(table)">
                                     {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_MODIFY_SELECTED_FOLLOW_UPS' | translate }}
@@ -188,7 +195,8 @@
                                 </button>
 
                                 <button
-                                    *ngIf="FollowUpModel.canBulkDelete(authUser)"
+                                    *ngIf="!history &&
+                                        FollowUpModel.canBulkDelete(authUser)"
                                     [disabled]="!checkedOnlyNotDeletedRecords"
                                     mat-menu-item
                                     (click)="deleteSelectedFollowUps()">
@@ -199,7 +207,8 @@
                                 </button>
 
                                 <button
-                                    *ngIf="FollowUpModel.canBulkRestore(authUser)"
+                                    *ngIf="!history &&
+                                        FollowUpModel.canBulkRestore(authUser)"
                                     [disabled]="!checkedOnlyDeletedRecords"
                                     mat-menu-item
                                     (click)="restoreSelectedFollowUps()">
