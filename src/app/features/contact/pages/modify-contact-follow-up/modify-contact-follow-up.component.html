@@ -17,15 +17,10 @@
 
                 <!-- Details section -->
                 <mat-card class="page-section" fxLayout="column">
-                    <div
-                        *ngIf="history">
-                        {{ 'LNG_PAGE_MODIFY_FOLLOW_UP_REGISTERED_AS_CONTACT_MESSAGE' | translate: { personName: relatedPersonData?.name } }}
-                    </div>
 
                     <div
-                        *ngIf="!history &&
-                            ContactModel.canView(authUser) &&
-                            relatedPersonData"
+                        *ngIf="relatedPersonData && ((relatedPersonData.type === EntityType.CASE && CaseModel.canView(authUser)) ||
+                            (relatedPersonData.type === EntityType.CONTACT && ContactModel.canView(authUser)))"
                         class="follow-ups-title"
                         fxLayout="row" fxLayoutGap="20px">
                         <div>{{ (relatedPersonData.type === EntityType.CASE ? 'LNG_FOLLOW_UP_FIELD_LABEL_CASE' : 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT') | translate }}</div>
@@ -35,7 +30,7 @@
                         </a>
                         <div
                             *ngIf="relatedPersonData.type === EntityType.CASE">
-                            {{ 'LNG_PAGE_MODIFY_FOLLOW_UP_FIELD_LABEL_FOLLOW_UP_WITH_INFO' | translate: {personName: relatedPersonData.name} }}
+                            {{ (history ? 'LNG_PAGE_MODIFY_FOLLOW_UP_REGISTERED_AS_CONTACT_MESSAGE' : 'LNG_PAGE_MODIFY_FOLLOW_UP_FIELD_LABEL_FOLLOW_UP_WITH_INFO') | translate: {personName: relatedPersonData.name} }}
                         </div>
                     </div>
                     <div fxLayout="row" fxLayoutGap="20px">

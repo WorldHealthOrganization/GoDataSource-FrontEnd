@@ -13,7 +13,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
-import { ContactModel } from 'app/core/models/contact.model';
+import { ContactModel } from '../../../../core/models/contact.model';
 
 @Component({
     selector: 'app-modify-questionnaire-contact',

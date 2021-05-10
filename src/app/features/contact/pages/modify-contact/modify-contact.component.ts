@@ -31,11 +31,11 @@ import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
-import { EntityDataService } from 'app/core/services/data/entity.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { TimerCache } from '../../../../core/helperClasses/timer-cache';
+import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 
 @Component({
     selector: 'app-modify-contact',

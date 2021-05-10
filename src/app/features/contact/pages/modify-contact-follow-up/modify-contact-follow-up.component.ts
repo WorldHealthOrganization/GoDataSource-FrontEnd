@@ -23,8 +23,8 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { CaseModel } from '../../../../core/models/case.model';
 import { catchError } from 'rxjs/operators';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { moment } from 'app/core/helperClasses/x-moment';
 import { EntityType } from '../../../../core/models/entity-type';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-modify-follow-up',
@@ -59,6 +59,7 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
     Constants = Constants;
     FollowUpModel = FollowUpModel;
     ContactModel = ContactModel;
+    CaseModel = CaseModel;
     EntityType = EntityType;
 
     /**

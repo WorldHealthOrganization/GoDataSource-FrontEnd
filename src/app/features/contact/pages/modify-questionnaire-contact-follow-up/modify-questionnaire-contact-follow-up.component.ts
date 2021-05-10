@@ -12,10 +12,10 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel } from '../../../../core/models/user.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
-import { ContactModel } from 'app/core/models/contact.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { ContactModel } from '../../../../core/models/contact.model';
 
 @Component({
     selector: 'app-modify-questionnaire-contact-follow-up',

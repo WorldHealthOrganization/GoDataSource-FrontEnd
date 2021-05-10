@@ -30,7 +30,7 @@ export const EnglishUsLang = {
          * uiModifyFollowUpPage
          */
         'LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_VIEW_CASE': 'View case',
-        'LNG_PAGE_MODIFY_FOLLOW_UP_REGISTERED_AS_CONTACT_MESSAGE': 'You cannot edit the follow-up because this person is now a case and follow-up was performed at the time when "{{ personName }}" was registered as a contact',
+        'LNG_PAGE_MODIFY_FOLLOW_UP_REGISTERED_AS_CONTACT_MESSAGE': '* You cannot edit the follow-up because this person is now a case and follow-up was performed at the time when "{{ personName }}" was registered as a contact',
 
          /**
          * uiModifyCasePage
