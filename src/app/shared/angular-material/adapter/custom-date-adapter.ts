@@ -3,6 +3,7 @@ import { MatMomentDateAdapterOptions } from '@angular/material-moment-adapter/ad
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { Moment } from 'moment';
 import * as moment from 'moment';
+import { moment as xMoment } from '../../../core/helperClasses/x-moment';
 
 export class CustomDateAdapter extends MomentDateAdapter {
 
@@ -206,7 +207,7 @@ export class CustomDateAdapter extends MomentDateAdapter {
 
         // format date
         const formattedDate: string = date ?
-            moment(date.toISOString()).format(displayFormat) :
+            xMoment(date.toISOString()).format(displayFormat) :
             '';
 
         // reset back to previous locale
