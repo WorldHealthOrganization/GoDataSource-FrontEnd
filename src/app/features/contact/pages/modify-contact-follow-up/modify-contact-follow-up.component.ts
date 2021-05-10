@@ -102,9 +102,6 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
                 this.rootPage = queryParams.rootPage;
                 this.rootCaseId = queryParams.rootCaseId;
 
-                // check if followup was generated as contact
-                this.history = this.rootPage === FollowUpPage.FOR_CASE;
-
                 this.loadRootCase();
                 this.initializeBreadcrumbs();
             });
@@ -240,34 +237,6 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
                     // finished
                     break;
 
-                case FollowUpPage.FOR_CASE:
-                    // cases list page
-                    if (CaseModel.canList(this.authUser)) {
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
-                        );
-                    }
-
-                    // case view page
-                    if (
-                        this.rootCaseData &&
-                        CaseModel.canView(this.authUser)
-                    ) {
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel(this.rootCaseData.name, `/cases/${this.rootCaseId}/view`)
-                        );
-                    }
-
-                    // follow-ups related list page
-                    if (FollowUpModel.canList(this.authUser)) {
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE', this.rootPageUrl)
-                        );
-                    }
-
-                    // finished
-                    break;
-
                 case FollowUpPage.CASE_RELATED:
                     // cases list page
                     if (CaseModel.canList(this.authUser)) {
@@ -325,7 +294,10 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
                     // follow-ups list page
                     if (FollowUpModel.canList(this.authUser)) {
                         this.breadcrumbs.push(
-                            new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', this.rootPageUrl)
+                            new BreadcrumbItemModel(
+                                this.history ? 'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE' : 'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
+                                this.rootPageUrl
+                            )
                         );
                     }
 
@@ -358,15 +330,12 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
             case FollowUpPage.CASE_RELATED:
                 return `/contacts/case-related-follow-ups/${this.rootCaseId}`;
 
-            case FollowUpPage.FOR_CASE:
-                return `/contacts/case-follow-ups/${this.contactId}`;
-
             case FollowUpPage.RANGE:
                 return '/contacts/range-follow-ups';
 
             case FollowUpPage.DAILY:
             default:
-                return '/contacts/follow-ups';
+                return this.history ? `/contacts/case-follow-ups/${this.contactId}` : '/contacts/follow-ups';
         }
     }
 

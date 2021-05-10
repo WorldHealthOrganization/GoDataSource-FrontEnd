@@ -41,9 +41,6 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
     styleUrls: ['./individual-contact-follow-ups-list.component.less']
 })
 export class IndividualContactFollowUpsListComponent extends FollowUpsListComponent implements OnInit, OnDestroy {
-    // needed for case/contact questionnaire history
-    history: boolean = false;
-
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -98,7 +95,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_VIEW_FOLLOW_UP',
             linkGenerator: (item: FollowUpModel): string[] => {
-                return ['/contacts', item.personId, 'follow-ups', item.id, 'view'];
+                return ['/contacts', item.personId, 'follow-ups', item.id, this.isContact ? 'view' : 'history'];
             },
             queryParamsGenerator: (): {
                 [k: string]: any;
@@ -125,8 +122,8 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                 });
             },
             visible: (item: FollowUpModel): boolean => {
-                return !this.history &&
-                    !item.deleted &&
+                return !item.deleted &&
+                    this.isContact &&
                     this.authUser &&
                     this.selectedOutbreak &&
                     this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
@@ -146,8 +143,8 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                         this.deleteFollowUp(item);
                     },
                     visible: (item: FollowUpModel): boolean => {
-                        return !this.history &&
-                            !item.deleted &&
+                        return !item.deleted &&
+                            this.isContact &&
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
@@ -163,8 +160,8 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                         this.restoreFollowUp(item);
                     },
                     visible: (item: FollowUpModel): boolean => {
-                        return !this.history &&
-                            item.deleted &&
+                        return item.deleted &&
+                            this.isContact &&
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
@@ -178,8 +175,8 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                     type: HoverRowActionType.DIVIDER,
                     visible: (item: FollowUpModel): boolean => {
                         // visible only if at least one of the previous...
-                        return !this.history &&
-                            !item.deleted &&
+                        return !item.deleted &&
+                            this.isContact &&
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
@@ -195,8 +192,8 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                         this.modifyQuestionnaire(item);
                     },
                     visible: (item: FollowUpModel): boolean => {
-                        return !this.history &&
-                            !item.deleted &&
+                        return !item.deleted &&
+                            this.isContact &&
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
@@ -261,8 +258,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                 } else {
                     this.recordId = params.caseId;
                     this.isContact = false;
-                    this.history = true;
-                    this.rootPage = FollowUpPage.FOR_CASE;
+                    this.rootPage = undefined;
                 }
 
                 // outbreak subscriber
@@ -323,44 +319,39 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
             this.recordId
         ) {
             // get data
-            let entityData$;
-            if (this.isContact) {
-                entityData$ = this.contactDataService.getContact(this.selectedOutbreak.id, this.recordId);
-            } else {
-                entityData$ = this.caseDataService.getCase(this.selectedOutbreak.id, this.recordId);
-            }
+            const entityData$: Observable<ContactModel | CaseModel> = this.isContact ?
+                this.contactDataService.getContact(this.selectedOutbreak.id, this.recordId) :
+                this.caseDataService.getCase(this.selectedOutbreak.id, this.recordId);
 
-            if (entityData$) {
-                entityData$.subscribe((recordData: ContactModel | CaseModel) => {
-                    this.recordData = recordData;
+            entityData$.subscribe((recordData: ContactModel | CaseModel) => {
+                this.recordData = recordData;
 
-                    // initialize print options
-                    this.printFollowUpsDialogFields = [
-                        new DialogField({
-                            name: 'contactId',
-                            placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_CONTACT_BUTTON',
-                            inputOptions: [({
-                                label: recordData.name,
-                                value: this.recordId
-                            }) as any],
-                            value: this.recordId,
-                            required: true,
-                            disabled: true
-                        }),
-                        new DialogField({
-                            name: 'groupBy',
-                            placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON',
-                            inputOptions: [(Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE) as any],
-                            value: Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE.value,
-                            required: true,
-                            disabled: true
-                        })
-                    ];
+                // initialize print options
+                this.printFollowUpsDialogFields = [
+                    new DialogField({
+                        name: 'contactId',
+                        placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_CONTACT_BUTTON',
+                        inputOptions: [({
+                            label: recordData.name,
+                            value: this.recordId
+                        }) as any],
+                        value: this.recordId,
+                        required: true,
+                        disabled: true
+                    }),
+                    new DialogField({
+                        name: 'groupBy',
+                        placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON',
+                        inputOptions: [(Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE) as any],
+                        value: Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE.value,
+                        required: true,
+                        disabled: true
+                    })
+                ];
 
-                    // initialize breadcrumbs
-                    this.initializeBreadcrumbs();
-                });
-            }
+                // initialize breadcrumbs
+                this.initializeBreadcrumbs();
+            });
         }
     }
 
@@ -401,7 +392,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
 
         // add follow-ups breadcrumbs
         this.breadcrumbs.push(new BreadcrumbItemModel(
-            history ? 'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE' : 'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
+            this.isContact ? 'LNG_PAGE_LIST_FOLLOW_UPS_TITLE' : 'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE',
             '.',
             true
         ));

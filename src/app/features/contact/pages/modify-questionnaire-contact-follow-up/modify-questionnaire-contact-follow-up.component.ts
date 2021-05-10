@@ -16,7 +16,6 @@ import { ContactModel } from 'app/core/models/contact.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { moment } from '../../../../core/helperClasses/x-moment';
-import { FollowUpPage } from '../../typings/follow-up-page';
 
 @Component({
     selector: 'app-modify-questionnaire-contact-follow-up',
@@ -82,9 +81,6 @@ export class ModifyQuestionnaireContactFollowUpComponent extends ViewModifyCompo
         this.route.queryParams.subscribe((params: { rootPage, rootCaseId }) => {
             this.rootPage = params.rootPage;
             this.rootCaseId = params.rootCaseId;
-
-            // check if questionnaires were filled as contact
-            this.history = this.rootPage === FollowUpPage.FOR_CASE;
         });
 
         // retrieve outbreak
@@ -110,27 +106,29 @@ export class ModifyQuestionnaireContactFollowUpComponent extends ViewModifyCompo
         if (this.followUpData) {
             // contacts list page
             if (ContactModel.canList(this.authUser)) {
-                const label = this.history ? 'LNG_PAGE_LIST_CASES_TITLE' : 'LNG_PAGE_LIST_CONTACTS_TITLE';
-                const link = this.history ? '/cases' : '/contacts';
                 this.breadcrumbs.push(
-                    new BreadcrumbItemModel(label, link)
+                    new BreadcrumbItemModel(
+                        this.history ? 'LNG_PAGE_LIST_CASES_TITLE' : 'LNG_PAGE_LIST_CONTACTS_TITLE',
+                        this.history ? '/cases' : '/contacts'
+                    )
                 );
             }
 
             // contacts view page
             if (ContactModel.canView(this.authUser)) {
-                const link = this.history ? '/cases' : '/contacts';
                 this.breadcrumbs.push(
-                    new BreadcrumbItemModel(this.followUpData.person.name, `${link}/${this.followUpData.person.id}/view`)
+                    new BreadcrumbItemModel(
+                        this.followUpData.person.name,
+                        this.history ? `/cases/${this.followUpData.person.id}/view` : `/contacts/${this.followUpData.person.id}/view`
+                    )
                 );
             }
 
             if (FollowUpModel.canModify(this.authUser)) {
-                const label = this.history ? 'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE' : 'LNG_PAGE_LIST_FOLLOW_UPS_TITLE';
                 this.breadcrumbs.push(
                     new BreadcrumbItemModel(
-                        label,
-                        `/contacts/${this.followUpData.person.id}/follow-ups/${this.followUpData.id}/modify`,
+                        this.history ? 'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE' : 'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
+                        this.history ? `/contacts/${this.followUpData.person.id}/follow-ups/${this.followUpData.id}/history` : `/contacts/${this.followUpData.person.id}/follow-ups/${this.followUpData.id}/modify`,
                         false,
                         { rootPage: this.rootPage, rootCaseId: this.rootCaseId }
                     )

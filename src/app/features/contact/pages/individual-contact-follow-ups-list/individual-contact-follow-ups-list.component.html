@@ -6,7 +6,7 @@
             <div class="topnav-actions">
                 <ng-container *app-selected-outbreak-is-active>
                     <button
-                        *ngIf="!history &&
+                        *ngIf="isContact &&
                             FollowUpModel.canCreate(authUser)"
                         mat-raised-button color="accent"
                         [routerLink]="['/contacts', recordData?.id, 'follow-ups', 'create']">
@@ -85,7 +85,7 @@
 
 <mat-card class="page-section page-content">
     <div
-        *ngIf="history">
+        *ngIf="!isContact">
         {{ 'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_MESSAGE' | translate: { personName: recordData?.name } }}
     </div>
 
@@ -180,7 +180,7 @@
                                 <mat-divider></mat-divider>
 
                                 <button
-                                    *ngIf="!history &&
+                                    *ngIf="isContact &&
                                         FollowUpModel.canBulkModify(authUser)"
                                     mat-menu-item
                                     (click)="modifySelectedFollowUps(table)">
@@ -195,7 +195,7 @@
                                 </button>
 
                                 <button
-                                    *ngIf="!history &&
+                                    *ngIf="isContact &&
                                         FollowUpModel.canBulkDelete(authUser)"
                                     [disabled]="!checkedOnlyNotDeletedRecords"
                                     mat-menu-item
@@ -207,7 +207,7 @@
                                 </button>
 
                                 <button
-                                    *ngIf="!history &&
+                                    *ngIf="isContact &&
                                         FollowUpModel.canBulkRestore(authUser)"
                                     [disabled]="!checkedOnlyDeletedRecords"
                                     mat-menu-item

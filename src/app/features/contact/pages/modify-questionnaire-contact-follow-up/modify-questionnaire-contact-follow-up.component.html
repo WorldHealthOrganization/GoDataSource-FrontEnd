@@ -43,8 +43,7 @@
                 </button>
 
                 <button
-                    *ngIf="!history &&
-                        !viewOnly"
+                    *ngIf="!viewOnly"
                     class="button-with-spinner"
                     mat-raised-button color="accent">
                     {{'LNG_COMMON_BUTTON_SAVE' | translate}}
@@ -53,7 +52,7 @@
 
             <button
                 type="button"
-                [routerLink]="['/contacts', contactId, 'follow-ups', followUpId, viewOnly ? 'view' : 'modify']"
+                [routerLink]="['/contacts', contactId, 'follow-ups', followUpId, history ? 'history' : viewOnly ? 'view' : 'modify']"
                 [queryParams]="{ rootPage: rootPage }"
                 mat-raised-button>
                 {{'LNG_COMMON_BUTTON_BACK' | translate}}

@@ -247,6 +247,18 @@ const routes: Routes = [
             PageChangeConfirmationGuard
         ]
     },
+    // View History Follow Up
+    {
+        path: ':contactId/follow-ups/:followUpId/history',
+        component: fromPages.ModifyContactFollowUpComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.FOLLOW_UP_VIEW
+            ],
+            action: ViewModifyComponentAction.HISTORY
+        }
+    },
     // View Contact Questionnaire
     {
         path: ':contactId/follow-ups/:followUpId/view-questionnaire',
@@ -273,6 +285,18 @@ const routes: Routes = [
         canDeactivate: [
             PageChangeConfirmationGuard
         ]
+    },
+    // View History Questionnaire
+    {
+        path: ':contactId/follow-ups/:followUpId/history-questionnaire',
+        component: fromPages.ModifyQuestionnaireContactFollowUpComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.FOLLOW_UP_VIEW
+            ],
+            action: ViewModifyComponentAction.HISTORY
+        }
     },
     // Modify list of Follow Ups
     {

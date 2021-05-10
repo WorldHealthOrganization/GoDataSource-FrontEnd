@@ -19,6 +19,7 @@
                     [ngModel]="history ? contactData?.questionnaireAnswersCase : contactData?.questionnaireAnswers"
                     [questions]="history ? selectedOutbreak?.caseInvestigationTemplate : selectedOutbreak?.contactInvestigationTemplate"
                     [disabled]="viewOnly"
+                    [warningTitle]="history ? ('LNG_QUESTIONNAIRE_REGISTERED_AS_CONTACT_MESSAGE' | translate: { personName: caseData?.name }) : ''"
                     [componentTitle]="'LNG_PAGE_MODIFY_CONTACT_TAB_QUESTIONNAIRE_TITLE' | translate">
                 </app-form-fill-questionnaire>
             </mat-tab>
@@ -42,8 +43,7 @@
                 </button>
 
                 <button
-                    *ngIf="!history &&
-                        !viewOnly"
+                    *ngIf="!viewOnly"
                     class="button-with-spinner"
                     mat-raised-button color="accent">
                     {{'LNG_COMMON_BUTTON_SAVE' | translate}}

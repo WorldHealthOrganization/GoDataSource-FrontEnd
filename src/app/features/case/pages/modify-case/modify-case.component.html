@@ -539,7 +539,13 @@
             {{ 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS' | translate }}
         </button>
 
-        <ng-container *ngIf="caseData?.wasContact">
+        <ng-container
+            *ngIf="caseData?.wasContact &&
+                (
+                    caseData?.hasQuestionnaireAnswersContact ||
+                    FollowUpModel.canList(authUser)
+                )">
+
             <div class="page-tabs-navbar-placeholder"></div>
 
             <div class="history-title">{{'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CASE_WAS_CONTACT_TITLE' | translate}}</div>

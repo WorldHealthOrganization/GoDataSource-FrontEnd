@@ -25,7 +25,6 @@ import {
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
-import { IFollowUpHistory } from './contact.model';
 
 export class CaseModel
     extends BaseModel
@@ -88,8 +87,6 @@ export class CaseModel
         endDate: string,
         status: string
     };
-
-    followUpHistory: IFollowUpHistory[];
 
     followUpTeamId: string;
 
@@ -330,7 +327,6 @@ export class CaseModel
         this.followUpTeamId = _.get(data, 'followUpTeamId');
 
         this.followUp = _.get(data, 'followUp', {});
-        this.followUpHistory = _.get(data, 'followUpHistory', []);
     }
 
     /**
