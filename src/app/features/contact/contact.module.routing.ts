@@ -86,6 +86,18 @@ const routes: Routes = [
             PageChangeConfirmationGuard
         ]
     },
+    // View Case Questionnaire
+    {
+        path: ':contactId/history',
+        component: fromPages.ModifyQuestionnaireContactComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.CONTACT_VIEW
+            ],
+            action: ViewModifyComponentAction.HISTORY
+        }
+    },
     // Bulk Add Contacts
     {
         path: 'create-bulk',
@@ -172,6 +184,17 @@ const routes: Routes = [
             ]
         }
     },
+    // Follow-ups list from a case
+    {
+        path: 'case-follow-ups/:caseId',
+        component: fromPages.IndividualContactFollowUpsListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.FOLLOW_UP_LIST
+            ]
+        }
+    },
     // Range Follow-ups list
     {
         path: 'range-follow-ups',
@@ -224,6 +247,18 @@ const routes: Routes = [
             PageChangeConfirmationGuard
         ]
     },
+    // View History Follow Up
+    {
+        path: ':contactId/follow-ups/:followUpId/history',
+        component: fromPages.ModifyContactFollowUpComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.FOLLOW_UP_VIEW
+            ],
+            action: ViewModifyComponentAction.HISTORY
+        }
+    },
     // View Contact Questionnaire
     {
         path: ':contactId/follow-ups/:followUpId/view-questionnaire',
@@ -250,6 +285,18 @@ const routes: Routes = [
         canDeactivate: [
             PageChangeConfirmationGuard
         ]
+    },
+    // View History Questionnaire
+    {
+        path: ':contactId/follow-ups/:followUpId/history-questionnaire',
+        component: fromPages.ModifyQuestionnaireContactFollowUpComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.FOLLOW_UP_VIEW
+            ],
+            action: ViewModifyComponentAction.HISTORY
+        }
     },
     // Modify list of Follow Ups
     {

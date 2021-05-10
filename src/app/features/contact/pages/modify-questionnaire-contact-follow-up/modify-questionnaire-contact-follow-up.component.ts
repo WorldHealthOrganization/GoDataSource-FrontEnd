@@ -12,10 +12,10 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel } from '../../../../core/models/user.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
-import { ContactModel } from 'app/core/models/contact.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { ContactModel } from '../../../../core/models/contact.model';
 
 @Component({
     selector: 'app-modify-questionnaire-contact-follow-up',
@@ -107,22 +107,28 @@ export class ModifyQuestionnaireContactFollowUpComponent extends ViewModifyCompo
             // contacts list page
             if (ContactModel.canList(this.authUser)) {
                 this.breadcrumbs.push(
-                    new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+                    new BreadcrumbItemModel(
+                        this.history ? 'LNG_PAGE_LIST_CASES_TITLE' : 'LNG_PAGE_LIST_CONTACTS_TITLE',
+                        this.history ? '/cases' : '/contacts'
+                    )
                 );
             }
 
             // contacts view page
             if (ContactModel.canView(this.authUser)) {
                 this.breadcrumbs.push(
-                    new BreadcrumbItemModel(this.followUpData.person.name, `/contacts/${this.followUpData.person.id}/view`)
+                    new BreadcrumbItemModel(
+                        this.followUpData.person.name,
+                        this.history ? `/cases/${this.followUpData.person.id}/view` : `/contacts/${this.followUpData.person.id}/view`
+                    )
                 );
             }
 
             if (FollowUpModel.canModify(this.authUser)) {
                 this.breadcrumbs.push(
                     new BreadcrumbItemModel(
-                        'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
-                        `/contacts/${this.followUpData.person.id}/follow-ups/${this.followUpData.id}/modify`,
+                        this.history ? 'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE' : 'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
+                        this.history ? `/contacts/${this.followUpData.person.id}/follow-ups/${this.followUpData.id}/history` : `/contacts/${this.followUpData.person.id}/follow-ups/${this.followUpData.id}/modify`,
                         false,
                         { rootPage: this.rootPage, rootCaseId: this.rootCaseId }
                     )

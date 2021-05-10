@@ -26,7 +26,7 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
-import { Constants } from 'app/core/models/constants';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-create-lab-result',

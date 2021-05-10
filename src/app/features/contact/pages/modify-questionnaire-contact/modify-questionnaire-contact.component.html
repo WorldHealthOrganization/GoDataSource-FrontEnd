@@ -16,9 +16,10 @@
                 <app-form-fill-questionnaire
                     *ngIf="!!contactData?.id"
                     name="questionnaireAnswers"
-                    [ngModel]="contactData.questionnaireAnswers"
-                    [questions]="selectedOutbreak?.contactInvestigationTemplate"
+                    [ngModel]="history ? contactData?.questionnaireAnswersCase : contactData?.questionnaireAnswers"
+                    [questions]="history ? selectedOutbreak?.caseInvestigationTemplate : selectedOutbreak?.contactInvestigationTemplate"
                     [disabled]="viewOnly"
+                    [warningTitle]="history ? ('LNG_QUESTIONNAIRE_REGISTERED_AS_CONTACT_MESSAGE' | translate: { personName: caseData?.name }) : undefined"
                     [componentTitle]="'LNG_PAGE_MODIFY_CONTACT_TAB_QUESTIONNAIRE_TITLE' | translate">
                 </app-form-fill-questionnaire>
             </mat-tab>
@@ -32,7 +33,9 @@
             <ng-container
                 *app-selected-outbreak-is-active>
                 <button
-                    *ngIf="viewOnly && ContactModel.canModify(authUser)"
+                    *ngIf="!history &&
+                        viewOnly &&
+                        ContactModel.canModify(authUser)"
                     type="button"
                     mat-raised-button color="accent"
                     [routerLink]="['/contacts', contactId, 'modify-questionnaire']">

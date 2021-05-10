@@ -23,8 +23,8 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { CaseModel } from '../../../../core/models/case.model';
 import { catchError } from 'rxjs/operators';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { moment } from 'app/core/helperClasses/x-moment';
 import { EntityType } from '../../../../core/models/entity-type';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-modify-follow-up',
@@ -59,6 +59,7 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
     Constants = Constants;
     FollowUpModel = FollowUpModel;
     ContactModel = ContactModel;
+    CaseModel = CaseModel;
     EntityType = EntityType;
 
     /**
@@ -294,7 +295,10 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
                     // follow-ups list page
                     if (FollowUpModel.canList(this.authUser)) {
                         this.breadcrumbs.push(
-                            new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', this.rootPageUrl)
+                            new BreadcrumbItemModel(
+                                this.history ? 'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE' : 'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
+                                this.rootPageUrl
+                            )
                         );
                     }
 
@@ -332,7 +336,7 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
 
             case FollowUpPage.DAILY:
             default:
-                return '/contacts/follow-ups';
+                return this.history ? `/contacts/case-follow-ups/${this.contactId}` : '/contacts/follow-ups';
         }
     }
 

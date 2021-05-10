@@ -17,8 +17,8 @@ import { catchError, share, tap } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
-import { Constants } from 'app/core/models/constants';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-transmission-chains-snapshot-list',

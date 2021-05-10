@@ -64,6 +64,10 @@ export class CaseModel
     questionnaireAnswers: {
         [variable: string]: IAnswerData[];
     };
+
+    questionnaireAnswersContact: {
+        [variable: string]: IAnswerData[];
+    };
     type: EntityType = EntityType.CASE;
     dateOfReporting: string;
     dateOfLastContact: string;
@@ -76,6 +80,13 @@ export class CaseModel
 
     numberOfContacts: number;
     numberOfExposures: number;
+
+    followUp: {
+        originalStartDate: string,
+        startDate: string,
+        endDate: string,
+        status: string
+    };
 
     visualId: string;
 
@@ -289,6 +300,7 @@ export class CaseModel
         this.outcomeId = _.get(data, 'outcomeId');
 
         this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
+        this.questionnaireAnswersContact = _.get(data, 'questionnaireAnswersContact', {});
 
         this.relationships = _.get(data, 'relationships', []);
         this.dateBecomeContact = _.get(data, 'dateBecomeContact');
@@ -309,6 +321,8 @@ export class CaseModel
         _.each(this.matchedDuplicateRelationships, (matchedRelationship, index) => {
             this.matchedDuplicateRelationships[index] = new EntityMatchedRelationshipModel(matchedRelationship);
         });
+
+        this.followUp = _.get(data, 'followUp', {});
     }
 
     /**
@@ -436,5 +450,12 @@ export class CaseModel
             }
             return acc;
         }, []);
+    }
+
+    /**
+     * Check if case has questionnaire answers registered as contact
+     */
+    get hasQuestionnaireAnswersContact(): boolean {
+        return !_.isEmpty(this.questionnaireAnswersContact);
     }
 }

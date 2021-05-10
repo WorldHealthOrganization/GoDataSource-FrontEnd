@@ -414,5 +414,21 @@
             [routerLink]="['/contacts', contactId, 'chronology']">
             {{ 'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_CHRONOLOGY' | translate }}
         </button>
+
+        <ng-container
+            *ngIf="contactData.wasCase &&
+                contactData?.hasQuestionnaireAnswersCase">
+
+            <div class="page-tabs-navbar-placeholder"></div>
+
+            <div class="history-title">{{'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_WAS_CASE_TITLE' | translate}}</div>
+
+            <button
+                type="button"
+                mat-raised-button
+                [routerLink]="['/contacts', contactId, 'history']">
+                {{'LNG_PAGE_MODIFY_CONTACT_TAB_CASE_QUESTIONNAIRE_TITLE' | translate}}
+            </button>
+        </ng-container>
     </div>
 </form>

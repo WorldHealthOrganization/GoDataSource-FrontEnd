@@ -19,6 +19,7 @@
                     [ngModel]="followUpData.questionnaireAnswers"
                     [questions]="selectedOutbreak?.contactFollowUpTemplate"
                     [disabled]="viewOnly"
+                    [warningTitle]="!history ? undefined : 'LNG_QUESTIONNAIRE_REGISTERED_AS_CONTACT_MESSAGE' | translate: { personName: followUpData?.person?.name }"
                     [componentTitle]="'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE' | translate">
                 </app-form-fill-questionnaire>
             </mat-tab>
@@ -32,7 +33,9 @@
             <ng-container
                 *app-selected-outbreak-is-active>
                 <button
-                    *ngIf="viewOnly && FollowUpModel.canModify(authUser)"
+                    *ngIf="!history &&
+                        viewOnly &&
+                        FollowUpModel.canModify(authUser)"
                     type="button"
                     mat-raised-button color="accent"
                     [routerLink]="['/contacts', contactId, 'follow-ups', followUpId, 'modify-questionnaire']">
@@ -49,7 +52,8 @@
 
             <button
                 type="button"
-                [routerLink]="['/contacts', contactId, 'follow-ups', followUpId, viewOnly ? 'view' : 'modify']"
+                [routerLink]="['/contacts', contactId, 'follow-ups', followUpId, history ? 'history' : (viewOnly ? 'view' : 'modify')]"
+                [queryParams]="{ rootPage: rootPage }"
                 mat-raised-button>
                 {{'LNG_COMMON_BUTTON_BACK' | translate}}
             </button>
