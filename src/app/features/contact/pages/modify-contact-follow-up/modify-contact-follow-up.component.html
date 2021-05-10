@@ -220,8 +220,8 @@
             *ngIf="ContactModel.canView(authUser)"
             mat-raised-button
             type="button"
-            [routerLink]="[history || (relatedPersonData && relatedPersonData.type === EntityType.CASE) ? '/cases' : '/contacts', contactId, 'view']">
-            {{ (history || (relatedPersonData && relatedPersonData.type === EntityType.CASE) ? 'LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_VIEW_CASE' : 'LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_VIEW_CONTACT') | translate }}
+            [routerLink]="[relatedPersonData && relatedPersonData.type === EntityType.CASE ? '/cases' : '/contacts', contactId, 'view']">
+            {{ (relatedPersonData && relatedPersonData.type === EntityType.CASE ? 'LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_VIEW_CASE' : 'LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_VIEW_CONTACT') | translate }}
         </button>
     </div>
 </form>

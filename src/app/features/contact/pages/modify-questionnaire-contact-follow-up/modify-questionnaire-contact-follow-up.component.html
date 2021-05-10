@@ -19,7 +19,7 @@
                     [ngModel]="followUpData.questionnaireAnswers"
                     [questions]="selectedOutbreak?.contactFollowUpTemplate"
                     [disabled]="viewOnly"
-                    [warningTitle]="!history ? '' : 'LNG_QUESTIONNAIRE_REGISTERED_AS_CONTACT_MESSAGE' | translate: { personName: followUpData?.person?.name }"
+                    [warningTitle]="!history ? undefined : 'LNG_QUESTIONNAIRE_REGISTERED_AS_CONTACT_MESSAGE' | translate: { personName: followUpData?.person?.name }"
                     [componentTitle]="'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE' | translate">
                 </app-form-fill-questionnaire>
             </mat-tab>
@@ -52,7 +52,7 @@
 
             <button
                 type="button"
-                [routerLink]="['/contacts', contactId, 'follow-ups', followUpId, history ? 'history' : viewOnly ? 'view' : 'modify']"
+                [routerLink]="['/contacts', contactId, 'follow-ups', followUpId, history ? 'history' : (viewOnly ? 'view' : 'modify')]"
                 [queryParams]="{ rootPage: rootPage }"
                 mat-raised-button>
                 {{'LNG_COMMON_BUTTON_BACK' | translate}}

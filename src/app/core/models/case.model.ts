@@ -88,8 +88,6 @@ export class CaseModel
         status: string
     };
 
-    followUpTeamId: string;
-
     visualId: string;
 
     relationships: {
@@ -323,8 +321,6 @@ export class CaseModel
         _.each(this.matchedDuplicateRelationships, (matchedRelationship, index) => {
             this.matchedDuplicateRelationships[index] = new EntityMatchedRelationshipModel(matchedRelationship);
         });
-
-        this.followUpTeamId = _.get(data, 'followUpTeamId');
 
         this.followUp = _.get(data, 'followUp', {});
     }
