@@ -509,6 +509,7 @@
                     [options]="teamsListLoaded"
                     optionLabelKey="name"
                     optionValueKey="id"
+                    [disabled]="!isContact"
                     (optionChanged)="changeFollowUpTeam(item, $event)">
                 </app-form-select>
                 <ng-template
@@ -574,6 +575,7 @@
                     [(ngModel)]="item.targeted"
                     [label]="'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate"
                     tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION"
+                    [readonly]="!isContact"
                     (optionChanged)="setTargetedItem(item, $event)">
                 </app-form-slide-toggle>
                 <ng-template
