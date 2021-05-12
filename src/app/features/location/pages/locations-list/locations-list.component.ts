@@ -343,8 +343,6 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
                                                 this.router.navigate(['/locations', err.details.id, 'usage']);
                                             }
                                         });
-                                } else if (err.code === ErrorCodes.DELETE_PARENT_MODEL) {
-                                    this.snackbarService.showError('LNG_DIALOG_CONFIRM_LOCATION_HAS_CHILDREN', location);
                                 } else {
                                     this.snackbarService.showApiError(err);
                                 }
