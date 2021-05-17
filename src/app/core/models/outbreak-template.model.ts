@@ -35,6 +35,7 @@ export class OutbreakTemplateModel
     generateFollowUpsOverwriteExisting: boolean;
     generateFollowUpsKeepTeamAssignment: boolean;
     generateFollowUpsTeamAssignmentAlgorithm: string;
+    generateFollowUpsDateOfLastContact: boolean;
 
     /**
      * Static Permissions - IPermissionBasic
@@ -86,6 +87,7 @@ export class OutbreakTemplateModel
         this.generateFollowUpsOverwriteExisting = _.get(data, 'generateFollowUpsOverwriteExisting', false);
         this.generateFollowUpsKeepTeamAssignment = _.get(data, 'generateFollowUpsKeepTeamAssignment', true);
         this.generateFollowUpsTeamAssignmentAlgorithm = _.get(data, 'generateFollowUpsTeamAssignmentAlgorithm', Constants.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM.ROUND_ROBIN_ALL_TEAMS.value);
+        this.generateFollowUpsDateOfLastContact = _.get(data, 'generateFollowUpsDateOfLastContact', false);
 
         // CASE INVESTIGATION TEMPLATE
         this.caseInvestigationTemplate = _.map(

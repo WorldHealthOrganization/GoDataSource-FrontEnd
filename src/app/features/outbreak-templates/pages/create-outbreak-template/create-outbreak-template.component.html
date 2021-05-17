@@ -193,6 +193,13 @@
                                 tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_OF_CONTACT_ACTIVE_DESCRIPTION">
                             </app-form-slide-toggle>
 
+                            <app-form-slide-toggle
+                                name="generateFollowUpsDateOfLastContact"
+                                [(ngModel)]="newOutbreakTemplate.generateFollowUpsDateOfLastContact"
+                                [label]="'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT' | translate"
+                                tooltip="LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT_DESCRIPTION">
+                            </app-form-slide-toggle>
+
                         </div>
                     </div>
                 </mat-card>
