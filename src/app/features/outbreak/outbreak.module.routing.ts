@@ -155,6 +155,25 @@ const routes: Routes = [
                 PERMISSION.OUTBREAK_SEE_INCONSISTENCIES
             ]
         }
+    },
+
+    // Global entity search result
+    {
+        path: ':outbreakId/search-results',
+        component: fromPages.SearchResultListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.CASE_VIEW,
+                PERMISSION.CASE_MODIFY,
+                PERMISSION.CONTACT_VIEW,
+                PERMISSION.CONTACT_MODIFY,
+                PERMISSION.CONTACT_OF_CONTACT_VIEW,
+                PERMISSION.CONTACT_OF_CONTACT_MODIFY,
+                PERMISSION.EVENT_VIEW,
+                PERMISSION.EVENT_MODIFY
+            ]
+        }
     }
 ];
 

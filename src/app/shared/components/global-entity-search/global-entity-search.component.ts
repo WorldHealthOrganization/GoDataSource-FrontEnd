@@ -101,11 +101,23 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
                     )
                     .subscribe((results) => {
                         if (!_.isEmpty(results)) {
-                            const foundEntity = results[0];
-                            // generate the link for the entity view
-                            const personLink = EntityModel.getPersonLink(foundEntity);
-                            // navigate to the person view page
-                            this.router.navigate([personLink]);
+                            // if there is a single result, navigate to the entity view page, otherwise display all results in a new page
+                            if (results.length === 1) {
+                                // generate the link for the entity view
+                                const personLink = EntityModel.getPersonLink(results[0]);
+                                // navigate to the person view page
+                                this.router.navigate([personLink]);
+                            } else {
+                                // save results
+                                this.globalEntitySearchDataService.setData(results);
+
+                                // set shouldReuseRoute to reload/refresh the data when navigate to same route
+                                this.router.routeReuseStrategy.shouldReuseRoute = () => false;
+
+                                // display all results
+                                this.router.navigate(['/outbreaks', this.selectedOutbreak.id, 'search-results']);
+                            }
+
                             // empty search field
                             this.globalSearchValue = '';
                             // close side nav

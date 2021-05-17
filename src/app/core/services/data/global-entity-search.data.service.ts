@@ -12,7 +12,30 @@ import { ContactOfContactModel } from '../../models/contact-of-contact.model';
 
 @Injectable()
 export class GlobalEntitySearchDataService {
+    // store search results data
+    private data;
 
+    // set data
+    setData(data) {
+        this.data = data;
+    }
+
+    // get data
+    getData() {
+        return this.data;
+        const temp = this.data;
+        this.clearData();
+        return temp;
+    }
+
+    // clear data
+    clearData() {
+        this.data = undefined;
+    }
+
+    /**
+     * Constructor
+     */
     constructor(
         private http: HttpClient
     ) {}
