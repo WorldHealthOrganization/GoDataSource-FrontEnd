@@ -206,6 +206,34 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Start contact follow-up on the date of last contact -->
+        <ng-container matColumnDef="generateFollowUpsDateOfLastContact">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="generateFollowUpsDateOfLastContact"
+                            [ngModel]="''"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="yesNoOptionsList$ | async"
+                            (optionChanged)="filterByBooleanField('generateFollowUpsDateOfLastContact', $event.value)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let outbreak">
+                <app-yes-no-label [value]="outbreak.generateFollowUpsDateOfLastContact"></app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
         <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
         <mat-row
             *matRowDef="let item; columns: visibleTableColumns"

@@ -56,6 +56,7 @@ export class OutbreakModel
     generateFollowUpsOverwriteExisting: boolean;
     generateFollowUpsKeepTeamAssignment: boolean;
     generateFollowUpsTeamAssignmentAlgorithm: string;
+    generateFollowUpsDateOfLastContact: boolean;
 
     // used for displaying information when hovering an outbreak from topnav component
     // no need to save this one in the database
@@ -130,6 +131,7 @@ export class OutbreakModel
         this.generateFollowUpsOverwriteExisting = _.get(data, 'generateFollowUpsOverwriteExisting', false);
         this.generateFollowUpsKeepTeamAssignment = _.get(data, 'generateFollowUpsKeepTeamAssignment', true);
         this.generateFollowUpsTeamAssignmentAlgorithm = _.get(data, 'generateFollowUpsTeamAssignmentAlgorithm', Constants.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM.ROUND_ROBIN_ALL_TEAMS.value);
+        this.generateFollowUpsDateOfLastContact = _.get(data, 'generateFollowUpsDateOfLastContact', false);
 
         // CASE INVESTIGATION TEMPLATE
         this.caseInvestigationTemplate = _.map(
