@@ -355,10 +355,12 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
         // check for duplicates
         this.caseDataService
-            .findDuplicates(this.selectedOutbreak.id, {
-                ...this.caseData,
-                ...dirtyFields
-            })
+            .findDuplicates(
+                this.selectedOutbreak.id, {
+                    ...this.caseData,
+                    ...dirtyFields
+                }
+            )
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showApiError(err);

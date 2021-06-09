@@ -234,10 +234,13 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
 
         this.showLoadingDialog();
         this.contactsOfContactsDataService
-            .findDuplicates(this.selectedOutbreak.id, {
-                ...this.contactOfContactData,
-                ...dirtyFields
-            })
+            .findDuplicates(
+                this.selectedOutbreak.id,
+                {
+                    ...this.contactOfContactData,
+                    ...dirtyFields
+                }
+            )
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showApiError(err);

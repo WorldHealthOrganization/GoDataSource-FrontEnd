@@ -289,10 +289,12 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
 
         // check for duplicates
         this.contactDataService
-            .findDuplicates(this.selectedOutbreak.id, {
-                ...this.contactData,
-                ...dirtyFields
-            })
+            .findDuplicates(
+                this.selectedOutbreak.id, {
+                    ...this.contactData,
+                    ...dirtyFields
+                }
+            )
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showApiError(err);

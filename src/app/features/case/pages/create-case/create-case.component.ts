@@ -215,7 +215,10 @@ export class CreateCaseComponent
             // check for duplicates
             const loadingDialog = this.dialogService.showLoadingDialog();
             this.caseDataService
-                .findDuplicates(this.selectedOutbreak.id, dirtyFields)
+                .findDuplicates(
+                    this.selectedOutbreak.id,
+                    dirtyFields
+                )
                 .pipe(
                     catchError((err) => {
                         if (_.includes(_.get(err, 'details.codes.id'), `uniqueness`)) {

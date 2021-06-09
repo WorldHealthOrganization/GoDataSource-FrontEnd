@@ -314,7 +314,10 @@ export class CreateContactComponent
             // check for duplicates
             const loadingDialog = this.dialogService.showLoadingDialog();
             this.contactDataService
-                .findDuplicates(this.selectedOutbreak.id, dirtyFields)
+                .findDuplicates(
+                    this.selectedOutbreak.id,
+                    dirtyFields
+                )
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
