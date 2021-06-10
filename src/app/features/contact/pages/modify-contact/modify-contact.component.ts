@@ -36,6 +36,8 @@ import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { TimerCache } from '../../../../core/helperClasses/timer-cache';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
+import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
+import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 
 @Component({
     selector: 'app-modify-contact',
@@ -102,7 +104,8 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         private i18nService: I18nService,
         private relationshipDataService: RelationshipDataService,
         private entityDataService: EntityDataService,
-        private teamDataService: TeamDataService
+        private teamDataService: TeamDataService,
+        private systemSettingsDataService: SystemSettingsDataService
     ) {
         super(
             route,
@@ -287,213 +290,227 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         // show loading
         this.showLoadingDialog();
 
-        // check for duplicates
-        this.contactDataService
-            .findDuplicates(
-                this.selectedOutbreak.id, {
-                    ...this.contactData,
-                    ...dirtyFields
-                }
-            )
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
+        // items marked as not duplicates
+        let itemsMarkedAsNotDuplicates: string[] = [];
 
-                    // hide loading
-                    this.hideLoadingDialog();
+        // modify Contact
+        const runModifyContact = (finishCallBack?: () => void) => {
+            // modify the contact
+            this.contactDataService
+                .modifyContact(
+                    this.selectedOutbreak.id,
+                    this.contactId,
+                    dirtyFields,
+                    true
+                )
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        // hide loading
+                        this.hideLoadingDialog();
+                        return throwError(err);
+                    })
+                )
+                .subscribe((modifiedContact: ContactModel) => {
+                    // called when we finished updating contact data
+                    const finishedUpdatingContact = () => {
+                        // update model
+                        this.contactData = modifiedContact;
 
-                    return throwError(err);
-                })
-            )
-            .subscribe((contactDuplicates: EntityDuplicatesModel) => {
-                // items marked as not duplicates
-                let itemsMarkedAsNotDuplicates: string[] = [];
+                        // mark form as pristine
+                        form.form.markAsPristine();
 
-                // modify Contact
-                const runModifyContact = (finishCallBack?: () => void) => {
-                    // modify the contact
-                    this.contactDataService
-                        .modifyContact(
-                            this.selectedOutbreak.id,
-                            this.contactId,
-                            dirtyFields,
-                            true
-                        )
-                        .pipe(
-                            catchError((err) => {
-                                this.snackbarService.showApiError(err);
-                                // hide loading
-                                this.hideLoadingDialog();
-                                return throwError(err);
-                            })
-                        )
-                        .subscribe((modifiedContact: ContactModel) => {
-                            // called when we finished updating contact data
-                            const finishedUpdatingContact = () => {
-                                // update model
-                                this.contactData = modifiedContact;
+                        // display message
+                        if (!finishCallBack) {
+                            this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE');
 
-                                // mark form as pristine
-                                form.form.markAsPristine();
+                            // update breadcrumb
+                            this.initializeBreadcrumbs();
 
-                                // display message
-                                if (!finishCallBack) {
-                                    this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE');
+                            // hide loading
+                            this.hideLoadingDialog();
+                        } else {
+                            // finished
+                            finishCallBack();
+                        }
+                    };
 
-                                    // update breadcrumb
-                                    this.initializeBreadcrumbs();
+                    // there are no records marked as NOT duplicates ?
+                    if (
+                        !itemsMarkedAsNotDuplicates ||
+                        itemsMarkedAsNotDuplicates.length < 1
+                    ) {
+                        finishedUpdatingContact();
+                    } else {
+                        // mark records as not duplicates
+                        this.entityDataService
+                            .markPersonAsOrNotADuplicate(
+                                this.selectedOutbreak.id,
+                                EntityType.CONTACT,
+                                this.contactId,
+                                itemsMarkedAsNotDuplicates
+                            )
+                            .pipe(
+                                catchError((err) => {
+                                    this.snackbarService.showApiError(err);
 
                                     // hide loading
                                     this.hideLoadingDialog();
-                                } else {
-                                    // finished
-                                    finishCallBack();
-                                }
-                            };
 
-                            // there are no records marked as NOT duplicates ?
-                            if (
-                                !itemsMarkedAsNotDuplicates ||
-                                itemsMarkedAsNotDuplicates.length < 1
-                            ) {
+                                    return throwError(err);
+                                })
+                            )
+                            .subscribe(() => {
+                                // finished
                                 finishedUpdatingContact();
-                            } else {
-                                // mark records as not duplicates
-                                this.entityDataService
-                                    .markPersonAsOrNotADuplicate(
-                                        this.selectedOutbreak.id,
-                                        EntityType.CONTACT,
-                                        this.contactId,
-                                        itemsMarkedAsNotDuplicates
-                                    )
-                                    .pipe(
-                                        catchError((err) => {
-                                            this.snackbarService.showApiError(err);
+                            });
+                    }
+                });
+        };
+
+        // check if we need to determine duplicates
+        this.systemSettingsDataService
+            .getAPIVersion()
+            .subscribe((versionData: SystemSettingsVersionModel) => {
+                // no duplicates - proceed to modify contact ?
+                if (versionData.duplicate.disableContactDuplicateCheck) {
+                    // no need to check for duplicates
+                    runModifyContact();
+
+                    // finished
+                    return;
+                }
+
+                // check for duplicates
+                this.contactDataService
+                    .findDuplicates(
+                        this.selectedOutbreak.id, {
+                            ...this.contactData,
+                            ...dirtyFields
+                        }
+                    )
+                    .pipe(
+                        catchError((err) => {
+                            this.snackbarService.showApiError(err);
+
+                            // hide loading
+                            this.hideLoadingDialog();
+
+                            return throwError(err);
+                        })
+                    )
+                    .subscribe((contactDuplicates: EntityDuplicatesModel) => {
+                        // do we have duplicates ?
+                        if (contactDuplicates.duplicates.length > 0) {
+                            // construct list of items from which we can choose actions
+                            const fieldsList: DialogField[] = [];
+                            const fieldsListLayout: number[] = [];
+                            contactDuplicates.duplicates.forEach((duplicate: EntityModel, index: number) => {
+                                // contact model
+                                const contactData: ContactModel = duplicate.model as ContactModel;
+
+                                // add row fields
+                                fieldsListLayout.push(60, 40);
+                                fieldsList.push(
+                                    new DialogField({
+                                        name: `actions[${contactData.id}].label`,
+                                        placeholder: (index + 1) + '. ' + EntityModel.getNameWithDOBAge(
+                                            contactData,
+                                            this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+                                            this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+                                        ),
+                                        fieldType: DialogFieldType.LINK,
+                                        routerLink: ['/contacts', contactData.id, 'view'],
+                                        linkTarget: '_blank'
+                                    }),
+                                    new DialogField({
+                                        name: `actions[${contactData.id}].action`,
+                                        placeholder: 'LNG_DUPLICATES_DIALOG_ACTION',
+                                        description: 'LNG_DUPLICATES_DIALOG_ACTION_DESCRIPTION',
+                                        inputOptions: [
+                                            new LabelValuePair(
+                                                Constants.DUPLICATE_ACTION.NO_ACTION,
+                                                Constants.DUPLICATE_ACTION.NO_ACTION
+                                            ),
+                                            new LabelValuePair(
+                                                Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE,
+                                                Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE
+                                            ),
+                                            new LabelValuePair(
+                                                Constants.DUPLICATE_ACTION.MERGE,
+                                                Constants.DUPLICATE_ACTION.MERGE
+                                            )
+                                        ],
+                                        inputOptionsClearable: false,
+                                        required: true,
+                                        value: Constants.DUPLICATE_ACTION.NO_ACTION
+                                    })
+                                );
+                            });
+
+                            // display dialog
+                            this.dialogService.showConfirm(new DialogConfiguration({
+                                message: 'LNG_PAGE_MODIFY_CONTACT_DUPLICATES_DIALOG_CONFIRM_MSG',
+                                yesLabel: 'LNG_COMMON_BUTTON_SAVE',
+                                customInput: true,
+                                fieldsListLayout: fieldsListLayout,
+                                fieldsList: fieldsList
+                            })).subscribe((answer) => {
+                                if (answer.button === DialogAnswerButton.Yes) {
+                                    // determine number of items to merge / mark as not duplicates
+                                    const itemsToMerge: string[] = [];
+                                    itemsMarkedAsNotDuplicates = [];
+                                    const actions: {
+                                        [id: string]: {
+                                            action: string
+                                        }
+                                    } = _.get(answer, 'inputValue.value.actions', {});
+                                    if (!_.isEmpty(actions)) {
+                                        _.each(actions, (data, id) => {
+                                            switch (data.action) {
+                                                case Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE:
+                                                    itemsMarkedAsNotDuplicates.push(id);
+                                                    break;
+                                                case Constants.DUPLICATE_ACTION.MERGE:
+                                                    itemsToMerge.push(id);
+                                                    break;
+                                            }
+                                        });
+                                    }
+
+                                    // save data first, followed by redirecting to merge
+                                    if (itemsToMerge.length > 0) {
+                                        runModifyContact(() => {
+                                            // construct list of ids
+                                            const mergeIds: string[] = [
+                                                this.contactId,
+                                                ...itemsToMerge
+                                            ];
 
                                             // hide loading
                                             this.hideLoadingDialog();
 
-                                            return throwError(err);
-                                        })
-                                    )
-                                    .subscribe(() => {
-                                        // finished
-                                        finishedUpdatingContact();
-                                    });
-                            }
-                        });
-                };
-
-                // do we have duplicates ?
-                if (contactDuplicates.duplicates.length > 0) {
-                    // construct list of items from which we can choose actions
-                    const fieldsList: DialogField[] = [];
-                    const fieldsListLayout: number[] = [];
-                    contactDuplicates.duplicates.forEach((duplicate: EntityModel, index: number) => {
-                        // contact model
-                        const contactData: ContactModel = duplicate.model as ContactModel;
-
-                        // add row fields
-                        fieldsListLayout.push(60, 40);
-                        fieldsList.push(
-                            new DialogField({
-                                name: `actions[${contactData.id}].label`,
-                                placeholder: (index + 1) + '. ' + EntityModel.getNameWithDOBAge(
-                                    contactData,
-                                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-                                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
-                                ),
-                                fieldType: DialogFieldType.LINK,
-                                routerLink: ['/contacts', contactData.id, 'view'],
-                                linkTarget: '_blank'
-                            }),
-                            new DialogField({
-                                name: `actions[${contactData.id}].action`,
-                                placeholder: 'LNG_DUPLICATES_DIALOG_ACTION',
-                                description: 'LNG_DUPLICATES_DIALOG_ACTION_DESCRIPTION',
-                                inputOptions: [
-                                    new LabelValuePair(
-                                        Constants.DUPLICATE_ACTION.NO_ACTION,
-                                        Constants.DUPLICATE_ACTION.NO_ACTION
-                                    ),
-                                    new LabelValuePair(
-                                        Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE,
-                                        Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE
-                                    ),
-                                    new LabelValuePair(
-                                        Constants.DUPLICATE_ACTION.MERGE,
-                                        Constants.DUPLICATE_ACTION.MERGE
-                                    )
-                                ],
-                                inputOptionsClearable: false,
-                                required: true,
-                                value: Constants.DUPLICATE_ACTION.NO_ACTION
-                            })
-                        );
-                    });
-
-                    // display dialog
-                    this.dialogService.showConfirm(new DialogConfiguration({
-                        message: 'LNG_PAGE_MODIFY_CONTACT_DUPLICATES_DIALOG_CONFIRM_MSG',
-                        yesLabel: 'LNG_COMMON_BUTTON_SAVE',
-                        customInput: true,
-                        fieldsListLayout: fieldsListLayout,
-                        fieldsList: fieldsList
-                    })).subscribe((answer) => {
-                        if (answer.button === DialogAnswerButton.Yes) {
-                            // determine number of items to merge / mark as not duplicates
-                            const itemsToMerge: string[] = [];
-                            itemsMarkedAsNotDuplicates = [];
-                            const actions: {
-                                [id: string]: {
-                                    action: string
-                                }
-                            } = _.get(answer, 'inputValue.value.actions', {});
-                            if (!_.isEmpty(actions)) {
-                                _.each(actions, (data, id) => {
-                                    switch (data.action) {
-                                        case Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE:
-                                            itemsMarkedAsNotDuplicates.push(id);
-                                            break;
-                                        case Constants.DUPLICATE_ACTION.MERGE:
-                                            itemsToMerge.push(id);
-                                            break;
+                                            // redirect to merge
+                                            this.router.navigate(
+                                                ['/duplicated-records', EntityModel.getLinkForEntityType(EntityType.CONTACT), 'merge'], {
+                                                    queryParams: {
+                                                        ids: JSON.stringify(mergeIds)
+                                                    }
+                                                }
+                                            );
+                                        });
+                                    } else {
+                                        runModifyContact();
                                     }
-                                });
-                            }
-
-                            // save data first, followed by redirecting to merge
-                            if (itemsToMerge.length > 0) {
-                                runModifyContact(() => {
-                                    // construct list of ids
-                                    const mergeIds: string[] = [
-                                        this.contactId,
-                                        ...itemsToMerge
-                                    ];
-
+                                } else {
                                     // hide loading
                                     this.hideLoadingDialog();
-
-                                    // redirect to merge
-                                    this.router.navigate(
-                                        ['/duplicated-records', EntityModel.getLinkForEntityType(EntityType.CONTACT), 'merge'], {
-                                            queryParams: {
-                                                ids: JSON.stringify(mergeIds)
-                                            }
-                                        }
-                                    );
-                                });
-                            } else {
-                                runModifyContact();
-                            }
+                                }
+                            });
                         } else {
-                            // hide loading
-                            this.hideLoadingDialog();
+                            runModifyContact();
                         }
                     });
-                } else {
-                    runModifyContact();
-                }
             });
     }
 
