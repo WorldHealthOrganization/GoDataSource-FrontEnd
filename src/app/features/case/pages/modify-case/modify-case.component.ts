@@ -32,6 +32,8 @@ import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { TimerCache } from '../../../../core/helperClasses/timer-cache';
+import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
+import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 
 @Component({
     selector: 'app-modify-case',
@@ -98,7 +100,8 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         private formHelper: FormHelperService,
         private i18nService: I18nService,
         protected dialogService: DialogService,
-        private entityDataService: EntityDataService
+        private entityDataService: EntityDataService,
+        private systemSettingsDataService: SystemSettingsDataService
     ) {
         super(
             route,
@@ -353,208 +356,229 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         // show loading
         this.showLoadingDialog();
 
-        // check for duplicates
-        this.caseDataService
-            .findDuplicates(this.selectedOutbreak.id, {
-                ...this.caseData,
-                ...dirtyFields
-            })
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
+        // items marked as not duplicates
+        let itemsMarkedAsNotDuplicates: string[] = [];
 
-                    // hide loading
-                    this.hideLoadingDialog();
+        // modify Case
+        const runModifyCase = (finishCallBack?: () => void) => {
+            // modify the Case
+            this.caseDataService
+                .modifyCase(this.selectedOutbreak.id, this.caseId, dirtyFields)
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
 
-                    return throwError(err);
-                })
-            )
-            .subscribe((caseDuplicates: EntityDuplicatesModel) => {
-                // items marked as not duplicates
-                let itemsMarkedAsNotDuplicates: string[] = [];
+                        // hide loading
+                        this.hideLoadingDialog();
 
-                // modify Case
-                const runModifyCase = (finishCallBack?: () => void) => {
-                    // modify the Case
-                    this.caseDataService
-                        .modifyCase(this.selectedOutbreak.id, this.caseId, dirtyFields)
-                        .pipe(
-                            catchError((err) => {
-                                this.snackbarService.showApiError(err);
+                        return throwError(err);
+                    })
+                )
+                .subscribe((modifiedCase: CaseModel) => {
+                    // called when we finished updating case data
+                    const finishedUpdatingCase = () => {
+                        // update model
+                        this.caseData = modifiedCase;
 
-                                // hide loading
-                                this.hideLoadingDialog();
+                        // mark form as pristine
+                        form.form.markAsPristine();
 
-                                return throwError(err);
-                            })
-                        )
-                        .subscribe((modifiedCase: CaseModel) => {
-                            // called when we finished updating case data
-                            const finishedUpdatingCase = () => {
-                                // update model
-                                this.caseData = modifiedCase;
+                        // display message
+                        if (!finishCallBack) {
+                            this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE');
 
-                                // mark form as pristine
-                                form.form.markAsPristine();
+                            // update breadcrumb
+                            this.retrieveCaseData();
 
-                                // display message
-                                if (!finishCallBack) {
-                                    this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE');
+                            // hide loading
+                            this.hideLoadingDialog();
+                        } else {
+                            // finished
+                            finishCallBack();
+                        }
+                    };
 
-                                    // update breadcrumb
-                                    this.retrieveCaseData();
+                    // there are no records marked as NOT duplicates ?
+                    if (
+                        !itemsMarkedAsNotDuplicates ||
+                        itemsMarkedAsNotDuplicates.length < 1
+                    ) {
+                        finishedUpdatingCase();
+                    } else {
+                        // mark records as not duplicates
+                        this.entityDataService
+                            .markPersonAsOrNotADuplicate(
+                                this.selectedOutbreak.id,
+                                EntityType.CASE,
+                                this.caseId,
+                                itemsMarkedAsNotDuplicates
+                            )
+                            .pipe(
+                                catchError((err) => {
+                                    this.snackbarService.showApiError(err);
 
                                     // hide loading
                                     this.hideLoadingDialog();
-                                } else {
-                                    // finished
-                                    finishCallBack();
-                                }
-                            };
 
-                            // there are no records marked as NOT duplicates ?
-                            if (
-                                !itemsMarkedAsNotDuplicates ||
-                                itemsMarkedAsNotDuplicates.length < 1
-                            ) {
+                                    return throwError(err);
+                                })
+                            )
+                            .subscribe(() => {
+                                // finished
                                 finishedUpdatingCase();
-                            } else {
-                                // mark records as not duplicates
-                                this.entityDataService
-                                    .markPersonAsOrNotADuplicate(
-                                        this.selectedOutbreak.id,
-                                        EntityType.CASE,
-                                        this.caseId,
-                                        itemsMarkedAsNotDuplicates
-                                    )
-                                    .pipe(
-                                        catchError((err) => {
-                                            this.snackbarService.showApiError(err);
+                            });
+                    }
+                });
+        };
+
+        // check if we need to determine duplicates
+        this.systemSettingsDataService
+            .getAPIVersion()
+            .subscribe((versionData: SystemSettingsVersionModel) => {
+                // no duplicates - proceed to modify case ?
+                if (
+                    versionData.duplicate.disableCaseDuplicateCheck || (
+                        versionData.duplicate.executeCheckOnlyOnDuplicateDataChange &&
+                        !EntityModel.duplicateDataHasChanged(dirtyFields)
+                    )
+                ) {
+                    // no need to check for duplicates
+                    runModifyCase();
+
+                    // finished
+                    return;
+                }
+
+                // check for duplicates
+                this.caseDataService
+                    .findDuplicates(
+                        this.selectedOutbreak.id, {
+                            ...this.caseData,
+                            ...dirtyFields
+                        }
+                    )
+                    .pipe(
+                        catchError((err) => {
+                            this.snackbarService.showApiError(err);
+
+                            // hide loading
+                            this.hideLoadingDialog();
+
+                            return throwError(err);
+                        })
+                    )
+                    .subscribe((caseDuplicates: EntityDuplicatesModel) => {
+                        // do we have duplicates ?
+                        if (caseDuplicates.duplicates.length > 0) {
+                            // construct list of items from which we can choose actions
+                            const fieldsList: DialogField[] = [];
+                            const fieldsListLayout: number[] = [];
+                            caseDuplicates.duplicates.forEach((duplicate: EntityModel, index: number) => {
+                                // case model
+                                const caseData: CaseModel = duplicate.model as CaseModel;
+
+                                // add row fields
+                                fieldsListLayout.push(60, 40);
+                                fieldsList.push(
+                                    new DialogField({
+                                        name: `actions[${caseData.id}].label`,
+                                        placeholder: (index + 1) + '. ' + EntityModel.getNameWithDOBAge(
+                                            caseData,
+                                            this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+                                            this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+                                        ),
+                                        fieldType: DialogFieldType.LINK,
+                                        routerLink: ['/cases', caseData.id, 'view'],
+                                        linkTarget: '_blank'
+                                    }),
+                                    new DialogField({
+                                        name: `actions[${caseData.id}].action`,
+                                        placeholder: 'LNG_DUPLICATES_DIALOG_ACTION',
+                                        description: 'LNG_DUPLICATES_DIALOG_ACTION_DESCRIPTION',
+                                        inputOptions: [
+                                            new LabelValuePair(
+                                                Constants.DUPLICATE_ACTION.NO_ACTION,
+                                                Constants.DUPLICATE_ACTION.NO_ACTION
+                                            ),
+                                            new LabelValuePair(
+                                                Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE,
+                                                Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE
+                                            ),
+                                            new LabelValuePair(
+                                                Constants.DUPLICATE_ACTION.MERGE,
+                                                Constants.DUPLICATE_ACTION.MERGE
+                                            )
+                                        ],
+                                        inputOptionsClearable: false,
+                                        required: true,
+                                        value: Constants.DUPLICATE_ACTION.NO_ACTION
+                                    })
+                                );
+                            });
+
+                            // display dialog
+                            this.dialogService.showConfirm(new DialogConfiguration({
+                                message: 'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_CONFIRM_MSG',
+                                yesLabel: 'LNG_COMMON_BUTTON_SAVE',
+                                customInput: true,
+                                fieldsListLayout: fieldsListLayout,
+                                fieldsList: fieldsList
+                            })).subscribe((answer) => {
+                                if (answer.button === DialogAnswerButton.Yes) {
+                                    // determine number of items to merge / mark as not duplicates
+                                    const itemsToMerge: string[] = [];
+                                    itemsMarkedAsNotDuplicates = [];
+                                    const actions: {
+                                        [id: string]: {
+                                            action: string
+                                        }
+                                    } = _.get(answer, 'inputValue.value.actions', {});
+                                    if (!_.isEmpty(actions)) {
+                                        _.each(actions, (data, id) => {
+                                            switch (data.action) {
+                                                case Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE:
+                                                    itemsMarkedAsNotDuplicates.push(id);
+                                                    break;
+                                                case Constants.DUPLICATE_ACTION.MERGE:
+                                                    itemsToMerge.push(id);
+                                                    break;
+                                            }
+                                        });
+                                    }
+
+                                    // save data first, followed by redirecting to merge
+                                    if (itemsToMerge.length > 0) {
+                                        runModifyCase(() => {
+                                            // construct list of ids
+                                            const mergeIds: string[] = [
+                                                this.caseId,
+                                                ...itemsToMerge
+                                            ];
 
                                             // hide loading
                                             this.hideLoadingDialog();
 
-                                            return throwError(err);
-                                        })
-                                    )
-                                    .subscribe(() => {
-                                        // finished
-                                        finishedUpdatingCase();
-                                    });
-                            }
-                        });
-                };
-
-                // do we have duplicates ?
-                if (caseDuplicates.duplicates.length > 0) {
-                    // construct list of items from which we can choose actions
-                    const fieldsList: DialogField[] = [];
-                    const fieldsListLayout: number[] = [];
-                    caseDuplicates.duplicates.forEach((duplicate: EntityModel, index: number) => {
-                        // case model
-                        const caseData: CaseModel = duplicate.model as CaseModel;
-
-                        // add row fields
-                        fieldsListLayout.push(60, 40);
-                        fieldsList.push(
-                            new DialogField({
-                                name: `actions[${caseData.id}].label`,
-                                placeholder: (index + 1) + '. ' + EntityModel.getNameWithDOBAge(
-                                    caseData,
-                                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-                                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
-                                ),
-                                fieldType: DialogFieldType.LINK,
-                                routerLink: ['/cases', caseData.id, 'view'],
-                                linkTarget: '_blank'
-                            }),
-                            new DialogField({
-                                name: `actions[${caseData.id}].action`,
-                                placeholder: 'LNG_DUPLICATES_DIALOG_ACTION',
-                                description: 'LNG_DUPLICATES_DIALOG_ACTION_DESCRIPTION',
-                                inputOptions: [
-                                    new LabelValuePair(
-                                        Constants.DUPLICATE_ACTION.NO_ACTION,
-                                        Constants.DUPLICATE_ACTION.NO_ACTION
-                                    ),
-                                    new LabelValuePair(
-                                        Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE,
-                                        Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE
-                                    ),
-                                    new LabelValuePair(
-                                        Constants.DUPLICATE_ACTION.MERGE,
-                                        Constants.DUPLICATE_ACTION.MERGE
-                                    )
-                                ],
-                                inputOptionsClearable: false,
-                                required: true,
-                                value: Constants.DUPLICATE_ACTION.NO_ACTION
-                            })
-                        );
-                    });
-
-                    // display dialog
-                    this.dialogService.showConfirm(new DialogConfiguration({
-                        message: 'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_CONFIRM_MSG',
-                        yesLabel: 'LNG_COMMON_BUTTON_SAVE',
-                        customInput: true,
-                        fieldsListLayout: fieldsListLayout,
-                        fieldsList: fieldsList
-                    })).subscribe((answer) => {
-                        if (answer.button === DialogAnswerButton.Yes) {
-                            // determine number of items to merge / mark as not duplicates
-                            const itemsToMerge: string[] = [];
-                            itemsMarkedAsNotDuplicates = [];
-                            const actions: {
-                                [id: string]: {
-                                    action: string
-                                }
-                            } = _.get(answer, 'inputValue.value.actions', {});
-                            if (!_.isEmpty(actions)) {
-                                _.each(actions, (data, id) => {
-                                    switch (data.action) {
-                                        case Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE:
-                                            itemsMarkedAsNotDuplicates.push(id);
-                                            break;
-                                        case Constants.DUPLICATE_ACTION.MERGE:
-                                            itemsToMerge.push(id);
-                                            break;
+                                            // redirect to merge
+                                            this.router.navigate(
+                                                ['/duplicated-records', EntityModel.getLinkForEntityType(EntityType.CASE), 'merge'], {
+                                                    queryParams: {
+                                                        ids: JSON.stringify(mergeIds)
+                                                    }
+                                                }
+                                            );
+                                        });
+                                    } else {
+                                        runModifyCase();
                                     }
-                                });
-                            }
-
-                            // save data first, followed by redirecting to merge
-                            if (itemsToMerge.length > 0) {
-                                runModifyCase(() => {
-                                    // construct list of ids
-                                    const mergeIds: string[] = [
-                                        this.caseId,
-                                        ...itemsToMerge
-                                    ];
-
+                                } else {
                                     // hide loading
                                     this.hideLoadingDialog();
-
-                                    // redirect to merge
-                                    this.router.navigate(
-                                        ['/duplicated-records', EntityModel.getLinkForEntityType(EntityType.CASE), 'merge'], {
-                                            queryParams: {
-                                                ids: JSON.stringify(mergeIds)
-                                            }
-                                        }
-                                    );
-                                });
-                            } else {
-                                runModifyCase();
-                            }
+                                }
+                            });
                         } else {
-                            // hide loading
-                            this.hideLoadingDialog();
+                            runModifyCase();
                         }
                     });
-                } else {
-                    runModifyCase();
-                }
             });
     }
 

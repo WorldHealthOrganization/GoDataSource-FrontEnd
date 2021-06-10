@@ -34,14 +34,14 @@
     <div
         fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px">
         <!-- Slider -->
-        <ng5-slider
+        <ngx-slider
             fxFlex
             #sliderElement
             [value]="sliderValue.low"
             [highValue]="sliderValue.high"
             [options]="sliderOptions"
             (userChange)="onChange($event)">
-        </ng5-slider>
+        </ngx-slider>
 
         <!-- Tooltip -->
         <span

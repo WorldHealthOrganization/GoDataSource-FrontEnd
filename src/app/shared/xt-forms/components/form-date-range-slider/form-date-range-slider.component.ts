@@ -11,7 +11,7 @@ import {
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { ElementBase } from '../../core/index';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { ChangeContext, Options } from 'ng5-slider';
+import { ChangeContext, Options } from '@angular-slider/ngx-slider';
 import { Constants } from '../../../../core/models/constants';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import * as momentOriginal from 'moment';

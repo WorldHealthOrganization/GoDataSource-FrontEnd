@@ -5,12 +5,12 @@ import { FormsModule } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { AngularMaterialModule } from '../angular-material/angular-material.module';
 import { TranslateModule } from '@ngx-translate/core';
-import { Ng5SliderModule } from 'ng5-slider';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { components } from './components';
 import { validatorDirectives } from './validators';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { MdePopoverModule } from '@material-extended/mde';
+import { NgxSliderModule } from '@angular-slider/ngx-slider';
 
 @NgModule({
     imports: [
@@ -19,7 +19,7 @@ import { MdePopoverModule } from '@material-extended/mde';
         FlexLayoutModule,
         AngularMaterialModule,
         MdePopoverModule,
-        Ng5SliderModule,
+        NgxSliderModule,
         NgxMatSelectSearchModule,
         TranslateModule,
         ScrollingModule
@@ -35,7 +35,7 @@ import { MdePopoverModule } from '@material-extended/mde';
         FlexLayoutModule,
         AngularMaterialModule,
         MdePopoverModule,
-        Ng5SliderModule,
+        NgxSliderModule,
         ScrollingModule,
         ...components,
         ...validatorDirectives
