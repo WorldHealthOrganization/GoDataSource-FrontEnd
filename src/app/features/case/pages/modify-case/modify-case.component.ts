@@ -436,7 +436,12 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
             .getAPIVersion()
             .subscribe((versionData: SystemSettingsVersionModel) => {
                 // no duplicates - proceed to modify case ?
-                if (versionData.duplicate.disableCaseDuplicateCheck) {
+                if (
+                    versionData.duplicate.disableCaseDuplicateCheck || (
+                        versionData.duplicate.executeCheckOnlyOnDuplicateDataChange &&
+                        !EntityModel.duplicateDataHasChanged(dirtyFields)
+                    )
+                ) {
                     // no need to check for duplicates
                     runModifyCase();
 

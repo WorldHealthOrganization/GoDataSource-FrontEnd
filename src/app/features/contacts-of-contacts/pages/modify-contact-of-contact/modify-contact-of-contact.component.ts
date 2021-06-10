@@ -320,7 +320,12 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
             .getAPIVersion()
             .subscribe((versionData: SystemSettingsVersionModel) => {
                 // no duplicates - proceed to modify contact of contact ?
-                if (versionData.duplicate.disableContactOfContactDuplicateCheck) {
+                if (
+                    versionData.duplicate.disableContactOfContactDuplicateCheck || (
+                        versionData.duplicate.executeCheckOnlyOnDuplicateDataChange &&
+                        !EntityModel.duplicateDataHasChanged(dirtyFields)
+                    )
+                ) {
                     // no need to check for duplicates
                     runModifyContactOfContact();
 

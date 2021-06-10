@@ -24,7 +24,8 @@ export class SystemSettingsVersionModel {
     duplicate: {
         disableCaseDuplicateCheck: boolean,
         disableContactDuplicateCheck: boolean,
-        disableContactOfContactDuplicateCheck: boolean
+        disableContactOfContactDuplicateCheck: boolean,
+        executeCheckOnlyOnDuplicateDataChange: boolean
     };
 
     /**
@@ -44,7 +45,8 @@ export class SystemSettingsVersionModel {
         this.duplicate = {
             disableCaseDuplicateCheck: _.get(data, 'duplicate.disableCaseDuplicateCheck', false),
             disableContactDuplicateCheck: _.get(data, 'duplicate.disableContactDuplicateCheck', false),
-            disableContactOfContactDuplicateCheck: _.get(data, 'duplicate.disableContactOfContactDuplicateCheck', false)
+            disableContactOfContactDuplicateCheck: _.get(data, 'duplicate.disableContactOfContactDuplicateCheck', false),
+            executeCheckOnlyOnDuplicateDataChange: _.get(data, 'duplicate.executeCheckOnlyOnDuplicateDataChange', false)
         };
     }
 }

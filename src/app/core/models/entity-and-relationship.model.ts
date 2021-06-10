@@ -16,6 +16,7 @@ import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
 import { IPermissionBasic, IPermissionBasicBulk, IPermissionExportable, IPermissionRelationship } from './permission.interface';
 import { ContactOfContactModel } from './contact-of-contact.model';
+import { DocumentModel } from './document.model';
 
 export class RelationshipModel
     extends BaseModel
@@ -460,6 +461,24 @@ export class EntityModel {
      */
     static getPersonLink(person): string {
         return `/${EntityModel.getLinkForEntityType(person.type)}/${person.id}/view`;
+    }
+
+    /**
+     * Determine if we need to do a duplicate check
+     */
+    static duplicateDataHasChanged(
+        dirtyData: {
+            firstName?: string,
+            middleName?: string,
+            lastName?: string,
+            documents?: DocumentModel[]
+        }
+    ): boolean {
+        // check if we need to change
+        return dirtyData.firstName !== undefined ||
+            dirtyData.middleName !== undefined ||
+            dirtyData.lastName !== undefined ||
+            dirtyData.documents !== undefined;
     }
 
     /**
