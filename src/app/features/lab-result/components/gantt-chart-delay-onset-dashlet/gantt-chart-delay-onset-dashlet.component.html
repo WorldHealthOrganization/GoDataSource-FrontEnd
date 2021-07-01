@@ -1,6 +1,6 @@
 <!-- Chart -->
 <ng-container
-    *ngIf="!displayLoading && ganttData[0]?.children?.length">
+    *ngIf="!displayLoading && ganttData.length > 0">
     <div
         fxLayout="column" fxFlex fxLayoutAlign="center"
         class="has-data-wait-for-bind">
@@ -31,7 +31,7 @@
 
 <!-- No data -->
 <ng-container
-    *ngIf="!displayLoading && !ganttData[0]?.children?.length">
+    *ngIf="!displayLoading && ganttData.length < 1">
     <div
         fxFlex fxLayout="column" fxFlexAlign="center"
         class="dashlet-no-data">
