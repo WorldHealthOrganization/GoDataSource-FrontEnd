@@ -35,7 +35,8 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
         // View mode: day/week/month
         viewMode: Constants.GANTT_CHART_VIEW_TYPE.DAY.value,
         styleOptions: {
-            groupBack: '#4DB0A0'
+            groupBack: '#4DB0A0',
+            redLineColor: 'transparent'
         }
     };
 
