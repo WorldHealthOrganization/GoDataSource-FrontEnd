@@ -1,0 +1,7 @@
+<mat-paginator
+    [pageIndex]="pageIndex"
+    [length]="countData?.count"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="pageSizeOptions"
+    (page)="page.emit($event)">
+</mat-paginator>

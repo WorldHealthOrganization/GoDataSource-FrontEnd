@@ -122,7 +122,7 @@
 <div fxLayout fxLayoutAlign="space-between end">
     <!--Total number of records from the list-->
     <app-total-number-of-records
-        [value]="(contactsListCount$ | async)?.count">
+        [value]="contactsListCount$ | async">
     </app-total-number-of-records>
 
     <!--Contacts grouped by risk level-->
@@ -1028,12 +1028,12 @@
         </div>
     </div>
 
-    <mat-paginator
+    <app-mat-paginator-extended
         [pageIndex]="pageIndex"
-        [length]="(contactsListCount$ | async)?.count"
+        [countData]="contactsListCount$ | async"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"
         (page)="changePage($event)">
-    </mat-paginator>
+    </app-mat-paginator-extended>
 
 </mat-card>
