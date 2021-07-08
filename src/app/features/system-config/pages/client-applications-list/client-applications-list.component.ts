@@ -41,7 +41,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
     // client applications servers
     clientApplicationsServerList: SystemClientApplicationModel[] = [];
     clientApplicationsServerListCount: IBasicCount;
-    clientApplicationsServerListAll: SystemClientApplicationModel[] = [];
+    clientApplicationsServerListAll: SystemClientApplicationModel[];
 
     // settings
     settings: SystemSettingsModel;
@@ -199,7 +199,8 @@ export class ClientApplicationsListComponent extends ListComponent implements On
      */
     refreshList(finishCallback: (records: any[]) => void) {
         this.clientApplicationsServerList = [];
-        this.clientApplicationsServerListAll = [];
+        this.clientApplicationsServerListAll = undefined;
+        this.refreshListCount();
 
         const outbreaksList$: Observable<OutbreakModel[]> = OutbreakModel.canList(this.authUser) ?
             this.outbreakDataService.getOutbreaksListReduced() :
@@ -267,9 +268,9 @@ export class ClientApplicationsListComponent extends ListComponent implements On
      */
     refreshListCount() {
         this.clientApplicationsServerListCount = {
-            count: this.clientApplicationsServerListAll ?
+            count: this.clientApplicationsServerListAll !== undefined ?
                 this.clientApplicationsServerListAll.length :
-                0
+                null
         };
     }
 

@@ -21,7 +21,7 @@
 </app-side-columns>
 
 <app-total-number-of-records
-    [value]="(entitiesListCount$ | async)?.count">
+    [value]="entitiesListCount$ | async">
 </app-total-number-of-records>
 
 <form class="page-content form-section" #form="ngForm" (submit)="selectEntities()">

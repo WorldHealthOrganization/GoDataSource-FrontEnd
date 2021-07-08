@@ -41,7 +41,7 @@
 <!--Total number of records from the list-->
 <app-total-number-of-records
     *ngIf="!loading"
-    [value]="(backupsListCount$ | async)?.count">
+    [value]="backupsListCount$ | async">
 </app-total-number-of-records>
 
 <mat-card class="page-section page-content">

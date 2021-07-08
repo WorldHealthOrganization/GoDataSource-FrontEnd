@@ -21,7 +21,7 @@
 
 <!--Total number of records from the list-->
 <app-total-number-of-records
-    [value]="(usersListCount$ | async)?.count">
+    [value]="usersListCount$ | async">
 </app-total-number-of-records>
 
 <mat-card class="page-section page-content">

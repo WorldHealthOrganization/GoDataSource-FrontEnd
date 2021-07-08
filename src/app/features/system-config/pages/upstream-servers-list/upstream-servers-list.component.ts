@@ -43,7 +43,7 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
     // upstream servers
     upstreamServerList: SystemUpstreamServerModel[] = [];
     upstreamServerListCount: IBasicCount;
-    upstreamServerListAll: SystemUpstreamServerModel[] = [];
+    upstreamServerListAll: SystemUpstreamServerModel[];
 
     // sync in progress ?
     loading: boolean = false;
@@ -201,7 +201,8 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
      */
     refreshList(finishCallback: (records: any[]) => void) {
         this.upstreamServerList = [];
-        this.upstreamServerListAll = [];
+        this.upstreamServerListAll = undefined;
+        this.refreshListCount();
         this.systemSettingsDataService
             .getSystemSettings()
             .pipe(
@@ -240,9 +241,9 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
      */
     refreshListCount() {
         this.upstreamServerListCount = {
-            count: this.upstreamServerListAll ?
+            count: this.upstreamServerListAll !== undefined ?
                 this.upstreamServerListAll.length :
-                0
+                null
         };
     }
 

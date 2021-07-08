@@ -25,7 +25,7 @@
 </app-side-columns>
 
 <app-total-number-of-records
-    [value]="(relationshipsListCount$ | async)?.count">
+    [value]="relationshipsListCount$ | async">
 </app-total-number-of-records>
 
 <mat-card class="page-section page-content">

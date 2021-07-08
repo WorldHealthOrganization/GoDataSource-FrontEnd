@@ -134,7 +134,7 @@
 <div fxLayout fxLayoutAlign="space-between end">
     <!--Total number of records from the list-->
     <app-total-number-of-records
-        [value]="(casesListCount$ | async)?.count">
+        [value]="casesListCount$ | async">
     </app-total-number-of-records>
 
     <!--Cases grouped by classification-->
