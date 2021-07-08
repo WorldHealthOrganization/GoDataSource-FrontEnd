@@ -4,6 +4,7 @@ import { PageEvent } from '@angular/material/paginator/paginator';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { Subscription } from 'rxjs';
+import { DecimalPipe } from '@angular/common';
 
 @Injectable()
 class CustomMatPaginatorIntl
@@ -18,7 +19,8 @@ class CustomMatPaginatorIntl
      */
     constructor(
         private i18nService: I18nService,
-        private parentComponent: MatPaginatorExtendedComponent
+        private parentComponent: MatPaginatorExtendedComponent,
+        private decimalPipe: DecimalPipe
     ) {
         // base
         super();
@@ -86,14 +88,14 @@ class CustomMatPaginatorIntl
             this.i18nService.instant(
                 'LNG_COMMON_LABEL_PAGINATOR_RANGE', {
                     pageLabel,
-                    length,
+                    length: this.decimalPipe.transform(length),
                     orMore: ' ' + this.i18nService.instant('LNG_COMMON_LABEL_PAGINATOR_COUNT_OR_MORE')
                 }
             ) :
             this.i18nService.instant(
                 'LNG_COMMON_LABEL_PAGINATOR_RANGE', {
                     pageLabel,
-                    length,
+                    length: this.decimalPipe.transform(length),
                     orMore: ''
                 }
             );
@@ -104,12 +106,14 @@ class CustomMatPaginatorIntl
     selector: 'app-mat-paginator-extended',
     templateUrl: './mat-paginator-extended.component.html',
     providers: [
+        DecimalPipe,
         {
             provide: MatPaginatorIntl,
             useClass: CustomMatPaginatorIntl,
             deps: [
                 I18nService,
-                MatPaginatorExtendedComponent
+                MatPaginatorExtendedComponent,
+                DecimalPipe
             ]
         }
     ]
