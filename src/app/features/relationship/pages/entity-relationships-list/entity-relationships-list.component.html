@@ -588,7 +588,9 @@
         {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
     </div>
 
+    <!-- Pages (need to be hidden and not ngIf, otherwise it makes a new duplicate request) -->
     <app-mat-paginator-extended
+        [hidden]="refreshingList || isEmptyList"
         [pageIndex]="pageIndex"
         [countData]="relationshipsListCount$ | async"
         [pageSize]="pageSize"

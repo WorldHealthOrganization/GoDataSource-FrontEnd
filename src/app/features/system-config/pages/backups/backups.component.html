@@ -335,8 +335,9 @@
         <mat-spinner></mat-spinner>
     </div>
 
+    <!-- Pages (need to be hidden and not ngIf, otherwise it makes a new duplicate request) -->
     <app-mat-paginator-extended
-        *ngIf="!loading"
+        [hidden]="loading || isEmptyList"
         [pageIndex]="pageIndex"
         [countData]="backupsListCount$ | async"
         [pageSize]="pageSize"
