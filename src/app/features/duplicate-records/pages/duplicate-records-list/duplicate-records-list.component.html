@@ -217,14 +217,11 @@
         </div>
     </ng-container>
 
+    <!-- No data -->
     <div
         *ngIf="!refreshingList && isEmptyList"
-        class="mat-table">
-        <div class="mat-row">
-            <div class="mat-cell">
-                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
-            </div>
-        </div>
+        class="empty-table-text">
+        {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
     </div>
 
     <app-mat-paginator-extended
