@@ -592,12 +592,12 @@
         </div>
     </div>
 
-    <mat-paginator
+    <app-mat-paginator-extended
         [pageIndex]="pageIndex"
-        [length]="(relationshipsListCount$ | async)?.count"
+        [countData]="relationshipsListCount$ | async"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"
         (page)="changePage($event)">
-    </mat-paginator>
+    </app-mat-paginator-extended>
 
 </mat-card>

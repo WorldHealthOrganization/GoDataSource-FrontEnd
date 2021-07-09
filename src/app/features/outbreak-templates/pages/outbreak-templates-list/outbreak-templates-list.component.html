@@ -261,11 +261,11 @@
         </div>
     </div>
 
-    <mat-paginator
+    <app-mat-paginator-extended
         [pageIndex]="pageIndex"
-        [length]="(outbreakTemplatesListCount$ | async)?.count"
+        [countData]="outbreakTemplatesListCount$ | async"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"
         (page)="changePage($event)">
-    </mat-paginator>
+    </app-mat-paginator-extended>
 </mat-card>

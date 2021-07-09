@@ -168,11 +168,11 @@
         </div>
     </div>
 
-    <mat-paginator
+    <app-mat-paginator-extended
         [pageIndex]="pageIndex"
-        [length]="(devicesListCount$ | async)?.count"
+        [countData]="devicesListCount$ | async"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"
         (page)="changePage($event)">
-    </mat-paginator>
+    </app-mat-paginator-extended>
 </mat-card>

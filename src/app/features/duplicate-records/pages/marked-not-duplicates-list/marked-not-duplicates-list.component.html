@@ -238,12 +238,12 @@
         </div>
     </div>
 
-    <mat-paginator
+    <app-mat-paginator-extended
         [pageIndex]="pageIndex"
-        [length]="(notDuplicatesListCount$ | async)?.count"
+        [countData]="notDuplicatesListCount$ | async"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"
         (page)="changePage($event)">
-    </mat-paginator>
+    </app-mat-paginator-extended>
 
 </mat-card>

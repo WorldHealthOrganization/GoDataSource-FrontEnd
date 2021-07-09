@@ -550,12 +550,12 @@
         </div>
     </div>
 
-    <mat-paginator
+    <app-mat-paginator-extended
         [pageIndex]="pageIndex"
-        [length]="(labResultsListCount$ | async)?.count"
+        [countData]="labResultsListCount$ | async"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"
         (page)="changePage($event)">
-    </mat-paginator>
+    </app-mat-paginator-extended>
 
 </mat-card>

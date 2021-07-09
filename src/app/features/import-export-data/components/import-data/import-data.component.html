@@ -1088,13 +1088,13 @@
                             </div>
                         </div>
 
-                        <mat-paginator
+                        <app-mat-paginator-extended
                             [pageIndex]="pageIndex"
-                            [length]="(importResultsListCount$ | async)?.count"
+                            [countData]="importResultsListCount$ | async"
                             [pageSize]="pageSize"
                             [pageSizeOptions]="pageSizeOptions"
                             (page)="changePage($event)">
-                        </mat-paginator>
+                        </app-mat-paginator-extended>
 
                     </div>
                 </div>

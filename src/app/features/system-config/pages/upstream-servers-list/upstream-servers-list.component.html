@@ -180,13 +180,13 @@
             </div>
         </div>
 
-        <mat-paginator
+        <app-mat-paginator-extended
             [pageIndex]="pageIndex"
-            [length]="upstreamServerListCount?.count"
+            [countData]="upstreamServerListCount"
             [pageSize]="pageSize"
             [pageSizeOptions]="pageSizeOptions"
             (page)="changePage($event)">
-        </mat-paginator>
+        </app-mat-paginator-extended>
     </ng-container>
 
     <!-- waiting for backup -->
