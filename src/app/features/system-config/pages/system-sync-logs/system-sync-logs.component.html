@@ -62,7 +62,7 @@
 
 <!--Total number of records from the list-->
 <app-total-number-of-records
-    [value]="(syncLogsListCount$ | async)?.count">
+    [value]="syncLogsListCount$ | async">
 </app-total-number-of-records>
 
 <mat-card class="page-section page-content">
@@ -287,22 +287,20 @@
         <mat-spinner></mat-spinner>
     </div>
 
+    <!-- No data -->
     <div
         *ngIf="!refreshingList && isEmptyList"
-        class="mat-table"
-    >
-        <div class="mat-row">
-            <div class="mat-cell">
-                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
-            </div>
-        </div>
+        class="empty-table-text">
+        {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
     </div>
 
-    <mat-paginator
+    <!-- Pages (need to be hidden and not ngIf, otherwise it makes a new duplicate request) -->
+    <app-mat-paginator-extended
+        [hidden]="refreshingList || isEmptyList"
         [pageIndex]="pageIndex"
-        [length]="(syncLogsListCount$ | async)?.count"
+        [countData]="syncLogsListCount$ | async"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"
         (page)="changePage($event)">
-    </mat-paginator>
+    </app-mat-paginator-extended>
 </mat-card>

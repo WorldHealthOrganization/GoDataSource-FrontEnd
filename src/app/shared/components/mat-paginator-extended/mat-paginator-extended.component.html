@@ -1,0 +1,9 @@
+<!-- Counted items -->
+<mat-paginator
+    *ngIf="countData && countData.count !== null"
+    [pageIndex]="pageIndex"
+    [length]="countData?.count"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="pageSizeOptions"
+    (page)="page.emit($event)">
+</mat-paginator>

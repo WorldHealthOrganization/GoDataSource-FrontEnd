@@ -238,8 +238,9 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
     }
 
     refreshList(finishCallback: (records: any[]) => void) {
-        this.categoryEntriesAll = [];
         this.categoryEntries = [];
+        this.categoryEntriesAll = undefined;
+        this.refreshListCount();
         if (this.categoryId) {
             this.referenceDataDataService
                 .getReferenceDataByCategory(this.categoryId)
@@ -284,9 +285,9 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
      */
     refreshListCount() {
         this.categoryEntriesCount = {
-            count: this.categoryEntriesAll ?
+            count: this.categoryEntriesAll !== undefined ?
                 this.categoryEntriesAll.length :
-                0
+                null
         };
     }
 

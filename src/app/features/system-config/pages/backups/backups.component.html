@@ -41,7 +41,7 @@
 <!--Total number of records from the list-->
 <app-total-number-of-records
     *ngIf="!loading"
-    [value]="(backupsListCount$ | async)?.count">
+    [value]="backupsListCount$ | async">
 </app-total-number-of-records>
 
 <mat-card class="page-section page-content">
@@ -320,15 +320,11 @@
             <mat-spinner></mat-spinner>
         </div>
 
+        <!-- No data -->
         <div
             *ngIf="!refreshingList && isEmptyList"
-            class="mat-table"
-        >
-            <div class="mat-row">
-                <div class="mat-cell">
-                    {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
-                </div>
-            </div>
+            class="empty-table-text">
+            {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
         </div>
     </ng-container>
 
@@ -339,12 +335,13 @@
         <mat-spinner></mat-spinner>
     </div>
 
-    <mat-paginator
-        *ngIf="!loading"
+    <!-- Pages (need to be hidden and not ngIf, otherwise it makes a new duplicate request) -->
+    <app-mat-paginator-extended
+        [hidden]="loading || isEmptyList"
         [pageIndex]="pageIndex"
-        [length]="(backupsListCount$ | async)?.count"
+        [countData]="backupsListCount$ | async"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"
         (page)="changePage($event)">
-    </mat-paginator>
+    </app-mat-paginator-extended>
 </mat-card>
