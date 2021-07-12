@@ -29,7 +29,7 @@ class CustomMatPaginatorIntl
         this.updateTranslations();
 
         // attach event
-        this.i18nService.languageChangedEvent
+        this.languageSubscription = this.i18nService.languageChangedEvent
             .subscribe(() => {
                 this.updateTranslations();
             });
