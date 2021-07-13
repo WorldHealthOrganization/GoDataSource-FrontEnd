@@ -1,27 +1,52 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import {
+    Component,
+    OnDestroy,
+    OnInit
+} from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { UserModel } from '../../../../core/models/user.model';
+import {
+    UserModel,
+    UserSettings
+} from '../../../../core/models/user.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
 import * as _ from 'lodash';
-import { share } from 'rxjs/operators';
+import {
+    catchError,
+    share,
+    tap
+} from 'rxjs/operators';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
-import { HoverRowAction } from '../../../../shared/components';
+import {
+    HoverRowAction,
+    LoadingDialogModel
+} from '../../../../shared/components';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { GlobalEntitySearchDataService } from '../../../../core/services/data/global-entity-search.data.service';
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { EntityType } from '../../../../core/models/entity-type';
-import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import {
+    ReferenceDataCategory,
+    ReferenceDataCategoryModel,
+    ReferenceDataEntryModel
+} from '../../../../core/models/reference-data.model';
+
+import {
+    Observable,
+    Subscription,
+    throwError
+} from 'rxjs';
 
 @Component({
     selector: 'app-search-result-list',
-    encapsulation: ViewEncapsulation.None,
     templateUrl: './search-result-list.component.html'
 })
 export class SearchResultListComponent extends ListComponent implements OnInit, OnDestroy {
@@ -32,21 +57,26 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
 
     // authenticated user
     authUser: UserModel;
+    // selected Outbreak
+    selectedOutbreak: OutbreakModel;
 
-    // entity list
-    entityListAll: (CaseModel | ContactModel | ContactOfContactModel | EventModel)[] = [];
-    entityList: (CaseModel | ContactModel | ContactOfContactModel | EventModel)[] = [];
-    entityListCount: IBasicCount;
-
-    // settings
-    settings: SystemSettingsModel;
+    // list of search result
+    entityList$: Observable<(CaseModel | ContactModel | ContactOfContactModel | EventModel)[]>;
+    entityListCount$: Observable<IBasicCount>;
 
     // models
     personTypesListMap: { [id: string]: ReferenceDataEntryModel };
 
     // constants
     EntityType = EntityType;
+    UserSettings = UserSettings;
     ReferenceDataCategory = ReferenceDataCategory;
+    OutbreakModel = OutbreakModel;
+
+    // subscribers
+    outbreakSubscriber: Subscription;
+
+    loadingDialog: LoadingDialogModel;
 
     recordActions: HoverRowAction[] = [
         // View Item
@@ -85,6 +115,8 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
         protected listHelperService: ListHelperService,
         private authDataService: AuthDataService,
         private globalEntitySearchDataService: GlobalEntitySearchDataService,
+        private outbreakDataService: OutbreakDataService,
+        private snackbarService: SnackbarService,
         private referenceDataDataService: ReferenceDataDataService
     ) {
         super(listHelperService);
@@ -110,14 +142,20 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
+        // subscribe to the Selected Outbreak Subject stream
+        this.outbreakSubscriber = this.outbreakDataService
+            .getSelectedOutbreakSubject()
+            .subscribe((selectedOutbreak: OutbreakModel) => {
+                this.selectedOutbreak = selectedOutbreak;
+
+                // initialize pagination
+                this.initPaginator();
+                // ...and re-load the list when the Selected Outbreak is changed
+                this.needsRefreshList(true);
+            });
+
         // initialize Side Table Columns
         this.initializeSideTableColumns();
-
-        // initialize pagination
-        this.initPaginator();
-
-        // retrieve entity list
-        this.needsRefreshList(true);
     }
 
     /**
@@ -139,12 +177,8 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
                 label: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID'
             }),
             new VisibleColumnModel({
-                field: 'firstName',
-                label: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME'
-            }),
-            new VisibleColumnModel({
-                field: 'lastName',
-                label: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME'
+                field: 'name',
+                label: 'LNG_ENTITY_FIELD_LABEL_NAME'
             })
         ];
     }
@@ -153,40 +187,58 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
      * Refresh list
      */
     refreshList(finishCallback: (records: any[]) => void) {
-        // get all items
-        this.entityListAll = this.globalEntitySearchDataService.getData();
-
-        // display only items from this page
-        this.entityList = [];
         if (
-            this.queryBuilder.paginator &&
-            !_.isEmpty(this.entityListAll)
+            this.selectedOutbreak &&
+            !_.isEmpty(this.globalEntitySearchDataService.getSearchValue())
         ) {
-            this.entityList = this.entityListAll.slice(
-                this.queryBuilder.paginator.skip,
-                this.queryBuilder.paginator.skip + this.queryBuilder.paginator.limit
-            );
+            // retrieve the list of Cases
+            this.entityList$ = this.globalEntitySearchDataService
+                .searchEntity(this.selectedOutbreak.id, this.globalEntitySearchDataService.getSearchValue(), this.queryBuilder)
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback([]);
+                        return throwError(err);
+                    }),
+                    tap(this.checkEmptyList.bind(this)),
+                    tap((data: any[]) => {
+                        finishCallback(data);
+                    })
+                );
+        } else {
+            finishCallback([]);
         }
-
-        // refresh the total count
-        this.refreshListCount();
-
-        // flag if list is empty
-        this.checkEmptyList(this.entityList);
-
-        // finished
-        finishCallback(this.entityList);
     }
 
     /**
      * Get total number of items
      */
     refreshListCount() {
-        this.entityListCount = {
-            count: this.entityListAll ?
-                this.entityListAll.length :
-                0
-        };
+        if (
+            this.selectedOutbreak &&
+            !_.isEmpty(this.globalEntitySearchDataService.getSearchValue())
+        ) {
+            // remove paginator from query builder
+            const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+            countQueryBuilder.paginator.clear();
+            countQueryBuilder.sort.clear();
+            this.entityListCount$ = this.globalEntitySearchDataService
+                .searchEntityCount(this.selectedOutbreak.id, this.globalEntitySearchDataService.getSearchValue(), countQueryBuilder)
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        return throwError(err);
+                    }),
+                    share()
+                );
+        } else {
+            // do not fetch any item
+            this.entityListCount$ = new Observable((observer) => {
+                observer.next({});
+                observer.complete();
+                return;
+            });
+        }
     }
 
     /**

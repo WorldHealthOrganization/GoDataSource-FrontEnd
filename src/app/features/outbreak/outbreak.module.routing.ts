@@ -7,6 +7,7 @@ import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 import { OutbreakResolver } from './services/outbreak-resolver';
 import { OutbreakQestionnaireTypeEnum } from '../../core/enums/outbreak-qestionnaire-type.enum';
+import { PermissionExpression } from '../../core/models/user.model';
 
 const routes: Routes = [
     // Outbreaks list
@@ -163,16 +164,14 @@ const routes: Routes = [
         component: fromPages.SearchResultListComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [
-                PERMISSION.CASE_VIEW,
-                PERMISSION.CASE_MODIFY,
-                PERMISSION.CONTACT_VIEW,
-                PERMISSION.CONTACT_MODIFY,
-                PERMISSION.CONTACT_OF_CONTACT_VIEW,
-                PERMISSION.CONTACT_OF_CONTACT_MODIFY,
-                PERMISSION.EVENT_VIEW,
-                PERMISSION.EVENT_MODIFY
-            ]
+            permissions: new PermissionExpression({
+                or: [
+                    PERMISSION.CASE_LIST,
+                    PERMISSION.CONTACT_LIST,
+                    PERMISSION.CONTACT_OF_CONTACT_LIST,
+                    PERMISSION.EVENT_LIST
+                ]
+            })
         }
     }
 ];

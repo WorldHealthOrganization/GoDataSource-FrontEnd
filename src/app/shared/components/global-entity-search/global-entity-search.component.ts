@@ -15,6 +15,7 @@ import { LoadingDialogModel } from '../loading-dialog/loading-dialog.component';
 import { DialogService } from '../../../core/services/helper/dialog.service';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { RedirectService } from '../../../core/services/helper/redirect.service';
 
 @Component({
     selector: 'app-global-entity-search',
@@ -44,7 +45,8 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
         private globalEntitySearchDataService: GlobalEntitySearchDataService,
         private outbreakDataService: OutbreakDataService,
         private dialogService: DialogService,
-        private router: Router
+        private router: Router,
+        private redirectService: RedirectService
     ) {
     }
 
@@ -90,7 +92,7 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
             if (this.selectedOutbreak.id) {
                 this.showLoadingDialog();
                 // search for the entity
-                this.globalEntitySearchDataService.searchEntity(this.selectedOutbreak.id, fields.globalSearchValue)
+                this.globalEntitySearchDataService.searchEntityCount(this.selectedOutbreak.id, fields.globalSearchValue)
                     .pipe(
                         catchError((err) => {
                             this.closeLoadingDialog();
@@ -102,20 +104,38 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
                     .subscribe((results) => {
                         if (!_.isEmpty(results)) {
                             // if there is a single result, navigate to the entity view page, otherwise display all results in a new page
-                            if (results.length === 1) {
-                                // generate the link for the entity view
-                                const personLink = EntityModel.getPersonLink(results[0]);
-                                // navigate to the person view page
-                                this.router.navigate([personLink]);
-                            } else {
-                                // save results
-                                this.globalEntitySearchDataService.setData(results);
+                            if (results.count === 1) {
+                                // search for the entity
+                                this.globalEntitySearchDataService.searchEntity(this.selectedOutbreak.id, fields.globalSearchValue)
+                                    .pipe(
+                                        catchError((err) => {
+                                            this.closeLoadingDialog();
+                                            this.snackbarService.showApiError(err);
 
-                                // set shouldReuseRoute to reload/refresh the data when navigate to same route
-                                this.router.routeReuseStrategy.shouldReuseRoute = () => false;
+                                            return throwError(err);
+                                        })
+                                    )
+                                    .subscribe((items) => {
+                                        if (!_.isEmpty(items)) {
+                                            // generate the link for the entity view
+                                            const personLink = EntityModel.getPersonLink(items[0]);
+                                            // navigate to the person view page
+                                            this.router.navigate([personLink]);
+
+                                            // empty search field
+                                            this.globalSearchValue = '';
+                                            // close side nav
+                                            this.closeSideNav();
+                                        }
+
+                                        this.closeLoadingDialog();
+                                    });
+                            } else {
+                                // save searched value
+                                this.globalEntitySearchDataService.setSearchValue(this.globalSearchValue);
 
                                 // display all results
-                                this.router.navigate(['/outbreaks', this.selectedOutbreak.id, 'search-results']);
+                                this.redirectService.to([`/outbreaks/${this.selectedOutbreak.id}/search-results`]);
                             }
 
                             // empty search field

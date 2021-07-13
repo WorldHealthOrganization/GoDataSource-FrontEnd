@@ -2,7 +2,10 @@ import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { UserModel } from '../../../../core/models/user.model';
+import {
+    UserModel,
+    UserSettings
+} from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
@@ -43,6 +46,7 @@ export class HelpItemsListComponent extends ListComponent implements OnInit, OnD
     // provide constants to template
     Constants = Constants;
     HelpItemModel = HelpItemModel;
+    UserSettings = UserSettings;
 
     recordActions: HoverRowAction[] = [
         // View Help Item

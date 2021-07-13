@@ -9,28 +9,21 @@ import * as _ from 'lodash';
 import { EntityModel } from '../../models/entity-and-relationship.model';
 import { map } from 'rxjs/operators';
 import { ContactOfContactModel } from '../../models/contact-of-contact.model';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class GlobalEntitySearchDataService {
-    // store search results data
-    private data;
+    // store search value
+    private _searchValue;
 
     // set data
-    setData(data) {
-        this.data = data;
+    setSearchValue(data) {
+        this._searchValue = data;
     }
 
     // get data
-    getData() {
-        return this.data;
-        const temp = this.data;
-        this.clearData();
-        return temp;
-    }
-
-    // clear data
-    clearData() {
-        this.data = undefined;
+    getSearchValue() {
+        return this._searchValue;
     }
 
     /**
@@ -73,6 +66,26 @@ export class GlobalEntitySearchDataService {
                     });
                 })
             );
+    }
+
+    /**
+     * Return the count of people items matched by identifier
+     * @param {string} outbreakId
+     * @param {string} globalSearchValue
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<IBasicCount>}
+     */
+    searchEntityCount(
+        outbreakId: string,
+        globalSearchValue: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<IBasicCount> {
+
+        // create condition
+        const whereFilter = JSON.stringify({identifier: globalSearchValue});
+
+        // get the items count
+        return this.http.get(`outbreaks/${outbreakId}/people/count?where=${whereFilter}`);
     }
 }
 

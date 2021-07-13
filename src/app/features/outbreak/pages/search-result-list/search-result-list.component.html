@@ -1,4 +1,4 @@
-<app-topnav [activeOutbreakEditable]="false">
+<app-topnav [activeOutbreakEditable]="true">
     <ng-container dynamic-section>
         <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
@@ -8,13 +8,14 @@
 
 <!-- Side columns -->
 <app-side-columns
+    [tableColumnsUserSettingsKey]="UserSettings.SEARCH_RESULTS_FIELDS"
     [tableColumns]="tableColumns"
     (visibleColumnsChanged)="applySideColumnsChanged($event)">
 </app-side-columns>
 
 <!--Total number of records from the list-->
 <app-total-number-of-records
-    [value]="entityListCount?.count">
+    [value]="(entityListCount$ | async)?.count">
 </app-total-number-of-records>
 
 <mat-card class="page-section page-content">
@@ -43,7 +44,7 @@
         [active]="!refreshingList"
     ></app-hover-row-actions>
 
-    <mat-table #table [dataSource]="entityList">
+    <mat-table #table [dataSource]="entityList$ | async">
         <!-- Visual ID -->
         <ng-container matColumnDef="visualId">
             <mat-header-cell *matHeaderCellDef>
@@ -57,29 +58,16 @@
             </mat-cell>
         </ng-container>
 
-        <!-- First Name -->
-        <ng-container matColumnDef="firstName">
+        <!-- Name -->
+        <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_ENTITY_FIELD_LABEL_FIRST_NAME' | translate}}</div>
+                    <div class="column-header">{{'LNG_ENTITY_FIELD_LABEL_NAME' | translate}}</div>
                 </div>
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
-                {{item.type === EntityType.EVENT ? item.name : item.firstName}}
-            </mat-cell>
-        </ng-container>
-
-        <!-- Last Name -->
-        <ng-container matColumnDef="lastName">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_ENTITY_FIELD_LABEL_LAST_NAME' | translate}}</div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
-                {{item.type === EntityType.EVENT ? item.name : item.lastName}}
+                {{item.name }}
             </mat-cell>
         </ng-container>
 
@@ -112,7 +100,7 @@
 
     <mat-paginator
         [pageIndex]="pageIndex"
-        [length]="entityListCount?.count"
+        [length]="(entityListCount$ | async)?.count"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"
         (page)="changePage($event)">
