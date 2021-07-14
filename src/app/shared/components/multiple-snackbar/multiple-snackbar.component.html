@@ -22,7 +22,7 @@
                 (click)="closeSnackbar(msg.id)"
                 fxLayoutAlign="center center"
                 class="snackbar-close-button-container {{msg.messageClass}}">
-                {{'LNG_MULTIPLE_SNACKBAR_BUTTON_CLOSE' | translate}}
+                {{('LNG_MULTIPLE_SNACKBAR_BUTTON_CLOSE' | translate) === 'LNG_MULTIPLE_SNACKBAR_BUTTON_CLOSE' ? 'Close' : ('LNG_MULTIPLE_SNACKBAR_BUTTON_CLOSE' | translate)}}
             </div>
         </div>
     </div>

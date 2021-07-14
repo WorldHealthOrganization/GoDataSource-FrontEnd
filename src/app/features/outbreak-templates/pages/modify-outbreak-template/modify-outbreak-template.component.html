@@ -214,6 +214,22 @@
                             </app-form-slide-toggle>
 
                         </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+
+                            <app-form-slide-toggle
+                                name="generateFollowUpsDateOfLastContact"
+                                [(ngModel)]="outbreakTemplate.generateFollowUpsDateOfLastContact"
+                                [label]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT' | translate"
+                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT_DESCRIPTION"
+                                [disabled]="viewOnly">
+                            </app-form-slide-toggle>
+
+                            <div fxFlex> <!--Placeholder --> </div>
+                            <div fxFlex> <!--Placeholder --> </div>
+                            <div fxFlex> <!--Placeholder --> </div>
+
+                        </div>
                     </div>
                 </mat-card>
             </mat-tab>

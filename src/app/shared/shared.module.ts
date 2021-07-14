@@ -1,4 +1,3 @@
-// modules
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -17,8 +16,6 @@ import { ScrollingModule as ExperimentalScrollingModule } from '@angular/cdk-exp
 import { MdePopoverModule } from '@material-extended/mde';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MglTimelineModule } from 'angular-mgl-timeline';
-
-// components
 import * as fromSharedComponents from './components';
 import * as fromSharedDirectives from './directives';
 import * as fromSharedPipes from './pipes';

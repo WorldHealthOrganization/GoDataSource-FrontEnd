@@ -239,7 +239,8 @@ export class TransmissionChainsListComponent extends ListComponent implements On
     refreshList(finishCallback: (records: any[]) => void) {
         // reset items
         this.transmissionChains = [];
-        this.transmissionChainsAll = [];
+        this.transmissionChainsAll = undefined;
+        this.refreshListCount();
 
         // retrieve data
         if (
@@ -329,9 +330,9 @@ export class TransmissionChainsListComponent extends ListComponent implements On
      */
     refreshListCount() {
         this.transmissionChainsCount = {
-            count: this.transmissionChainsAll ?
+            count: this.transmissionChainsAll !== undefined ?
                 this.transmissionChainsAll.length :
-                0
+                null
         };
     }
 }

@@ -135,7 +135,11 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
 
         // set current page title
         this.breadcrumbs.push(
-            new BreadcrumbItemModel('LNG_PAGE_GANTT_CHART_TITLE', '/gantt-chart')
+            new BreadcrumbItemModel(
+                'LNG_PAGE_GANTT_CHART_TITLE',
+                '.',
+                true
+            )
         );
     }
 

@@ -330,7 +330,9 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                 this.printFollowUpsDialogFields = [
                     new DialogField({
                         name: 'contactId',
-                        placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_CONTACT_BUTTON',
+                        placeholder: this.isContact ?
+                            'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_CONTACT_BUTTON' :
+                            'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_CASE_BUTTON',
                         inputOptions: [({
                             label: recordData.name,
                             value: this.recordId
