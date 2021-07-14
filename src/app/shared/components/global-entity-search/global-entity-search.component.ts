@@ -132,7 +132,7 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
                                     });
                             } else {
                                 // save searched value
-                                this.globalEntitySearchDataService.setSearchValue(this.globalSearchValue);
+                                this.globalEntitySearchDataService.searchValue = this.globalSearchValue;
 
                                 // display all results
                                 this.redirectService.to([`/outbreaks/${this.selectedOutbreak.id}/search-results`]);

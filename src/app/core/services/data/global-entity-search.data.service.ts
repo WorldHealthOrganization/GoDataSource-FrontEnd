@@ -14,15 +14,12 @@ import { IBasicCount } from '../../models/basic-count.interface';
 @Injectable()
 export class GlobalEntitySearchDataService {
     // store search value
-    private _searchValue;
-
-    // set data
-    setSearchValue(data) {
+    private _searchValue: string;
+    set searchValue(data: string) {
         this._searchValue = data;
     }
 
-    // get data
-    getSearchValue() {
+    get searchValue(): string {
         return this._searchValue;
     }
 
@@ -51,7 +48,7 @@ export class GlobalEntitySearchDataService {
         qb.filter.firstLevelConditions();
         // add condition for identifier
         qb.filter.where({
-            identifier: globalSearchValue
+            identifier: encodeURIComponent(globalSearchValue)
         }, true);
 
         qb.merge(queryBuilder);
@@ -80,12 +77,10 @@ export class GlobalEntitySearchDataService {
         globalSearchValue: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<IBasicCount> {
-
         // create condition
-        const whereFilter = JSON.stringify({identifier: globalSearchValue});
+        const whereFilter = JSON.stringify({identifier: encodeURIComponent(globalSearchValue)});
 
         // get the items count
         return this.http.get(`outbreaks/${outbreakId}/people/count?where=${whereFilter}`);
     }
 }
-

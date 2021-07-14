@@ -189,11 +189,11 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
     refreshList(finishCallback: (records: any[]) => void) {
         if (
             this.selectedOutbreak &&
-            !_.isEmpty(this.globalEntitySearchDataService.getSearchValue())
+            !_.isEmpty(this.globalEntitySearchDataService.searchValue)
         ) {
             // retrieve the list of Cases
             this.entityList$ = this.globalEntitySearchDataService
-                .searchEntity(this.selectedOutbreak.id, this.globalEntitySearchDataService.getSearchValue(), this.queryBuilder)
+                .searchEntity(this.selectedOutbreak.id, this.globalEntitySearchDataService.searchValue, this.queryBuilder)
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
@@ -216,14 +216,14 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
     refreshListCount() {
         if (
             this.selectedOutbreak &&
-            !_.isEmpty(this.globalEntitySearchDataService.getSearchValue())
+            !_.isEmpty(this.globalEntitySearchDataService.searchValue)
         ) {
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
             this.entityListCount$ = this.globalEntitySearchDataService
-                .searchEntityCount(this.selectedOutbreak.id, this.globalEntitySearchDataService.getSearchValue(), countQueryBuilder)
+                .searchEntityCount(this.selectedOutbreak.id, this.globalEntitySearchDataService.searchValue, countQueryBuilder)
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
@@ -234,7 +234,7 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
         } else {
             // do not fetch any item
             this.entityListCount$ = new Observable((observer) => {
-                observer.next({});
+                observer.next({count: 0});
                 observer.complete();
                 return;
             });
