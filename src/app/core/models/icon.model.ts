@@ -15,10 +15,10 @@ export class IconModel
     /**
      * Static Permissions - IPermissionBasic
      */
-    static canView(user: UserModel): boolean { return false; }
+    static canView(): boolean { return false; }
     static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.ICON_LIST) : false; }
     static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.ICON_CREATE) : false; }
-    static canModify(user: UserModel): boolean { return false; }
+    static canModify(): boolean { return false; }
     static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.ICON_DELETE) : false; }
 
     /**
@@ -36,9 +36,9 @@ export class IconModel
     /**
      * Permissions - IPermissionBasic
      */
-    canView(user: UserModel): boolean { return IconModel.canView(user); }
+    canView(): boolean { return IconModel.canView(); }
     canList(user: UserModel): boolean { return IconModel.canList(user); }
     canCreate(user: UserModel): boolean { return IconModel.canCreate(user); }
-    canModify(user: UserModel): boolean { return IconModel.canModify(user); }
+    canModify(): boolean { return IconModel.canModify(); }
     canDelete(user: UserModel): boolean { return IconModel.canDelete(user); }
 }

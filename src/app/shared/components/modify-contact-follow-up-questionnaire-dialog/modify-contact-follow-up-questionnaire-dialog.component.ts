@@ -61,7 +61,6 @@ export class ModifyContactFollowUpQuestionnaireDialogComponent implements OnInit
         // make sure we have the latest follow-up data
         this.followUpsDataService.getFollowUp(
             this.data.outbreak.id,
-            this.data.followUp.personId,
             this.data.followUp.id
         ).subscribe((followUp: FollowUpModel) => {
             this.data.followUp = followUp;

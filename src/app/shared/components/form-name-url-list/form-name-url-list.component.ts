@@ -5,7 +5,7 @@ import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 import { DialogService } from '../../../core/services/helper/dialog.service';
 import { GenericDataService } from '../../../core/services/data/generic.data.service';
 import { SortableListBase } from '../../xt-forms/core/sortable-list-base';
-import { CdkDragDrop, CdkDragStart, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Constants } from '../../../core/models/constants';
 import { IGeneralAsyncValidatorResponse } from '../../xt-forms/validators/general-async-validator.directive';
 import * as _ from 'lodash';
@@ -131,7 +131,7 @@ export class FormNameUrlListComponent
     /**
      * Drag started
      */
-    dragStarted(event: CdkDragStart<NameUrlModel>): void {
+    dragStarted(): void {
         if (this.isInvalidDragEvent) {
             document.dispatchEvent(new Event('mouseup'));
         }

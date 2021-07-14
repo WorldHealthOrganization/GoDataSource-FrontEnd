@@ -63,10 +63,10 @@ export class RelationshipModel
     /**
      * Static Permissions - IPermissionBasicBulk
      */
-    static canBulkCreate(user: UserModel): boolean { return false; }
-    static canBulkModify(user: UserModel): boolean { return false; }
+    static canBulkCreate(): boolean { return false; }
+    static canBulkModify(): boolean { return false; }
     static canBulkDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_BULK_DELETE) : false); }
-    static canBulkRestore(user: UserModel): boolean { return false; }
+    static canBulkRestore(): boolean { return false; }
 
     /**
      * Constructor
@@ -117,10 +117,10 @@ export class RelationshipModel
     /**
      * Permissions - IPermissionBasicBulk
      */
-    canBulkCreate(user: UserModel): boolean { return RelationshipModel.canBulkCreate(user); }
-    canBulkModify(user: UserModel): boolean { return RelationshipModel.canBulkModify(user); }
+    canBulkCreate(): boolean { return RelationshipModel.canBulkCreate(); }
+    canBulkModify(): boolean { return RelationshipModel.canBulkModify(); }
     canBulkDelete(user: UserModel): boolean { return RelationshipModel.canBulkDelete(user); }
-    canBulkRestore(user: UserModel): boolean { return RelationshipModel.canBulkRestore(user); }
+    canBulkRestore(): boolean { return RelationshipModel.canBulkRestore(); }
 
     /**
      * Get the related entity

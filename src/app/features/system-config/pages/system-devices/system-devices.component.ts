@@ -98,7 +98,7 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
                     click: (item: DeviceModel) => {
                         this.wipeDevice(item);
                     },
-                    visible: (item: DeviceModel): boolean => {
+                    visible: (): boolean => {
                         // for now let use do another wipe even if one is in progress, because parse might fails..and status might remain pending..which might cause issues if we can't send a new notification
                         // [Constants.DEVICE_WIPE_STATUS.READY.value, Constants.DEVICE_WIPE_STATUS.PENDING.value].includes(item.status)
                         return DeviceModel.canWipe(this.authUser);
@@ -112,7 +112,7 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
                     click: (item: DeviceModel) => {
                         this.router.navigate(['/system-config', 'devices', item.id, 'history']);
                     },
-                    visible: (item: DeviceModel): boolean => {
+                    visible: (): boolean => {
                         return DeviceModel.canListHistory(this.authUser);
                     },
                 })

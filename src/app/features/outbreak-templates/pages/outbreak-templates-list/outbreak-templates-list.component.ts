@@ -178,7 +178,7 @@ export class OutbreakTemplatesListComponent
                     click: (item: OutbreakTemplateModel) => {
                         this.cloneOutbreakTemplate(item);
                     },
-                    visible: (item: OutbreakTemplateModel): boolean => {
+                    visible: (): boolean => {
                         return OutbreakTemplateModel.canClone(this.authUser);
                     }
                 })

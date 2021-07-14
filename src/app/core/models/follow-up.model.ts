@@ -123,7 +123,7 @@ export class FollowUpModel
     /**
      * Static Permissions - IPermissionBasicBulk
      */
-    static canBulkCreate(user: UserModel): boolean { return false; }
+    static canBulkCreate(): boolean { return false; }
     static canBulkModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.FOLLOW_UP_BULK_MODIFY) : false); }
     static canBulkDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.FOLLOW_UP_BULK_DELETE) : false); }
     static canBulkRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.FOLLOW_UP_BULK_RESTORE) : false); }
@@ -200,7 +200,7 @@ export class FollowUpModel
     /**
      * Permissions - IPermissionBasicBulk
      */
-    canBulkCreate(user: UserModel): boolean { return FollowUpModel.canBulkCreate(user); }
+    canBulkCreate(): boolean { return FollowUpModel.canBulkCreate(); }
     canBulkModify(user: UserModel): boolean { return FollowUpModel.canBulkModify(user); }
     canBulkDelete(user: UserModel): boolean { return FollowUpModel.canBulkDelete(user); }
     canBulkRestore(user: UserModel): boolean { return FollowUpModel.canBulkRestore(user); }

@@ -322,7 +322,7 @@ export class DialogConfiguration {
      */
     updateFieldListLayoutCss() {
         this.fieldsListLayoutCss = [];
-        _.each(this.fieldsList, (field: DialogField, index: number) => {
+        _.each(this.fieldsList, (_field: DialogField, index: number) => {
             this.fieldsListLayoutCss.push(
                 this.fieldsListLayout &&
                 this.fieldsListLayout[index] ?
@@ -407,7 +407,7 @@ export class DialogComponent implements OnDestroy {
     constructor(
         public dialogRef: MatDialogRef<DialogComponent>,
         // tslint:disable-next-line:no-unused-variable
-        @Inject(MAT_DIALOG_DATA) private data: DialogConfiguration
+        @Inject(MAT_DIALOG_DATA) data: DialogConfiguration
     ) {
         // set confirm data
         this.confirmData = data;

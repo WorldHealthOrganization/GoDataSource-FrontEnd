@@ -1,4 +1,4 @@
-import { ActivatedRouteSnapshot, CanDeactivate, RouterStateSnapshot } from '@angular/router';
+import { CanDeactivate } from '@angular/router';
 import { Directive, HostListener, Injectable, QueryList, ViewChildren } from '@angular/core';
 import { Observable, Observer } from 'rxjs';
 import * as _ from 'lodash';
@@ -110,15 +110,9 @@ export class PageChangeConfirmationGuard implements CanDeactivate<ConfirmOnFormC
     /**
      * Handle can deactivate
      * @param component
-     * @param currentRoute
-     * @param currentState
-     * @param nextState
      */
     canDeactivate(
-        component: ConfirmOnFormChanges,
-        currentRoute: ActivatedRouteSnapshot,
-        currentState: RouterStateSnapshot,
-        nextState?: RouterStateSnapshot
+        component: ConfirmOnFormChanges
     ): Observable<boolean> | boolean {
         // no guard set here
         if (!(component instanceof ConfirmOnFormChanges)) {
