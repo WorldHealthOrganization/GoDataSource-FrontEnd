@@ -19,6 +19,10 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { EventModel } from '../../../../core/models/event.model';
+import { CaseModel } from '../../../../core/models/case.model';
+import { ContactModel } from '../../../../core/models/contact.model';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
     selector: 'app-duplicate-records-list',
@@ -284,5 +288,19 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
                 // not supported
                 return false;
         }
+    }
+
+    /**
+     * Cast to event
+     */
+    getEvent(item): EventModel {
+        return item as EventModel;
+    }
+
+    /**
+     * Cast to anything but not event
+     */
+    getNotEvent(item): CaseModel | ContactModel | ContactOfContactModel {
+        return item as CaseModel | ContactModel | ContactOfContactModel;
     }
 }

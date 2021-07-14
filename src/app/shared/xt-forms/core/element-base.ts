@@ -44,7 +44,7 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
      * Constructor
      */
     protected constructor(
-        protected controlContainer: ControlContainer,
+        public controlContainer: ControlContainer,
         private validators: ValidatorArray,
         private _asyncValidators: AsyncValidatorArray
     ) {
@@ -98,7 +98,7 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
      * Returns a list of validation error messages for a custom form control.
      * @returns {Array<ElementBaseFailure>}
      */
-    protected get failures(): ElementBaseFailure[] {
+    public get failures(): ElementBaseFailure[] {
         return this.validationResultErrMsgs;
     }
 

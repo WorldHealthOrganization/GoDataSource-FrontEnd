@@ -65,6 +65,48 @@ enum ImportServerErrorCodes {
     ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE = 'ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE'
 }
 
+interface IImportErrorDetailsSimple {
+    failed: {
+        // used internally
+        showData: boolean,
+
+        // from server
+        data: {
+            file: {
+                [prop: string]: any
+            },
+            save: {
+                [prop: string]: any
+            }
+        },
+        recordNo: number,
+        message: string,
+        error: {
+            code: number,
+            message: string,
+            errmsg: string,
+            details: {
+                codes: {
+                    [property: string]: any
+                }
+            }
+        }
+    }[];
+}
+
+interface IImportErrorDetailsProcessedImported {
+    processed: {
+        no: string,
+        total: string
+    };
+    imported: {
+        model: string,
+        success: string,
+        failed: string,
+        failedNo: number
+    };
+}
+
 @Component({
     selector: 'app-import-data',
     encapsulation: ViewEncapsulation.None,
@@ -278,46 +320,14 @@ export class ImportDataComponent
 
     // Keep err msg details
     errMsgDetails: {
-        details: {
-            failed: {
-                // used internally
-                showData: boolean,
-
-                // from server
-                data: {
-                    file: {
-                        [prop: string]: any
-                    },
-                    save: {
-                        [prop: string]: any
-                    }
-                },
-                recordNo: number,
-                message: string,
-                error: {
-                    code: number,
-                    message: string,
-                    errmsg: string,
-                    details: {
-                        codes: {
-                            [property: string]: any
-                        }
-                    }
-                }
-            }[]
-        } | {
-            processed: {
-                no: string,
-                total: string
-            },
-            imported: {
-                model: string,
-                success: string,
-                failed: string,
-                failedNo: number
-            }
-        }
+        details: IImportErrorDetailsSimple | IImportErrorDetailsProcessedImported
     };
+    get errMsgDetailsAsS(): IImportErrorDetailsSimple {
+        return this.errMsgDetails.details as IImportErrorDetailsSimple;
+    }
+    get errMsgDetailsAsPI(): IImportErrorDetailsProcessedImported {
+        return this.errMsgDetails.details as IImportErrorDetailsProcessedImported;
+    }
 
     // Import is async ?
     @Input() asyncImport: boolean = false;

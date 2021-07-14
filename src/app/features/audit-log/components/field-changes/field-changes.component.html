@@ -3,10 +3,10 @@
     *ngIf="value?.type === FieldValueType.STRING || value?.type === FieldValueType.NUMBER"
     class="string-diff"
     fxLayout="column" fxLayoutGap="2px">
-    <span class="field-name">{{value.value.property}}</span>
+    <span class="field-name">{{valueAsNotObjectNotArray.value.property}}</span>
     <div class="field-changes" fxLayout="column">
-        <span class="old-value">{{value.value.oldValue}}</span>
-        <span class="new-value">{{value.value.newValue}}</span>
+        <span class="old-value">{{valueAsNotObjectNotArray.value.oldValue}}</span>
+        <span class="new-value">{{valueAsNotObjectNotArray.value.newValue}}</span>
     </div>
 </div>
 
@@ -15,10 +15,10 @@
     *ngIf="value?.type === FieldValueType.BOOLEAN"
     class="string-diff"
     fxLayout="column" fxLayoutGap="2px">
-    <span class="field-name">{{value.value.property}}</span>
+    <span class="field-name">{{valueAsNotObjectNotArray.value.property}}</span>
     <div class="field-changes" fxLayout="column">
-        <span class="old-value">{{value.value.oldValue ? 'true' : 'false'}}</span>
-        <span class="new-value">{{value.value.newValue ? 'true' : 'false'}}</span>
+        <span class="old-value">{{valueAsNotObjectNotArray.value.oldValue ? 'true' : 'false'}}</span>
+        <span class="new-value">{{valueAsNotObjectNotArray.value.newValue ? 'true' : 'false'}}</span>
     </div>
 </div>
 
@@ -27,10 +27,10 @@
     *ngIf="value?.type === FieldValueType.LNG_TOKEN"
     class="string-diff"
     fxLayout="column" fxLayoutGap="2px">
-    <span class="field-name">{{value.value.property}}</span>
+    <span class="field-name">{{valueAsNotObjectNotArray.value.property}}</span>
     <div class="field-changes" fxLayout="column">
-        <span class="old-value">{{value.value.oldValue | translate}}</span>
-        <span class="new-value">{{value.value.newValue | translate}}</span>
+        <span class="old-value">{{valueAsNotObjectNotArray.value.oldValue | translate}}</span>
+        <span class="new-value">{{valueAsNotObjectNotArray.value.newValue | translate}}</span>
     </div>
 </div>
 
@@ -39,10 +39,10 @@
     *ngIf="value?.type === FieldValueType.DATE"
     class="string-diff"
     fxLayout="column" fxLayoutGap="2px">
-    <span class="field-name">{{value.value.property}}</span>
+    <span class="field-name">{{valueAsNotObjectNotArray.value.property}}</span>
     <div class="field-changes" fxLayout="column">
-        <span class="old-value">{{value.value.oldValue | dateTimeDefault}}</span>
-        <span class="new-value">{{value.value.newValue | dateTimeDefault}}</span>
+        <span class="old-value">{{valueAsNotObjectNotArray.value.oldValue | dateTimeDefault}}</span>
+        <span class="new-value">{{valueAsNotObjectNotArray.value.newValue | dateTimeDefault}}</span>
     </div>
 </div>
 
@@ -51,7 +51,7 @@
     *ngIf="value?.type === FieldValueType.RICH_CONTENT"
     class="string-diff"
     fxLayout="column" fxLayoutGap="2px">
-    <span class="field-name">{{value.property}}</span>
+    <span class="field-name">{{valueAsRichContent.property}}</span>
     <div class="field-changes" fxLayout="column">
         <div
             fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="3px"
@@ -71,7 +71,7 @@
         class="object-value-property"
         fxLayout="row" fxLayoutGap="3px"
         (click)="collapsed = !collapsed">
-        <span class="field-name">{{value.rootProperty}}</span>
+        <span class="field-name">{{valueAsObjectOrArray.rootProperty}}</span>
         <span *ngIf="collapsed" class="xt-icon">thinArrowRight</span>
         <span *ngIf="!collapsed" class="xt-icon">thinArrowDown</span>
     </div>
@@ -80,7 +80,7 @@
         class="field-changes"
         fxLayout="column" fxLayoutGap="2px">
         <app-field-changes
-            *ngFor="let propValue of value.value"
+            *ngFor="let propValue of valueAsObjectOrArray.value"
             [value]="propValue">
         </app-field-changes>
     </div>
