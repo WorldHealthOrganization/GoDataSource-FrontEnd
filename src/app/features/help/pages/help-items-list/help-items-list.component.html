@@ -20,6 +20,7 @@
 
 <!-- Side columns -->
 <app-side-columns
+    [tableColumnsUserSettingsKey]="UserSettings.HELP_ITEMS_LIST"
     [tableColumns]="tableColumns"
     (visibleColumnsChanged)="applySideColumnsChanged($event)">
 </app-side-columns>

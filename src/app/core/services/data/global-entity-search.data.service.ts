@@ -9,13 +9,48 @@ import * as _ from 'lodash';
 import { EntityModel } from '../../models/entity-and-relationship.model';
 import { map } from 'rxjs/operators';
 import { ContactOfContactModel } from '../../models/contact-of-contact.model';
+import { IBasicCount } from '../../models/basic-count.interface';
+import { RequestFilterGenerator } from '../../../core/helperClasses/request-query-builder';
 
 @Injectable()
 export class GlobalEntitySearchDataService {
+    // store search value
+    private _searchValue: string;
+    set searchValue(data: string) {
+        this._searchValue = data;
+    }
 
+    get searchValue(): string {
+        return this._searchValue;
+    }
+
+    /**
+     * Constructor
+     */
     constructor(
         private http: HttpClient
     ) {}
+
+    /**
+     * Returns the search value condition
+     * @param {string} searchValue
+     * @returns {any}
+     */
+    private createSearchValueCondition(searchValue: string): any {
+        return {
+            or: [
+                {
+                    id: RequestFilterGenerator.textContains(searchValue, false)
+                },
+                {
+                    visualId: RequestFilterGenerator.textContains(searchValue, false)
+                },
+                {
+                    'documents.number': RequestFilterGenerator.textContains(searchValue, false)
+                }
+            ]
+        };
+    }
 
     /**
      * Return the entity matched by identifier
@@ -29,17 +64,13 @@ export class GlobalEntitySearchDataService {
         globalSearchValue: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<(CaseModel | ContactModel | EventModel | ContactOfContactModel)[]> {
-
+        // create filter
         const qb = new RequestQueryBuilder();
-
         qb.filter.firstLevelConditions();
-        // add condition for identifier
-        qb.filter.where({
-            identifier: globalSearchValue
-        }, true);
-
+        qb.filter.where(this.createSearchValueCondition(globalSearchValue), true);
         qb.merge(queryBuilder);
 
+        // construct query
         const filter = qb.buildQuery();
 
         return this.http.get(`outbreaks/${outbreakId}/people?filter=${filter}`)
@@ -51,5 +82,29 @@ export class GlobalEntitySearchDataService {
                 })
             );
     }
-}
 
+    /**
+     * Return the count of people items matched by identifier
+     * @param {string} outbreakId
+     * @param {string} globalSearchValue
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<IBasicCount>}
+     */
+    searchEntityCount(
+        outbreakId: string,
+        globalSearchValue: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<IBasicCount> {
+        // create filter
+        const qb = new RequestQueryBuilder();
+        qb.filter.firstLevelConditions();
+        qb.filter.where(this.createSearchValueCondition(globalSearchValue), true);
+        qb.merge(queryBuilder);
+
+        // construct query
+        const whereFilter = qb.filter.generateCondition(true);
+
+        // get the items count
+        return this.http.get(`outbreaks/${outbreakId}/people/count?where=${whereFilter}`);
+    }
+}

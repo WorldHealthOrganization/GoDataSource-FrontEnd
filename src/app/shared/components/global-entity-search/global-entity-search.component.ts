@@ -15,6 +15,7 @@ import { LoadingDialogModel } from '../loading-dialog/loading-dialog.component';
 import { DialogService } from '../../../core/services/helper/dialog.service';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { RedirectService } from '../../../core/services/helper/redirect.service';
 
 @Component({
     selector: 'app-global-entity-search',
@@ -44,7 +45,8 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
         private globalEntitySearchDataService: GlobalEntitySearchDataService,
         private outbreakDataService: OutbreakDataService,
         private dialogService: DialogService,
-        private router: Router
+        private router: Router,
+        private redirectService: RedirectService
     ) {
     }
 
@@ -90,7 +92,7 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
             if (this.selectedOutbreak.id) {
                 this.showLoadingDialog();
                 // search for the entity
-                this.globalEntitySearchDataService.searchEntity(this.selectedOutbreak.id, fields.globalSearchValue)
+                this.globalEntitySearchDataService.searchEntityCount(this.selectedOutbreak.id, fields.globalSearchValue)
                     .pipe(
                         catchError((err) => {
                             this.closeLoadingDialog();
@@ -101,11 +103,41 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
                     )
                     .subscribe((results) => {
                         if (!_.isEmpty(results)) {
-                            const foundEntity = results[0];
-                            // generate the link for the entity view
-                            const personLink = EntityModel.getPersonLink(foundEntity);
-                            // navigate to the person view page
-                            this.router.navigate([personLink]);
+                            // if there is a single result, navigate to the entity view page, otherwise display all results in a new page
+                            if (results.count === 1) {
+                                // search for the entity
+                                this.globalEntitySearchDataService.searchEntity(this.selectedOutbreak.id, fields.globalSearchValue)
+                                    .pipe(
+                                        catchError((err) => {
+                                            this.closeLoadingDialog();
+                                            this.snackbarService.showApiError(err);
+
+                                            return throwError(err);
+                                        })
+                                    )
+                                    .subscribe((items) => {
+                                        if (!_.isEmpty(items)) {
+                                            // generate the link for the entity view
+                                            const personLink = EntityModel.getPersonLink(items[0]);
+                                            // navigate to the person view page
+                                            this.router.navigate([personLink]);
+
+                                            // empty search field
+                                            this.globalSearchValue = '';
+                                            // close side nav
+                                            this.closeSideNav();
+                                        }
+
+                                        this.closeLoadingDialog();
+                                    });
+                            } else {
+                                // save searched value
+                                this.globalEntitySearchDataService.searchValue = this.globalSearchValue;
+
+                                // display all results
+                                this.redirectService.to([`/outbreaks/${this.selectedOutbreak.id}/search-results`]);
+                            }
+
                             // empty search field
                             this.globalSearchValue = '';
                             // close side nav

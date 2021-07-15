@@ -1,36 +1,42 @@
-<app-topnav>
+<app-topnav [activeOutbreakEditable]="false">
     <ng-container dynamic-section>
         <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
-
-            <div class="topnav-actions">
-                <ng-container>
-                    <button
-                        *ngIf="HelpCategoryModel.canCreate(authUser)"
-                        mat-raised-button
-                        color="accent"
-                        [routerLink]="'/help/categories/create'">
-                        {{'LNG_COMMON_BUTTON_ADD'| translate}} <span class="xt-icon">addCircle</span>
-                    </button>
-                </ng-container>
-            </div>
         </div>
     </ng-container>
 </app-topnav>
 
 <!-- Side columns -->
 <app-side-columns
-    [tableColumnsUserSettingsKey]="UserSettings.HELP_CATEGORIES_LIST"
+    [tableColumnsUserSettingsKey]="UserSettings.SEARCH_RESULTS_FIELDS"
     [tableColumns]="tableColumns"
     (visibleColumnsChanged)="applySideColumnsChanged($event)">
 </app-side-columns>
 
 <!--Total number of records from the list-->
 <app-total-number-of-records
-    [value]="helpCategoriesListCount$ | async">
+    [value]="entityListCount$ | async">
 </app-total-number-of-records>
 
 <mat-card class="page-section page-content">
+    <div class="top-section-wrapper">
+        <!--Color Legend-->
+        <div>
+            <app-color-list-legend [referenceDataCategory]="ReferenceDataCategory.PERSON_TYPE">
+            </app-color-list-legend>
+        </div>
+
+        <!-- Filters -->
+        <div class="reset-filters">
+            <button
+                type="button"
+                mat-raised-button
+                color="accent"
+                (click)="needsRefreshList(true)">
+                {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+            </button>
+        </div>
+    </div>
 
     <!-- Hover question effects / actions -->
     <app-hover-row-actions
@@ -38,48 +44,30 @@
         [active]="!refreshingList"
     ></app-hover-row-actions>
 
-    <mat-table #table [dataSource]="helpCategoriesList$ | async" matSort (matSortChange)="sortBy($event)">
+    <mat-table #table [dataSource]="entityList$ | async">
+        <!-- Visual ID -->
+        <ng-container matColumnDef="visualId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_ENTITY_FIELD_LABEL_VISUAL_ID' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                {{ item.visualId }}
+            </mat-cell>
+        </ng-container>
 
         <!-- Name -->
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_HELP_CATEGORY_FIELD_LABEL_NAME' | translate}}
-                    </div>
-                    <div class="column-filter"></div>
+                    <div class="column-header">{{'LNG_ENTITY_FIELD_LABEL_NAME' | translate}}</div>
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item">
-                {{ item.name | translate }}
-            </mat-cell>
-        </ng-container>
-
-        <!-- Description -->
-        <ng-container matColumnDef="description">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_HELP_CATEGORY_FIELD_LABEL_DESCRIPTION' |
-                        translate}}
-                    </div>
-                    <div class="column-filter"></div>
-                </div>
-            </mat-header-cell>
-            <mat-cell *matCellDef="let item">
-                {{ item.description | translate }}
-            </mat-cell>
-        </ng-container>
-
-        <!-- Order -->
-        <ng-container matColumnDef="order">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_HELP_CATEGORY_FIELD_LABEL_ORDER' | translate }}</div>
-                    <div class="column-filter"></div>
-                </div>
-            </mat-header-cell>
-            <mat-cell *matCellDef="let item">
-                {{ item.order }}
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                {{item.name }}
             </mat-cell>
         </ng-container>
 
@@ -110,7 +98,7 @@
     <app-mat-paginator-extended
         [hidden]="refreshingList || isEmptyList"
         [pageIndex]="pageIndex"
-        [countData]="helpCategoriesListCount$ | async"
+        [countData]="entityListCount$ | async"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"
         (page)="changePage($event)">

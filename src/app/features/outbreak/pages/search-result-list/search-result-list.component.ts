@@ -1,0 +1,314 @@
+import {
+    Component,
+    OnDestroy,
+    OnInit
+} from '@angular/core';
+import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import {
+    UserModel,
+    UserSettings
+} from '../../../../core/models/user.model';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
+import * as _ from 'lodash';
+import {
+    catchError,
+    share,
+    tap
+} from 'rxjs/operators';
+import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
+import {
+    HoverRowAction,
+    LoadingDialogModel
+} from '../../../../shared/components';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { GlobalEntitySearchDataService } from '../../../../core/services/data/global-entity-search.data.service';
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { CaseModel } from '../../../../core/models/case.model';
+import { ContactModel } from '../../../../core/models/contact.model';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { EventModel } from '../../../../core/models/event.model';
+import { EntityType } from '../../../../core/models/entity-type';
+import {
+    ReferenceDataCategory,
+    ReferenceDataCategoryModel,
+    ReferenceDataEntryModel
+} from '../../../../core/models/reference-data.model';
+
+import {
+    Observable,
+    Subscription,
+    throwError
+} from 'rxjs';
+
+@Component({
+    selector: 'app-search-result-list',
+    templateUrl: './search-result-list.component.html'
+})
+export class SearchResultListComponent extends ListComponent implements OnInit, OnDestroy {
+    // Breadcrumbs
+    breadcrumbs: BreadcrumbItemModel[] = [
+        new BreadcrumbItemModel('LNG_PAGE_LIST_SEARCH_RESULT_TITLE', '.', true)
+    ];
+
+    // authenticated user
+    authUser: UserModel;
+    // selected Outbreak
+    selectedOutbreak: OutbreakModel;
+
+    // list of search result
+    entityList$: Observable<(CaseModel | ContactModel | ContactOfContactModel | EventModel)[]>;
+    entityListCount$: Observable<IBasicCount>;
+
+    // models
+    personTypesListMap: { [id: string]: ReferenceDataEntryModel };
+
+    // constants
+    EntityType = EntityType;
+    UserSettings = UserSettings;
+    ReferenceDataCategory = ReferenceDataCategory;
+    OutbreakModel = OutbreakModel;
+
+    // subscribers
+    outbreakSubscriber: Subscription;
+
+    loadingDialog: LoadingDialogModel;
+
+    recordActions: HoverRowAction[] = [
+        // View Item
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_ACTION_VIEW',
+            linkGenerator: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): string[] => {
+                return [this.getItemRouterLink(item, 'view')];
+            },
+            visible: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): boolean => {
+                return !item.deleted &&
+                    this.authUser &&
+                    this.canViewItem(item);
+            }
+        }),
+
+        // Modify Item
+        new HoverRowAction({
+            icon: 'settings',
+            iconTooltip: 'LNG_PAGE_ACTION_MODIFY',
+            linkGenerator: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): string[] => {
+                return [this.getItemRouterLink(item, 'modify')];
+            },
+            visible: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): boolean => {
+                return !item.deleted &&
+                    this.authUser &&
+                    this.canModifyItem(item);
+            }
+        })
+    ];
+
+    /**
+     * Constructor
+     */
+    constructor(
+        protected listHelperService: ListHelperService,
+        private authDataService: AuthDataService,
+        private globalEntitySearchDataService: GlobalEntitySearchDataService,
+        private outbreakDataService: OutbreakDataService,
+        private snackbarService: SnackbarService,
+        private referenceDataDataService: ReferenceDataDataService
+    ) {
+        super(listHelperService);
+    }
+
+    /**
+     * Component initialized
+     */
+    ngOnInit() {
+        // reference data
+        const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).pipe(share());
+        personTypes$.subscribe((personTypeCategory: ReferenceDataCategoryModel) => {
+            this.personTypesListMap = _.transform(
+                personTypeCategory.entries,
+                (result, entry: ReferenceDataEntryModel) => {
+                    // groupBy won't work here since groupBy will put an array instead of one value
+                    result[entry.id] = entry;
+                },
+                {}
+            );
+        });
+
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // subscribe to the Selected Outbreak Subject stream
+        this.outbreakSubscriber = this.outbreakDataService
+            .getSelectedOutbreakSubject()
+            .subscribe((selectedOutbreak: OutbreakModel) => {
+                this.selectedOutbreak = selectedOutbreak;
+
+                // initialize pagination
+                this.initPaginator();
+                // ...and re-load the list when the Selected Outbreak is changed
+                this.needsRefreshList(true);
+            });
+
+        // initialize Side Table Columns
+        this.initializeSideTableColumns();
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+    }
+
+    /**
+     * Initialize Side Table Columns
+     */
+    initializeSideTableColumns() {
+        // default table columns
+        this.tableColumns = [
+            new VisibleColumnModel({
+                field: 'visualId',
+                label: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID'
+            }),
+            new VisibleColumnModel({
+                field: 'name',
+                label: 'LNG_ENTITY_FIELD_LABEL_NAME'
+            })
+        ];
+    }
+
+    /**
+     * Refresh list
+     */
+    refreshList(finishCallback: (records: any[]) => void) {
+        if (
+            this.selectedOutbreak &&
+            !_.isEmpty(this.globalEntitySearchDataService.searchValue)
+        ) {
+            // retrieve the list of Cases
+            this.entityList$ = this.globalEntitySearchDataService
+                .searchEntity(this.selectedOutbreak.id, this.globalEntitySearchDataService.searchValue, this.queryBuilder)
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback([]);
+                        return throwError(err);
+                    }),
+                    tap(this.checkEmptyList.bind(this)),
+                    tap((data: any[]) => {
+                        finishCallback(data);
+                    })
+                );
+        } else {
+            finishCallback([]);
+        }
+    }
+
+    /**
+     * Get total number of items
+     */
+    refreshListCount() {
+        if (
+            this.selectedOutbreak &&
+            !_.isEmpty(this.globalEntitySearchDataService.searchValue)
+        ) {
+            // remove paginator from query builder
+            const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+            countQueryBuilder.paginator.clear();
+            countQueryBuilder.sort.clear();
+            this.entityListCount$ = this.globalEntitySearchDataService
+                .searchEntityCount(this.selectedOutbreak.id, this.globalEntitySearchDataService.searchValue, countQueryBuilder)
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        return throwError(err);
+                    }),
+                    share()
+                );
+        } else {
+            // do not fetch any item
+            this.entityListCount$ = new Observable((observer) => {
+                observer.next({count: 0});
+                observer.complete();
+                return;
+            });
+        }
+    }
+
+    /**
+     * Retrieve Person Type color
+     */
+    getPersonTypeColor(personType: string) {
+        const personTypeData = _.get(this.personTypesListMap, personType);
+        return _.get(personTypeData, 'colorCode', '');
+    }
+
+    /**
+     * Check if we can view item
+     * @param {Object} item
+     * @returns {boolean}
+     */
+    canViewItem(item: CaseModel | ContactModel | ContactOfContactModel | EventModel): boolean {
+        // check if we can modify item
+        switch (item.type) {
+            case EntityType.CASE:
+                return CaseModel.canView(this.authUser);
+            case EntityType.CONTACT:
+                return ContactModel.canView(this.authUser);
+            case EntityType.CONTACT_OF_CONTACT:
+                return ContactOfContactModel.canModify(this.authUser);
+            case EntityType.EVENT:
+                return EventModel.canView(this.authUser);
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if we can modify item
+     * @param {Object} item
+     * @returns {boolean}
+     */
+    canModifyItem(item: CaseModel | ContactModel | ContactOfContactModel | EventModel): boolean {
+        // check if we can modify item
+        switch (item.type) {
+            case EntityType.CASE:
+                return CaseModel.canModify(this.authUser);
+            case EntityType.CONTACT:
+                return ContactModel.canModify(this.authUser);
+            case EntityType.CONTACT_OF_CONTACT:
+                return ContactOfContactModel.canModify(this.authUser);
+            case EntityType.EVENT:
+                return EventModel.canModify(this.authUser);
+        }
+
+        return false;
+    }
+
+    /**
+     * Get the link to redirect to view page depending on item type and action
+     * @param {Object} item
+     * @param {string} action
+     * @returns {string}
+     */
+    getItemRouterLink(item: CaseModel | ContactModel | ContactOfContactModel | EventModel, action: string): string {
+        switch (item.type) {
+            case EntityType.CASE:
+                return `/cases/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
+            case EntityType.CONTACT:
+                return `/contacts/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
+            case EntityType.CONTACT_OF_CONTACT:
+                return `/contacts-of-contacts/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
+            case EntityType.EVENT:
+                return `/events/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
+        }
+
+        return '';
+    }
+}
