@@ -54,7 +54,7 @@ export class RolesListComponent extends ListComponent implements OnInit, OnDestr
             linkGenerator: (item: UserRoleModel): string[] => {
                 return ['/user-roles', item.id, 'view'];
             },
-            visible: (item: UserRoleModel): boolean => {
+            visible: (): boolean => {
                 return UserRoleModel.canView(this.authUser);
             }
         }),

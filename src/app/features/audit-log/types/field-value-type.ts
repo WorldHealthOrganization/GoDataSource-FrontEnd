@@ -58,3 +58,5 @@ export interface ArrayValue {
 }
 
 export type AuditLogValue = (BooleanValue | NumberValue | StringValue | LanguageTokenValue | RichContentValue | DateValue | ObjectValue | ArrayValue);
+export type AuditLogValueWithoutArrayAndObject = (BooleanValue | NumberValue | StringValue | LanguageTokenValue | DateValue);
+export type AuditLogValueArrayAndObject = (ObjectValue | ArrayValue);

@@ -1,4 +1,4 @@
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { AuthDataService } from '../data/auth.data.service';
 import { ModulePath } from '../../enums/module-path.enum';
@@ -18,8 +18,7 @@ export class PasswordChangeGuard implements CanActivate {
      * Check if we need to change password before we access a different page
      */
     canActivate(
-        next: ActivatedRouteSnapshot,
-        state: RouterStateSnapshot
+        next: ActivatedRouteSnapshot
     ) {
         // get the authenticated user
         const user = this.authDataService.getAuthenticatedUser();

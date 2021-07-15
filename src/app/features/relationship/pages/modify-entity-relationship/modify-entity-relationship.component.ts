@@ -343,7 +343,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
                     return throwError(err);
                 })
             )
-            .subscribe((relationshipData) => {
+            .subscribe(() => {
                 // update model
                 this.loadRelationship();
 

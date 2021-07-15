@@ -594,7 +594,7 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
         });
 
         // go through each group key and add those that are empty
-        _.each(this.groupKeys.none, (noneKey: string, groupValueKey: string) => {
+        _.each(this.groupKeys.none, (_noneKey: string, groupValueKey: string) => {
             if (!notEmptyGroups[groupValueKey]) {
                 // add none key
                 if (this.value.indexOf(this.groupKeys.none[groupValueKey]) < 0) {
@@ -688,7 +688,7 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
     ) {
         // reset all partial keys
         this.partialOptions = {};
-        _.each(this.groupKeys.map.partial, (groupValueKey: string, partialValue: string) => {
+        _.each(this.groupKeys.map.partial, (_groupValueKey: string, partialValue: string) => {
             this.partialOptions[partialValue] = '';
         });
 

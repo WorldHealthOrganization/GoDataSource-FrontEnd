@@ -481,13 +481,11 @@ export class RequestFilter {
      * Filter by an age range field ('from' / 'to')
      * @param {string} property
      * @param value Object with 'from' and 'to' properties
-     * @param {boolean} replace
      * @returns {RequestFilter}
      */
     byAgeRange(
         property: string,
-        value: any,
-        replace: boolean = true
+        value: any
     ): RequestFilter {
         // remove conditions
         this.remove(`${property}.months`);

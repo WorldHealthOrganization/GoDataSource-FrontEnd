@@ -6,7 +6,6 @@ import { ContactModel } from '../../../core/models/contact.model';
 import { DialogAnswer, DialogAnswerButton, DialogField, LoadingDialogModel, ModifyContactFollowUpQuestionnaireData, ModifyContactFollowUpQuestionnaireDialogComponent } from '../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../core/services/helper/dialog.service';
 import { FollowUpsDataService } from '../../../core/services/data/follow-ups.data.service';
-import { MatTable } from '@angular/material/table';
 import { Constants } from '../../../core/models/constants';
 import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
@@ -336,7 +335,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
     /**
      * Modify selected follow-ups
      */
-    modifySelectedFollowUps(table: MatTable<any>) {
+    modifySelectedFollowUps() {
         // get list of selected ids
         const selectedRecords: false | string[] = this.validateCheckedRecords();
         if (!selectedRecords) {

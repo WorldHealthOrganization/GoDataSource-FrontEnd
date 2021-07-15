@@ -83,7 +83,7 @@ export class BackupModel
     static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.BACKUP_VIEW) : false; }
     static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.BACKUP_LIST) : false; }
     static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.BACKUP_CREATE) : false; }
-    static canModify(user: UserModel): boolean { return false; }
+    static canModify(): boolean { return false; }
     static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.BACKUP_DELETE) : false; }
 
     /**
@@ -131,7 +131,7 @@ export class BackupModel
     canView(user: UserModel): boolean { return BackupModel.canView(user); }
     canList(user: UserModel): boolean { return BackupModel.canList(user); }
     canCreate(user: UserModel): boolean { return BackupModel.canCreate(user); }
-    canModify(user: UserModel): boolean { return BackupModel.canModify(user); }
+    canModify(): boolean { return BackupModel.canModify(); }
     canDelete(user: UserModel): boolean { return BackupModel.canDelete(user); }
 
     /**

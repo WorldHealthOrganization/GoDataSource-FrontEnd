@@ -373,7 +373,7 @@ export abstract class ListComponent implements OnDestroy {
 
         // listen for back / forward buttons
         ListComponent.locationSubscription = this.listHelperService.location
-            .subscribe((popStateEvent) => {
+            .subscribe(() => {
                 setTimeout(() => {
                     // check if subscription was closed
                     if (

@@ -26,17 +26,17 @@ export class SystemSyncLogModel
      */
     static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.SYNC_LOG_VIEW) : false; }
     static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.SYNC_LOG_LIST) : false; }
-    static canCreate(user: UserModel): boolean { return false; }
-    static canModify(user: UserModel): boolean { return false; }
+    static canCreate(): boolean { return false; }
+    static canModify(): boolean { return false; }
     static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.SYNC_LOG_DELETE) : false; }
 
     /**
      * Static Permissions - IPermissionBasicBulk
      */
-    static canBulkCreate(user: UserModel): boolean { return false; }
-    static canBulkModify(user: UserModel): boolean { return false; }
+    static canBulkCreate(): boolean { return false; }
+    static canBulkModify(): boolean { return false; }
     static canBulkDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.SYNC_LOG_BULK_DELETE) : false; }
-    static canBulkRestore(user: UserModel): boolean { return false; }
+    static canBulkRestore(): boolean { return false; }
 
     /**
      * Static Permissions - IPermissionSyncLog
@@ -66,17 +66,17 @@ export class SystemSyncLogModel
      */
     canView(user: UserModel): boolean { return SystemSyncLogModel.canView(user); }
     canList(user: UserModel): boolean { return SystemSyncLogModel.canList(user); }
-    canCreate(user: UserModel): boolean { return SystemSyncLogModel.canCreate(user); }
-    canModify(user: UserModel): boolean { return SystemSyncLogModel.canModify(user); }
+    canCreate(): boolean { return SystemSyncLogModel.canCreate(); }
+    canModify(): boolean { return SystemSyncLogModel.canModify(); }
     canDelete(user: UserModel): boolean { return SystemSyncLogModel.canDelete(user); }
 
     /**
      * Permissions - IPermissionBasicBulk
      */
-    canBulkCreate(user: UserModel): boolean { return SystemSyncLogModel.canBulkCreate(user); }
-    canBulkModify(user: UserModel): boolean { return SystemSyncLogModel.canBulkModify(user); }
+    canBulkCreate(): boolean { return SystemSyncLogModel.canBulkCreate(); }
+    canBulkModify(): boolean { return SystemSyncLogModel.canBulkModify(); }
     canBulkDelete(user: UserModel): boolean { return SystemSyncLogModel.canBulkDelete(user); }
-    canBulkRestore(user: UserModel): boolean { return SystemSyncLogModel.canBulkRestore(user); }
+    canBulkRestore(): boolean { return SystemSyncLogModel.canBulkRestore(); }
 
     /**
      * Permissions - IPermissionSyncLog

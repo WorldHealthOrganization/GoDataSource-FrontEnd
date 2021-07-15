@@ -28,9 +28,9 @@ export class ImportResultModel
      */
     static canView(user: UserModel): boolean { return !!user; }
     static canList(user: UserModel): boolean { return !!user; }
-    static canCreate(user: UserModel): boolean { return false; }
-    static canModify(user: UserModel): boolean { return false; }
-    static canDelete(user: UserModel): boolean { return false; }
+    static canCreate(): boolean { return false; }
+    static canModify(): boolean { return false; }
+    static canDelete(): boolean { return false; }
 
     /**
      * Constructor
@@ -49,7 +49,7 @@ export class ImportResultModel
      */
     canView(user: UserModel): boolean { return ImportResultModel.canView(user); }
     canList(user: UserModel): boolean { return ImportResultModel.canList(user); }
-    canCreate(user: UserModel): boolean { return ImportResultModel.canCreate(user); }
-    canModify(user: UserModel): boolean { return ImportResultModel.canModify(user); }
-    canDelete(user: UserModel): boolean { return ImportResultModel.canDelete(user); }
+    canCreate(): boolean { return ImportResultModel.canCreate(); }
+    canModify(): boolean { return ImportResultModel.canModify(); }
+    canDelete(): boolean { return ImportResultModel.canDelete(); }
 }

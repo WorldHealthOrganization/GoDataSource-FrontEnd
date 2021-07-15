@@ -42,7 +42,7 @@
                                 </ng-template>
 
                                 <div
-                                    *ngIf="labResultData.person.type === EntityType.CONTACT && labResultData.person.wasCase">
+                                    *ngIf="labResultData.person.type === EntityType.CONTACT && labResultDataPersonAsContact.wasCase">
                                     {{ 'LNG_PAGE_MODIFY_LAB_RESULT_FIELD_LABEL_CONTACT_WITH_INFO' | translate: {caseName: labResultData.person.name} }}
                                 </div>
                             </ng-container>

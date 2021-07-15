@@ -262,7 +262,7 @@ export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements 
         };
 
         // handle errors when trying to upload files
-        this.uploader.onWhenAddingFileFailed = (item: FileLikeObject, filter: any) => {
+        this.uploader.onWhenAddingFileFailed = (_item: FileLikeObject, filter: any) => {
             switch (filter.name) {
                 case 'mimeType':
                     // display error
@@ -284,12 +284,12 @@ export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements 
         };
 
         // handle file upload progress
-        this.uploader.onProgressItem = (fileItem: FileItem, progress: any) => {
+        this.uploader.onProgressItem = (_fileItem: FileItem, progress: any) => {
             this.progress = Math.round(progress);
         };
 
         // everything went smoothly ?
-        this.uploader.onCompleteItem = (item: FileItem, response: string, status: number) => {
+        this.uploader.onCompleteItem = (_item: FileItem, _response: string, status: number) => {
             // an error occurred ?
             if (status !== 200) {
                 return;

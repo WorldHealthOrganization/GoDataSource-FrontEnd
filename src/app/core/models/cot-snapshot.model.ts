@@ -49,8 +49,8 @@ export class CotSnapshotModel
      */
     static canView(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.COT_LIST) : false); }
     static canList(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.COT_LIST) : false); }
-    static canCreate(user: UserModel): boolean { return false; }
-    static canModify(user: UserModel): boolean { return false; }
+    static canCreate(): boolean { return false; }
+    static canModify(): boolean { return false; }
     static canDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.COT_LIST) : false); }
 
     /**
@@ -90,7 +90,7 @@ export class CotSnapshotModel
      */
     canView(user: UserModel): boolean { return CotSnapshotModel.canView(user); }
     canList(user: UserModel): boolean { return CotSnapshotModel.canList(user); }
-    canCreate(user: UserModel): boolean { return CotSnapshotModel.canCreate(user); }
-    canModify(user: UserModel): boolean { return CotSnapshotModel.canModify(user); }
+    canCreate(): boolean { return CotSnapshotModel.canCreate(); }
+    canModify(): boolean { return CotSnapshotModel.canModify(); }
     canDelete(user: UserModel): boolean { return CotSnapshotModel.canDelete(user); }
 }

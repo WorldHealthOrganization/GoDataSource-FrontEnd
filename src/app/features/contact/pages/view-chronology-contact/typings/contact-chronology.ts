@@ -21,7 +21,7 @@ export class ContactChronology {
         const sourcePersons = [];
 
         // create function that return all source persons for every relationship
-        const getSourcePersons = (contactDataId: string,
+        const getSourcePersons = (_contactDataId: string,
                                   relationships: RelationshipModel[]) => {
             _.forEach(relationships, (relationship) => {
                 _.forEach(relationship.people, (people) => {

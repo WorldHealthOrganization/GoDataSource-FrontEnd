@@ -8,7 +8,7 @@
             cdkDropList [cdkDropListData]="value" (cdkDropListDropped)="dropTable($event)">
             <div
                 *ngFor="let inputValue of values; let i = index; trackBy: trackByIndex"
-                cdkDrag (cdkDragStarted)="dragStarted($event)" [cdkDragData]="inputValue">
+                cdkDrag (cdkDragStarted)="dragStarted()" [cdkDragData]="inputValue">
 
                 <!-- Content -->
                 <div

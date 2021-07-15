@@ -51,6 +51,9 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
     // entity
     personType: EntityType;
     entityData: CaseModel | ContactModel;
+    get entityDataAsCaseModel(): CaseModel {
+        return this.entityData as CaseModel;
+    }
 
     initialCaseClassification: string;
 

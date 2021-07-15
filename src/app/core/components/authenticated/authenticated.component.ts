@@ -407,7 +407,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
                             // show dialog
                             this.confirmDialog
                                 .afterClosed()
-                                .subscribe((answer) => {
+                                .subscribe(() => {
                                     // popup closed
                                     this.tokenExpirePopupIsVisible = false;
                                     this.confirmDialog = null;

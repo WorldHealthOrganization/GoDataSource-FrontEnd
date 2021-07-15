@@ -1,4 +1,4 @@
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { AuthDataService } from '../data/auth.data.service';
 import { Observable } from 'rxjs/internal/Observable';
@@ -25,8 +25,7 @@ export class AuthGuard implements CanActivate {
      * Can activate
      */
     canActivate(
-        next: ActivatedRouteSnapshot,
-        state: RouterStateSnapshot
+        next: ActivatedRouteSnapshot
     ): Observable<boolean> | boolean {
         // get the authenticated user
         const user = this.authDataService.getAuthenticatedUser();

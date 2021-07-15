@@ -808,7 +808,7 @@ export class SideFiltersComponent {
 
                     case FilterType.RANGE_AGE:
                         // between / from / to
-                        qb.filter.byAgeRange(filter.fieldName, appliedFilter.value, false);
+                        qb.filter.byAgeRange(filter.fieldName, appliedFilter.value);
                         break;
 
                     case FilterType.RANGE_DATE:
