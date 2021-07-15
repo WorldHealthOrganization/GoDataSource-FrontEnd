@@ -51,7 +51,7 @@ export class LanguagesListComponent extends ListComponent implements OnInit, OnD
             linkGenerator: (item: LanguageModel): string[] => {
                 return ['/languages', item.id, 'view'];
             },
-            visible: (item: LanguageModel): boolean => {
+            visible: (): boolean => {
                 return LanguageModel.canView(this.authUser);
             }
         }),
@@ -103,7 +103,7 @@ export class LanguagesListComponent extends ListComponent implements OnInit, OnD
                     click: (item: LanguageModel) => {
                         this.downloadLanguage(item);
                     },
-                    visible: (item: LanguageModel): boolean => {
+                    visible: (): boolean => {
                         return LanguageModel.canExportTokens(this.authUser);
                     }
                 }),

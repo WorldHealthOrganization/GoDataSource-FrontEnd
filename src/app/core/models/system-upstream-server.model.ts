@@ -21,10 +21,10 @@ export class SystemUpstreamServerModel
     /**
      * Static Permissions - IPermissionBasic
      */
-    static canView(user: UserModel): boolean { return false; }
+    static canView(): boolean { return false; }
     static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.UPSTREAM_SERVER_LIST) : false; }
     static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.UPSTREAM_SERVER_CREATE) : false; }
-    static canModify(user: UserModel): boolean { return false; }
+    static canModify(): boolean { return false; }
     static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.UPSTREAM_SERVER_DELETE) : false; }
 
     /**
@@ -52,10 +52,10 @@ export class SystemUpstreamServerModel
     /**
      * Permissions - IPermissionBasic
      */
-    canView(user: UserModel): boolean { return SystemUpstreamServerModel.canView(user); }
+    canView(): boolean { return SystemUpstreamServerModel.canView(); }
     canList(user: UserModel): boolean { return SystemUpstreamServerModel.canList(user); }
     canCreate(user: UserModel): boolean { return SystemUpstreamServerModel.canCreate(user); }
-    canModify(user: UserModel): boolean { return SystemUpstreamServerModel.canModify(user); }
+    canModify(): boolean { return SystemUpstreamServerModel.canModify(); }
     canDelete(user: UserModel): boolean { return SystemUpstreamServerModel.canDelete(user); }
 
     /**

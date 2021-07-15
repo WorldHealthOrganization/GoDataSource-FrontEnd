@@ -826,7 +826,7 @@
                 {{ 'LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED' | translate }}
             </div>
             <div
-                *ngFor="let err of errMsgDetails.details && errMsgDetails.details.failed ? errMsgDetails.details.failed : []"
+                *ngFor="let err of errMsgDetails.details && errMsgDetailsAsS.failed ? errMsgDetailsAsS.failed : []"
                 class="import-data-errors-err"
                 fxLayout="column">
                 <div
@@ -913,7 +913,7 @@
                 #asyncImportErrors>
             <!-- No extra details -->
             <div
-                *ngIf="!errMsgDetails.details || !errMsgDetails.details.imported; else asyncHaveDetails">
+                *ngIf="!errMsgDetails.details || !errMsgDetailsAsPI.imported; else asyncHaveDetails">
                 {{ 'LNG_PAGE_IMPORT_DATA_ERROR_MISSING_ERROR_DETAILS' | translate }}
             </div>
 
@@ -929,7 +929,7 @@
 
                 <!-- Errors -->
                 <div
-                    *ngIf="errMsgDetails.details.imported.failedNo > 0">
+                    *ngIf="errMsgDetailsAsPI.imported.failedNo > 0">
 
                     <!-- Total number of records from the list -->
                     <app-total-number-of-records

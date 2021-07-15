@@ -1088,7 +1088,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                 featurePath.setProperties({
                     dataForEventListeners: new WorldMapClusterLine({
                         data: lineData.lines,
-                        selected: (map: WorldMapComponent, clusterLine: WorldMapClusterLine) => {
+                        selected: (_map: WorldMapComponent, clusterLine: WorldMapClusterLine) => {
                             // display dialog for grouped lines
                             this.displayChoseFromGroupDialog(clusterLine.data);
                         }
@@ -1525,7 +1525,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
      * Update map size
      */
     @HostListener('window:resize')
-    // tslint:disable-next-line:no-unused-variable
+    // @ts-ignore: Ignore value not used
     private updateMapSizeOnWindowResize() {
         this.updateMapSize();
     }

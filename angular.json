@@ -50,6 +50,7 @@
                             "file-saver",
                             "isemail",
                             "lodash",
+                            "ol",
                             "pikaday",
                             "rxjs"
                         ]

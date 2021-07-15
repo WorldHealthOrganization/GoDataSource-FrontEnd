@@ -211,11 +211,13 @@
                     *ngIf="item.outbreaks?.length < 1; else outbreaksList">
                     {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_LABEL_ALL_OUTBREAKS' | translate }}
                 </span>
-                <span
-                    *ngFor="let outbreak of item.outbreaks; let isFirst = first;"
+                <ng-template
                     #outbreaksList>
-                    {{ (isFirst ? '' : ' / ') + outbreak.name }}
-                </span>
+                    <span
+                        *ngFor="let outbreak of item.outbreaks; let isFirst = first;">
+                        {{ (isFirst ? '' : ' / ') + outbreak.name }}
+                    </span>
+                </ng-template>
             </mat-cell>
         </ng-container>
 

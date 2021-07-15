@@ -65,6 +65,48 @@ enum ImportServerErrorCodes {
     ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE = 'ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE'
 }
 
+interface IImportErrorDetailsSimple {
+    failed: {
+        // used internally
+        showData: boolean,
+
+        // from server
+        data: {
+            file: {
+                [prop: string]: any
+            },
+            save: {
+                [prop: string]: any
+            }
+        },
+        recordNo: number,
+        message: string,
+        error: {
+            code: number,
+            message: string,
+            errmsg: string,
+            details: {
+                codes: {
+                    [property: string]: any
+                }
+            }
+        }
+    }[];
+}
+
+interface IImportErrorDetailsProcessedImported {
+    processed: {
+        no: string,
+        total: string
+    };
+    imported: {
+        model: string,
+        success: string,
+        failed: string,
+        failedNo: number
+    };
+}
+
 @Component({
     selector: 'app-import-data',
     encapsulation: ViewEncapsulation.None,
@@ -278,46 +320,14 @@ export class ImportDataComponent
 
     // Keep err msg details
     errMsgDetails: {
-        details: {
-            failed: {
-                // used internally
-                showData: boolean,
-
-                // from server
-                data: {
-                    file: {
-                        [prop: string]: any
-                    },
-                    save: {
-                        [prop: string]: any
-                    }
-                },
-                recordNo: number,
-                message: string,
-                error: {
-                    code: number,
-                    message: string,
-                    errmsg: string,
-                    details: {
-                        codes: {
-                            [property: string]: any
-                        }
-                    }
-                }
-            }[]
-        } | {
-            processed: {
-                no: string,
-                total: string
-            },
-            imported: {
-                model: string,
-                success: string,
-                failed: string,
-                failedNo: number
-            }
-        }
+        details: IImportErrorDetailsSimple | IImportErrorDetailsProcessedImported
     };
+    get errMsgDetailsAsS(): IImportErrorDetailsSimple {
+        return this.errMsgDetails.details as IImportErrorDetailsSimple;
+    }
+    get errMsgDetailsAsPI(): IImportErrorDetailsProcessedImported {
+        return this.errMsgDetails.details as IImportErrorDetailsProcessedImported;
+    }
 
     // Import is async ?
     @Input() asyncImport: boolean = false;
@@ -486,7 +496,7 @@ export class ImportDataComponent
                 return this.elementInEditMode === item;
             },
             click: (
-                item: ImportableMapField | IMappedOption,
+                _item: ImportableMapField | IMappedOption,
                 handler: HoverRowActionsDirective
             ) => {
                 // clear
@@ -529,7 +539,7 @@ export class ImportDataComponent
             },
             click: (
                 item: ImportableMapField | IMappedOption,
-                handler: HoverRowActionsDirective,
+                _handler: HoverRowActionsDirective,
                 index: number
             ) => {
                 // remove item
@@ -698,7 +708,7 @@ export class ImportDataComponent
         };
 
         // handle errors when trying to upload files
-        this.uploader.onWhenAddingFileFailed = (item: FileLikeObject, filter: any) => {
+        this.uploader.onWhenAddingFileFailed = (_item: FileLikeObject, filter: any) => {
             switch (filter.name) {
                 case 'mimeType':
                     // display error
@@ -711,7 +721,7 @@ export class ImportDataComponent
         };
 
         // handle server errors
-        this.uploader.onErrorItem = (file, err: any) => {
+        this.uploader.onErrorItem = (_file, err: any) => {
             // display toast
             try {
                 err = _.isObject(err) ? err : JSON.parse(err);
@@ -747,7 +757,7 @@ export class ImportDataComponent
         };
 
         // handle file upload progress
-        this.uploader.onProgressItem = (fileItem: FileItem, progress: any) => {
+        this.uploader.onProgressItem = (_fileItem: FileItem, progress: any) => {
             this.progress = Math.round(progress);
         };
 
@@ -1271,7 +1281,7 @@ export class ImportDataComponent
         });
 
         // do we still have required fields? then we need to add a field map for each one of them  to force user to enter data
-        _.each(mapOfRequiredDestinationFields, (n: boolean, property: string) => {
+        _.each(mapOfRequiredDestinationFields, (_n: boolean, property: string) => {
             // create
             const importableItem = new ImportableMapField(
                 property
@@ -1692,7 +1702,7 @@ export class ImportDataComponent
 
                             // add missing required fields
                             _.each(mapOfRequiredDestinationFields, (
-                                n: boolean,
+                                _n: boolean,
                                 destinationField: string
                             ) => {
                                 // create
@@ -2735,7 +2745,7 @@ export class ImportDataComponent
                     const locationsToRetrieveMap: {
                         [locationIdName: string]: true
                     } = {};
-                    _.each(mustRetrieveLocations, (N, key: string) => {
+                    _.each(mustRetrieveLocations, (_N, key: string) => {
                         if (
                             this.distinctValuesCache[key] &&
                             this.distinctValuesCache[key].length > 0

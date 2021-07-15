@@ -119,7 +119,7 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
             legend: {
                 item: {
                     // disable click on legend
-                    onclick: function (id) {
+                    onclick: function () {
                         return false;
                     }
                 }

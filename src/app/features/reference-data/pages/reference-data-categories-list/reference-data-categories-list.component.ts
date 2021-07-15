@@ -55,7 +55,7 @@ export class ReferenceDataCategoriesListComponent extends ListComponent implemen
             linkGenerator: (item: ReferenceDataCategoryModel): string[] => {
                 return ['/reference-data', item.id];
             },
-            visible: (item: ReferenceDataCategoryModel): boolean => {
+            visible: (): boolean => {
                 return ReferenceDataEntryModel.canList(this.authUser);
             }
         })

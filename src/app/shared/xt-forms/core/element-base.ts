@@ -27,6 +27,7 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
     private validationResultErrMsgs: ElementBaseFailure[];
 
     // alternative name used for specifying indexes for questionnaire inputs and other places
+    // @ts-ignore: Ignore value not used
     @Input() set alternativeName(value: string) {
         // @NOTHING
     }
@@ -43,7 +44,7 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
      * Constructor
      */
     protected constructor(
-        protected controlContainer: ControlContainer,
+        public controlContainer: ControlContainer,
         private validators: ValidatorArray,
         private _asyncValidators: AsyncValidatorArray
     ) {
@@ -59,6 +60,7 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
     /**
      * Validate a custom form control
      */
+    // @ts-ignore: Ignore value not used
     protected validate(touch: boolean = false) {
         setTimeout(() => {
             // wait for the next tick so angular can update the form control value
@@ -96,7 +98,7 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
      * Returns a list of validation error messages for a custom form control.
      * @returns {Array<ElementBaseFailure>}
      */
-    protected get failures(): ElementBaseFailure[] {
+    public get failures(): ElementBaseFailure[] {
         return this.validationResultErrMsgs;
     }
 

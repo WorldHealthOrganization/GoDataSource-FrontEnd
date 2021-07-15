@@ -14,7 +14,7 @@ export class UserRoleHelper {
     public static groupOptionFormatMethod(
         sanitized: DomSanitizer,
         i18nService: I18nService,
-        groupsMap: ISelectGroupMap<PermissionModel>,
+        _groupsMap: ISelectGroupMap<PermissionModel>,
         optionsMap: ISelectGroupOptionMap<IPermissionChildModel>,
         option: IPermissionChildModel
     ): ISelectGroupOptionFormatResponse {

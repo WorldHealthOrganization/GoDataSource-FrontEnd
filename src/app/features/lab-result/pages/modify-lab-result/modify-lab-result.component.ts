@@ -43,6 +43,9 @@ export class ModifyLabResultComponent extends ViewModifyComponent implements OnI
 
     // lab results
     labResultData: LabResultModel = new LabResultModel();
+    get labResultDataPersonAsContact(): ContactModel {
+        return this.labResultData.person as ContactModel;
+    }
 
     // constants
     CaseModel = CaseModel;

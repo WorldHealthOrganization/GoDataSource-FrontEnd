@@ -147,8 +147,8 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
         ) {
             this.contactsOfContactsDataService
                 .getContactOfContact(this.selectedOutbreak.id, this.contactOfContactId, true)
-                .subscribe(contactDataReturned => {
-                    this.contactOfContactData = new ContactModel(contactDataReturned);
+                .subscribe((contactOfContactData) => {
+                    this.contactOfContactData = new ContactOfContactModel(contactOfContactData);
 
                     // set visual ID translate data
                     this.visualIDTranslateData = {

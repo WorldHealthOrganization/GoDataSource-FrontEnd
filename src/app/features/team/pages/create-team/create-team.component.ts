@@ -97,7 +97,7 @@ export class CreateTeamComponent
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
         if (form.valid && !_.isEmpty(dirtyFields)) {
 
-            this.checkTeamsInSameLocations(this.teamData.locationIds)
+            this.checkTeamsInSameLocations()
                 .subscribe((createTeam: boolean) => {
                     if (createTeam) {
                         this.teamDataService
@@ -144,7 +144,7 @@ export class CreateTeamComponent
      */
     checkUsersMultipleTeams(users) {
         const userIds = [];
-        _.forEach(users, (user, key) => {
+        _.forEach(users, (user) => {
             userIds.push(user.id);
         });
         const difUser = _.difference(userIds, this.existingUsers);
@@ -159,7 +159,7 @@ export class CreateTeamComponent
 
         this.teamDataService.getTeamsList(qb).subscribe((teamsList) => {
             const teamsNames = [];
-            _.forEach(teamsList, (team, key) => {
+            _.forEach(teamsList, (team) => {
                 teamsNames.push(team.name);
             });
 
@@ -183,7 +183,7 @@ export class CreateTeamComponent
      * @param {string[]} locationIds
      * @returns {Observable<boolean>}
      */
-    private checkTeamsInSameLocations(locationIds: string[]): Observable<boolean> {
+    private checkTeamsInSameLocations(): Observable<boolean> {
         return new Observable((observer) => {
             // check if there are existing teams in the same locations
             const qb = new RequestQueryBuilder();
