@@ -13,13 +13,14 @@ import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../..
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
 
 @Component({
     selector: 'app-team-list',
@@ -38,6 +39,9 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
 
     outbreakSubscriber: Subscription;
 
+    // address model needed for filters
+    filterAddressParentLocationIds: string[] = [];
+
     // constants
     TeamModel = TeamModel;
 
@@ -55,6 +59,9 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
         'users',
         'locations'
     ];
+
+    // users
+    usersList$: Observable<UserModel[]>;
 
     recordActions: HoverRowAction[] = [
         // View Team
@@ -111,7 +118,8 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
         private dialogService: DialogService,
         private outbreakDataService: OutbreakDataService,
         private followUpsDataService: FollowUpsDataService,
-        private snackbarService: SnackbarService
+        private snackbarService: SnackbarService,
+        private userDataService: UserDataService
     ) {
         super(listHelperService);
     }
@@ -122,6 +130,11 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // get list of users
+        if (UserModel.canList(this.authUser)) {
+            this.retrieveEntireListOfUsers();
+        }
 
         // subscribe to the Selected Outbreak Subject stream
         this.outbreakSubscriber = this.outbreakDataService
@@ -234,5 +247,22 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
                         });
                 }
             });
+    }
+
+    /**
+     * Retrieve users
+     */
+    private retrieveEntireListOfUsers(): void {
+        // retrieve user list
+        const qbUsers = new RequestQueryBuilder();
+        qbUsers.sort
+            .by('firstName', RequestSortDirection.ASC)
+            .by('lastName', RequestSortDirection.ASC);
+        qbUsers.fields(
+            'id',
+            'firstName',
+            'lastName'
+        );
+        this.usersList$ = this.userDataService.getUsersList(qbUsers);
     }
 }
