@@ -16,6 +16,7 @@ import { DialogService } from '../../../core/services/helper/dialog.service';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { RedirectService } from '../../../core/services/helper/redirect.service';
+import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-global-entity-search',
@@ -91,8 +92,12 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
         if (!_.isEmpty(fields.globalSearchValue)) {
             if (this.selectedOutbreak.id) {
                 this.showLoadingDialog();
+
                 // search for the entity
-                this.globalEntitySearchDataService.searchEntityCount(this.selectedOutbreak.id, fields.globalSearchValue)
+                const qb = new RequestQueryBuilder();
+                qb.filter.firstLevelConditions();
+                qb.filter.where(this.globalEntitySearchDataService.generateSearchValueCondition(fields.globalSearchValue), true);
+                this.globalEntitySearchDataService.searchEntityCount(this.selectedOutbreak.id, qb)
                     .pipe(
                         catchError((err) => {
                             this.closeLoadingDialog();
@@ -106,7 +111,7 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
                             // if there is a single result, navigate to the entity view page, otherwise display all results in a new page
                             if (results.count === 1) {
                                 // search for the entity
-                                this.globalEntitySearchDataService.searchEntity(this.selectedOutbreak.id, fields.globalSearchValue)
+                                this.globalEntitySearchDataService.searchEntity(this.selectedOutbreak.id, qb)
                                     .pipe(
                                         catchError((err) => {
                                             this.closeLoadingDialog();
@@ -131,11 +136,13 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
                                         this.closeLoadingDialog();
                                     });
                             } else {
-                                // save searched value
-                                this.globalEntitySearchDataService.searchValue = this.globalSearchValue;
-
                                 // display all results
-                                this.redirectService.to([`/outbreaks/${this.selectedOutbreak.id}/search-results`]);
+                                this.redirectService.to(
+                                    [`/outbreaks/${this.selectedOutbreak.id}/search-results`],
+                                    {
+                                        search: fields.globalSearchValue
+                                    }
+                                );
                             }
 
                             // empty search field
