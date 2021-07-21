@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { IAsyncImportResponse, IImportableFileDistinctValues } from '../../../features/import-export-data/components/import-data/model';
+import { IAsyncExportResponse } from '../helper/dialog.service';
 
 @Injectable()
 export class ImportExportDataService {
@@ -40,8 +41,9 @@ export class ImportExportDataService {
             useQuestionVariable?: boolean,
             [otherData: string]: any
         },
-        queryBuilder?: RequestQueryBuilder
-    ): Observable<Blob>  {
+        queryBuilder?: RequestQueryBuilder,
+        responseType: 'blob' | 'json' = 'blob'
+    ): Observable<Blob | IAsyncExportResponse>  {
         // clone data object
         data = _.cloneDeep(data);
 
@@ -92,11 +94,17 @@ export class ImportExportDataService {
         }
 
         // execute export
-        return this.http.get(
-            completeURL, {
-                responseType: 'blob'
-            }
-        );
+        return responseType === 'blob' ?
+            this.http.get(
+                completeURL, {
+                    responseType: 'blob'
+                }
+            ) :
+            (this.http.get(
+                completeURL, {
+                    responseType: 'json'
+                }
+            ) as Observable<IAsyncExportResponse>);
     }
 
     /**
@@ -107,8 +115,9 @@ export class ImportExportDataService {
     exportPOSTData(
         url: string,
         data: any,
-        queryBuilder?: RequestQueryBuilder
-    ): Observable<Blob>  {
+        queryBuilder?: RequestQueryBuilder,
+        responseType: 'blob' | 'json' = 'blob'
+    ): Observable<Blob | IAsyncExportResponse>  {
         // filter ?
         if (
             queryBuilder &&
@@ -130,12 +139,19 @@ export class ImportExportDataService {
         }
 
         // execute export
-        return this.http.post(
-            url,
-            data, {
-                responseType: 'blob'
-            }
-        );
+        return responseType === 'blob' ?
+            this.http.post(
+                url,
+                data, {
+                    responseType: 'blob'
+                }
+            ) :
+            (this.http.post(
+                url,
+                data, {
+                    responseType: 'json'
+                }
+            ) as Observable<IAsyncExportResponse>);
     }
 
     /**

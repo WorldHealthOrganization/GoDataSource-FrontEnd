@@ -16,6 +16,8 @@ import { LoadingDialogComponent, LoadingDialogDataModel, LoadingDialogModel } fr
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { IExportFieldsGroupRequired } from '../../../core/models/export-fields-group.model';
+import { ExportLogDataService } from '../data/export-log.data.service';
+import { Constants, ExportStatusStep } from '../../models/constants';
 
 export enum ExportDataExtension {
     CSV = 'csv',
@@ -29,6 +31,10 @@ export enum ExportDataExtension {
     QR = 'qr'
 }
 
+export interface IAsyncExportResponse {
+    exportLogId: string;
+}
+
 @Injectable()
 export class DialogService {
     /**
@@ -37,7 +43,8 @@ export class DialogService {
     constructor(
         private dialog: MatDialog,
         private importExportDataService: ImportExportDataService,
-        private snackbarService: SnackbarService
+        private snackbarService: SnackbarService,
+        private exportLogDataService: ExportLogDataService
     ) {}
 
     /**
@@ -147,6 +154,12 @@ export class DialogService {
         fileName: string,
 
         // optional
+        isAsyncExport?: boolean,
+        exportProgress?: (
+            step: ExportStatusStep,
+            processed: number,
+            total: number
+        ) => void,
         exportStart?: () => void,
         exportFinished?: (answer: DialogAnswer) => void,
         extensionPlaceholder?: string,
@@ -384,7 +397,10 @@ export class DialogService {
                                     answer.inputValue.value,
                                     data.extraAPIData
                                 ),
-                                qb
+                                qb,
+                                data.isAsyncExport ?
+                                    'json' :
+                                    'blob'
                             ) :
                             this.importExportDataService.exportData(
                                 data.url,
@@ -392,7 +408,10 @@ export class DialogService {
                                     answer.inputValue.value,
                                     data.extraAPIData
                                 ),
-                                qb
+                                qb,
+                                data.isAsyncExport ?
+                                    'json' :
+                                    'blob'
                             )
                     )
                         .pipe(
@@ -407,15 +426,114 @@ export class DialogService {
                                 return throwError(err);
                             })
                         )
-                        .subscribe((blob) => {
-                            FileSaver.saveAs(
-                                blob,
-                                `${data.fileName}.${data.fileExtension ? data.fileExtension : answer.inputValue.value[data.allowedExportTypesKey]}`
-                            );
+                        .subscribe((blobOrJson) => {
+                            // if not async then we should have file data, send it to browser download
+                            if (!data.isAsyncExport) {
+                                // save file
+                                FileSaver.saveAs(
+                                    blobOrJson as Blob,
+                                    `${data.fileName}.${data.fileExtension ? data.fileExtension : answer.inputValue.value[data.allowedExportTypesKey]}`
+                                );
 
-                            // call dialog closed
-                            if (data.exportFinished) {
-                                data.exportFinished(answer);
+                                // call dialog closed
+                                if (data.exportFinished) {
+                                    data.exportFinished(answer);
+                                }
+                            } else {
+                                // handler to check status periodically
+                                const checkStatusPeriodically = () => {
+                                    this.exportLogDataService
+                                        .getExportLog((blobOrJson as IAsyncExportResponse).exportLogId)
+                                        .pipe(
+                                            catchError((err) => {
+                                                this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
+
+                                                // call dialog closed
+                                                if (data.exportFinished) {
+                                                    data.exportFinished(answer);
+                                                }
+
+                                                return throwError(err);
+                                            })
+                                        )
+                                        .subscribe((exportLogModel) => {
+                                            // update progress
+                                            if (data.exportProgress) {
+                                                data.exportProgress(
+                                                    exportLogModel.statusStep,
+                                                    exportLogModel.processedNo,
+                                                    exportLogModel.totalNo
+                                                );
+                                            }
+
+                                            // check if we still need to wait for data to be processed
+                                            if (exportLogModel.status === Constants.SYSTEM_SYNC_LOG_STATUS.IN_PROGRESS.value) {
+                                                // wait
+                                                setTimeout(() => {
+                                                    checkStatusPeriodically();
+                                                }, 3000);
+
+                                                // finished
+                                                return;
+                                            }
+
+
+                                            // finished everything with success ?
+                                            if (exportLogModel.status === Constants.SYSTEM_SYNC_LOG_STATUS.SUCCESS.value) {
+                                                this.exportLogDataService
+                                                    .download(exportLogModel.id)
+                                                    .pipe(
+                                                        catchError((err) => {
+                                                            this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
+
+                                                            // call dialog closed
+                                                            if (data.exportFinished) {
+                                                                data.exportFinished(answer);
+                                                            }
+
+                                                            return throwError(err);
+                                                        })
+                                                    )
+                                                    .subscribe((dataBlob) => {
+                                                        // update progress message
+                                                        data.exportProgress(
+                                                            exportLogModel.statusStep,
+                                                            exportLogModel.processedNo,
+                                                            exportLogModel.totalNo
+                                                        );
+
+                                                        // save file
+                                                        FileSaver.saveAs(
+                                                            dataBlob,
+                                                            `${data.fileName}.${data.fileExtension ? data.fileExtension : answer.inputValue.value[data.allowedExportTypesKey]}`
+                                                        );
+
+                                                        // call dialog closed
+                                                        if (data.exportFinished) {
+                                                            data.exportFinished(answer);
+                                                        }
+                                                    });
+                                            }
+
+                                            // process errors
+                                            if (exportLogModel.status === Constants.SYSTEM_SYNC_LOG_STATUS.FAILED.value) {
+                                                // error exporting data
+                                                this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
+
+                                                // call dialog closed
+                                                if (data.exportFinished) {
+                                                    data.exportFinished(answer);
+                                                }
+
+                                                // finished
+                                                return;
+                                            }
+
+                                        });
+                                };
+
+                                // update status periodically
+                                checkStatusPeriodically();
                             }
                         });
                 } else {

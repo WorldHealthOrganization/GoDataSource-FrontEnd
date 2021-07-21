@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, throwError } from 'rxjs';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -11,8 +11,8 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton, DialogField, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { Constants } from '../../../../core/models/constants';
-import { FilterType, FilterModel } from '../../../../shared/components/side-filters/model';
+import { Constants, ExportStatusStep } from '../../../../core/models/constants';
+import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Router } from '@angular/router';
@@ -28,7 +28,6 @@ import { ClusterDataService } from '../../../../core/services/data/cluster.data.
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
@@ -39,10 +38,8 @@ import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { AddressModel } from '../../../../core/models/address.model';
-import {
-    IExportFieldsGroupRequired,
-    ExportFieldsGroupModelNameEnum
-} from '../../../../core/models/export-fields-group.model';
+import { ExportFieldsGroupModelNameEnum, IExportFieldsGroupRequired } from '../../../../core/models/export-fields-group.model';
+import { DialogExportProgressAnswer } from '../../../../shared/components/export-button/export-button.component';
 
 @Component({
     selector: 'app-cases-list',
@@ -1441,6 +1438,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     showLoadingDialog() {
         this.loadingDialog = this.dialogService.showLoadingDialog();
     }
+
     /**
      * Hide loading dialog
      */
@@ -1448,6 +1446,34 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         if (this.loadingDialog) {
             this.loadingDialog.close();
             this.loadingDialog = null;
+        }
+    }
+
+    /**
+     * Show Export progress
+     */
+    showExportProgress(progress: DialogExportProgressAnswer): void {
+        switch (progress.step) {
+            case ExportStatusStep.LNG_STATUS_STEP_RETRIEVING_LANGUAGE_TOKENS:
+                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_RETRIEVING_LANGUAGE_TOKENS');
+                break;
+            case ExportStatusStep.LNG_STATUS_STEP_PREPARING_RECORDS:
+                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING');
+                break;
+            case ExportStatusStep.LNG_STATUS_STEP_CONFIGURE_HEADERS:
+                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_CONFIGURE_HEADERS');
+                break;
+            case ExportStatusStep.LNG_STATUS_STEP_EXPORTING_RECORDS:
+                this.loadingDialog.showMessage(
+                    'LNG_PAGE_EXPORT_DATA_EXPORT_PROCESSED', {
+                        processed: progress.processed.toLocaleString('en'),
+                        total: progress.total.toLocaleString('en')
+                    }
+                );
+                break;
+            case ExportStatusStep.LNG_STATUS_STEP_EXPORT_FINISHED:
+                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_DOWNLOADING');
+                break;
         }
     }
 

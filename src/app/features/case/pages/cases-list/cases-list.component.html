@@ -73,8 +73,10 @@
                         [fieldsGroupList]="fieldsGroupList"
                         [fieldsGroupListRequired]="fieldsGroupListRequired"
                         [queryBuilder]="queryBuilder"
+                        [isAsyncExport]="true"
                         (exportStart)="showLoadingDialog()"
-                        (exportFinished)="closeLoadingDialog()">
+                        (exportFinished)="closeLoadingDialog()"
+                        (exportProgress)="showExportProgress($event)">
                     </app-export-button>
 
                     <ng-container *app-selected-outbreak-is-active>
@@ -378,7 +380,7 @@
                             [(ngModel)]="filterAddressParentLocationIds"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             multiple="true"
-                            (itemChanged)="filterByAddress('addresses', true, filterAddressModel, filterAddressParentLocationIds)"
+                            (itemChanged)="filterBySelectField('usualPlaceOfResidenceLocationId.parentLocationIdFilter', filterAddressParentLocationIds, null)"
                             app-reset-location-on-side-filter
                             [useOutbreakLocations]="true">
                         </app-form-location-dropdown>

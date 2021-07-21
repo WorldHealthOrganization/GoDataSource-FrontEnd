@@ -5,6 +5,18 @@ import { DialogService, ExportDataExtension } from '../../../core/services/helpe
 import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
 import { DialogAnswer, DialogField } from '../dialog/dialog.component';
 import { IExportFieldsGroupRequired } from '../../../core/models/export-fields-group.model';
+import { ExportStatusStep } from '../../../core/models/constants';
+
+/**
+ * Dialog Progress Answer
+ */
+export class DialogExportProgressAnswer {
+    constructor(
+        public readonly step: ExportStatusStep,
+        public readonly processed: number,
+        public readonly total: number
+    ) {}
+}
 
 @Component({
     selector: 'app-export-button',
@@ -46,6 +58,9 @@ export class ExportButtonComponent {
     };
     @Input() extraDialogFields: DialogField[];
 
+    // async export ?
+    @Input() isAsyncExport: boolean;
+
     /**
      * If file type is provided, allowedExportTypes will be ignored
      */
@@ -54,11 +69,18 @@ export class ExportButtonComponent {
 
     @Output() exportStart = new EventEmitter<void>();
     @Output() exportFinished = new EventEmitter<DialogAnswer>();
+    @Output() exportProgress = new EventEmitter<DialogExportProgressAnswer>();
 
+    /**
+     * Constructor
+     */
     constructor(
         private dialogService: DialogService = null
     ) {}
 
+    /**
+     * Trigger export
+     */
     triggerExport() {
         this.dialogService.showExportDialog({
             message: this.message,
@@ -86,8 +108,20 @@ export class ExportButtonComponent {
             isPOST: this.isPOST,
             extraAPIData: this.extraAPIData,
             extraDialogFields: this.extraDialogFields,
+            isAsyncExport: this.isAsyncExport,
             exportStart: () => { this.exportStartCallback(); },
-            exportFinished: (answer) => { this.exportFinishedCallback(answer); }
+            exportFinished: (answer) => { this.exportFinishedCallback(answer); },
+            exportProgress: (
+                step: ExportStatusStep,
+                processed: number,
+                total: number
+            ) => {
+                this.exportProgress.emit(new DialogExportProgressAnswer(
+                    step,
+                    processed,
+                    total
+                ));
+            }
         });
     }
 
