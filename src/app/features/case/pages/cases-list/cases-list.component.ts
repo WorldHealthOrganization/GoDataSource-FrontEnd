@@ -1460,6 +1460,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             case ExportStatusStep.LNG_STATUS_STEP_PREPARING_RECORDS:
                 this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING');
                 break;
+            case ExportStatusStep.LNG_STATUS_STEP_PREPARING_LOCATIONS:
+                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING_LOCATIONS');
+                break;
             case ExportStatusStep.LNG_STATUS_STEP_CONFIGURE_HEADERS:
                 this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_CONFIGURE_HEADERS');
                 break;
