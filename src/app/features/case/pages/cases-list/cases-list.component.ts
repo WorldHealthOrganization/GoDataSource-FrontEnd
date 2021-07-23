@@ -1477,6 +1477,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     }
                 );
                 break;
+            case ExportStatusStep.LNG_STATUS_STEP_ENCRYPT:
+                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_ENCRYPTING');
+                break;
             case ExportStatusStep.LNG_STATUS_STEP_EXPORT_FINISHED:
                 this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_DOWNLOADING');
                 break;
