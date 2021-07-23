@@ -32,7 +32,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING': 'Preparing data. This step might take up to a few minutes',
         'LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING_LOCATIONS': 'Determine and retrieve locations',
         'LNG_PAGE_EXPORT_DATA_EXPORT_CONFIGURE_HEADERS': 'Determine and save header columns',
-        'LNG_PAGE_EXPORT_DATA_EXPORT_PROCESSED': 'Processed {{processed}} / {{total}}',
+        'LNG_PAGE_EXPORT_DATA_EXPORT_PROCESSED': 'Processed {{processed}} / {{total}}. Estimated end date: {{estimatedEnd}}',
         'LNG_PAGE_EXPORT_DATA_EXPORT_DOWNLOADING': 'Export finished, downloading file'
 
 

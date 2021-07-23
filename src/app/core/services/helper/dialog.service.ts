@@ -18,6 +18,8 @@ import { throwError } from 'rxjs';
 import { IExportFieldsGroupRequired } from '../../../core/models/export-fields-group.model';
 import { ExportLogDataService } from '../data/export-log.data.service';
 import { Constants, ExportStatusStep } from '../../models/constants';
+import { Moment } from 'moment';
+import * as moment from 'moment';
 
 export enum ExportDataExtension {
     CSV = 'csv',
@@ -158,7 +160,8 @@ export class DialogService {
         exportProgress?: (
             step: ExportStatusStep,
             processed: number,
-            total: number
+            total: number,
+            estimatedEndDate: Moment
         ) => void,
         exportStart?: () => void,
         exportFinished?: (answer: DialogAnswer) => void,
@@ -441,6 +444,8 @@ export class DialogService {
                                 }
                             } else {
                                 // handler to check status periodically
+                                let startTime: Moment;
+                                let processedErrorForCorrectTime: number = 0;
                                 const checkStatusPeriodically = () => {
                                     this.exportLogDataService
                                         .getExportLog((blobOrJson as IAsyncExportResponse).exportLogId)
@@ -457,12 +462,33 @@ export class DialogService {
                                             })
                                         )
                                         .subscribe((exportLogModel) => {
+                                            // determine end estimated date
+                                            let estimatedEndDate: Moment;
+                                            if (exportLogModel.processedNo > 0) {
+                                                // initialize start time if necessary
+                                                if (!startTime) {
+                                                    startTime = moment();
+                                                    processedErrorForCorrectTime = exportLogModel.processedNo;
+                                                }
+
+                                                // determine estimated time
+                                                const processed: number = exportLogModel.processedNo - processedErrorForCorrectTime;
+                                                const total: number = exportLogModel.totalNo - processedErrorForCorrectTime;
+                                                if (processed > 0) {
+                                                    const processedSoFarTimeMs: number = moment().diff(startTime);
+                                                    const requiredTimeForAllMs: number = processedSoFarTimeMs * total / processed;
+                                                    const remainingTimeMs = requiredTimeForAllMs - processedSoFarTimeMs;
+                                                    estimatedEndDate = moment().add(remainingTimeMs, 'ms');
+                                                }
+                                            }
+
                                             // update progress
                                             if (data.exportProgress) {
                                                 data.exportProgress(
                                                     exportLogModel.statusStep,
                                                     exportLogModel.processedNo,
-                                                    exportLogModel.totalNo
+                                                    exportLogModel.totalNo,
+                                                    estimatedEndDate
                                                 );
                                             }
 
@@ -499,7 +525,8 @@ export class DialogService {
                                                         data.exportProgress(
                                                             exportLogModel.statusStep,
                                                             exportLogModel.processedNo,
-                                                            exportLogModel.totalNo
+                                                            exportLogModel.totalNo,
+                                                            undefined
                                                         );
 
                                                         // save file

@@ -1470,7 +1470,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 this.loadingDialog.showMessage(
                     'LNG_PAGE_EXPORT_DATA_EXPORT_PROCESSED', {
                         processed: progress.processed.toLocaleString('en'),
-                        total: progress.total.toLocaleString('en')
+                        total: progress.total.toLocaleString('en'),
+                        estimatedEnd: progress.estimatedEndDate ?
+                            progress.estimatedEndDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) :
+                            '-'
                     }
                 );
                 break;

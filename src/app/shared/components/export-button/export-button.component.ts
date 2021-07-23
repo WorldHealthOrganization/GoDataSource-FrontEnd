@@ -6,6 +6,7 @@ import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-b
 import { DialogAnswer, DialogField } from '../dialog/dialog.component';
 import { IExportFieldsGroupRequired } from '../../../core/models/export-fields-group.model';
 import { ExportStatusStep } from '../../../core/models/constants';
+import { Moment } from 'moment';
 
 /**
  * Dialog Progress Answer
@@ -14,7 +15,8 @@ export class DialogExportProgressAnswer {
     constructor(
         public readonly step: ExportStatusStep,
         public readonly processed: number,
-        public readonly total: number
+        public readonly total: number,
+        public readonly estimatedEndDate: Moment
     ) {}
 }
 
@@ -114,12 +116,14 @@ export class ExportButtonComponent {
             exportProgress: (
                 step: ExportStatusStep,
                 processed: number,
-                total: number
+                total: number,
+                estimatedEndDate: Moment
             ) => {
                 this.exportProgress.emit(new DialogExportProgressAnswer(
                     step,
                     processed,
-                    total
+                    total,
+                    estimatedEndDate
                 ));
             }
         });
