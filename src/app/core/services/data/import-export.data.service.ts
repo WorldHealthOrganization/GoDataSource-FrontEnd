@@ -38,6 +38,8 @@ export class ImportExportDataService {
             encryptPassword?: string,
             anonymizeFields?: string[],
             fieldsGroupList?: string[],
+            useDbColumns?: boolean,
+            dontTranslateValues?: boolean,
             useQuestionVariable?: boolean,
             [otherData: string]: any
         },
@@ -68,6 +70,24 @@ export class ImportExportDataService {
             // send the fields group list
             completeURL += '&fieldsGroupList=' + JSON.stringify(data.fieldsGroupList);
             delete data.fieldsGroupList;
+        }
+
+        // add flag useDbColumns
+        if (!_.isUndefined(data.useDbColumns)) {
+            queryBuilder.filter.flag(
+                'useDbColumns',
+                data.useDbColumns
+            );
+            delete data.useDbColumns;
+        }
+
+        // add flag dontTranslateValues
+        if (!_.isUndefined(data.dontTranslateValues)) {
+            queryBuilder.filter.flag(
+                'dontTranslateValues',
+                data.dontTranslateValues
+            );
+            delete data.dontTranslateValues;
         }
 
         // add flag useQuestionVariable

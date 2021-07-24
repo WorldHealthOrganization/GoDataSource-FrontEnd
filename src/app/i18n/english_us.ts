@@ -25,6 +25,14 @@ export const EnglishUsLang = {
         'LNG_COMMON_LABEL_PAGINATOR_RANGE_PAGE_START_END': '-',
 
         /**
+         * uiCommonLabels
+         */
+        'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS': 'Use database column headers',
+        'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS_DESCRIPTION': 'Use as column headers the properties from database (useful for scripts)',
+        'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS_NO_TRANSLATED_VALUES': 'Don\'t translate values',
+        'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS_NO_TRANSLATED_VALUES_DESCRIPTION': 'Receive values the same way they are in database (useful for scripts)',
+
+        /**
          * NEW GROUP
          * uiExportData
          */

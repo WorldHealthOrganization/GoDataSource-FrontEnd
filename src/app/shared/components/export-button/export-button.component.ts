@@ -55,6 +55,11 @@ export class ExportButtonComponent {
     @Input() displayUseQuestionVariable: boolean = false;
     @Input() useQuestionVariableDescription: string;
     @Input() useQuestionVariablePlaceholder: string;
+    @Input() displayUseDbColumns: boolean = false;
+    @Input() useDbColumnsPlaceholder: string;
+    @Input() useDbColumnsDescription: string;
+    @Input() useDbColumnsDontTranslateValuePlaceholder: string;
+    @Input() useDbColumnsDontTranslateValueDescription: string;
     @Input() extraAPIData: {
         [key: string]: any
     };
@@ -97,6 +102,11 @@ export class ExportButtonComponent {
             displayUseQuestionVariable: this.displayUseQuestionVariable,
             useQuestionVariablePlaceholder: this.useQuestionVariablePlaceholder,
             useQuestionVariableDescription: this.useQuestionVariableDescription,
+            useDbColumnsDontTranslateValuePlaceholder: this.useDbColumnsDontTranslateValuePlaceholder,
+            useDbColumnsDontTranslateValueDescription: this.useDbColumnsDontTranslateValueDescription,
+            displayUseDbColumns: this.displayUseDbColumns,
+            useDbColumnsPlaceholder: this.useDbColumnsPlaceholder,
+            useDbColumnsDescription: this.useDbColumnsDescription,
             anonymizeFields: this.anonymizeFields,
             fieldsGroupList: this.fieldsGroupList,
             fieldsGroupListRequired: this.fieldsGroupListRequired,

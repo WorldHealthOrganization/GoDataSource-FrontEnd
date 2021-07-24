@@ -183,6 +183,11 @@ export class DialogService {
         displayUseQuestionVariable?: boolean,
         useQuestionVariablePlaceholder?: string,
         useQuestionVariableDescription?: string,
+        displayUseDbColumns?: boolean,
+        useDbColumnsPlaceholder?: string,
+        useDbColumnsDescription?: string,
+        useDbColumnsDontTranslateValuePlaceholder?: string,
+        useDbColumnsDontTranslateValueDescription?: string,
         yesLabel?: string,
         queryBuilder?: RequestQueryBuilder,
         queryBuilderClearOthers?: string[],
@@ -223,6 +228,22 @@ export class DialogService {
             data.useQuestionVariableDescription = 'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE_DESCRIPTION';
         }
 
+        if (!data.useDbColumnsPlaceholder) {
+            data.useDbColumnsPlaceholder = 'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS';
+        }
+
+        if (!data.useDbColumnsDescription) {
+            data.useDbColumnsDescription = 'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS_DESCRIPTION';
+        }
+
+        if (!data.useDbColumnsDontTranslateValuePlaceholder) {
+            data.useDbColumnsDontTranslateValuePlaceholder = 'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS_NO_TRANSLATED_VALUES';
+        }
+
+        if (!data.useDbColumnsDontTranslateValueDescription) {
+            data.useDbColumnsDontTranslateValueDescription = 'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS_NO_TRANSLATED_VALUES_DESCRIPTION';
+        }
+
         if (!data.anonymizePlaceholder) {
             data.anonymizePlaceholder = 'LNG_COMMON_LABEL_EXPORT_ANONYMIZE_FIELDS';
         }
@@ -259,6 +280,7 @@ export class DialogService {
         }
 
         // construct list of inputs that we need in the dialog
+        const fieldsListLayout: number[] = [40];
         let fieldsList: DialogField[] = [
             new DialogField({
                 name: data.allowedExportTypesKey,
@@ -278,6 +300,7 @@ export class DialogService {
 
         // add encrypt password
         if (data.displayEncrypt) {
+            fieldsListLayout.push(60);
             fieldsList.push(
                 new DialogField({
                     name: 'encryptPassword',
@@ -293,6 +316,7 @@ export class DialogService {
 
         // add encrypt anonymize fields
         if (data.displayAnonymize) {
+            fieldsListLayout.push(100);
             fieldsList.push(
                 new DialogField({
                     name: data.anonymizeFieldsKey,
@@ -305,6 +329,7 @@ export class DialogService {
 
         // add export fields Groups
         if (data.displayFieldsGroupList) {
+            fieldsListLayout.push(100);
             fieldsList.push(
                 new DialogField({
                     name: 'fieldsGroupAll',
@@ -314,6 +339,7 @@ export class DialogService {
                 })
             );
 
+            fieldsListLayout.push(100);
             fieldsList.push(
                 new DialogField({
                     name: 'fieldsGroupList',
@@ -338,19 +364,53 @@ export class DialogService {
         }
 
         // add field for use question variable
+        if (data.displayUseDbColumns) {
+            // use db columns
+            fieldsListLayout.push(100);
+            fieldsList.push(
+                new DialogField({
+                    name: 'useDbColumns',
+                    placeholder: data.useDbColumnsPlaceholder,
+                    fieldType: DialogFieldType.BOOLEAN,
+                    description: data.useDbColumnsDescription
+                })
+            );
+
+            // db columns values
+            fieldsListLayout.push(100);
+            fieldsList.push(
+                new DialogField({
+                    name: 'dontTranslateValues',
+                    placeholder: data.useDbColumnsDontTranslateValuePlaceholder,
+                    fieldType: DialogFieldType.BOOLEAN,
+                    description: data.useDbColumnsDontTranslateValueDescription,
+                    visible: (dialogFieldsValues: any): boolean => {
+                        return !!dialogFieldsValues.useDbColumns;
+                    }
+                })
+            );
+        }
+
+        // add field for use question variable
         if (data.displayUseQuestionVariable) {
+            fieldsListLayout.push(100);
             fieldsList.push(
                 new DialogField({
                     name: 'useQuestionVariable',
                     placeholder: data.useQuestionVariablePlaceholder,
                     fieldType: DialogFieldType.BOOLEAN,
-                    description: data.useQuestionVariableDescription
+                    description: data.useQuestionVariableDescription,
+                    visible: (dialogFieldsValues: any): boolean => {
+                        return !dialogFieldsValues.useDbColumns;
+                    }
                 })
             );
         }
 
         // add custom fields to dialog
         if (data.extraDialogFields) {
+            // make sure we fill
+            fieldsListLayout.push(100);
             fieldsList = [
                 ...fieldsList,
                 ...data.extraDialogFields
@@ -377,7 +437,8 @@ export class DialogService {
         this.showInput(new DialogConfiguration({
             message: data.message,
             yesLabel: data.yesLabel,
-            fieldsList: fieldsList
+            fieldsList: fieldsList,
+            fieldsListLayout
         }))
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
