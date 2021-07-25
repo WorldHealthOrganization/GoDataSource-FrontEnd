@@ -593,7 +593,7 @@ export class DialogService {
                                                         // save file
                                                         FileSaver.saveAs(
                                                             dataBlob,
-                                                            `${data.fileName}.${data.fileExtension ? data.fileExtension : answer.inputValue.value[data.allowedExportTypesKey]}`
+                                                            `${data.fileName}.${exportLogModel.extension}`
                                                         );
 
                                                         // call dialog closed

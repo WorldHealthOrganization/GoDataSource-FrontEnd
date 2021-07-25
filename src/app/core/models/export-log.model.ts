@@ -16,6 +16,7 @@ export class ExportLogModel
     processedNo: number;
     actionStartDate: string;
     actionCompletionDate: string;
+    extension: string;
 
     /**
      * Static Permissions - IPermissionBasic
@@ -41,6 +42,7 @@ export class ExportLogModel
         this.processedNo = _.get(data, 'processedNo');
         this.actionStartDate = _.get(data, 'actionStartDate');
         this.actionCompletionDate = _.get(data, 'actionCompletionDate');
+        this.extension = _.get(data, 'extension');
     }
 
     /**
