@@ -25,7 +25,10 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
-import { catchError } from 'rxjs/operators';
+import {
+    catchError,
+    share
+} from 'rxjs/operators';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { EventModel } from '../../../../core/models/event.model';
@@ -38,6 +41,7 @@ import { TimerCache } from '../../../../core/helperClasses/timer-cache';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
 
 @Component({
     selector: 'app-modify-contact',
@@ -58,6 +62,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
     RelationshipModel = RelationshipModel;
     LabResultModel = LabResultModel;
     TeamModel = TeamModel;
+    UserModel = UserModel;
     Constants = Constants;
 
     contactId: string;
@@ -72,6 +77,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
     finalFollowUpStatus$: Observable<any[]>;
     pregnancyStatusList$: Observable<any[]>;
     teamList$: Observable<TeamModel[]>;
+    userList$: Observable<UserModel[]>;
 
     // provide constants to template
     EntityType = EntityType;
@@ -105,7 +111,8 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         private relationshipDataService: RelationshipDataService,
         private entityDataService: EntityDataService,
         private teamDataService: TeamDataService,
-        private systemSettingsDataService: SystemSettingsDataService
+        private systemSettingsDataService: SystemSettingsDataService,
+        private userDataService: UserDataService
     ) {
         super(
             route,
@@ -130,6 +137,11 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         // get teams only if we're allowed to
         if (TeamModel.canList(this.authUser)) {
             this.teamList$ = this.teamDataService.getTeamsListReduced();
+        }
+
+        // get users only if we're allowed to
+        if (UserModel.canList(this.authUser)) {
+            this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
         }
 
         // show loading

@@ -21,10 +21,14 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { FollowUpPage } from '../../typings/follow-up-page';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
-import { catchError } from 'rxjs/operators';
+import {
+    catchError,
+    share
+} from 'rxjs/operators';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
 
 @Component({
     selector: 'app-modify-follow-up',
@@ -54,6 +58,7 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
 
     teamsList$: Observable<TeamModel[]>;
     dailyStatusTypeOptions$: Observable<any[]>;
+    userList$: Observable<UserModel[]>;
 
     // provide constants to template
     Constants = Constants;
@@ -61,6 +66,7 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
     ContactModel = ContactModel;
     CaseModel = CaseModel;
     EntityType = EntityType;
+    UserModel = UserModel;
 
     /**
      * Constructor
@@ -76,7 +82,8 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
         private authDataService: AuthDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private teamDataService: TeamDataService,
-        protected dialogService: DialogService
+        protected dialogService: DialogService,
+        private userDataService: UserDataService
     ) {
         super(
             route,
@@ -90,6 +97,11 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // get users only if we're allowed to
+        if (UserModel.canList(this.authUser)) {
+            this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
+        }
 
         this.teamsList$ = this.teamDataService.getTeamsList();
         this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);

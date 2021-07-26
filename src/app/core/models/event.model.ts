@@ -36,6 +36,9 @@ export class EventModel
 
     matchedDuplicateRelationships: EntityMatchedRelationshipModel[];
 
+    responsibleUserId: string;
+    responsibleUser: UserModel;
+
     /**
      * Static Permissions - IPermissionBasic
      */
@@ -119,6 +122,12 @@ export class EventModel
         _.each(this.matchedDuplicateRelationships, (matchedRelationship, index) => {
             this.matchedDuplicateRelationships[index] = new EntityMatchedRelationshipModel(matchedRelationship);
         });
+
+        this.responsibleUserId = _.get(data, 'responsibleUserId');
+        this.responsibleUser = _.get(data, 'responsibleUser');
+        if (this.responsibleUser) {
+            this.responsibleUser = new UserModel(this.responsibleUser);
+        }
     }
 
     /**

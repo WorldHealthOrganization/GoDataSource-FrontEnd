@@ -11,13 +11,18 @@ import { EventDataService } from '../../../../core/services/data/event.data.serv
 import * as _ from 'lodash';
 import { AddressType } from '../../../../core/models/address.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { catchError } from 'rxjs/operators';
+import {
+    catchError,
+    share
+} from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { Observable } from 'rxjs/index';
 
 @Component({
     selector: 'app-create-event',
@@ -36,10 +41,15 @@ export class CreateEventComponent
 
     eventData: EventModel = new EventModel();
 
+    userList$: Observable<UserModel[]>;
+
     serverToday: Moment = moment();
 
     // authenticated user details
     authUser: UserModel;
+
+    // constants
+    UserModel = UserModel;
 
     /**
      * Constructor
@@ -52,7 +62,8 @@ export class CreateEventComponent
         private formHelper: FormHelperService,
         private dialogService: DialogService,
         private authDataService: AuthDataService,
-        private redirectService: RedirectService
+        private redirectService: RedirectService,
+        private userDataService: UserDataService
     ) {
         super();
     }
@@ -63,6 +74,11 @@ export class CreateEventComponent
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // get users only if we're allowed to
+        if (UserModel.canList(this.authUser)) {
+            this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
+        }
 
         // get selected outbreak
         this.outbreakDataService

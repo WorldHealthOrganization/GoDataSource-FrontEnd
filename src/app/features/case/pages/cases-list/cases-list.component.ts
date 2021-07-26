@@ -116,6 +116,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     LabResultModel = LabResultModel;
     CaseModel = CaseModel;
     OutbreakModel = OutbreakModel;
+    UserModel = UserModel;
 
     notACaseFilter: boolean | string = false;
 
@@ -722,6 +723,14 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 field: 'wasContact',
                 label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
                 visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'responsibleUserId',
+                label: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
+                visible: false,
+                excludeFromDisplay: (): boolean => {
+                    return UserModel.canList(this.authUser);
+                }
             })
         ];
 
@@ -964,6 +973,20 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 type: FilterType.RANGE_DATE
             })
         ];
+
+        // allowed to filter by responsible user ?
+        if (UserModel.canList(this.authUser)) {
+            this.availableSideFilters.push(
+                new FilterModel({
+                    fieldName: 'responsibleUserId',
+                    fieldLabel: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
+                    type: FilterType.MULTISELECT,
+                    options$: this.userList$,
+                    optionsLabelKey: 'name',
+                    optionsValueKey: 'id'
+                })
+            );
+        }
     }
 
     /**
@@ -999,6 +1022,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             // retrieve created user & modified user information
             this.queryBuilder.include('createdByUser', true);
             this.queryBuilder.include('updatedByUser', true);
+
+            // retrieve responsible user information
+            this.queryBuilder.include('responsibleUser', true);
 
             // retrieve location list
             this.queryBuilder.include('locations', true);

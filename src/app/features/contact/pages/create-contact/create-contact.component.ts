@@ -24,7 +24,10 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
-import { catchError } from 'rxjs/operators';
+import {
+    catchError,
+    share
+} from 'rxjs/operators';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
@@ -37,6 +40,7 @@ import { TeamDataService } from '../../../../core/services/data/team.data.servic
 import { TimerCache } from '../../../../core/helperClasses/timer-cache';
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
 
 @Component({
     selector: 'app-create-contact',
@@ -63,6 +67,7 @@ export class CreateContactComponent
     pregnancyStatusList$: Observable<any[]>;
     riskLevelsList$: Observable<any[]>;
     teamList$: Observable<TeamModel[]>;
+    userList$: Observable<UserModel[]>;
 
     relatedEntityData: CaseModel | EventModel;
     relationship: RelationshipModel = new RelationshipModel();
@@ -80,6 +85,7 @@ export class CreateContactComponent
 
     // constants
     TeamModel = TeamModel;
+    UserModel = UserModel;
     Constants = Constants;
 
     /**
@@ -100,7 +106,8 @@ export class CreateContactComponent
         private redirectService: RedirectService,
         private authDataService: AuthDataService,
         private teamDataService: TeamDataService,
-        private systemSettingsDataService: SystemSettingsDataService
+        private systemSettingsDataService: SystemSettingsDataService,
+        private userDataService: UserDataService
     ) {
         super();
     }
@@ -121,6 +128,11 @@ export class CreateContactComponent
         // get teams only if we're allowed to
         if (TeamModel.canList(this.authUser)) {
             this.teamList$ = this.teamDataService.getTeamsListReduced();
+        }
+
+        // get users only if we're allowed to
+        if (UserModel.canList(this.authUser)) {
+            this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
         }
 
         // by default, enforce Contact having an address

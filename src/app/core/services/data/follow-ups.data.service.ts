@@ -11,6 +11,7 @@ import { MetricContactsLostToFollowUpModel } from '../../models/metrics/metric-c
 import { MetricContactsModel } from '../../models/metrics/metric-contacts.model';
 import { MetricContactsWithSuccessfulFollowUp } from '../../models/metrics/metric.contacts-with-success-follow-up.model';
 import { TeamFollowupsPerDayModel } from '../../models/team-followups-per-day.model';
+import { UserFollowupsPerDayModel } from '../../models/user-followups-per-day.model';
 import { RangeFollowUpsModel } from '../../models/range-follow-ups.model';
 import { map, mergeMap } from 'rxjs/operators';
 import { IBasicCount } from '../../models/basic-count.interface';
@@ -391,6 +392,23 @@ export class FollowUpsDataService {
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/follow-ups/per-team-per-day/count?filter=${filter}`),
             TeamFollowupsPerDayModel
+        );
+    }
+
+    /**
+     * get user workload
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<UserFollowupsPerDayModel>}
+     */
+    getFollowUpsPerDayUser(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<UserFollowupsPerDayModel> {
+        const filter = queryBuilder.buildQuery();
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`outbreaks/${outbreakId}/follow-ups/per-user-per-day/count?filter=${filter}`),
+            UserFollowupsPerDayModel
         );
     }
 

@@ -173,7 +173,28 @@
                                 [clearable]="false">
                             </app-form-select>
 
-                            <div fxFlex><!-- placeholder --></div>
+                            <!-- Responsible user -->
+                            <ng-container
+                                *ngIf="UserModel.canList(authUser); else cantListUsers">
+                                <app-form-select
+                                    fxFlex
+                                    name="responsibleUserId"
+                                    [(ngModel)]="contactData.responsibleUserId"
+                                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID' | translate"
+                                    tooltip="LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION"
+                                    [options]="userList$ | async"
+                                    optionLabelKey="name"
+                                    optionValueKey="id"
+                                    [disabled]="viewOnly">
+                                </app-form-select>
+                            </ng-container>
+                            <ng-template
+                                #cantListUsers>
+                                <div fxFlex>
+                                    {{ 'LNG_PAGE_CREATE_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE' | translate }}
+                                </div>
+                            </ng-template>
+
                             <div fxFlex><!-- placeholder --></div>
                             <div fxFlex><!-- placeholder --></div>
                         </div>
