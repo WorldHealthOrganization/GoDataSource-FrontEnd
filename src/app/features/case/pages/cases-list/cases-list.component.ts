@@ -1249,6 +1249,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             url: this.exportCasesUrl,
             fileName: this.casesDataExportFileName,
 
+            // configure
+            isAsyncExport: true,
+            displayUseDbColumns: true,
+
             // optional
             allowedExportTypes: this.allowedExportTypes,
             queryBuilder: qb,
@@ -1260,7 +1264,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             fieldsGroupList: this.fieldsGroupList,
             fieldsGroupListRequired: this.fieldsGroupListRequired,
             exportStart: () => { this.showLoadingDialog(); },
-            exportFinished: () => { this.closeLoadingDialog(); }
+            exportFinished: () => { this.closeLoadingDialog(); },
+            exportProgress: (data) => { this.showExportProgress(data); }
         });
     }
 
