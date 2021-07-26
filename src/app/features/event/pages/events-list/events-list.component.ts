@@ -21,7 +21,6 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { catchError, share, tap } from 'rxjs/operators';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { LoadingDialogModel } from '../../../../shared/components/loading-dialog/loading-dialog.component';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
@@ -82,8 +81,6 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
     Constants = Constants;
     EntityType = EntityType;
     UserSettings = UserSettings;
-
-    loadingDialog: LoadingDialogModel;
 
     outbreakSubscriber: Subscription;
 
@@ -662,22 +659,6 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });
-    }
-
-    /**
-     * Display loading dialog
-     */
-    showLoadingDialog() {
-        this.loadingDialog = this.dialogService.showLoadingDialog();
-    }
-    /**
-     * Hide loading dialog
-     */
-    closeLoadingDialog() {
-        if (this.loadingDialog) {
-            this.loadingDialog.close();
-            this.loadingDialog = null;
-        }
     }
 
     /**

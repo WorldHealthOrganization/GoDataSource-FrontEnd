@@ -12,8 +12,7 @@ import {
     CountedItemsListItem,
     DialogAnswerButton,
     HoverRowAction,
-    HoverRowActionType,
-    LoadingDialogModel
+    HoverRowActionType
 } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -147,8 +146,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         new LabelValuePair('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING', 'dateOfReporting'),
         new LabelValuePair('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', 'isDateOfReportingApproximate'),
     ];
-
-    loadingDialog: LoadingDialogModel;
 
     recordActions: HoverRowAction[] = [
         // View Contact
@@ -924,22 +921,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });
-    }
-
-    /**
-     * Display loading dialog
-     */
-    showLoadingDialog() {
-        this.loadingDialog = this.dialogService.showLoadingDialog();
-    }
-    /**
-     * Hide loading dialog
-     */
-    closeLoadingDialog() {
-        if (this.loadingDialog) {
-            this.loadingDialog.close();
-            this.loadingDialog = null;
-        }
     }
 
     /**

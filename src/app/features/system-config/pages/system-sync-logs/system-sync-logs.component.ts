@@ -10,7 +10,7 @@ import { SystemSyncLogDataService } from '../../../../core/services/data/system-
 import { SystemSyncLogModel } from '../../../../core/models/system-sync-log.model';
 import { Observable } from 'rxjs';
 import * as _ from 'lodash';
-import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
+import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -33,10 +33,11 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
     templateUrl: './system-sync-logs.component.html',
     styleUrls: ['./system-sync-logs.component.less']
 })
-export class SystemSyncLogsComponent extends ListComponent implements OnInit, OnDestroy {
-    /**
-     * Breadcrumbs
-     */
+export class SystemSyncLogsComponent
+    extends ListComponent
+    implements OnInit, OnDestroy {
+
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_TITLE', '.', true)
     ];
@@ -46,8 +47,6 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit, On
 
     // authenticated user
     authUser: UserModel;
-
-    loadingDialog: LoadingDialogModel;
 
     // settings
     settings: SystemSettingsModel;
@@ -441,7 +440,7 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit, On
             })).subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     // display loading
-                    const loadingDialog = this.dialogService.showLoadingDialog();
+                    this.showLoadingDialog();
 
                     // construct query
                     const qb = new RequestQueryBuilder();
@@ -456,7 +455,7 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit, On
                         .pipe(
                             catchError((err) => {
                                 this.snackbarService.showApiError(err);
-                                loadingDialog.close();
+                                this.closeLoadingDialog();
                                 return throwError(err);
                             })
                         )
@@ -468,7 +467,7 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit, On
                             this.needsRefreshList(true);
 
                             // hide loading
-                            loadingDialog.close();
+                            this.closeLoadingDialog();
                         });
                 }
             });
@@ -488,19 +487,11 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit, On
                     moment().format('YYYY-MM-DD'),
                 fileType: ExportDataExtension.ZIP,
                 exportStart: () => {
-                    // hide previous dialog ?
-                    if (this.loadingDialog) {
-                        this.loadingDialog.close();
-                    }
-
                     // display loading dialog
-                    this.loadingDialog = this.dialogService.showLoadingDialog();
+                    this.showLoadingDialog();
                 },
                 exportFinished: () => {
-                    if (this.loadingDialog) {
-                        this.loadingDialog.close();
-                        this.loadingDialog = undefined;
-                    }
+                    this.closeLoadingDialog();
                 },
                 extraDialogFields: [
                     new DialogField({

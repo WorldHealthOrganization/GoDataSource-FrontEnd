@@ -21,6 +21,9 @@ import { Constants, ExportStatusStep } from '../../models/constants';
 import { Moment } from 'moment';
 import * as moment from 'moment';
 
+/**
+ * Export accepted extensions
+ */
 export enum ExportDataExtension {
     CSV = 'csv',
     XLS = 'xls',
@@ -33,8 +36,23 @@ export enum ExportDataExtension {
     QR = 'qr'
 }
 
+/**
+ * Async response
+ */
 export interface IAsyncExportResponse {
     exportLogId: string;
+}
+
+/**
+ * Dialog Progress Answer
+ */
+export class DialogExportProgressAnswer {
+    constructor(
+        public readonly step: ExportStatusStep,
+        public readonly processed: number,
+        public readonly total: number,
+        public readonly estimatedEndDate: Moment
+    ) {}
 }
 
 @Injectable()
@@ -158,10 +176,7 @@ export class DialogService {
         // optional
         isAsyncExport?: boolean,
         exportProgress?: (
-            step: ExportStatusStep,
-            processed: number,
-            total: number,
-            estimatedEndDate: Moment
+            data: DialogExportProgressAnswer
         ) => void,
         exportStart?: () => void,
         exportFinished?: (answer: DialogAnswer) => void,
@@ -545,12 +560,12 @@ export class DialogService {
 
                                             // update progress
                                             if (data.exportProgress) {
-                                                data.exportProgress(
+                                                data.exportProgress(new DialogExportProgressAnswer(
                                                     exportLogModel.statusStep,
                                                     exportLogModel.processedNo,
                                                     exportLogModel.totalNo,
                                                     estimatedEndDate
-                                                );
+                                                ));
                                             }
 
                                             // check if we still need to wait for data to be processed
@@ -583,12 +598,12 @@ export class DialogService {
                                                     )
                                                     .subscribe((dataBlob) => {
                                                         // update progress message
-                                                        data.exportProgress(
+                                                        data.exportProgress(new DialogExportProgressAnswer(
                                                             exportLogModel.statusStep,
                                                             exportLogModel.processedNo,
                                                             exportLogModel.totalNo,
                                                             undefined
-                                                        );
+                                                        ));
 
                                                         // save file
                                                         FileSaver.saveAs(

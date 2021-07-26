@@ -1,24 +1,10 @@
 import { Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
-import { DialogService, ExportDataExtension } from '../../../core/services/helper/dialog.service';
+import { DialogExportProgressAnswer, DialogService, ExportDataExtension } from '../../../core/services/helper/dialog.service';
 import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
 import { DialogAnswer, DialogField } from '../dialog/dialog.component';
 import { IExportFieldsGroupRequired } from '../../../core/models/export-fields-group.model';
-import { ExportStatusStep } from '../../../core/models/constants';
-import { Moment } from 'moment';
-
-/**
- * Dialog Progress Answer
- */
-export class DialogExportProgressAnswer {
-    constructor(
-        public readonly step: ExportStatusStep,
-        public readonly processed: number,
-        public readonly total: number,
-        public readonly estimatedEndDate: Moment
-    ) {}
-}
 
 @Component({
     selector: 'app-export-button',
@@ -123,18 +109,8 @@ export class ExportButtonComponent {
             isAsyncExport: this.isAsyncExport,
             exportStart: () => { this.exportStartCallback(); },
             exportFinished: (answer) => { this.exportFinishedCallback(answer); },
-            exportProgress: (
-                step: ExportStatusStep,
-                processed: number,
-                total: number,
-                estimatedEndDate: Moment
-            ) => {
-                this.exportProgress.emit(new DialogExportProgressAnswer(
-                    step,
-                    processed,
-                    total,
-                    estimatedEndDate
-                ));
+            exportProgress: (data) => {
+                this.exportProgress.emit(data);
             }
         });
     }

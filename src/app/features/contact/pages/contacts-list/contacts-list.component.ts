@@ -10,7 +10,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
+import { DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -176,8 +176,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING', 'dateOfReporting'),
         new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', 'isDateOfReportingApproximate'),
     ];
-
-    loadingDialog: LoadingDialogModel;
 
     recordActions: HoverRowAction[] = [
         // View Contact
@@ -1441,22 +1439,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });
-    }
-
-    /**
-     * Display loading dialog
-     */
-    showLoadingDialog() {
-        this.loadingDialog = this.dialogService.showLoadingDialog();
-    }
-    /**
-     * Hide loading dialog
-     */
-    closeLoadingDialog() {
-        if (this.loadingDialog) {
-            this.loadingDialog.close();
-            this.loadingDialog = null;
-        }
     }
 
     /**

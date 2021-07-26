@@ -9,9 +9,9 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton, DialogField, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
+import { DialogAnswerButton, DialogField, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { Constants, ExportStatusStep } from '../../../../core/models/constants';
+import { Constants } from '../../../../core/models/constants';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
@@ -39,7 +39,6 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { AddressModel } from '../../../../core/models/address.model';
 import { ExportFieldsGroupModelNameEnum, IExportFieldsGroupRequired } from '../../../../core/models/export-fields-group.model';
-import { DialogExportProgressAnswer } from '../../../../shared/components/export-button/export-button.component';
 
 @Component({
     selector: 'app-cases-list',
@@ -159,8 +158,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     // subscribers
     outbreakSubscriber: Subscription;
 
-    loadingDialog: LoadingDialogModel;
-
+    // actions
     recordActions: HoverRowAction[] = [
         // View Case
         new HoverRowAction({
@@ -1429,63 +1427,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 exportStart: () => { this.showLoadingDialog(); },
                 exportFinished: () => { this.closeLoadingDialog(); }
             });
-        }
-    }
-
-    /**
-     * Display loading dialog
-     */
-    showLoadingDialog() {
-        this.loadingDialog = this.dialogService.showLoadingDialog();
-    }
-
-    /**
-     * Hide loading dialog
-     */
-    closeLoadingDialog() {
-        if (this.loadingDialog) {
-            this.loadingDialog.close();
-            this.loadingDialog = null;
-        }
-    }
-
-    /**
-     * Show Export progress
-     */
-    showExportProgress(progress: DialogExportProgressAnswer): void {
-        switch (progress.step) {
-            case ExportStatusStep.LNG_STATUS_STEP_RETRIEVING_LANGUAGE_TOKENS:
-                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_RETRIEVING_LANGUAGE_TOKENS');
-                break;
-            case ExportStatusStep.LNG_STATUS_STEP_PREPARING_RECORDS:
-                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING');
-                break;
-            case ExportStatusStep.LNG_STATUS_STEP_PREPARING_LOCATIONS:
-                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING_LOCATIONS');
-                break;
-            case ExportStatusStep.LNG_STATUS_STEP_CONFIGURE_HEADERS:
-                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_CONFIGURE_HEADERS');
-                break;
-            case ExportStatusStep.LNG_STATUS_STEP_EXPORTING_RECORDS:
-                this.loadingDialog.showMessage(
-                    'LNG_PAGE_EXPORT_DATA_EXPORT_PROCESSED', {
-                        processed: progress.processed.toLocaleString('en'),
-                        total: progress.total.toLocaleString('en'),
-                        estimatedEnd: progress.estimatedEndDate ?
-                            progress.estimatedEndDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) :
-                            '-'
-                    }
-                );
-                break;
-            case ExportStatusStep.LNG_STATUS_STEP_ENCRYPT:
-                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_ENCRYPTING');
-                break;
-            case ExportStatusStep.LNG_STATUS_STEP_ARCHIVE:
-                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_ARCHIVING');
-                break;
-            case ExportStatusStep.LNG_STATUS_STEP_EXPORT_FINISHED:
-                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_DOWNLOADING');
-                break;
         }
     }
 

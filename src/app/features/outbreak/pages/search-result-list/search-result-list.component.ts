@@ -17,10 +17,7 @@ import {
     tap
 } from 'rxjs/operators';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
-import {
-    HoverRowAction,
-    LoadingDialogModel
-} from '../../../../shared/components';
+import { HoverRowAction } from '../../../../shared/components';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -75,8 +72,6 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
 
     // subscribers
     outbreakSubscriber: Subscription;
-
-    loadingDialog: LoadingDialogModel;
 
     recordActions: HoverRowAction[] = [
         // View Item

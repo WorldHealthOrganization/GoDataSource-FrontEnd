@@ -21,7 +21,7 @@ import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { catchError, share, tap } from 'rxjs/operators';
 import { Constants } from '../../../../core/models/constants';
-import { HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
+import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
@@ -63,9 +63,6 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
     // list of export fields groups
     fieldsGroupList: LabelValuePair[];
     fieldsGroupListRequired: IExportFieldsGroupRequired;
-
-    // loading dialog handler
-    loadingDialog: LoadingDialogModel;
 
     // selected Outbreak
     selectedOutbreak: OutbreakModel;
@@ -773,22 +770,5 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
                     }
                 }
             });
-    }
-
-    /**
-     * Display loading dialog
-     */
-    showLoadingDialog() {
-        this.loadingDialog = this.dialogService.showLoadingDialog();
-    }
-
-    /**
-     * Hide loading dialog
-     */
-    closeLoadingDialog() {
-        if (this.loadingDialog) {
-            this.loadingDialog.close();
-            this.loadingDialog = null;
-        }
     }
 }

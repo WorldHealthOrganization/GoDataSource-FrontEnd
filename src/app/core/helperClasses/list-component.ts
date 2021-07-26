@@ -1,7 +1,7 @@
 import { ISerializedQueryBuilder, RequestFilter, RequestFilterOperator, RequestQueryBuilder, RequestSortDirection } from './request-query-builder';
 import * as _ from 'lodash';
 import { Subscriber } from 'rxjs';
-import { ApplyListFilter, Constants } from '../models/constants';
+import { ApplyListFilter, Constants, ExportStatusStep } from '../models/constants';
 import { FormRangeModel } from '../../shared/components/form-range/form-range.model';
 import { BreadcrumbItemModel } from '../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Directive, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
@@ -26,6 +26,8 @@ import { UserModel } from '../models/user.model';
 import { ValueAccessorBase } from '../../shared/xt-forms/core';
 import { SavedFilterData } from '../models/saved-filters.model';
 import * as LzString from 'lz-string';
+import { LoadingDialogModel } from '../../shared/components';
+import { DialogExportProgressAnswer } from '../services/helper/dialog.service';
 
 /**
  * Used by caching filter
@@ -156,6 +158,9 @@ export abstract class ListComponent implements OnDestroy {
     public queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(() => {
         this.updateCachedFilters();
     });
+
+    // loading dialog
+    private loadingDialog: LoadingDialogModel;
 
     /**
      * Applied list filter on this list page
@@ -2620,6 +2625,69 @@ export abstract class ListComponent implements OnDestroy {
             if (this.queryBuilder.paginator.limit) {
                 this.pageSize = this.queryBuilder.paginator.limit;
             }
+        }
+    }
+
+    /**
+     * Display loading dialog
+     */
+    showLoadingDialog() {
+        this.loadingDialog = this.listHelperService.dialogService.showLoadingDialog();
+    }
+
+    /**
+     * Hide loading dialog
+     */
+    closeLoadingDialog() {
+        if (this.loadingDialog) {
+            this.loadingDialog.close();
+            this.loadingDialog = null;
+        }
+    }
+
+    /**
+     * Show Export progress
+     */
+    showExportProgress(progress: DialogExportProgressAnswer): void {
+        // no visible loading dialog ?
+        if (!this.loadingDialog) {
+            return;
+        }
+
+        // display progress accordingly to status steps
+        switch (progress.step) {
+            case ExportStatusStep.LNG_STATUS_STEP_RETRIEVING_LANGUAGE_TOKENS:
+                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_RETRIEVING_LANGUAGE_TOKENS');
+                break;
+            case ExportStatusStep.LNG_STATUS_STEP_PREPARING_RECORDS:
+                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING');
+                break;
+            case ExportStatusStep.LNG_STATUS_STEP_PREPARING_LOCATIONS:
+                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING_LOCATIONS');
+                break;
+            case ExportStatusStep.LNG_STATUS_STEP_CONFIGURE_HEADERS:
+                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_CONFIGURE_HEADERS');
+                break;
+            case ExportStatusStep.LNG_STATUS_STEP_EXPORTING_RECORDS:
+                this.loadingDialog.showMessage(
+                    'LNG_PAGE_EXPORT_DATA_EXPORT_PROCESSED', {
+                        processed: progress.processed.toLocaleString('en'),
+                        total: progress.total.toLocaleString('en'),
+                        estimatedEnd: progress.estimatedEndDate ?
+                            progress.estimatedEndDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) :
+                            '-'
+                    }
+                );
+                break;
+            case ExportStatusStep.LNG_STATUS_STEP_ENCRYPT:
+                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_ENCRYPTING');
+                break;
+            case ExportStatusStep.LNG_STATUS_STEP_ARCHIVE:
+                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_ARCHIVING');
+                break;
+            case ExportStatusStep.LNG_STATUS_STEP_EXPORT_FINISHED:
+                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_DOWNLOADING');
+                break;
         }
     }
 }
