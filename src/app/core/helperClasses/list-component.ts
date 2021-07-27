@@ -2659,6 +2659,9 @@ export abstract class ListComponent implements OnDestroy {
             case ExportStatusStep.LNG_STATUS_STEP_RETRIEVING_LANGUAGE_TOKENS:
                 this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_RETRIEVING_LANGUAGE_TOKENS');
                 break;
+            case ExportStatusStep.LNG_STATUS_STEP_PREPARING_PREFILTERS:
+                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING_PREFILTERS');
+                break;
             case ExportStatusStep.LNG_STATUS_STEP_PREPARING_RECORDS:
                 this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING');
                 break;

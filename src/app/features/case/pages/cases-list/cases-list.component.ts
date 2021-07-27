@@ -1252,6 +1252,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             // configure
             isAsyncExport: true,
             displayUseDbColumns: true,
+            exportProgress: (data) => { this.showExportProgress(data); },
 
             // optional
             allowedExportTypes: this.allowedExportTypes,
@@ -1264,8 +1265,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             fieldsGroupList: this.fieldsGroupList,
             fieldsGroupListRequired: this.fieldsGroupListRequired,
             exportStart: () => { this.showLoadingDialog(); },
-            exportFinished: () => { this.closeLoadingDialog(); },
-            exportProgress: (data) => { this.showExportProgress(data); }
+            exportFinished: () => { this.closeLoadingDialog(); }
         });
     }
 
@@ -1283,6 +1283,12 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         const qb = new RequestQueryBuilder();
         const personsQb = qb.addChildQueryBuilder('person');
 
+        // retrieve only relationships that have at least one persons as desired type
+        qb.filter.byEquality(
+            'persons.type',
+            EntityType.CASE
+        );
+
         // id
         personsQb.filter.bySelect('id', selectedRecords, true, null);
 
@@ -1298,6 +1304,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             message: 'LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIPS_TITLE',
             url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
             fileName: this.i18nService.instant('LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIP_FILE_NAME'),
+
+            // configure
+            isAsyncExport: true,
+            displayUseDbColumns: true,
+            exportProgress: (data) => { this.showExportProgress(data); },
 
             // optional
             queryBuilder: qb,
@@ -1321,17 +1332,26 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         const qb = new RequestQueryBuilder();
         const personsQb = qb.addChildQueryBuilder('person');
 
+        // retrieve only relationships that have at least one persons as desired type
+        qb.filter.byEquality(
+            'persons.type',
+            EntityType.CASE
+        );
+
         // merge out query builder
         personsQb.merge(this.queryBuilder);
 
         // remove pagination
         personsQb.paginator.clear();
 
-        // filter only cases
-        personsQb.filter.byEquality(
-            'type',
-            EntityType.CASE
-        );
+        // attach condition only if not empty
+        if (!personsQb.filter.isEmpty()) {
+            // filter only cases
+            personsQb.filter.byEquality(
+                'type',
+                EntityType.CASE
+            );
+        }
 
         // display export dialog
         this.dialogService.showExportDialog({
@@ -1339,6 +1359,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             message: 'LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIPS_TITLE',
             url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
             fileName: this.i18nService.instant('LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIP_FILE_NAME'),
+
+            // configure
+            isAsyncExport: true,
+            displayUseDbColumns: true,
+            exportProgress: (data) => { this.showExportProgress(data); },
 
             // optional
             queryBuilder: qb,
