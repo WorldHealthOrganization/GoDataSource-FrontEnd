@@ -1340,6 +1340,12 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         const qb = new RequestQueryBuilder();
         const personsQb = qb.addChildQueryBuilder('person');
 
+        // retrieve only relationships that have at least one persons as desired type
+        qb.filter.byEquality(
+            'persons.type',
+            EntityType.CONTACT
+        );
+
         // id
         personsQb.filter.bySelect('id', selectedRecords, true, null);
 
@@ -1355,6 +1361,11 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             message: 'LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIPS_TITLE',
             url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
             fileName: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME'),
+
+            // configure
+            isAsyncExport: true,
+            displayUseDbColumns: true,
+            exportProgress: (data) => { this.showExportProgress(data); },
 
             // optional
             queryBuilder: qb,
@@ -1378,6 +1389,12 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         const qb = new RequestQueryBuilder();
         const personsQb = qb.addChildQueryBuilder('person');
 
+        // retrieve only relationships that have at least one persons as desired type
+        qb.filter.byEquality(
+            'persons.type',
+            EntityType.CONTACT
+        );
+
         // merge query builder
         personsQb.merge(this.queryBuilder);
 
@@ -1398,11 +1415,14 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         const relationships: RequestRelationBuilder = personsQb.include('relationships');
         personsQb.removeRelation('relationships');
 
-        // filter contacts
-        personsQb.filter.byEquality(
-            'type',
-            EntityType.CONTACT
-        );
+        // attach condition only if not empty
+        if (!personsQb.filter.isEmpty()) {
+            // filter contacts
+            personsQb.filter.byEquality(
+                'type',
+                EntityType.CONTACT
+            );
+        }
 
         // relationships
         if (!relationships.queryBuilder.isEmpty()) {
@@ -1431,6 +1451,11 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             message: 'LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIPS_TITLE',
             url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
             fileName: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME'),
+
+            // configure
+            isAsyncExport: true,
+            displayUseDbColumns: true,
+            exportProgress: (data) => { this.showExportProgress(data); },
 
             // optional
             queryBuilder: qb,
