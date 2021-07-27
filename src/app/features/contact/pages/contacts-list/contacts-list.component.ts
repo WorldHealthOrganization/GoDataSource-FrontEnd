@@ -1269,7 +1269,12 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             url: this.exportContactsUrl,
             fileName: this.contactsDataExportFileName,
 
-            // // optional
+            // configure
+            isAsyncExport: true,
+            displayUseDbColumns: true,
+            exportProgress: (data) => { this.showExportProgress(data); },
+
+            // optional
             allowedExportTypes: this.allowedExportTypes,
             queryBuilder: qb,
             displayEncrypt: true,
