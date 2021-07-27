@@ -69,15 +69,15 @@
                         [displayAnonymize]="true"
                         [displayFieldsGroupList]="true"
                         [displayUseQuestionVariable]="true"
-                        [displayUseDbColumns]="true"
                         [anonymizeFields]="anonymizeFields"
                         [fieldsGroupList]="fieldsGroupList"
                         [fieldsGroupListRequired]="fieldsGroupListRequired"
                         [queryBuilder]="queryBuilder"
-                        [isAsyncExport]="true"
                         (exportStart)="showLoadingDialog()"
                         (exportFinished)="closeLoadingDialog()"
-                        (exportProgress)="showExportProgress($event)">
+                        (exportProgress)="showExportProgress($event)"
+                        [displayUseDbColumns]="true"
+                        [isAsyncExport]="true">
                     </app-export-button>
 
                     <ng-container *app-selected-outbreak-is-active>
