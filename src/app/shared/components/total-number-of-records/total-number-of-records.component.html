@@ -10,6 +10,6 @@
     <!-- Counted items -->
     <ng-template
         #pageInfo>
-        {{ (value.hasMore ? ('LNG_COMMON_LABEL_PAGINATOR_COUNT_BEFORE_LENGTH' | translate) + ' ' : '') + (value.count | number) + (value.hasMore ? ' ' + ('LNG_COMMON_LABEL_PAGINATOR_COUNT_AFTER_LENGTH' | translate) : '') }}
+        {{ (value.hasMore ? ('LNG_COMMON_LABEL_PAGINATOR_COUNT_BEFORE_LENGTH' | translate) + ' ' : '') + (value.count | number) + (' ' + ('LNG_COMMON_LABEL_PAGINATOR_COUNT_AFTER_LENGTH' | translate)) }}
     </ng-template>
 </div>

@@ -320,6 +320,10 @@ export class Constants {
             label: 'LNG_APP_PAGE_IMPORT_CASES',
             value: 'LNG_APP_PAGE_IMPORT_CASES'
         },
+        EVENT: {
+            label: 'LNG_APP_PAGE_IMPORT_EVENT',
+            value: 'LNG_APP_PAGE_IMPORT_EVENT'
+        },
         CONTACT: {
             label: 'LNG_APP_PAGE_IMPORT_CONTACTS',
             value: 'LNG_APP_PAGE_IMPORT_CONTACTS'

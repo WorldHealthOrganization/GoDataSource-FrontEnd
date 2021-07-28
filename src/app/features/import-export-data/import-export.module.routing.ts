@@ -65,6 +65,18 @@ const routes: Routes = [
         }
     },
 
+    // Import event data
+    {
+        path: 'event-data/import',
+        component: fromPages.ImportEventDataComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.EVENT_IMPORT
+            ]
+        }
+    },
+
     // Import case lab data
     {
         path: 'case-lab-data/import',

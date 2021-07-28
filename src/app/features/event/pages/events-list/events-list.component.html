@@ -14,7 +14,9 @@
                 <button
                     *ngIf="!appliedListFilter && (
                         (EventModel.canList(authUser) && EventModel.canListPersonsWithoutRelationships(authUser)) ||
-                        (RelationshipModel.canExport(authUser) && EventModel.canExportRelationships(authUser))
+                        (RelationshipModel.canExport(authUser) && EventModel.canExportRelationships(authUser)) ||
+                        (exportEventsUrl && EventModel.canExport(authUser)) ||
+                        EventModel.canImport(authUser)
                     )"
                     mat-raised-button
                     color="accent"
@@ -55,6 +57,15 @@
                         [displayUseDbColumns]="true"
                         [isAsyncExport]="true">
                     </app-export-button>
+
+                    <ng-container *app-selected-outbreak-is-active>
+                        <button
+                            *ngIf="EventModel.canImport(authUser)"
+                            mat-menu-item
+                            [routerLink]="['/import-export-data', 'event-data', 'import']">
+                            {{'LNG_PAGE_LIST_EVENTS_IMPORT_BUTTON' | translate}}
+                        </button>
+                    </ng-container>
 
                     <mat-divider
                         *ngIf="(exportEventsUrl && EventModel.canExport(authUser)) || EventModel.canImport(authUser)"></mat-divider>
