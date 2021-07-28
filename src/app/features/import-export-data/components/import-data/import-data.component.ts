@@ -124,7 +124,6 @@ export class ImportDataComponent
         [ImportDataExtension.CSV]: 'text/csv',
         [ImportDataExtension.XLS]: 'application/vnd.ms-excel',
         [ImportDataExtension.XLSX]: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        [ImportDataExtension.XML]: 'text/xml',
         [ImportDataExtension.ODS]: 'application/vnd.oasis.opendocument.spreadsheet',
         [ImportDataExtension.JSON]: 'application/json',
         [ImportDataExtension.ZIP]: [

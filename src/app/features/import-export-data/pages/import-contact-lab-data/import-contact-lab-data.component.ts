@@ -32,7 +32,6 @@ export class ImportContactLabDataComponent implements OnInit, OnDestroy {
         ImportDataExtension.CSV,
         ImportDataExtension.XLS,
         ImportDataExtension.XLSX,
-        ImportDataExtension.XML,
         ImportDataExtension.ODS,
         ImportDataExtension.JSON
     ];

@@ -176,7 +176,7 @@ export class QuestionModel {
         extraDataUsedToFormat: any
     ) {
         // determine if this is a flat file
-        const isFlat: boolean = fileType !== ImportDataExtension.JSON && fileType !== ImportDataExtension.XML;
+        const isFlat: boolean = fileType !== ImportDataExtension.JSON;
 
         // determine questionnaire question types
         const questionTypes: {

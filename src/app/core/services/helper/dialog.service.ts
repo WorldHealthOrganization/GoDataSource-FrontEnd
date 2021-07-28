@@ -28,7 +28,6 @@ export enum ExportDataExtension {
     CSV = 'csv',
     XLS = 'xls',
     XLSX = 'xlsx',
-    XML = 'xml',
     ODS = 'ods',
     JSON = 'json',
     PDF = 'pdf',
@@ -225,7 +224,6 @@ export class DialogService {
                     ExportDataExtension.CSV,
                     ExportDataExtension.XLS,
                     ExportDataExtension.XLSX,
-                    ExportDataExtension.XML,
                     ExportDataExtension.ODS,
                     ExportDataExtension.JSON
                 ];
