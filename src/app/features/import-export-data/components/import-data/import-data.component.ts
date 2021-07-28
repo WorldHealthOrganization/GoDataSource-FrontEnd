@@ -999,7 +999,7 @@ export class ImportDataComponent
             const stripEndingNumbers = /\s(\d+)$/g.exec(fHeaderWithoutMultiLevel);
             if (stripEndingNumbers) {
                 // determine sub-level
-                const subLevel: number = _.parseInt(stripEndingNumbers[1]) - 1;
+                const subLevelChild: number = _.parseInt(stripEndingNumbers[1]) - 1;
 
                 // remove index value
                 mapKey = fHeaderWithoutMultiLevel.substring(0, stripEndingNumbers.index);
@@ -1016,8 +1016,8 @@ export class ImportDataComponent
                 } else {
                     canAdd = !_.find(mappedHeaders[mapKeyCamelCase], {
                         value: fHeader,
-                        level: _.isNumber(level) ? level : subLevel,
-                        subLevel: _.isNumber(level) ? subLevel : undefined
+                        level: _.isNumber(level) ? level : subLevelChild,
+                        subLevel: _.isNumber(level) ? subLevelChild : undefined
                     });
                 }
 
@@ -1025,15 +1025,15 @@ export class ImportDataComponent
                 if (canAdd) {
                     mappedHeaders[mapKeyCamelCase].push({
                         value: fHeader,
-                        level: _.isNumber(level) ? level : subLevel,
-                        subLevel: _.isNumber(level) ? subLevel : undefined
+                        level: _.isNumber(level) ? level : subLevelChild,
+                        subLevel: _.isNumber(level) ? subLevelChild : undefined
                     });
 
                     // add value
                     mappedHeaders[mapKeyCamelCaseWithValue].push({
                         value: fHeader,
-                        level: _.isNumber(level) ? level : subLevel,
-                        subLevel: _.isNumber(level) ? subLevel : undefined
+                        level: _.isNumber(level) ? level : subLevelChild,
+                        subLevel: _.isNumber(level) ? subLevelChild : undefined
                     });
                 }
             }
