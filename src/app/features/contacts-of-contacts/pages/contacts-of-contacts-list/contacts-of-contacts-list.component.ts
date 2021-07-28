@@ -760,6 +760,11 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             url: this.exportContactsOfContactsUrl,
             fileName: this.contactsOfContactsDataExportFileName,
 
+            // configure
+            isAsyncExport: true,
+            displayUseDbColumns: true,
+            exportProgress: (data) => { this.showExportProgress(data); },
+
             // // optional
             allowedExportTypes: this.allowedExportTypes,
             queryBuilder: qb,
@@ -827,6 +832,12 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         const qb = new RequestQueryBuilder();
         const personsQb = qb.addChildQueryBuilder('person');
 
+        // retrieve only relationships that have at least one persons as desired type
+        qb.filter.byEquality(
+            'persons.type',
+            EntityType.CONTACT_OF_CONTACT
+        );
+
         // id
         personsQb.filter.bySelect('id', selectedRecords, true, null);
 
@@ -842,6 +853,11 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             message: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_RELATIONSHIPS_TITLE',
             url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
             fileName: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME'),
+
+            // configure
+            isAsyncExport: true,
+            displayUseDbColumns: true,
+            exportProgress: (data) => { this.showExportProgress(data); },
 
             // optional
             queryBuilder: qb,
@@ -865,6 +881,12 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         const qb = new RequestQueryBuilder();
         const personsQb = qb.addChildQueryBuilder('person');
 
+        // retrieve only relationships that have at least one persons as desired type
+        qb.filter.byEquality(
+            'persons.type',
+            EntityType.CONTACT_OF_CONTACT
+        );
+
         // merge query builder
         personsQb.merge(this.queryBuilder);
 
@@ -875,11 +897,14 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         const relationships: RequestRelationBuilder = personsQb.include('relationships');
         personsQb.removeRelation('relationships');
 
-        // filter contacts
-        personsQb.filter.byEquality(
-            'type',
-            EntityType.CONTACT_OF_CONTACT
-        );
+        // attach condition only if not empty
+        if (!personsQb.filter.isEmpty()) {
+            // filter contacts
+            personsQb.filter.byEquality(
+                'type',
+                EntityType.CONTACT_OF_CONTACT
+            );
+        }
 
         // relationships
         if (!relationships.queryBuilder.isEmpty()) {
@@ -908,6 +933,11 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             message: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_RELATIONSHIPS_TITLE',
             url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
             fileName: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME'),
+
+            // configure
+            isAsyncExport: true,
+            displayUseDbColumns: true,
+            exportProgress: (data) => { this.showExportProgress(data); },
 
             // optional
             queryBuilder: qb,

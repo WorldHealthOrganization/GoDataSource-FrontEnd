@@ -711,7 +711,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
         // retrieve only relationships that have at least one persons as desired type
         qb.filter.byEquality(
             'persons.type',
-            EntityType.CASE
+            EntityType.EVENT
         );
 
         // merge out query builder
