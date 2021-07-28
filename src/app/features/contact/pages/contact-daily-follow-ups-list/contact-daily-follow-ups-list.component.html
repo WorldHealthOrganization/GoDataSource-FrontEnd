@@ -56,7 +56,10 @@
                         [fieldsGroupListRequired]="fieldsGroupListRequired"
                         [queryBuilder]="queryBuilder"
                         (exportStart)="showLoadingDialog()"
-                        (exportFinished)="closeLoadingDialog()">
+                        (exportFinished)="closeLoadingDialog()"
+                        (exportProgress)="showExportProgress($event)"
+                        [displayUseDbColumns]="true"
+                        [isAsyncExport]="true">
                     </app-export-button>
                 </mat-menu>
             </div>
@@ -503,7 +506,7 @@
                             name="locationFilter"
                             [(ngModel)]="filterAddressParentLocationIds"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (itemChanged)="filterByAddress('address', false, filterAddressModel, filterAddressParentLocationIds)"
+                            (itemChanged)="filterBySelectField('usualPlaceOfResidenceLocationId.parentLocationIdFilter', filterAddressParentLocationIds, null)"
                             multiple="true"
                             app-reset-input-on-side-filter
                             [useOutbreakLocations]="true">

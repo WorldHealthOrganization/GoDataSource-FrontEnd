@@ -377,7 +377,12 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
             url: this.exportFollowUpsUrl,
             fileName: this.followUpsDataExportFileName,
 
-            // // optional
+            // configure
+            isAsyncExport: true,
+            displayUseDbColumns: true,
+            exportProgress: (data) => { this.showExportProgress(data); },
+
+            // optional
             allowedExportTypes: this.allowedExportTypes,
             queryBuilder: qb,
             displayEncrypt: true,
