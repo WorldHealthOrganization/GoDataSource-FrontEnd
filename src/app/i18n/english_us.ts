@@ -12,40 +12,6 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
-        /**
-         * uiCommonLabels
-         */
-        'LNG_COMMON_LABEL_PAGINATOR_ITEMS_PER_PAGE': 'Items per page:',
-        'LNG_COMMON_LABEL_PAGINATOR_FIRST_PAGE': 'First page',
-        'LNG_COMMON_LABEL_PAGINATOR_LAST_PAGE': 'Last page',
-        'LNG_COMMON_LABEL_PAGINATOR_NEXT_PAGE': 'Next page',
-        'LNG_COMMON_LABEL_PAGINATOR_PREVIOUS_PAGE': 'Previous page',
-        'LNG_COMMON_LABEL_PAGINATOR_COUNT_OR_MORE': 'or more',
-        'LNG_COMMON_LABEL_PAGINATOR_RANGE': '{{pageLabel}} of {{length}}{{orMore}}',
-        'LNG_COMMON_LABEL_PAGINATOR_RANGE_PAGE_START_END': '-',
-
-        /**
-         * uiCommonLabels
-         */
-        'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS': 'Use database column headers',
-        'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS_DESCRIPTION': 'Use as column headers the properties from database (useful for scripts)',
-        'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS_NO_TRANSLATED_VALUES': 'Don\'t translate values',
-        'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS_NO_TRANSLATED_VALUES_DESCRIPTION': 'Receive values the same way they are in database (useful for scripts)',
-
-        /**
-         * NEW GROUP
-         * uiExportData
-         */
-        'LNG_PAGE_EXPORT_DATA_EXPORT_RETRIEVING_LANGUAGE_TOKENS': 'Retrieving language',
-        'LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING_PREFILTERS': 'Preparing filters. This step might take up to a few minutes',
-        'LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING': 'Preparing data. This step might take up to a few minutes',
-        'LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING_LOCATIONS': 'Determine and retrieve locations',
-        'LNG_PAGE_EXPORT_DATA_EXPORT_CONFIGURE_HEADERS': 'Determine and save header columns',
-        'LNG_PAGE_EXPORT_DATA_EXPORT_PROCESSED': 'Processed {{processed}} / {{total}}. Estimated end date: {{estimatedEnd}}',
-        'LNG_PAGE_EXPORT_DATA_EXPORT_ENCRYPTING': 'Export finished, encrypting file(s)',
-        'LNG_PAGE_EXPORT_DATA_EXPORT_ARCHIVING': 'Export finished, archiving files',
-        'LNG_PAGE_EXPORT_DATA_EXPORT_DOWNLOADING': 'Export finished, downloading file'
-
 
 
         /**

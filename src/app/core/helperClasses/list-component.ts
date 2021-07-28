@@ -2260,7 +2260,7 @@ export abstract class ListComponent implements OnDestroy {
                     // display only if we're loading data, for save it doesn't matter since we will overwrite it
                     if (forLoadingFilters) {
                         setTimeout(() => {
-                            this.listHelperService.snackbarService.showError('LNG_COMMON_LABEL__INVALID_URL_FILTERS');
+                            this.listHelperService.snackbarService.showError('LNG_COMMON_LABEL_INVALID_URL_FILTERS');
                         });
                     }
                 } else {

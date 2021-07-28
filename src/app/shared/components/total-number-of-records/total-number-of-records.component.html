@@ -10,6 +10,6 @@
     <!-- Counted items -->
     <ng-template
         #pageInfo>
-        {{'LNG_COMMON_LABEL_RECORDS_NUMBER' | translate:{ value: (value.count | number) + (value.hasMore ? ' ' + ('LNG_COMMON_LABEL_PAGINATOR_COUNT_OR_MORE' | translate) : '') } }}
+        {{ (value.hasMore ? ('LNG_COMMON_LABEL_PAGINATOR_COUNT_BEFORE_LENGTH' | translate) + ' ' : '') + (value.count | number) + (value.hasMore ? ' ' + ('LNG_COMMON_LABEL_PAGINATOR_COUNT_AFTER_LENGTH' | translate) : '') }}
     </ng-template>
 </div>

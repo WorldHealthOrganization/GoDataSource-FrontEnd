@@ -30,6 +30,35 @@
                         {{'LNG_PAGE_LIST_EVENTS_ACTION_NO_RELATIONSHIPS_BUTTON' | translate}}
                     </button>
 
+                    <mat-divider
+                        *ngIf="EventModel.canList(authUser) && EventModel.canListPersonsWithoutRelationships(authUser)"></mat-divider>
+
+                    <app-export-button
+                        *ngIf="exportEventsUrl && EventModel.canExport(authUser)"
+                        [menuItem]="true"
+                        [label]="'LNG_PAGE_LIST_EVENTS_EXPORT_BUTTON' | translate"
+                        [message]="'LNG_PAGE_LIST_EVENTS_EXPORT_TITLE' | translate"
+                        [url]="exportEventsUrl"
+                        [fileName]="eventsDataExportFileName"
+                        [allowedExportTypes]="allowedExportTypes"
+                        [displayEncrypt]="true"
+                        [displayAnonymize]="true"
+                        [displayFieldsGroupList]="true"
+                        [displayUseQuestionVariable]="false"
+                        [anonymizeFields]="anonymizeFields"
+                        [fieldsGroupList]="fieldsGroupList"
+                        [fieldsGroupListRequired]="fieldsGroupListRequired"
+                        [queryBuilder]="queryBuilder"
+                        (exportStart)="showLoadingDialog()"
+                        (exportFinished)="closeLoadingDialog()"
+                        (exportProgress)="showExportProgress($event)"
+                        [displayUseDbColumns]="true"
+                        [isAsyncExport]="true">
+                    </app-export-button>
+
+                    <mat-divider
+                        *ngIf="(exportEventsUrl && EventModel.canExport(authUser)) || EventModel.canImport(authUser)"></mat-divider>
+
                     <button
                         *ngIf="RelationshipModel.canExport(authUser) && EventModel.canExportRelationships(authUser)"
                         mat-menu-item
@@ -135,16 +164,21 @@
                                 {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}
                             </button>
 
-                            <ng-container
-                                *ngIf="RelationshipModel.canExport(authUser) && EventModel.canExportRelationships(authUser)">
-                                <mat-divider></mat-divider>
+                            <mat-divider></mat-divider>
 
-                                <button
-                                    mat-menu-item
-                                    (click)="exportSelectedEventsRelationship()">
-                                    {{ 'LNG_PAGE_LIST_EVENTS_GROUP_ACTION_EXPORT_SELECTED_EVENTS_RELATIONSHIPS' | translate }}
-                                </button>
-                            </ng-container>
+                            <button
+                                *ngIf="exportEventsUrl && EventModel.canExport(authUser)"
+                                mat-menu-item
+                                (click)="exportSelectedEvents()">
+                                {{ 'LNG_PAGE_LIST_EVENTS_GROUP_ACTION_EXPORT_SELECTED_EVENTS' | translate }}
+                            </button>
+
+                            <button
+                                *ngIf="RelationshipModel.canExport(authUser) && EventModel.canExportRelationships(authUser)"
+                                mat-menu-item
+                                (click)="exportSelectedEventsRelationship()">
+                                {{ 'LNG_PAGE_LIST_EVENTS_GROUP_ACTION_EXPORT_SELECTED_EVENTS_RELATIONSHIPS' | translate }}
+                            </button>
                         </mat-menu>
                     </div>
                     <div class="column-filter">
@@ -307,8 +341,8 @@
                             name="locationFilter"
                             [(ngModel)]="filterAddressParentLocationIds"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (itemChanged)="filterByAddress('address', false, filterAddressModel, filterAddressParentLocationIds, true)"
                             multiple="true"
+                            (itemChanged)="filterBySelectField('usualPlaceOfResidenceLocationId.parentLocationIdFilter', filterAddressParentLocationIds, null)"
                             app-reset-input-on-side-filter
                             [useOutbreakLocations]="true">
                         </app-form-location-dropdown>
