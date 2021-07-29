@@ -1329,7 +1329,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     exportFilteredCasesRelationships() {
         // construct filter by case query builder
         const qb = new RequestQueryBuilder();
-        const personsQb = qb.addChildQueryBuilder('person');
 
         // retrieve only relationships that have at least one persons as desired type
         qb.filter.byEquality(
@@ -1338,6 +1337,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         );
 
         // merge out query builder
+        const personsQb = qb.addChildQueryBuilder('person');
         personsQb.merge(this.queryBuilder);
 
         // remove pagination
