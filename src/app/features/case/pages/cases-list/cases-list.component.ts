@@ -1040,8 +1040,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     /**
      * Get total number of items, based on the applied filters
      */
-    refreshListCount() {
+    refreshListCount(applyHasMoreLimit?: boolean) {
         if (this.selectedOutbreak) {
+            // set apply value
+            if (applyHasMoreLimit !== undefined) {
+                this.applyHasMoreLimit = applyHasMoreLimit;
+            }
+
             // classification conditions
             this.addClassificationConditions();
 
@@ -1049,6 +1054,16 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
+
+            // apply has more limit
+            if (this.applyHasMoreLimit) {
+                countQueryBuilder.flag(
+                    'applyHasMoreLimit',
+                    true
+                );
+            }
+
+            // count
             this.casesListCount$ = this.caseDataService
                 .getCasesCount(this.selectedOutbreak.id, countQueryBuilder)
                 .pipe(

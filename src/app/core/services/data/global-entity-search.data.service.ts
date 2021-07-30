@@ -66,13 +66,11 @@ export class GlobalEntitySearchDataService {
     ): Observable<(CaseModel | ContactModel | EventModel | ContactOfContactModel)[]> {
         // create filter
         const qb = new RequestQueryBuilder();
-        qb.filter.firstLevelConditions();
-        qb.filter.where(this.createSearchValueCondition(globalSearchValue), true);
         qb.merge(queryBuilder);
+        qb.filter.where(this.createSearchValueCondition(globalSearchValue), true);
 
         // construct query
         const filter = qb.buildQuery();
-
         return this.http.get(`outbreaks/${outbreakId}/people?filter=${filter}`)
             .pipe(
                 map((peopleList) => {
@@ -97,14 +95,10 @@ export class GlobalEntitySearchDataService {
     ): Observable<IBasicCount> {
         // create filter
         const qb = new RequestQueryBuilder();
-        qb.filter.firstLevelConditions();
-        qb.filter.where(this.createSearchValueCondition(globalSearchValue), true);
         qb.merge(queryBuilder);
+        qb.filter.where(this.createSearchValueCondition(globalSearchValue), true);
 
-        // construct query
-        const whereFilter = qb.filter.generateCondition(true);
-
-        // get the items count
-        return this.http.get(`outbreaks/${outbreakId}/people/count?where=${whereFilter}`);
+        const filter = queryBuilder.buildQuery();
+        return this.http.get(`outbreaks/${outbreakId}/people/filtered-count?filter=${filter}`);
     }
 }

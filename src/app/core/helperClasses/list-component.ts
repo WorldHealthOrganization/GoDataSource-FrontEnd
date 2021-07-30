@@ -167,6 +167,9 @@ export abstract class ListComponent implements OnDestroy {
      */
     public appliedListFilterLoading: boolean = false;
 
+    // apply has more limit
+    protected applyHasMoreLimit: boolean = true;
+
     /**
      * List Filter Query Builder
      */
@@ -427,7 +430,7 @@ export abstract class ListComponent implements OnDestroy {
      * Refresh items count
      * Note: To be overridden on pages that implement pagination
      */
-    public refreshListCount() {
+    public refreshListCount(_applyHasMoreLimit?: boolean) {
         console.error('Component must implement \'refreshListCount\' method');
     }
 

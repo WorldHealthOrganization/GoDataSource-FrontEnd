@@ -208,15 +208,30 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
     /**
      * Get total number of items
      */
-    refreshListCount() {
+    refreshListCount(applyHasMoreLimit?: boolean) {
         if (
             this.selectedOutbreak &&
             !_.isEmpty(this.globalEntitySearchDataService.searchValue)
         ) {
+            // set apply value
+            if (applyHasMoreLimit !== undefined) {
+                this.applyHasMoreLimit = applyHasMoreLimit;
+            }
+
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
+
+            // apply has more limit
+            if (this.applyHasMoreLimit) {
+                countQueryBuilder.flag(
+                    'applyHasMoreLimit',
+                    true
+                );
+            }
+
+            // count
             this.entityListCount$ = this.globalEntitySearchDataService
                 .searchEntityCount(this.selectedOutbreak.id, this.globalEntitySearchDataService.searchValue, countQueryBuilder)
                 .pipe(
