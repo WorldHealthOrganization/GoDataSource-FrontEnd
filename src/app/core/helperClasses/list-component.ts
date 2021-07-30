@@ -6,7 +6,7 @@ import { FormRangeModel } from '../../shared/components/form-range/form-range.mo
 import { BreadcrumbItemModel } from '../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Directive, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ResetInputOnSideFilterDirective, ResetLocationOnSideFilterDirective } from '../../shared/directives/reset-input-on-side-filter/reset-input-on-side-filter.directive';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { PageEvent } from '@angular/material/paginator';
 import { MatSort, MatSortable, MatSortHeader } from '@angular/material/sort';
 import { SideFiltersComponent } from '../../shared/components/side-filters/side-filters.component';
 import { DebounceTimeCaller } from './debounce-time-caller';
@@ -103,11 +103,6 @@ export abstract class ListComponent implements OnDestroy {
      * Retrieve Side Filters
      */
     @ViewChild(SideFiltersComponent) sideFilter: SideFiltersComponent;
-
-    /**
-     * Retrieve Paginator
-     */
-    @ViewChild(MatPaginator) paginator: MatPaginator;
 
     /**
      * Individual checkboxes selects
@@ -499,15 +494,8 @@ export abstract class ListComponent implements OnDestroy {
                 this.triggerListCountRefresh.call(instant);
             }
 
-            // move to the first page (if not already there)
-            if (
-                this.paginator &&
-                this.paginator.hasPreviousPage()
-            ) {
-                this.paginator.firstPage();
-                // no need to refresh the list here, because our 'changePage' hook will trigger that again
-                return;
-            }
+            // reset paginator
+            this.resetPaginator(true);
         }
 
         // refresh list
@@ -905,12 +893,12 @@ export abstract class ListComponent implements OnDestroy {
     /**
      * Reset paginator
      */
-    protected resetPaginator(): void {
+    protected resetPaginator(disableOnChange: boolean = false): void {
         // initialize query paginator
         this.queryBuilder.paginator.setPage({
             pageSize: this.pageSize,
             pageIndex: 0
-        });
+        }, disableOnChange);
 
         // update page index
         this.updatePageIndex();
@@ -2619,6 +2607,8 @@ export abstract class ListComponent implements OnDestroy {
                 this.queryBuilder.paginator.limit
             ) {
                 this.pageIndex = this.queryBuilder.paginator.skip / this.queryBuilder.paginator.limit;
+            } else {
+                this.pageIndex = 0;
             }
 
             // set page size
