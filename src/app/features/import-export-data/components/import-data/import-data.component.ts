@@ -52,6 +52,7 @@ export enum ImportServerModelNames {
     OUTBREAK = 'outbreak',
     RELATIONSHIPS = 'relationship',
     CASE = 'case',
+    EVENT = 'event',
     CONTACT = 'contact',
     CONTACT_OF_CONTACT = 'contactOfContact'
 }
@@ -123,7 +124,6 @@ export class ImportDataComponent
         [ImportDataExtension.CSV]: 'text/csv',
         [ImportDataExtension.XLS]: 'application/vnd.ms-excel',
         [ImportDataExtension.XLSX]: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        [ImportDataExtension.XML]: 'text/xml',
         [ImportDataExtension.ODS]: 'application/vnd.oasis.opendocument.spreadsheet',
         [ImportDataExtension.JSON]: 'application/json',
         [ImportDataExtension.ZIP]: [
@@ -936,9 +936,9 @@ export class ImportDataComponent
         } = {};
         _.each(this.importableObject.fileHeaders, (fHeader: string) => {
             // determine if this is a multi level header
-            const fHeaderMultiLevelData = /\s\[((MD)|(MV))\s+(\d+)\]$/g.exec(fHeader);
+            const fHeaderMultiLevelData = /\s\[((MD)|(MV))\s+(\d+)\]((\s(\d+))?)$/g.exec(fHeader);
             let mapKey: string;
-            let level: number;
+            let level: number, subLevel: number;
             let fHeaderWithoutMultiLevel: string = fHeader;
             let addValue: boolean = true;
             if (fHeaderMultiLevelData) {
@@ -950,6 +950,14 @@ export class ImportDataComponent
 
                 // set level
                 level = _.parseInt(fHeaderMultiLevelData[4]) - 1;
+
+                // add sub level ?
+                if (
+                    fHeaderMultiLevelData.length > 7 &&
+                    fHeaderMultiLevelData[7]
+                ) {
+                    subLevel = _.parseInt(fHeaderMultiLevelData[7]) - 1;
+                }
 
                 // no need to add value anymore
                 addValue = false;
@@ -966,7 +974,8 @@ export class ImportDataComponent
             // add the new option
             mappedHeaders[mapKeyCamelCase].push({
                 value: fHeader,
-                level: level
+                level: level,
+                subLevel
             });
 
             // add an extra map containing value since it might be a questionnaire answer
@@ -990,7 +999,7 @@ export class ImportDataComponent
             const stripEndingNumbers = /\s(\d+)$/g.exec(fHeaderWithoutMultiLevel);
             if (stripEndingNumbers) {
                 // determine sub-level
-                const subLevel: number = _.parseInt(stripEndingNumbers[1]) - 1;
+                const subLevelChild: number = _.parseInt(stripEndingNumbers[1]) - 1;
 
                 // remove index value
                 mapKey = fHeaderWithoutMultiLevel.substring(0, stripEndingNumbers.index);
@@ -1007,8 +1016,8 @@ export class ImportDataComponent
                 } else {
                     canAdd = !_.find(mappedHeaders[mapKeyCamelCase], {
                         value: fHeader,
-                        level: _.isNumber(level) ? level : subLevel,
-                        subLevel: _.isNumber(level) ? subLevel : undefined
+                        level: _.isNumber(level) ? level : subLevelChild,
+                        subLevel: _.isNumber(level) ? subLevelChild : undefined
                     });
                 }
 
@@ -1016,15 +1025,15 @@ export class ImportDataComponent
                 if (canAdd) {
                     mappedHeaders[mapKeyCamelCase].push({
                         value: fHeader,
-                        level: _.isNumber(level) ? level : subLevel,
-                        subLevel: _.isNumber(level) ? subLevel : undefined
+                        level: _.isNumber(level) ? level : subLevelChild,
+                        subLevel: _.isNumber(level) ? subLevelChild : undefined
                     });
 
                     // add value
                     mappedHeaders[mapKeyCamelCaseWithValue].push({
                         value: fHeader,
-                        level: _.isNumber(level) ? level : subLevel,
-                        subLevel: _.isNumber(level) ? subLevel : undefined
+                        level: _.isNumber(level) ? level : subLevelChild,
+                        subLevel: _.isNumber(level) ? subLevelChild : undefined
                     });
                 }
             }

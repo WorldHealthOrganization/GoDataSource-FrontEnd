@@ -298,6 +298,15 @@ export class FormSelectComponent
                 let translatedValue: string = this.i18nService.instant(item[this.optionLabelKey]);
                 translatedValue = this.filterOptionsIsCaseSensitive ? translatedValue : translatedValue.toLowerCase();
 
+                // attach prefix if necessary
+                if (
+                    this.optionLabelPrefixKey &&
+                    item[this.optionLabelPrefixKey]
+                ) {
+                    const prefixValue: string = this.i18nService.instant(item[this.optionLabelPrefixKey]);
+                    translatedValue = (prefixValue ? prefixValue.toLowerCase() + this.optionLabelPrefixDelimiter : '') + translatedValue;
+                }
+
                 // filter
                 return this.filterOptionsComparator(byValue, translatedValue);
             });

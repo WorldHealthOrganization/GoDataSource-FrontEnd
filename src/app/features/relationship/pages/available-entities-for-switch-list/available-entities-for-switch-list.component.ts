@@ -260,26 +260,39 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
     /**
      * Get total number of items, based on the applied filters
      */
-    refreshListCount() {
+    refreshListCount(applyHasMoreLimit?: boolean) {
         if (
             this.entityType &&
             this.entityId &&
             this.selectedOutbreak
         ) {
+            // set apply value
+            if (applyHasMoreLimit !== undefined) {
+                this.applyHasMoreLimit = applyHasMoreLimit;
+            }
+
+            // get ...
             this.getQueryParams();
+
             // create queryBuilder
             const qb = new RequestQueryBuilder();
             qb.merge(this.queryBuilder);
-
+            qb.paginator.clear();
             qb.filter.where({
                 id: {
                     nin: this.selectedPeopleIds
                 }
             });
 
-            // remove paginator from query builder
-            const countQueryBuilder = _.cloneDeep(this.queryBuilder);
-            countQueryBuilder.paginator.clear();
+            // apply has more limit
+            if (this.applyHasMoreLimit) {
+                qb.flag(
+                    'applyHasMoreLimit',
+                    true
+                );
+            }
+
+            // count
             this.entitiesListCount$ = this.relationshipDataService
                 .getEntityAvailablePeopleCount(
                     this.selectedOutbreak.id,

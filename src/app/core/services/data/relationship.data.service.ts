@@ -491,8 +491,8 @@ export class RelationshipDataService {
         entityId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<IBasicCount> {
-        const whereFilter = queryBuilder.filter.generateCondition(true);
-        return this.http.get(`outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/available-people/count?where=${whereFilter}`);
+        const filter = queryBuilder.buildQuery();
+        return this.http.get(`outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/available-people/count?filter=${filter}`);
     }
 
     /**

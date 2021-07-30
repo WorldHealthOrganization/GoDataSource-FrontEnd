@@ -1,12 +1,12 @@
 import { ISerializedQueryBuilder, RequestFilter, RequestFilterOperator, RequestQueryBuilder, RequestSortDirection } from './request-query-builder';
 import * as _ from 'lodash';
 import { Subscriber } from 'rxjs';
-import { ApplyListFilter, Constants } from '../models/constants';
+import { ApplyListFilter, Constants, ExportStatusStep } from '../models/constants';
 import { FormRangeModel } from '../../shared/components/form-range/form-range.model';
 import { BreadcrumbItemModel } from '../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Directive, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ResetInputOnSideFilterDirective, ResetLocationOnSideFilterDirective } from '../../shared/directives/reset-input-on-side-filter/reset-input-on-side-filter.directive';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { PageEvent } from '@angular/material/paginator';
 import { MatSort, MatSortable, MatSortHeader } from '@angular/material/sort';
 import { SideFiltersComponent } from '../../shared/components/side-filters/side-filters.component';
 import { DebounceTimeCaller } from './debounce-time-caller';
@@ -26,6 +26,8 @@ import { UserModel } from '../models/user.model';
 import { ValueAccessorBase } from '../../shared/xt-forms/core';
 import { SavedFilterData } from '../models/saved-filters.model';
 import * as LzString from 'lz-string';
+import { LoadingDialogModel } from '../../shared/components';
+import { DialogExportProgressAnswer } from '../services/helper/dialog.service';
 
 /**
  * Used by caching filter
@@ -103,11 +105,6 @@ export abstract class ListComponent implements OnDestroy {
     @ViewChild(SideFiltersComponent) sideFilter: SideFiltersComponent;
 
     /**
-     * Retrieve Paginator
-     */
-    @ViewChild(MatPaginator) paginator: MatPaginator;
-
-    /**
      * Individual checkboxes selects
      */
     @ViewChildren('listCheckedIndividual') protected listCheckedIndividualInputs: QueryList<FormCheckboxComponent>;
@@ -157,6 +154,9 @@ export abstract class ListComponent implements OnDestroy {
         this.updateCachedFilters();
     });
 
+    // loading dialog
+    private loadingDialog: LoadingDialogModel;
+
     /**
      * Applied list filter on this list page
      */
@@ -166,6 +166,9 @@ export abstract class ListComponent implements OnDestroy {
      * Preparing loading filter ?
      */
     public appliedListFilterLoading: boolean = false;
+
+    // apply has more limit
+    protected applyHasMoreLimit: boolean = true;
 
     /**
      * List Filter Query Builder
@@ -427,7 +430,7 @@ export abstract class ListComponent implements OnDestroy {
      * Refresh items count
      * Note: To be overridden on pages that implement pagination
      */
-    public refreshListCount() {
+    public refreshListCount(_applyHasMoreLimit?: boolean) {
         console.error('Component must implement \'refreshListCount\' method');
     }
 
@@ -494,15 +497,8 @@ export abstract class ListComponent implements OnDestroy {
                 this.triggerListCountRefresh.call(instant);
             }
 
-            // move to the first page (if not already there)
-            if (
-                this.paginator &&
-                this.paginator.hasPreviousPage()
-            ) {
-                this.paginator.firstPage();
-                // no need to refresh the list here, because our 'changePage' hook will trigger that again
-                return;
-            }
+            // reset paginator
+            this.resetPaginator(true);
         }
 
         // refresh list
@@ -900,12 +896,12 @@ export abstract class ListComponent implements OnDestroy {
     /**
      * Reset paginator
      */
-    protected resetPaginator(): void {
+    protected resetPaginator(disableOnChange: boolean = false): void {
         // initialize query paginator
         this.queryBuilder.paginator.setPage({
             pageSize: this.pageSize,
             pageIndex: 0
-        });
+        }, disableOnChange);
 
         // update page index
         this.updatePageIndex();
@@ -2255,7 +2251,7 @@ export abstract class ListComponent implements OnDestroy {
                     // display only if we're loading data, for save it doesn't matter since we will overwrite it
                     if (forLoadingFilters) {
                         setTimeout(() => {
-                            this.listHelperService.snackbarService.showError('LNG_COMMON_LABEL__INVALID_URL_FILTERS');
+                            this.listHelperService.snackbarService.showError('LNG_COMMON_LABEL_INVALID_URL_FILTERS');
                         });
                     }
                 } else {
@@ -2614,12 +2610,80 @@ export abstract class ListComponent implements OnDestroy {
                 this.queryBuilder.paginator.limit
             ) {
                 this.pageIndex = this.queryBuilder.paginator.skip / this.queryBuilder.paginator.limit;
+            } else {
+                this.pageIndex = 0;
             }
 
             // set page size
             if (this.queryBuilder.paginator.limit) {
                 this.pageSize = this.queryBuilder.paginator.limit;
             }
+        }
+    }
+
+    /**
+     * Display loading dialog
+     */
+    showLoadingDialog() {
+        this.loadingDialog = this.listHelperService.dialogService.showLoadingDialog();
+    }
+
+    /**
+     * Hide loading dialog
+     */
+    closeLoadingDialog() {
+        if (this.loadingDialog) {
+            this.loadingDialog.close();
+            this.loadingDialog = null;
+        }
+    }
+
+    /**
+     * Show Export progress
+     */
+    showExportProgress(progress: DialogExportProgressAnswer): void {
+        // no visible loading dialog ?
+        if (!this.loadingDialog) {
+            return;
+        }
+
+        // display progress accordingly to status steps
+        switch (progress.step) {
+            case ExportStatusStep.LNG_STATUS_STEP_RETRIEVING_LANGUAGE_TOKENS:
+                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_RETRIEVING_LANGUAGE_TOKENS');
+                break;
+            case ExportStatusStep.LNG_STATUS_STEP_PREPARING_PREFILTERS:
+                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING_PREFILTERS');
+                break;
+            case ExportStatusStep.LNG_STATUS_STEP_PREPARING_RECORDS:
+                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING');
+                break;
+            case ExportStatusStep.LNG_STATUS_STEP_PREPARING_LOCATIONS:
+                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING_LOCATIONS');
+                break;
+            case ExportStatusStep.LNG_STATUS_STEP_CONFIGURE_HEADERS:
+                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_CONFIGURE_HEADERS');
+                break;
+            case ExportStatusStep.LNG_STATUS_STEP_EXPORTING_RECORDS:
+                this.loadingDialog.showMessage(
+                    'LNG_PAGE_EXPORT_DATA_EXPORT_PROCESSED', {
+                        processed: progress.processed.toLocaleString('en'),
+                        total: progress.total.toLocaleString('en'),
+                        estimatedEnd: progress.estimatedEndDate ?
+                            progress.estimatedEndDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) :
+                            '-'
+                    }
+                );
+                break;
+            case ExportStatusStep.LNG_STATUS_STEP_ENCRYPT:
+                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_ENCRYPTING');
+                break;
+            case ExportStatusStep.LNG_STATUS_STEP_ARCHIVE:
+                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_ARCHIVING');
+                break;
+            case ExportStatusStep.LNG_STATUS_STEP_EXPORT_FINISHED:
+                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_DOWNLOADING');
+                break;
         }
     }
 }

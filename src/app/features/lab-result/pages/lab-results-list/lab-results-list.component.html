@@ -39,7 +39,10 @@
                         [fieldsGroupListRequired]="fieldsGroupListRequired"
                         [queryBuilder]="queryBuilder"
                         (exportStart)="showLoadingDialog()"
-                        (exportFinished)="closeLoadingDialog()">
+                        (exportFinished)="closeLoadingDialog()"
+                        (exportProgress)="showExportProgress($event)"
+                        [displayUseDbColumns]="true"
+                        [isAsyncExport]="true">
                     </app-export-button>
 
                     <ng-container *app-selected-outbreak-is-active>
@@ -78,7 +81,8 @@
 
 <!--Total number of records from the list-->
 <app-total-number-of-records
-    [value]="labResultsListCount$ | async">
+    [value]="labResultsListCount$ | async"
+    (showAll)="refreshListCount(false)">
 </app-total-number-of-records>
 
 <mat-card class="page-section page-content">

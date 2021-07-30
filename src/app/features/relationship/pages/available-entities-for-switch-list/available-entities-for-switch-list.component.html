@@ -14,7 +14,8 @@
 </app-side-filters>
 
 <app-total-number-of-records
-    [value]="entitiesListCount$ | async">
+    [value]="entitiesListCount$ | async"
+    (showAll)="refreshListCount(false)">
 </app-total-number-of-records>
 
 <div class="page-content form-section">

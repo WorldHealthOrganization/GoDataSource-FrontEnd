@@ -14,8 +14,8 @@ import { Constants } from '../../../../core/models/constants';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { DialogField, LoadingDialogModel } from '../../../../shared/components';
+import { ExportDataExtension } from '../../../../core/services/helper/dialog.service';
+import { DialogField } from '../../../../shared/components';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { FormDateRangeSliderData } from '../../../../shared/xt-forms/components/form-date-range-slider/form-date-range-slider.component';
 import { FollowUpPage } from '../../typings/follow-up-page';
@@ -92,8 +92,6 @@ export class ContactRangeFollowUpsListComponent
     FollowUpModel = FollowUpModel;
     EntityType = EntityType;
 
-    loadingDialog: LoadingDialogModel;
-
     filtersVisible: boolean = false;
 
     filters: {
@@ -146,7 +144,6 @@ export class ContactRangeFollowUpsListComponent
         private referenceDataDataService: ReferenceDataDataService,
         private i18nService: I18nService,
         private genericDataService: GenericDataService,
-        private dialogService: DialogService,
         private teamDataService: TeamDataService
     ) {
         super(
@@ -396,22 +393,6 @@ export class ContactRangeFollowUpsListComponent
                     }),
                     share()
                 );
-        }
-    }
-
-    /**
-     * Display loading dialog
-     */
-    showLoadingDialog() {
-        this.loadingDialog = this.dialogService.showLoadingDialog();
-    }
-    /**
-     * Hide loading dialog
-     */
-    closeLoadingDialog() {
-        if (this.loadingDialog) {
-            this.loadingDialog.close();
-            this.loadingDialog = null;
         }
     }
 

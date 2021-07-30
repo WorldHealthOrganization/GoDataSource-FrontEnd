@@ -21,7 +21,6 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { catchError, share, tap } from 'rxjs/operators';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { LoadingDialogModel } from '../../../../shared/components/loading-dialog/loading-dialog.component';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
@@ -36,6 +35,7 @@ import {
     IExportFieldsGroupRequired,
     ExportFieldsGroupModelNameEnum
 } from '../../../../core/models/export-fields-group.model';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-events-list',
@@ -67,6 +67,10 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
     userList$: Observable<UserModel[]>;
 
     // list of export fields groups
+    fieldsGroupList: LabelValuePair[];
+    fieldsGroupListRequired: IExportFieldsGroupRequired;
+
+    // list of export fields groups
     fieldsGroupListRelationships: LabelValuePair[];
     fieldsGroupListRelationshipsRequired: IExportFieldsGroupRequired;
 
@@ -83,19 +87,19 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
     EntityType = EntityType;
     UserSettings = UserSettings;
 
-    loadingDialog: LoadingDialogModel;
-
     outbreakSubscriber: Subscription;
 
     allowedExportTypes: ExportDataExtension[] = [
         ExportDataExtension.CSV,
         ExportDataExtension.XLS,
         ExportDataExtension.XLSX,
-        ExportDataExtension.XML,
         ExportDataExtension.JSON,
         ExportDataExtension.ODS,
         ExportDataExtension.PDF
     ];
+
+    exportEventsUrl: string;
+    eventsDataExportFileName: string = moment().format('YYYY-MM-DD');
 
     anonymizeFields: LabelValuePair[] = [
         new LabelValuePair('LNG_EVENT_FIELD_LABEL_NAME', 'name'),
@@ -303,6 +307,11 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
+        // add page title
+        this.eventsDataExportFileName = this.i18nService.instant('LNG_PAGE_LIST_EVENTS_TITLE') +
+            ' - ' +
+            this.eventsDataExportFileName;
+
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
         // retrieve users
@@ -314,10 +323,26 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
 
+                // export cases url
+                this.exportEventsUrl = null;
+                if (
+                    this.selectedOutbreak &&
+                    this.selectedOutbreak.id
+                ) {
+                    this.exportEventsUrl = `/outbreaks/${this.selectedOutbreak.id}/events/export`;
+                }
+
                 // initialize pagination
                 this.initPaginator();
                 // ...and re-load the list when the Selected Outbreak is changed
                 this.needsRefreshList(true);
+            });
+
+        // retrieve the list of export fields groups for model
+        this.outbreakDataService.getExportFieldsGroups(ExportFieldsGroupModelNameEnum.EVENT)
+            .subscribe((fieldsGroupList) => {
+                this.fieldsGroupList = fieldsGroupList.toLabelValuePair(this.i18nService);
+                this.fieldsGroupListRequired = fieldsGroupList.toRequiredList();
             });
 
         // retrieve the list of export fields groups for relationships
@@ -507,12 +532,27 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
     /**
      * Get total number of items, based on the applied filters
      */
-    refreshListCount() {
+    refreshListCount(applyHasMoreLimit?: boolean) {
         if (this.selectedOutbreak) {
+            // set apply value
+            if (applyHasMoreLimit !== undefined) {
+                this.applyHasMoreLimit = applyHasMoreLimit;
+            }
+
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
+
+            // apply has more limit
+            if (this.applyHasMoreLimit) {
+                countQueryBuilder.flag(
+                    'applyHasMoreLimit',
+                    true
+                );
+            }
+
+            // count
             this.eventsListCount$ = this.eventDataService
                 .getEventsCount(this.selectedOutbreak.id, countQueryBuilder)
                 .pipe(
@@ -580,6 +620,52 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
     }
 
     /**
+     * Export selected events
+     */
+    exportSelectedEvents() {
+        // get list of selected ids
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
+            return;
+        }
+
+        // construct query builder
+        const qb = new RequestQueryBuilder();
+        qb.filter.bySelect(
+            'id',
+            selectedRecords,
+            true,
+            null
+        );
+
+        // display export dialog
+        this.dialogService.showExportDialog({
+            // required
+            message: 'LNG_PAGE_LIST_EVENTS_EXPORT_TITLE',
+            url: this.exportEventsUrl,
+            fileName: this.eventsDataExportFileName,
+
+            // configure
+            isAsyncExport: true,
+            displayUseDbColumns: true,
+            exportProgress: (data) => { this.showExportProgress(data); },
+
+            // optional
+            allowedExportTypes: this.allowedExportTypes,
+            queryBuilder: qb,
+            displayEncrypt: true,
+            displayAnonymize: true,
+            displayFieldsGroupList: true,
+            displayUseQuestionVariable: false,
+            anonymizeFields: this.anonymizeFields,
+            fieldsGroupList: this.fieldsGroupList,
+            fieldsGroupListRequired: this.fieldsGroupListRequired,
+            exportStart: () => { this.showLoadingDialog(); },
+            exportFinished: () => { this.closeLoadingDialog(); }
+        });
+    }
+
+    /**
      * Export relationships for selected events
      */
     exportSelectedEventsRelationship() {
@@ -609,6 +695,11 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
             fileName: this.i18nService.instant('LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIP_FILE_NAME'),
 
+            // configure
+            isAsyncExport: true,
+            displayUseDbColumns: true,
+            exportProgress: (data) => { this.showExportProgress(data); },
+
             // optional
             queryBuilder: qb,
             displayEncrypt: true,
@@ -631,17 +722,26 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
         const qb = new RequestQueryBuilder();
         const personsQb = qb.addChildQueryBuilder('person');
 
+        // retrieve only relationships that have at least one persons as desired type
+        qb.filter.byEquality(
+            'persons.type',
+            EntityType.EVENT
+        );
+
         // merge out query builder
         personsQb.merge(this.queryBuilder);
 
         // remove pagination
         personsQb.paginator.clear();
 
-        // filter only events
-        personsQb.filter.byEquality(
-            'type',
-            EntityType.EVENT
-        );
+        // attach condition only if not empty
+        if (!personsQb.filter.isEmpty()) {
+            // filter only events
+            personsQb.filter.byEquality(
+                'type',
+                EntityType.EVENT
+            );
+        }
 
         // display export dialog
         this.dialogService.showExportDialog({
@@ -649,6 +749,11 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             message: 'LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIPS_TITLE',
             url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
             fileName: this.i18nService.instant('LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIP_FILE_NAME'),
+
+            // configure
+            isAsyncExport: true,
+            displayUseDbColumns: true,
+            exportProgress: (data) => { this.showExportProgress(data); },
 
             // optional
             queryBuilder: qb,
@@ -662,22 +767,6 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });
-    }
-
-    /**
-     * Display loading dialog
-     */
-    showLoadingDialog() {
-        this.loadingDialog = this.dialogService.showLoadingDialog();
-    }
-    /**
-     * Hide loading dialog
-     */
-    closeLoadingDialog() {
-        if (this.loadingDialog) {
-            this.loadingDialog.close();
-            this.loadingDialog = null;
-        }
     }
 
     /**

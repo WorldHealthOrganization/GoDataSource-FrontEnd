@@ -5,6 +5,7 @@ export enum ExportFieldsGroupModelNameEnum {
     CASE = 'case',
     CONTACT = 'contact',
     CONTACT_OF_CONTACT = 'ContactOfContact',
+    EVENT = 'event',
     FOLLOWUP = 'followUp',
     LAB_RESULT = 'LabResult',
     RELATIONSHIP = 'relationship',

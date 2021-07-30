@@ -312,16 +312,31 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
     /**
      * Get total number of items, based on the applied filters
      */
-    refreshListCount() {
+    refreshListCount(applyHasMoreLimit?: boolean) {
         if (
             this.entityType &&
             this.entityId &&
             this.selectedOutbreak
         ) {
+            // set apply value
+            if (applyHasMoreLimit !== undefined) {
+                this.applyHasMoreLimit = applyHasMoreLimit;
+            }
+
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
+
+            // apply has more limit
+            if (this.applyHasMoreLimit) {
+                countQueryBuilder.flag(
+                    'applyHasMoreLimit',
+                    true
+                );
+            }
+
+            // count
             this.entitiesListCount$ = this.entityDataService
                 .getEntitiesCount(this.selectedOutbreak.id, countQueryBuilder)
                 .pipe(
