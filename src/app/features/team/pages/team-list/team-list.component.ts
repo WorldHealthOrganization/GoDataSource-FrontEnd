@@ -219,6 +219,9 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
                             }
                         }, true);
 
+                    // no need for more
+                    qb.limit(1);
+
                     // retrieve follow-ups + contact details
                     this.followUpsDataService
                         .getFollowUpsCount(

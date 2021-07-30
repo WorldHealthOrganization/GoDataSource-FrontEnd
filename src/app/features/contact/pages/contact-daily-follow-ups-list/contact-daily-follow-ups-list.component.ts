@@ -1056,8 +1056,13 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     /**
      * Get total number of items, based on the applied filters
      */
-    refreshListCount() {
+    refreshListCount(applyHasMoreLimit?: boolean) {
         if (this.selectedOutbreak) {
+            // set apply value
+            if (applyHasMoreLimit !== undefined) {
+                this.applyHasMoreLimit = applyHasMoreLimit;
+            }
+
             // include related people in response
             const qb = new RequestQueryBuilder();
             qb.merge(this.queryBuilder);
@@ -1071,6 +1076,16 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             const countQueryBuilder = _.cloneDeep(qb);
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
+
+            // apply has more limit
+            if (this.applyHasMoreLimit) {
+                countQueryBuilder.flag(
+                    'applyHasMoreLimit',
+                    true
+                );
+            }
+
+            // count
             this.followUpsListCount$ = this.followUpsDataService
                 .getFollowUpsCount(this.selectedOutbreak.id, countQueryBuilder)
                 .pipe(
