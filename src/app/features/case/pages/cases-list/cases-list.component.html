@@ -154,7 +154,7 @@
             *ngIf="!appliedListFilter"
             fxFlex
             [items]="countedCasesGroupedByClassification$ | async"
-            (optionChanged)="filterByEquality('classification', $event.label)">
+            (optionChanged)="$event.label === 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_UNCLASSIFIED' ? filterByNotHavingValue('classification') : filterByEquality('classification',  $event.label)">
         </app-counted-items-list>
     </ng-template>
 </div>
