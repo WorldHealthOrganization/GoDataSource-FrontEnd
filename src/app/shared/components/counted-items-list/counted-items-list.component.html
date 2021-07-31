@@ -10,10 +10,10 @@
             <div
                 fxLayout="row">
                 <div class="counted-items-list-count" [style.background-color]="item.countBgColor">
-                    {{ item.count }}
+                    {{ item.countNo }}
                 </div>
                 <div class="counted-items-list-label">
-                    {{ item.label | translate }}
+                    {{ item.label ? (item.label | translate) : '-' }}
                 </div>
             </div>
         </mat-chip>

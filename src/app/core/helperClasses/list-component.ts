@@ -690,6 +690,20 @@ export abstract class ListComponent implements OnDestroy {
     }
 
     /**
+     * Filter all records that don't have value on a specific field
+     * @param property
+     */
+    filterByNotHavingValue(
+        property: string
+    ): void {
+        // filter
+        this.queryBuilder.filter.byNotHavingValue(property);
+
+        // refresh list
+        this.needsRefreshList();
+    }
+
+    /**
      * Filter the list by a range field ('from' / 'to')
      * @param {string} property
      * @param {FormRangeModel} value Object with 'from' and 'to' properties
