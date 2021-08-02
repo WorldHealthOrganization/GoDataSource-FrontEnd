@@ -260,7 +260,8 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     ) {
         super(
             listHelperService, dialogService, followUpsDataService,
-            router, i18nService, teamDataService, outbreakDataService, userDataService
+            router, i18nService, teamDataService, outbreakDataService, userDataService,
+            !!route.snapshot.queryParams.fromWorkload
         );
     }
 
@@ -357,7 +358,9 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                     this.initPaginator();
 
                     // ...and re-load the list when the Selected Outbreak is changed
-                    this.needsRefreshList(true);
+                    if (!this.disableFilterCaching) {
+                        this.needsRefreshList(true);
+                    }
                 }
             });
 
@@ -998,7 +1001,13 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
      */
     beforeCacheLoadFilters(): void {
         // set default filter rules
-        this.initializeHeaderFilters();
+        if (this.disableFilterCaching) {
+            setTimeout(() => {
+                this.initializeHeaderFilters();
+            });
+        } else {
+            this.initializeHeaderFilters();
+        }
     }
 
     /**

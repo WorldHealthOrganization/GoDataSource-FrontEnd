@@ -94,8 +94,12 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
         protected teamDataService: TeamDataService,
         protected outbreakDataService: OutbreakDataService,
         protected userDataService: UserDataService,
+        disableFilterCaching: boolean = false
     ) {
-        super(listHelperService);
+        super(
+            listHelperService,
+            disableFilterCaching
+        );
     }
 
     /**
