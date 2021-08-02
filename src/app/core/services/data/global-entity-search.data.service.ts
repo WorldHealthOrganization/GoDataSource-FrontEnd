@@ -14,16 +14,6 @@ import { RequestFilterGenerator } from '../../../core/helperClasses/request-quer
 
 @Injectable()
 export class GlobalEntitySearchDataService {
-    // store search value
-    private _searchValue: string;
-    set searchValue(data: string) {
-        this._searchValue = data;
-    }
-
-    get searchValue(): string {
-        return this._searchValue;
-    }
-
     /**
      * Constructor
      */
@@ -46,7 +36,7 @@ export class GlobalEntitySearchDataService {
                     visualId: RequestFilterGenerator.textContains(searchValue, false)
                 },
                 {
-                    'documents.number': RequestFilterGenerator.textContains(searchValue, false)
+                    'documents.number': RequestFilterGenerator.textContains(searchValue, true)
                 }
             ]
         };

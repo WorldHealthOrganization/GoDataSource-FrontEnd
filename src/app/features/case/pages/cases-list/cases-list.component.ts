@@ -1008,7 +1008,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     /**
      * Re(load) the Cases list, based on the applied filter, sort criterias
      */
-    refreshList(finishCallback: (records: any[]) => void) {
+    refreshList(
+        finishCallback: (records: any[]) => void,
+        triggeredByPageChange: boolean
+    ) {
         if (this.selectedOutbreak) {
             // classification conditions - not really necessary since refreshListCount is always called before this one
             this.addClassificationConditions();
@@ -1036,7 +1039,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             }
 
             // refresh badges list with applied filter
-            this.getCasesGroupedByClassification();
+            if (!triggeredByPageChange) {
+                this.getCasesGroupedByClassification();
+            }
 
             // retrieve the list of Cases
             this.casesList$ = this.caseDataService

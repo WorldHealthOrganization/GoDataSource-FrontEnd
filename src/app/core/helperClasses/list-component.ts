@@ -308,11 +308,16 @@ export abstract class ListComponent implements OnDestroy {
     // refresh only after we finish changing data
     // by default each time we get back to a page we should display loading spinner
     public refreshingList: boolean = true;
+    private _triggeredByPageChange: boolean = false;
     private triggerListRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
         // disabled ?
         if (this.appliedListFilterLoading) {
             return;
         }
+
+        // triggered by page change ?
+        const triggeredByPageChange: boolean = this._triggeredByPageChange;
+        this._triggeredByPageChange = false;
 
         // refresh list
         this.refreshingList = true;
@@ -328,7 +333,7 @@ export abstract class ListComponent implements OnDestroy {
                 // finished refreshing list
                 this.refreshingList = false;
             });
-        });
+        }, triggeredByPageChange);
     }));
 
     // disable next load from cache input values ?
@@ -427,7 +432,10 @@ export abstract class ListComponent implements OnDestroy {
     /**
      * Refresh list
      */
-    public abstract refreshList(finishCallback: (records: any[]) => void);
+    public abstract refreshList(
+        finishCallback: (records: any[]) => void,
+        triggeredByPageChange?: boolean
+    );
 
     /**
      * Refresh items count
@@ -485,8 +493,14 @@ export abstract class ListComponent implements OnDestroy {
      */
     public needsRefreshList(
         instant: boolean = false,
-        resetPagination: boolean = true
+        resetPagination: boolean = true,
+        triggeredByPageChange: boolean = false
     ) {
+        // triggered by page change ?
+        if (triggeredByPageChange) {
+            this._triggeredByPageChange = true;
+        }
+
         // reset checked items
         this.resetCheckboxData();
 
@@ -951,7 +965,8 @@ export abstract class ListComponent implements OnDestroy {
         // refresh list
         this.needsRefreshList(
             true,
-            false
+            false,
+            true
         );
     }
 

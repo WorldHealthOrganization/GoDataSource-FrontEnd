@@ -321,6 +321,7 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     // delete record
+                    this.showLoadingDialog();
                     this.locationDataService
                         .deleteLocation(location.id)
                         .pipe(
@@ -333,6 +334,7 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
                                 }
                             }) => {
                                 // check if we have a model in use error
+                                this.closeLoadingDialog();
                                 if (err.code === ErrorCodes.MODEL_IN_USE) {
                                     this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_LOCATION_USED', location)
                                         .subscribe((answerC: DialogAnswer) => {
@@ -341,8 +343,6 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
                                                 this.router.navigate(['/locations', err.details.id, 'usage']);
                                             }
                                         });
-                                } else if (err.code === ErrorCodes.DELETE_PARENT_MODEL) {
-                                    this.snackbarService.showError('LNG_DIALOG_CONFIRM_LOCATION_HAS_CHILDREN', location);
                                 } else {
                                     this.snackbarService.showApiError(err);
                                 }
@@ -355,6 +355,9 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
 
                             // reset location cache after deleting a location
                             FormLocationDropdownComponent.CACHE = {};
+
+                            // hide loading
+                            this.closeLoadingDialog();
 
                             // reload data
                             this.needsRefreshList(true);
