@@ -161,11 +161,6 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
                     .subscribe((params: { searchValue }) => {
                         this.searchValue = _.get(params, 'search');
 
-                        // add search value condition
-                        if (!_.isEmpty(this.searchValue)) {
-                            this.queryBuilder.filter.where(this.globalEntitySearchDataService.generateSearchValueCondition(this.searchValue));
-                        }
-
                         // ...and re-load the list when the Selected Outbreak is changed
                         this.needsRefreshList(true);
                     });
@@ -210,11 +205,15 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
     refreshList(finishCallback: (records: any[]) => void) {
         if (
             this.selectedOutbreak &&
-            !this.queryBuilder.filter.isEmpty()
+            !_.isEmpty(this.searchValue)
         ) {
             // retrieve the list of entities
             this.entityList$ = this.globalEntitySearchDataService
-                .searchEntity(this.selectedOutbreak.id, this.queryBuilder)
+                .searchEntity(
+                    this.selectedOutbreak.id,
+                    this.searchValue,
+                    this.queryBuilder
+                )
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
@@ -237,7 +236,7 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
     refreshListCount(applyHasMoreLimit?: boolean) {
         if (
             this.selectedOutbreak &&
-            !this.queryBuilder.filter.isEmpty()
+            !_.isEmpty(this.searchValue)
         ) {
             // set apply value
             if (applyHasMoreLimit !== undefined) {
@@ -259,7 +258,11 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
 
             // count
             this.entityListCount$ = this.globalEntitySearchDataService
-                .searchEntityCount(this.selectedOutbreak.id, countQueryBuilder )
+                .searchEntityCount(
+                    this.selectedOutbreak.id,
+                    this.searchValue,
+                    countQueryBuilder
+                )
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
