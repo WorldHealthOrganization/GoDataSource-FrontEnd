@@ -39,6 +39,12 @@
         </div>
     </div>
 
+    <div fxLayout="column" fxLayoutGap="5px">
+        <div>
+            {{ 'LNG_PAGE_LIST_SEARCH_RESULT_DESCRIPTION' | translate }}
+        </div>
+    </div>
+
     <!-- Hover question effects / actions -->
     <app-hover-row-actions
         #hoverRow
@@ -46,16 +52,33 @@
     ></app-hover-row-actions>
 
     <mat-table #table [dataSource]="entityList$ | async">
-        <!-- Visual ID -->
-        <ng-container matColumnDef="visualId">
+        <!-- ID -->
+        <ng-container matColumnDef="id">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_ENTITY_FIELD_LABEL_VISUAL_ID' | translate}}</div>
+                    <div class="column-header">{{'LNG_COMMON_MODEL_FIELD_LABEL_ID' | translate}}</div>
                 </div>
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
-                {{ item.visualId }}
+                <span
+                    [innerHTML]="item.id | highlight: searchValue">
+                </span>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Visual ID -->
+        <ng-container matColumnDef="visualId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_PAGE_LIST_SEARCH_RESULT_ENTITY_ID' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+               <span
+                   [innerHTML]="item.visualId | highlight: searchValue">
+                </span>
             </mat-cell>
         </ng-container>
 

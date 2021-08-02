@@ -1,7 +1,8 @@
 import {
     Component,
     OnDestroy,
-    OnInit
+    OnInit,
+    ViewEncapsulation
 } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -41,10 +42,13 @@ import {
     Subscription,
     throwError
 } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
     selector: 'app-search-result-list',
-    templateUrl: './search-result-list.component.html'
+    encapsulation: ViewEncapsulation.None,
+    templateUrl: './search-result-list.component.html',
+    styleUrls: ['./search-result-list.less']
 })
 export class SearchResultListComponent extends ListComponent implements OnInit, OnDestroy {
     // Breadcrumbs
@@ -56,6 +60,8 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
     authUser: UserModel;
     // selected Outbreak
     selectedOutbreak: OutbreakModel;
+
+    searchValue: string;
 
     // list of search result
     entityList$: Observable<(CaseModel | ContactModel | ContactOfContactModel | EventModel)[]>;
@@ -112,9 +118,13 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
         private globalEntitySearchDataService: GlobalEntitySearchDataService,
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        private route: ActivatedRoute
     ) {
-        super(listHelperService);
+        super(
+            listHelperService,
+            true
+        );
     }
 
     /**
@@ -145,8 +155,15 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
 
                 // initialize pagination
                 this.initPaginator();
-                // ...and re-load the list when the Selected Outbreak is changed
-                this.needsRefreshList(true);
+
+                // retrieve query params
+                this.route.queryParams
+                    .subscribe((params: { searchValue }) => {
+                        this.searchValue = _.get(params, 'search');
+
+                        // ...and re-load the list when the Selected Outbreak is changed
+                        this.needsRefreshList(true);
+                    });
             });
 
         // initialize Side Table Columns
@@ -168,6 +185,10 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
         // default table columns
         this.tableColumns = [
             new VisibleColumnModel({
+                field: 'id',
+                label: 'LNG_ENTITY_FIELD_LABEL_ID'
+            }),
+            new VisibleColumnModel({
                 field: 'visualId',
                 label: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID'
             }),
@@ -184,11 +205,15 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
     refreshList(finishCallback: (records: any[]) => void) {
         if (
             this.selectedOutbreak &&
-            !_.isEmpty(this.globalEntitySearchDataService.searchValue)
+            !_.isEmpty(this.searchValue)
         ) {
-            // retrieve the list of Cases
+            // retrieve the list of entities
             this.entityList$ = this.globalEntitySearchDataService
-                .searchEntity(this.selectedOutbreak.id, this.globalEntitySearchDataService.searchValue, this.queryBuilder)
+                .searchEntity(
+                    this.selectedOutbreak.id,
+                    this.searchValue,
+                    this.queryBuilder
+                )
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
@@ -211,7 +236,7 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
     refreshListCount(applyHasMoreLimit?: boolean) {
         if (
             this.selectedOutbreak &&
-            !_.isEmpty(this.globalEntitySearchDataService.searchValue)
+            !_.isEmpty(this.searchValue)
         ) {
             // set apply value
             if (applyHasMoreLimit !== undefined) {
@@ -233,7 +258,11 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
 
             // count
             this.entityListCount$ = this.globalEntitySearchDataService
-                .searchEntityCount(this.selectedOutbreak.id, this.globalEntitySearchDataService.searchValue, countQueryBuilder)
+                .searchEntityCount(
+                    this.selectedOutbreak.id,
+                    this.searchValue,
+                    countQueryBuilder
+                )
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
