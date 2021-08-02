@@ -1044,10 +1044,15 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
     /**
      * Re(load) the Contacts list
      */
-    refreshList(finishCallback: (records: any[]) => void) {
+    refreshList(
+        finishCallback: (records: any[]) => void,
+        triggeredByPageChange: boolean
+    ) {
         if (this.selectedOutbreak) {
             // refresh list of contacts grouped by risk level
-            this.getContactsGroupedByRiskLevel();
+            if (!triggeredByPageChange) {
+                this.getContactsGroupedByRiskLevel();
+            }
 
             // retrieve created user & modified user information
             this.queryBuilder.include('createdByUser', true);
