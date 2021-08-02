@@ -358,9 +358,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                     this.initializeSideFilters();
                 }
 
-                // get contacts grouped by risk level
-                this.getContactsOfContactsGroupedByRiskLevel();
-
                 // initialize pagination
                 this.initPaginator();
                 // ...and re-load the list when the Selected Outbreak is changed
@@ -588,10 +585,15 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     /**
      * Re(load) the Contacts list
      */
-    refreshList(finishCallback: (records: any[]) => void) {
+    refreshList(
+        finishCallback: (records: any[]) => void,
+        triggeredByPageChange: boolean
+    ) {
         if (this.selectedOutbreak) {
             // refresh list of contacts grouped by risk level
-            this.getContactsOfContactsGroupedByRiskLevel();
+            if (!triggeredByPageChange) {
+                this.getContactsOfContactsGroupedByRiskLevel();
+            }
 
             // retrieve created user & modified user information
             this.queryBuilder.include('createdByUser', true);
