@@ -35,7 +35,7 @@
 
 <!--Total number of records from the list-->
 <app-total-number-of-records
-    [value]="(followUpsGroupedByContactCount$ | async)?.count">
+    [value]="followUpsGroupedByContactCount$ | async">
 </app-total-number-of-records>
 
 <mat-card
@@ -363,11 +363,13 @@
         </div>
     </div>
 
-    <mat-paginator
+    <!-- Pages (need to be hidden and not ngIf, otherwise it makes a new duplicate request) -->
+    <app-mat-paginator-extended
+        [hidden]="refreshingList || isEmptyList"
         [pageIndex]="pageIndex"
-        [length]="(followUpsGroupedByContactCount$ | async)?.count"
+        [countData]="followUpsGroupedByContactCount$ | async"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"
         (page)="changePage($event)">
-    </mat-paginator>
+    </app-mat-paginator-extended>
 </mat-card>

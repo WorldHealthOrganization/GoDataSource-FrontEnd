@@ -52,6 +52,7 @@ export enum ImportServerModelNames {
     OUTBREAK = 'outbreak',
     RELATIONSHIPS = 'relationship',
     CASE = 'case',
+    EVENT = 'event',
     CONTACT = 'contact',
     CONTACT_OF_CONTACT = 'contactOfContact'
 }
@@ -63,6 +64,48 @@ enum ImportServerErrorCodes {
     ADDRESS_MUST_HAVE_USUAL_PLACE_OF_RESIDENCE = 'ADDRESS_MUST_HAVE_USUAL_PLACE_OF_RESIDENCE',
     ADDRESS_MULTIPLE_USUAL_PLACE_OF_RESIDENCE = 'ADDRESS_MULTIPLE_USUAL_PLACE_OF_RESIDENCE',
     ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE = 'ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE'
+}
+
+interface IImportErrorDetailsSimple {
+    failed: {
+        // used internally
+        showData: boolean,
+
+        // from server
+        data: {
+            file: {
+                [prop: string]: any
+            },
+            save: {
+                [prop: string]: any
+            }
+        },
+        recordNo: number,
+        message: string,
+        error: {
+            code: number,
+            message: string,
+            errmsg: string,
+            details: {
+                codes: {
+                    [property: string]: any
+                }
+            }
+        }
+    }[];
+}
+
+interface IImportErrorDetailsProcessedImported {
+    processed: {
+        no: string,
+        total: string
+    };
+    imported: {
+        model: string,
+        success: string,
+        failed: string,
+        failedNo: number
+    };
 }
 
 @Component({
@@ -81,7 +124,6 @@ export class ImportDataComponent
         [ImportDataExtension.CSV]: 'text/csv',
         [ImportDataExtension.XLS]: 'application/vnd.ms-excel',
         [ImportDataExtension.XLSX]: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        [ImportDataExtension.XML]: 'text/xml',
         [ImportDataExtension.ODS]: 'application/vnd.oasis.opendocument.spreadsheet',
         [ImportDataExtension.JSON]: 'application/json',
         [ImportDataExtension.ZIP]: [
@@ -278,46 +320,14 @@ export class ImportDataComponent
 
     // Keep err msg details
     errMsgDetails: {
-        details: {
-            failed: {
-                // used internally
-                showData: boolean,
-
-                // from server
-                data: {
-                    file: {
-                        [prop: string]: any
-                    },
-                    save: {
-                        [prop: string]: any
-                    }
-                },
-                recordNo: number,
-                message: string,
-                error: {
-                    code: number,
-                    message: string,
-                    errmsg: string,
-                    details: {
-                        codes: {
-                            [property: string]: any
-                        }
-                    }
-                }
-            }[]
-        } | {
-            processed: {
-                no: string,
-                total: string
-            },
-            imported: {
-                model: string,
-                success: string,
-                failed: string,
-                failedNo: number
-            }
-        }
+        details: IImportErrorDetailsSimple | IImportErrorDetailsProcessedImported
     };
+    get errMsgDetailsAsS(): IImportErrorDetailsSimple {
+        return this.errMsgDetails.details as IImportErrorDetailsSimple;
+    }
+    get errMsgDetailsAsPI(): IImportErrorDetailsProcessedImported {
+        return this.errMsgDetails.details as IImportErrorDetailsProcessedImported;
+    }
 
     // Import is async ?
     @Input() asyncImport: boolean = false;
@@ -486,7 +496,7 @@ export class ImportDataComponent
                 return this.elementInEditMode === item;
             },
             click: (
-                item: ImportableMapField | IMappedOption,
+                _item: ImportableMapField | IMappedOption,
                 handler: HoverRowActionsDirective
             ) => {
                 // clear
@@ -529,7 +539,7 @@ export class ImportDataComponent
             },
             click: (
                 item: ImportableMapField | IMappedOption,
-                handler: HoverRowActionsDirective,
+                _handler: HoverRowActionsDirective,
                 index: number
             ) => {
                 // remove item
@@ -698,7 +708,7 @@ export class ImportDataComponent
         };
 
         // handle errors when trying to upload files
-        this.uploader.onWhenAddingFileFailed = (item: FileLikeObject, filter: any) => {
+        this.uploader.onWhenAddingFileFailed = (_item: FileLikeObject, filter: any) => {
             switch (filter.name) {
                 case 'mimeType':
                     // display error
@@ -711,7 +721,7 @@ export class ImportDataComponent
         };
 
         // handle server errors
-        this.uploader.onErrorItem = (file, err: any) => {
+        this.uploader.onErrorItem = (_file, err: any) => {
             // display toast
             try {
                 err = _.isObject(err) ? err : JSON.parse(err);
@@ -747,7 +757,7 @@ export class ImportDataComponent
         };
 
         // handle file upload progress
-        this.uploader.onProgressItem = (fileItem: FileItem, progress: any) => {
+        this.uploader.onProgressItem = (_fileItem: FileItem, progress: any) => {
             this.progress = Math.round(progress);
         };
 
@@ -926,9 +936,9 @@ export class ImportDataComponent
         } = {};
         _.each(this.importableObject.fileHeaders, (fHeader: string) => {
             // determine if this is a multi level header
-            const fHeaderMultiLevelData = /\s\[((MD)|(MV))\s+(\d+)\]$/g.exec(fHeader);
+            const fHeaderMultiLevelData = /\s\[((MD)|(MV))\s+(\d+)\]((\s(\d+))?)$/g.exec(fHeader);
             let mapKey: string;
-            let level: number;
+            let level: number, subLevel: number;
             let fHeaderWithoutMultiLevel: string = fHeader;
             let addValue: boolean = true;
             if (fHeaderMultiLevelData) {
@@ -940,6 +950,14 @@ export class ImportDataComponent
 
                 // set level
                 level = _.parseInt(fHeaderMultiLevelData[4]) - 1;
+
+                // add sub level ?
+                if (
+                    fHeaderMultiLevelData.length > 7 &&
+                    fHeaderMultiLevelData[7]
+                ) {
+                    subLevel = _.parseInt(fHeaderMultiLevelData[7]) - 1;
+                }
 
                 // no need to add value anymore
                 addValue = false;
@@ -956,7 +974,8 @@ export class ImportDataComponent
             // add the new option
             mappedHeaders[mapKeyCamelCase].push({
                 value: fHeader,
-                level: level
+                level: level,
+                subLevel
             });
 
             // add an extra map containing value since it might be a questionnaire answer
@@ -980,7 +999,7 @@ export class ImportDataComponent
             const stripEndingNumbers = /\s(\d+)$/g.exec(fHeaderWithoutMultiLevel);
             if (stripEndingNumbers) {
                 // determine sub-level
-                const subLevel: number = _.parseInt(stripEndingNumbers[1]) - 1;
+                const subLevelChild: number = _.parseInt(stripEndingNumbers[1]) - 1;
 
                 // remove index value
                 mapKey = fHeaderWithoutMultiLevel.substring(0, stripEndingNumbers.index);
@@ -997,8 +1016,8 @@ export class ImportDataComponent
                 } else {
                     canAdd = !_.find(mappedHeaders[mapKeyCamelCase], {
                         value: fHeader,
-                        level: _.isNumber(level) ? level : subLevel,
-                        subLevel: _.isNumber(level) ? subLevel : undefined
+                        level: _.isNumber(level) ? level : subLevelChild,
+                        subLevel: _.isNumber(level) ? subLevelChild : undefined
                     });
                 }
 
@@ -1006,15 +1025,15 @@ export class ImportDataComponent
                 if (canAdd) {
                     mappedHeaders[mapKeyCamelCase].push({
                         value: fHeader,
-                        level: _.isNumber(level) ? level : subLevel,
-                        subLevel: _.isNumber(level) ? subLevel : undefined
+                        level: _.isNumber(level) ? level : subLevelChild,
+                        subLevel: _.isNumber(level) ? subLevelChild : undefined
                     });
 
                     // add value
                     mappedHeaders[mapKeyCamelCaseWithValue].push({
                         value: fHeader,
-                        level: _.isNumber(level) ? level : subLevel,
-                        subLevel: _.isNumber(level) ? subLevel : undefined
+                        level: _.isNumber(level) ? level : subLevelChild,
+                        subLevel: _.isNumber(level) ? subLevelChild : undefined
                     });
                 }
             }
@@ -1271,7 +1290,7 @@ export class ImportDataComponent
         });
 
         // do we still have required fields? then we need to add a field map for each one of them  to force user to enter data
-        _.each(mapOfRequiredDestinationFields, (n: boolean, property: string) => {
+        _.each(mapOfRequiredDestinationFields, (_n: boolean, property: string) => {
             // create
             const importableItem = new ImportableMapField(
                 property
@@ -1692,7 +1711,7 @@ export class ImportDataComponent
 
                             // add missing required fields
                             _.each(mapOfRequiredDestinationFields, (
-                                n: boolean,
+                                _n: boolean,
                                 destinationField: string
                             ) => {
                                 // create
@@ -2735,7 +2754,7 @@ export class ImportDataComponent
                     const locationsToRetrieveMap: {
                         [locationIdName: string]: true
                     } = {};
-                    _.each(mustRetrieveLocations, (N, key: string) => {
+                    _.each(mustRetrieveLocations, (_N, key: string) => {
                         if (
                             this.distinctValuesCache[key] &&
                             this.distinctValuesCache[key].length > 0

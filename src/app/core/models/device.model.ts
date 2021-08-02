@@ -22,7 +22,7 @@ export class DeviceModel
      */
     static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.DEVICE_VIEW) : false; }
     static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.DEVICE_LIST) : false; }
-    static canCreate(user: UserModel): boolean { return false; }
+    static canCreate(): boolean { return false; }
     static canModify(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.DEVICE_VIEW, PERMISSION.DEVICE_MODIFY) : false; }
     static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.DEVICE_DELETE) : false; }
 
@@ -52,7 +52,7 @@ export class DeviceModel
      */
     canView(user: UserModel): boolean { return DeviceModel.canView(user); }
     canList(user: UserModel): boolean { return DeviceModel.canList(user); }
-    canCreate(user: UserModel): boolean { return DeviceModel.canCreate(user); }
+    canCreate(): boolean { return DeviceModel.canCreate(); }
     canModify(user: UserModel): boolean { return DeviceModel.canModify(user); }
     canDelete(user: UserModel): boolean { return DeviceModel.canDelete(user); }
 

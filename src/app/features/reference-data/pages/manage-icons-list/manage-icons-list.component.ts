@@ -58,7 +58,7 @@ export class ManageIconsListComponent extends ListComponent implements OnInit, O
                     click: (item: IconModel) => {
                         this.deleteIcon(item);
                     },
-                    visible: (item: IconModel): boolean => {
+                    visible: (): boolean => {
                         return IconModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'

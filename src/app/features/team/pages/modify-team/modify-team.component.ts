@@ -143,7 +143,7 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
         // show loading
         this.showLoadingDialog();
 
-        this.checkTeamsInSameLocations(this.teamData.locationIds)
+        this.checkTeamsInSameLocations()
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showApiError(err);
@@ -201,7 +201,7 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
      */
     checkUsersMultipleTeams(users) {
         const userIds = [];
-        _.forEach(users, (user, key) => {
+        _.forEach(users, (user) => {
             userIds.push(user.id);
         });
         const difUser = _.difference(userIds, this.existingUsers);
@@ -246,7 +246,7 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
      * @param {string[]} locationIds
      * @returns {Observable<boolean>}
      */
-    private checkTeamsInSameLocations(locationIds: string[]): Observable<boolean> {
+    private checkTeamsInSameLocations(): Observable<boolean> {
         return new Observable((observer) => {
             // check if there are existing teams in the same locations
             const qb = new RequestQueryBuilder();

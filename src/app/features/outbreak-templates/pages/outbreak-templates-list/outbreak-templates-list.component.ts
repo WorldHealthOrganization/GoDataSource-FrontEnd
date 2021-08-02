@@ -178,7 +178,7 @@ export class OutbreakTemplatesListComponent
                     click: (item: OutbreakTemplateModel) => {
                         this.cloneOutbreakTemplate(item);
                     },
-                    visible: (item: OutbreakTemplateModel): boolean => {
+                    visible: (): boolean => {
                         return OutbreakTemplateModel.canClone(this.authUser);
                     }
                 })
@@ -264,7 +264,12 @@ export class OutbreakTemplatesListComponent
                 field: 'generateFollowUpsKeepTeamAssignment',
                 label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT',
                 visible: false
-            })
+            }),
+            new VisibleColumnModel({
+                field: 'generateFollowUpsDateOfLastContact',
+                label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT',
+                visible: false
+            }),
         ];
     }
 
@@ -278,7 +283,8 @@ export class OutbreakTemplatesListComponent
             'disease',
             'generateFollowUpsTeamAssignmentAlgorithm',
             'generateFollowUpsOverwriteExisting',
-            'generateFollowUpsKeepTeamAssignment'
+            'generateFollowUpsKeepTeamAssignment',
+            'generateFollowUpsDateOfLastContact'
         );
     }
 

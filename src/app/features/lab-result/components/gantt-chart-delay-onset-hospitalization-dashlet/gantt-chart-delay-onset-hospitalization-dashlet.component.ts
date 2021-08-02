@@ -13,6 +13,7 @@ import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/index';
 import { MetricCasesDelayBetweenOnsetHospitalizationModel } from '../../../../core/models/metrics/metric-cases-delay-between-onset-hospitalization.model';
 import { Moment } from '../../../../core/helperClasses/x-moment';
+import { IGanttDataInterface } from '../../interfaces/gantt-data.interface';
 
 @Component({
     selector: 'app-gantt-chart-delay-onset-hospitalization-dashlet',
@@ -29,15 +30,14 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
 
     // gantt chart settings
     ganttChart: any;
-    ganttData: any = [];
+    ganttData: IGanttDataInterface[] = [];
     options = {
         // View mode: day/week/month
         viewMode: Constants.GANTT_CHART_VIEW_TYPE.DAY.value,
-        onClick: () => {},
         styleOptions: {
-            baseBar: '#4DB0A0'
-        },
-        legends: []
+            groupBack: '#4DB0A0',
+            redLineColor: 'transparent'
+        }
     };
 
     // subscribers
@@ -98,7 +98,10 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
             .subscribe((personTypes) => {
                 const casePersonType = _.find(personTypes.entries, {value: EntityType.CASE});
                 if (casePersonType) {
-                    this.options.styleOptions.baseBar = casePersonType.colorCode;
+                    // set case color
+                    if (casePersonType.colorCode) {
+                        this.options.styleOptions.groupBack = casePersonType.colorCode;
+                    }
 
                     // outbreak subscriber
                     if (this.outbreakSubscriber) {
@@ -159,10 +162,7 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
         }
 
         // only display id data is available
-        if (
-            !_.isEmpty(this.ganttData) &&
-            !_.isEmpty(this.ganttData[0].children)
-        ) {
+        if (this.ganttData.length > 0) {
             this.ganttChart = new SVGGantt(
                 '#gantt-svg-root-hospitalization',
                 this.ganttData,
@@ -177,10 +177,6 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
     formatData(metricResults: MetricCasesDelayBetweenOnsetHospitalizationModel[]) {
         // initialize
         this.ganttData = [];
-        const chartDataItem: any = {};
-        chartDataItem.id = '';
-        chartDataItem.name = '';
-        chartDataItem.children = [];
 
         // add data
         _.forEach(metricResults, (result) => {
@@ -189,23 +185,24 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
                 !_.isEmpty(result.hospitalizationIsolationDate)
             ) {
                 // create gantt render item
-                const chartDataItemChild: any = {};
-                chartDataItemChild.id = result.case.id;
-                chartDataItemChild.name = result.case.name;
-                chartDataItemChild.from = new Date(Date.parse(result.dateOfOnset));
+                const chartDataItemChild: IGanttDataInterface = {
+                    id: result.case.id,
+                    type: 'group',
+                    text: result.case.name,
+                    start: new Date(Date.parse(result.dateOfOnset)),
+                    end: null,
+                    links: undefined
+                };
 
                 // set duration
-                chartDataItemChild.to = result.delay > 0 ?
+                chartDataItemChild.end = result.delay > 0 ?
                     new Date(Date.parse(result.hospitalizationIsolationDate)) :
                     new Date(new Date(result.dateOfOnset).getTime() + GanttChartDelayOnsetHospitalizationDashletComponent.DELAY_MISSING_ED_ADD_TIME);
 
                 // finished - add to list items to render
-                chartDataItem.children.push(chartDataItemChild);
+                this.ganttData.push(chartDataItemChild);
             }
         });
-
-        // finished
-        this.ganttData.push(chartDataItem);
     }
 
     /**
@@ -275,6 +272,6 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
      * Check if graph has data
      */
     hasData(): boolean {
-        return _.get(this.ganttData, '[0].children.length', 0) > 0;
+        return this.ganttData.length > 0;
     }
 }

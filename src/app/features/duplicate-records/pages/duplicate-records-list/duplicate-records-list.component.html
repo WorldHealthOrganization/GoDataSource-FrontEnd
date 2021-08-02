@@ -9,7 +9,7 @@
 
 <!-- Total number of records from the list -->
 <app-total-number-of-records
-    [value]="(duplicatesListCount$ | async)?.count">
+    [value]="duplicatesListCount$ | async">
 </app-total-number-of-records>
 
 <mat-card class="page-section page-content">
@@ -125,14 +125,14 @@
                                     <ng-template
                                         #documentsTemplate>
                                         <span
-                                            *ngIf="!duplicatesList.peopleMap[item]?.documents || duplicatesList.peopleMap[item]?.documents.length < 1; else docChildTemplate"
+                                            *ngIf="!getNotEvent(duplicatesList.peopleMap[item])?.documents || getNotEvent(duplicatesList.peopleMap[item])?.documents.length < 1; else docChildTemplate"
                                             class="duplicate-records-label-none">
                                             {{ 'LNG_PAGE_LIST_DUPLICATE_RECORDS_LABEL_NONE' | translate }}
                                         </span>
                                         <ng-template
                                             #docChildTemplate>
                                             <span
-                                                *ngFor="let document of duplicatesList.peopleMap[item]?.documents; let first = first">
+                                                *ngFor="let document of getNotEvent(duplicatesList.peopleMap[item])?.documents; let first = first">
                                                 {{ document.number ? ( first ? '' : ' / ' ) + document.number : ('LNG_PAGE_LIST_DUPLICATE_RECORDS_LABEL_MISSING' | translate) }}
                                             </span>
                                         </ng-template>
@@ -157,7 +157,7 @@
                                     </span>
                                     <ng-template
                                         #visualIdTemplate>
-                                        {{duplicatesList.peopleMap[item]?.visualId}}
+                                        {{getNotEvent(duplicatesList.peopleMap[item])?.visualId}}
                                     </ng-template>
                                 </mat-cell>
                             </ng-container>
@@ -177,7 +177,7 @@
                                     </span>
                                     <ng-template
                                         #ageTemplate>
-                                        <app-age-label [age]="duplicatesList.peopleMap[item]?.age"></app-age-label>
+                                        <app-age-label [age]="getNotEvent(duplicatesList.peopleMap[item])?.age"></app-age-label>
                                     </ng-template>
                                 </mat-cell>
                             </ng-container>
@@ -191,8 +191,8 @@
                                 </mat-header-cell>
                                 <mat-cell *matCellDef="let item">
                                     {{ duplicatesList.peopleMap[item]?.type === EntityType.EVENT ?
-                                        duplicatesList.peopleMap[item]?.address.fullAddress :
-                                        AddressModel.getCurrentAddress(duplicatesList.peopleMap[item]?.addresses)?.fullAddress }}
+                                        getEvent(duplicatesList.peopleMap[item])?.address.fullAddress :
+                                        AddressModel.getCurrentAddress(getNotEvent(duplicatesList.peopleMap[item])?.addresses)?.fullAddress }}
                                 </mat-cell>
                             </ng-container>
 
@@ -217,21 +217,20 @@
         </div>
     </ng-container>
 
+    <!-- No data -->
     <div
         *ngIf="!refreshingList && isEmptyList"
-        class="mat-table">
-        <div class="mat-row">
-            <div class="mat-cell">
-                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
-            </div>
-        </div>
+        class="empty-table-text">
+        {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
     </div>
 
-    <mat-paginator
+    <!-- Pages (need to be hidden and not ngIf, otherwise it makes a new duplicate request) -->
+    <app-mat-paginator-extended
+        [hidden]="refreshingList || isEmptyList"
         [pageIndex]="pageIndex"
-        [length]="(duplicatesListCount$ | async)?.count"
+        [countData]="duplicatesListCount$ | async"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"
         (page)="changePage($event)">
-    </mat-paginator>
+    </app-mat-paginator-extended>
 </mat-card>

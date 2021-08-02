@@ -16,6 +16,7 @@ import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
 import { IPermissionBasic, IPermissionBasicBulk, IPermissionExportable, IPermissionRelationship } from './permission.interface';
 import { ContactOfContactModel } from './contact-of-contact.model';
+import { DocumentModel } from './document.model';
 
 export class RelationshipModel
     extends BaseModel
@@ -62,10 +63,10 @@ export class RelationshipModel
     /**
      * Static Permissions - IPermissionBasicBulk
      */
-    static canBulkCreate(user: UserModel): boolean { return false; }
-    static canBulkModify(user: UserModel): boolean { return false; }
+    static canBulkCreate(): boolean { return false; }
+    static canBulkModify(): boolean { return false; }
     static canBulkDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_BULK_DELETE) : false); }
-    static canBulkRestore(user: UserModel): boolean { return false; }
+    static canBulkRestore(): boolean { return false; }
 
     /**
      * Constructor
@@ -116,10 +117,10 @@ export class RelationshipModel
     /**
      * Permissions - IPermissionBasicBulk
      */
-    canBulkCreate(user: UserModel): boolean { return RelationshipModel.canBulkCreate(user); }
-    canBulkModify(user: UserModel): boolean { return RelationshipModel.canBulkModify(user); }
+    canBulkCreate(): boolean { return RelationshipModel.canBulkCreate(); }
+    canBulkModify(): boolean { return RelationshipModel.canBulkModify(); }
     canBulkDelete(user: UserModel): boolean { return RelationshipModel.canBulkDelete(user); }
-    canBulkRestore(user: UserModel): boolean { return RelationshipModel.canBulkRestore(user); }
+    canBulkRestore(): boolean { return RelationshipModel.canBulkRestore(); }
 
     /**
      * Get the related entity
@@ -460,6 +461,24 @@ export class EntityModel {
      */
     static getPersonLink(person): string {
         return `/${EntityModel.getLinkForEntityType(person.type)}/${person.id}/view`;
+    }
+
+    /**
+     * Determine if we need to do a duplicate check
+     */
+    static duplicateDataHasChanged(
+        dirtyData: {
+            firstName?: string,
+            middleName?: string,
+            lastName?: string,
+            documents?: DocumentModel[]
+        }
+    ): boolean {
+        // check if we need to change
+        return dirtyData.firstName !== undefined ||
+            dirtyData.middleName !== undefined ||
+            dirtyData.lastName !== undefined ||
+            dirtyData.documents !== undefined;
     }
 
     /**

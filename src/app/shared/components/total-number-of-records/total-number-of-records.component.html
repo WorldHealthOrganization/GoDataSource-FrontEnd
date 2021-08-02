@@ -3,13 +3,22 @@
 
     <!-- Display loading while loading data -->
     <div
-        *ngIf="value === null; else pageInfo">
+        *ngIf="!value || value.count === null; else pageInfo">
         <mat-spinner></mat-spinner>
     </div>
 
     <!-- Counted items -->
     <ng-template
         #pageInfo>
-        {{'LNG_COMMON_LABEL_RECORDS_NUMBER' | translate:{ value: value ? value : 0 } }}
+        {{ (value.hasMore ? ('LNG_COMMON_LABEL_PAGINATOR_COUNT_BEFORE_LENGTH' | translate) + ' ' : '') + (value.count | number) + (' ' + ('LNG_COMMON_LABEL_PAGINATOR_COUNT_AFTER_LENGTH' | translate)) }}
+
+        <!-- Determine total -->
+        <span
+            *ngIf="value.hasMore">
+            (<a
+                class="xlink-button"
+                href="javascript: void(0)"
+                (click)="showExactCount()">{{ 'LNG_COMMON_LABEL_PAGINATOR_SHOW_EXACT_COUNT' | translate }}</a>)
+        </span>
     </ng-template>
 </div>

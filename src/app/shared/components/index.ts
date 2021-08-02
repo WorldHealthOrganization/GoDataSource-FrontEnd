@@ -54,6 +54,7 @@ import { FormContactOfContactQuickComponent } from './form-contact-of-contact-qu
 import { MultipleSnackbarComponent } from './multiple-snackbar/multiple-snackbar.component';
 import { FancyTooltipComponent } from './fancy-tooltip/fancy-tooltip.component';
 import { PieDonutChartComponent } from './pie-donut-graph/pie-donut-chart.component';
+import { MatPaginatorExtendedComponent } from './mat-paginator-extended/mat-paginator-extended.component';
 
 // export necessary components individually
 export * from './multiple-snackbar/multiple-snackbar.component';
@@ -142,5 +143,8 @@ export const components: any[] = [
     HoverRowActionsComponent,
 
     // Graphs
-    PieDonutChartComponent
+    PieDonutChartComponent,
+
+    // Material extensions
+    MatPaginatorExtendedComponent
 ];

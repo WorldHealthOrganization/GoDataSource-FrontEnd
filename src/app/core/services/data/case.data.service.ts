@@ -83,17 +83,14 @@ export class CaseDataService {
      * Find case duplicates
      * @param outbreakId
      * @param caseData
-     * @param queryBuilder
      */
     findDuplicates(
         outbreakId: string,
-        caseData: any,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+        caseData: any
     ): Observable<EntityDuplicatesModel> {
-        const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
             this.http.post(
-                `outbreaks/${outbreakId}/cases/duplicates/find?filter=${filter}`,
+                `outbreaks/${outbreakId}/cases/duplicates/find`,
                 caseData
             ),
             EntityDuplicatesModel

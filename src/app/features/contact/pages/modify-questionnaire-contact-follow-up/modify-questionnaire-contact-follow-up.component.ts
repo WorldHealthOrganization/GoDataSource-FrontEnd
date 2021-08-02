@@ -169,7 +169,6 @@ export class ModifyQuestionnaireContactFollowUpComponent extends ViewModifyCompo
             this.followUpsDataService
                 .getFollowUp(
                     this.selectedOutbreak.id,
-                    this.contactId,
                     this.followUpId
                 )
                 .pipe(

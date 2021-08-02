@@ -10,7 +10,7 @@ import { BreadcrumbItemModel } from './breadcrumb-item.model';
 export class BreadcrumbsComponent {
 
     // Breadcrumbs items
-    @Input() items: BreadcrumbItemModel;
+    @Input() items: BreadcrumbItemModel[];
 
     @Input() addSeparatorAtTheEnd: boolean = false;
     @Input() displaySeparator: boolean = true;

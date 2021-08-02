@@ -85,10 +85,7 @@ class CustomLocationEditor extends Handsontable.default.editors.BaseEditor {
     /**
      * Begin editing
      */
-    beginEditing(
-        initialValue?: any,
-        event?: Event
-    ): void {
+    beginEditing(): void {
         // dialog either already visible or we don't need to show it ?
         if (this.locationDialogVisible === HotTableWrapperDialogVisibility.Visible) {
             return;
@@ -124,7 +121,7 @@ class CustomLocationEditor extends Handsontable.default.editors.BaseEditor {
                     wrapper.cachedLocations[selectedLocation.id] = selectedLocation;
                 }
 
-                // update spreedsheet data
+                // update spreadsheet data
                 this.instance.setDataAtCell(
                     this.row,
                     this.col,
@@ -177,7 +174,7 @@ class CustomLocationEditor extends Handsontable.default.editors.BaseEditor {
     /**
      * Open
      */
-    open(event?: Event): void {
+    open(): void {
         // NOTHING
     }
 
@@ -737,7 +734,7 @@ export class HotTableWrapperComponent
                 // location not loading anymore
                 this.loadingLocations = false;
 
-                // render spreedsheet
+                // render spreadsheet
                 (this.sheetTable as any).hotInstance.render();
             });
     }
@@ -763,11 +760,11 @@ export class HotTableWrapperComponent
         const noLocationLabel: string = this.i18nService.instant('LNG_FORM_HOT_TABLE_WRAPPER_NO_LOCATION_SELECTED_LABEL');
         const loadingTitle: string = this.i18nService.instant('LNG_FORM_HOT_TABLE_WRAPPER_LOADING_LOCATIONS_TITLE');
         this.locationRendererCallback = (
-            instance,
+            _instance,
             td: HTMLTableCellElement,
-            row: number,
-            col: number,
-            prop: string,
+            _row: number,
+            _col: number,
+            _prop: string,
             value: any,
             cellProperties: any
         ) => {

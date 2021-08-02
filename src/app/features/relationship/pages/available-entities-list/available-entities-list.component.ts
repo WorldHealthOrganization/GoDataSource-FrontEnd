@@ -13,7 +13,6 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { NgForm } from '@angular/forms';
 import * as _ from 'lodash';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
@@ -236,22 +235,37 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
     /**
      * Get total number of items, based on the applied filters
      */
-    refreshListCount() {
+    refreshListCount(applyHasMoreLimit?: boolean) {
         if (
             this.entityType &&
             this.entityId &&
             this.selectedOutbreak
         ) {
+            // set apply value
+            if (applyHasMoreLimit !== undefined) {
+                this.applyHasMoreLimit = applyHasMoreLimit;
+            }
+
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
+
+            // apply has more limit
+            if (this.applyHasMoreLimit) {
+                countQueryBuilder.flag(
+                    'applyHasMoreLimit',
+                    true
+                );
+            }
+
+            // count
             this.entitiesListCount$ = this.relationshipDataService
                 .getEntityAvailablePeopleCount(
                     this.selectedOutbreak.id,
                     this.entityType,
                     this.entityId,
-                    this.queryBuilder
+                    countQueryBuilder
                 )
                 .pipe(
                     catchError((err) => {
@@ -375,7 +389,7 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
         return _.get(personTypeData, 'colorCode', '');
     }
 
-    selectEntities(form: NgForm) {
+    selectEntities() {
         // get list of selected ids
         const selectedRecords: false | string[] = this.validateCheckedRecords();
         if (!selectedRecords) {

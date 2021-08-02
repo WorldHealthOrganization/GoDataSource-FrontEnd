@@ -6,7 +6,6 @@ export enum ImportDataExtension {
     CSV = '.csv',
     XLS = '.xls',
     XLSX = '.xlsx',
-    XML = '.xml',
     ODS = '.ods',
     JSON = '.json',
     ZIP = '.zip'
@@ -551,7 +550,7 @@ export class ImportableMapField {
         }
 
         // add indexes
-        this._numberOfMaxLevels.forEach((value, index) => {
+        this._numberOfMaxLevels.forEach((_value, index) => {
             // check level validity
             if (
                 this._sourceDestinationLevel[index] === undefined ||

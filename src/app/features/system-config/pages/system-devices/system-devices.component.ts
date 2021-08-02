@@ -5,7 +5,7 @@ import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
-import { HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
+import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { Observable } from 'rxjs';
 import { DeviceDataService } from '../../../../core/services/data/device.data.service';
@@ -38,8 +38,6 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
 
     // constants
     UserSettings = UserSettings;
-
-    loadingDialog: LoadingDialogModel;
 
     recordActions: HoverRowAction[] = [
         // View Device
@@ -98,7 +96,7 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
                     click: (item: DeviceModel) => {
                         this.wipeDevice(item);
                     },
-                    visible: (item: DeviceModel): boolean => {
+                    visible: (): boolean => {
                         // for now let use do another wipe even if one is in progress, because parse might fails..and status might remain pending..which might cause issues if we can't send a new notification
                         // [Constants.DEVICE_WIPE_STATUS.READY.value, Constants.DEVICE_WIPE_STATUS.PENDING.value].includes(item.status)
                         return DeviceModel.canWipe(this.authUser);
@@ -112,7 +110,7 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
                     click: (item: DeviceModel) => {
                         this.router.navigate(['/system-config', 'devices', item.id, 'history']);
                     },
-                    visible: (item: DeviceModel): boolean => {
+                    visible: (): boolean => {
                         return DeviceModel.canListHistory(this.authUser);
                     },
                 })
@@ -290,21 +288,5 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
                         });
                 }
             });
-    }
-
-    /**
-     * Display loading dialog
-     */
-    showLoadingDialog() {
-        this.loadingDialog = this.dialogService.showLoadingDialog();
-    }
-    /**
-     * Hide loading dialog
-     */
-    closeLoadingDialog() {
-        if (this.loadingDialog) {
-            this.loadingDialog.close();
-            this.loadingDialog = null;
-        }
     }
 }

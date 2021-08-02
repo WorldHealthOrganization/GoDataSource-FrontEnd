@@ -32,11 +32,11 @@ export class AuditLogModel
     /**
      * Static Permissions - IPermissionBasic
      */
-    static canView(user: UserModel): boolean { return false; }
+    static canView(): boolean { return false; }
     static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.AUDIT_LOG_LIST) : false; }
-    static canCreate(user: UserModel): boolean { return false; }
-    static canModify(user: UserModel): boolean { return false; }
-    static canDelete(user: UserModel): boolean { return false; }
+    static canCreate(): boolean { return false; }
+    static canModify(): boolean { return false; }
+    static canDelete(): boolean { return false; }
 
     /**
      * Constructor
@@ -61,9 +61,9 @@ export class AuditLogModel
     /**
      * Permissions - IPermissionBasic
      */
-    canView(user: UserModel): boolean { return AuditLogModel.canView(user); }
+    canView(): boolean { return AuditLogModel.canView(); }
     canList(user: UserModel): boolean { return AuditLogModel.canList(user); }
-    canCreate(user: UserModel): boolean { return AuditLogModel.canCreate(user); }
-    canModify(user: UserModel): boolean { return AuditLogModel.canModify(user); }
-    canDelete(user: UserModel): boolean { return AuditLogModel.canDelete(user); }
+    canCreate(): boolean { return AuditLogModel.canCreate(); }
+    canModify(): boolean { return AuditLogModel.canModify(); }
+    canDelete(): boolean { return AuditLogModel.canDelete(); }
 }

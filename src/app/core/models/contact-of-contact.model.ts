@@ -108,8 +108,8 @@ export class ContactOfContactModel
      */
     static canBulkCreate(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_BULK_CREATE) : false); }
     static canBulkModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_BULK_MODIFY) : false); }
-    static canBulkDelete(user: UserModel): boolean { return false; }
-    static canBulkRestore(user: UserModel): boolean { return false; }
+    static canBulkDelete(): boolean { return false; }
+    static canBulkRestore(): boolean { return false; }
 
     /**
      * Static Permissions - IPermissionRestorable
@@ -119,22 +119,22 @@ export class ContactOfContactModel
     /**
      * Static Permissions - IPermissionRelatedRelationship
      */
-    static canListRelationshipContacts(user: UserModel): boolean { return false; }
-    static canViewRelationshipContacts(user: UserModel): boolean { return false; }
-    static canCreateRelationshipContacts(user: UserModel): boolean { return false; }
-    static canModifyRelationshipContacts(user: UserModel): boolean { return false; }
-    static canDeleteRelationshipContacts(user: UserModel): boolean { return false; }
+    static canListRelationshipContacts(): boolean { return false; }
+    static canViewRelationshipContacts(): boolean { return false; }
+    static canCreateRelationshipContacts(): boolean { return false; }
+    static canModifyRelationshipContacts(): boolean { return false; }
+    static canDeleteRelationshipContacts(): boolean { return false; }
     static canListRelationshipExposures(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_LIST_RELATIONSHIP_EXPOSURES) : false); }
     static canViewRelationshipExposures(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_VIEW_RELATIONSHIP_EXPOSURES) : false); }
     static canCreateRelationshipExposures(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_CREATE_RELATIONSHIP_EXPOSURES) : false); }
     static canModifyRelationshipExposures(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_MODIFY_RELATIONSHIP_EXPOSURES) : false); }
     static canDeleteRelationshipExposures(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_DELETE_RELATIONSHIP_EXPOSURES) : false); }
-    static canReverseRelationship(user: UserModel): boolean { return false; }
-    static canListPersonsWithoutRelationships(user: UserModel): boolean { return false; }
+    static canReverseRelationship(): boolean { return false; }
+    static canListPersonsWithoutRelationships(): boolean { return false; }
     static canExportRelationships(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_EXPORT_RELATIONSHIPS) : false); }
     static canShareRelationship(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_SHARE_RELATIONSHIPS) : false); }
     static canChangeSource(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_CHANGE_SOURCE_RELATIONSHIP) : false); }
-    static canBulkDeleteRelationshipContacts(user: UserModel): boolean { return false; }
+    static canBulkDeleteRelationshipContacts(): boolean { return false; }
     static canBulkDeleteRelationshipExposures(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_BULK_DELETE_RELATIONSHIP_EXPOSURES) : false); }
 
     /**
@@ -253,8 +253,8 @@ export class ContactOfContactModel
      */
     canBulkCreate(user: UserModel): boolean { return ContactOfContactModel.canBulkCreate(user); }
     canBulkModify(user: UserModel): boolean { return ContactOfContactModel.canBulkModify(user); }
-    canBulkDelete(user: UserModel): boolean { return ContactOfContactModel.canBulkDelete(user); }
-    canBulkRestore(user: UserModel): boolean { return ContactOfContactModel.canBulkRestore(user); }
+    canBulkDelete(): boolean { return ContactOfContactModel.canBulkDelete(); }
+    canBulkRestore(): boolean { return ContactOfContactModel.canBulkRestore(); }
 
     /**
      * Permissions - IPermissionRestorable
@@ -264,22 +264,22 @@ export class ContactOfContactModel
     /**
      * Permissions - IPermissionRelatedRelationship
      */
-    canListRelationshipContacts(user: UserModel): boolean { return ContactOfContactModel.canListRelationshipContacts(user); }
-    canViewRelationshipContacts(user: UserModel): boolean { return ContactOfContactModel.canViewRelationshipContacts(user); }
-    canCreateRelationshipContacts(user: UserModel): boolean { return ContactOfContactModel.canCreateRelationshipContacts(user); }
-    canModifyRelationshipContacts(user: UserModel): boolean { return ContactOfContactModel.canModifyRelationshipContacts(user); }
-    canDeleteRelationshipContacts(user: UserModel): boolean { return ContactOfContactModel.canDeleteRelationshipContacts(user); }
+    canListRelationshipContacts(): boolean { return ContactOfContactModel.canListRelationshipContacts(); }
+    canViewRelationshipContacts(): boolean { return ContactOfContactModel.canViewRelationshipContacts(); }
+    canCreateRelationshipContacts(): boolean { return ContactOfContactModel.canCreateRelationshipContacts(); }
+    canModifyRelationshipContacts(): boolean { return ContactOfContactModel.canModifyRelationshipContacts(); }
+    canDeleteRelationshipContacts(): boolean { return ContactOfContactModel.canDeleteRelationshipContacts(); }
     canListRelationshipExposures(user: UserModel): boolean { return ContactOfContactModel.canListRelationshipExposures(user); }
     canViewRelationshipExposures(user: UserModel): boolean { return ContactOfContactModel.canViewRelationshipExposures(user); }
     canCreateRelationshipExposures(user: UserModel): boolean { return ContactOfContactModel.canCreateRelationshipExposures(user); }
     canModifyRelationshipExposures(user: UserModel): boolean { return ContactOfContactModel.canModifyRelationshipExposures(user); }
     canDeleteRelationshipExposures(user: UserModel): boolean { return ContactOfContactModel.canDeleteRelationshipExposures(user); }
-    canReverseRelationship(user: UserModel): boolean { return ContactOfContactModel.canReverseRelationship(user); }
-    canListPersonsWithoutRelationships(user: UserModel): boolean { return ContactOfContactModel.canListPersonsWithoutRelationships(user); }
+    canReverseRelationship(): boolean { return ContactOfContactModel.canReverseRelationship(); }
+    canListPersonsWithoutRelationships(): boolean { return ContactOfContactModel.canListPersonsWithoutRelationships(); }
     canExportRelationships(user: UserModel): boolean { return ContactOfContactModel.canExportRelationships(user); }
     canShareRelationship(user: UserModel): boolean { return ContactOfContactModel.canShareRelationship(user); }
     canChangeSource(user: UserModel): boolean { return ContactOfContactModel.canChangeSource(user); }
-    canBulkDeleteRelationshipContacts(user: UserModel): boolean { return ContactOfContactModel.canBulkDeleteRelationshipContacts(user); }
+    canBulkDeleteRelationshipContacts(): boolean { return ContactOfContactModel.canBulkDeleteRelationshipContacts(); }
     canBulkDeleteRelationshipExposures(user: UserModel): boolean { return ContactOfContactModel.canBulkDeleteRelationshipExposures(user); }
 
     /**

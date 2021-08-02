@@ -355,6 +355,11 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
                 visible: false
             }),
             new VisibleColumnModel({
+                field: 'generateFollowUpsDateOfLastContact',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT',
+                visible: false
+            }),
+            new VisibleColumnModel({
                 field: 'isContactLabResultsActive',
                 label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_LAB_RESULTS_ACTIVE',
                 visible: false

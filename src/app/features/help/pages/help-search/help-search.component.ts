@@ -11,7 +11,10 @@ import { HelpItemModel } from '../../../../core/models/help-item.model';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import * as _ from 'lodash';
 import { catchError, tap } from 'rxjs/operators';
-import { UserModel } from '../../../../core/models/user.model';
+import {
+    UserModel,
+    UserSettings
+} from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { HoverRowAction } from '../../../../shared/components';
 import { throwError } from 'rxjs/internal/observable/throwError';
@@ -38,6 +41,7 @@ export class HelpSearchComponent extends ListComponent implements OnInit, OnDest
     // provide constants to template
     Constants = Constants;
     HelpCategoryModel = HelpCategoryModel;
+    UserSettings = UserSettings;
 
     searchedTerm: string = '';
 

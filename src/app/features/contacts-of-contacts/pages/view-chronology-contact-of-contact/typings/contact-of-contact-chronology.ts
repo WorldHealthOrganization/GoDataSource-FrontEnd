@@ -1,5 +1,4 @@
 import { ChronologyItem } from '../../../../../shared/components/chronology/typings/chronology-item';
-import { I18nService } from '../../../../../core/services/helper/i18n.service';
 import { RelationshipModel } from '../../../../../core/models/entity-and-relationship.model';
 import * as _ from 'lodash';
 import { CaseModel } from '../../../../../core/models/case.model';
@@ -9,7 +8,6 @@ import { ContactOfContactModel } from '../../../../../core/models/contact-of-con
 
 export class ContactOfContactChronology {
     static getChronologyEntries(
-        i18nService: I18nService,
         contactOfContactData: ContactOfContactModel,
         relationshipsData?: RelationshipModel[],
     ): ChronologyItem[] {
@@ -17,7 +15,7 @@ export class ContactOfContactChronology {
         const sourcePersons = [];
 
         // create function that return all source persons for every relationship
-        const getSourcePersons = (contactOfContactId: string,
+        const getSourcePersons = (_contactOfContactId: string,
                                   relationships: RelationshipModel[]) => {
             _.forEach(relationships, (relationship) => {
                 _.forEach(relationship.people, (people) => {

@@ -1295,7 +1295,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
         // loop through all the nodes to set their position based on date and relations
         let index: number = 0;
-        _.forEach(nodes, (node, key) => {
+        _.forEach(nodes, (node) => {
             // check if the node has a date to be taken into consideration
             if (!_.isEmpty(node.data.dateTimeline)) {
                 // check if there is already a node added to that date
@@ -1328,7 +1328,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      */
     getRelatedNodes(nodeId) {
         const relatedNodes = [];
-        _.forEach(this.graphElements.edges, (edge, key) => {
+        _.forEach(this.graphElements.edges, (edge) => {
             if (edge.data.source === nodeId) {
                 const node = this.getNode(edge.data.target);
                 relatedNodes.push(node);
@@ -1348,7 +1348,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      */
     getNode(nodeId) {
         let foundNode = null;
-        _.forEach(this.graphElements.nodes, (node, key) => {
+        _.forEach(this.graphElements.nodes, (node) => {
             if (node.data.id === nodeId) {
                 foundNode = node;
             }
@@ -1433,7 +1433,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         let maxRankPerParentNode = -1;
         const relatedNodes = this.getRelatedNodes(node.data.id);
         if (!_.isEmpty(relatedNodes)) {
-            _.forEach(relatedNodes, (relatedNode, relatedKey) => {
+            _.forEach(relatedNodes, (relatedNode) => {
                 // get max rank from the date interval
                 const maxRankPerDateInterval = this.getMaxRankDateInterval(node.data.dateTimeline, relatedNode.data.dateTimeline);
                 let maxRankToBlock = -1;
@@ -1882,7 +1882,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                         caseClassificationToColorMap[(entity.model as CaseModel).classification] :
                         Constants.DEFAULT_COLOR_CHAINS,
                     data: entity,
-                    selected: (mapComponent: WorldMapComponent, mark: WorldMapMarker) => {
+                    selected: (_mapComponent: WorldMapComponent, mark: WorldMapMarker) => {
                         // display entity information ( case / contact / event )
                         const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
                         const localEntity: EntityModel = mark.data;
@@ -2016,7 +2016,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                         lineWidth: 5,
                         offsetX: -(markerCircleRadius * 2 + 3),
                         data: relationship,
-                        selected: (mapComponent: WorldMapComponent, path: WorldMapPath) => {
+                        selected: (_mapComponent: WorldMapComponent, path: WorldMapPath) => {
                             // display relationship information
                             const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
                             const localRelationship: RelationshipModel = path.data;

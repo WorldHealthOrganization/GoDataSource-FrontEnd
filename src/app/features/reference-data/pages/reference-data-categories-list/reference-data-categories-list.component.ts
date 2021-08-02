@@ -6,8 +6,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { HoverRowAction, LoadingDialogModel } from '../../../../shared/components';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { HoverRowAction } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { catchError, tap } from 'rxjs/operators';
@@ -22,7 +21,10 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
     templateUrl: './reference-data-categories-list.component.html',
     styleUrls: ['./reference-data-categories-list.component.less']
 })
-export class ReferenceDataCategoriesListComponent extends ListComponent implements OnInit, OnDestroy {
+export class ReferenceDataCategoriesListComponent
+    extends ListComponent
+    implements OnInit, OnDestroy {
+
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '..', true)
@@ -40,8 +42,6 @@ export class ReferenceDataCategoriesListComponent extends ListComponent implemen
 
     referenceDataExporFileName: string = moment().format('YYYY-MM-DD');
 
-    loadingDialog: LoadingDialogModel;
-
     fixedTableColumns: string[] = [
         'categoryName',
         'entries'
@@ -55,7 +55,7 @@ export class ReferenceDataCategoriesListComponent extends ListComponent implemen
             linkGenerator: (item: ReferenceDataCategoryModel): string[] => {
                 return ['/reference-data', item.id];
             },
-            visible: (item: ReferenceDataCategoryModel): boolean => {
+            visible: (): boolean => {
                 return ReferenceDataEntryModel.canList(this.authUser);
             }
         })
@@ -69,7 +69,6 @@ export class ReferenceDataCategoriesListComponent extends ListComponent implemen
         private referenceDataDataService: ReferenceDataDataService,
         private authDataService: AuthDataService,
         private i18nService: I18nService,
-        private dialogService: DialogService,
         private snackbarService: SnackbarService
     ) {
         super(listHelperService);
@@ -115,21 +114,5 @@ export class ReferenceDataCategoriesListComponent extends ListComponent implemen
                     finishCallback(data);
                 })
             );
-    }
-
-    /**
-     * Display loading dialog
-     */
-    showLoadingDialog() {
-        this.loadingDialog = this.dialogService.showLoadingDialog();
-    }
-    /**
-     * Hide loading dialog
-     */
-    closeLoadingDialog() {
-        if (this.loadingDialog) {
-            this.loadingDialog.close();
-            this.loadingDialog = null;
-        }
     }
 }

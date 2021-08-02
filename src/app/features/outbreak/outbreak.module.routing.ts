@@ -7,6 +7,7 @@ import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 import { OutbreakResolver } from './services/outbreak-resolver';
 import { OutbreakQestionnaireTypeEnum } from '../../core/enums/outbreak-qestionnaire-type.enum';
+import { PermissionExpression } from '../../core/models/user.model';
 
 const routes: Routes = [
     // Outbreaks list
@@ -154,6 +155,23 @@ const routes: Routes = [
             permissions: [
                 PERMISSION.OUTBREAK_SEE_INCONSISTENCIES
             ]
+        }
+    },
+
+    // Global entity search result
+    {
+        path: ':outbreakId/search-results',
+        component: fromPages.SearchResultListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: new PermissionExpression({
+                or: [
+                    PERMISSION.CASE_LIST,
+                    PERMISSION.CONTACT_LIST,
+                    PERMISSION.CONTACT_OF_CONTACT_LIST,
+                    PERMISSION.EVENT_LIST
+                ]
+            })
         }
     }
 ];

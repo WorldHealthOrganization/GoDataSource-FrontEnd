@@ -395,7 +395,7 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
         _.each(this.uploadersData, (uploadersData: UploaderData[], questionVariable: string) => {
             if (this.value[questionVariable]) {
                 // init uploaders data
-                _.each(this.value[questionVariable], (answer: IAnswerData, index: number) => {
+                _.each(this.value[questionVariable], (_answer: IAnswerData, index: number) => {
                     // init only if necessary
                     if (uploadersData.length > index) {
                         return;
@@ -458,7 +458,7 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
                     };
 
                     // everything went smoothly ?
-                    uploaderData.uploader.onCompleteItem = (item: FileItem, response: string, status: number) => {
+                    uploaderData.uploader.onCompleteItem = (_item: FileItem, response: string, status: number) => {
                         // finished uploading
                         uploaderData.uploading = false;
 

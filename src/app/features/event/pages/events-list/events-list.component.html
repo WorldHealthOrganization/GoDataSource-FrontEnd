@@ -14,7 +14,9 @@
                 <button
                     *ngIf="!appliedListFilter && (
                         (EventModel.canList(authUser) && EventModel.canListPersonsWithoutRelationships(authUser)) ||
-                        (RelationshipModel.canExport(authUser) && EventModel.canExportRelationships(authUser))
+                        (RelationshipModel.canExport(authUser) && EventModel.canExportRelationships(authUser)) ||
+                        (exportEventsUrl && EventModel.canExport(authUser)) ||
+                        EventModel.canImport(authUser)
                     )"
                     mat-raised-button
                     color="accent"
@@ -29,6 +31,44 @@
                         (click)="navigateToEventsWithoutRelationships()">
                         {{'LNG_PAGE_LIST_EVENTS_ACTION_NO_RELATIONSHIPS_BUTTON' | translate}}
                     </button>
+
+                    <mat-divider
+                        *ngIf="EventModel.canList(authUser) && EventModel.canListPersonsWithoutRelationships(authUser)"></mat-divider>
+
+                    <app-export-button
+                        *ngIf="exportEventsUrl && EventModel.canExport(authUser)"
+                        [menuItem]="true"
+                        [label]="'LNG_PAGE_LIST_EVENTS_EXPORT_BUTTON' | translate"
+                        [message]="'LNG_PAGE_LIST_EVENTS_EXPORT_TITLE' | translate"
+                        [url]="exportEventsUrl"
+                        [fileName]="eventsDataExportFileName"
+                        [allowedExportTypes]="allowedExportTypes"
+                        [displayEncrypt]="true"
+                        [displayAnonymize]="true"
+                        [displayFieldsGroupList]="true"
+                        [displayUseQuestionVariable]="false"
+                        [anonymizeFields]="anonymizeFields"
+                        [fieldsGroupList]="fieldsGroupList"
+                        [fieldsGroupListRequired]="fieldsGroupListRequired"
+                        [queryBuilder]="queryBuilder"
+                        (exportStart)="showLoadingDialog()"
+                        (exportFinished)="closeLoadingDialog()"
+                        (exportProgress)="showExportProgress($event)"
+                        [displayUseDbColumns]="true"
+                        [isAsyncExport]="true">
+                    </app-export-button>
+
+                    <ng-container *app-selected-outbreak-is-active>
+                        <button
+                            *ngIf="EventModel.canImport(authUser)"
+                            mat-menu-item
+                            [routerLink]="['/import-export-data', 'event-data', 'import']">
+                            {{'LNG_PAGE_LIST_EVENTS_IMPORT_BUTTON' | translate}}
+                        </button>
+                    </ng-container>
+
+                    <mat-divider
+                        *ngIf="(exportEventsUrl && EventModel.canExport(authUser)) || EventModel.canImport(authUser)"></mat-divider>
 
                     <button
                         *ngIf="RelationshipModel.canExport(authUser) && EventModel.canExportRelationships(authUser)"
@@ -60,7 +100,8 @@
 
 <!--Total number of records from the list-->
 <app-total-number-of-records
-    [value]="(eventsListCount$ | async)?.count">
+    [value]="eventsListCount$ | async"
+    (showAll)="refreshListCount(false)">
 </app-total-number-of-records>
 
 <mat-card class="page-section page-content">
@@ -135,16 +176,21 @@
                                 {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}
                             </button>
 
-                            <ng-container
-                                *ngIf="RelationshipModel.canExport(authUser) && EventModel.canExportRelationships(authUser)">
-                                <mat-divider></mat-divider>
+                            <mat-divider></mat-divider>
 
-                                <button
-                                    mat-menu-item
-                                    (click)="exportSelectedEventsRelationship()">
-                                    {{ 'LNG_PAGE_LIST_EVENTS_GROUP_ACTION_EXPORT_SELECTED_EVENTS_RELATIONSHIPS' | translate }}
-                                </button>
-                            </ng-container>
+                            <button
+                                *ngIf="exportEventsUrl && EventModel.canExport(authUser)"
+                                mat-menu-item
+                                (click)="exportSelectedEvents()">
+                                {{ 'LNG_PAGE_LIST_EVENTS_GROUP_ACTION_EXPORT_SELECTED_EVENTS' | translate }}
+                            </button>
+
+                            <button
+                                *ngIf="RelationshipModel.canExport(authUser) && EventModel.canExportRelationships(authUser)"
+                                mat-menu-item
+                                (click)="exportSelectedEventsRelationship()">
+                                {{ 'LNG_PAGE_LIST_EVENTS_GROUP_ACTION_EXPORT_SELECTED_EVENTS_RELATIONSHIPS' | translate }}
+                            </button>
                         </mat-menu>
                     </div>
                     <div class="column-filter">
@@ -307,8 +353,8 @@
                             name="locationFilter"
                             [(ngModel)]="filterAddressParentLocationIds"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (itemChanged)="filterByAddress('address', false, filterAddressModel, filterAddressParentLocationIds, true)"
                             multiple="true"
+                            (itemChanged)="filterBySelectField('usualPlaceOfResidenceLocationId.parentLocationIdFilter', filterAddressParentLocationIds, null)"
                             app-reset-input-on-side-filter
                             [useOutbreakLocations]="true">
                         </app-form-location-dropdown>
@@ -628,23 +674,21 @@
         <mat-spinner></mat-spinner>
     </div>
 
+    <!-- No data -->
     <div
         *ngIf="!refreshingList && isEmptyList"
-        class="mat-table"
-    >
-        <div class="mat-row">
-            <div class="mat-cell">
-                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
-            </div>
-        </div>
+        class="empty-table-text">
+        {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
     </div>
 
-    <mat-paginator
+    <!-- Pages (need to be hidden and not ngIf, otherwise it makes a new duplicate request) -->
+    <app-mat-paginator-extended
+        [hidden]="refreshingList || isEmptyList"
         [pageIndex]="pageIndex"
-        [length]="(eventsListCount$ | async)?.count"
+        [countData]="eventsListCount$ | async"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"
         (page)="changePage($event)">
-    </mat-paginator>
+    </app-mat-paginator-extended>
 
 </mat-card>

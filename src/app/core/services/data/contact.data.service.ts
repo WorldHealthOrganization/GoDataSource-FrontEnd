@@ -116,13 +116,11 @@ export class ContactDataService {
      */
     findDuplicates(
         outbreakId: string,
-        contactData: any,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+        contactData: any
     ): Observable<EntityDuplicatesModel> {
-        const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
             this.http.post(
-                `outbreaks/${outbreakId}/contacts/duplicates/find?filter=${filter}`,
+                `outbreaks/${outbreakId}/contacts/duplicates/find`,
                 contactData
             ),
             EntityDuplicatesModel

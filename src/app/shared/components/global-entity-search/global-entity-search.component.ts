@@ -15,6 +15,8 @@ import { LoadingDialogModel } from '../loading-dialog/loading-dialog.component';
 import { DialogService } from '../../../core/services/helper/dialog.service';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { RedirectService } from '../../../core/services/helper/redirect.service';
+import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-global-entity-search',
@@ -44,7 +46,8 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
         private globalEntitySearchDataService: GlobalEntitySearchDataService,
         private outbreakDataService: OutbreakDataService,
         private dialogService: DialogService,
-        private router: Router
+        private router: Router,
+        private redirectService: RedirectService
     ) {
     }
 
@@ -89,8 +92,16 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
         if (!_.isEmpty(fields.globalSearchValue)) {
             if (this.selectedOutbreak.id) {
                 this.showLoadingDialog();
+
                 // search for the entity
-                this.globalEntitySearchDataService.searchEntity(this.selectedOutbreak.id, fields.globalSearchValue)
+                const qb: RequestQueryBuilder = new RequestQueryBuilder();
+                qb.filter.firstLevelConditions();
+                qb.limit(2);
+                this.globalEntitySearchDataService.searchEntity(
+                    this.selectedOutbreak.id,
+                    this.globalSearchValue,
+                    qb
+                )
                     .pipe(
                         catchError((err) => {
                             this.closeLoadingDialog();
@@ -100,18 +111,50 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
                         })
                     )
                     .subscribe((results) => {
-                        if (!_.isEmpty(results)) {
-                            const foundEntity = results[0];
-                            // generate the link for the entity view
-                            const personLink = EntityModel.getPersonLink(foundEntity);
-                            // navigate to the person view page
-                            this.router.navigate([personLink]);
+                        // close side nav
+                        this.closeSideNav();
+
+                        // check the number of results
+                        if (
+                            results &&
+                            results.length > 0
+                        ) {
+                            // if there is a single result, navigate to the entity view page, otherwise display all results in a new page
+                            if (results.length === 1) {
+                                // generate the link for the entity view
+                                const personLink = EntityModel.getPersonLink(results[0]);
+
+                                // navigate to the person view page
+                                this.router.navigate([personLink]);
+
+                                // empty search field
+                                this.globalSearchValue = '';
+
+                                // close side nav
+                                this.closeSideNav();
+
+                                // hide loading
+                                this.closeLoadingDialog();
+                            } else {
+                                // display all results
+                                this.redirectService.to(
+                                    [`/outbreaks/${this.selectedOutbreak.id}/search-results`],
+                                    {
+                                        search: fields.globalSearchValue
+                                    }
+                                );
+
+                                // hide loading
+                                this.closeLoadingDialog();
+                            }
+
                             // empty search field
                             this.globalSearchValue = '';
-                            // close side nav
-                            this.closeSideNav();
                         } else {
                             this.snackbarService.showError('LNG_GLOBAL_ENTITY_SEARCH_NO_ENTITIES_MESSAGE');
+
+                            // hide loading
+                            this.closeLoadingDialog();
 
                             // did user enter a UID?
                             if (fields.globalSearchValue.length === 36) {
@@ -119,7 +162,6 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
                                 this.askCreateCaseWithUID(fields.globalSearchValue);
                             }
                         }
-                        this.closeLoadingDialog();
                     });
 
             }

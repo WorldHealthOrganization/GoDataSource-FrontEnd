@@ -7,7 +7,6 @@ import { ActivatedRoute } from '@angular/router';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
@@ -38,8 +37,7 @@ export class ViewChronologyContactOfContactComponent implements OnInit {
         private contactOfContactDataService: ContactsOfContactsDataService,
         private outbreakDataService: OutbreakDataService,
         private relationshipDataService: RelationshipDataService,
-        private i18nService: I18nService,
-        private authDataService: AuthDataService,
+        private authDataService: AuthDataService
     ) {}
 
     /**
@@ -77,7 +75,6 @@ export class ViewChronologyContactOfContactComponent implements OnInit {
                                     ).subscribe((relationshipsData) => {
                                     // set data
                                     this.chronologyEntries = ContactOfContactChronology.getChronologyEntries(
-                                        this.i18nService,
                                         this.contactOfContactData,
                                         relationshipsData
                                     );

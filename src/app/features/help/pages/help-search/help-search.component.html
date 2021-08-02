@@ -17,6 +17,7 @@
 
 <!-- Side columns -->
 <app-side-columns
+    [tableColumnsUserSettingsKey]="UserSettings.HELP_SEARCH"
     [tableColumns]="tableColumns"
     (visibleColumnsChanged)="applySideColumnsChanged($event)">
 </app-side-columns>
@@ -100,15 +101,11 @@
         <mat-spinner></mat-spinner>
     </div>
 
+    <!-- No data -->
     <div
         *ngIf="!refreshingList && isEmptyList"
-        class="mat-table"
-    >
-        <div class="mat-row">
-            <div class="mat-cell">
-                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
-            </div>
-        </div>
+        class="empty-table-text">
+        {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
     </div>
 
 </mat-card>

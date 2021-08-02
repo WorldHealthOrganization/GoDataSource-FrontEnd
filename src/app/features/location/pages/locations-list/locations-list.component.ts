@@ -9,7 +9,7 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { DialogAnswerButton, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
+import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import * as _ from 'lodash';
@@ -66,8 +66,6 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
 
     // export
     hierarchicalLocationsDataExportFileName: string = moment().format('YYYY-MM-DD');
-
-    loadingDialog: LoadingDialogModel;
 
     geographicalLevelsList$: Observable<any[]>;
 
@@ -375,22 +373,6 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
             // redirect
             this.locationFilter.clear();
             this.router.navigate(['/locations', data.id, 'children']);
-        }
-    }
-
-    /**
-     * Display loading dialog
-     */
-    showLoadingDialog() {
-        this.loadingDialog = this.dialogService.showLoadingDialog();
-    }
-    /**
-     * Hide loading dialog
-     */
-    closeLoadingDialog() {
-        if (this.loadingDialog) {
-            this.loadingDialog.close();
-            this.loadingDialog = null;
         }
     }
 

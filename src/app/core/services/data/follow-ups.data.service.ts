@@ -79,8 +79,7 @@ export class FollowUpsDataService {
      */
     getFollowUpsList(
         outbreakId: string,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(),
-        needsContactData: boolean = true
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<FollowUpModel[]> {
         // construct query
         const filter = queryBuilder.buildQuery();
@@ -155,14 +154,12 @@ export class FollowUpsDataService {
     /**
      * Retrieve Follow-up of a Contact
      * @param {string} outbreakId
-     * @param {string} contactId
      * @param {string} followUpId
      * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<FollowUpModel>}
      */
     getFollowUp(
         outbreakId: string,
-        contactId: string,
         followUpId: string,
         retrieveCreatedUpdatedBy?: boolean
     ): Observable<FollowUpModel> {

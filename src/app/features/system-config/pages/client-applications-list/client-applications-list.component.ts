@@ -8,7 +8,7 @@ import { SystemSettingsModel } from '../../../../core/models/system-settings.mod
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
-import { DialogAnswer, DialogAnswerButton, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
+import { DialogAnswer, DialogAnswerButton, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { SystemClientApplicationModel } from '../../../../core/models/system-client-application.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -29,8 +29,11 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
     templateUrl: './client-applications-list.component.html',
     styleUrls: ['./client-applications-list.component.less']
 })
-export class ClientApplicationsListComponent extends ListComponent implements OnInit, OnDestroy {
-    // Breadcrumbs
+export class ClientApplicationsListComponent
+    extends ListComponent
+    implements OnInit, OnDestroy {
+
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_TITLE', '.', true)
     ];
@@ -41,7 +44,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
     // client applications servers
     clientApplicationsServerList: SystemClientApplicationModel[] = [];
     clientApplicationsServerListCount: IBasicCount;
-    clientApplicationsServerListAll: SystemClientApplicationModel[] = [];
+    clientApplicationsServerListAll: SystemClientApplicationModel[];
 
     // settings
     settings: SystemSettingsModel;
@@ -49,8 +52,6 @@ export class ClientApplicationsListComponent extends ListComponent implements On
     // constants
     UserSettings = UserSettings;
     SystemClientApplicationModel = SystemClientApplicationModel;
-
-    loadingDialog: LoadingDialogModel;
 
     recordActions: HoverRowAction[] = [
         // Download Client Application Conf File
@@ -199,7 +200,8 @@ export class ClientApplicationsListComponent extends ListComponent implements On
      */
     refreshList(finishCallback: (records: any[]) => void) {
         this.clientApplicationsServerList = [];
-        this.clientApplicationsServerListAll = [];
+        this.clientApplicationsServerListAll = undefined;
+        this.refreshListCount();
 
         const outbreaksList$: Observable<OutbreakModel[]> = OutbreakModel.canList(this.authUser) ?
             this.outbreakDataService.getOutbreaksListReduced() :
@@ -267,9 +269,9 @@ export class ClientApplicationsListComponent extends ListComponent implements On
      */
     refreshListCount() {
         this.clientApplicationsServerListCount = {
-            count: this.clientApplicationsServerListAll ?
+            count: this.clientApplicationsServerListAll !== undefined ?
                 this.clientApplicationsServerListAll.length :
-                0
+                null
         };
     }
 
@@ -453,22 +455,5 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                 this.closeLoadingDialog();
             }
         });
-    }
-
-    /**
-     * Display loading dialog
-     */
-    showLoadingDialog() {
-        this.loadingDialog = this.dialogService.showLoadingDialog();
-    }
-
-    /**
-     * Hide loading dialog
-     */
-    closeLoadingDialog() {
-        if (this.loadingDialog) {
-            this.loadingDialog.close();
-            this.loadingDialog = null;
-        }
     }
 }

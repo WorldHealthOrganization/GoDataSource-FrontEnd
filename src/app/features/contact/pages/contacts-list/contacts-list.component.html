@@ -48,7 +48,10 @@
                         [fieldsGroupListRequired]="fieldsGroupListRequired"
                         [queryBuilder]="queryBuilder"
                         (exportStart)="showLoadingDialog()"
-                        (exportFinished)="closeLoadingDialog()">
+                        (exportFinished)="closeLoadingDialog()"
+                        (exportProgress)="showExportProgress($event)"
+                        [displayUseDbColumns]="true"
+                        [isAsyncExport]="true">
                     </app-export-button>
 
                     <button
@@ -122,7 +125,8 @@
 <div fxLayout fxLayoutAlign="space-between end">
     <!--Total number of records from the list-->
     <app-total-number-of-records
-        [value]="(contactsListCount$ | async)?.count">
+        [value]="contactsListCount$ | async"
+        (showAll)="refreshListCount(false)">
     </app-total-number-of-records>
 
     <!--Contacts grouped by risk level-->
@@ -138,7 +142,7 @@
             *ngIf="!appliedListFilter"
             fxFlex
             [items]="countedContactsByRiskLevel$ | async"
-            (optionChanged)="$event.label === 'LNG_REFERENCE_DATA_CATEGORY_RISK_LEVEL_UNCLASSIFIED' ? filterByBooleanField('riskLevel', false) : filterByEquality('riskLevel',  $event.label)">
+            (optionChanged)="$event.label === 'LNG_REFERENCE_DATA_CATEGORY_RISK_LEVEL_UNCLASSIFIED' ? filterByNotHavingValue('riskLevel') : filterByEquality('riskLevel',  $event.label)">
         </app-counted-items-list>
     </ng-template>
 </div>
@@ -511,7 +515,7 @@
                             [(ngModel)]="filterAddressParentLocationIds"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             multiple="true"
-                            (itemChanged)="filterByAddress('addresses', true, filterAddressModel, filterAddressParentLocationIds)"
+                            (itemChanged)="filterBySelectField('usualPlaceOfResidenceLocationId.parentLocationIdFilter', filterAddressParentLocationIds, null)"
                             app-reset-location-on-side-filter
                             [useOutbreakLocations]="true">
                         </app-form-location-dropdown>
@@ -1017,23 +1021,21 @@
         <mat-spinner></mat-spinner>
     </div>
 
+    <!-- No data -->
     <div
         *ngIf="!refreshingList && isEmptyList"
-        class="mat-table"
-    >
-        <div class="mat-row">
-            <div class="mat-cell">
-                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
-            </div>
-        </div>
+        class="empty-table-text">
+        {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
     </div>
 
-    <mat-paginator
+    <!-- Pages (need to be hidden and not ngIf, otherwise it makes a new duplicate request) -->
+    <app-mat-paginator-extended
+        [hidden]="refreshingList || isEmptyList"
         [pageIndex]="pageIndex"
-        [length]="(contactsListCount$ | async)?.count"
+        [countData]="contactsListCount$ | async"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"
         (page)="changePage($event)">
-    </mat-paginator>
+    </app-mat-paginator-extended>
 
 </mat-card>

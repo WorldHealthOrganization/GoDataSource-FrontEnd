@@ -8,7 +8,7 @@ import { DialogService, ExportDataExtension } from '../../../../core/services/he
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { LanguageDataService } from '../../../../core/services/data/language.data.service';
 import { LanguageModel } from '../../../../core/models/language.model';
-import { DialogAnswer, DialogAnswerButton, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
+import { DialogAnswer, DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { TopnavComponent } from '../../../../shared/components/topnav/topnav.component';
 import { catchError, share, tap } from 'rxjs/operators';
@@ -24,7 +24,11 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
     templateUrl: './languages-list.component.html',
     styleUrls: ['./languages-list.component.less']
 })
-export class LanguagesListComponent extends ListComponent implements OnInit, OnDestroy {
+export class LanguagesListComponent
+    extends ListComponent
+    implements OnInit, OnDestroy {
+
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_LANGUAGES_TITLE', '.', true)
     ];
@@ -41,8 +45,6 @@ export class LanguagesListComponent extends ListComponent implements OnInit, OnD
 
     @ViewChild('topNav', { static: true }) topNav: TopnavComponent;
 
-    loadingDialog: LoadingDialogModel;
-
     recordActions: HoverRowAction[] = [
         // View Language
         new HoverRowAction({
@@ -51,7 +53,7 @@ export class LanguagesListComponent extends ListComponent implements OnInit, OnD
             linkGenerator: (item: LanguageModel): string[] => {
                 return ['/languages', item.id, 'view'];
             },
-            visible: (item: LanguageModel): boolean => {
+            visible: (): boolean => {
                 return LanguageModel.canView(this.authUser);
             }
         }),
@@ -103,7 +105,7 @@ export class LanguagesListComponent extends ListComponent implements OnInit, OnD
                     click: (item: LanguageModel) => {
                         this.downloadLanguage(item);
                     },
-                    visible: (item: LanguageModel): boolean => {
+                    visible: (): boolean => {
                         return LanguageModel.canExportTokens(this.authUser);
                     }
                 }),
@@ -254,21 +256,5 @@ export class LanguagesListComponent extends ListComponent implements OnInit, OnD
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });
-    }
-
-    /**
-     * Display loading dialog
-     */
-    showLoadingDialog() {
-        this.loadingDialog = this.dialogService.showLoadingDialog();
-    }
-    /**
-     * Hide loading dialog
-     */
-    closeLoadingDialog() {
-        if (this.loadingDialog) {
-            this.loadingDialog.close();
-            this.loadingDialog = null;
-        }
     }
 }

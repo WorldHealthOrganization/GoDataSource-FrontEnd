@@ -258,26 +258,25 @@ export class ListFilterDataService {
 
         // compare isolation dates start and end with current date
         filterQueryBuilder.filter.where({
-            [RequestFilterOperator.AND]: [
-                {
-                    'dateRanges.typeId': DateType.ISOLATION_DATE
-                },
-                {
-                    'dateRanges.startDate': {
-                        lte: moment(date).endOf('day').toISOString()
-                    }
-                }, {
-                    [RequestFilterOperator.OR]: [{
-                        'dateRanges.endDate': {
-                            eq: null
+            dateRanges: {
+                elemMatch: {
+                    typeId: DateType.ISOLATION_DATE,
+                    startDate: {
+                        $lte: moment(date).endOf('day').toISOString()
+                    },
+                    $or: [
+                        {
+                            endDate: {
+                                $eq: null
+                            }
+                        }, {
+                            endDate: {
+                                $gte: moment(date).endOf('day').toISOString()
+                            }
                         }
-                    }, {
-                        'dateRanges.endDate': {
-                            gte: moment(date).startOf('day').toISOString()
-                        }
-                    }]
+                    ]
                 }
-            ]
+            }
         }, true);
 
         // finished

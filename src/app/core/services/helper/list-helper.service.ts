@@ -7,6 +7,7 @@ import { Location } from '@angular/common';
 import { StorageService } from './storage.service';
 import { AuthDataService } from '../data/auth.data.service';
 import { OutbreakDataService } from '../data/outbreak.data.service';
+import { DialogService } from './dialog.service';
 
 @Injectable()
 export class ListHelperService {
@@ -23,7 +24,8 @@ export class ListHelperService {
         public location: Location,
         public storageService: StorageService,
         public authDataService: AuthDataService,
-        public outbreakDataService: OutbreakDataService
+        public outbreakDataService: OutbreakDataService,
+        public dialogService: DialogService
     ) {}
 
     /**

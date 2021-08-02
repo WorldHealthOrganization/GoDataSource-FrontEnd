@@ -58,11 +58,11 @@ export class ReferenceDataCategoryModel
     /**
      * Static Permissions - IPermissionBasic
      */
-    static canView(user: UserModel): boolean { return false; }
+    static canView(): boolean { return false; }
     static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.REFERENCE_DATA_LIST) : false; }
-    static canCreate(user: UserModel): boolean { return false; }
-    static canModify(user: UserModel): boolean { return false; }
-    static canDelete(user: UserModel): boolean { return false; }
+    static canCreate(): boolean { return false; }
+    static canModify(): boolean { return false; }
+    static canDelete(): boolean { return false; }
 
     /**
      * Static Permissions - IPermissionExportable
@@ -87,11 +87,11 @@ export class ReferenceDataCategoryModel
     /**
      * Permissions - IPermissionBasic
      */
-    canView(user: UserModel): boolean { return ReferenceDataCategoryModel.canView(user); }
+    canView(): boolean { return ReferenceDataCategoryModel.canView(); }
     canList(user: UserModel): boolean { return ReferenceDataCategoryModel.canList(user); }
-    canCreate(user: UserModel): boolean { return ReferenceDataCategoryModel.canCreate(user); }
-    canModify(user: UserModel): boolean { return ReferenceDataCategoryModel.canModify(user); }
-    canDelete(user: UserModel): boolean { return ReferenceDataCategoryModel.canDelete(user); }
+    canCreate(): boolean { return ReferenceDataCategoryModel.canCreate(); }
+    canModify(): boolean { return ReferenceDataCategoryModel.canModify(); }
+    canDelete(): boolean { return ReferenceDataCategoryModel.canDelete(); }
 
     /**
      * Permissions - IPermissionExportable

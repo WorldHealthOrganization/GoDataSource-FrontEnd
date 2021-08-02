@@ -16,17 +16,42 @@ import { LoadingDialogComponent, LoadingDialogDataModel, LoadingDialogModel } fr
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { IExportFieldsGroupRequired } from '../../../core/models/export-fields-group.model';
+import { ExportLogDataService } from '../data/export-log.data.service';
+import { Constants, ExportStatusStep } from '../../models/constants';
+import { Moment } from 'moment';
+import * as moment from 'moment';
 
+/**
+ * Export accepted extensions
+ */
 export enum ExportDataExtension {
     CSV = 'csv',
     XLS = 'xls',
     XLSX = 'xlsx',
-    XML = 'xml',
     ODS = 'ods',
     JSON = 'json',
     PDF = 'pdf',
     ZIP = 'zip',
     QR = 'qr'
+}
+
+/**
+ * Async response
+ */
+export interface IAsyncExportResponse {
+    exportLogId: string;
+}
+
+/**
+ * Dialog Progress Answer
+ */
+export class DialogExportProgressAnswer {
+    constructor(
+        public readonly step: ExportStatusStep,
+        public readonly processed: number,
+        public readonly total: number,
+        public readonly estimatedEndDate: Moment
+    ) {}
 }
 
 @Injectable()
@@ -37,7 +62,8 @@ export class DialogService {
     constructor(
         private dialog: MatDialog,
         private importExportDataService: ImportExportDataService,
-        private snackbarService: SnackbarService
+        private snackbarService: SnackbarService,
+        private exportLogDataService: ExportLogDataService
     ) {}
 
     /**
@@ -147,6 +173,10 @@ export class DialogService {
         fileName: string,
 
         // optional
+        isAsyncExport?: boolean,
+        exportProgress?: (
+            data: DialogExportProgressAnswer
+        ) => void,
         exportStart?: () => void,
         exportFinished?: (answer: DialogAnswer) => void,
         extensionPlaceholder?: string,
@@ -167,6 +197,11 @@ export class DialogService {
         displayUseQuestionVariable?: boolean,
         useQuestionVariablePlaceholder?: string,
         useQuestionVariableDescription?: string,
+        displayUseDbColumns?: boolean,
+        useDbColumnsPlaceholder?: string,
+        useDbColumnsDescription?: string,
+        useDbColumnsDontTranslateValuePlaceholder?: string,
+        useDbColumnsDontTranslateValueDescription?: string,
         yesLabel?: string,
         queryBuilder?: RequestQueryBuilder,
         queryBuilderClearOthers?: string[],
@@ -189,7 +224,6 @@ export class DialogService {
                     ExportDataExtension.CSV,
                     ExportDataExtension.XLS,
                     ExportDataExtension.XLSX,
-                    ExportDataExtension.XML,
                     ExportDataExtension.ODS,
                     ExportDataExtension.JSON
                 ];
@@ -205,6 +239,22 @@ export class DialogService {
 
         if (!data.useQuestionVariableDescription) {
             data.useQuestionVariableDescription = 'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE_DESCRIPTION';
+        }
+
+        if (!data.useDbColumnsPlaceholder) {
+            data.useDbColumnsPlaceholder = 'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS';
+        }
+
+        if (!data.useDbColumnsDescription) {
+            data.useDbColumnsDescription = 'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS_DESCRIPTION';
+        }
+
+        if (!data.useDbColumnsDontTranslateValuePlaceholder) {
+            data.useDbColumnsDontTranslateValuePlaceholder = 'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS_NO_TRANSLATED_VALUES';
+        }
+
+        if (!data.useDbColumnsDontTranslateValueDescription) {
+            data.useDbColumnsDontTranslateValueDescription = 'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS_NO_TRANSLATED_VALUES_DESCRIPTION';
         }
 
         if (!data.anonymizePlaceholder) {
@@ -243,6 +293,7 @@ export class DialogService {
         }
 
         // construct list of inputs that we need in the dialog
+        const fieldsListLayout: number[] = [40];
         let fieldsList: DialogField[] = [
             new DialogField({
                 name: data.allowedExportTypesKey,
@@ -262,6 +313,7 @@ export class DialogService {
 
         // add encrypt password
         if (data.displayEncrypt) {
+            fieldsListLayout.push(60);
             fieldsList.push(
                 new DialogField({
                     name: 'encryptPassword',
@@ -277,6 +329,7 @@ export class DialogService {
 
         // add encrypt anonymize fields
         if (data.displayAnonymize) {
+            fieldsListLayout.push(100);
             fieldsList.push(
                 new DialogField({
                     name: data.anonymizeFieldsKey,
@@ -289,6 +342,7 @@ export class DialogService {
 
         // add export fields Groups
         if (data.displayFieldsGroupList) {
+            fieldsListLayout.push(100);
             fieldsList.push(
                 new DialogField({
                     name: 'fieldsGroupAll',
@@ -298,6 +352,7 @@ export class DialogService {
                 })
             );
 
+            fieldsListLayout.push(100);
             fieldsList.push(
                 new DialogField({
                     name: 'fieldsGroupList',
@@ -322,19 +377,53 @@ export class DialogService {
         }
 
         // add field for use question variable
+        if (data.displayUseDbColumns) {
+            // use db columns
+            fieldsListLayout.push(100);
+            fieldsList.push(
+                new DialogField({
+                    name: 'useDbColumns',
+                    placeholder: data.useDbColumnsPlaceholder,
+                    fieldType: DialogFieldType.BOOLEAN,
+                    description: data.useDbColumnsDescription
+                })
+            );
+
+            // db columns values
+            fieldsListLayout.push(100);
+            fieldsList.push(
+                new DialogField({
+                    name: 'dontTranslateValues',
+                    placeholder: data.useDbColumnsDontTranslateValuePlaceholder,
+                    fieldType: DialogFieldType.BOOLEAN,
+                    description: data.useDbColumnsDontTranslateValueDescription,
+                    visible: (dialogFieldsValues: any): boolean => {
+                        return !!dialogFieldsValues.useDbColumns;
+                    }
+                })
+            );
+        }
+
+        // add field for use question variable
         if (data.displayUseQuestionVariable) {
+            fieldsListLayout.push(100);
             fieldsList.push(
                 new DialogField({
                     name: 'useQuestionVariable',
                     placeholder: data.useQuestionVariablePlaceholder,
                     fieldType: DialogFieldType.BOOLEAN,
-                    description: data.useQuestionVariableDescription
+                    description: data.useQuestionVariableDescription,
+                    visible: (dialogFieldsValues: any): boolean => {
+                        return !dialogFieldsValues.useDbColumns;
+                    }
                 })
             );
         }
 
         // add custom fields to dialog
         if (data.extraDialogFields) {
+            // make sure we fill
+            fieldsListLayout.push(100);
             fieldsList = [
                 ...fieldsList,
                 ...data.extraDialogFields
@@ -361,7 +450,8 @@ export class DialogService {
         this.showInput(new DialogConfiguration({
             message: data.message,
             yesLabel: data.yesLabel,
-            fieldsList: fieldsList
+            fieldsList: fieldsList,
+            fieldsListLayout
         }))
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
@@ -384,7 +474,10 @@ export class DialogService {
                                     answer.inputValue.value,
                                     data.extraAPIData
                                 ),
-                                qb
+                                qb,
+                                data.isAsyncExport ?
+                                    'json' :
+                                    'blob'
                             ) :
                             this.importExportDataService.exportData(
                                 data.url,
@@ -392,7 +485,10 @@ export class DialogService {
                                     answer.inputValue.value,
                                     data.extraAPIData
                                 ),
-                                qb
+                                qb,
+                                data.isAsyncExport ?
+                                    'json' :
+                                    'blob'
                             )
                     )
                         .pipe(
@@ -407,15 +503,138 @@ export class DialogService {
                                 return throwError(err);
                             })
                         )
-                        .subscribe((blob) => {
-                            FileSaver.saveAs(
-                                blob,
-                                `${data.fileName}.${data.fileExtension ? data.fileExtension : answer.inputValue.value[data.allowedExportTypesKey]}`
-                            );
+                        .subscribe((blobOrJson) => {
+                            // if not async then we should have file data, send it to browser download
+                            if (!data.isAsyncExport) {
+                                // save file
+                                FileSaver.saveAs(
+                                    blobOrJson as Blob,
+                                    `${data.fileName}.${data.fileExtension ? data.fileExtension : answer.inputValue.value[data.allowedExportTypesKey]}`
+                                );
 
-                            // call dialog closed
-                            if (data.exportFinished) {
-                                data.exportFinished(answer);
+                                // call dialog closed
+                                if (data.exportFinished) {
+                                    data.exportFinished(answer);
+                                }
+                            } else {
+                                // handler to check status periodically
+                                let startTime: Moment;
+                                let processedErrorForCorrectTime: number = 0;
+                                const checkStatusPeriodically = () => {
+                                    this.exportLogDataService
+                                        .getExportLog((blobOrJson as IAsyncExportResponse).exportLogId)
+                                        .pipe(
+                                            catchError((err) => {
+                                                this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
+
+                                                // call dialog closed
+                                                if (data.exportFinished) {
+                                                    data.exportFinished(answer);
+                                                }
+
+                                                return throwError(err);
+                                            })
+                                        )
+                                        .subscribe((exportLogModel) => {
+                                            // determine end estimated date
+                                            let estimatedEndDate: Moment;
+                                            if (exportLogModel.processedNo > 0) {
+                                                // initialize start time if necessary
+                                                if (!startTime) {
+                                                    startTime = moment();
+                                                    processedErrorForCorrectTime = exportLogModel.processedNo;
+                                                }
+
+                                                // determine estimated time
+                                                const processed: number = exportLogModel.processedNo - processedErrorForCorrectTime;
+                                                const total: number = exportLogModel.totalNo - processedErrorForCorrectTime;
+                                                if (processed > 0) {
+                                                    const processedSoFarTimeMs: number = moment().diff(startTime);
+                                                    const requiredTimeForAllMs: number = processedSoFarTimeMs * total / processed;
+                                                    const remainingTimeMs = requiredTimeForAllMs - processedSoFarTimeMs;
+                                                    estimatedEndDate = moment().add(remainingTimeMs, 'ms');
+                                                }
+                                            }
+
+                                            // update progress
+                                            if (data.exportProgress) {
+                                                data.exportProgress(new DialogExportProgressAnswer(
+                                                    exportLogModel.statusStep,
+                                                    exportLogModel.processedNo,
+                                                    exportLogModel.totalNo,
+                                                    estimatedEndDate
+                                                ));
+                                            }
+
+                                            // check if we still need to wait for data to be processed
+                                            if (exportLogModel.status === Constants.SYSTEM_SYNC_LOG_STATUS.IN_PROGRESS.value) {
+                                                // wait
+                                                setTimeout(() => {
+                                                    checkStatusPeriodically();
+                                                }, 3000);
+
+                                                // finished
+                                                return;
+                                            }
+
+
+                                            // finished everything with success ?
+                                            if (exportLogModel.status === Constants.SYSTEM_SYNC_LOG_STATUS.SUCCESS.value) {
+                                                this.exportLogDataService
+                                                    .download(exportLogModel.id)
+                                                    .pipe(
+                                                        catchError((err) => {
+                                                            this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
+
+                                                            // call dialog closed
+                                                            if (data.exportFinished) {
+                                                                data.exportFinished(answer);
+                                                            }
+
+                                                            return throwError(err);
+                                                        })
+                                                    )
+                                                    .subscribe((dataBlob) => {
+                                                        // update progress message
+                                                        data.exportProgress(new DialogExportProgressAnswer(
+                                                            exportLogModel.statusStep,
+                                                            exportLogModel.processedNo,
+                                                            exportLogModel.totalNo,
+                                                            undefined
+                                                        ));
+
+                                                        // save file
+                                                        FileSaver.saveAs(
+                                                            dataBlob,
+                                                            `${data.fileName}.${exportLogModel.extension}`
+                                                        );
+
+                                                        // call dialog closed
+                                                        if (data.exportFinished) {
+                                                            data.exportFinished(answer);
+                                                        }
+                                                    });
+                                            }
+
+                                            // process errors
+                                            if (exportLogModel.status === Constants.SYSTEM_SYNC_LOG_STATUS.FAILED.value) {
+                                                // error exporting data
+                                                this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
+
+                                                // call dialog closed
+                                                if (data.exportFinished) {
+                                                    data.exportFinished(answer);
+                                                }
+
+                                                // finished
+                                                return;
+                                            }
+
+                                        });
+                                };
+
+                                // update status periodically
+                                checkStatusPeriodically();
                             }
                         });
                 } else {

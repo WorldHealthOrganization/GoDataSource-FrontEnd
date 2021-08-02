@@ -21,7 +21,7 @@ import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { catchError, share, tap } from 'rxjs/operators';
 import { Constants } from '../../../../core/models/constants';
-import { HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
+import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
@@ -51,6 +51,9 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
     // entity
     personType: EntityType;
     entityData: CaseModel | ContactModel;
+    get entityDataAsCaseModel(): CaseModel {
+        return this.entityData as CaseModel;
+    }
 
     initialCaseClassification: string;
 
@@ -60,9 +63,6 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
     // list of export fields groups
     fieldsGroupList: LabelValuePair[];
     fieldsGroupListRequired: IExportFieldsGroupRequired;
-
-    // loading dialog handler
-    loadingDialog: LoadingDialogModel;
 
     // selected Outbreak
     selectedOutbreak: OutbreakModel;
@@ -105,7 +105,6 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
         ExportDataExtension.CSV,
         ExportDataExtension.XLS,
         ExportDataExtension.XLSX,
-        ExportDataExtension.XML,
         ExportDataExtension.JSON,
         ExportDataExtension.ODS,
         ExportDataExtension.PDF
@@ -134,16 +133,16 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_VIEW_LAB_RESULT',
             linkGenerator: (item: LabResultModel): string[] => {
-                return ['/lab-results', EntityModel.getLinkForEntityType(item.personType), item.personId, item.id, 'view'];
+                return ['/lab-results', EntityModel.getLinkForEntityType(this.personType), item.personId, item.id, 'view'];
             },
             visible: (item: LabResultModel): boolean => {
                 return !item.deleted &&
                     LabResultModel.canView(this.authUser) && (
                         (
-                            item.personType === EntityType.CASE &&
+                            this.personType === EntityType.CASE &&
                             CaseModel.canViewLabResult(this.authUser)
                         ) || (
-                            item.personType === EntityType.CONTACT &&
+                            this.personType === EntityType.CONTACT &&
                             ContactModel.canViewLabResult(this.authUser)
                         )
                     );
@@ -155,7 +154,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_MODIFY_LAB_RESULT',
             linkGenerator: (item: LabResultModel): string[] => {
-                return ['/lab-results', EntityModel.getLinkForEntityType(item.personType), item.personId, item.id, 'modify'];
+                return ['/lab-results', EntityModel.getLinkForEntityType(this.personType), item.personId, item.id, 'modify'];
             },
             visible: (item: LabResultModel): boolean => {
                 return !item.deleted &&
@@ -164,10 +163,10 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
                     this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
                     LabResultModel.canModify(this.authUser) && (
                         (
-                            item.personType === EntityType.CASE &&
+                            this.personType === EntityType.CASE &&
                             CaseModel.canModifyLabResult(this.authUser)
                         ) || (
-                            item.personType === EntityType.CONTACT &&
+                            this.personType === EntityType.CONTACT &&
                             ContactModel.canModifyLabResult(this.authUser)
                         )
                     );
@@ -192,10 +191,10 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
                             LabResultModel.canDelete(this.authUser) && (
                                 (
-                                    item.personType === EntityType.CASE &&
+                                    this.personType === EntityType.CASE &&
                                     CaseModel.canDeleteLabResult(this.authUser)
                                 ) || (
-                                    item.personType === EntityType.CONTACT &&
+                                    this.personType === EntityType.CONTACT &&
                                     ContactModel.canDeleteLabResult(this.authUser)
                                 )
                             );
@@ -214,10 +213,10 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
                             LabResultModel.canDelete(this.authUser) && (
                                 (
-                                    item.personType === EntityType.CASE &&
+                                    this.personType === EntityType.CASE &&
                                     CaseModel.canDeleteLabResult(this.authUser)
                                 ) || (
-                                    item.personType === EntityType.CONTACT &&
+                                    this.personType === EntityType.CONTACT &&
                                     ContactModel.canDeleteLabResult(this.authUser)
                                 )
                             );
@@ -249,10 +248,10 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
                             LabResultModel.canRestore(this.authUser) && (
                                 (
-                                    item.personType === EntityType.CASE &&
+                                    this.personType === EntityType.CASE &&
                                     CaseModel.canRestoreLabResult(this.authUser)
                                 ) || (
-                                    item.personType === EntityType.CONTACT &&
+                                    this.personType === EntityType.CONTACT &&
                                     ContactModel.canRestoreLabResult(this.authUser)
                                 )
                             );
@@ -649,16 +648,31 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
     /**
      * Get total number of items, based on the applied filters
      */
-    refreshListCount() {
+    refreshListCount(applyHasMoreLimit?: boolean) {
         if (
             this.selectedOutbreak &&
             this.personType &&
             this.entityData
         ) {
+            // set apply value
+            if (applyHasMoreLimit !== undefined) {
+                this.applyHasMoreLimit = applyHasMoreLimit;
+            }
+
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
+
+            // apply has more limit
+            if (this.applyHasMoreLimit) {
+                countQueryBuilder.flag(
+                    'applyHasMoreLimit',
+                    true
+                );
+            }
+
+            // count
             this.labResultsListCount$ = this.labResultDataService
                 .getEntityLabResultsCount(this.selectedOutbreak.id, EntityModel.getLinkForEntityType(this.personType), this.entityData.id, countQueryBuilder)
                 .pipe(
@@ -770,22 +784,5 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
                     }
                 }
             });
-    }
-
-    /**
-     * Display loading dialog
-     */
-    showLoadingDialog() {
-        this.loadingDialog = this.dialogService.showLoadingDialog();
-    }
-
-    /**
-     * Hide loading dialog
-     */
-    closeLoadingDialog() {
-        if (this.loadingDialog) {
-            this.loadingDialog.close();
-            this.loadingDialog = null;
-        }
     }
 }

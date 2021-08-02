@@ -9,7 +9,7 @@ import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { DialogAnswerButton, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
+import { DialogAnswerButton, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogConfiguration } from '../../../../shared/components/dialog/dialog.component';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
@@ -1056,8 +1056,13 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     /**
      * Get total number of items, based on the applied filters
      */
-    refreshListCount() {
+    refreshListCount(applyHasMoreLimit?: boolean) {
         if (this.selectedOutbreak) {
+            // set apply value
+            if (applyHasMoreLimit !== undefined) {
+                this.applyHasMoreLimit = applyHasMoreLimit;
+            }
+
             // include related people in response
             const qb = new RequestQueryBuilder();
             qb.merge(this.queryBuilder);
@@ -1071,6 +1076,16 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             const countQueryBuilder = _.cloneDeep(qb);
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
+
+            // apply has more limit
+            if (this.applyHasMoreLimit) {
+                countQueryBuilder.flag(
+                    'applyHasMoreLimit',
+                    true
+                );
+            }
+
+            // count
             this.followUpsListCount$ = this.followUpsDataService
                 .getFollowUpsCount(this.selectedOutbreak.id, countQueryBuilder)
                 .pipe(
@@ -1157,7 +1172,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                     .subscribe((answer: DialogAnswer) => {
                         if (answer.button === DialogAnswerButton.Yes) {
                             // display loading
-                            const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
+                            this.showLoadingDialog();
 
                             // generate follow-ups
                             this.followUpsDataService
@@ -1173,7 +1188,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                                 .pipe(
                                     catchError((err) => {
                                         // hide loading
-                                        loadingDialog.close();
+                                        this.closeLoadingDialog();
 
                                         // error
                                         this.snackbarService.showApiError(err);
@@ -1182,7 +1197,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                                 )
                                 .subscribe(() => {
                                     // hide loading
-                                    loadingDialog.close();
+                                    this.closeLoadingDialog();
 
                                     // finished
                                     this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');

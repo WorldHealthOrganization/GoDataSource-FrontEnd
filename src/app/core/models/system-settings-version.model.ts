@@ -21,6 +21,12 @@ export class SystemSettingsVersionModel {
             fontSize: string
         }
     };
+    duplicate: {
+        disableCaseDuplicateCheck: boolean,
+        disableContactDuplicateCheck: boolean,
+        disableContactOfContactDuplicateCheck: boolean,
+        executeCheckOnlyOnDuplicateDataChange: boolean
+    };
 
     /**
      * Constructor
@@ -34,5 +40,13 @@ export class SystemSettingsVersionModel {
         this.skipOldPasswordForUserModify = _.get(data, 'skipOldPasswordForUserModify');
         this.captcha = new CaptchaConfigModel(_.get(data, 'captcha'));
         this.demoInstance = _.get(data, 'demoInstance');
+
+        // duplicate checks
+        this.duplicate = {
+            disableCaseDuplicateCheck: _.get(data, 'duplicate.disableCaseDuplicateCheck', false),
+            disableContactDuplicateCheck: _.get(data, 'duplicate.disableContactDuplicateCheck', false),
+            disableContactOfContactDuplicateCheck: _.get(data, 'duplicate.disableContactOfContactDuplicateCheck', false),
+            executeCheckOnlyOnDuplicateDataChange: _.get(data, 'duplicate.executeCheckOnlyOnDuplicateDataChange', false)
+        };
     }
 }
