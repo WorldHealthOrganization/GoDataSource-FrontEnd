@@ -12,6 +12,10 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
+        /**
+         * uiDialogs
+         */
+        'LNG_DIALOG_CONFIRM_LOCATION_USED': 'Location \'{{name}}\' and its sub-locations can\'t be removed because they are used, do you want to see where?',
 
 
         /**

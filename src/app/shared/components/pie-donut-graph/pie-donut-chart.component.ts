@@ -32,6 +32,7 @@ export class PieDonutChartData {
     readonly key: string;
     readonly label: string;
     readonly value: number;
+    readonly valueText: string;
     readonly id: string;
     color: string;
     checked: boolean = true;
@@ -82,6 +83,11 @@ export class PieDonutChartData {
 
         // generate unique id
         this.id = uuid();
+
+        // convert value to text
+        this.valueText = this.value ?
+            this.value.toLocaleString('en') :
+            '0';
     }
 }
 
@@ -232,7 +238,8 @@ export class PieDonutChartComponent
         },
         dataToRender: PieDonutChartData[],
         rendered: {
-            total: number
+            totalNo: number,
+            total: string
         }
     } = {
         // graph settings
@@ -288,7 +295,8 @@ export class PieDonutChartComponent
         },
         dataToRender: [],
         rendered: {
-            total: 0
+            totalNo: 0,
+            total: '0'
         }
     };
 
@@ -956,12 +964,14 @@ export class PieDonutChartComponent
         setTimeout(() => {
             // reset
             this._graph.rendered = {
-                total: 0
+                totalNo: 0,
+                total: '0'
             };
 
             // deter,ine total
             this._graph.dataToRender.forEach((item) => {
-                this._graph.rendered.total += item.value;
+                this._graph.rendered.totalNo += item.value;
+                this._graph.rendered.total = this._graph.rendered.totalNo.toLocaleString('en');
             });
         });
 
