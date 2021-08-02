@@ -78,6 +78,9 @@ export class RequestQueryBuilder {
     private changesListener: () => void;
     private triggerChangesListener: DebounceTimeCaller;
 
+    // flags
+    private flags: { [key: string]: any } = {};
+
     /**
      * Constructor
      */
@@ -326,6 +329,11 @@ export class RequestQueryBuilder {
             filter.deleted = true;
         }
 
+        // flags
+        if (!_.isEmpty(this.flags)) {
+            filter.flags = this.flags;
+        }
+
         // add other custom filters
         if (!_.isEmpty(this.childrenQueryBuilders)) {
             _.each(this.childrenQueryBuilders, (qb: RequestQueryBuilder, qbKey: string) => {
@@ -401,6 +409,12 @@ export class RequestQueryBuilder {
         // merge deleted
         this.deleted = queryBuilder.deleted;
 
+        // flags
+        Object.assign(
+            this.flags,
+            queryBuilder.flags
+        );
+
         // merge custom filters
         if (!_.isEmpty(queryBuilder.childrenQueryBuilders)) {
             this.childrenQueryBuilders = {
@@ -437,7 +451,8 @@ export class RequestQueryBuilder {
             _.isEmpty(this.limitResultsNumber) &&
             this.paginator.isEmpty() &&
             _.isEmpty(this.fieldsInResponse) &&
-            isEmptyChildrenBuilders;
+            isEmptyChildrenBuilders &&
+            _.isEmpty(this.flags);
     }
 
     /**
@@ -494,6 +509,39 @@ export class RequestQueryBuilder {
     }
 
     /**
+     * Set flag
+     * @param property
+     * @param value
+     * @returns {RequestFilter}
+     */
+    flag(property: string, value: any): RequestQueryBuilder {
+        // flag
+        this.flags[property] = value;
+
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
+        return this;
+    }
+
+    /**
+     * Remove flag
+     * @param property
+     * @returns {RequestFilter}
+     */
+    removeFlag(property: string): RequestQueryBuilder {
+        // flag
+        delete this.flags[property];
+
+        // trigger change
+        this.triggerChangeListener();
+
+        // finished
+        return this;
+    }
+
+    /**
      * Clear children query builders
      */
     clearChildrenQueryBuilders() {
@@ -514,6 +562,7 @@ export class RequestQueryBuilder {
         this.sort.clear();
         this.clearChildrenQueryBuilders();
         this.deleted = false;
+        this.flags = {};
 
         // trigger change
         this.triggerChangeListener();
@@ -544,6 +593,9 @@ export class RequestQueryBuilder {
                 },
                 {}
             )
+
+            // !IMPORTANT - flags shouldn't be serialized / deserialized because it breaks logic
+            // e.g - see applyHasMoreLimit
         };
     }
 
@@ -557,6 +609,9 @@ export class RequestQueryBuilder {
         const serializedValueObject: ISerializedQueryBuilder = _.isString(serializedValue) ?
             JSON.parse(serializedValue) :
             serializedValue as ISerializedQueryBuilder;
+
+        // !IMPORTANT - flags shouldn't be serialized / deserialized because it breaks logic
+        // e.g - see applyHasMoreLimit
 
         // deserialize
         this.filter.deserialize(serializedValueObject.filter);

@@ -7,7 +7,7 @@ import { BaseModel } from './base.model';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
-import { IPermissionBasic, IPermissionRelatedContact, IPermissionRelatedContactBulk, IPermissionRelatedRelationship, IPermissionRestorable } from './permission.interface';
+import { IPermissionBasic, IPermissionExportable, IPermissionImportable, IPermissionRelatedContact, IPermissionRelatedContactBulk, IPermissionRelatedRelationship, IPermissionRestorable } from './permission.interface';
 
 export class EventModel
     extends BaseModel
@@ -15,6 +15,8 @@ export class EventModel
         IPermissionBasic,
         IPermissionRelatedRelationship,
         IPermissionRestorable,
+        IPermissionImportable,
+        IPermissionExportable,
         IPermissionRelatedContact,
         IPermissionRelatedContactBulk {
     id: string;
@@ -52,6 +54,16 @@ export class EventModel
      * Static Permissions - IPermissionRestorable
      */
     static canRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_RESTORE) : false); }
+
+    /**
+     * Static Permissions - IPermissionImportable
+     */
+    static canImport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_IMPORT) : false); }
+
+    /**
+     * Static Permissions - IPermissionExportable
+     */
+    static canExport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_EXPORT) : false); }
 
     /**
      * Static Permissions - IPermissionRelatedContact
@@ -143,6 +155,16 @@ export class EventModel
      * Permissions - IPermissionRestorable
      */
     canRestore(user: UserModel): boolean { return EventModel.canRestore(user); }
+
+    /**
+     * Permissions - IPermissionImportable
+     */
+    canImport(user: UserModel): boolean { return EventModel.canImport(user); }
+
+    /**
+     * Permissions - IPermissionExportable
+     */
+    canExport(user: UserModel): boolean { return EventModel.canExport(user); }
 
     /**
      * Permissions - IPermissionRelatedContact

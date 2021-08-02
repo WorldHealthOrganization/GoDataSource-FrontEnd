@@ -2,6 +2,8 @@ import { Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angu
 import { Constants } from '../../../core/models/constants';
 
 export class CountedItemsListItem {
+    readonly countNo: string;
+
     /**
      * List item
      * @param {number} count
@@ -13,7 +15,9 @@ export class CountedItemsListItem {
         public label: string,
         private _ids: string[],
         public countBgColor: string = Constants.DEFAULT_COLOR_REF_DATA
-    ) {}
+    ) {
+        this.countNo = count.toLocaleString('en');
+    }
 
     public get ids(): string[] | boolean {
         return this._ids && this._ids.length > 0 ?

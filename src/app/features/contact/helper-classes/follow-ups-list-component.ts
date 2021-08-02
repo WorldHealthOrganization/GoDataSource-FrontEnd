@@ -3,7 +3,7 @@ import { UserModel } from '../../../core/models/user.model';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { FollowUpModel } from '../../../core/models/follow-up.model';
 import { ContactModel } from '../../../core/models/contact.model';
-import { DialogAnswer, DialogAnswerButton, DialogField, LoadingDialogModel, ModifyContactFollowUpQuestionnaireData, ModifyContactFollowUpQuestionnaireDialogComponent } from '../../../shared/components';
+import { DialogAnswer, DialogAnswerButton, DialogField, ModifyContactFollowUpQuestionnaireData, ModifyContactFollowUpQuestionnaireDialogComponent } from '../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../core/services/helper/dialog.service';
 import { FollowUpsDataService } from '../../../core/services/data/follow-ups.data.service';
 import { Constants } from '../../../core/models/constants';
@@ -61,7 +61,6 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
         ExportDataExtension.CSV,
         ExportDataExtension.XLS,
         ExportDataExtension.XLSX,
-        ExportDataExtension.XML,
         ExportDataExtension.JSON,
         ExportDataExtension.ODS,
         ExportDataExtension.PDF
@@ -82,8 +81,6 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
     printFollowUpsDialogExtraAPIData: {
         [key: string]: any
     } = {};
-
-    loadingDialog: LoadingDialogModel;
 
     /**
      * Constructor
@@ -239,13 +236,13 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
                     });
 
                     // display loading
-                    const loadingDialog = this.dialogService.showLoadingDialog();
+                    this.showLoadingDialog();
                     this.followUpsDataService
                         .deleteBulkFollowUps(this.selectedOutbreak.id, qb)
                         .pipe(
                             catchError((err) => {
                                 // hide dialog
-                                loadingDialog.close();
+                                this.closeLoadingDialog();
 
                                 this.listHelperService.snackbarService.showApiError(err);
                                 return throwError(err);
@@ -253,7 +250,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
                         )
                         .subscribe(() => {
                             // hide dialog
-                            loadingDialog.close();
+                            this.closeLoadingDialog();
 
                             this.listHelperService.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
 
@@ -288,13 +285,13 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
                         }
                     });
                     // display loading
-                    const loadingDialog = this.dialogService.showLoadingDialog();
+                    this.showLoadingDialog();
                     this.followUpsDataService
                         .restoreBulkFollowUps(this.selectedOutbreak.id, qb)
                         .pipe(
                             catchError((err) => {
                                 // hide dialog
-                                loadingDialog.close();
+                                this.closeLoadingDialog();
 
                                 this.listHelperService.snackbarService.showApiError(err);
                                 return throwError(err);
@@ -302,7 +299,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
                         )
                         .subscribe(() => {
                             // hide dialog
-                            loadingDialog.close();
+                            this.closeLoadingDialog();
 
                             this.listHelperService.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
 
@@ -387,7 +384,12 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
             url: this.exportFollowUpsUrl,
             fileName: this.followUpsDataExportFileName,
 
-            // // optional
+            // configure
+            isAsyncExport: true,
+            displayUseDbColumns: true,
+            exportProgress: (data) => { this.showExportProgress(data); },
+
+            // optional
             allowedExportTypes: this.allowedExportTypes,
             queryBuilder: qb,
             displayEncrypt: true,
@@ -512,23 +514,6 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
             } else {
                 this.filterBySelectField('teamId', data);
             }
-        }
-    }
-
-    /**
-     * Display loading dialog
-     */
-    showLoadingDialog() {
-        this.loadingDialog = this.dialogService.showLoadingDialog();
-    }
-
-    /**
-     * Hide loading dialog
-     */
-    closeLoadingDialog() {
-        if (this.loadingDialog) {
-            this.loadingDialog.close();
-            this.loadingDialog = null;
         }
     }
 }

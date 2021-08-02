@@ -168,6 +168,8 @@ export enum PERMISSION {
     EVENT_MODIFY = 'event_modify',
     EVENT_DELETE = 'event_delete',
     EVENT_RESTORE = 'event_restore',
+    EVENT_EXPORT = 'event_export',
+    EVENT_IMPORT = 'event_import',
     EVENT_CREATE_CONTACT = 'event_create_contact',
     EVENT_CREATE_BULK_CONTACT = 'event_create_bulk_contact',
     EVENT_LIST_RELATIONSHIP_CONTACTS = 'event_list_relationship_contacts',

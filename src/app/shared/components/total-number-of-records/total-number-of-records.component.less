@@ -9,6 +9,10 @@ app-total-number-of-records {
         font-family: @font-roboto;
         color: @color-dark-2nd;
 
+        &::first-letter {
+            text-transform: capitalize;
+        }
+
         @mat-spinner-width: 12px;
         @mat-spinner-height: 12px;
         mat-spinner {

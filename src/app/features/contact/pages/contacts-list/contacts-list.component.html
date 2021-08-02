@@ -48,7 +48,10 @@
                         [fieldsGroupListRequired]="fieldsGroupListRequired"
                         [queryBuilder]="queryBuilder"
                         (exportStart)="showLoadingDialog()"
-                        (exportFinished)="closeLoadingDialog()">
+                        (exportFinished)="closeLoadingDialog()"
+                        (exportProgress)="showExportProgress($event)"
+                        [displayUseDbColumns]="true"
+                        [isAsyncExport]="true">
                     </app-export-button>
 
                     <button
@@ -122,7 +125,8 @@
 <div fxLayout fxLayoutAlign="space-between end">
     <!--Total number of records from the list-->
     <app-total-number-of-records
-        [value]="contactsListCount$ | async">
+        [value]="contactsListCount$ | async"
+        (showAll)="refreshListCount(false)">
     </app-total-number-of-records>
 
     <!--Contacts grouped by risk level-->
@@ -138,7 +142,7 @@
             *ngIf="!appliedListFilter"
             fxFlex
             [items]="countedContactsByRiskLevel$ | async"
-            (optionChanged)="$event.label === 'LNG_REFERENCE_DATA_CATEGORY_RISK_LEVEL_UNCLASSIFIED' ? filterByBooleanField('riskLevel', false) : filterByEquality('riskLevel',  $event.label)">
+            (optionChanged)="$event.label === 'LNG_REFERENCE_DATA_CATEGORY_RISK_LEVEL_UNCLASSIFIED' ? filterByNotHavingValue('riskLevel') : filterByEquality('riskLevel',  $event.label)">
         </app-counted-items-list>
     </ng-template>
 </div>
@@ -511,7 +515,7 @@
                             [(ngModel)]="filterAddressParentLocationIds"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             multiple="true"
-                            (itemChanged)="filterByAddress('addresses', true, filterAddressModel, filterAddressParentLocationIds)"
+                            (itemChanged)="filterBySelectField('usualPlaceOfResidenceLocationId.parentLocationIdFilter', filterAddressParentLocationIds, null)"
                             app-reset-location-on-side-filter
                             [useOutbreakLocations]="true">
                         </app-form-location-dropdown>

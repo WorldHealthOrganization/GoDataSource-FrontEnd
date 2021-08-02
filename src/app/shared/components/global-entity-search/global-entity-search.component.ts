@@ -16,6 +16,7 @@ import { DialogService } from '../../../core/services/helper/dialog.service';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { RedirectService } from '../../../core/services/helper/redirect.service';
+import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-global-entity-search',
@@ -92,7 +93,13 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
             if (this.selectedOutbreak.id) {
                 this.showLoadingDialog();
                 // search for the entity
-                this.globalEntitySearchDataService.searchEntityCount(this.selectedOutbreak.id, fields.globalSearchValue)
+                const qb: RequestQueryBuilder = new RequestQueryBuilder();
+                qb.limit(2);
+                this.globalEntitySearchDataService.searchEntityCount(
+                    this.selectedOutbreak.id,
+                    fields.globalSearchValue,
+                    qb
+                )
                     .pipe(
                         catchError((err) => {
                             this.closeLoadingDialog();
@@ -102,7 +109,14 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
                         })
                     )
                     .subscribe((results) => {
-                        if (!_.isEmpty(results)) {
+                        // close side nav
+                        this.closeSideNav();
+
+                        // ...
+                        if (
+                            results &&
+                            results.count > 0
+                        ) {
                             // if there is a single result, navigate to the entity view page, otherwise display all results in a new page
                             if (results.count === 1) {
                                 // search for the entity
@@ -128,6 +142,7 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
                                             this.closeSideNav();
                                         }
 
+                                        // hide loading
                                         this.closeLoadingDialog();
                                     });
                             } else {
@@ -136,14 +151,18 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
 
                                 // display all results
                                 this.redirectService.to([`/outbreaks/${this.selectedOutbreak.id}/search-results`]);
+
+                                // hide loading
+                                this.closeLoadingDialog();
                             }
 
                             // empty search field
                             this.globalSearchValue = '';
-                            // close side nav
-                            this.closeSideNav();
                         } else {
                             this.snackbarService.showError('LNG_GLOBAL_ENTITY_SEARCH_NO_ENTITIES_MESSAGE');
+
+                            // hide loading
+                            this.closeLoadingDialog();
 
                             // did user enter a UID?
                             if (fields.globalSearchValue.length === 36) {
@@ -151,7 +170,6 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
                                 this.askCreateCaseWithUID(fields.globalSearchValue);
                             }
                         }
-                        this.closeLoadingDialog();
                     });
 
             }

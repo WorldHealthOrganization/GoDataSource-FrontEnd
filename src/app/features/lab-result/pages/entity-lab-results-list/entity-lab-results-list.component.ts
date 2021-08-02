@@ -21,7 +21,7 @@ import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { catchError, share, tap } from 'rxjs/operators';
 import { Constants } from '../../../../core/models/constants';
-import { HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
+import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
@@ -64,9 +64,6 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
     fieldsGroupList: LabelValuePair[];
     fieldsGroupListRequired: IExportFieldsGroupRequired;
 
-    // loading dialog handler
-    loadingDialog: LoadingDialogModel;
-
     // selected Outbreak
     selectedOutbreak: OutbreakModel;
 
@@ -108,7 +105,6 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
         ExportDataExtension.CSV,
         ExportDataExtension.XLS,
         ExportDataExtension.XLSX,
-        ExportDataExtension.XML,
         ExportDataExtension.JSON,
         ExportDataExtension.ODS,
         ExportDataExtension.PDF
@@ -652,16 +648,31 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
     /**
      * Get total number of items, based on the applied filters
      */
-    refreshListCount() {
+    refreshListCount(applyHasMoreLimit?: boolean) {
         if (
             this.selectedOutbreak &&
             this.personType &&
             this.entityData
         ) {
+            // set apply value
+            if (applyHasMoreLimit !== undefined) {
+                this.applyHasMoreLimit = applyHasMoreLimit;
+            }
+
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
+
+            // apply has more limit
+            if (this.applyHasMoreLimit) {
+                countQueryBuilder.flag(
+                    'applyHasMoreLimit',
+                    true
+                );
+            }
+
+            // count
             this.labResultsListCount$ = this.labResultDataService
                 .getEntityLabResultsCount(this.selectedOutbreak.id, EntityModel.getLinkForEntityType(this.personType), this.entityData.id, countQueryBuilder)
                 .pipe(
@@ -773,22 +784,5 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
                     }
                 }
             });
-    }
-
-    /**
-     * Display loading dialog
-     */
-    showLoadingDialog() {
-        this.loadingDialog = this.dialogService.showLoadingDialog();
-    }
-
-    /**
-     * Hide loading dialog
-     */
-    closeLoadingDialog() {
-        if (this.loadingDialog) {
-            this.loadingDialog.close();
-            this.loadingDialog = null;
-        }
     }
 }

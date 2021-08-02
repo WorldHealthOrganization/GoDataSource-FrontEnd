@@ -10,7 +10,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
+import { DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -152,7 +152,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         ExportDataExtension.CSV,
         ExportDataExtension.XLS,
         ExportDataExtension.XLSX,
-        ExportDataExtension.XML,
         ExportDataExtension.JSON,
         ExportDataExtension.ODS,
         ExportDataExtension.PDF
@@ -176,8 +175,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING', 'dateOfReporting'),
         new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', 'isDateOfReportingApproximate'),
     ];
-
-    loadingDialog: LoadingDialogModel;
 
     recordActions: HoverRowAction[] = [
         // View Contact
@@ -1116,12 +1113,27 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
     /**
      * Get total number of items, based on the applied filters
      */
-    refreshListCount() {
+    refreshListCount(applyHasMoreLimit?: boolean) {
         if (this.selectedOutbreak) {
+            // set apply value
+            if (applyHasMoreLimit !== undefined) {
+                this.applyHasMoreLimit = applyHasMoreLimit;
+            }
+
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
+
+            // apply has more limit
+            if (this.applyHasMoreLimit) {
+                countQueryBuilder.flag(
+                    'applyHasMoreLimit',
+                    true
+                );
+            }
+
+            // count
             this.contactsListCount$ = this.contactDataService
                 .getContactsCount(this.selectedOutbreak.id, countQueryBuilder)
                 .pipe(
@@ -1296,7 +1308,12 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             url: this.exportContactsUrl,
             fileName: this.contactsDataExportFileName,
 
-            // // optional
+            // configure
+            isAsyncExport: true,
+            displayUseDbColumns: true,
+            exportProgress: (data) => { this.showExportProgress(data); },
+
+            // optional
             allowedExportTypes: this.allowedExportTypes,
             queryBuilder: qb,
             displayEncrypt: true,
@@ -1362,6 +1379,12 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         const qb = new RequestQueryBuilder();
         const personsQb = qb.addChildQueryBuilder('person');
 
+        // retrieve only relationships that have at least one persons as desired type
+        qb.filter.byEquality(
+            'persons.type',
+            EntityType.CONTACT
+        );
+
         // id
         personsQb.filter.bySelect('id', selectedRecords, true, null);
 
@@ -1377,6 +1400,11 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             message: 'LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIPS_TITLE',
             url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
             fileName: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME'),
+
+            // configure
+            isAsyncExport: true,
+            displayUseDbColumns: true,
+            exportProgress: (data) => { this.showExportProgress(data); },
 
             // optional
             queryBuilder: qb,
@@ -1400,6 +1428,12 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         const qb = new RequestQueryBuilder();
         const personsQb = qb.addChildQueryBuilder('person');
 
+        // retrieve only relationships that have at least one persons as desired type
+        qb.filter.byEquality(
+            'persons.type',
+            EntityType.CONTACT
+        );
+
         // merge query builder
         personsQb.merge(this.queryBuilder);
 
@@ -1420,11 +1454,14 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         const relationships: RequestRelationBuilder = personsQb.include('relationships');
         personsQb.removeRelation('relationships');
 
-        // filter contacts
-        personsQb.filter.byEquality(
-            'type',
-            EntityType.CONTACT
-        );
+        // attach condition only if not empty
+        if (!personsQb.filter.isEmpty()) {
+            // filter contacts
+            personsQb.filter.byEquality(
+                'type',
+                EntityType.CONTACT
+            );
+        }
 
         // relationships
         if (!relationships.queryBuilder.isEmpty()) {
@@ -1454,6 +1491,11 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
             fileName: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME'),
 
+            // configure
+            isAsyncExport: true,
+            displayUseDbColumns: true,
+            exportProgress: (data) => { this.showExportProgress(data); },
+
             // optional
             queryBuilder: qb,
             displayEncrypt: true,
@@ -1466,22 +1508,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });
-    }
-
-    /**
-     * Display loading dialog
-     */
-    showLoadingDialog() {
-        this.loadingDialog = this.dialogService.showLoadingDialog();
-    }
-    /**
-     * Hide loading dialog
-     */
-    closeLoadingDialog() {
-        if (this.loadingDialog) {
-            this.loadingDialog.close();
-            this.loadingDialog = null;
-        }
     }
 
     /**

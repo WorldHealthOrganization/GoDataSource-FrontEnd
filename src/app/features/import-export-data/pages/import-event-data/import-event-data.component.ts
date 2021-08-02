@@ -6,7 +6,6 @@ import { ImportServerModelNames } from '../../components/import-data/import-data
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Constants } from '../../../../core/models/constants';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { QuestionModel } from '../../../../core/models/question.model';
 import { ImportDataExtension } from '../../components/import-data/model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
@@ -14,12 +13,12 @@ import { UserModel } from '../../../../core/models/user.model';
 import { CaseModel } from '../../../../core/models/case.model';
 
 @Component({
-    selector: 'app-import-case-data',
+    selector: 'app-import-event-data',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './import-case-data.component.html',
-    styleUrls: ['./import-case-data.component.less']
+    templateUrl: './import-event-data.component.html',
+    styleUrls: ['./import-event-data.component.less']
 })
-export class ImportCaseDataComponent implements OnInit, OnDestroy {
+export class ImportEventDataComponent implements OnInit, OnDestroy {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -46,25 +45,15 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
     ImportServerModelNames = ImportServerModelNames;
 
     fieldsWithoutTokens = {
-        questionnaireAnswers: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-        'addresses[]': 'LNG_CASE_FIELD_LABEL_ADDRESSES',
-        'documents[]': 'LNG_CASE_FIELD_LABEL_DOCUMENTS',
-        'dateRanges[]': 'LNG_CASE_FIELD_LABEL_DATE_RANGES',
-        'vaccinesReceived[]': 'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED',
-
         // !must be empty token - logic depends on it!
-        'addresses[].geoLocation': ''
+        'address.geoLocation': ''
     };
 
     addressFields = {
-        'addresses[].locationId': true,
-        'dateRanges[].locationId': true,
-        'burialLocationId': true
+        'address.locationId': true
     };
 
     requiredDestinationFields;
-
-    formatDataBeforeUse = QuestionModel.formatQuestionnaireImportDefs;
 
     selectedOutbreak: OutbreakModel;
 
@@ -95,19 +84,14 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
 
                     // set default required fields
                     this.requiredDestinationFields = [
-                        'firstName',
-                        'dateOfReporting',
-                        'classification'
+                        'name',
+                        'date',
+                        'dateOfReporting'
                     ];
-
-                    // is dateOfOnset required for this outbreak ?
-                    if (this.selectedOutbreak.isDateOfOnsetRequired) {
-                        this.requiredDestinationFields.push('dateOfOnset');
-                    }
 
                     // set URLs
                     this.importFileUrl = `outbreaks/${selectedOutbreak.id}/importable-files`;
-                    this.importDataUrl = `outbreaks/${selectedOutbreak.id}/cases/import-importable-file-using-map`;
+                    this.importDataUrl = `outbreaks/${selectedOutbreak.id}/events/import-importable-file-using-map`;
 
                     // display import form
                     this.displayLoading = false;
@@ -140,8 +124,8 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
         if (CaseModel.canList(this.authUser)) {
             this.breadcrumbs.push(
                 new BreadcrumbItemModel(
-                    'LNG_PAGE_LIST_CASES_TITLE',
-                    '/cases'
+                    'LNG_PAGE_LIST_EVENTS_TITLE',
+                    '/events'
                 )
             );
         }
@@ -149,7 +133,7 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
         // import breadcrumb
         this.breadcrumbs.push(
             new BreadcrumbItemModel(
-                'LNG_PAGE_IMPORT_CASE_DATA_TITLE',
+                'LNG_PAGE_IMPORT_EVENT_DATA_TITLE',
                 '.',
                 true
             )
@@ -161,10 +145,10 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
      */
     finished() {
         if (CaseModel.canList(this.authUser)) {
-            this.router.navigate(['/cases']);
+            this.router.navigate(['/events']);
         } else {
             // fallback
-            this.redirectService.to(['/import-export-data/case-data/import']);
+            this.redirectService.to(['/import-export-data/event-data/import']);
         }
     }
 }

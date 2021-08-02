@@ -56,7 +56,10 @@
                         [fieldsGroupListRequired]="fieldsGroupListRequired"
                         [queryBuilder]="queryBuilder"
                         (exportStart)="showLoadingDialog()"
-                        (exportFinished)="closeLoadingDialog()">
+                        (exportFinished)="closeLoadingDialog()"
+                        (exportProgress)="showExportProgress($event)"
+                        [displayUseDbColumns]="true"
+                        [isAsyncExport]="true">
                     </app-export-button>
                 </mat-menu>
             </div>
@@ -76,7 +79,8 @@
 <div fxLayout fxLayoutAlign="space-between end">
     <!--Total number of records from the list-->
     <app-total-number-of-records
-        [value]="followUpsListCount$ | async">
+        [value]="followUpsListCount$ | async"
+        (showAll)="refreshListCount(false)">
     </app-total-number-of-records>
 
     <!--Contacts grouped by risk level-->
@@ -503,7 +507,7 @@
                             name="locationFilter"
                             [(ngModel)]="filterAddressParentLocationIds"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (itemChanged)="filterByAddress('address', false, filterAddressModel, filterAddressParentLocationIds)"
+                            (itemChanged)="filterBySelectField('usualPlaceOfResidenceLocationId.parentLocationIdFilter', filterAddressParentLocationIds, null)"
                             multiple="true"
                             app-reset-input-on-side-filter
                             [useOutbreakLocations]="true">
