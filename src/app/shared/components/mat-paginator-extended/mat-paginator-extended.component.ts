@@ -89,14 +89,16 @@ class CustomMatPaginatorIntl
                 'LNG_COMMON_LABEL_PAGINATOR_RANGE', {
                     pageLabel,
                     length: this.decimalPipe.transform(length),
-                    orMore: ' ' + this.i18nService.instant('LNG_COMMON_LABEL_PAGINATOR_COUNT_OR_MORE')
+                    beforeLength: this.i18nService.instant('LNG_COMMON_LABEL_PAGINATOR_COUNT_BEFORE_LENGTH'),
+                    afterLength: this.i18nService.instant('LNG_COMMON_LABEL_PAGINATOR_COUNT_AFTER_LENGTH')
                 }
             ) :
             this.i18nService.instant(
                 'LNG_COMMON_LABEL_PAGINATOR_RANGE', {
                     pageLabel,
                     length: this.decimalPipe.transform(length),
-                    orMore: ''
+                    beforeLength: '',
+                    afterLength: this.i18nService.instant('LNG_COMMON_LABEL_PAGINATOR_COUNT_AFTER_LENGTH')
                 }
             );
     }

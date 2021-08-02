@@ -107,8 +107,8 @@ export class EntityDataService {
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<IBasicCount> {
-        const whereFilter = queryBuilder.filter.generateCondition(true);
-        return this.http.get(`outbreaks/${outbreakId}/people/count?where=${whereFilter}`);
+        const filter = queryBuilder.buildQuery();
+        return this.http.get(`outbreaks/${outbreakId}/people/filtered-count?filter=${filter}`);
     }
 
     /**

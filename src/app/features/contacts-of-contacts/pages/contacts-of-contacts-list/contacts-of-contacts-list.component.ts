@@ -12,8 +12,7 @@ import {
     CountedItemsListItem,
     DialogAnswerButton,
     HoverRowAction,
-    HoverRowActionType,
-    LoadingDialogModel
+    HoverRowActionType
 } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -123,7 +122,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         ExportDataExtension.CSV,
         ExportDataExtension.XLS,
         ExportDataExtension.XLSX,
-        ExportDataExtension.XML,
         ExportDataExtension.JSON,
         ExportDataExtension.ODS,
         ExportDataExtension.PDF
@@ -147,8 +145,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         new LabelValuePair('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING', 'dateOfReporting'),
         new LabelValuePair('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', 'isDateOfReportingApproximate'),
     ];
-
-    loadingDialog: LoadingDialogModel;
 
     recordActions: HoverRowAction[] = [
         // View Contact
@@ -628,12 +624,27 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     /**
      * Get total number of items, based on the applied filters
      */
-    refreshListCount() {
+    refreshListCount(applyHasMoreLimit?: boolean) {
         if (this.selectedOutbreak) {
+            // set apply value
+            if (applyHasMoreLimit !== undefined) {
+                this.applyHasMoreLimit = applyHasMoreLimit;
+            }
+
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
+
+            // apply has more limit
+            if (this.applyHasMoreLimit) {
+                countQueryBuilder.flag(
+                    'applyHasMoreLimit',
+                    true
+                );
+            }
+
+            // count
             this.contactsOfContactsListCount$ = this.contactsOfContactsDataService.getContactsOfContactsCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
         }
     }
@@ -763,6 +774,11 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             url: this.exportContactsOfContactsUrl,
             fileName: this.contactsOfContactsDataExportFileName,
 
+            // configure
+            isAsyncExport: true,
+            displayUseDbColumns: true,
+            exportProgress: (data) => { this.showExportProgress(data); },
+
             // // optional
             allowedExportTypes: this.allowedExportTypes,
             queryBuilder: qb,
@@ -830,6 +846,12 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         const qb = new RequestQueryBuilder();
         const personsQb = qb.addChildQueryBuilder('person');
 
+        // retrieve only relationships that have at least one persons as desired type
+        qb.filter.byEquality(
+            'persons.type',
+            EntityType.CONTACT_OF_CONTACT
+        );
+
         // id
         personsQb.filter.bySelect('id', selectedRecords, true, null);
 
@@ -845,6 +867,11 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             message: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_RELATIONSHIPS_TITLE',
             url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
             fileName: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME'),
+
+            // configure
+            isAsyncExport: true,
+            displayUseDbColumns: true,
+            exportProgress: (data) => { this.showExportProgress(data); },
 
             // optional
             queryBuilder: qb,
@@ -868,6 +895,12 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         const qb = new RequestQueryBuilder();
         const personsQb = qb.addChildQueryBuilder('person');
 
+        // retrieve only relationships that have at least one persons as desired type
+        qb.filter.byEquality(
+            'persons.type',
+            EntityType.CONTACT_OF_CONTACT
+        );
+
         // merge query builder
         personsQb.merge(this.queryBuilder);
 
@@ -878,11 +911,14 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         const relationships: RequestRelationBuilder = personsQb.include('relationships');
         personsQb.removeRelation('relationships');
 
-        // filter contacts
-        personsQb.filter.byEquality(
-            'type',
-            EntityType.CONTACT_OF_CONTACT
-        );
+        // attach condition only if not empty
+        if (!personsQb.filter.isEmpty()) {
+            // filter contacts
+            personsQb.filter.byEquality(
+                'type',
+                EntityType.CONTACT_OF_CONTACT
+            );
+        }
 
         // relationships
         if (!relationships.queryBuilder.isEmpty()) {
@@ -912,6 +948,11 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
             fileName: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME'),
 
+            // configure
+            isAsyncExport: true,
+            displayUseDbColumns: true,
+            exportProgress: (data) => { this.showExportProgress(data); },
+
             // optional
             queryBuilder: qb,
             displayEncrypt: true,
@@ -924,22 +965,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });
-    }
-
-    /**
-     * Display loading dialog
-     */
-    showLoadingDialog() {
-        this.loadingDialog = this.dialogService.showLoadingDialog();
-    }
-    /**
-     * Hide loading dialog
-     */
-    closeLoadingDialog() {
-        if (this.loadingDialog) {
-            this.loadingDialog.close();
-            this.loadingDialog = null;
-        }
     }
 
     /**

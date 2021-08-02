@@ -12,18 +12,6 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
-        /**
-         * uiCommonLabels
-         */
-        'LNG_COMMON_LABEL_PAGINATOR_ITEMS_PER_PAGE': 'Items per page:',
-        'LNG_COMMON_LABEL_PAGINATOR_FIRST_PAGE': 'First page',
-        'LNG_COMMON_LABEL_PAGINATOR_LAST_PAGE': 'Last page',
-        'LNG_COMMON_LABEL_PAGINATOR_NEXT_PAGE': 'Next page',
-        'LNG_COMMON_LABEL_PAGINATOR_PREVIOUS_PAGE': 'Previous page',
-        'LNG_COMMON_LABEL_PAGINATOR_COUNT_OR_MORE': 'or more',
-        'LNG_COMMON_LABEL_PAGINATOR_RANGE': '{{pageLabel}} of {{length}}{{orMore}}',
-        'LNG_COMMON_LABEL_PAGINATOR_RANGE_PAGE_START_END': '-',
-
 
 
         /**

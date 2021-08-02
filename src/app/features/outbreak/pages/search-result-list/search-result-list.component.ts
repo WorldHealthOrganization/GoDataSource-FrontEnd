@@ -18,10 +18,7 @@ import {
     tap
 } from 'rxjs/operators';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
-import {
-    HoverRowAction,
-    LoadingDialogModel
-} from '../../../../shared/components';
+import { HoverRowAction } from '../../../../shared/components';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -81,8 +78,6 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
 
     // subscribers
     outbreakSubscriber: Subscription;
-
-    loadingDialog: LoadingDialogModel;
 
     recordActions: HoverRowAction[] = [
         // View Item
@@ -239,15 +234,30 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
     /**
      * Get total number of items
      */
-    refreshListCount() {
+    refreshListCount(applyHasMoreLimit?: boolean) {
         if (
             this.selectedOutbreak &&
             !this.queryBuilder.filter.isEmpty()
         ) {
+            // set apply value
+            if (applyHasMoreLimit !== undefined) {
+                this.applyHasMoreLimit = applyHasMoreLimit;
+            }
+
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
+
+            // apply has more limit
+            if (this.applyHasMoreLimit) {
+                countQueryBuilder.flag(
+                    'applyHasMoreLimit',
+                    true
+                );
+            }
+
+            // count
             this.entityListCount$ = this.globalEntitySearchDataService
                 .searchEntityCount(this.selectedOutbreak.id, countQueryBuilder )
                 .pipe(

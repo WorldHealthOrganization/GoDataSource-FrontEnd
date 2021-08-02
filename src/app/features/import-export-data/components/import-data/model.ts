@@ -6,7 +6,6 @@ export enum ImportDataExtension {
     CSV = '.csv',
     XLS = '.xls',
     XLSX = '.xlsx',
-    XML = '.xml',
     ODS = '.ods',
     JSON = '.json',
     ZIP = '.zip'

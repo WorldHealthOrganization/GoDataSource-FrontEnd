@@ -74,7 +74,10 @@
                         [fieldsGroupListRequired]="fieldsGroupListRequired"
                         [queryBuilder]="queryBuilder"
                         (exportStart)="showLoadingDialog()"
-                        (exportFinished)="closeLoadingDialog()">
+                        (exportFinished)="closeLoadingDialog()"
+                        (exportProgress)="showExportProgress($event)"
+                        [displayUseDbColumns]="true"
+                        [isAsyncExport]="true">
                     </app-export-button>
 
                     <ng-container *app-selected-outbreak-is-active>
@@ -134,7 +137,8 @@
 <div fxLayout fxLayoutAlign="space-between end">
     <!--Total number of records from the list-->
     <app-total-number-of-records
-        [value]="casesListCount$ | async">
+        [value]="casesListCount$ | async"
+        (showAll)="refreshListCount(false)">
     </app-total-number-of-records>
 
     <!--Cases grouped by classification-->
@@ -150,7 +154,7 @@
             *ngIf="!appliedListFilter"
             fxFlex
             [items]="countedCasesGroupedByClassification$ | async"
-            (optionChanged)="filterByEquality('classification', $event.label)">
+            (optionChanged)="$event.label === 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_UNCLASSIFIED' ? filterByNotHavingValue('classification') : filterByEquality('classification',  $event.label)">
         </app-counted-items-list>
     </ng-template>
 </div>
@@ -378,7 +382,7 @@
                             [(ngModel)]="filterAddressParentLocationIds"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             multiple="true"
-                            (itemChanged)="filterByAddress('addresses', true, filterAddressModel, filterAddressParentLocationIds)"
+                            (itemChanged)="filterBySelectField('usualPlaceOfResidenceLocationId.parentLocationIdFilter', filterAddressParentLocationIds, null)"
                             app-reset-location-on-side-filter
                             [useOutbreakLocations]="true">
                         </app-form-location-dropdown>

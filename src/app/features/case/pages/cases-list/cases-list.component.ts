@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, throwError } from 'rxjs';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -9,10 +9,10 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton, DialogField, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
+import { DialogAnswerButton, DialogField, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
-import { FilterType, FilterModel } from '../../../../shared/components/side-filters/model';
+import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Router } from '@angular/router';
@@ -28,7 +28,6 @@ import { ClusterDataService } from '../../../../core/services/data/cluster.data.
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
@@ -39,10 +38,7 @@ import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { AddressModel } from '../../../../core/models/address.model';
-import {
-    IExportFieldsGroupRequired,
-    ExportFieldsGroupModelNameEnum
-} from '../../../../core/models/export-fields-group.model';
+import { ExportFieldsGroupModelNameEnum, IExportFieldsGroupRequired } from '../../../../core/models/export-fields-group.model';
 
 @Component({
     selector: 'app-cases-list',
@@ -125,7 +121,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         ExportDataExtension.CSV,
         ExportDataExtension.XLS,
         ExportDataExtension.XLSX,
-        ExportDataExtension.XML,
         ExportDataExtension.JSON,
         ExportDataExtension.ODS,
         ExportDataExtension.PDF
@@ -162,8 +157,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     // subscribers
     outbreakSubscriber: Subscription;
 
-    loadingDialog: LoadingDialogModel;
-
+    // actions
     recordActions: HoverRowAction[] = [
         // View Case
         new HoverRowAction({
@@ -1046,8 +1040,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     /**
      * Get total number of items, based on the applied filters
      */
-    refreshListCount() {
+    refreshListCount(applyHasMoreLimit?: boolean) {
         if (this.selectedOutbreak) {
+            // set apply value
+            if (applyHasMoreLimit !== undefined) {
+                this.applyHasMoreLimit = applyHasMoreLimit;
+            }
+
             // classification conditions
             this.addClassificationConditions();
 
@@ -1055,6 +1054,16 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
+
+            // apply has more limit
+            if (this.applyHasMoreLimit) {
+                countQueryBuilder.flag(
+                    'applyHasMoreLimit',
+                    true
+                );
+            }
+
+            // count
             this.casesListCount$ = this.caseDataService
                 .getCasesCount(this.selectedOutbreak.id, countQueryBuilder)
                 .pipe(
@@ -1254,6 +1263,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             url: this.exportCasesUrl,
             fileName: this.casesDataExportFileName,
 
+            // configure
+            isAsyncExport: true,
+            displayUseDbColumns: true,
+            exportProgress: (data) => { this.showExportProgress(data); },
+
             // optional
             allowedExportTypes: this.allowedExportTypes,
             queryBuilder: qb,
@@ -1283,6 +1297,12 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         const qb = new RequestQueryBuilder();
         const personsQb = qb.addChildQueryBuilder('person');
 
+        // retrieve only relationships that have at least one persons as desired type
+        qb.filter.byEquality(
+            'persons.type',
+            EntityType.CASE
+        );
+
         // id
         personsQb.filter.bySelect('id', selectedRecords, true, null);
 
@@ -1298,6 +1318,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             message: 'LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIPS_TITLE',
             url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
             fileName: this.i18nService.instant('LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIP_FILE_NAME'),
+
+            // configure
+            isAsyncExport: true,
+            displayUseDbColumns: true,
+            exportProgress: (data) => { this.showExportProgress(data); },
 
             // optional
             queryBuilder: qb,
@@ -1319,19 +1344,28 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     exportFilteredCasesRelationships() {
         // construct filter by case query builder
         const qb = new RequestQueryBuilder();
-        const personsQb = qb.addChildQueryBuilder('person');
+
+        // retrieve only relationships that have at least one persons as desired type
+        qb.filter.byEquality(
+            'persons.type',
+            EntityType.CASE
+        );
 
         // merge out query builder
+        const personsQb = qb.addChildQueryBuilder('person');
         personsQb.merge(this.queryBuilder);
 
         // remove pagination
         personsQb.paginator.clear();
 
-        // filter only cases
-        personsQb.filter.byEquality(
-            'type',
-            EntityType.CASE
-        );
+        // attach condition only if not empty
+        if (!personsQb.filter.isEmpty()) {
+            // filter only cases
+            personsQb.filter.byEquality(
+                'type',
+                EntityType.CASE
+            );
+        }
 
         // display export dialog
         this.dialogService.showExportDialog({
@@ -1339,6 +1373,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             message: 'LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIPS_TITLE',
             url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
             fileName: this.i18nService.instant('LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIP_FILE_NAME'),
+
+            // configure
+            isAsyncExport: true,
+            displayUseDbColumns: true,
+            exportProgress: (data) => { this.showExportProgress(data); },
 
             // optional
             queryBuilder: qb,
@@ -1432,22 +1471,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 exportStart: () => { this.showLoadingDialog(); },
                 exportFinished: () => { this.closeLoadingDialog(); }
             });
-        }
-    }
-
-    /**
-     * Display loading dialog
-     */
-    showLoadingDialog() {
-        this.loadingDialog = this.dialogService.showLoadingDialog();
-    }
-    /**
-     * Hide loading dialog
-     */
-    closeLoadingDialog() {
-        if (this.loadingDialog) {
-            this.loadingDialog.close();
-            this.loadingDialog = null;
         }
     }
 

@@ -94,10 +94,14 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
                 this.showLoadingDialog();
 
                 // search for the entity
-                const qb = new RequestQueryBuilder();
+                const qb: RequestQueryBuilder = new RequestQueryBuilder();
                 qb.filter.firstLevelConditions();
                 qb.filter.where(this.globalEntitySearchDataService.generateSearchValueCondition(fields.globalSearchValue), true);
-                this.globalEntitySearchDataService.searchEntityCount(this.selectedOutbreak.id, qb)
+                qb.limit(2);
+                this.globalEntitySearchDataService.searchEntityCount(
+                    this.selectedOutbreak.id,
+                    qb
+                )
                     .pipe(
                         catchError((err) => {
                             this.closeLoadingDialog();
@@ -107,7 +111,14 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
                         })
                     )
                     .subscribe((results) => {
-                        if (!_.isEmpty(results)) {
+                        // close side nav
+                        this.closeSideNav();
+
+                        // ...
+                        if (
+                            results &&
+                            results.count > 0
+                        ) {
                             // if there is a single result, navigate to the entity view page, otherwise display all results in a new page
                             if (results.count === 1) {
                                 // search for the entity
@@ -133,6 +144,7 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
                                             this.closeSideNav();
                                         }
 
+                                        // hide loading
                                         this.closeLoadingDialog();
                                     });
                             } else {
@@ -143,14 +155,18 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
                                         search: fields.globalSearchValue
                                     }
                                 );
+
+                                // hide loading
+                                this.closeLoadingDialog();
                             }
 
                             // empty search field
                             this.globalSearchValue = '';
-                            // close side nav
-                            this.closeSideNav();
                         } else {
                             this.snackbarService.showError('LNG_GLOBAL_ENTITY_SEARCH_NO_ENTITIES_MESSAGE');
+
+                            // hide loading
+                            this.closeLoadingDialog();
 
                             // did user enter a UID?
                             if (fields.globalSearchValue.length === 36) {
@@ -158,7 +174,6 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
                                 this.askCreateCaseWithUID(fields.globalSearchValue);
                             }
                         }
-                        this.closeLoadingDialog();
                     });
 
             }

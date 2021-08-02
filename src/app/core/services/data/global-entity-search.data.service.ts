@@ -52,6 +52,7 @@ export class GlobalEntitySearchDataService {
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<(CaseModel | ContactModel | EventModel | ContactOfContactModel)[]> {
         const filter = queryBuilder.buildQuery();
+
         return this.http.get(`outbreaks/${outbreakId}/people?filter=${filter}`)
             .pipe(
                 map((peopleList) => {
