@@ -625,6 +625,9 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
             this.queryBuilder.include('createdByUser', true);
             this.queryBuilder.include('updatedByUser', true);
 
+            // retrieve responsible user information
+            this.queryBuilder.include('responsibleUser', true);
+
             // retrieve the list of Follow Ups
             this.followUpsList$ = this.followUpsDataService
                 .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder)

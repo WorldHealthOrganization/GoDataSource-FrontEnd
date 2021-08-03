@@ -70,8 +70,8 @@
                                 fxFlex
                                 name="responsibleUserId"
                                 [(ngModel)]="followUpData.responsibleUserId"
-                                [placeholder]="'LNG_PAGE_MODIFY_FOLLOW_RESPONSIBLE_USER_ID' | translate"
-                                tooltip="LNG_PAGE_MODIFY_FOLLOW_RESPONSIBLE_USER_ID_DESCRIPTION"
+                                [placeholder]="'LNG_PAGE_MODIFY_FOLLOW_UP_RESPONSIBLE_USER_ID' | translate"
+                                tooltip="LNG_PAGE_MODIFY_FOLLOW_UP_RESPONSIBLE_USER_ID_DESCRIPTION"
                                 [options]="userList$ | async"
                                 optionLabelKey="name"
                                 optionValueKey="id"
@@ -81,7 +81,7 @@
                         <ng-template
                             #cantListUsers>
                             <div fxFlex>
-                                {{ 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE' | translate }}
+                                {{ 'LNG_PAGE_MODIFY_FOLLOW_UP_CANT_SET_RESPONSIBLE_ID_TITLE' | translate }}
                             </div>
                         </ng-template>
                     </div>
