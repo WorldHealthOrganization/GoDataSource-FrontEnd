@@ -770,6 +770,14 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                 visible: false
             }),
             new VisibleColumnModel({
+                field: 'responsibleUserId',
+                label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+                visible: false,
+                excludeFromDisplay: (): boolean => {
+                    return UserModel.canList(this.authUser);
+                }
+            }),
+            new VisibleColumnModel({
                 field: 'numberOfContacts',
                 label: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS',
                 visible: false
@@ -942,6 +950,20 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             );
         }
 
+        // allowed to filter by follow-up user ?
+        if (UserModel.canList(this.authUser)) {
+            this.availableSideFilters.push(
+                new FilterModel({
+                    fieldName: 'responsibleUserId',
+                    fieldLabel: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+                    type: FilterType.MULTISELECT,
+                    options$: this.userList$,
+                    optionsLabelKey: 'name',
+                    optionsValueKey: 'id'
+                })
+            );
+        }
+
         // Relation - Follow-up
         if (FollowUpModel.canList(this.authUser)) {
             this.availableSideFilters = [
@@ -1057,6 +1079,9 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             // retrieve created user & modified user information
             this.queryBuilder.include('createdByUser', true);
             this.queryBuilder.include('updatedByUser', true);
+
+            // retrieve responsible user information
+            this.queryBuilder.include('responsibleUser', true);
 
             // retrieve location list
             this.queryBuilder.include('locations', true);

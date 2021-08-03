@@ -58,6 +58,17 @@ const routes: Routes = [
         canDeactivate: [
             PageChangeConfirmationGuard
         ]
+    },
+    // View workload
+    {
+        path: 'workload',
+        component: fromPages.UserWorkloadComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.USER_LIST_WORKLOAD
+            ]
+        }
     }
 ];
 

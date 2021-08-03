@@ -21,7 +21,10 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Constants } from '../../../../core/models/constants';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import {
+    catchError,
+    share
+} from 'rxjs/operators';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -33,6 +36,7 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { TimerCache } from '../../../../core/helperClasses/timer-cache';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
 
 @Component({
     selector: 'app-create-case',
@@ -59,6 +63,7 @@ export class CreateCaseComponent
     occupationsList$: Observable<any[]>;
     outcomeList$: Observable<any[]>;
     pregnancyStatusList$: Observable<any[]>;
+    userList$: Observable<UserModel[]>;
 
     selectedOutbreak: OutbreakModel = new OutbreakModel();
 
@@ -74,6 +79,8 @@ export class CreateCaseComponent
     // authenticated user details
     authUser: UserModel;
 
+    // constants
+    UserModel = UserModel;
     /**
      * Constructor
      */
@@ -90,7 +97,8 @@ export class CreateCaseComponent
         private redirectService: RedirectService,
         private authDataService: AuthDataService,
         private entityDataService: EntityDataService,
-        private systemSettingsDataService: SystemSettingsDataService
+        private systemSettingsDataService: SystemSettingsDataService,
+        private userDataService: UserDataService
     ) {
         super();
     }
@@ -108,6 +116,11 @@ export class CreateCaseComponent
         this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
         this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
         this.pregnancyStatusList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PREGNANCY_STATUS);
+
+        // get users only if we're allowed to
+        if (UserModel.canList(this.authUser)) {
+            this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
+        }
 
         this.route.queryParams
             .subscribe((params: { uid }) => {

@@ -56,6 +56,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
     EventModel = EventModel;
     RelationshipModel = RelationshipModel;
     OutbreakModel = OutbreakModel;
+    UserModel = UserModel;
 
     // address model needed for filters
     filterAddressModel: AddressModel = new AddressModel({
@@ -403,6 +404,14 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                 label: 'LNG_EVENT_FIELD_LABEL_EMAIL',
                 visible: false
             }),
+            new VisibleColumnModel({
+                field: 'responsibleUserId',
+                label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+                visible: false,
+                excludeFromDisplay: (): boolean => {
+                    return UserModel.canList(this.authUser);
+                }
+            })
         ];
 
         // number of contacts & exposures columns should be visible only on pages where we have relationships
@@ -494,6 +503,9 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             // retrieve created user & modified user information
             this.queryBuilder.include('createdByUser', true);
             this.queryBuilder.include('updatedByUser', true);
+
+            // retrieve responsible user information
+            this.queryBuilder.include('responsibleUser', true);
 
             // retrieve location list
             this.queryBuilder.include('location', true);

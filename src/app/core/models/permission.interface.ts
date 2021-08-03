@@ -148,6 +148,11 @@ export interface IPermissionUser {
      * Has permission to list users in dropdowns used to filter other list pages
      */
     canListForFilters(user: UserModel): boolean;
+
+    /**
+     * Has permission to list users workload
+     */
+    canListWorkload(user: UserModel): boolean;
 }
 
 /**

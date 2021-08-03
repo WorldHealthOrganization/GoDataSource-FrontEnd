@@ -24,7 +24,10 @@ import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates
 import { DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
-import { catchError } from 'rxjs/operators';
+import {
+    catchError,
+    share
+} from 'rxjs/operators';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
@@ -34,6 +37,7 @@ import { EntityDataService } from '../../../../core/services/data/entity.data.se
 import { TimerCache } from '../../../../core/helperClasses/timer-cache';
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
 
 @Component({
     selector: 'app-modify-case',
@@ -59,6 +63,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     caseRiskLevelsList$: Observable<any[]>;
     outcomeList$: Observable<any[]>;
     pregnancyStatusList$: Observable<any[]>;
+    userList$: Observable<UserModel[]>;
 
     // provide constants to template
     EntityType = EntityType;
@@ -67,6 +72,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     ContactModel = ContactModel;
     LabResultModel = LabResultModel;
     FollowUpModel = FollowUpModel;
+    UserModel = UserModel;
 
     serverToday: Moment = moment();
 
@@ -101,7 +107,8 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         private i18nService: I18nService,
         protected dialogService: DialogService,
         private entityDataService: EntityDataService,
-        private systemSettingsDataService: SystemSettingsDataService
+        private systemSettingsDataService: SystemSettingsDataService,
+        private userDataService: UserDataService
     ) {
         super(
             route,
@@ -122,6 +129,11 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
         this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
         this.pregnancyStatusList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PREGNANCY_STATUS);
+
+        // get users only if we're allowed to
+        if (UserModel.canList(this.authUser)) {
+            this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
+        }
 
         // show loading
         this.showLoadingDialog(false);

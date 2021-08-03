@@ -477,6 +477,35 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Responsible User -->
+        <ng-container matColumnDef="responsibleUserId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{ 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="responsibleUserIdFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="userList$ | async"
+                            (optionChanged)="filterBySelectField('responsibleUserId', $event, 'id')"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            optionLabelKey="name"
+                            optionValueKey="id"
+                            [multiple]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.responsibleUser?.name }}
+            </mat-cell>
+        </ng-container>
+
         <!-- Number of Contacts -->
         <ng-container matColumnDef="numberOfContacts">
             <mat-header-cell *matHeaderCellDef>

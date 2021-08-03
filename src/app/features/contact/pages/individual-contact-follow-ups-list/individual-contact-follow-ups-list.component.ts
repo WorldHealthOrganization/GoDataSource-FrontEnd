@@ -216,18 +216,18 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
         protected i18nService: I18nService,
         protected teamDataService: TeamDataService,
         protected outbreakDataService: OutbreakDataService,
+        protected userDataService: UserDataService,
         private snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private route: ActivatedRoute,
         private contactDataService: ContactDataService,
-        private caseDataService: CaseDataService,
-        private userDataService: UserDataService
+        private caseDataService: CaseDataService
     ) {
         super(
             listHelperService, dialogService, followUpsDataService,
-            router, i18nService, teamDataService, outbreakDataService
+            router, i18nService, teamDataService, outbreakDataService, userDataService
         );
     }
 
@@ -476,6 +476,14 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                 visible: false
             }),
             new VisibleColumnModel({
+                field: 'responsibleUserId',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID',
+                visible: false,
+                excludeFromDisplay: (): boolean => {
+                    return UserModel.canList(this.authUser);
+                }
+            }),
+            new VisibleColumnModel({
                 field: 'deleted',
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED',
                 visible: false
@@ -574,6 +582,20 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                 questionnaireTemplate: this.selectedOutbreak.contactFollowUpTemplate
             })
         ];
+
+        // allowed to filter by responsible user ?
+        if (UserModel.canList(this.authUser)) {
+            this.availableSideFilters.push(
+                new FilterModel({
+                    fieldName: 'responsibleUserId',
+                    fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID',
+                    type: FilterType.MULTISELECT,
+                    options$: this.userList$,
+                    optionsLabelKey: 'name',
+                    optionsValueKey: 'id'
+                })
+            );
+        }
     }
 
     /**
@@ -602,6 +624,9 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
             // retrieve created user & modified user information
             this.queryBuilder.include('createdByUser', true);
             this.queryBuilder.include('updatedByUser', true);
+
+            // retrieve responsible user information
+            this.queryBuilder.include('responsibleUser', true);
 
             // retrieve the list of Follow Ups
             this.followUpsList$ = this.followUpsDataService

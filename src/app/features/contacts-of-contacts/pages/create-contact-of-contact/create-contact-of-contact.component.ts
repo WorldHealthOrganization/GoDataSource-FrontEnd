@@ -17,7 +17,10 @@ import { EntityModel, RelationshipModel } from '../../../../core/models/entity-a
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
-import { catchError } from 'rxjs/internal/operators';
+import {
+    catchError,
+    share
+} from 'rxjs/operators';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
 import { NgForm } from '@angular/forms';
@@ -38,6 +41,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { TimerCache } from '../../../../core/helperClasses/timer-cache';
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
 
 @Component({
     selector: 'app-create-contact-of-contact',
@@ -63,8 +67,10 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
     occupationsList$: Observable<any[]>;
     pregnancyStatusList$: Observable<any[]>;
     riskLevelsList$: Observable<any[]>;
+    userList$: Observable<UserModel[]>;
 
     relatedEntityData: ContactModel;
+    UserModel = UserModel;
     relationship: RelationshipModel = new RelationshipModel();
 
     serverToday: Moment = moment();
@@ -95,7 +101,8 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
         private dialogService: DialogService,
         private i18nService: I18nService,
         private redirectService: RedirectService,
-        private systemSettingsDataService: SystemSettingsDataService
+        private systemSettingsDataService: SystemSettingsDataService,
+        private userDataService: UserDataService
     ) {
         super();
     }
@@ -112,6 +119,11 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
         this.pregnancyStatusList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PREGNANCY_STATUS);
         this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
+
+        // get users only if we're allowed to
+        if (UserModel.canList(this.authUser)) {
+            this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
+        }
 
         // by default, enforce Contact having an address
         this.contactOfContactData.addresses.push(new AddressModel());

@@ -58,6 +58,29 @@
                         </div>
 
                         <div fxLayout="row" fxLayoutGap="20px">
+                            <!-- Responsible user -->
+                            <ng-container
+                                *ngIf="UserModel.canList(authUser); else cantListUsers">
+                                <app-form-select
+                                    fxFlex
+                                    name="responsibleUserId"
+                                    [(ngModel)]="eventData.responsibleUserId"
+                                    [placeholder]="'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID' | translate"
+                                    tooltip="LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION"
+                                    [options]="userList$ | async"
+                                    optionLabelKey="name"
+                                    optionValueKey="id">
+                                </app-form-select>
+                            </ng-container>
+                            <ng-template
+                                #cantListUsers>
+                                <div fxFlex>
+                                    {{ 'LNG_PAGE_CREATE_EVENT_CANT_SET_RESPONSIBLE_ID_TITLE' | translate }}
+                                </div>
+                            </ng-template>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-textarea
                                 name="description"
                                 [(ngModel)]="eventData.description"

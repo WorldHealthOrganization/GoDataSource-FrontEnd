@@ -141,7 +141,27 @@
                                 [disabled]="viewOnly">
                             </app-form-slide-toggle>
 
-                            <div fxFlex><!--Placeholder--></div>
+                            <!-- Responsible user -->
+                            <ng-container
+                                *ngIf="UserModel.canList(authUser); else cantListUsers">
+                                <app-form-select
+                                    fxFlex
+                                    name="responsibleUserId"
+                                    [(ngModel)]="caseData.responsibleUserId"
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION"
+                                    [options]="userList$ | async"
+                                    optionLabelKey="name"
+                                    optionValueKey="id"
+                                    [disabled]="viewOnly">
+                                </app-form-select>
+                            </ng-container>
+                            <ng-template
+                                #cantListUsers>
+                                <div fxFlex>
+                                    {{ 'LNG_PAGE_MODIFY_CASE_CANT_SET_RESPONSIBLE_ID_TITLE' | translate }}
+                                </div>
+                            </ng-template>
                         </div>
                     </div>
                 </mat-card>

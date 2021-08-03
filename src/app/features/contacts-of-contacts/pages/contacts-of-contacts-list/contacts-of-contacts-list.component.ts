@@ -60,6 +60,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     Constants = Constants;
     ContactOfContactModel = ContactOfContactModel;
     OutbreakModel = OutbreakModel;
+    UserModel = UserModel;
 
     // address model needed for filters
     filterAddressModel: AddressModel = new AddressModel({
@@ -479,6 +480,14 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                 label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
             }),
             new VisibleColumnModel({
+                field: 'responsibleUserId',
+                label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+                visible: false,
+                excludeFromDisplay: (): boolean => {
+                    return UserModel.canList(this.authUser);
+                }
+            }),
+            new VisibleColumnModel({
                 field: 'numberOfExposures',
                 label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
                 visible: false
@@ -580,6 +589,20 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                 sortable: true
             })
         ];
+
+        // allowed to filter by responsible user ?
+        if (UserModel.canList(this.authUser)) {
+            this.availableSideFilters.push(
+                new FilterModel({
+                    fieldName: 'responsibleUserId',
+                    fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+                    type: FilterType.MULTISELECT,
+                    options$: this.userList$,
+                    optionsLabelKey: 'name',
+                    optionsValueKey: 'id'
+                })
+            );
+        }
     }
 
     /**
@@ -598,6 +621,9 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             // retrieve created user & modified user information
             this.queryBuilder.include('createdByUser', true);
             this.queryBuilder.include('updatedByUser', true);
+
+            // retrieve responsible user information
+            this.queryBuilder.include('responsibleUser', true);
 
             // retrieve location list
             this.queryBuilder.include('locations', true);

@@ -37,6 +37,9 @@ export class FollowUpModel
 
     fillLocation: FillLocationModel;
 
+    responsibleUserId: string;
+    responsibleUser: UserModel;
+
     /**
      * Determine alertness
      */
@@ -181,6 +184,12 @@ export class FollowUpModel
         this.index = _.get(data, 'index');
 
         this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
+
+        this.responsibleUserId = _.get(data, 'responsibleUserId');
+        this.responsibleUser = _.get(data, 'responsibleUser');
+        if (this.responsibleUser) {
+            this.responsibleUser = new UserModel(this.responsibleUser);
+        }
     }
 
     /**

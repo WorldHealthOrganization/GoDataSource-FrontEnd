@@ -100,6 +100,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     caseData: CaseModel;
 
     selectedTeamIdFilterValue: string;
+    selectedResponsibleUserIdFilterValue: string;
     selectedStatusFilterValue: string[];
 
     // which follow-ups list page are we visiting?
@@ -110,9 +111,10 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     // subscribers
     outbreakSubscriber: Subscription;
 
-    teamWorkloadData: {
+    workloadData: {
         date: Moment,
         team: string,
+        user: string,
         status: string[]
     };
 
@@ -248,17 +250,18 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         protected i18nService: I18nService,
         protected teamDataService: TeamDataService,
         protected outbreakDataService: OutbreakDataService,
+        protected userDataService: UserDataService,
         private snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private route: ActivatedRoute,
-        private caseDataService: CaseDataService,
-        private userDataService: UserDataService
+        private caseDataService: CaseDataService
     ) {
         super(
             listHelperService, dialogService, followUpsDataService,
-            router, i18nService, teamDataService, outbreakDataService
+            router, i18nService, teamDataService, outbreakDataService, userDataService,
+            !!route.snapshot.queryParams.fromWorkload
         );
     }
 
@@ -292,14 +295,16 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             fromWorkload: boolean,
             date: string,
             team: string,
+            user: string,
             status: string[]
         } = this.route.snapshot.queryParams as any;
 
-        // from team workload ?
+        // from team/user workload ?
         if (queryParams.fromWorkload) {
-            this.teamWorkloadData = {
+            this.workloadData = {
                 date: moment(queryParams.date),
                 team: queryParams.team,
+                user: queryParams.user,
                 status: queryParams.status ?
                     queryParams.status :
                     null,
@@ -353,7 +358,9 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                     this.initPaginator();
 
                     // ...and re-load the list when the Selected Outbreak is changed
-                    this.needsRefreshList(true);
+                    if (!this.disableFilterCaching) {
+                        this.needsRefreshList(true);
+                    }
                 }
             });
 
@@ -403,17 +410,30 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
 
         // add case / contact breadcrumbs
         if (!this.caseData) {
-            // add team workload page if necessary
+            // add team/user workload page if necessary
             if (
-                this.teamWorkloadData &&
-                TeamModel.canListWorkload(this.authUser)
+                this.workloadData
             ) {
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel(
-                        'LNG_PAGE_TEAMS_WORKLOAD_TITLE',
-                        '/teams/workload'
-                    )
-                );
+                if (
+                    this.workloadData.user &&
+                    UserModel.canListWorkload(this.authUser)
+                ) {
+                    // add user workload page
+                    this.breadcrumbs.push(
+                        new BreadcrumbItemModel(
+                            'LNG_PAGE_USERS_WORKLOAD_TITLE',
+                            '/users/workload'
+                        )
+                    );
+                } else if (TeamModel.canListWorkload(this.authUser)) {
+                    // add team workload page
+                    this.breadcrumbs.push(
+                        new BreadcrumbItemModel(
+                            'LNG_PAGE_TEAMS_WORKLOAD_TITLE',
+                            '/teams/workload'
+                        )
+                    );
+                }
             }
 
             // list contacts
@@ -566,6 +586,14 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 visible: false
             }),
             new VisibleColumnModel({
+                field: 'responsibleUserId',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID',
+                visible: false,
+                excludeFromDisplay: (): boolean => {
+                    return UserModel.canList(this.authUser);
+                }
+            }),
+            new VisibleColumnModel({
                 field: 'deleted',
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED',
                 visible: false
@@ -673,6 +701,20 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 questionnaireTemplate: this.selectedOutbreak.contactFollowUpTemplate
             })
         ];
+
+        // allowed to filter by responsible user ?
+        if (UserModel.canList(this.authUser)) {
+            this.availableSideFilters.push(
+                new FilterModel({
+                    fieldName: 'responsibleUserId',
+                    fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID',
+                    type: FilterType.MULTISELECT,
+                    options$: this.userList$,
+                    optionsLabelKey: 'name',
+                    optionsValueKey: 'id'
+                })
+            );
+        }
 
         // Contact
         if (ContactModel.canList(this.authUser)) {
@@ -959,7 +1001,13 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
      */
     beforeCacheLoadFilters(): void {
         // set default filter rules
-        this.initializeHeaderFilters();
+        if (this.disableFilterCaching) {
+            setTimeout(() => {
+                this.initializeHeaderFilters();
+            });
+        } else {
+            this.initializeHeaderFilters();
+        }
     }
 
     /**
@@ -967,25 +1015,41 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
      */
     initializeHeaderFilters() {
         // from workload page ?
-        if (this.teamWorkloadData) {
+        if (this.workloadData) {
             // date
-            this.dateFilterDefaultValue = this.teamWorkloadData.date.clone().startOf('day');
+            this.dateFilterDefaultValue = this.workloadData.date.clone().startOf('day');
             this.dateFilterValue = this.dateFilterDefaultValue;
 
             // team
-            this.selectedTeamIdFilterValue = this.teamWorkloadData.team ?
-                this.teamWorkloadData.team :
+            this.selectedTeamIdFilterValue = this.workloadData.team ?
+                this.workloadData.team :
+                null;
+
+            // user
+            this.selectedResponsibleUserIdFilterValue = this.workloadData.user ?
+                this.workloadData.user :
                 null;
 
             // make sure we filter by team first time
-            this.filterByTeam(new LabelValuePair(
-                '',
-                this.selectedTeamIdFilterValue
-            ));
+            if (this.workloadData.team) {
+                this.filterByTeam(new LabelValuePair(
+                    '',
+                    this.selectedTeamIdFilterValue
+                ));
+            }
+
+            // make sure we filter by responsible user first time
+            if (this.workloadData.user) {
+                this.filterBySelectField(
+                    'responsibleUserId',
+                    this.selectedResponsibleUserIdFilterValue,
+                    null
+                );
+            }
 
             // filter by status ?
-            if (this.teamWorkloadData.status) {
-                this.selectedStatusFilterValue = this.teamWorkloadData.status;
+            if (this.workloadData.status) {
+                this.selectedStatusFilterValue = this.workloadData.status;
 
                 // filter by status
                 this.filterBySelectField(
@@ -1024,6 +1088,9 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             // retrieve created user & modified user information
             this.queryBuilder.include('createdByUser', true);
             this.queryBuilder.include('updatedByUser', true);
+
+            // include responsible user details
+            this.queryBuilder.include('responsibleUser', true);
 
             // refresh badges
             this.getFollowUpsGroupedByTeams();

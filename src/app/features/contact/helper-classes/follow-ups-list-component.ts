@@ -25,6 +25,7 @@ import {
     IExportFieldsGroupRequired,
     ExportFieldsGroupModelNameEnum
 } from '../../../core/models/export-fields-group.model';
+import { UserDataService } from '../../../core/services/data/user.data.service';
 
 /**
  * Follow-up list component
@@ -40,6 +41,9 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
     // list of export fields groups
     fieldsGroupList: LabelValuePair[];
     fieldsGroupListRequired: IExportFieldsGroupRequired;
+
+    // user list
+    usersList$: Observable<UserModel[]>;
 
     // teams list
     teamsList$: Observable<TeamModel[]>;
@@ -88,9 +92,14 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
         protected router: Router,
         protected i18nService: I18nService,
         protected teamDataService: TeamDataService,
-        protected outbreakDataService: OutbreakDataService
+        protected outbreakDataService: OutbreakDataService,
+        protected userDataService: UserDataService,
+        disableFilterCaching: boolean = false
     ) {
-        super(listHelperService);
+        super(
+            listHelperService,
+            disableFilterCaching
+        );
     }
 
     /**
@@ -104,6 +113,9 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
 
         // print follow-ups file name
         this.printFollowUpsFileName = this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME');
+
+        // load user list
+        this.usersList$ = this.userDataService.getUsersList().pipe(share());
 
         // load teams list
         // using share does the job, but it takes a bit to see the changes in the list

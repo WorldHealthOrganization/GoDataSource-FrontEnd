@@ -56,7 +56,8 @@ const routes: Routes = [
                             PERMISSION.USER_LIST,
                             PERMISSION.USER_CREATE,
                             PERMISSION.USER_VIEW,
-                            PERMISSION.USER_MODIFY
+                            PERMISSION.USER_MODIFY,
+                            PERMISSION.USER_LIST_WORKLOAD
                         ]
                     })
                 }

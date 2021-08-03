@@ -13,11 +13,16 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { catchError } from 'rxjs/operators';
+import {
+    catchError,
+    share
+} from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { Observable } from 'rxjs/index';
 
 @Component({
     selector: 'app-modify-event',
@@ -29,11 +34,14 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
+    userList$: Observable<UserModel[]>;
+
     // authenticated user
     authUser: UserModel;
     EventModel = EventModel;
     ContactModel = ContactModel;
     RelationshipModel = RelationshipModel;
+    UserModel = UserModel;
 
     eventId: string;
     outbreakId: string;
@@ -55,7 +63,8 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
         private formHelper: FormHelperService,
         private snackbarService: SnackbarService,
         private authDataService: AuthDataService,
-        protected dialogService: DialogService
+        protected dialogService: DialogService,
+        private userDataService: UserDataService
     ) {
         super(
             route,
@@ -72,6 +81,11 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
 
         // show loading
         this.showLoadingDialog(false);
+
+        // get users only if we're allowed to
+        if (UserModel.canList(this.authUser)) {
+            this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
+        }
 
         this.route.params
             .subscribe((params: {eventId}) => {

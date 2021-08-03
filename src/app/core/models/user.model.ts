@@ -304,6 +304,7 @@ export class UserModel
      */
     static canModifyOwnAccount(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_MODIFY_OWN_ACCOUNT) : false; }
     static canListForFilters(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_LIST_FOR_FILTERS) : false; }
+    static canListWorkload(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_LIST_WORKLOAD) : false; }
 
     /**
      * Constructor
@@ -344,6 +345,7 @@ export class UserModel
      */
     canModifyOwnAccount(user: UserModel): boolean { return UserModel.canModifyOwnAccount(user); }
     canListForFilters(user: UserModel): boolean { return UserModel.canListForFilters(user); }
+    canListWorkload(user: UserModel): boolean { return UserModel.canListWorkload(user); }
 
     /**
      * Check if user has specific permissions

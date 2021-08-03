@@ -341,6 +341,9 @@ export abstract class ListComponent implements OnDestroy {
     private _nextTimerForLoadCachedInputValues: number;
     private _loadedCachedFilterPage: string;
     private _disableFilterCaching: boolean = false;
+    get disableFilterCaching(): boolean {
+        return this._disableFilterCaching;
+    }
 
     // refresh only after we finish changing data
     private triggerListCountRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {

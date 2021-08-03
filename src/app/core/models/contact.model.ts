@@ -82,6 +82,9 @@ export class ContactModel
 
     followUpTeamId: string;
 
+    responsibleUserId: string;
+    responsibleUser: UserModel;
+
     dob: string;
     age: AgeModel;
 
@@ -286,6 +289,12 @@ export class ContactModel
 
         this.followUp = _.get(data, 'followUp', {});
         this.followUpHistory = _.get(data, 'followUpHistory', []);
+
+        this.responsibleUserId = _.get(data, 'responsibleUserId');
+        this.responsibleUser = _.get(data, 'responsibleUser');
+        if (this.responsibleUser) {
+            this.responsibleUser = new UserModel(this.responsibleUser);
+        }
 
         this.inconsistencies = _.get(data, 'inconsistencies', []);
         _.each(this.inconsistencies, (inconsistency, index) => {

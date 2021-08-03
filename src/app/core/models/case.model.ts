@@ -88,6 +88,9 @@ export class CaseModel
         status: string
     };
 
+    responsibleUserId: string;
+    responsibleUser: UserModel;
+
     visualId: string;
 
     relationships: {
@@ -323,6 +326,12 @@ export class CaseModel
         });
 
         this.followUp = _.get(data, 'followUp', {});
+
+        this.responsibleUserId = _.get(data, 'responsibleUserId');
+        this.responsibleUser = _.get(data, 'responsibleUser');
+        if (this.responsibleUser) {
+            this.responsibleUser = new UserModel(this.responsibleUser);
+        }
     }
 
     /**
