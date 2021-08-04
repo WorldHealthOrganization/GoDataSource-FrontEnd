@@ -490,8 +490,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             this.defaultStyle;
 
         // init filters - only show cases and events first
-        this.filters.showContacts = false;
-        this.filters.includeContactsOfContacts = false;
+        this.filters.showContacts = true;
+        this.filters.includeContactsOfContacts = true;
         this.filters.showEvents = true;
 
         // color criteria
@@ -2545,6 +2545,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                         this.snapshotFilters
                     );
 
+                    // preselect show contacts & show contact of contacts
+                    this.showContacts = this.snapshotOptionsMap[this.selectedSnapshot].snapshot.showContacts;
+                    this.showContactsOfContacts = this.snapshotOptionsMap[this.selectedSnapshot].snapshot.showContactsOfContacts;
+
                     // finished
                     loadingDialog.close();
 
@@ -2587,6 +2591,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                                 this.pageSize,
                                 this.snapshotFilters
                             );
+
+                            // preselect show contacts & show contact of contacts
+                            this.showContacts = this.snapshotOptionsMap[this.selectedSnapshot].snapshot.showContacts;
+                            this.showContactsOfContacts = this.snapshotOptionsMap[this.selectedSnapshot].snapshot.showContactsOfContacts;
 
                             // finished
                             loadingDialog.close();
