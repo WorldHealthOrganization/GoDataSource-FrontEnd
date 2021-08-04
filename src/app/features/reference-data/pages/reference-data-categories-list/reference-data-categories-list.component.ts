@@ -71,7 +71,10 @@ export class ReferenceDataCategoriesListComponent
         private i18nService: I18nService,
         private snackbarService: SnackbarService
     ) {
-        super(listHelperService);
+        super(
+            listHelperService,
+            true
+        );
     }
 
     /**
