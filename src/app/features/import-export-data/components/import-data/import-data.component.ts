@@ -608,6 +608,15 @@ export class ImportDataComponent
     // Used to keep function scope
     onWindowResizeScope: any;
 
+    // not mapped file columns translate data
+    notMappedTransData: {
+        no: number,
+        total: number
+    } = {
+        no: 0,
+        total: 0
+    };
+
     /**
      * Constructor
      */
@@ -904,6 +913,10 @@ export class ImportDataComponent
         // we should have at least the headers of the file
         if (this.importableObject.fileHeaders.length < 1) {
             this.importableObject = null;
+            this.notMappedTransData = {
+                no: 0,
+                total: 0
+            };
 
             this.displayError(
                 'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_HEADERS',
@@ -911,6 +924,8 @@ export class ImportDataComponent
             );
 
             return;
+        } else {
+            this.notMappedTransData.total = this.importableObject.fileHeaders.length;
         }
 
         // required fields
@@ -1294,6 +1309,9 @@ export class ImportDataComponent
             this.mappedFields.push(importableItem);
         });
 
+        // update number of items mapped
+        this.updateNotMappedFileColumnsData();
+
         // rerender list of visible items
         this.makeAllFieldsVisible();
 
@@ -1669,6 +1687,7 @@ export class ImportDataComponent
                             // clear map data
                             this.mappedFieldsVisible = [];
                             this.mappedFields = [];
+                            this.updateNotMappedFileColumnsData();
                             this.distinctValuesCache = {};
                             this.locationCache = {};
                             this.locationCacheIndex = {};
@@ -1719,6 +1738,9 @@ export class ImportDataComponent
 
                             // rerender list of visible items
                             this.makeAllFieldsVisible();
+
+                            // update number of items mapped
+                            this.updateNotMappedFileColumnsData();
 
                             // go through process of mapping sub options accordingly to what was saved
                             // this method will hide the loading dialog too
@@ -2065,12 +2087,17 @@ export class ImportDataComponent
         this.locationCache = {};
         this.locationCacheIndex = {};
         this.importableObject = null;
+        this.notMappedTransData = {
+            no: 0,
+            total: 0
+        };
         this.errMsgDetails = null;
         this.resetFiltersToSideFilters();
         this.asyncResponse = null;
         this.uploader.clearQueue();
         this.mappedFieldsVisible = [];
         this.mappedFields = [];
+        this.updateNotMappedFileColumnsData();
         this.decryptPassword = null;
         this.loadedImportMapping = null;
 
@@ -2100,6 +2127,9 @@ export class ImportDataComponent
 
         // 2 - update data after options were added
         this.validateData();
+
+        // update number of items mapped
+        this.updateNotMappedFileColumnsData();
     }
 
     /**
@@ -2173,6 +2203,7 @@ export class ImportDataComponent
             newItem,
             ...this.mappedFields
         ];
+        this.updateNotMappedFileColumnsData();
 
         // edit item
         this.editItem(newItem);
@@ -3449,9 +3480,11 @@ export class ImportDataComponent
     }
 
     /**
-     * Show not mapped file columns
+     * Retrieve not mapped column fields
      */
-    showNotMappedFileColumns(): void {
+    private getNotMappedFileFields(): {
+        [value: string]: ImportableLabelValuePair
+    } {
         // get file headers
         const notUsedFileHeaders: {
             [value: string]: ImportableLabelValuePair
@@ -3465,12 +3498,33 @@ export class ImportDataComponent
             delete notUsedFileHeaders[item.sourceField];
         });
 
+        // finished
+        return notUsedFileHeaders;
+    }
+
+    /**
+     * Update not mapped ...mapped file columns number
+     * @private
+     */
+    private updateNotMappedFileColumnsData(): void {
+        this.notMappedTransData = this.notMappedTransData.total > 0 ? {
+                no: this.notMappedTransData.total - Object.keys(this.getNotMappedFileFields()).length,
+                total: this.notMappedTransData.total
+            } :
+            this.notMappedTransData;
+    }
+
+    /**
+     * Show not mapped file columns
+     */
+    showNotMappedFileColumns(): void {
         // create missing columns
+        const notUsedFileHeaders = this.getNotMappedFileFields();
         const notMappedFields: DialogField[] = [];
         _.each(notUsedFileHeaders, (item) => {
             notMappedFields.push(new DialogField({
                 name: '_',
-                placeholder: item.label,
+                placeholder: `${notMappedFields.length + 1}. ${item.label}`,
                 fieldType: DialogFieldType.ACTION
             }));
         });

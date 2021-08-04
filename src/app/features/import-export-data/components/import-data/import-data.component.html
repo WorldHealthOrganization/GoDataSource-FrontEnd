@@ -116,10 +116,10 @@
             <div
                 fxFlex fxLayoutAlign="end center">
                 <span>
-                    {{ 'LNG_PAGE_IMPORT_DATA_NO_FILE_COLUMN_MAPPED' | translate:{no: mappedFields?.length, total: importableObject?.fileHeadersKeyValue?.length} }}
+                    {{ 'LNG_PAGE_IMPORT_DATA_NO_FILE_COLUMN_MAPPED' | translate:notMappedTransData}}
                 </span>
                 <span
-                    *ngIf="mappedFields?.length < importableObject?.fileHeadersKeyValue?.length">
+                    *ngIf="notMappedTransData.no < notMappedTransData.total">
                     &nbsp;(<a
                         class="xlink-button"
                         href="javascript: void(0)"
