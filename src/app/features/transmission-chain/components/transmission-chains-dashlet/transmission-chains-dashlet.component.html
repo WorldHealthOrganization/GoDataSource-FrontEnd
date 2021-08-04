@@ -53,7 +53,7 @@
                     (optionChanged)="updateShowContactsOfContactValue($event)">
                 </app-form-checkbox>
 
-                <!--  This checkbox is valid only if 'showContacts' is already enabled -->
+                <!-- This checkbox is valid only if 'showContacts' is already enabled -->
                 <app-form-checkbox
                     name="includeContactsOfContacts"
                     [disabled]="!filters.showContacts"
@@ -650,12 +650,16 @@
     </button>
 </div>
 
-<div *ngIf="sizeOfChainsFilter">
+<div *ngIf="sizeOfChainsFilter && !chainGroup &&
+        mustLoadChain &&
+        selectedChainPageIndex === null">
     <div>
         {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CHAINS_FILTERED_BY_SIZE' | translate}} {{sizeOfChainsFilter}}
     </div>
 </div>
-<div *ngIf="personId">
+<div *ngIf="personId && !chainGroup &&
+        mustLoadChain &&
+        selectedChainPageIndex === null">
     <div>
         {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CHAINS_FILTERED_BY_PERSON' | translate}} {{personName}}
     </div>
