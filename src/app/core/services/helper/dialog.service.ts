@@ -431,7 +431,7 @@ export class DialogService {
         }
 
         // construct query builder
-        let qb: RequestQueryBuilder;
+        let qb: RequestQueryBuilder = new RequestQueryBuilder();
         if (
             data.queryBuilder &&
             !data.queryBuilder.isEmpty()
