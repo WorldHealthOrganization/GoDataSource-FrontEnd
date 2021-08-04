@@ -100,9 +100,9 @@
         fxLayout="column"
         class="import-data-map-fields">
         <div
-            *ngIf="savedImportPage"
             fxLayout="row" fxLayoutGap="20px">
             <app-form-select
+                *ngIf="savedImportPage"
                 name="loadImportMapping"
                 [ngModel]="loadedImportMapping?.id"
                 [placeholder]="'LNG_PAGE_IMPORT_DATA_LOAD_SAVED_IMPORT_MAPPING_LABEL' | translate"
@@ -112,9 +112,20 @@
                 optionValueKey="id">
             </app-form-select>
 
-            <div fxFlex><!-- placeholder --></div>
-            <div fxFlex><!-- placeholder --></div>
-            <div fxFlex><!-- placeholder --></div>
+            <!-- Number of columns mapped -->
+            <div
+                fxFlex fxLayoutAlign="end center">
+                <span>
+                    {{ 'LNG_PAGE_IMPORT_DATA_NO_FILE_COLUMN_MAPPED' | translate:{no: mappedFields?.length, total: importableObject?.fileHeadersKeyValue?.length} }}
+                </span>
+                <span
+                    *ngIf="mappedFields?.length < importableObject?.fileHeadersKeyValue?.length">
+                    &nbsp;(<a
+                        class="xlink-button"
+                        href="javascript: void(0)"
+                        (click)="showNotMappedFileColumns()">{{ 'LNG_PAGE_IMPORT_DATA_BUTTON_SHOW_NOT_MAPPED_COLUMNS' | translate }}</a>)
+                </span>
+            </div>
         </div>
 
         <!-- Mapped Data -->

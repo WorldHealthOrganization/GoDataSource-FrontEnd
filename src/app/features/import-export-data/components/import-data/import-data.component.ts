@@ -5,28 +5,18 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { environment } from '../../../../../environments/environment';
 import { IAsyncImportResponse, IMappedOption, IModelArrayProperties, ImportableFileModel, ImportableFilePropertiesModel, ImportableFilePropertyValuesModel, ImportableLabelValuePair, ImportableMapField, ImportDataExtension } from './model';
 import * as _ from 'lodash';
-import { DialogAnswer, DialogAnswerButton, HoverRowAction, LoadingDialogModel } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { v4 as uuid } from 'uuid';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { SavedImportMappingService } from '../../../../core/services/data/saved-import-mapping.data.service';
-import {
-    DialogButton, DialogComponent,
-    DialogConfiguration, DialogField,
-    DialogFieldType
-} from '../../../../shared/components/dialog/dialog.component';
-import {
-    ISavedImportMappingModel,
-    SavedImportField, SavedImportMappingModel,
-    SavedImportOption
-} from '../../../../core/models/saved-import-mapping.model';
-import { Observable, Subscriber } from 'rxjs';
+import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components/dialog/dialog.component';
+import { ISavedImportMappingModel, SavedImportField, SavedImportMappingModel, SavedImportOption } from '../../../../core/models/saved-import-mapping.model';
+import { Observable, Subscriber, throwError } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 import { MatDialogRef } from '@angular/material/dialog';
 import { catchError, share, tap } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 import { HoverRowActionsDirective } from '../../../../shared/directives/hover-row-actions/hover-row-actions.directive';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
@@ -43,6 +33,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { ImportResultDataService } from '../../../../core/services/data/import-result.data.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ImportResultModel } from '../../../../core/models/import-result.model';
+import { HoverRowAction, LoadingDialogModel } from '../../../../shared/components';
 
 export enum ImportServerModelNames {
     CASE_LAB_RESULTS = 'labResult',
@@ -3455,5 +3446,50 @@ export class ImportDataComponent
                 ]
             }))
             .subscribe();
+    }
+
+    /**
+     * Show not mapped file columns
+     */
+    showNotMappedFileColumns(): void {
+        // get file headers
+        const notUsedFileHeaders: {
+            [value: string]: ImportableLabelValuePair
+        } = {};
+        (this.importableObject.fileHeadersKeyValue || []).forEach((sourceItem) => {
+            notUsedFileHeaders[sourceItem.value] = sourceItem;
+        });
+
+        // determine missing columns
+        (this.mappedFields || []).forEach((item) => {
+            delete notUsedFileHeaders[item.sourceField];
+        });
+
+        // create missing columns
+        const notMappedFields: DialogField[] = [];
+        _.each(notUsedFileHeaders, (item) => {
+            notMappedFields.push(new DialogField({
+                name: '_',
+                placeholder: item.label,
+                fieldType: DialogFieldType.ACTION
+            }));
+        });
+
+        // open dialog to choose the split factor
+        this.dialogService.showInput(
+            new DialogConfiguration({
+                message: 'LNG_PAGE_IMPORT_DATA_SHOW_NOT_MAPPED_COLUMNS_TITLE',
+                addDefaultButtons: false,
+                buttons: [
+                    new DialogButton({
+                        label: 'LNG_COMMON_BUTTON_CLOSE',
+                        clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
+                            dialogHandler.close();
+                        }
+                    })
+                ],
+                fieldsList: notMappedFields
+            }), true)
+            .subscribe(() => {});
     }
 }
