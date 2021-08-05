@@ -21,6 +21,7 @@ import { catchError, map } from 'rxjs/operators';
 import { throwError, of } from 'rxjs';
 import { moment } from '../../helperClasses/x-moment';
 import { IBasicCount } from '../../models/basic-count.interface';
+import { ICasesHospitalizedCount } from '../../models/cases-hospitalized-count.interface';
 
 @Injectable()
 export class CaseDataService {
@@ -163,6 +164,15 @@ export class CaseDataService {
     getCasesGroupedByClassification(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
         const filter = queryBuilder.buildQuery();
         return this.http.get(`outbreaks/${outbreakId}/cases/per-classification/count?filter=${filter}`);
+    }
+    /**
+     * Count Cases grouped by Classification
+     * @param outbreakId
+     * @param queryBuilder
+     */
+    getCasesHospitalized(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<ICasesHospitalizedCount> {
+        const filter = queryBuilder.buildQuery();
+        return this.http.get<ICasesHospitalizedCount>(`outbreaks/${outbreakId}/cases/hospitalized/count?filter=${filter}`);
     }
 
     /**

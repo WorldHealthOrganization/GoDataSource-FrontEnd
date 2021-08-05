@@ -2,7 +2,7 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
-import { Subscription, Subscriber, throwError, forkJoin } from 'rxjs';
+import { Subscription, Subscriber, throwError } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
@@ -15,7 +15,6 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel } from '../../../../core/models/user.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { PieDonutChartData } from '../../../../shared/components/pie-donut-graph/pie-donut-chart.component';
-import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-cases-hospitalized-pie-chart-dashlet',
@@ -222,54 +221,54 @@ export class CasesHospitalizedPieChartDashletComponent
 
             // retrieve data
             this.displayLoading = true;
-            this.previousSubscriber = forkJoin([
-                this.caseDataService.getHospitalisedCasesCount(this.outbreakId, this.globalFilterDate, qb),
-                this.caseDataService.getIsolatedCasesCount(this.outbreakId, this.globalFilterDate, qb),
-                this.caseDataService.getNotHospitalisedCasesCount(this.outbreakId, this.globalFilterDate, qb)
-            ])
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    return throwError(err);
-                })
-            )
-            .subscribe(([
-                hospitalizedCountResults,
-                isolatedCountResults,
-                caseNotHospitalizationCount
-            ]: [
-                IBasicCount,
-                IBasicCount,
-                IBasicCount
-            ]) => {
-                // create data
-                this.data = [
-                    new PieDonutChartData({
-                        key: Constants.APPLY_LIST_FILTER.CASES_HOSPITALISED,
-                        color: null,
-                        label: 'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_HOSPITALIZED_LABEL',
-                        value: hospitalizedCountResults.count
-                    }),
-                    new PieDonutChartData({
-                        key: Constants.APPLY_LIST_FILTER.CASES_ISOLATED,
-                        color: null,
-                        label: 'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_ISOLATED_LABEL',
-                        value: isolatedCountResults.count
-                    }),
-                    new PieDonutChartData({
-                        key: Constants.APPLY_LIST_FILTER.CASES_NOT_HOSPITALISED,
-                        color: null,
-                        label: 'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_NOT_HOSPITALIZED_LABEL',
-                        value: caseNotHospitalizationCount.count
+
+            // determine hospitalized & isolated for a specific date
+            qb.flag(
+                'date',
+                this.globalFilterDate
+            );
+
+            // make teh request to count hospitalized, isolated ...
+            this.previousSubscriber = this.caseDataService
+                .getCasesHospitalized(
+                    this.outbreakId,
+                    qb
+                )
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        return throwError(err);
                     })
-                ];
+                )
+                .subscribe((data) => {
+                    // create data
+                    this.data = [
+                        new PieDonutChartData({
+                            key: Constants.APPLY_LIST_FILTER.CASES_HOSPITALISED,
+                            color: null,
+                            label: 'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_HOSPITALIZED_LABEL',
+                            value: data.hospitalized
+                        }),
+                        new PieDonutChartData({
+                            key: Constants.APPLY_LIST_FILTER.CASES_ISOLATED,
+                            color: null,
+                            label: 'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_ISOLATED_LABEL',
+                            value: data.isolated
+                        }),
+                        new PieDonutChartData({
+                            key: Constants.APPLY_LIST_FILTER.CASES_NOT_HOSPITALISED,
+                            color: null,
+                            label: 'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_NOT_HOSPITALIZED_LABEL',
+                            value: data.notHospitalized
+                        })
+                    ];
 
-                // assign colors
-                PieDonutChartData.assignColorDomain(this.data);
+                    // assign colors
+                    PieDonutChartData.assignColorDomain(this.data);
 
-                // finished
-                this.displayLoading = false;
-            });
+                    // finished
+                    this.displayLoading = false;
+                });
         }
     }
 }
