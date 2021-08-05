@@ -2734,7 +2734,16 @@ export abstract class ListComponent implements OnDestroy {
                 this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_ARCHIVING');
                 break;
             case ExportStatusStep.LNG_STATUS_STEP_EXPORT_FINISHED:
-                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_DOWNLOADING');
+                this.loadingDialog.showMessage(
+                    'LNG_PAGE_EXPORT_DATA_EXPORT_DOWNLOADING', {
+                        downloaded: progress.downloadedBytes ?
+                            progress.downloadedBytes :
+                            '',
+                        total: progress.totalBytes ?
+                            progress.totalBytes :
+                            ''
+                    }
+                );
                 break;
         }
     }
