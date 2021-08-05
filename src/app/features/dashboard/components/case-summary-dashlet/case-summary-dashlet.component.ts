@@ -278,7 +278,9 @@ export class CaseSummaryDashletComponent
 
                             // put colors into data elements
                             this.data.forEach((dataItem) => {
-                                dataItem.color = classificationColorMap[dataItem.key];
+                                dataItem.color = classificationColorMap[dataItem.key] ?
+                                    classificationColorMap[dataItem.key] :
+                                    Constants.DEFAULT_COLOR_REF_DATA;
                             });
 
                             // finished

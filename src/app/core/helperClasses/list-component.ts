@@ -1448,16 +1448,36 @@ export abstract class ListComponent implements OnDestroy {
                     );
                 }
 
+                // filter by classification
                 const classificationCriteria = _.get(queryParams, 'x', null);
+
                 // merge query builder
                 this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
                 this.appliedListFilterQueryBuilder.filter.where({
                     // add and condition because otherwise classification filter if overwritten by the default one
-                    and: [{
-                        classification: {
-                            'eq': classificationCriteria
+                    and: [
+                        classificationCriteria === 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_UNCLASSIFIED' ? {
+                            or: [
+                                {
+                                    classification: {
+                                        exists: false
+                                    }
+                                }, {
+                                    classification: {
+                                        type: 'null'
+                                    }
+                                }, {
+                                    classification: {
+                                        eq: ''
+                                    }
+                                }
+                            ]
+                        } : {
+                            classification: {
+                                eq: classificationCriteria
+                            }
                         }
-                    }]
+                    ]
                 }, true);
 
                 if (!globalQb.isEmpty()) {
