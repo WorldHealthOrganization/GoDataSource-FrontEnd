@@ -415,7 +415,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 this.workloadData
             ) {
                 if (
-                    this.workloadData.user &&
+                    this.workloadData.user !== undefined &&
                     UserModel.canListWorkload(this.authUser)
                 ) {
                     // add user workload page
@@ -1031,7 +1031,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 null;
 
             // make sure we filter by team first time
-            if (this.workloadData.team) {
+            if (this.workloadData.team !== undefined) {
                 this.filterByTeam(new LabelValuePair(
                     '',
                     this.selectedTeamIdFilterValue
@@ -1039,7 +1039,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             }
 
             // make sure we filter by responsible user first time
-            if (this.workloadData.user) {
+            if (this.workloadData.user !== undefined) {
                 this.filterBySelectField(
                     'responsibleUserId',
                     this.selectedResponsibleUserIdFilterValue,
