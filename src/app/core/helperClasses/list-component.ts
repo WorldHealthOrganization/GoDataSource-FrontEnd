@@ -1448,16 +1448,36 @@ export abstract class ListComponent implements OnDestroy {
                     );
                 }
 
+                // filter by classification
                 const classificationCriteria = _.get(queryParams, 'x', null);
+
                 // merge query builder
                 this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
                 this.appliedListFilterQueryBuilder.filter.where({
                     // add and condition because otherwise classification filter if overwritten by the default one
-                    and: [{
-                        classification: {
-                            'eq': classificationCriteria
+                    and: [
+                        classificationCriteria === 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_UNCLASSIFIED' ? {
+                            or: [
+                                {
+                                    classification: {
+                                        exists: false
+                                    }
+                                }, {
+                                    classification: {
+                                        type: 'null'
+                                    }
+                                }, {
+                                    classification: {
+                                        eq: ''
+                                    }
+                                }
+                            ]
+                        } : {
+                            classification: {
+                                eq: classificationCriteria
+                            }
                         }
-                    }]
+                    ]
                 }, true);
 
                 if (!globalQb.isEmpty()) {
@@ -2714,7 +2734,16 @@ export abstract class ListComponent implements OnDestroy {
                 this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_ARCHIVING');
                 break;
             case ExportStatusStep.LNG_STATUS_STEP_EXPORT_FINISHED:
-                this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_DOWNLOADING');
+                this.loadingDialog.showMessage(
+                    'LNG_PAGE_EXPORT_DATA_EXPORT_DOWNLOADING', {
+                        downloaded: progress.downloadedBytes ?
+                            progress.downloadedBytes :
+                            '',
+                        total: progress.totalBytes ?
+                            progress.totalBytes :
+                            ''
+                    }
+                );
                 break;
         }
     }

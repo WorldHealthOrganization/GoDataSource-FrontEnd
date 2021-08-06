@@ -37,6 +37,7 @@ import {
     IExportFieldsGroupRequired,
     ExportFieldsGroupModelNameEnum
 } from '../../../../core/models/export-fields-group.model';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-entity-lab-results-list',
@@ -448,6 +449,11 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
         // default table columns
         this.tableColumns = [
             new VisibleColumnModel({
+                field: 'checkbox',
+                required: true,
+                excludeFromSave: true
+            }),
+            new VisibleColumnModel({
                 field: 'sampleIdentifier',
                 label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID'
             }),
@@ -784,5 +790,51 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
                     }
                 }
             });
+    }
+
+    /**
+     * Export selected records
+     */
+    exportSelectedLabResults() {
+        // get list of selected ids
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
+            return;
+        }
+
+        // construct query builder
+        const qb = new RequestQueryBuilder();
+        qb.filter.bySelect(
+            'id',
+            selectedRecords,
+            true,
+            null
+        );
+
+        // display export dialog
+        this.dialogService.showExportDialog({
+            // required
+            message: 'LNG_PAGE_LIST_LAB_RESULTS_EXPORT_TITLE',
+            url: this.exportLabResultsUrl,
+            fileName: this.exportLabResultsFileName,
+
+            // configure
+            isAsyncExport: true,
+            displayUseDbColumns: true,
+            exportProgress: (data) => { this.showExportProgress(data); },
+
+            // optional
+            allowedExportTypes: this.allowedExportTypes,
+            queryBuilder: qb,
+            displayEncrypt: true,
+            displayAnonymize: true,
+            displayFieldsGroupList: true,
+            displayUseQuestionVariable: true,
+            anonymizeFields: this.anonymizeFields,
+            fieldsGroupList: this.fieldsGroupList,
+            fieldsGroupListRequired: this.fieldsGroupListRequired,
+            exportStart: () => { this.showLoadingDialog(); },
+            exportFinished: () => { this.closeLoadingDialog(); }
+        });
     }
 }

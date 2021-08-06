@@ -50,7 +50,9 @@ export class DialogExportProgressAnswer {
         public readonly step: ExportStatusStep,
         public readonly processed: number,
         public readonly total: number,
-        public readonly estimatedEndDate: Moment
+        public readonly estimatedEndDate: Moment,
+        public readonly downloadedBytes: string,
+        public readonly totalBytes: string
     ) {}
 }
 
@@ -562,7 +564,9 @@ export class DialogService {
                                                     exportLogModel.statusStep,
                                                     exportLogModel.processedNo,
                                                     exportLogModel.totalNo,
-                                                    estimatedEndDate
+                                                    estimatedEndDate,
+                                                    undefined,
+                                                    undefined
                                                 ));
                                             }
 
@@ -581,7 +585,22 @@ export class DialogService {
                                             // finished everything with success ?
                                             if (exportLogModel.status === Constants.SYSTEM_SYNC_LOG_STATUS.SUCCESS.value) {
                                                 this.exportLogDataService
-                                                    .download(exportLogModel.id)
+                                                    .download(
+                                                        exportLogModel.id,
+                                                        (
+                                                            bytesLoaded: string
+                                                        ) => {
+                                                            // update progress message
+                                                            data.exportProgress(new DialogExportProgressAnswer(
+                                                                exportLogModel.statusStep,
+                                                                exportLogModel.processedNo,
+                                                                exportLogModel.totalNo,
+                                                                undefined,
+                                                                bytesLoaded,
+                                                                exportLogModel.sizeBytesHumanReadable
+                                                            ));
+                                                        }
+                                                    )
                                                     .pipe(
                                                         catchError((err) => {
                                                             this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
@@ -600,6 +619,8 @@ export class DialogService {
                                                             exportLogModel.statusStep,
                                                             exportLogModel.processedNo,
                                                             exportLogModel.totalNo,
+                                                            undefined,
+                                                            undefined,
                                                             undefined
                                                         ));
 

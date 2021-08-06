@@ -3,6 +3,7 @@ import { BaseModel } from './base.model';
 import { UserModel } from './user.model';
 import { IPermissionBasic } from './permission.interface';
 import { ExportStatusStep } from './constants';
+import { FileSize } from '../helperClasses/file-size';
 
 export class ExportLogModel
     extends BaseModel
@@ -17,6 +18,29 @@ export class ExportLogModel
     actionStartDate: string;
     actionCompletionDate: string;
     extension: string;
+
+    // size in bytes
+    private _sizeBytes: number;
+    private _sizeBytesHumanReadable: string;
+    get sizeBytes(): number {
+        return this._sizeBytes;
+    }
+    set sizeBytes(sizeBytes: number) {
+        // set value
+        this._sizeBytes = sizeBytes;
+
+        // format human readable
+        if (this.sizeBytes) {
+            this._sizeBytesHumanReadable = FileSize.bytesToReadableForm(this.sizeBytes);
+        } else {
+            this._sizeBytesHumanReadable = '-';
+        }
+    }
+
+    // file size in human readable format
+    get sizeBytesHumanReadable(): string {
+        return this._sizeBytesHumanReadable;
+    }
 
     /**
      * Static Permissions - IPermissionBasic
@@ -43,6 +67,9 @@ export class ExportLogModel
         this.actionStartDate = _.get(data, 'actionStartDate');
         this.actionCompletionDate = _.get(data, 'actionCompletionDate');
         this.extension = _.get(data, 'extension');
+
+        // file size
+        this.sizeBytes = _.get(data, 'sizeBytes', 0);
     }
 
     /**
