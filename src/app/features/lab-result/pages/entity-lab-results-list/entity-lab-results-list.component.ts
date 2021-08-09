@@ -79,6 +79,8 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
     yesNoOptionsList$: Observable<any[]>;
     caseClassificationsList$: Observable<any[]>;
     progressOptionsList$: Observable<any[]>;
+    sequenceLabOptionsList$: Observable<any[]>;
+    sequenceResultOptionsList$: Observable<any[]>;
 
     // constants
     ReferenceDataCategory = ReferenceDataCategory;
@@ -291,6 +293,8 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
     ngOnInit() {
         // progress options
         this.progressOptionsList$ = this.genericDataService.getProgressOptionsList();
+        this.sequenceLabOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_SEQUENCE_LABORATORY);
+        this.sequenceResultOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_SEQUENCE_RESULT);
 
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -492,6 +496,36 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
             new VisibleColumnModel({
                 field: 'testedFor',
                 label: 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR'
+            }),
+            new VisibleColumnModel({
+                field: 'sequence.hasSequence',
+                label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'sequence.dateSampleSent',
+                label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'sequence.labId',
+                label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'sequence.dateResult',
+                label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'sequence.resultId',
+                label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'sequence.noSequenceReason',
+                label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'deleted',

@@ -9,6 +9,7 @@ import { IPermissionBasic, IPermissionExportable, IPermissionImportable, IPermis
 import { UserModel } from './user.model';
 import { OutbreakModel } from './outbreak.model';
 import { PERMISSION } from './permission.model';
+import { LabResultSequenceModel } from './lab-result-sequence.model';
 
 export class LabResultModel
     extends BaseModel
@@ -37,6 +38,7 @@ export class LabResultModel
     personType: EntityType;
     person: CaseModel | ContactModel;
     testedFor: string;
+    sequence: LabResultSequenceModel;
 
     /**
      * Static Permissions - IPermissionBasic
@@ -91,6 +93,9 @@ export class LabResultModel
         this.personId = _.get(data, 'personId');
         this.personType = _.get(data, 'personType');
         this.testedFor = _.get(data, 'testedFor');
+
+        // sequence
+        this.sequence = new LabResultSequenceModel(_.get(data, 'sequence'));
 
         this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
     }
