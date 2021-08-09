@@ -187,18 +187,31 @@ export class ListFilterDataService {
         const elementCondition = {
             [negated ? '$elemMatch' : 'elemMatch']: {
                 typeId: DateType.HOSPITALIZATION_DATE,
-                startDate: {
-                    $lte: moment(date).endOf('day').toISOString()
-                },
-                $or: [
+                $and: [
                     {
-                        endDate: {
-                            $eq: null
-                        }
+                        $or: [
+                            {
+                                startDate: {
+                                    $eq: null
+                                }
+                            }, {
+                                startDate: {
+                                    $lte: moment(date).endOf('day').toISOString()
+                                }
+                            }
+                        ]
                     }, {
-                        endDate: {
-                            $gte: moment(date).endOf('day').toISOString()
-                        }
+                        $or: [
+                            {
+                                endDate: {
+                                    $eq: null
+                                }
+                            }, {
+                                endDate: {
+                                    $gte: moment(date).startOf('day').toISOString()
+                                }
+                            }
+                        ]
                     }
                 ]
             }
@@ -261,18 +274,31 @@ export class ListFilterDataService {
             dateRanges: {
                 elemMatch: {
                     typeId: DateType.ISOLATION_DATE,
-                    startDate: {
-                        $lte: moment(date).endOf('day').toISOString()
-                    },
-                    $or: [
+                    $and: [
                         {
-                            endDate: {
-                                $eq: null
-                            }
+                            $or: [
+                                {
+                                    startDate: {
+                                        $eq: null
+                                    }
+                                }, {
+                                    startDate: {
+                                        $lte: moment(date).endOf('day').toISOString()
+                                    }
+                                }
+                            ]
                         }, {
-                            endDate: {
-                                $gte: moment(date).endOf('day').toISOString()
-                            }
+                            $or: [
+                                {
+                                    endDate: {
+                                        $eq: null
+                                    }
+                                }, {
+                                    endDate: {
+                                        $gte: moment(date).startOf('day').toISOString()
+                                    }
+                                }
+                            ]
                         }
                     ]
                 }
