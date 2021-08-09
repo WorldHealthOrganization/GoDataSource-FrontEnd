@@ -224,6 +224,94 @@
                     </div>
                 </mat-card>
 
+                <!-- Sequence -->
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+                        <div>
+                            {{'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE' | translate}}
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-slide-toggle
+                                name="sequence.hasSequence"
+                                [(ngModel)]="labResultData.sequence.hasSequence"
+                                [label]="'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE' | translate"
+                                tooltip="LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE_DESCRIPTION">
+                            </app-form-slide-toggle>
+
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
+
+                        <!-- Has sequence -->
+                        <div fxLayout="row" fxLayoutGap="20px"
+                             *ngIf="labResultData.sequence.hasSequence; else noSequence">
+
+                            <app-form-datepicker
+                                name="sequence.dateSampleSent"
+                                [(ngModel)]="labResultData.sequence.dateSampleSent"
+                                [placeholder]="'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT' | translate"
+                                tooltip="LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT_DESCRIPTION"
+                                [maxDate]="serverToday"
+                                app-date-validator
+                                [dateSameOrBefore]="[
+                                    serverToday
+                                ]">
+                            </app-form-datepicker>
+
+                            <app-form-select
+                                name="sequence.labId"
+                                [(ngModel)]="labResultData.sequence.labId"
+                                [placeholder]="'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB' | translate"
+                                tooltip="LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB_DESCRIPTION"
+                                [options]="sequenceLabOptionsList$ | async"
+                                optionLabelKey="label"
+                                optionValueKey="value">
+                            </app-form-select>
+
+                            <app-form-datepicker
+                                name="sequence.dateResult"
+                                [(ngModel)]="labResultData.sequence.dateResult"
+                                [placeholder]="'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT' | translate"
+                                tooltip="LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT_DESCRIPTION"
+                                [maxDate]="serverToday"
+                                app-date-validator
+                                [dateSameOrBefore]="[
+                                    serverToday
+                                ]">
+                            </app-form-datepicker>
+
+                            <app-form-select
+                                name="sequence.resultId"
+                                [(ngModel)]="labResultData.sequence.resultId"
+                                [placeholder]="'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT' | translate"
+                                tooltip="LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT_DESCRIPTION"
+                                [options]="sequenceResultOptionsList$ | async"
+                                optionLabelKey="label"
+                                optionValueKey="value">
+                            </app-form-select>
+
+                        </div>
+
+                        <!-- Doesn't have sequence -->
+                        <ng-template
+                            #noSequence>
+                            <div fxLayout="row" fxLayoutGap="20px">
+
+                                <app-form-textarea
+                                    name="sequence.noSequenceReason"
+                                    [(ngModel)]="labResultData.sequence.noSequenceReason"
+                                    [placeholder]="'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON' | translate"
+                                    tooltip="LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON_DESCRIPTION">
+                                </app-form-textarea>
+
+                            </div>
+                        </ng-template>
+
+                    </div>
+                </mat-card>
+
                 <!-- Create / update by user information section -->
                 <div class="section-title">
                     {{ 'LNG_PAGE_MODIFY_LAB_RESULT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE' | translate }}

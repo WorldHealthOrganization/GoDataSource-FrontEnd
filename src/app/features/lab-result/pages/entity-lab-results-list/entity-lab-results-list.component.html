@@ -461,6 +461,165 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Has sequence -->
+        <ng-container matColumnDef="sequence.hasSequence">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="hasSequenceFilter"
+                            [ngModel]="''"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="yesNoOptionsList$ | async"
+                            (optionChanged)="filterByBooleanField('sequence.hasSequence', $event.value)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                <app-yes-no-label [value]="item.sequence?.hasSequence"></app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Sequence date sample taken -->
+        <ng-container matColumnDef="sequence.dateSampleSent">
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-daterange
+                            name="seqDateSampleSentFilter"
+                            ngModel
+                            (changed)="filterByDateRangeField('sequence.dateSampleSent', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
+                {{ item.sequence?.dateSampleSent | dateDefault}}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Sequence laboratory -->
+        <ng-container matColumnDef="sequence.labId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="seqLaboratoryFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="sequenceLabOptionsList$ | async"
+                            (optionChanged)="filterBySelectField('sequence.labId', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.LAB_SEQUENCE_LABORATORY"
+                    [value]="item.sequence.labId">
+                </app-reference-data-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Sequence date result -->
+        <ng-container matColumnDef="sequence.dateResult">
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-daterange
+                            name="seqDateResultFilter"
+                            ngModel
+                            (changed)="filterByDateRangeField('sequence.dateResult', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
+                {{ item.sequence?.dateResult | dateDefault}}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Sequence result -->
+        <ng-container matColumnDef="sequence.resultId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="seqResultFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="sequenceResultOptionsList$ | async"
+                            (optionChanged)="filterBySelectField('sequence.resultId', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.LAB_SEQUENCE_RESULT"
+                    [value]="item.sequence.resultId">
+                </app-reference-data-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Sequence no seq reason -->
+        <ng-container matColumnDef="sequence.noSequenceReason">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="seqNoSeqReasonFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('sequence.noSequenceReason', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.sequence?.noSequenceReason }}
+            </mat-cell>
+        </ng-container>
+
         <!-- Deleted -->
         <ng-container matColumnDef="deleted">
             <mat-header-cell *matHeaderCellDef>

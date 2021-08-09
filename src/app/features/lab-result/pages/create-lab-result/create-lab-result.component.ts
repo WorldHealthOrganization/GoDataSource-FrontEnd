@@ -47,6 +47,8 @@ export class CreateLabResultComponent
     resultTypesList$: Observable<any[]>;
     labNameOptionsList$: Observable<any[]>;
     progressOptionsList$: Observable<any[]>;
+    sequenceLabOptionsList$: Observable<any[]>;
+    sequenceResultOptionsList$: Observable<any[]>;
 
     selectedOutbreak: OutbreakModel = new OutbreakModel();
 
@@ -111,6 +113,8 @@ export class CreateLabResultComponent
         this.resultTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_TEST_RESULT);
         this.labNameOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_NAME);
         this.progressOptionsList$ = this.genericDataService.getProgressOptionsList();
+        this.sequenceLabOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_SEQUENCE_LABORATORY);
+        this.sequenceResultOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_SEQUENCE_RESULT);
 
         // retrieve page information
         this.route.data.subscribe((data: { personType: EntityType }) => {

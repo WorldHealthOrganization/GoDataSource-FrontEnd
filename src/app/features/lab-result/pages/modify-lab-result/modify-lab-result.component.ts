@@ -66,6 +66,8 @@ export class ModifyLabResultComponent extends ViewModifyComponent implements OnI
     resultTypesList$: Observable<any[]>;
     labNameOptionsList$: Observable<any[]>;
     progressOptionsList$: Observable<any[]>;
+    sequenceLabOptionsList$: Observable<any[]>;
+    sequenceResultOptionsList$: Observable<any[]>;
 
     serverToday: Moment = moment();
 
@@ -112,6 +114,8 @@ export class ModifyLabResultComponent extends ViewModifyComponent implements OnI
         this.resultTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_TEST_RESULT);
         this.labNameOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_NAME);
         this.progressOptionsList$ = this.genericDataService.getProgressOptionsList();
+        this.sequenceLabOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_SEQUENCE_LABORATORY);
+        this.sequenceResultOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_SEQUENCE_RESULT);
 
         this.route.queryParams.
             subscribe((queryParams: {fromLabResultsList}) => {
