@@ -126,6 +126,9 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
                                 low: moment().add(-this.selectedOutbreak.periodOfFollowup + 1, 'days').startOf('day'),
                                 high: moment().add(1, 'days').endOf('day')
                             });
+                        } else {
+                            // hide loading
+                            this.displayLoading = false;
                         }
                     });
             });
@@ -198,6 +201,9 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
                     .getFollowUpsPerDayTeam(this.selectedOutbreak.id, this.queryBuilder)
                     .pipe(
                         catchError((err) => {
+                            // hide loading
+                            this.displayLoading = false;
+
                             this.snackbarService.showApiError(err);
                             finishCallback([]);
                             return throwError(err);
@@ -221,6 +227,10 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
                 finishCallback([]);
             }
         } else {
+            // hide loading
+            this.displayLoading = false;
+
+            // finished
             finishCallback([]);
         }
     }
