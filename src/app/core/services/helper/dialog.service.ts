@@ -202,6 +202,9 @@ export class DialogService {
         displayUseDbColumns?: boolean,
         useDbColumnsPlaceholder?: string,
         useDbColumnsDescription?: string,
+        displayJsonReplaceUndefinedWithNull?: boolean,
+        jsonReplaceUndefinedWithNullPlaceholder?: string,
+        jsonReplaceUndefinedWithNullDescription?: string,
         useDbColumnsDontTranslateValuePlaceholder?: string,
         useDbColumnsDontTranslateValueDescription?: string,
         yesLabel?: string,
@@ -249,6 +252,14 @@ export class DialogService {
 
         if (!data.useDbColumnsDescription) {
             data.useDbColumnsDescription = 'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS_DESCRIPTION';
+        }
+
+        if (!data.jsonReplaceUndefinedWithNullPlaceholder) {
+            data.jsonReplaceUndefinedWithNullPlaceholder = 'LNG_COMMON_LABEL_EXPORT_JSON_REPLACE_UNDEFINED_WITH_NULL';
+        }
+
+        if (!data.jsonReplaceUndefinedWithNullDescription) {
+            data.jsonReplaceUndefinedWithNullDescription = 'LNG_COMMON_LABEL_EXPORT_JSON_REPLACE_UNDEFINED_WITH_NULL_DESCRIPTION';
         }
 
         if (!data.useDbColumnsDontTranslateValuePlaceholder) {
@@ -378,10 +389,10 @@ export class DialogService {
             );
         }
 
-        // add field for use question variable
+        // add field for use db columns
         if (data.displayUseDbColumns) {
             // use db columns
-            fieldsListLayout.push(100);
+            fieldsListLayout.push(50);
             fieldsList.push(
                 new DialogField({
                     name: 'useDbColumns',
@@ -392,7 +403,7 @@ export class DialogService {
             );
 
             // db columns values
-            fieldsListLayout.push(100);
+            fieldsListLayout.push(50);
             fieldsList.push(
                 new DialogField({
                     name: 'dontTranslateValues',
@@ -401,6 +412,23 @@ export class DialogService {
                     description: data.useDbColumnsDontTranslateValueDescription,
                     visible: (dialogFieldsValues: any): boolean => {
                         return !!dialogFieldsValues.useDbColumns;
+                    }
+                })
+            );
+        }
+
+        // add field for json replace undefined with NULL
+        if (data.displayJsonReplaceUndefinedWithNull) {
+            // use db columns
+            fieldsListLayout.push(100);
+            fieldsList.push(
+                new DialogField({
+                    name: 'jsonReplaceUndefinedWithNull',
+                    placeholder: data.jsonReplaceUndefinedWithNullPlaceholder,
+                    fieldType: DialogFieldType.BOOLEAN,
+                    description: data.jsonReplaceUndefinedWithNullDescription,
+                    visible: (dialogFieldsValues: any): boolean => {
+                        return dialogFieldsValues.fileType === ExportDataExtension.JSON;
                     }
                 })
             );

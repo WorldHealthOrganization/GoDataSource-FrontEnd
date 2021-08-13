@@ -42,6 +42,7 @@
                         (exportFinished)="closeLoadingDialog()"
                         (exportProgress)="showExportProgress($event)"
                         [displayUseDbColumns]="true"
+                        [displayJsonReplaceUndefinedWithNull]="true"
                         [isAsyncExport]="true">
                     </app-export-button>
 

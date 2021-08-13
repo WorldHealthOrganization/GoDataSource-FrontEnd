@@ -1316,6 +1316,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             // configure
             isAsyncExport: true,
             displayUseDbColumns: true,
+            displayJsonReplaceUndefinedWithNull: true,
             exportProgress: (data) => { this.showExportProgress(data); },
 
             // optional
@@ -1409,6 +1410,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             // configure
             isAsyncExport: true,
             displayUseDbColumns: true,
+            displayJsonReplaceUndefinedWithNull: true,
             exportProgress: (data) => { this.showExportProgress(data); },
 
             // optional
@@ -1499,6 +1501,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             // configure
             isAsyncExport: true,
             displayUseDbColumns: true,
+            displayJsonReplaceUndefinedWithNull: true,
             exportProgress: (data) => { this.showExportProgress(data); },
 
             // optional

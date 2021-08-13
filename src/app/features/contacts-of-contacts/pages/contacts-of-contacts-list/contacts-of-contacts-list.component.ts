@@ -805,6 +805,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             // configure
             isAsyncExport: true,
             displayUseDbColumns: true,
+            displayJsonReplaceUndefinedWithNull: true,
             exportProgress: (data) => { this.showExportProgress(data); },
 
             // // optional
@@ -899,6 +900,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             // configure
             isAsyncExport: true,
             displayUseDbColumns: true,
+            displayJsonReplaceUndefinedWithNull: true,
             exportProgress: (data) => { this.showExportProgress(data); },
 
             // optional
@@ -979,6 +981,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             // configure
             isAsyncExport: true,
             displayUseDbColumns: true,
+            displayJsonReplaceUndefinedWithNull: true,
             exportProgress: (data) => { this.showExportProgress(data); },
 
             // optional

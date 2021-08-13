@@ -1297,6 +1297,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             // configure
             isAsyncExport: true,
             displayUseDbColumns: true,
+            displayJsonReplaceUndefinedWithNull: true,
             exportProgress: (data) => { this.showExportProgress(data); },
 
             // optional
@@ -1353,6 +1354,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             // configure
             isAsyncExport: true,
             displayUseDbColumns: true,
+            displayJsonReplaceUndefinedWithNull: true,
             exportProgress: (data) => { this.showExportProgress(data); },
 
             // optional
@@ -1408,6 +1410,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             // configure
             isAsyncExport: true,
             displayUseDbColumns: true,
+            displayJsonReplaceUndefinedWithNull: true,
             exportProgress: (data) => { this.showExportProgress(data); },
 
             // optional
