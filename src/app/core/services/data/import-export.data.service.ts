@@ -39,6 +39,7 @@ export class ImportExportDataService {
             anonymizeFields?: string[],
             fieldsGroupList?: string[],
             useDbColumns?: boolean,
+            jsonReplaceUndefinedWithNull?: boolean,
             dontTranslateValues?: boolean,
             useQuestionVariable?: boolean,
             [otherData: string]: any
@@ -79,6 +80,15 @@ export class ImportExportDataService {
                 data.useDbColumns
             );
             delete data.useDbColumns;
+        }
+
+        // add flag jsonReplaceUndefinedWithNull
+        if (!_.isUndefined(data.jsonReplaceUndefinedWithNull)) {
+            queryBuilder.filter.flag(
+                'jsonReplaceUndefinedWithNull',
+                data.jsonReplaceUndefinedWithNull
+            );
+            delete data.jsonReplaceUndefinedWithNull;
         }
 
         // add flag dontTranslateValues

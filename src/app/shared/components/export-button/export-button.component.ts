@@ -42,6 +42,7 @@ export class ExportButtonComponent {
     @Input() useQuestionVariableDescription: string;
     @Input() useQuestionVariablePlaceholder: string;
     @Input() displayUseDbColumns: boolean = false;
+    @Input() displayJsonReplaceUndefinedWithNull: boolean = false;
     @Input() useDbColumnsPlaceholder: string;
     @Input() useDbColumnsDescription: string;
     @Input() useDbColumnsDontTranslateValuePlaceholder: string;
@@ -91,6 +92,7 @@ export class ExportButtonComponent {
             useDbColumnsDontTranslateValuePlaceholder: this.useDbColumnsDontTranslateValuePlaceholder,
             useDbColumnsDontTranslateValueDescription: this.useDbColumnsDontTranslateValueDescription,
             displayUseDbColumns: this.displayUseDbColumns,
+            displayJsonReplaceUndefinedWithNull: this.displayJsonReplaceUndefinedWithNull,
             useDbColumnsPlaceholder: this.useDbColumnsPlaceholder,
             useDbColumnsDescription: this.useDbColumnsDescription,
             anonymizeFields: this.anonymizeFields,

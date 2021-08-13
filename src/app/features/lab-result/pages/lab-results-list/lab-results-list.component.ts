@@ -811,6 +811,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
             // configure
             isAsyncExport: true,
             displayUseDbColumns: true,
+            displayJsonReplaceUndefinedWithNull: true,
             exportProgress: (data) => { this.showExportProgress(data); },
 
             // optional

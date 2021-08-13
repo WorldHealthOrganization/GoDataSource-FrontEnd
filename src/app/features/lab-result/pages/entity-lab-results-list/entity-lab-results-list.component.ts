@@ -855,6 +855,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
             // configure
             isAsyncExport: true,
             displayUseDbColumns: true,
+            displayJsonReplaceUndefinedWithNull: true,
             exportProgress: (data) => { this.showExportProgress(data); },
 
             // optional
