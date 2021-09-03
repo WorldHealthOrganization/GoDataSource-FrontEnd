@@ -9,7 +9,7 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton, DialogField, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
+import { DialogAnswerButton, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
@@ -127,6 +127,17 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         ExportDataExtension.PDF
     ];
 
+    // include contact data in case export ?
+    caseExtraDialogFields: DialogField[] = [
+        new DialogField({
+            name: 'includeContactFields',
+            placeholder: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION',
+            description: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION_DESCRIPTION',
+            fieldType: DialogFieldType.BOOLEAN
+        })
+    ];
+
+    // anonymize fields
     anonymizeFields: LabelValuePair[] = [
         new LabelValuePair('LNG_CASE_FIELD_LABEL_ID', 'id'),
         new LabelValuePair('LNG_CASE_FIELD_LABEL_FIRST_NAME', 'firstName'),
@@ -1299,6 +1310,14 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             displayUseDbColumns: true,
             displayJsonReplaceUndefinedWithNull: true,
             exportProgress: (data) => { this.showExportProgress(data); },
+            extraDialogFields: [
+                new DialogField({
+                    name: 'includeContactFields',
+                    placeholder: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION',
+                    description: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION_DESCRIPTION',
+                    fieldType: DialogFieldType.BOOLEAN
+                })
+            ],
 
             // optional
             allowedExportTypes: this.allowedExportTypes,

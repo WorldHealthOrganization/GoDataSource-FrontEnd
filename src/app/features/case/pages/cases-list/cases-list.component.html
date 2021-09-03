@@ -78,7 +78,8 @@
                         (exportProgress)="showExportProgress($event)"
                         [displayUseDbColumns]="true"
                         [displayJsonReplaceUndefinedWithNull]="true"
-                        [isAsyncExport]="true">
+                        [isAsyncExport]="true"
+                        [extraDialogFields]="caseExtraDialogFields">
                     </app-export-button>
 
                     <ng-container *app-selected-outbreak-is-active>

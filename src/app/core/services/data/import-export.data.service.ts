@@ -109,6 +109,24 @@ export class ImportExportDataService {
             delete data.useQuestionVariable;
         }
 
+        // add flag includeContactFields
+        if (!_.isUndefined(data.includeContactFields)) {
+            queryBuilder.filter.flag(
+                'includeContactFields',
+                data.includeContactFields
+            );
+            delete data.includeContactFields;
+        }
+
+        // add flag includeCaseFields
+        if (!_.isUndefined(data.includeCaseFields)) {
+            queryBuilder.filter.flag(
+                'includeCaseFields',
+                data.includeCaseFields
+            );
+            delete data.includeCaseFields;
+        }
+
         // add other custom fields caused by API inconsistencies...
         _.each(data, (value: any, key: string) => {
             completeURL += `&${key}=` + (_.isString(value) || _.isNumber(value) ? value : JSON.stringify(value));
