@@ -2734,16 +2734,25 @@ export abstract class ListComponent implements OnDestroy {
                 this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_ARCHIVING');
                 break;
             case ExportStatusStep.LNG_STATUS_STEP_EXPORT_FINISHED:
-                this.loadingDialog.showMessage(
-                    'LNG_PAGE_EXPORT_DATA_EXPORT_DOWNLOADING', {
-                        downloaded: progress.downloadedBytes ?
-                            progress.downloadedBytes :
-                            '',
-                        total: progress.totalBytes ?
-                            progress.totalBytes :
-                            ''
-                    }
-                );
+                if (
+                    progress.downloadedBytes === undefined ||
+                    progress.totalBytes === undefined
+                ) {
+                    this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_FINISHING');
+                } else {
+                    this.loadingDialog.showMessage(
+                        'LNG_PAGE_EXPORT_DATA_EXPORT_DOWNLOADING', {
+                            downloaded: progress.downloadedBytes ?
+                                progress.downloadedBytes :
+                                '',
+                            total: progress.totalBytes ?
+                                progress.totalBytes :
+                                ''
+                        }
+                    );
+                }
+
+                // finished
                 break;
         }
     }

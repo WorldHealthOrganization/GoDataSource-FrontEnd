@@ -477,12 +477,13 @@ export class DialogService {
         }
 
         // display dialog
-        this.showInput(new DialogConfiguration({
-            message: data.message,
-            yesLabel: data.yesLabel,
-            fieldsList: fieldsList,
-            fieldsListLayout
-        }))
+        this.showInput(
+            new DialogConfiguration({
+                message: data.message,
+                yesLabel: data.yesLabel,
+                fieldsList: fieldsList,
+                fieldsListLayout
+            }))
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     // do not send the checkbox all value to api

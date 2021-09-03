@@ -157,6 +157,17 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         ExportDataExtension.PDF
     ];
 
+    // include case data in contact export ?
+    contactExtraDialogFields: DialogField[] = [
+        new DialogField({
+            name: 'includeCaseFields',
+            placeholder: 'LNG_PAGE_LIST_CONTACTS_EXPORT_CASE_INFORMATION',
+            description: 'LNG_PAGE_LIST_CONTACTS_EXPORT_CASE_INFORMATION_DESCRIPTION',
+            fieldType: DialogFieldType.BOOLEAN
+        })
+    ];
+
+    // anonymize fields
     anonymizeFields: LabelValuePair[] = [
         new LabelValuePair('LNG_CONTACT_FIELD_LABEL_ID', 'id'),
         new LabelValuePair('LNG_CONTACT_FIELD_LABEL_FIRST_NAME', 'firstName'),
@@ -933,7 +944,13 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                 fieldName: 'vaccinesReceived.date',
                 fieldLabel: 'LNG_CONTACT_FIELD_LABEL_VACCINE_DATE',
                 type: FilterType.RANGE_DATE
-            })
+            }),
+            new FilterModel({
+                fieldName: 'wasCase',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE',
+                type: FilterType.SELECT,
+                options$: this.yesNoOptionsList$
+            }),
         ];
 
         // allowed to filter by follow-up team ?
@@ -1318,6 +1335,14 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             displayUseDbColumns: true,
             displayJsonReplaceUndefinedWithNull: true,
             exportProgress: (data) => { this.showExportProgress(data); },
+            extraDialogFields: [
+                new DialogField({
+                    name: 'includeCaseFields',
+                    placeholder: 'LNG_PAGE_LIST_CONTACTS_EXPORT_CASE_INFORMATION',
+                    description: 'LNG_PAGE_LIST_CONTACTS_EXPORT_CASE_INFORMATION_DESCRIPTION',
+                    fieldType: DialogFieldType.BOOLEAN
+                })
+            ],
 
             // optional
             allowedExportTypes: this.allowedExportTypes,
