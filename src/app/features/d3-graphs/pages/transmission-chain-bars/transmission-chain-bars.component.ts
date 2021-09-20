@@ -248,30 +248,34 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
      * Export visible chain as PDF
      */
     exportChain() {
+        // display loading
         this.showLoadingDialog();
 
-        (domtoimage as any).toPng(this.chartContainer.nativeElement)
-            .then((dataUrl) => {
-                const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
+        // convert dom container to image
+        setTimeout(() => {
+            (domtoimage as any).toPng(this.chartContainer.nativeElement)
+                .then((dataUrl) => {
+                    const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
 
-                this.importExportDataService
-                    .exportImageToPdf({image: dataBase64, responseType: 'blob', splitFactor: 1})
-                    .pipe(
-                        catchError((err) => {
-                            this.snackbarService.showApiError(err);
+                    this.importExportDataService
+                        .exportImageToPdf({image: dataBase64, responseType: 'blob', splitFactor: 1})
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                this.closeLoadingDialog();
+                                return throwError(err);
+                            })
+                        )
+                        .subscribe((blob) => {
+                            const fileName = this.i18nService.instant('LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE');
+                            FileSaver.saveAs(
+                                blob,
+                                `${fileName}.pdf`
+                            );
                             this.closeLoadingDialog();
-                            return throwError(err);
-                        })
-                    )
-                    .subscribe((blob) => {
-                        const fileName = this.i18nService.instant('LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE');
-                        FileSaver.saveAs(
-                            blob,
-                            `${fileName}.pdf`
-                        );
-                        this.closeLoadingDialog();
-                    });
-            });
+                        });
+                });
+        });
     }
 
     /**
