@@ -16,6 +16,8 @@ import { throwError } from 'rxjs';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { UserModel } from '../../../../core/models/user.model';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
 
 @Component({
     selector: 'app-saved-filters',
@@ -31,6 +33,9 @@ export class SavedFiltersComponent extends ListComponent implements OnInit, OnDe
 
     yesNoOptionsList$: Observable<any[]>;
 
+    // user list
+    userList$: Observable<UserModel[]>;
+
     pagesWithSavedFilters: LabelValuePair[] = _.map(Constants.APP_PAGE, (page) => {
         return new LabelValuePair(page.label, page.value);
     });
@@ -41,7 +46,10 @@ export class SavedFiltersComponent extends ListComponent implements OnInit, OnDe
     fixedTableColumns: string[] = [
         'name',
         'public',
-        'filter-keys'
+        'filter-keys',
+        'createdBy',
+        'updatedBy',
+        'updatedAt'
     ];
 
     recordActions: HoverRowAction[] = [
@@ -73,7 +81,8 @@ export class SavedFiltersComponent extends ListComponent implements OnInit, OnDe
         private savedFiltersService: SavedFiltersService,
         private snackbarService: SnackbarService,
         private genericDataService: GenericDataService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private userDataService: UserDataService
     ) {
         super(listHelperService);
     }
@@ -83,6 +92,9 @@ export class SavedFiltersComponent extends ListComponent implements OnInit, OnDe
      */
     ngOnInit() {
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
+
+        // retrieve users
+        this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
         // initialize pagination
         this.initPaginator();
@@ -102,6 +114,11 @@ export class SavedFiltersComponent extends ListComponent implements OnInit, OnDe
      * Re(load) the Saved filters list, based on the applied filter, sort criterias
      */
     refreshList(finishCallback: (records: any[]) => void) {
+        // retrieve created user & modified user information
+        this.queryBuilder.include('createdByUser', true);
+        this.queryBuilder.include('updatedByUser', true);
+
+        // retrieve list
         this.savedFiltersList$ = this.savedFiltersService
             .getSavedFiltersList(this.queryBuilder)
             .pipe(

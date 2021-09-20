@@ -1,4 +1,7 @@
 import * as _ from 'lodash';
+import { UserModel } from './user.model';
+import { Moment } from 'moment';
+import * as moment from 'moment';
 
 /**
  * Saved side filter sort
@@ -100,6 +103,11 @@ export class SavedFilterModel {
     readOnly: boolean;
     filterKey: string;
     filterData: SavedFilterData;
+    createdBy: string;
+    createdByUser: UserModel;
+    updatedAt: Moment;
+    updatedBy: string;
+    updatedByUser: UserModel;
 
     /**
      * Constructor
@@ -118,5 +126,29 @@ export class SavedFilterModel {
         this.readOnly = _.get(data, 'readOnly');
         this.filterKey = _.get(data, 'filterKey');
         this.filterData = new SavedFilterData(_.get(data, 'filterData', {}));
+
+        // created by
+        this.createdBy = _.get(data, 'createdBy');
+
+        // created by user
+        this.createdByUser = _.get(data, 'createdByUser');
+        if (this.createdByUser) {
+            this.createdByUser = new UserModel(this.createdByUser);
+        }
+
+        // updated at
+        this.updatedAt = _.get(data, 'updatedAt');
+        if (this.updatedAt) {
+            this.updatedAt = moment.utc(this.updatedAt);
+        }
+
+        // updated by
+        this.updatedBy = _.get(data, 'updatedBy');
+
+        // updated by user
+        this.updatedByUser = _.get(data, 'updatedByUser');
+        if (this.updatedByUser) {
+            this.updatedByUser = new UserModel(this.updatedByUser);
+        }
     }
 }

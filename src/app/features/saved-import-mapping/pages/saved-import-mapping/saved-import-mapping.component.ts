@@ -16,6 +16,8 @@ import { throwError } from 'rxjs';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { UserModel } from '../../../../core/models/user.model';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
 
 @Component({
     selector: 'app-saved-import-mapping',
@@ -37,10 +39,16 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
     savedImportMappingsList$: Observable<SavedImportMappingModel[]>;
     savedImportMappingsListCount$: Observable<IBasicCount>;
 
+    // user list
+    userList$: Observable<UserModel[]>;
+
     fixedTableColumns: string[] = [
         'name',
         'isPublic',
-        'mappingKey'
+        'mappingKey',
+        'createdBy',
+        'updatedBy',
+        'updatedAt'
     ];
 
     recordActions: HoverRowAction[] = [
@@ -72,7 +80,8 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
         private snackbarService: SnackbarService,
         private savedImportMappingService: SavedImportMappingService,
         private dialogService: DialogService,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
+        private userDataService: UserDataService
     ) {
         super(listHelperService);
     }
@@ -82,6 +91,9 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
      */
     ngOnInit() {
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
+
+        // retrieve users
+        this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
         // initialize pagination
         this.initPaginator();
@@ -101,6 +113,11 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
      * Re(load) the Clusters list, based on the applied filter, sort criterias
      */
     refreshList(finishCallback: (records: any[]) => void) {
+        // retrieve created user & modified user information
+        this.queryBuilder.include('createdByUser', true);
+        this.queryBuilder.include('updatedByUser', true);
+
+        // retrieve list
         this.savedImportMappingsList$ = this.savedImportMappingService
             .getImportMappingsList(this.queryBuilder)
             .pipe(

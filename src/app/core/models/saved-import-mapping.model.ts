@@ -1,4 +1,7 @@
 import * as _ from 'lodash';
+import { UserModel } from './user.model';
+import * as moment from 'moment';
+import { Moment } from 'moment';
 
 export class SavedImportField {
     source: string;
@@ -47,6 +50,11 @@ export class SavedImportMappingModel implements ISavedImportMappingModel {
     readOnly: boolean;
     mappingKey: string;
     mappingData: SavedImportField[];
+    createdBy: string;
+    createdByUser: UserModel;
+    updatedAt: Moment;
+    updatedBy: string;
+    updatedByUser: UserModel;
 
     constructor(data: {
         id?: string,
@@ -62,5 +70,29 @@ export class SavedImportMappingModel implements ISavedImportMappingModel {
         this.readOnly = _.get(data, 'readOnly', false);
         this.mappingKey = _.get(data, 'mappingKey');
         this.mappingData = _.get(data, 'mappingData', []);
+
+        // created by
+        this.createdBy = _.get(data, 'createdBy');
+
+        // created by user
+        this.createdByUser = _.get(data, 'createdByUser');
+        if (this.createdByUser) {
+            this.createdByUser = new UserModel(this.createdByUser);
+        }
+
+        // updated at
+        this.updatedAt = _.get(data, 'updatedAt');
+        if (this.updatedAt) {
+            this.updatedAt = moment.utc(this.updatedAt);
+        }
+
+        // updated by
+        this.updatedBy = _.get(data, 'updatedBy');
+
+        // updated by user
+        this.updatedByUser = _.get(data, 'updatedByUser');
+        if (this.updatedByUser) {
+            this.updatedByUser = new UserModel(this.updatedByUser);
+        }
     }
 }
