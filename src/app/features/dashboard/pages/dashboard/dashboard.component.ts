@@ -611,25 +611,29 @@ export class DashboardComponent implements OnInit, OnDestroy {
             return;
         }
 
-        // render
+        // display loading
         this.showLoadingDialog();
-        (domtoimage as any).toPng(this.kpiSection.nativeElement)
-            .then((dataUrl) => {
-                const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
 
-                this.importExportDataService
-                    .exportImageToPdf({image: dataBase64, responseType: 'blob', splitFactor: 1})
-                    .pipe(
-                        catchError((err) => {
-                            this.snackbarService.showApiError(err);
-                            this.closeLoadingDialog();
-                            return throwError(err);
-                        })
-                    )
-                    .subscribe((blob) => {
-                        this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL');
-                    });
-            });
+        // convert dom container to image
+        setTimeout(() => {
+            (domtoimage as any).toPng(this.kpiSection.nativeElement)
+                .then((dataUrl) => {
+                    const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
+
+                    this.importExportDataService
+                        .exportImageToPdf({image: dataBase64, responseType: 'blob', splitFactor: 1})
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                this.closeLoadingDialog();
+                                return throwError(err);
+                            })
+                        )
+                        .subscribe((blob) => {
+                            this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL');
+                        });
+                });
+        });
     }
 
     /**
