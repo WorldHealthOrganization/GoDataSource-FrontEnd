@@ -2,6 +2,8 @@ import * as _ from 'lodash';
 import { UserModel } from './user.model';
 import { Moment } from 'moment';
 import * as moment from 'moment';
+import { IPermissionBasic } from './permission.interface';
+import { PERMISSION } from './permission.model';
 
 /**
  * Saved side filter sort
@@ -95,7 +97,9 @@ export class SavedFilterData {
 /**
  * Saved side filter model
  */
-export class SavedFilterModel {
+export class SavedFilterModel
+    implements IPermissionBasic {
+
     // data
     id: string;
     name: string;
@@ -108,6 +112,15 @@ export class SavedFilterModel {
     updatedAt: Moment;
     updatedBy: string;
     updatedByUser: UserModel;
+
+    /**
+     * Static Permissions - IPermissionBasic
+     */
+    static canView(user: UserModel): boolean { return !!user; }
+    static canList(user: UserModel): boolean { return !!user; }
+    static canCreate(user: UserModel): boolean { return !!user; }
+    static canModify(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.SYSTEM_SETTINGS_MODIFY_SAVED_FILTERS) : false; }
+    static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.SYSTEM_SETTINGS_DELETE_SAVED_FILTERS) : false; }
 
     /**
      * Constructor
@@ -151,4 +164,13 @@ export class SavedFilterModel {
             this.updatedByUser = new UserModel(this.updatedByUser);
         }
     }
+
+    /**
+     * Permissions - IPermissionBasic
+     */
+    canView(user: UserModel): boolean { return SavedFilterModel.canView(user); }
+    canList(user: UserModel): boolean { return SavedFilterModel.canList(user); }
+    canCreate(user: UserModel): boolean { return SavedFilterModel.canCreate(user); }
+    canModify(user: UserModel): boolean { return SavedFilterModel.canModify(user); }
+    canDelete(user: UserModel): boolean { return SavedFilterModel.canDelete(user); }
 }

@@ -92,6 +92,8 @@ const routes: Routes = [
                 data: {
                     permissions: new PermissionExpression({
                         or: [
+                            PERMISSION.SYSTEM_SETTINGS_MODIFY_SAVED_FILTERS,
+                            PERMISSION.SYSTEM_SETTINGS_DELETE_SAVED_FILTERS,
                             PERMISSION.CASE_LIST,
                             PERMISSION.FOLLOW_UP_LIST,
                             PERMISSION.CONTACT_LIST,
@@ -133,6 +135,8 @@ const routes: Routes = [
                 data: {
                     permissions: new PermissionExpression({
                         or: [
+                            PERMISSION.SYSTEM_SETTINGS_MODIFY_SAVED_IMPORT,
+                            PERMISSION.SYSTEM_SETTINGS_DELETE_SAVED_IMPORT,
                             PERMISSION.LOCATION_IMPORT,
                             PERMISSION.REFERENCE_DATA_IMPORT,
                             PERMISSION.CONTACT_IMPORT,

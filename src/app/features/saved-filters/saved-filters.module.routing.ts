@@ -13,6 +13,8 @@ const routes: Routes = [
         data: {
             permissions: new PermissionExpression({
                 or: [
+                    PERMISSION.SYSTEM_SETTINGS_MODIFY_SAVED_FILTERS,
+                    PERMISSION.SYSTEM_SETTINGS_DELETE_SAVED_FILTERS,
                     PERMISSION.CASE_LIST,
                     PERMISSION.FOLLOW_UP_LIST,
                     PERMISSION.CONTACT_LIST,
