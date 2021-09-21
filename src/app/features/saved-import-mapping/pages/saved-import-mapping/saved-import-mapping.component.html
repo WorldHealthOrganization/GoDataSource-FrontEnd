@@ -95,17 +95,19 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
                 <app-form-slide-toggle
-                    *ngIf="!item.readOnly || SavedImportMappingModel.canModify(authUser)"
+                    *ngIf="!item.readOnly || SavedImportMappingModel.canModify(authUser); else readonlyValue"
                     name="isPublic"
                     [(ngModel)]="item.isPublic"
                     [label]="'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_IS_PUBLIC' | translate"
                     tooltip="LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_IS_PUBLIC_DESCRIPTION"
                     (optionChanged)="setPublicItem(item.id, $event)">
                 </app-form-slide-toggle>
-                <app-yes-no-label
-                    *ngIf="item.readOnly"
-                    [value]="item.isPublic">
-                </app-yes-no-label>
+                <ng-template
+                    #readonlyValue>
+                    <app-yes-no-label
+                        [value]="item.isPublic">
+                    </app-yes-no-label>
+                </ng-template>
             </mat-cell>
         </ng-container>
 
