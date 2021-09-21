@@ -9,6 +9,8 @@ export enum PERMISSION {
     SYSTEM_SETTINGS_MODIFY = 'system_settings_modify',
     SYSTEM_SETTINGS_MODIFY_SAVED_FILTERS = 'system_settings_modify_saved_filters',
     SYSTEM_SETTINGS_DELETE_SAVED_FILTERS = 'system_settings_delete_saved_filters',
+    SYSTEM_SETTINGS_MODIFY_SAVED_IMPORT = 'system_settings_modify_saved_import',
+    SYSTEM_SETTINGS_DELETE_SAVED_IMPORT = 'system_settings_delete_saved_import',
 
     // audit logs
     AUDIT_LOG_LIST = 'audit_log_list',

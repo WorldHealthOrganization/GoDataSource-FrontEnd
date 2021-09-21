@@ -1537,8 +1537,10 @@ export class ImportDataComponent
         // create / update?
         if (
             this.loadedImportMapping &&
-            this.loadedImportMapping.id &&
-            !this.loadedImportMapping.readOnly
+            this.loadedImportMapping.id && (
+                !this.loadedImportMapping.readOnly ||
+                SavedImportMappingModel.canModify(this.authDataService.getAuthenticatedUser())
+            )
         ) {
             this.dialogService
                 .showConfirm(new DialogConfiguration({

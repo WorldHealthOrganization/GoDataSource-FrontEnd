@@ -90,6 +90,8 @@ export class SidenavComponent implements OnInit, OnDestroy {
                 'LNG_LAYOUT_MENU_ITEM_SAVED_IMPORT_MAPPING_LABEL',
                 new PermissionExpression({
                     or: [
+                        PERMISSION.SYSTEM_SETTINGS_MODIFY_SAVED_IMPORT,
+                        PERMISSION.SYSTEM_SETTINGS_DELETE_SAVED_IMPORT,
                         PERMISSION.LOCATION_IMPORT,
                         PERMISSION.REFERENCE_DATA_IMPORT,
                         PERMISSION.CONTACT_IMPORT,

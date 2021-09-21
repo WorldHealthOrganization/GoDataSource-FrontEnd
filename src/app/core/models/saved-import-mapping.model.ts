@@ -2,6 +2,8 @@ import * as _ from 'lodash';
 import { UserModel } from './user.model';
 import * as moment from 'moment';
 import { Moment } from 'moment';
+import { IPermissionBasic } from './permission.interface';
+import { PERMISSION } from './permission.model';
 
 export class SavedImportField {
     source: string;
@@ -43,7 +45,12 @@ export interface ISavedImportMappingModel {
     readOnly: boolean;
 }
 
-export class SavedImportMappingModel implements ISavedImportMappingModel {
+export class SavedImportMappingModel
+    implements
+        IPermissionBasic,
+        ISavedImportMappingModel {
+
+    // data
     id: string;
     name: string;
     isPublic: boolean;
@@ -56,6 +63,18 @@ export class SavedImportMappingModel implements ISavedImportMappingModel {
     updatedBy: string;
     updatedByUser: UserModel;
 
+    /**
+     * Static Permissions - IPermissionBasic
+     */
+    static canView(user: UserModel): boolean { return !!user; }
+    static canList(user: UserModel): boolean { return !!user; }
+    static canCreate(user: UserModel): boolean { return !!user; }
+    static canModify(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.SYSTEM_SETTINGS_MODIFY_SAVED_IMPORT) : false; }
+    static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.SYSTEM_SETTINGS_DELETE_SAVED_IMPORT) : false; }
+
+    /**
+     * Constructor
+     */
     constructor(data: {
         id?: string,
         name?: string,
@@ -95,4 +114,13 @@ export class SavedImportMappingModel implements ISavedImportMappingModel {
             this.updatedByUser = new UserModel(this.updatedByUser);
         }
     }
+
+    /**
+     * Permissions - IPermissionBasic
+     */
+    canView(user: UserModel): boolean { return SavedImportMappingModel.canView(user); }
+    canList(user: UserModel): boolean { return SavedImportMappingModel.canList(user); }
+    canCreate(user: UserModel): boolean { return SavedImportMappingModel.canCreate(user); }
+    canModify(user: UserModel): boolean { return SavedImportMappingModel.canModify(user); }
+    canDelete(user: UserModel): boolean { return SavedImportMappingModel.canDelete(user); }
 }
