@@ -18,6 +18,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
     selector: 'app-saved-filters',
@@ -43,6 +44,9 @@ export class SavedFiltersComponent extends ListComponent implements OnInit, OnDe
     savedFiltersList$: Observable<SavedFilterModel[]>;
     savedFiltersListCount$: Observable<IBasicCount>;
 
+    // constants
+    SavedFilterModel = SavedFilterModel;
+
     fixedTableColumns: string[] = [
         'name',
         'public',
@@ -51,6 +55,9 @@ export class SavedFiltersComponent extends ListComponent implements OnInit, OnDe
         'updatedBy',
         'updatedAt'
     ];
+
+    // authenticated user
+    authUser: UserModel;
 
     recordActions: HoverRowAction[] = [
         // Other actions
@@ -65,7 +72,7 @@ export class SavedFiltersComponent extends ListComponent implements OnInit, OnDe
                         this.deleteFilter(item.id);
                     },
                     visible: (item: SavedFilterModel): boolean => {
-                        return !item.readOnly;
+                        return !item.readOnly || SavedFilterModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 })
@@ -82,7 +89,8 @@ export class SavedFiltersComponent extends ListComponent implements OnInit, OnDe
         private snackbarService: SnackbarService,
         private genericDataService: GenericDataService,
         private dialogService: DialogService,
-        private userDataService: UserDataService
+        private userDataService: UserDataService,
+        private authDataService: AuthDataService
     ) {
         super(listHelperService);
     }
@@ -95,6 +103,9 @@ export class SavedFiltersComponent extends ListComponent implements OnInit, OnDe
 
         // retrieve users
         this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
+
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
 
         // initialize pagination
         this.initPaginator();

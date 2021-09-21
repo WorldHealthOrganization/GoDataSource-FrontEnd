@@ -20,6 +20,8 @@ import { moment } from '../../../core/helperClasses/x-moment';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { DateRangeModel } from '../../../core/models/date-range.model';
 import { of } from 'rxjs/internal/observable/of';
+import { UserModel } from '../../../core/models/user.model';
+import { AuthDataService } from '../../../core/services/data/auth.data.service';
 
 @Component({
     selector: 'app-side-filters',
@@ -70,6 +72,9 @@ export class SideFiltersComponent {
 
     // available sort options to be applied
     sortOptions: SortModel[] = [];
+
+    // authenticated user
+    authUser: UserModel;
 
     // extra sort options from the ones provided in the filters
     _extraSortOptions: SortModel[] = [];
@@ -159,10 +164,13 @@ export class SideFiltersComponent {
         private savedFiltersService: SavedFiltersService,
         private dialogService: DialogService,
         private snackbarService: SnackbarService,
-        private savedFilterService: SavedFiltersService
+        authDataService: AuthDataService
     ) {
         // initialize data
         this.clear();
+
+        // get the authenticated user
+        this.authUser = authDataService.getAuthenticatedUser();
     }
 
     addFilter() {
@@ -198,7 +206,7 @@ export class SideFiltersComponent {
                 eq: this.savedFiltersType
             }
         });
-        this.savedFilters$ = this.savedFilterService.getSavedFiltersList(qb);
+        this.savedFilters$ = this.savedFiltersService.getSavedFiltersList(qb);
     }
 
     /**
@@ -275,8 +283,10 @@ export class SideFiltersComponent {
         // create / update ?
         if (
             this.loadedFilter &&
-            this.loadedFilter.id &&
-            !this.loadedFilter.readOnly
+            this.loadedFilter.id && (
+                !this.loadedFilter.readOnly ||
+                SavedFilterModel.canModify(this.authUser)
+            )
         ) {
             // ask user if he wants to overwrite the filter with new settings
             this.dialogService

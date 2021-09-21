@@ -4,6 +4,12 @@ export enum PERMISSION {
     // no restrictions permissions
     SYSTEM_VERSION_VIEW = 'view_system_version',
 
+    // system settings
+    SYSTEM_SETTINGS_VIEW = 'system_settings_view',
+    SYSTEM_SETTINGS_MODIFY = 'system_settings_modify',
+    SYSTEM_SETTINGS_MODIFY_SAVED_FILTERS = 'system_settings_modify_saved_filters',
+    SYSTEM_SETTINGS_DELETE_SAVED_FILTERS = 'system_settings_delete_saved_filters',
+
     // audit logs
     AUDIT_LOG_LIST = 'audit_log_list',
 

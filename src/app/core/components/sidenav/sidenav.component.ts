@@ -68,6 +68,8 @@ export class SidenavComponent implements OnInit, OnDestroy {
                 'LNG_LAYOUT_MENU_ITEM_SAVED_FILTERS_LABEL',
                 new PermissionExpression({
                     or: [
+                        PERMISSION.SYSTEM_SETTINGS_MODIFY_SAVED_FILTERS,
+                        PERMISSION.SYSTEM_SETTINGS_DELETE_SAVED_FILTERS,
                         PERMISSION.CASE_LIST,
                         PERMISSION.FOLLOW_UP_LIST,
                         PERMISSION.CONTACT_LIST,
