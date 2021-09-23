@@ -257,6 +257,13 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
 
                     // call the api for the pdf
                     this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: Number(splitFactor)})
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                loadingDialog.close();
+                                return throwError(err);
+                            })
+                        )
                         .subscribe((blob) => {
                             const fileName = this.i18nService.instant('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE');
                             FileSaver.saveAs(
