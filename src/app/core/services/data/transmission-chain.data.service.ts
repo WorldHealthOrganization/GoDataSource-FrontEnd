@@ -22,6 +22,7 @@ import { CotSnapshotModel } from '../../models/cot-snapshot.model';
 import { CaseModel } from '../../models/case.model';
 import { IBasicCount } from '../../models/basic-count.interface';
 import { FileSize } from '../../helperClasses/file-size';
+import { EntityModel } from '../../models/entity-and-relationship.model';
 
 export interface IConvertChainToGraphElements {
     nodes: {
@@ -148,18 +149,20 @@ export class TransmissionChainDataService {
         pageSize: number,
         snapshotFilters: {
             firstName?: string,
-            lastName?: string
+            lastName?: string,
+            labSeqResult?: string[]
         }
     ): ITransmissionChainGroupPageModel[] {
         // must filter
         const mustFilterSnapshot: boolean = snapshotFilters && (
             !!snapshotFilters.firstName ||
-            !!snapshotFilters.lastName
+            !!snapshotFilters.lastName || (
+                snapshotFilters.labSeqResult &&
+                snapshotFilters.labSeqResult.length > 0
+            )
         );
 
         // get chains of transmission
-        let snapshotFiltersFirstName: string;
-        let snapshotFiltersLastName: string;
         let chainGroupChains: {
             chainIndex: number,
             chain: TransmissionChainModel
@@ -171,11 +174,61 @@ export class TransmissionChainDataService {
         });
 
         // do we need to filter ?
+        let snapshotFiltersFirstName: string;
+        let snapshotFiltersLastName: string;
+        let snapshotFiltersLabSeqResult: {
+            [labSeqResult: string]: true
+        };
         if (mustFilterSnapshot) {
             // filter value
             snapshotFiltersFirstName = snapshotFilters.firstName ? snapshotFilters.firstName.toLowerCase() : null;
             snapshotFiltersLastName = snapshotFilters.lastName ? snapshotFilters.lastName.toLowerCase() : null;
 
+            // seq results
+            snapshotFiltersLabSeqResult = null;
+            if (
+                snapshotFilters.labSeqResult &&
+                snapshotFilters.labSeqResult.length > 0
+            ) {
+                snapshotFiltersLabSeqResult = {};
+                snapshotFilters.labSeqResult.forEach((resultId) => {
+                    snapshotFiltersLabSeqResult[resultId] = true;
+                });
+            }
+        }
+
+        // filter nodes
+        const nodesToCheck: EntityModel[] = Object.values(chainGroup.nodesMap);
+        for (let nodeIndex = 0; nodeIndex < nodesToCheck.length; nodeIndex++) {
+            // get node data
+            const nodeData = nodesToCheck[nodeIndex];
+
+            // reset filter
+            nodeData.matchesFilter = false;
+
+            // filter
+            if (
+                mustFilterSnapshot && (
+                    !snapshotFiltersFirstName ||
+                    nodeData.model.name.toLowerCase().indexOf(snapshotFiltersFirstName) > -1
+                ) && (
+                    !snapshotFiltersLastName ||
+                    nodeData.model.name.toLowerCase().indexOf(snapshotFiltersLastName) > -1
+                ) && (
+                    !snapshotFiltersLabSeqResult || (
+                        nodeData.labResults &&
+                        nodeData.labResults.length > 0 &&
+                        nodeData.labResults.findIndex((item) => item.sequence && snapshotFiltersLabSeqResult[item.sequence.resultId]) > -1
+                    )
+                )
+            ) {
+                // matches filter
+                nodeData.matchesFilter = true;
+            }
+        }
+
+        // filter chains
+        if (mustFilterSnapshot) {
             // filter chains
             const originalChains: {
                 chainIndex: number,
@@ -199,29 +252,11 @@ export class TransmissionChainDataService {
                         continue;
                     }
 
-                    // check conditions
-                    const matchesAllConditions: boolean = (
-                        (
-                            (
-                                !snapshotFiltersFirstName ||
-                                chainGroup.nodesMap[chainRel.entityIds[0]].model.name.toLowerCase().indexOf(snapshotFiltersFirstName) > -1
-                            ) && (
-                                !snapshotFiltersLastName ||
-                                chainGroup.nodesMap[chainRel.entityIds[0]].model.name.toLowerCase().indexOf(snapshotFiltersLastName) > -1
-                            )
-                        ) || (
-                            (
-                                !snapshotFiltersFirstName ||
-                                chainGroup.nodesMap[chainRel.entityIds[1]].model.name.toLowerCase().indexOf(snapshotFiltersFirstName) > -1
-                            ) && (
-                                !snapshotFiltersLastName ||
-                                chainGroup.nodesMap[chainRel.entityIds[1]].model.name.toLowerCase().indexOf(snapshotFiltersLastName) > -1
-                            )
-                        )
-                    );
-
                     // must add chain to list of display ?
-                    if (matchesAllConditions) {
+                    if (
+                        chainGroup.nodesMap[chainRel.entityIds[0]].matchesFilter ||
+                        chainGroup.nodesMap[chainRel.entityIds[1]].matchesFilter
+                    ) {
                         // add chain to the list
                         chainGroupChains.push(chainInfo);
 
@@ -261,15 +296,7 @@ export class TransmissionChainDataService {
 
             // should filter ?
             if (mustFilterSnapshot) {
-                if (
-                    (
-                        !snapshotFiltersFirstName ||
-                        chainGroup.nodesMap[entityId].model.name.toLowerCase().indexOf(snapshotFiltersFirstName) > -1
-                    ) && (
-                        !snapshotFiltersLastName ||
-                        chainGroup.nodesMap[entityId].model.name.toLowerCase().indexOf(snapshotFiltersLastName) > -1
-                    )
-                ) {
+                if (chainGroup.nodesMap[entityId].matchesFilter) {
                     // isolated node
                     isolatedNodes.push(entityId);
                 }
@@ -342,7 +369,8 @@ export class TransmissionChainDataService {
         filters: {
             showEvents?: boolean,
             showContacts?: boolean,
-            showContactsOfContacts?: boolean
+            showContactsOfContacts?: boolean,
+            showLabResultsSeqData?: boolean
         },
         colorCriteria: any,
         locationsListMap: {
@@ -510,20 +538,72 @@ export class TransmissionChainDataService {
 
                 // can add ?
                 if (allowAdd) {
+                    // initialize node data
                     const nodeData = new GraphNodeModel(nodeProps);
                     nodeData.type = node.type;
+
                     // set node color
                     if (!_.isEmpty(colorCriteria.nodeColor)) {
                         if (colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]]) {
+                            // set node color
                             nodeData.nodeColor = colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]];
+
+                            // logic doesn't work for checkpoint nodes
+                            if (nodeData.nodeType !== 'checkpoint') {
+                                // matches filter ?
+                                if (node.matchesFilter) {
+                                    // matches search
+                                    nodeData.borderColor = Constants.DEFAULT_GRAPH_NODE_MATCH_FILTER_COLOR;
+                                    nodeData.borderWidth = 7;
+                                    nodeData.borderStyle = 'double';
+                                } else {
+                                    // defaults
+                                    nodeData.borderColor = nodeData.nodeColor;
+                                    nodeData.borderWidth = 3;
+                                    nodeData.borderStyle = 'solid';
+                                }
+                            }
                         }
                     }
+
+                    // attach lab sequence information
+                    if (
+                        filters.showLabResultsSeqData &&
+                        node.labResults &&
+                        node.labResults.length > 0
+                    ) {
+                        // render single sequence
+                        if (
+                            node.labResults[0].sequence &&
+                            node.labResults[0].sequence.resultId
+                        ) {
+                            // get sequence result
+                            const nodeLabSequenceResultId: string = node.labResults[0].sequence.resultId;
+                            const nodeLabSequenceColor = colorCriteria.labSequenceColor[nodeLabSequenceResultId] ?
+                                colorCriteria.labSequenceColor[nodeLabSequenceResultId] :
+                                Constants.DEFAULT_COLOR_CHAINS;
+
+                            // display sequence accordingly
+                            nodeData.backgroundFill = 'radial-gradient';
+
+                            // has more ?
+                            if (node.labResults.length > 1) {
+                                nodeData.backgroundFillStopColors = `${Constants.DEFAULT_GRAPH_NODE_HAS_MORE_LAB_SEQ_COLOR} ${Constants.DEFAULT_GRAPH_NODE_MATCH_FILTER_COLOR} ${nodeLabSequenceColor} ${nodeLabSequenceColor} ${nodeData.nodeColor} ${nodeData.nodeColor}`;
+                                nodeData.backgroundFillStopPositions = '0% 10% 12% 28% 30% 100%';
+                            } else {
+                                nodeData.backgroundFillStopColors = `${nodeLabSequenceColor} ${nodeLabSequenceColor} ${nodeData.nodeColor} ${nodeData.nodeColor}`;
+                                nodeData.backgroundFillStopPositions = '0% 28% 30% 100%';
+                            }
+                        }
+                    }
+
                     // set node label color
                     if (!_.isEmpty(colorCriteria.nodeNameColor)) {
                         if (colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]]) {
                             nodeData.nodeNameColor = colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]];
                         }
                     }
+
                     // set node icon
                     if (!_.isEmpty(colorCriteria.nodeIcon)) {
                         if (colorCriteria.nodeIcon[node.model[colorCriteria.nodeIconField]]) {

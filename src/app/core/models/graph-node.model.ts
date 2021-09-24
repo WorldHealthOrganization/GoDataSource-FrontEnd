@@ -23,7 +23,15 @@ export class GraphNodeModel {
     height: number = 40;
     width: number = 40;
     borderColor: string;
+    borderWidth: number;
+    borderStyle: string;
+    backgroundFill: string;
+    backgroundFillStopColors: string;
+    backgroundFillStopPositions: string;
 
+    /**
+     * Constructor
+     */
     constructor(data = null) {
         this.id = _.get(data, 'id');
         this.name = _.get(data, 'name');
@@ -35,13 +43,20 @@ export class GraphNodeModel {
         this.picture = _.get(data, 'picture', 'none');
         this.nodeType = _.get(data, 'nodeType', 'data');
         this.borderColor = this.nodeColor;
+        this.borderWidth = 3;
+        this.borderStyle = 'solid';
+        this.backgroundFill = 'solid';
+        this.backgroundFillStopColors = this.nodeColor;
+        this.backgroundFillStopPositions = '100%';
 
+        // timeline render ?
         if ( this.dateTimeline ) {
             this.dateTimeline = moment(this.dateTimeline).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
         } else {
             this.displayTimeline = 'none';
         }
 
+        // checkpoint ?
         if (this.nodeType === 'checkpoint') {
             this.label = this.name;
             this.shape = 'rectangle';
@@ -64,6 +79,9 @@ export class GraphNodeModel {
         }
     }
 
+    /**
+     * Default Node shape
+     */
     static getNodeShapeType(type: EntityType): string | undefined {
         switch (type) {
             case EntityType.CASE:
@@ -79,6 +97,9 @@ export class GraphNodeModel {
         }
     }
 
+    /**
+     * Node shape by classification
+     */
     static getNodeShapeClassification(classification: string): string | undefined {
         switch (classification) {
             case Constants.CASE_CLASSIFICATION.CONFIRMED:

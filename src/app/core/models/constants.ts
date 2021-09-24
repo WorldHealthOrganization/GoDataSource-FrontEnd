@@ -86,6 +86,12 @@ export class Constants {
     // AGE constants
     static DEFAULT_AGE_MAX_YEARS = 150;
 
+    // default color to display nodes in graph when they match the search
+    static DEFAULT_GRAPH_NODE_MATCH_FILTER_COLOR = '#00FFE5';
+
+    // node has more than 1 lab sequences
+    static DEFAULT_GRAPH_NODE_HAS_MORE_LAB_SEQ_COLOR = '#00FFE5';
+
     // default color used by reference data
     static DEFAULT_COLOR_REF_DATA = '#CCC';
 
