@@ -97,6 +97,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     showEvents: boolean = true;
     showContacts: boolean = false;
     showContactsOfContacts: boolean = false;
+    showLabResultsSeqData: boolean = true;
     showSnapshots: boolean = true;
     locationsListMap: {
         [idLocation: string]: LocationModel
@@ -124,7 +125,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         ReferenceDataCategory.EXPOSURE_FREQUENCY,
         ReferenceDataCategory.EXPOSURE_DURATION,
         ReferenceDataCategory.OCCUPATION,
-        ReferenceDataCategory.OUTCOME
+        ReferenceDataCategory.OUTCOME,
+        ReferenceDataCategory.LAB_SEQUENCE_RESULT
     ];
     // reference data entries per category
     referenceDataEntries: any = [];
@@ -199,6 +201,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         edgeColorLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
         nodeIconLabel: '',
         nodeColor: {},
+        labSequenceColor: {},
+        labSequenceColorKeys: [],
         nodeNameColor: {},
         nodeIcon: {},
         nodeNameColorAdditionalInfo: {
@@ -231,6 +235,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         }
     } = {};
     selectedSnapshot: string;
+
+    // lab sequence results
+    labSequenceResultOptions: LabelValuePair[];
 
     // cytoscape-graph.component data
     style: any;
@@ -380,14 +387,23 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 'background-color': 'data(nodeColor)',
                 'background-image': 'data(picture)',
                 'background-fit': 'cover',
-                'border-color': 'data(nodeColor)',
-                'border-width': 3,
                 'shape': 'data(shape)',
                 'color': 'data(nodeNameColor)',
                 'label': 'data(label)',
                 'text-wrap': 'wrap',
                 'height': 40,
-                'width': 40
+                'width': 40,
+
+                // border
+                'border-color': 'data(borderColor)',
+                'border-width': 'data(borderWidth)',
+                'border-style': 'data(borderStyle)', // solid, dotted, dashed, or double.
+                'border-opacity': 1,
+
+                // background effects - for now used only by lab results seq data
+                'background-fill': 'data(backgroundFill)',
+                'background-gradient-stop-colors': 'data(backgroundFillStopColors)',
+                'background-gradient-stop-positions': 'data(backgroundFillStopPositions)'
             }
         },
         {
@@ -451,11 +467,13 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     showSnapshotFilters: boolean = false;
     snapshotFilters: {
         firstName?: string,
-        lastName?: string
+        lastName?: string,
+        labSeqResult?: string[]
     } = {};
     snapshotFiltersClone: {
         firstName?: string,
-        lastName?: string
+        lastName?: string,
+        labSeqResult?: string[]
     } = {};
 
     /**
@@ -793,7 +811,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                     'nodes.addresses',
                     'nodes.visualId',
                     'nodes.classification',
-                    'nodes.isDateOfOnsetApproximate'
+                    'nodes.isDateOfOnsetApproximate',
+
+                    // node lab results
+                    'nodes.labResults'
                 );
 
                 // do we have chainIncludesPerson filters ?
@@ -977,6 +998,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         // re-initialize legend entries
         this.legend.nodeColor = {};
         this.legend.nodeColorKeys = [];
+        this.legend.labSequenceColor = {};
         this.legend.nodeNameColor = {};
         this.legend.nodeNameColorKeys = [];
         this.legend.edgeColor = {};
@@ -987,6 +1009,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         this.legend.nodeIconKeys = [];
         this.legend.nodeShape = {};
         this.legend.nodeShapeKeys = [];
+
         // set legend entries
         const nodeColorReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.nodeColorCriteria].refDataCateg], 'entries', []);
         _.forEach(nodeColorReferenceDataEntries, (value) => {
@@ -998,6 +1021,13 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             this.legend.nodeNameColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
         });
         this.legend.nodeNameColorKeys = Object.keys(this.legend.nodeNameColor);
+
+        // get lab results sequence keys
+        const labSequenceColorReferenceDataEntries = _.get(this.referenceDataEntries[ReferenceDataCategory.LAB_SEQUENCE_RESULT], 'entries', []);
+        _.forEach(labSequenceColorReferenceDataEntries, (value) => {
+            this.legend.labSequenceColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
+        });
+        this.legend.labSequenceColorKeys = Object.keys(this.legend.labSequenceColor);
 
         if (this.colorCriteria.edgeColorCriteria === 'clusterId') {
             // we should check if we have this information, if not we must wait for it to be retrieved
@@ -1123,7 +1153,16 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 return this.referenceDataDataService.getReferenceDataByCategory(refDataCategory)
                     .pipe(
                         tap((results) => {
+                            // set data
                             this.referenceDataEntries[refDataCategory] = results;
+
+                            // initialize options for filters
+                            if (refDataCategory === ReferenceDataCategory.LAB_SEQUENCE_RESULT) {
+                                this.labSequenceResultOptions = this.referenceDataEntries[refDataCategory].entries.map((item) => new LabelValuePair(
+                                    item.value,
+                                    item.value
+                                ));
+                            }
                         })
                     );
             }
@@ -1492,7 +1531,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 {
                     showEvents: this.showEvents,
                     showContacts: this.showContacts,
-                    showContactsOfContacts: this.showContactsOfContacts
+                    showContactsOfContacts: this.showContactsOfContacts,
+                    showLabResultsSeqData: this.showLabResultsSeqData
                 },
                 this.legend,
                 this.locationsListMap,

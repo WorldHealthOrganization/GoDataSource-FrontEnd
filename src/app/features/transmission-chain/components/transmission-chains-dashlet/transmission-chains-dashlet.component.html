@@ -112,7 +112,7 @@
             fxLayout="row" fxLayoutGap="10px">
             <!-- entity type filter - events -->
             <app-form-checkbox
-                fxFlex="150px"
+                fxFlex fxGrow="0"
                 name="showEvents"
                 [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_EVENTS_LABEL' | translate"
                 [(ngModel)]="showEvents">
@@ -121,22 +121,36 @@
             <!-- entity type filter - contacts -->
             <app-form-checkbox
                 *ngIf="!snapshotOptionsMap || !selectedSnapshot || !snapshotOptionsMap[selectedSnapshot] || snapshotOptionsMap[selectedSnapshot].snapshot.showContacts"
-                fxFlex="150px"
+                fxFlex fxGrow="0"
                 name="showContacts"
                 [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_LABEL' | translate"
                 [(ngModel)]="showContacts"
                 (optionChanged)="updateShowContactsOfContactValue($event)">
             </app-form-checkbox>
 
-            <!--  This checkbox is valid only if 'showContacts' is already enabled -->
+            <!-- This checkbox is valid only if 'showContacts' is already enabled -->
             <app-form-checkbox
                 *ngIf="!snapshotOptionsMap || !selectedSnapshot || !snapshotOptionsMap[selectedSnapshot] || snapshotOptionsMap[selectedSnapshot].snapshot.showContactsOfContacts"
+                fxFlex fxGrow="0"
                 name="includeContactsOfContacts"
                 [disabled]="!showContacts"
                 [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_OF_CONTACTS' | translate"
-                [(ngModel)]="showContactsOfContacts"
-                fxFlex="150px">
+                [(ngModel)]="showContactsOfContacts">
             </app-form-checkbox>
+
+            <!-- Show lab results -->
+            <app-form-checkbox
+                fxFlex fxGrow="0"
+                name="showLabResultsSeqData"
+                [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_LAB_RESULTS_SEQUENCE_DATA' | translate"
+                [(ngModel)]="showLabResultsSeqData">
+            </app-form-checkbox>
+
+            <!-- Empty space since all others are with fxGrow=0 -->
+            <div
+                fxFlex>
+                <!-- Placeholder -->
+            </div>
         </div>
 
         <!-- Node Settings -->
@@ -288,15 +302,24 @@
                 <app-form-input
                     name="snapshotFirstName"
                     [(ngModel)]="snapshotFilters.firstName"
-                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_FIRST_NAME' | translate">
+                    [placeholder]="'LNG_PAGE_GRAPH_SNAPSHOT_FILTER_FIRST_NAME_LABEL' | translate">
                 </app-form-input>
 
                 <!-- last name -->
                 <app-form-input
                     name="snapshotLastName"
                     [(ngModel)]="snapshotFilters.lastName"
-                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_LAST_NAME' | translate">
+                    [placeholder]="'LNG_PAGE_GRAPH_SNAPSHOT_FILTER_LAST_NAME_LABEL' | translate">
                 </app-form-input>
+
+                <!-- Lab sequence result -->
+                <app-form-select
+                    name="snapshotLabSeqResult"
+                    [(ngModel)]="snapshotFilters.labSeqResult"
+                    [placeholder]="'LNG_PAGE_GRAPH_SNAPSHOT_FILTER_LAB_SEQ_RESULT_LABEL' | translate"
+                    [options]="labSequenceResultOptions"
+                    [multiple]="true">
+                </app-form-select>
             </div>
         </mat-card>
     </div>
@@ -391,6 +414,12 @@
                     (ngModelChange)="changedPage()">
                 </app-form-select-vscroll>
 
+                <!-- Nothing to display ? -->
+                <div
+                    *ngIf="!mustLoadChain && chainGroupId && chainGroupId === selectedSnapshot && chainPages && chainPages.length < 1"
+                    style="text-align: center; width: 100%">
+                    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NOTHING_TO_DISPLAY' | translate }}
+                </div>
             </div>
         </mat-card>
 
@@ -408,6 +437,32 @@
         <div
             *ngIf="legend && showLegend && (transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0)"
             class="graph-legend {{ fullScreen ? 'full-screen-graph-legend' : '' }}">
+
+            <!-- Filter Match -->
+            <div
+                class="legend-name"
+                fxLayout="row" fxLayoutAlign="start center">
+
+                <!-- Circle -->
+                <div
+                    fxGrow="0"
+                    class="matches-filter"
+                    [style.borderColor]="Constants.DEFAULT_GRAPH_NODE_MATCH_FILTER_COLOR">
+                    <!-- Placeholder -->
+                </div>
+
+                <!-- details -->
+                <div
+                    fxFlex>
+                    {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_MATCH_FILTER_TITLE' | translate}}
+                </div>
+
+                <!-- help -->
+                <app-fancy-tooltip
+                    fxGrow="0"
+                    [tooltip]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_MATCH_FILTER_TITLE_DESCRIPTION' | translate"></app-fancy-tooltip>
+            </div>
+
             <!-- node color -->
             <div *ngIf="legend.nodeColorKeys && legend.nodeColorKeys.length"
                  class="legend-name">
@@ -511,6 +566,44 @@
                     {{legend.clustersList && legend.clustersList[edgeIconItem] ? legend.clustersList[edgeIconItem] : (edgeIconItem | translate)}}
                 </div>
             </div>
+
+            <!-- lab result sequence color -->
+            <ng-container
+                *ngIf="showLabResultsSeqData">
+                <div *ngIf="legend.labSequenceColorKeys && legend.labSequenceColorKeys.length"
+                     class="legend-name">
+                    {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LAB_SEQ_COLOR_TITLE' | translate}}
+                </div>
+                <div
+                    class="legend-item"
+                    fxLayout="row" fxLayoutAlign="start center">
+                    <div
+                        fxGrow="0"
+                        class="legend-color"
+                        [style.background-color]="Constants.DEFAULT_GRAPH_NODE_HAS_MORE_LAB_SEQ_COLOR">
+                    </div>
+                    <div
+                        fxFlex>
+                        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LAB_SEQ_HAS_MORE_COLOR_TITLE' | translate}}
+                    </div>
+
+                    <!-- help -->
+                    <app-fancy-tooltip
+                        fxGrow="0"
+                        [tooltip]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LAB_SEQ_HAS_MORE_COLOR_TITLE_DESCRIPTION' | translate"></app-fancy-tooltip>
+                </div>
+                <hr />
+                <div
+                    *ngFor="let labSequenceColorItem of legend.labSequenceColorKeys" class="legend-item">
+                    <div
+                        class="legend-color"
+                        [style.background-color]="legend.labSequenceColor[labSequenceColorItem]">
+                    </div>
+                    <div>
+                        {{labSequenceColorItem | translate}}
+                    </div>
+                </div>
+            </ng-container>
         </div>
 
         <!-- Toggles -->

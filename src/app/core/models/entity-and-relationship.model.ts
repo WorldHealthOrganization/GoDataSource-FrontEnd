@@ -171,9 +171,21 @@ export class ReportDifferenceOnsetRelationshipModel extends RelationshipModel {
  * Model representing a Case, a Contact or an Event
  */
 export class EntityModel {
+    // data
     type: EntityType;
     model: CaseModel | ContactModel | EventModel | ContactOfContactModel;
     relationship: RelationshipModel;
+    labResults: {
+        id: string,
+        dateSampleTaken?: string,
+        sequence: {
+            dateResult?: string,
+            resultId: string
+        }
+    }[];
+
+    // used by ui
+    matchesFilter: boolean = false;
 
     /**
      * Link accordingly to type
@@ -494,6 +506,33 @@ export class EntityModel {
                 new RelationshipModel(this.relationship);
         }
 
+        // get lab results
+        this.labResults = _.get(
+            data,
+            'labResults'
+        );
+        if (Array.isArray(this.labResults)) {
+            this.labResults = this.labResults.sort((lab1, lab2) => {
+                // retrieve lab 1 date
+                const lab1Date = moment(
+                    lab1.sequence && lab1.sequence.dateResult ?
+                        lab1.sequence.dateResult :
+                        lab1.dateSampleTaken
+                );
+
+                // retrieve lab 2 date
+                const lab2Date = moment(
+                    lab2.sequence && lab2.sequence.dateResult ?
+                        lab2.sequence.dateResult :
+                        lab2.dateSampleTaken
+                );
+
+                // compare and sort
+                return lab2Date.valueOf() - lab1Date.valueOf();
+            });
+        }
+
+        // get entity
         switch (this.type) {
             case EntityType.CASE:
                 this.model = new CaseModel(data);
