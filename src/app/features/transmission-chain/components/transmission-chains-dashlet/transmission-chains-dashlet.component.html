@@ -568,39 +568,42 @@
             </div>
 
             <!-- lab result sequence color -->
-            <div *ngIf="legend.labSequenceColorKeys && legend.labSequenceColorKeys.length"
-                 class="legend-name">
-                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LAB_SEQ_COLOR_TITLE' | translate}}
-            </div>
-            <div
-                class="legend-item"
-                fxLayout="row" fxLayoutAlign="start center">
-                <div
-                    fxGrow="0"
-                    class="legend-color"
-                    [style.background-color]="Constants.DEFAULT_GRAPH_NODE_HAS_MORE_LAB_SEQ_COLOR">
+            <ng-container
+                *ngIf="showLabResultsSeqData">
+                <div *ngIf="legend.labSequenceColorKeys && legend.labSequenceColorKeys.length"
+                     class="legend-name">
+                    {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LAB_SEQ_COLOR_TITLE' | translate}}
                 </div>
                 <div
-                    fxFlex>
-                    {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LAB_SEQ_HAS_MORE_COLOR_TITLE' | translate}}
-                </div>
+                    class="legend-item"
+                    fxLayout="row" fxLayoutAlign="start center">
+                    <div
+                        fxGrow="0"
+                        class="legend-color"
+                        [style.background-color]="Constants.DEFAULT_GRAPH_NODE_HAS_MORE_LAB_SEQ_COLOR">
+                    </div>
+                    <div
+                        fxFlex>
+                        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LAB_SEQ_HAS_MORE_COLOR_TITLE' | translate}}
+                    </div>
 
-                <!-- help -->
-                <app-fancy-tooltip
-                    fxGrow="0"
-                    [tooltip]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LAB_SEQ_HAS_MORE_COLOR_TITLE_DESCRIPTION' | translate"></app-fancy-tooltip>
-            </div>
-            <hr />
-            <div
-                *ngFor="let labSequenceColorItem of legend.labSequenceColorKeys" class="legend-item">
+                    <!-- help -->
+                    <app-fancy-tooltip
+                        fxGrow="0"
+                        [tooltip]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LAB_SEQ_HAS_MORE_COLOR_TITLE_DESCRIPTION' | translate"></app-fancy-tooltip>
+                </div>
+                <hr />
                 <div
-                    class="legend-color"
-                    [style.background-color]="legend.labSequenceColor[labSequenceColorItem]">
+                    *ngFor="let labSequenceColorItem of legend.labSequenceColorKeys" class="legend-item">
+                    <div
+                        class="legend-color"
+                        [style.background-color]="legend.labSequenceColor[labSequenceColorItem]">
+                    </div>
+                    <div>
+                        {{labSequenceColorItem | translate}}
+                    </div>
                 </div>
-                <div>
-                    {{labSequenceColorItem | translate}}
-                </div>
-            </div>
+            </ng-container>
         </div>
 
         <!-- Toggles -->
