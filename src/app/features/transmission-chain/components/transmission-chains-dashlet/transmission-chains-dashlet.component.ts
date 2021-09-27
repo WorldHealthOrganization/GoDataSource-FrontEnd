@@ -237,7 +237,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     selectedSnapshot: string;
 
     // lab sequence results
-    labSequenceResultOptions: LabelValuePair[];
+    labSequenceResultOptions: LabelValuePair[] = [];
 
     // cytoscape-graph.component data
     style: any;
@@ -1157,7 +1157,12 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                             this.referenceDataEntries[refDataCategory] = results;
 
                             // initialize options for filters
-                            if (refDataCategory === ReferenceDataCategory.LAB_SEQUENCE_RESULT) {
+                            if (
+                                refDataCategory === ReferenceDataCategory.LAB_SEQUENCE_RESULT &&
+                                this.referenceDataEntries[refDataCategory] &&
+                                this.referenceDataEntries[refDataCategory].entries &&
+                                this.referenceDataEntries[refDataCategory].entries.length > 0
+                            ) {
                                 this.labSequenceResultOptions = this.referenceDataEntries[refDataCategory].entries.map((item) => new LabelValuePair(
                                     item.value,
                                     item.value
