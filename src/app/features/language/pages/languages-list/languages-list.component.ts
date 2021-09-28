@@ -220,15 +220,19 @@ export class LanguagesListComponent
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     // delete language
+                    this.showLoadingDialog();
                     this.languageDataService
                         .deleteLanguage(language.id)
                         .pipe(
                             catchError((err) => {
+                                this.closeLoadingDialog();
                                 this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )
                         .subscribe(() => {
+                            this.closeLoadingDialog();
+
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_LANGUAGES_ACTION_DELETE_SUCCESS_MESSAGE');
 
                             // clear cache

@@ -200,6 +200,17 @@ export class I18nService {
                     return throwError(err);
                 }),
                 mergeMap((language: LanguageModel) => {
+                    // force sign in
+                    if (!language) {
+                        // force sign in to refresh language id
+                        this.clearStorage();
+                        this.authDataService.clearStorage();
+                        window.location.reload();
+
+                        // finished
+                        return;
+                    }
+
                     // get the tokens for the selected language
                     return this.languageDataService
                         .getLanguageTokens(language, this.determineCurrentLanguageSinceDate(language))
