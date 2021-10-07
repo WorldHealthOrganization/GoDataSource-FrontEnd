@@ -16,6 +16,7 @@ import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { ContactModel } from '../../../../core/models/contact.model';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-modify-questionnaire-contact-follow-up',
@@ -41,6 +42,7 @@ export class ModifyQuestionnaireContactFollowUpComponent extends ViewModifyCompo
 
     // constants
     FollowUpModel = FollowUpModel;
+    Constants = Constants;
 
     /**
      * Constructor
