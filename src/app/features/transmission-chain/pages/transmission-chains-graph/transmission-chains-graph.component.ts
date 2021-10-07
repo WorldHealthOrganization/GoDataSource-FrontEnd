@@ -310,7 +310,18 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
         }
     }
 
+    /**
+     * Node tap / click
+     */
     onNodeTap(entity: GraphNodeModel) {
+        // not really of expected format ?
+        if (
+            !entity ||
+            !entity.type
+        ) {
+            return;
+        }
+
         // retrieve entity info
         const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
         this.entityDataService
@@ -413,6 +424,9 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             });
     }
 
+    /**
+     * Edge tap / click
+     */
     onEdgeTap(relationship: GraphEdgeModel) {
         // retrieve relationship info
         const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
