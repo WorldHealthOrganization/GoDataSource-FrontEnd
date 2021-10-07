@@ -24,7 +24,7 @@
 
             <!-- Link -->
             <a
-                *ngIf="buttonData.routerLink; else simpleButton"
+                *ngIf="buttonData.routerLink && !buttonData.isDisabled; else simpleButton"
                 [routerLink]="buttonData.routerLink"
                 [queryParams]="buttonData.queryParams">
                 <button
@@ -41,15 +41,19 @@
             <!-- Simple button -->
             <ng-template
                 #simpleButton>
-                <button
-                    mat-icon-button
-                    color="accent"
-                    type="button"
-                    [ngClass]="buttonData.class"
-                    (click)="clickedButton(buttonData)"
-                    [matTooltip]="buttonData.iconTooltip | translate:buttonData.iconTooltipTranslateData ? buttonData.iconTooltipTranslateData(actionData) : null">
-                    <span class="xt-icon">{{ buttonData.icon }}</span>
-                </button>
+                <span
+                    [matTooltip]="buttonData.disabledTooltip | translate">
+                    <button
+                        mat-icon-button
+                        color="accent"
+                        type="button"
+                        [ngClass]="buttonData.class"
+                        (click)="clickedButton(buttonData)"
+                        [matTooltip]="buttonData.iconTooltip | translate:buttonData.iconTooltipTranslateData ? buttonData.iconTooltipTranslateData(actionData) : null"
+                        [disabled]="buttonData.isDisabled">
+                        <span class="xt-icon">{{ buttonData.icon }}</span>
+                    </button>
+                </span>
             </ng-template>
         </ng-container>
 
@@ -79,7 +83,8 @@
                         mat-menu-item
                         type="button"
                         [ngClass]="menuOptionData.class"
-                        (click)="clickedButton(menuOptionData)">
+                        (click)="clickedButton(menuOptionData)"
+                        [disabled]="menuOptionData.isDisabled">
                         {{ menuOptionData.menuOptionLabel | translate:menuOptionData.menuOptionLabelTranslateData ? menuOptionData.menuOptionLabelTranslateData(actionData) : null }}
                     </button>
 
