@@ -80,13 +80,42 @@ export class HoverRowActionsDirective {
                     return;
                 }
 
+                // cloned option
+                const clonedMenuOption: HoverRowAction = new HoverRowAction(menuOption);
+
+                // disable option if necessary
+                if (
+                    clonedMenuOption.disable !== undefined &&
+                    clonedMenuOption.disable(
+                        this.hoverRowActionData,
+                        this.hoverRowActionIndex
+                    )
+                ) {
+                    clonedMenuOption.isDisabled = true;
+                } else {
+                    clonedMenuOption.isDisabled = false;
+                }
+
                 // add menu option
-                clonedAction.menuOptions.push(new HoverRowAction(menuOption));
+                clonedAction.menuOptions.push(clonedMenuOption);
             });
 
             // no neu options, then we don't need to display menu options button
             if (_.isEmpty(clonedAction.menuOptions)) {
                 clonedAction.menuOptions = undefined;
+            }
+
+            // disable option if necessary
+            if (
+                clonedAction.disable !== undefined &&
+                clonedAction.disable(
+                    this.hoverRowActionData,
+                    this.hoverRowActionIndex
+                )
+            ) {
+                clonedAction.isDisabled = true;
+            } else {
+                clonedAction.isDisabled = false;
             }
 
             // add action

@@ -18,12 +18,17 @@ export class HoverRowAction {
     type: HoverRowActionType = HoverRowActionType.BUTTON;
     icon: string;
     iconTooltip: string;
+    disabledTooltip: string;
     iconTooltipTranslateData: (item: any) => {
         [key: string]: any
     };
     click: (item: any, handler: any, index: any) => void | boolean;
     class: string;
     visible: (item: any, index: any) => boolean;
+    disable: (item: any, index: any) => boolean;
+
+    // determined from disable method
+    isDisabled: boolean = false;
 
     menuOptions: HoverRowAction[];
     menuOptionLabel: string;
@@ -48,6 +53,7 @@ export class HoverRowAction {
         // optional
         icon?: string,
         iconTooltip?: string,
+        disabledTooltip?: string,
         iconTooltipTranslateData?: (item: any) => {
             [key: string]: any
         },
@@ -60,6 +66,7 @@ export class HoverRowAction {
         },
         class?: string,
         visible?: (item: any, index: any) => boolean,
+        disable?: (item: any, index: any) => boolean,
 
         // link
         linkGenerator?: (item: any) => string[],

@@ -20,6 +20,7 @@ import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'app-location-usage-list',
@@ -49,17 +50,28 @@ export class LocationUsageListComponent extends ListComponent implements OnInit,
         'outbreakName'
     ];
 
+    // selected outbreak
+    selectedOutbreak: OutbreakModel;
+    outbreakSubscriber: Subscription;
+
     recordActions: HoverRowAction[] = [
         // View Item
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_ACTION_VIEW',
+            disabledTooltip: 'LNG_PAGE_LIST_USAGE_LOCATIONS_NOT_SELECTED_OUTBREAK',
             linkGenerator: (item: UsageDetailsItem): string[] => {
                 return [item.viewUrl];
             },
             visible: (item: UsageDetailsItem): boolean => {
                 return item.typePermissions &&
-                    item.typePermissions.canView(this.authUser);
+                    item.typePermissions.canView(this.authUser) &&
+                    !!item.outbreakId &&
+                    !!item.outbreakName;
+            },
+            disable: (item: UsageDetailsItem): boolean => {
+                return !this.selectedOutbreak ||
+                    item.outbreakId !== this.selectedOutbreak.id;
             }
         }),
 
@@ -67,12 +79,19 @@ export class LocationUsageListComponent extends ListComponent implements OnInit,
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_ACTION_MODIFY',
+            disabledTooltip: 'LNG_PAGE_LIST_USAGE_LOCATIONS_NOT_SELECTED_OUTBREAK',
             linkGenerator: (item: UsageDetailsItem): string[] => {
                 return [item.modifyUrl];
             },
             visible: (item: UsageDetailsItem): boolean => {
                 return item.typePermissions &&
-                    item.typePermissions.canModify(this.authUser);
+                    item.typePermissions.canModify(this.authUser) &&
+                    !!item.outbreakId &&
+                    item.outbreakId === this.authUser.activeOutbreakId;
+            },
+            disable: (item: UsageDetailsItem): boolean => {
+                return !this.selectedOutbreak ||
+                    item.outbreakId !== this.selectedOutbreak.id;
             }
         })
     ];
@@ -98,6 +117,14 @@ export class LocationUsageListComponent extends ListComponent implements OnInit,
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
+        // subscribe to the Selected Outbreak Subject stream
+        this.outbreakSubscriber = this.outbreakDataService
+            .getSelectedOutbreakSubject()
+            .subscribe((selectedOutbreak: OutbreakModel) => {
+                this.selectedOutbreak = selectedOutbreak;
+            });
+
+        // get location for which we need to retrieve usages
         this.route.params.subscribe((params: { locationId }) => {
             this.locationId = params.locationId;
 
@@ -123,6 +150,12 @@ export class LocationUsageListComponent extends ListComponent implements OnInit,
     ngOnDestroy() {
         // release parent resources
         super.ngOnDestroy();
+
+        // release subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**
