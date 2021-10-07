@@ -35,7 +35,8 @@
                 <button
                     *ngIf="!history &&
                         viewOnly &&
-                        FollowUpModel.canModify(authUser)"
+                        FollowUpModel.canModify(authUser) &&
+                        !Constants.isDateInTheFuture(followUpData.date)"
                     type="button"
                     mat-raised-button color="accent"
                     [routerLink]="['/contacts', contactId, 'follow-ups', followUpId, 'modify-questionnaire']">
