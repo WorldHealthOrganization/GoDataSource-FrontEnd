@@ -1268,18 +1268,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     }
 
     /**
-     * Filter by Not a Case classification
-     * @param value
-     */
-    filterByNotACaseField(value: boolean | string) {
-        // set filter value
-        this.notACaseFilter = value;
-
-        // refresh list
-        this.needsRefreshList();
-    }
-
-    /**
      * Export selected records
      */
     exportSelectedCases() {
