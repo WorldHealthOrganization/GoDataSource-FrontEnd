@@ -749,7 +749,8 @@
                             [ngModel]="notACaseFilter"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="yesNoOptionsList$ | async"
-                            (optionChanged)="filterByNotACaseField($event.value)"
+                            (optionChanged)="needsRefreshList()"
+                            (ngModelChange)="notACaseFilter = $event"
                             app-reset-input-on-side-filter
                             [clearable]="false">
                         </app-form-select>
