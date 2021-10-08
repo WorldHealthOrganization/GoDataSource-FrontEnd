@@ -301,7 +301,14 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
      * Delete
      */
     deleteBackup(item: BackupModel) {
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_BACKUP', item)
+        this.dialogService
+            .showConfirm(
+                'LNG_DIALOG_CONFIRM_DELETE_BACKUP', {
+                    location: item.location ?
+                        item.location :
+                        '-'
+                }
+            )
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.systemBackupDataService
