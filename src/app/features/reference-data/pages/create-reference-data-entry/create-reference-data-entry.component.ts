@@ -169,7 +169,26 @@ export class CreateReferenceDataEntryComponent
             .createEntry(dirtyFields)
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showApiError(err);
+                    // replace error if unique id rule id is breach ?
+                    if (
+                        err &&
+                        err.details &&
+                        err.details.codes &&
+                        err.details.codes.id &&
+                        Array.isArray(err.details.codes.id) &&
+                        err.details.codes.id.indexOf('uniqueness') > -1
+                    ) {
+                        err = {
+                            code: 'REFERENCE_ENTRY_NAME_NOT_UNIQUE'
+                        };
+                    }
+
+                    // display error
+                    this.snackbarService.showApiError(
+                        err, {
+                            name: this.entry.value
+                        }
+                    );
                     return throwError(err);
                 }),
                 switchMap((newReferenceDataEntry) => {
