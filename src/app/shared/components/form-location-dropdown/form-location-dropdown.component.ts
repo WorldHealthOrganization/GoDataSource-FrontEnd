@@ -144,6 +144,11 @@ export class FormLocationDropdownComponent
     private languageSubscription: Subscription;
 
     /**
+     * Used to keep function scope
+     */
+    onWindowScroll: (Event) => void;
+
+    /**
      * Do a request or retrieve it from cache if it didn't expire
      * @param methodKey
      * @param outbreakId [Optional]
@@ -283,6 +288,22 @@ export class FormLocationDropdownComponent
                 });
         }
 
+        // register listeners
+        this.onWindowScroll = (e) => {
+            // close location dialog
+            if (
+                this.locationHandler &&
+                this.locationHandler.isOpen &&
+                e &&
+                e.target &&
+                e.target.classList &&
+                !e.target.classList.contains('scroll-host')
+            ) {
+                this.locationHandler.close();
+            }
+        };
+        window.addEventListener('scroll', this.onWindowScroll, true);
+
         // configure location filter to reduce quantity of data retrieved from api since some requests might return a huge amount of data
         this.queryBuilder.fields(
             'id',
@@ -361,6 +382,9 @@ export class FormLocationDropdownComponent
             this.languageSubscription.unsubscribe();
             this.languageSubscription = null;
         }
+
+        // remove listener
+        window.removeEventListener('scroll', this.onWindowScroll, true);
     }
 
     /**
