@@ -951,6 +951,16 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                 type: FilterType.SELECT,
                 options$: this.yesNoOptionsList$
             }),
+            new FilterModel({
+                fieldName: 'numberOfContacts',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS',
+                type: FilterType.RANGE_NUMBER
+            }),
+            new FilterModel({
+                fieldName: 'numberOfExposures',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+                type: FilterType.RANGE_NUMBER
+            })
         ];
 
         // allowed to filter by follow-up team ?

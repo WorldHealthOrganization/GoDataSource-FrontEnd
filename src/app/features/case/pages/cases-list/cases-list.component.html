@@ -768,11 +768,19 @@
         <ng-container matColumnDef="numberOfContacts">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">
+                    <div
+                        mat-sort-header
+                        class="column-header">
                         {{ 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS' | translate }}
                     </div>
                     <div class="column-filter">
-                        <!-- placeholder -->
+                        <app-form-range
+                            name="numberOfContactsFilter"
+                            ngModel
+                            (changed)="filterByRangeField('numberOfContacts', $event)"
+                            app-reset-input-on-side-filter
+                            [min]="0">
+                        </app-form-range>
                     </div>
                 </div>
             </mat-header-cell>
@@ -796,11 +804,19 @@
         <ng-container matColumnDef="numberOfExposures">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">
+                    <div
+                        mat-sort-header
+                        class="column-header">
                         {{ 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES' | translate}}
                     </div>
                     <div class="column-filter">
-                        <!-- placeholder -->
+                        <app-form-range
+                            name="numberOfExposuresFilter"
+                            ngModel
+                            (changed)="filterByRangeField('numberOfExposures', $event)"
+                            app-reset-input-on-side-filter
+                            [min]="0">
+                        </app-form-range>
                     </div>
                 </div>
             </mat-header-cell>
