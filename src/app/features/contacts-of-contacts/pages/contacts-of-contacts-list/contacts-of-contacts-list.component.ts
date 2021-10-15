@@ -628,16 +628,9 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             // retrieve location list
             this.queryBuilder.include('locations', true);
 
-            // retrieve number of contacts & exposures for each record
-            const clonedQb = _.cloneDeep(this.queryBuilder);
-            clonedQb.filter.flag(
-                'countRelations',
-                true
-            );
-
             // retrieve the list of Contacts
             this.contactsOfContactsList$ = this.contactsOfContactsDataService
-                .getContactsOfContactsList(this.selectedOutbreak.id, clonedQb)
+                .getContactsOfContactsList(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(
                     tap(this.checkEmptyList.bind(this)),
                     tap((data: any[]) => {

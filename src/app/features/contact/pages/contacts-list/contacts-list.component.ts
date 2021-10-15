@@ -1103,19 +1103,9 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             // retrieve location list
             this.queryBuilder.include('locations', true);
 
-            // since some flags can do damage to other endpoints called with the same flag, we should make sure we don't send it
-            // to do this, we clone the query filter before filtering by it
-            const clonedQB = _.cloneDeep(this.queryBuilder);
-
-            // retrieve number of contacts & exposures for each record
-            clonedQB.filter.flag(
-                'countRelations',
-                true
-            );
-
             // retrieve the list of Contacts
             this.contactsList$ = this.contactDataService
-                .getContactsList(this.selectedOutbreak.id, clonedQB)
+                .getContactsList(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);

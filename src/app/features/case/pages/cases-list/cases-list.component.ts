@@ -1037,18 +1037,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             // retrieve location list
             this.queryBuilder.include('locations', true);
 
-            // since some flags can do damage to other endpoints called with the same flag, we should make sure we don't send it
-            // to do this, we clone the query filter before filtering by it
-            const clonedQB = _.cloneDeep(this.queryBuilder);
-
-            // retrieve number of contacts & exposures for each record
-            if (this.appliedListFilter !== Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS) {
-                clonedQB.filter.flag(
-                    'countRelations',
-                    true
-                );
-            }
-
             // refresh badges list with applied filter
             if (!triggeredByPageChange) {
                 this.getCasesGroupedByClassification();
@@ -1056,7 +1044,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
             // retrieve the list of Cases
             this.casesList$ = this.caseDataService
-                .getCasesList(this.selectedOutbreak.id, clonedQB)
+                .getCasesList(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
