@@ -587,6 +587,11 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                 fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
                 type: FilterType.RANGE_DATE,
                 sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'numberOfExposures',
+                fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+                type: FilterType.RANGE_NUMBER
             })
         ];
 

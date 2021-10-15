@@ -976,6 +976,16 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 fieldName: 'vaccinesReceived.date',
                 fieldLabel: 'LNG_CASE_FIELD_LABEL_VACCINE_DATE',
                 type: FilterType.RANGE_DATE
+            }),
+            new FilterModel({
+                fieldName: 'numberOfContacts',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS',
+                type: FilterType.RANGE_NUMBER
+            }),
+            new FilterModel({
+                fieldName: 'numberOfExposures',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+                type: FilterType.RANGE_NUMBER
             })
         ];
 
