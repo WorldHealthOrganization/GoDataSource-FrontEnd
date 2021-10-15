@@ -510,21 +510,9 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             // retrieve location list
             this.queryBuilder.include('location', true);
 
-            // since some flags can do damage to other endpoints called with the same flag, we should make sure we don't send it
-            // to do this, we clone the query filter before filtering by it
-            const clonedQB = _.cloneDeep(this.queryBuilder);
-
-            // retrieve number of contacts & exposures for each record
-            if (this.appliedListFilter !== Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS) {
-                clonedQB.filter.flag(
-                    'countRelations',
-                    true
-                );
-            }
-
             // retrieve the list of Events
             this.eventsList$ = this.eventDataService
-                .getEventsList(this.selectedOutbreak.id, clonedQB)
+                .getEventsList(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
