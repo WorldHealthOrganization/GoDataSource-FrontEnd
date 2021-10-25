@@ -103,7 +103,7 @@
                             <app-form-select
                                 name="outbreakIds"
                                 [(ngModel)]="user.outbreakIds"
-                                [placeholder]="'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS' | translate"
+                                [placeholder]="(!user.outbreakIds || user.outbreakIds.length < 1 ? 'LNG_USER_FIELD_LABEL_ALL_OUTBREAKS' : 'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS') | translate"
                                 tooltip="LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS_DESCRIPTION"
                                 optionLabelKey="name"
                                 optionValueKey="id"
