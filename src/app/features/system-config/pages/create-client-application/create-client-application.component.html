@@ -36,8 +36,8 @@
                             <app-form-select
                                 *ngIf="OutbreakModel.canList(authUser)"
                                 name="outbreakIDs"
-                                [ngModel]="clientApplicationData.outbreakIDs"
-                                [placeholder]="'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_OUTBREAKS' | translate"
+                                [(ngModel)]="clientApplicationData.outbreakIDs"
+                                [placeholder]="(!clientApplicationData.outbreakIDs || clientApplicationData.outbreakIDs.length < 1 ? 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_ALL_OUTBREAKS' : 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_OUTBREAKS') | translate"
                                 tooltip="LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_OUTBREAKS_DESCRIPTION"
                                 [options]="outbreaksOptionsList$ | async"
                                 optionLabelKey="name"
