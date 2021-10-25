@@ -27,6 +27,7 @@
             fxLayout="row" fxLayoutGap="10px" fxGrow="0">
             <!-- Link to person resource -->
             <a
+                *ngIf="entity.type !== EntityType.CONTACT_OF_CONTACT || selectedOutbreak?.isContactsOfContactsActive"
                 [href]="resourceViewPageLink"
                 target="_blank">
                 {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_FULL_RESOURCE' | translate}}

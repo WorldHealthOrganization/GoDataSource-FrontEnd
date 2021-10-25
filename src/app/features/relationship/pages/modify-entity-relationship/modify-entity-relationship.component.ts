@@ -136,6 +136,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
 
     // provide constants to template
     EntityModel = EntityModel;
+    EntityType = EntityType;
 
     /**
      * Constructor

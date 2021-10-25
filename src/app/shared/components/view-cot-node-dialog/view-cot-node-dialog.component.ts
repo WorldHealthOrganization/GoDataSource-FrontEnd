@@ -10,6 +10,8 @@ import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { EntityModel } from '../../../core/models/entity-and-relationship.model';
 import * as _ from 'lodash';
 import { ContactOfContactModel } from '../../../core/models/contact-of-contact.model';
+import { OutbreakModel } from '../../../core/models/outbreak.model';
+import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
 
 /**
  * Node Data
@@ -67,13 +69,17 @@ export class ViewCotNodeDialogComponent implements OnDestroy {
     resourceViewPageLink: string;
     personChainLink: string;
 
+    // selected outbreak
+    selectedOutbreak: OutbreakModel;
+
     /**
      * Constructor
      */
     constructor(
         public dialogRef: MatDialogRef<ViewCotNodeDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: ViewCOTNodeData,
-        private entityDataService: EntityDataService
+        private entityDataService: EntityDataService,
+        private outbreakDataService: OutbreakDataService
     ) {
         this.entity = this.data.entity;
         this.entityInfo = this.entityDataService.getLightObjectDisplay(this.entity);
@@ -95,6 +101,13 @@ export class ViewCotNodeDialogComponent implements OnDestroy {
         if (!!this.data.showPersonContactsOfContacts) {
             this.personChainLink = this.personChainLink + `&showPersonContactsOfContacts=${this.data.showPersonContactsOfContacts}`;
         }
+
+        // retrieve selected outbreak
+        this.outbreakDataService
+            .getSelectedOutbreak()
+            .subscribe((selectedOutbreak: OutbreakModel) => {
+                this.selectedOutbreak = selectedOutbreak;
+            });
 
         // init timer handler
         this.initTimerHandler();

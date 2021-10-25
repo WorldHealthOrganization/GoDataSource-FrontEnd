@@ -18,15 +18,25 @@
                 <mat-card class="page-section" fxLayout="column">
                     <div
                         class="follow-ups-title"
-                        fxLayout="row" fxLayoutGap="20px"
-                    >
-                        <div>{{ relationship.relatedEntity(entityId)?.type | translate }}</div>
-                        <a
-                            *ngIf="relationship.relatedEntity(entityId)"
-                            [routerLink]="['', EntityModel.getLinkForEntityType(relationship.relatedEntity(entityId).type), relationship.relatedEntity(entityId).model.id, 'view']"
-                        >
-                            {{ relationship.relatedEntity(entityId).model.name }}
-                        </a>
+                        fxLayout="row" fxLayoutGap="20px">
+                        <div>
+                            {{ relationship.relatedEntity(entityId)?.type | translate }}
+                        </div>
+                        <div
+                            *ngIf="relationship.relatedEntity(entityId)">
+                            <!-- Link -->
+                            <a
+                                *ngIf="relationship.relatedEntity(entityId).type !== EntityType.CONTACT_OF_CONTACT || selectedOutbreak?.isContactsOfContactsActive; else showText"
+                                [routerLink]="['', EntityModel.getLinkForEntityType(relationship.relatedEntity(entityId).type), relationship.relatedEntity(entityId).model.id, 'view']">
+                                {{ relationship.relatedEntity(entityId).model.name }}
+                            </a>
+
+                            <!-- Text -->
+                            <ng-template
+                                #showText>
+                                {{ relationship.relatedEntity(entityId).model.name }}
+                            </ng-template>
+                        </div>
                     </div>
 
                     <app-form-relationship
