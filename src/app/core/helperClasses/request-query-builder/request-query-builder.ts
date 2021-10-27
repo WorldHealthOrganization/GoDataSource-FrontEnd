@@ -407,7 +407,7 @@ export class RequestQueryBuilder {
         }
 
         // merge deleted
-        this.deleted = queryBuilder.deleted;
+        this.deleted = this.deleted || queryBuilder.deleted;
 
         // flags
         Object.assign(
