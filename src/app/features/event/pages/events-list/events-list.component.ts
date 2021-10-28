@@ -103,11 +103,43 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
     eventsDataExportFileName: string = moment().format('YYYY-MM-DD');
 
     anonymizeFields: LabelValuePair[] = [
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_ID', 'id'),
         new LabelValuePair('LNG_EVENT_FIELD_LABEL_NAME', 'name'),
         new LabelValuePair('LNG_EVENT_FIELD_LABEL_DATE', 'date'),
         new LabelValuePair('LNG_EVENT_FIELD_LABEL_DESCRIPTION', 'description'),
         new LabelValuePair('LNG_EVENT_FIELD_LABEL_ADDRESS', 'address'),
         new LabelValuePair('LNG_EVENT_FIELD_LABEL_DELETED', 'deleted'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', 'createdAt'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', 'createdBy'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', 'updatedAt'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', 'updatedBy'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_DELETED', 'deleted'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', 'deletedAt'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', 'createdOn'),
+        new LabelValuePair('LNG_ENTITY_FIELD_LABEL_TYPE', 'type'),
+        new LabelValuePair('LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES', 'numberOfExposures'),
+        new LabelValuePair('LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS', 'numberOfContacts'),
+        new LabelValuePair('LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING', 'dateOfReporting'),
+        new LabelValuePair('LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', 'isDateOfReportingApproximate'),
+        new LabelValuePair('LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID', 'responsibleUserId')
+    ];
+
+    // relationship anonymize fields
+    relationshipAnonymizeFields: LabelValuePair[] = [
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_ID', 'id'),
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_SOURCE', 'sourcePerson'),
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_TARGET', 'targetPerson'),
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT', 'dateOfFirstContact'),
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE', 'contactDate'),
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED', 'contactDateEstimated'),
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL', 'certaintyLevelId'),
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE', 'exposureTypeId'),
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY', 'exposureFrequencyId'),
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION', 'exposureDurationId'),
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_RELATION', 'socialRelationshipTypeId'),
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL', 'socialRelationshipDetail'),
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER', 'clusterId'),
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_COMMENT', 'comment')
     ];
 
     recordActions: HoverRowAction[] = [
@@ -708,7 +740,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             displayAnonymize: true,
             displayFieldsGroupList: true,
             allowedExportTypes: this.allowedExportTypes,
-            anonymizeFields: this.anonymizeFields,
+            anonymizeFields: this.relationshipAnonymizeFields,
             fieldsGroupList: this.fieldsGroupListRelationships,
             fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
             exportStart: () => { this.showLoadingDialog(); },
@@ -764,7 +796,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             displayAnonymize: true,
             displayFieldsGroupList: true,
             allowedExportTypes: this.allowedExportTypes,
-            anonymizeFields: this.anonymizeFields,
+            anonymizeFields: this.relationshipAnonymizeFields,
             fieldsGroupList: this.fieldsGroupListRelationships,
             fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
             exportStart: () => { this.showLoadingDialog(); },
