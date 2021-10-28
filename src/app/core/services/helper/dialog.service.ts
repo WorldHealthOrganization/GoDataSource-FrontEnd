@@ -20,6 +20,7 @@ import { ExportLogDataService } from '../data/export-log.data.service';
 import { Constants, ExportStatusStep } from '../../models/constants';
 import { Moment } from 'moment';
 import * as moment from 'moment';
+import { I18nService } from './i18n.service';
 
 /**
  * Export accepted extensions
@@ -65,7 +66,8 @@ export class DialogService {
         private dialog: MatDialog,
         private importExportDataService: ImportExportDataService,
         private snackbarService: SnackbarService,
-        private exportLogDataService: ExportLogDataService
+        private exportLogDataService: ExportLogDataService,
+        private i18nService: I18nService
     ) {}
 
     /**
@@ -347,7 +349,14 @@ export class DialogService {
                 new DialogField({
                     name: data.anonymizeFieldsKey,
                     placeholder: data.anonymizePlaceholder,
-                    inputOptions: data.anonymizeFields,
+                    inputOptions: (data.anonymizeFields || [])
+                        .map((item) => {
+                            item.label = item.label ?
+                                this.i18nService.instant(item.label) :
+                                '-';
+                            return item;
+                        })
+                        .sort((v1, v2) => v1.label.localeCompare(v2.label)),
                     inputOptionsMultiple: true
                 })
             );

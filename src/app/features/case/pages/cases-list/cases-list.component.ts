@@ -163,7 +163,45 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         new LabelValuePair('LNG_CASE_FIELD_LABEL_TYPE', 'type'),
         new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING', 'dateOfReporting'),
         new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', 'isDateOfReportingApproximate'),
-        new LabelValuePair('LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED', 'transferRefused')
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED', 'transferRefused'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_VISUAL_ID', 'visualId'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', 'createdAt'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', 'createdBy'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', 'updatedAt'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', 'updatedBy'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_DELETED', 'deleted'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', 'deletedAt'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', 'createdOn'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_WAS_CONTACT', 'wasContact'),
+        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_WAS_CASE', 'wasCase'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_OUTCOME_ID', 'outcomeId'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_SAFE_BURIAL', 'safeBurial'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL', 'dateOfBurial'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES', 'numberOfExposures'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS', 'numberOfContacts'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_BURIAL_LOCATION_ID', 'burialLocationId'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME', 'burialPlaceName'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED', 'vaccinesReceived'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS', 'pregnancyStatus'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID', 'responsibleUserId')
+    ];
+
+    // relationship anonymize fields
+    relationshipAnonymizeFields: LabelValuePair[] = [
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_ID', 'id'),
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_SOURCE', 'sourcePerson'),
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_TARGET', 'targetPerson'),
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT', 'dateOfFirstContact'),
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE', 'contactDate'),
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED', 'contactDateEstimated'),
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL', 'certaintyLevelId'),
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE', 'exposureTypeId'),
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY', 'exposureFrequencyId'),
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION', 'exposureDurationId'),
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_RELATION', 'socialRelationshipTypeId'),
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL', 'socialRelationshipDetail'),
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER', 'clusterId'),
+        new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_COMMENT', 'comment')
     ];
 
     // subscribers
@@ -1368,7 +1406,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             displayAnonymize: true,
             displayFieldsGroupList: true,
             allowedExportTypes: this.allowedExportTypes,
-            anonymizeFields: this.anonymizeFields,
+            anonymizeFields: this.relationshipAnonymizeFields,
             fieldsGroupList: this.fieldsGroupListRelationships,
             fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
             exportStart: () => { this.showLoadingDialog(); },
@@ -1424,7 +1462,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             displayAnonymize: true,
             displayFieldsGroupList: true,
             allowedExportTypes: this.allowedExportTypes,
-            anonymizeFields: this.anonymizeFields,
+            anonymizeFields: this.relationshipAnonymizeFields,
             fieldsGroupList: this.fieldsGroupListRelationships,
             fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
             exportStart: () => { this.showLoadingDialog(); },
