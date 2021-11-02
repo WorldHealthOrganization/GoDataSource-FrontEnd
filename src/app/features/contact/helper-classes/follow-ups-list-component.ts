@@ -67,11 +67,24 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
     ];
     anonymizeFields: LabelValuePair[] = [
         new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_ID', 'id'),
+        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_CONTACT', 'contact'),
         new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_DATE', 'date'),
-        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_TARGETED', 'targeted'),
-        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID', 'statusId'),
         new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS', 'address'),
-        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers')
+        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_FILL_LOCATION', 'fillLocation'),
+        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_INDEX', 'index'),
+        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_TEAM', 'teamId'),
+        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_STATUSID', 'statusId'),
+        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_TARGETED', 'targeted'),
+        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_COMMENT', 'comment'),
+        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID', 'responsibleUserId'),
+        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', 'createdAt'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', 'createdBy'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', 'updatedAt'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', 'updatedBy'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_DELETED', 'deleted'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', 'deletedAt'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', 'createdOn')
     ];
 
     // print follow-ups
