@@ -363,9 +363,10 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
             return;
         }
 
+        // create query builder for relationships
         const qb = new RequestQueryBuilder();
-        qb.merge(this.queryBuilder);
 
+        // filter
         qb.filter.where({
             id: {
                 inq: this.selectedRecordsIds
@@ -374,14 +375,16 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
 
         // display loading
         const loadingDialog = this.dialogService.showLoadingDialog();
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_CHANGE_SOURCE')
+        this.dialogService
+            .showConfirm('LNG_DIALOG_CONFIRM_CHANGE_SOURCE')
             .subscribe((answer: DialogAnswer) => {
                   if (answer.button === DialogAnswerButton.Yes) {
                       this.relationshipDataService
                           .bulkChangeSource(
                               this.selectedOutbreak.id,
                               selectedRecordId,
-                              qb)
+                              qb
+                          )
                           .pipe(
                               catchError((err) => {
                                   // hide dialog
