@@ -34,7 +34,8 @@ export class ImportLocationDataComponent {
     ImportServerModelNames = ImportServerModelNames;
 
     requiredDestinationFields = [
-        'name'
+        'name',
+        'geographicalLevelId'
     ];
 
     fieldsWithoutTokens = {
