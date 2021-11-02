@@ -114,19 +114,30 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
     ];
     anonymizeFields: LabelValuePair[] = [
         new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_ID', 'id'),
-        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID', 'sampleIdentifier'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_PERSON_ID', 'personId'),
         new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN', 'dateSampleTaken'),
         new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED', 'dateSampleDelivered'),
         new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING', 'dateTesting'),
         new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT', 'dateOfResult'),
         new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME', 'labName'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID', 'sampleIdentifier'),
         new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE', 'sampleType'),
         new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE', 'testType'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR', 'testedFor'),
         new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_RESULT', 'result'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT', 'quantitativeResult'),
         new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_NOTES', 'notes'),
         new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_STATUS', 'status'),
-        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT', 'quantitativeResult'),
-        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers')
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE', 'sequence'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_PERSON', 'person'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', 'createdAt'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', 'createdBy'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', 'updatedAt'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', 'updatedBy'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_DELETED', 'deleted'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', 'deletedAt'),
+        new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', 'createdOn')
     ];
 
     // actions
