@@ -253,6 +253,9 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
 
             qb.filter
                 .where({
+                    id: {
+                        neq: this.teamId
+                    },
                     locationIds: {
                         'inq': this.teamData.locationIds
                     }
