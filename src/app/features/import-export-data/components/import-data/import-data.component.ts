@@ -2749,8 +2749,10 @@ export class ImportDataComponent
                                 // for now we don't handle empty
                                 // #TODO - later we should allow user to map empty file value to a db value (we might want to map empty to LNG_REFERENCE_...NONE)
                                 if (
-                                    !fileUniqueValue ||
-                                    fileUniqueValue.toLowerCase() === 'null'
+                                    !fileUniqueValue || (
+                                        typeof fileUniqueValue === 'string' &&
+                                        fileUniqueValue.toLowerCase() === 'null'
+                                    )
                                 ) {
                                     return;
                                 }
