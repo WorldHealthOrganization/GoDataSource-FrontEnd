@@ -29,7 +29,8 @@ export class ImportEventDataComponent implements OnInit, OnDestroy {
         ImportDataExtension.XLS,
         ImportDataExtension.XLSX,
         ImportDataExtension.ODS,
-        ImportDataExtension.JSON
+        ImportDataExtension.JSON,
+        ImportDataExtension.ZIP
     ];
 
     // Constants for template usage
