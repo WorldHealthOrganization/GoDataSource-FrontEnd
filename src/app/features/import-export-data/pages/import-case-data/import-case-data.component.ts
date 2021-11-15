@@ -30,7 +30,8 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
         ImportDataExtension.XLS,
         ImportDataExtension.XLSX,
         ImportDataExtension.ODS,
-        ImportDataExtension.JSON
+        ImportDataExtension.JSON,
+        ImportDataExtension.ZIP
     ];
 
     // Constants for template usage
