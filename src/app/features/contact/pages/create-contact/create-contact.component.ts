@@ -43,6 +43,7 @@ import { SystemSettingsDataService } from '../../../../core/services/data/system
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
+import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 
 @Component({
     selector: 'app-create-contact',
@@ -89,29 +90,44 @@ export class CreateContactComponent
     TeamModel = TeamModel;
     UserModel = UserModel;
     Constants = Constants;
+    EntityType = EntityType;
 
     // check for case existence
-    casesDuplicates: CaseModel[] = [];
+    personDuplicates: (ContactModel | CaseModel)[] = [];
     checkingForCaseDuplicate: boolean = false;
     private _previousChecked: {
         firstName: string,
-        lastName: string
+        lastName: string,
+        middleName: string
     } = {
         firstName: '',
-        lastName: ''
+        lastName: '',
+        middleName: ''
     };
     private _checkForDuplicate = new DebounceTimeCaller(new Subscriber<void>(() => {
         // nothing to show ?
         if (
             !this.selectedOutbreak?.id ||
-            !this.contactData.firstName ||
-            !this.contactData.lastName
+            (
+                this.contactData.firstName &&
+                !this.contactData.lastName &&
+                !this.contactData.middleName
+            ) || (
+                this.contactData.lastName &&
+                !this.contactData.firstName &&
+                !this.contactData.middleName
+            ) || (
+                this.contactData.middleName &&
+                !this.contactData.firstName &&
+                !this.contactData.lastName
+            )
         ) {
             // reset
-            this.casesDuplicates = [];
+            this.personDuplicates = [];
             this.checkingForCaseDuplicate = false;
             this._previousChecked.firstName = this.contactData.firstName;
             this._previousChecked.lastName = this.contactData.lastName;
+            this._previousChecked.middleName = this.contactData.middleName;
 
             // nothing to do
             return;
@@ -120,7 +136,8 @@ export class CreateContactComponent
         // same as before ?
         if (
             this._previousChecked.firstName === this.contactData.firstName &&
-            this._previousChecked.lastName === this.contactData.lastName
+            this._previousChecked.lastName === this.contactData.lastName &&
+            this._previousChecked.middleName === this.contactData.middleName
         ) {
             // nothing to do
             return;
@@ -129,21 +146,40 @@ export class CreateContactComponent
         // must check if there is a contact with the same name
         this._previousChecked.firstName = this.contactData.firstName;
         this._previousChecked.lastName = this.contactData.lastName;
+        this._previousChecked.middleName = this.contactData.middleName;
         this.checkingForCaseDuplicate = true;
-        this.caseDataService
-            .findDuplicates(
-                this.selectedOutbreak.id,
-                this._previousChecked
-            )
-            .subscribe((foundEntities) => {
-                // finished
-                this.checkingForCaseDuplicate = false;
+        forkJoin([
+            this.caseDataService
+                .findDuplicates(
+                    this.selectedOutbreak.id,
+                    this._previousChecked
+                ),
+            this.contactDataService
+                .findDuplicates(
+                    this.selectedOutbreak.id,
+                    this._previousChecked
+                )
+        ]).subscribe((
+            [foundCases, foundContacts]: [
+                EntityDuplicatesModel,
+                EntityDuplicatesModel
+            ]
+        ) => {
+            // finished
+            this.checkingForCaseDuplicate = false;
 
-                // did we find anything ?
-                this.casesDuplicates = foundEntities ?
-                    foundEntities.duplicates.map((item) => item.model as CaseModel) :
-                    [];
-            });
+            // did we find anything ?
+            this.personDuplicates = [
+                ...(foundCases ?
+                        foundCases.duplicates.map((item) => item.model as CaseModel) :
+                        []
+                ),
+                ...(foundContacts ?
+                        foundContacts.duplicates.map((item) => item.model as ContactModel) :
+                        []
+                )
+            ];
+        });
     }));
 
     /**
@@ -632,7 +668,7 @@ export class CreateContactComponent
     /**
      * Check if a case exists with the same name
      */
-    checkForCaseExistence(): void {
+    checkForPersonExistence(): void {
         // wait a bit before checking
         this._checkForDuplicate.call();
     }
