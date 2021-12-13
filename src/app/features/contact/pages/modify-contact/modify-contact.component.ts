@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { NgForm, NgModel } from '@angular/forms';
-import { Observable, throwError } from 'rxjs';
+import { Observable, Subscriber, throwError } from 'rxjs';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -42,6 +42,8 @@ import { EntityDataService } from '../../../../core/services/data/entity.data.se
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
+import { CaseDataService } from '../../../../core/services/data/case.data.service';
 
 @Component({
     selector: 'app-modify-contact',
@@ -49,7 +51,9 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
     templateUrl: './modify-contact.component.html',
     styleUrls: ['./modify-contact.component.less']
 })
-export class ModifyContactComponent extends ViewModifyComponent implements OnInit {
+export class ModifyContactComponent
+    extends ViewModifyComponent
+    implements OnInit, OnDestroy {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -94,6 +98,62 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
     displayRefresh: boolean = false;
     @ViewChild('visualId', { static: true }) visualId: NgModel;
 
+    // check for case existence
+    casesDuplicates: CaseModel[] = [];
+    checkingForCaseDuplicate: boolean = false;
+    private _previousChecked: {
+        firstName: string,
+        lastName: string
+    } = {
+        firstName: '',
+        lastName: ''
+    };
+    private _checkForDuplicate = new DebounceTimeCaller(new Subscriber<void>(() => {
+        // nothing to show ?
+        if (
+            !this.selectedOutbreak?.id ||
+            !this.contactData.firstName ||
+            !this.contactData.lastName
+        ) {
+            // reset
+            this.casesDuplicates = [];
+            this.checkingForCaseDuplicate = false;
+            this._previousChecked.firstName = this.contactData.firstName;
+            this._previousChecked.lastName = this.contactData.lastName;
+
+            // nothing to do
+            return;
+        }
+
+        // same as before ?
+        if (
+            this._previousChecked.firstName === this.contactData.firstName &&
+            this._previousChecked.lastName === this.contactData.lastName
+        ) {
+            // nothing to do
+            return;
+        }
+
+        // must check if there is a contact with the same name
+        this._previousChecked.firstName = this.contactData.firstName;
+        this._previousChecked.lastName = this.contactData.lastName;
+        this.checkingForCaseDuplicate = true;
+        this.caseDataService
+            .findDuplicates(
+                this.selectedOutbreak.id,
+                this._previousChecked
+            )
+            .subscribe((foundEntities) => {
+                // finished
+                this.checkingForCaseDuplicate = false;
+
+                // did we find anything ?
+                this.casesDuplicates = foundEntities ?
+                    foundEntities.duplicates.map((item) => item.model as CaseModel) :
+                    [];
+            });
+    }));
+
     /**
      * Constructor
      */
@@ -112,7 +172,8 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         private entityDataService: EntityDataService,
         private teamDataService: TeamDataService,
         private systemSettingsDataService: SystemSettingsDataService,
-        private userDataService: UserDataService
+        private userDataService: UserDataService,
+        private caseDataService: CaseDataService
     ) {
         super(
             route,
@@ -169,6 +230,16 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
     }
 
     /**
+     * Component destroyed
+     */
+    ngOnDestroy(): void {
+        if (this._checkForDuplicate) {
+            this._checkForDuplicate.unsubscribe();
+            this._checkForDuplicate = null;
+        }
+    }
+
+    /**
      * Initialize breadcrumbs
      */
     initializeBreadcrumbs() {
@@ -212,6 +283,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                 .getContact(this.selectedOutbreak.id, this.contactId, true)
                 .subscribe(contactDataReturned => {
                     this.contactData = new ContactModel(contactDataReturned);
+                    this.checkForCaseExistence();
 
                     // set visual ID translate data
                     this.visualIDTranslateData = {
@@ -571,5 +643,13 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
 
         // not supported
         return false;
+    }
+
+    /**
+     * Check if a case exists with the same name
+     */
+    checkForCaseExistence(): void {
+        // wait a bit before checking
+        this._checkForDuplicate.call();
     }
 }

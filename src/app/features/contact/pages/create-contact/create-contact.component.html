@@ -6,6 +6,40 @@
 
 <div class="page-content">
 
+    <!-- Display if there is a case with the same name -->
+    <div
+        style="height: 24px; margin: 5px 0;">
+        <!-- Display loading while checking -->
+        <mat-spinner
+            *ngIf="checkingForCaseDuplicate; else displayInfo"
+            [diameter]="24">
+        </mat-spinner>
+
+        <!-- Duplicate info -->
+        <ng-template
+            #displayInfo>
+            <div
+                *ngIf="casesDuplicates.length > 0"
+                class="link-list warning">
+
+                <!-- Display duplicates -->
+                {{ 'LNG_CONTACT_FIELD_LABEL_DUPLICATE_CASES' | translate }}
+                <ng-container
+                    *ngFor="let casesDuplicate of casesDuplicates; let casesDuplicateIndex = index">
+                    <!-- Separator -->
+                    <ng-container
+                        *ngIf="casesDuplicateIndex > 0">, </ng-container>
+
+                    <!-- Name -->
+                    <a
+                        target="_blank"
+                        [routerLink]="['/cases', casesDuplicate.id, 'view']">{{ casesDuplicate.name }}</a>
+                </ng-container>
+            </div>
+        </ng-template>
+    </div>
+
+    <!-- Data -->
     <mat-horizontal-stepper linear #stepper>
 
         <!-- Personal step -->
@@ -23,7 +57,8 @@
                                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_FIRST_NAME' | translate"
                                 tooltip="LNG_CONTACT_FIELD_LABEL_FIRST_NAME_DESCRIPTION"
                                 required="true"
-                                maxlength="200">
+                                maxlength="200"
+                                (ngModelChange)="checkForCaseExistence()">
                             </app-form-input>
 
                             <app-form-input
@@ -39,7 +74,8 @@
                                 [(ngModel)]="contactData.lastName"
                                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_LAST_NAME' | translate"
                                 tooltip="LNG_CONTACT_FIELD_LABEL_LAST_NAME_DESCRIPTION"
-                                maxlength="200">
+                                maxlength="200"
+                                (ngModelChange)="checkForCaseExistence()">
                             </app-form-input>
 
                             <app-form-select
