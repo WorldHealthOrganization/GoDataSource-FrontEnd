@@ -19,21 +19,21 @@
         <ng-template
             #displayInfo>
             <div
-                *ngIf="contactDuplicates.length > 0"
+                *ngIf="personDuplicates.length > 0"
                 class="link-list warning">
 
                 <!-- Display duplicates -->
                 {{ 'LNG_CASE_FIELD_LABEL_DUPLICATE_CONTACTS' | translate }}
                 <ng-container
-                    *ngFor="let contactDuplicate of contactDuplicates; let contactDuplicateIndex = index">
+                    *ngFor="let personDuplicate of personDuplicates; let personDuplicateIndex = index">
                     <!-- Separator -->
                     <ng-container
-                        *ngIf="contactDuplicateIndex > 0">, </ng-container>
+                        *ngIf="personDuplicateIndex > 0">, </ng-container>
 
                     <!-- Name -->
                     <a
                         target="_blank"
-                        [routerLink]="['/contacts', contactDuplicate.id, 'view']">{{ contactDuplicate.name }}</a>
+                        [routerLink]="[personDuplicate.type === EntityType.CONTACT ? '/contacts' : '/cases', personDuplicate.id, 'view']">{{ (personDuplicate.type | translate) + ' ' + personDuplicate.name }}</a>
                 </ng-container>
             </div>
         </ng-template>
@@ -59,7 +59,7 @@
                                 tooltip="LNG_CASE_FIELD_LABEL_FIRST_NAME_DESCRIPTION"
                                 required="true"
                                 maxlength="200"
-                                (ngModelChange)="checkForContactExistence()">
+                                (ngModelChange)="checkForPersonExistence()">
                             </app-form-input>
 
                             <app-form-input
@@ -67,7 +67,8 @@
                                 [(ngModel)]="caseData.middleName"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_MIDDLE_NAME' | translate"
                                 tooltip="LNG_CASE_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION"
-                                maxlength="200">
+                                maxlength="200"
+                                (ngModelChange)="checkForPersonExistence()">
                             </app-form-input>
 
                             <app-form-input
@@ -76,7 +77,7 @@
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_LAST_NAME' | translate"
                                 tooltip="LNG_CASE_FIELD_LABEL_LAST_NAME_DESCRIPTION"
                                 maxlength="200"
-                                (ngModelChange)="checkForContactExistence()">
+                                (ngModelChange)="checkForPersonExistence()">
                             </app-form-input>
 
                             <app-form-select
