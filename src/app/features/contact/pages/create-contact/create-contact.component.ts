@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,7 +9,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
-import { Observable, throwError } from 'rxjs';
+import { Observable, Subscriber, throwError } from 'rxjs';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
@@ -41,6 +41,8 @@ import { TimerCache } from '../../../../core/helperClasses/timer-cache';
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
+import { CaseDataService } from '../../../../core/services/data/case.data.service';
 
 @Component({
     selector: 'app-create-contact',
@@ -50,7 +52,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 })
 export class CreateContactComponent
     extends CreateConfirmOnChanges
-    implements OnInit {
+    implements OnInit, OnDestroy {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -88,6 +90,62 @@ export class CreateContactComponent
     UserModel = UserModel;
     Constants = Constants;
 
+    // check for case existence
+    casesDuplicates: CaseModel[] = [];
+    checkingForCaseDuplicate: boolean = false;
+    private _previousChecked: {
+        firstName: string,
+        lastName: string
+    } = {
+        firstName: '',
+        lastName: ''
+    };
+    private _checkForDuplicate = new DebounceTimeCaller(new Subscriber<void>(() => {
+        // nothing to show ?
+        if (
+            !this.selectedOutbreak?.id ||
+            !this.contactData.firstName ||
+            !this.contactData.lastName
+        ) {
+            // reset
+            this.casesDuplicates = [];
+            this.checkingForCaseDuplicate = false;
+            this._previousChecked.firstName = this.contactData.firstName;
+            this._previousChecked.lastName = this.contactData.lastName;
+
+            // nothing to do
+            return;
+        }
+
+        // same as before ?
+        if (
+            this._previousChecked.firstName === this.contactData.firstName &&
+            this._previousChecked.lastName === this.contactData.lastName
+        ) {
+            // nothing to do
+            return;
+        }
+
+        // must check if there is a contact with the same name
+        this._previousChecked.firstName = this.contactData.firstName;
+        this._previousChecked.lastName = this.contactData.lastName;
+        this.checkingForCaseDuplicate = true;
+        this.caseDataService
+            .findDuplicates(
+                this.selectedOutbreak.id,
+                this._previousChecked
+            )
+            .subscribe((foundEntities) => {
+                // finished
+                this.checkingForCaseDuplicate = false;
+
+                // did we find anything ?
+                this.casesDuplicates = foundEntities ?
+                    foundEntities.duplicates.map((item) => item.model as CaseModel) :
+                    [];
+            });
+    }));
+
     /**
      * Constructor
      */
@@ -107,7 +165,8 @@ export class CreateContactComponent
         private authDataService: AuthDataService,
         private teamDataService: TeamDataService,
         private systemSettingsDataService: SystemSettingsDataService,
-        private userDataService: UserDataService
+        private userDataService: UserDataService,
+        private caseDataService: CaseDataService
     ) {
         super();
     }
@@ -244,6 +303,16 @@ export class CreateContactComponent
                             });
                     });
             });
+    }
+
+    /**
+     * Component destroyed
+     */
+    ngOnDestroy(): void {
+        if (this._checkForDuplicate) {
+            this._checkForDuplicate.unsubscribe();
+            this._checkForDuplicate = null;
+        }
     }
 
     /**
@@ -558,5 +627,13 @@ export class CreateContactComponent
                         }
                     });
             });
+    }
+
+    /**
+     * Check if a case exists with the same name
+     */
+    checkForCaseExistence(): void {
+        // wait a bit before checking
+        this._checkForDuplicate.call();
     }
 }

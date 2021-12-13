@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -8,7 +8,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { Observable, throwError } from 'rxjs';
+import { Observable, Subscriber, throwError } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -38,6 +38,8 @@ import { TimerCache } from '../../../../core/helperClasses/timer-cache';
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
+import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 
 @Component({
     selector: 'app-modify-case',
@@ -45,7 +47,9 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
     templateUrl: './modify-case.component.html',
     styleUrls: ['./modify-case.component.less']
 })
-export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
+export class ModifyCaseComponent
+    extends ViewModifyComponent
+    implements OnInit, OnDestroy {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -92,6 +96,62 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     displayRefresh: boolean = false;
     @ViewChild('visualId', { static: true }) visualId: NgModel;
 
+    // check for contact existence
+    contactDuplicates: ContactModel[] = [];
+    checkingForContactDuplicate: boolean = false;
+    private _previousChecked: {
+        firstName: string,
+        lastName: string
+    } = {
+        firstName: '',
+        lastName: ''
+    };
+    private _checkForDuplicate = new DebounceTimeCaller(new Subscriber<void>(() => {
+        // nothing to show ?
+        if (
+            !this.selectedOutbreak?.id ||
+            !this.caseData.firstName ||
+            !this.caseData.lastName
+        ) {
+            // reset
+            this.contactDuplicates = [];
+            this.checkingForContactDuplicate = false;
+            this._previousChecked.firstName = this.caseData.firstName;
+            this._previousChecked.lastName = this.caseData.lastName;
+
+            // nothing to do
+            return;
+        }
+
+        // same as before ?
+        if (
+            this._previousChecked.firstName === this.caseData.firstName &&
+            this._previousChecked.lastName === this.caseData.lastName
+        ) {
+            // nothing to do
+            return;
+        }
+
+        // must check if there is a contact with the same name
+        this._previousChecked.firstName = this.caseData.firstName;
+        this._previousChecked.lastName = this.caseData.lastName;
+        this.checkingForContactDuplicate = true;
+        this.contactDataService
+            .findDuplicates(
+                this.selectedOutbreak.id,
+                this._previousChecked
+            )
+            .subscribe((foundEntities) => {
+                // finished
+                this.checkingForContactDuplicate = false;
+
+                // did we find anything ?
+                this.contactDuplicates = foundEntities ?
+                    foundEntities.duplicates.map((item) => item.model as ContactModel) :
+                    [];
+            });
+    }));
+
     /**
      * Constructor
      */
@@ -108,7 +168,8 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         protected dialogService: DialogService,
         private entityDataService: EntityDataService,
         private systemSettingsDataService: SystemSettingsDataService,
-        private userDataService: UserDataService
+        private userDataService: UserDataService,
+        private contactDataService: ContactDataService
     ) {
         super(
             route,
@@ -165,6 +226,16 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                 // breadcrumbs
                 this.retrieveCaseData();
             });
+    }
+
+    /**
+     * Component destroyed
+     */
+    ngOnDestroy(): void {
+        if (this._checkForDuplicate) {
+            this._checkForDuplicate.unsubscribe();
+            this._checkForDuplicate = null;
+        }
     }
 
     /**
@@ -283,6 +354,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                 .subscribe((cases: CaseModel[]) => {
                     // set data only when we have everything
                     this.caseData = new CaseModel(cases[0]);
+                    this.checkForContactExistence();
 
                     // determine parent onset dates
                     const uniqueDates: {} = {};
@@ -612,5 +684,13 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
             this.caseData.visualId = CaseModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask);
             this.visualId.control.markAsDirty();
         }
+    }
+
+    /**
+     * Check if a contact exists with the same name
+     */
+    checkForContactExistence(): void {
+        // wait a bit before checking
+        this._checkForDuplicate.call();
     }
 }

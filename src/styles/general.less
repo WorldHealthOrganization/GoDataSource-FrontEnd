@@ -542,3 +542,31 @@ a.xlink-button {
         cursor: pointer;
     }
 }
+
+.link-list {
+    font-family: @font-roboto;
+    font-weight: bold;
+
+    &.warning {
+        color: #e74c3c;
+    }
+
+    a {
+        font-family: @font-roboto;
+        color: #0071e1;
+        font-weight: bold;
+        text-decoration: none;
+        white-space: nowrap;
+        padding-top: 10px;
+
+        &:active {
+            color: #0071e1;
+            text-decoration: none;
+        }
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
