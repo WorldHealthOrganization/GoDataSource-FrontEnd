@@ -2789,8 +2789,10 @@ export class ImportDataComponent
                             this.distinctValuesCache[key].forEach((data) => {
                                 // jump over if label not relevant
                                 if (
-                                    !data.label ||
-                                    data.label.toLowerCase() === 'null'
+                                    !data.label || (
+                                        typeof data.label === 'string' &&
+                                        data.label.toLowerCase() === 'null'
+                                    )
                                 ) {
                                     return;
                                 }
