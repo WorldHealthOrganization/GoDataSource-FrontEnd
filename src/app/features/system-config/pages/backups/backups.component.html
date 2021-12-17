@@ -38,6 +38,13 @@
     </ng-container>
 </app-topnav>
 
+<!-- Side columns -->
+<app-side-columns
+    [tableColumnsUserSettingsKey]="UserSettings.BACKUP_FIELDS"
+    [tableColumns]="tableColumns"
+    (visibleColumnsChanged)="applySideColumnsChanged($event)">
+</app-side-columns>
+
 <!--Total number of records from the list-->
 <app-total-number-of-records
     *ngIf="!loading"
@@ -304,9 +311,9 @@
                 </mat-cell>
             </ng-container>
 
-            <mat-header-row *matHeaderRowDef="fixedTableColumns"></mat-header-row>
+            <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
             <mat-row
-                *matRowDef="let item; columns: fixedTableColumns"
+                *matRowDef="let item; columns: visibleTableColumns"
                 app-hover-row-actions
                 [hoverRowActionsComponent]="hoverRow"
                 [hoverRowActions]="recordActions"

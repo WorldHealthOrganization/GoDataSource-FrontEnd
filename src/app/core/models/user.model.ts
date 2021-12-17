@@ -38,7 +38,8 @@ export enum UserSettings {
     SEARCH_RESULTS_FIELDS = 'searchResultsFields',
     HELP_CATEGORIES_LIST = 'helpCategoriesList',
     HELP_SEARCH = 'helpSearch',
-    HELP_ITEMS_LIST = 'helpItemsList'
+    HELP_ITEMS_LIST = 'helpItemsList',
+    BACKUP_FIELDS = 'backupFields'
 }
 
 /**
@@ -78,6 +79,7 @@ abstract class UserSettingsHandlers {
     static HELP_CATEGORIES_LIST = [];
     static HELP_SEARCH = [];
     static HELP_ITEMS_LIST = [];
+    static BACKUP_FIELDS = [];
 }
 
 export enum PhoneNumberType {

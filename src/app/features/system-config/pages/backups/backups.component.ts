@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { UserModel } from '../../../../core/models/user.model';
+import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
@@ -22,6 +22,7 @@ import { throwError } from 'rxjs';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 
 @Component({
     selector: 'app-backups',
@@ -37,6 +38,7 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
 
     // constants
     BackupModel = BackupModel;
+    UserSettings = UserSettings;
 
     // authenticated user
     authUser: UserModel;
@@ -58,18 +60,7 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
     waitForBackupIdToBeReady: string;
     loading: boolean = false;
 
-    fixedTableColumns: string[] = [
-        'description',
-        'location',
-        'modules',
-        'date',
-        'status',
-        'fileSize',
-        'duration',
-        'user',
-        'error'
-    ];
-
+    // actions
     recordActions: HoverRowAction[] = [
         // View Backup Path
         new HoverRowAction({
@@ -162,6 +153,9 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
 
         // retrieve backups
         this.needsRefreshList(true);
+
+        // initialize Side Table Columns
+        this.initializeSideTableColumns();
     }
 
     /**
@@ -170,6 +164,51 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
     ngOnDestroy() {
         // release parent resources
         super.ngOnDestroy();
+    }
+
+    /**
+     * Initialize Side Table Columns
+     */
+    initializeSideTableColumns() {
+        // default table columns
+        this.tableColumns = [
+            new VisibleColumnModel({
+                field: 'description',
+                label: 'LNG_BACKUP_FIELD_LABEL_DESCRIPTION'
+            }),
+            new VisibleColumnModel({
+                field: 'location',
+                label: 'LNG_BACKUP_FIELD_LABEL_LOCATION'
+            }),
+            new VisibleColumnModel({
+                field: 'modules',
+                label: 'LNG_BACKUP_FIELD_LABEL_MODULES'
+            }),
+            new VisibleColumnModel({
+                field: 'date',
+                label: 'LNG_BACKUP_FIELD_LABEL_DATE'
+            }),
+            new VisibleColumnModel({
+                field: 'status',
+                label: 'LNG_BACKUP_FIELD_LABEL_STATUS'
+            }),
+            new VisibleColumnModel({
+                field: 'fileSize',
+                label: 'LNG_BACKUP_FIELD_LABEL_FILE_SIZE'
+            }),
+            new VisibleColumnModel({
+                field: 'duration',
+                label: 'LNG_BACKUP_FIELD_LABEL_DURATION'
+            }),
+            new VisibleColumnModel({
+                field: 'user',
+                label: 'LNG_BACKUP_FIELD_LABEL_USER'
+            }),
+            new VisibleColumnModel({
+                field: 'error',
+                label: 'LNG_BACKUP_FIELD_LABEL_ERROR'
+            })
+        ];
     }
 
     /**
