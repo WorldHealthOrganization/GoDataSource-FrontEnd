@@ -9,7 +9,7 @@ import { SystemSettingsDataService } from '../../../../core/services/data/system
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { BackupModel } from '../../../../core/models/backup.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { SystemBackupDataService } from '../../../../core/services/data/system-backup.data.service';
@@ -18,11 +18,11 @@ import { Constants } from '../../../../core/models/constants';
 import { MatDialogRef } from '@angular/material/dialog';
 import { catchError, share, tap } from 'rxjs/operators';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
-import { throwError } from 'rxjs';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
+import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 
 @Component({
     selector: 'app-backups',
@@ -500,11 +500,21 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
     configureAutomaticBackupSettings() {
         // keep the existing configuration
         const currentSettings = {...this.settings.dataBackup};
-        this.genericDataService
-            .getFilterYesNoOptions()
-            .subscribe((yesNoOptions: LabelValuePair[]) => {
-                const yesNoOptionsFiltered: LabelValuePair[] = _.filter(yesNoOptions, (item: LabelValuePair) => _.isBoolean(item.value));
-                return this.dialogService.showInput(new DialogConfiguration({
+        forkJoin([
+            this.genericDataService.getFilterYesNoOptions(),
+            this.genericDataService.getAutomaticBackupTypesList()
+        ]).subscribe((
+            [
+                yesNoOptions,
+                automaticBackupTypeOptions
+            ]: [
+                LabelValuePair[],
+                LabelValuePair[]
+            ]
+        ) => {
+            const yesNoOptionsFiltered: LabelValuePair[] = _.filter(yesNoOptions, (item: LabelValuePair) => _.isBoolean(item.value));
+            this.dialogService
+                .showInput(new DialogConfiguration({
                     message: 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_TITLE',
                     yesLabel: 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SAVE_BUTTON',
                     additionalInfo: this.settings.dataBackup && !this.settings.dataBackup.disabled ?
@@ -548,7 +558,6 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
                             visible: (fieldsData): boolean => {
                                 return !fieldsData.disabled;
                             }
-
                         }),
 
                         // location
@@ -563,6 +572,22 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
                             }
                         }),
 
+                        // backup interval type
+                        new DialogField({
+                            name: 'backupType',
+                            placeholder: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_BACKUP_INTERVAL_TYPE',
+                            description: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_BACKUP_INTERVAL_TYPE_DESCRIPTION',
+                            inputOptions: automaticBackupTypeOptions,
+                            inputOptionsClearable: false,
+                            required: true,
+                            value: this.settings.dataBackup.backupType ?
+                                this.settings.dataBackup.backupType :
+                                Constants.SYSTEM_BACKUP_TYPES.N_HOURS.value,
+                            visible: (fieldsData): boolean => {
+                                return !fieldsData.disabled;
+                            }
+                        }),
+
                         // backup interval
                         new DialogField({
                             name: 'backupInterval',
@@ -572,7 +597,26 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
                             value: this.settings.dataBackup.backupInterval,
                             type: 'number',
                             visible: (fieldsData): boolean => {
-                                return !fieldsData.disabled;
+                                // input visible ?
+                                return !fieldsData.disabled && (
+                                    !fieldsData.backupType ||
+                                    fieldsData.backupType === Constants.SYSTEM_BACKUP_TYPES.N_HOURS.value
+                                );
+                            }
+                        }),
+
+                        // backup daily at a time
+                        new DialogField({
+                            name: 'backupDailyAtTime',
+                            placeholder: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_BACKUP_DAILY_AT_TIME',
+                            description: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_BACKUP_DAILY_AT_TIME_DESCRIPTION',
+                            required: true,
+                            value: this.settings.dataBackup.backupDailyAtTime,
+                            fieldType: DialogFieldType.TIMEPICKER,
+                            visible: (fieldsData): boolean => {
+                                // input visible ?
+                                return !fieldsData.disabled &&
+                                    fieldsData.backupType === Constants.SYSTEM_BACKUP_TYPES.DAILY_AT_TIME.value;
                             }
                         }),
 
@@ -602,8 +646,9 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
                                 return !fieldsData.disabled;
                             }
                         })
-                    ]
-                })).subscribe((answer: DialogAnswer) => {
+                    ]})
+                )
+                .subscribe((answer: DialogAnswer) => {
                     if (answer.button === DialogAnswerButton.Yes) {
                         // if the automatic backup is off do not change the rest of the settings
                         if (answer.inputValue.value.disabled) {
@@ -611,18 +656,21 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
                             answer.inputValue.value.disabled = true;
                         }
 
+                        this.showLoadingDialog();
                         this.systemSettingsDataService
                             .modifySystemSettings({
                                 dataBackup: answer.inputValue.value
                             })
                             .pipe(
                                 catchError((err) => {
+                                    this.closeLoadingDialog();
                                     this.snackbarService.showApiError(err);
                                     return throwError(err);
                                 })
                             )
                             .subscribe(() => {
                                 // display success message
+                                this.closeLoadingDialog();
                                 this.snackbarService.showSuccess('LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SUCCESS_MESSAGE');
 
                                 // refresh settings

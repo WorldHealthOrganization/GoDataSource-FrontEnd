@@ -16,6 +16,14 @@ export class GenericDataService {
     }
 
     /**
+     * Retrieve the list of Automatic Backup Types
+     * @returns {Observable<any[]>}
+     */
+    getAutomaticBackupTypesList(): Observable<any[]> {
+        return of(Object.values(Constants.SYSTEM_BACKUP_TYPES));
+    }
+
+    /**
      * Retrieve the list of Answer Types
      * @returns {Observable<any[]>}
      */
