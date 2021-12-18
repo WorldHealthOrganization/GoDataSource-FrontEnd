@@ -14,6 +14,7 @@ import { FormHiddenInputComponent } from './form-hidden-input/form-hidden-input.
 import { FormSelectGroupsComponent } from './form-select-groups/form-select-groups.component';
 import { FormSelectVscrollComponent } from './form-select-vscroll/form-select-vscroll.component';
 import { FormIconPickerComponent } from './form-icon-picker/form-icon-picker.component';
+import { FormTimepickerComponent } from './form-timepicker/form-timepicker.component';
 
 export const components: any[] = [
     FormValidationComponent,
@@ -31,5 +32,6 @@ export const components: any[] = [
     FormDateSliderComponent,
     FormDateRangeSliderComponent,
     FormHiddenInputComponent,
-    FormSelectGroupsComponent
+    FormSelectGroupsComponent,
+    FormTimepickerComponent
 ];

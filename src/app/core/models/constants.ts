@@ -289,6 +289,20 @@ export class Constants {
     /**
      * System settings backup modules
      */
+    static SYSTEM_BACKUP_TYPES = {
+        N_HOURS: {
+            label: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_BACKUP_INTERVAL_TYPE_N_HOURS',
+            value: 'n_hours'
+        },
+        DAILY_AT_TIME: {
+            label: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_BACKUP_INTERVAL_TYPE_DAILY_AT_TIME',
+            value: 'daily_at_time'
+        }
+    };
+
+    /**
+     * System settings backup modules
+     */
     static SYSTEM_BACKUP_MODULES = {
         SYSTEM_CONFIGURATION: {
             label: 'LNG_BACKUP_MODULE_LABEL_SYSTEM_CONFIGURATION',

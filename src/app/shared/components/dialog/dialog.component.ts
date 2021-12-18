@@ -123,7 +123,8 @@ export enum DialogFieldType {
     ACTION = 'action',
     SECTION_TITLE = 'section-title',
     CHECKBOX_LIST = 'checkbox-list',
-    REGEX_INPUT = 'regex-input'
+    REGEX_INPUT = 'regex-input',
+    TIMEPICKER = 'timepicker'
 }
 
 /**

@@ -11,6 +11,7 @@ import { validatorDirectives } from './validators';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { MdePopoverModule } from '@material-extended/mde';
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
+import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
 
 @NgModule({
     imports: [
@@ -20,6 +21,7 @@ import { NgxSliderModule } from '@angular-slider/ngx-slider';
         AngularMaterialModule,
         MdePopoverModule,
         NgxSliderModule,
+        NgxMaterialTimepickerModule,
         NgxMatSelectSearchModule,
         TranslateModule,
         ScrollingModule

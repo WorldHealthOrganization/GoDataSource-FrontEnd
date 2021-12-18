@@ -310,6 +310,7 @@ form.form-view-only {
 
 // handle the tooltips on input fields
 .form-input-tooltip,
+.form-timepicker-tooltip,
 .form-datepicker-tooltip,
 .form-select-tooltip,
 .form-select-groups-tooltip,
@@ -570,3 +571,12 @@ a.xlink-button {
     }
 }
 
+// display in front of dialogs
+ngx-material-timepicker-container {
+    .timepicker-backdrop-overlay {
+        z-index: 9998 !important;
+    }
+    .timepicker-overlay {
+        z-index: 9999 !important;
+    }
+}

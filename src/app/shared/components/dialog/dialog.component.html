@@ -95,6 +95,19 @@
                                 </app-form-input>
                             </div>
 
+                            <!-- Timepicker -->
+                            <div
+                                *ngIf="field.fieldType === DialogFieldType.TIMEPICKER">
+                                <app-form-timepicker
+                                    [name]="field.name"
+                                    [(ngModel)]="dialogAnswerInputValue.value[field.name]"
+                                    [placeholder]="field.placeholder | translate:confirmData?.translateData"
+                                    [tooltip]="field.description"
+                                    [required]="field.required"
+                                    [disabled]="field.disabled">
+                                </app-form-timepicker>
+                            </div>
+
                             <!-- Regex Input -->
                             <div
                                 *ngIf="field.fieldType === DialogFieldType.REGEX_INPUT">
