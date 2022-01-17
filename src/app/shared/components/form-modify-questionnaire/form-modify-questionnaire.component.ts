@@ -133,6 +133,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
 
     // Flag to say when saving data is in progress
     savingData: boolean = false;
+    savingDataActual: boolean = false;
 
     // Flag to say when we're loading data
     loadingData: boolean = true;
@@ -826,6 +827,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
 
             // call event
             this.savingData = blockWhileSaving;
+            this.savingDataActual = true;
             this.updateQuestionnaire.emit(new FormModifyQuestionnaireUpdateData(
                 this.parent,
                 this.questionnaireType,
@@ -839,6 +841,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
 
                     // finished saving data
                     this.savingData = false;
+                    this.savingDataActual = false;
                 })
             ));
         }
