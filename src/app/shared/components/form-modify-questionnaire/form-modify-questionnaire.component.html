@@ -13,49 +13,72 @@
 >
     <!-- Question list general actions -->
     <div
-        fxLayout="row" fxLayoutAlign="end"
+        fxLayout="row"
         class="modify-questionnaire-table-question-actions-top">
-        <button
-            type="button"
-            mat-flat-button color="accent"
-            class="modify-questionnaire-more-left"
-            (click)="addNewQuestion()"
-            [disabled]="savingData || questionIndexInEditMode !== null">
-            {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW'| translate }}
-        </button>
-        <button
-            type="button"
-            mat-flat-button color="accent"
-            class="modify-questionnaire-more-right"
-            [matMenuTriggerFor]="questionsMenu"
-            [disabled]="savingData || questionIndexInEditMode !== null">
-            <span class="xt-icon expand">thinArrowDown</span>
-        </button>
 
-        <mat-menu
-            #questionsMenu="matMenu"
-            class="table-max-sized-menu">
+        <!-- Inform user that data is being saved -->
+        <div
+            *ngIf="savingDataActual"
+            fxLayout="row" fxLayoutGap="5px" fxLayoutAlign="start center"
+            style="margin-right: 10px;">
+
+            <!-- Spinner -->
+            <mat-spinner
+                [diameter]="24"></mat-spinner>
+
+            <!-- Label -->
+            <div
+                fxFlex>
+                {{ 'LNG_COMMON_LABEL_SAVING' | translate }}
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div
+            fxFlex fxLayout="row" fxLayoutAlign="end">
             <button
-                mat-menu-item
                 type="button"
-                (click)="addNewQuestion(0)">
-                {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW_TOP' | translate }}
+                mat-flat-button color="accent"
+                class="modify-questionnaire-more-left"
+                (click)="addNewQuestion()"
+                [disabled]="savingData || questionIndexInEditMode !== null">
+                {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW'| translate }}
+            </button>
+            <button
+                type="button"
+                mat-flat-button color="accent"
+                class="modify-questionnaire-more-right"
+                [matMenuTriggerFor]="questionsMenu"
+                [disabled]="savingData || questionIndexInEditMode !== null">
+                <span class="xt-icon expand">thinArrowDown</span>
             </button>
 
-            <button
-                mat-menu-item
-                type="button"
-                (click)="addMoveQuestionPosition()">
-                {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW_AT_POSITION_X' | translate }}
-            </button>
+            <mat-menu
+                #questionsMenu="matMenu"
+                class="table-max-sized-menu">
+                <button
+                    mat-menu-item
+                    type="button"
+                    (click)="addNewQuestion(0)">
+                    {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW_TOP' | translate }}
+                </button>
 
-            <button
-                mat-menu-item
-                type="button"
-                (click)="addNewQuestion()">
-                {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW_BOTTOM' | translate }}
-            </button>
-        </mat-menu>
+                <button
+                    mat-menu-item
+                    type="button"
+                    (click)="addMoveQuestionPosition()">
+                    {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW_AT_POSITION_X' | translate }}
+                </button>
+
+                <button
+                    mat-menu-item
+                    type="button"
+                    (click)="addNewQuestion()">
+                    {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW_BOTTOM' | translate }}
+                </button>
+            </mat-menu>
+
+        </div>
     </div>
 
     <!-- Question list headers -->
