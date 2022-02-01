@@ -37,6 +37,16 @@
                             <div fxFlex><!-- placeholder --></div>
                             <div fxFlex><!-- placeholder --></div>
                         </div>
+
+                        <div
+                            fxLayout="row">
+                            <app-form-textarea
+                                name="description"
+                                [(ngModel)]="newOutbreakTemplate.description"
+                                [placeholder]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DESCRIPTION' | translate"
+                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DESCRIPTION_DESCRIPTION">
+                            </app-form-textarea>
+                        </div>
                     </div>
                 </mat-card>
 
