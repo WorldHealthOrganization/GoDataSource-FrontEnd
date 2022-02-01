@@ -247,6 +247,10 @@ export class OutbreakTemplatesListComponent
                 label: 'LNG_OUTBREAK_FIELD_LABEL_NAME'
             }),
             new VisibleColumnModel({
+                field: 'description',
+                label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DESCRIPTION'
+            }),
+            new VisibleColumnModel({
                 field: 'disease',
                 label: 'LNG_OUTBREAK_FIELD_LABEL_DISEASE'
             }),
@@ -280,6 +284,7 @@ export class OutbreakTemplatesListComponent
         this.queryBuilder.fields(
             'id',
             'name',
+            'description',
             'disease',
             'generateFollowUpsTeamAssignmentAlgorithm',
             'generateFollowUpsOverwriteExisting',

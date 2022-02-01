@@ -91,6 +91,29 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Description -->
+        <ng-container matColumnDef="description">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{ "LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DESCRIPTION" | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="descriptionFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('description', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.description }}
+            </mat-cell>
+        </ng-container>
+
         <!-- Disease -->
         <ng-container matColumnDef="disease">
             <mat-header-cell *matHeaderCellDef>

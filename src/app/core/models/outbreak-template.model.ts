@@ -13,6 +13,7 @@ export class OutbreakTemplateModel
         IPermissionCloneable {
     id: string;
     name: string;
+    description: string;
     disease: string;
     periodOfFollowup: number;
     frequencyOfFollowUpPerDay: number;
@@ -70,6 +71,7 @@ export class OutbreakTemplateModel
     constructor(data = null) {
         this.id = _.get(data, 'id');
         this.name = _.get(data, 'name');
+        this.description = _.get(data, 'description');
         this.disease = _.get(data, 'disease');
         this.periodOfFollowup = _.get(data, 'periodOfFollowup');
         this.frequencyOfFollowUpPerDay = _.get(data, 'frequencyOfFollowUpPerDay');
