@@ -13,7 +13,7 @@
   "dependencies": {
     "@angular/animations": "13.2.2",
     "@angular/cdk": "12.2.13",
-    "@angular/cdk-experimental": "12.2.13",
+    "@angular/cdk-experimental": "13.2.2",
     "@angular/common": "13.2.2",
     "@angular/compiler": "13.2.2",
     "@angular/core": "13.2.2",
@@ -48,7 +48,7 @@
     "moment": "2.29.1",
     "ng2-file-upload": "1.4.0",
     "ngx-color-picker": "11.0.0",
-    "ngx-mat-select-search": "3.3.0",
+    "ngx-mat-select-search": "4.0.2",
     "ngx-material-timepicker": "5.5.3",
     "ngx-popperjs": "13.0.0",
     "ngx-wig": "13.0.3",
