@@ -60,17 +60,6 @@ import * as fromSharedPipes from './pipes';
         ...fromSharedDirectives.directives,
         ...fromSharedPipes.pipes,
         ...fromSharedComponents.components
-    ],
-    entryComponents: [
-        fromSharedComponents.MultipleSnackbarComponent,
-        fromSharedComponents.DialogComponent,
-        fromSharedComponents.ModifyContactFollowUpQuestionnaireDialogComponent,
-        fromSharedComponents.LoadingDialogComponent,
-        fromSharedComponents.ViewCotNodeDialogComponent,
-        fromSharedComponents.ViewCotEdgeDialogComponent,
-        fromSharedComponents.ViewHelpDialogComponent,
-        fromSharedComponents.ViewHelpDetailsDialogComponent,
-        fromSharedComponents.LocationDialogComponent
     ]
 })
 export class SharedModule {
