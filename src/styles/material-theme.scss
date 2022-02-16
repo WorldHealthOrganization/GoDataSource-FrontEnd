@@ -6,11 +6,13 @@
 // define accent and primary colors
 $color-accent: #4db0a0;
 $color-primary: #5373af;
+$color-primary-darker: #33538f;
 
 // define primary palette
 $app-primary-palette-config: (
     100: $color-primary,
     500: $color-primary,
+    700: $color-primary-darker,
     contrast: (
         500: white
     )
@@ -20,6 +22,7 @@ $app-primary-palette-config: (
 $app-accent-palette-config: (
     100: $color-accent,
     500: $color-accent,
+    700: $color-primary-darker,
     contrast: (
         500: white
     )

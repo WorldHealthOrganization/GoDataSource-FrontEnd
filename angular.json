@@ -47,11 +47,14 @@
                             "cytoscape-cola",
                             "cytoscape-dagre",
                             "file-saver",
-                            "isemail",
                             "lodash",
                             "ol",
                             "pikaday",
-                            "rxjs"
+                            "rxjs",
+                            "clone-deep",
+                            "xml-utils/find-tags-by-name",
+                            "lru-cache",
+                            "pbf"
                         ],
                         "vendorChunk": true,
                         "extractLicenses": false,

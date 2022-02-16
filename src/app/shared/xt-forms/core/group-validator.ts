@@ -88,9 +88,11 @@ export abstract class GroupValidator<T> extends ElementBase<T> implements AfterV
     public touch() {
         // touch children
         if (this.controlContainer) {
-            const formDirectives = _.get(this.controlContainer, '_directives', []);
+            let formDirectives = _.get(this.controlContainer, '_directives', []);
+            formDirectives = formDirectives ? Array.from(formDirectives) : formDirectives;
             _.forEach(formDirectives, (ngModel: NgModel) => {
-                const groupFormDirectives = _.get(ngModel, 'valueAccessor.groupForm._directives', []);
+                let groupFormDirectives = _.get(ngModel, 'valueAccessor.groupForm._directives', []);
+                groupFormDirectives = groupFormDirectives ? Array.from(groupFormDirectives) : groupFormDirectives;
                 _.forEach(groupFormDirectives, (groupModel: NgModel) => {
                     if (groupModel.valueAccessor) {
                         if (groupModel.valueAccessor instanceof ValueAccessorBase) {

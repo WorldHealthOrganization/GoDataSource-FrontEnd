@@ -152,7 +152,9 @@ export class FormHelperService {
                         !_.isEmpty(name)
                     ) {
                         // determine directive
-                        const directive = _.find((controlsForm as any)._directives, {name: name}) as any;
+                        let directives = (controlsForm as any)._directives;
+                        directives = directives ? Array.from(directives) : directives;
+                        const directive = _.find(directives, {name: name}) as any;
                         if (
                             directive &&
                             directive.valueAccessor

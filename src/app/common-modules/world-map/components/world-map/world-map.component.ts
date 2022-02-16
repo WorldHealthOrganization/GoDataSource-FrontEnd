@@ -36,6 +36,7 @@ import { DialogButton, DialogComponent, DialogConfiguration, DialogField, Dialog
 import { MatDialogRef } from '@angular/material/dialog';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { applyStyle } from 'ol-mapbox-style';
+import RenderFeature from 'ol/render/Feature';
 
 /**
  * Point used for rendering purposes
@@ -254,7 +255,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     layersLoading: boolean = true;
     layers: {
         styleLoaded: boolean,
-        layer: TileLayer | VectorTileLayer | VectorLayer
+        layer: TileLayer<any> | VectorTileLayer | VectorLayer<any>
     }[] = [];
 
     // Map handler
@@ -264,10 +265,10 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     mapView: View;
 
     // Map Overlay Layer Source
-    mapOverlayLayerSource: VectorSource;
+    mapOverlayLayerSource: VectorSource<any>;
 
     // Map Overlay Layer Source used to draw cluster stuff ( grouped lines )
-    mapOverlayLayerSourceForCluster: VectorSource;
+    mapOverlayLayerSourceForCluster: VectorSource<any>;
 
     // Merge distance
     private _clusterDistance: number = 10;
@@ -282,14 +283,14 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     }
 
     // Map cluster vector source
-    mapClusterLayerSource: VectorSource;
+    mapClusterLayerSource: VectorSource<any>;
 
     // Cluster
     mapClusterSource: Cluster;
 
     // Style cache
     styleCache: {
-        [key: string]: Style
+        [key: string]: any
     } = {};
 
     // Cluster size color
@@ -433,7 +434,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
 
                     // create layer based on the map type
                     let layerData: {
-                        layer: TileLayer | VectorTileLayer | VectorLayer,
+                        layer: TileLayer<any> | VectorTileLayer | VectorLayer<any>,
                         styleLoaded: boolean
                     };
                     switch (mapServer.type) {
@@ -459,8 +460,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                                     // add '/tile/{z}/{y}/{x}.pbf' to url if not specified
                                     source: new VectorTileSource({
                                         url: mapServer.url + (!/\/tile\/{z}\/{y}\/{x}.pbf$/.test(mapServer.url) ? '/tile/{z}/{y}/{x}.pbf' : ''),
-                                        format: new MVT(),
-                                        crossOrigin: 'anonymous'
+                                        format: new MVT()
                                     })
                                 })
                             };
@@ -597,7 +597,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         // add markers
         _.each(this.markers, (markerData: WorldMapMarker) => {
             // create marker
-            const marker: Feature = new Feature(
+            const marker: Feature<any> = new Feature(
                 new Point(this.transformFromLatLng(
                     markerData.point.latitude,
                     markerData.point.longitude
@@ -698,7 +698,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                     );
 
                     // configure arrow
-                    const arrow: Feature = new Feature(new Point(p));
+                    const arrow: Feature<any> = new Feature(new Point(p));
                     arrow.setStyle(new Style({
                         text: new Text({
                             text: '>',
@@ -760,9 +760,9 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     /**
      * Style Features
      */
-    clusterStyleFeature(feature: Feature): Style {
+    clusterStyleFeature(feature: Feature<any>): Style {
         // determine number of markers
-        const features: Feature[] = feature.get('features');
+        const features: Feature<any>[] = feature.get('features');
         const size: number = features.length;
 
         // in case we have just one marker in this group & we are allowed to display marker info, do it...
@@ -846,11 +846,11 @@ export class WorldMapComponent implements OnInit, OnDestroy {
             } = {};
 
             // go through cluster features & map children features to easily determine the cluster group later
-            const clusterFeatures: Feature[] = this.mapClusterSource.getFeatures();
-            clusterFeatures.forEach((clusterFeature: Feature, groupIndex: number) => {
+            const clusterFeatures: Feature<any>[] = this.mapClusterSource.getFeatures();
+            clusterFeatures.forEach((clusterFeature: Feature<any>, groupIndex: number) => {
                 // go through each child and set the group
-                const clusterChildFeatures: Feature[] = clusterFeature.get('features');
-                clusterChildFeatures.forEach((childClusterFeature: Feature) => {
+                const clusterChildFeatures: Feature<any>[] = clusterFeature.get('features');
+                clusterChildFeatures.forEach((childClusterFeature: Feature<any>) => {
                     const properties = childClusterFeature.getProperties();
                     if (properties.dataForEventListeners instanceof WorldMapMarker) {
                         clusterFeaturesMap[properties.dataForEventListeners.id] = {
@@ -884,8 +884,8 @@ export class WorldMapComponent implements OnInit, OnDestroy {
             const overlayGroupLines: {
                 [path: string]: IClusterLines
             } = {};
-            const overlayFeatures: Feature[] = this.mapOverlayLayerSource.getFeatures();
-            (overlayFeatures || []).forEach((overlayFeature: Feature) => {
+            const overlayFeatures: Feature<any>[] = this.mapOverlayLayerSource.getFeatures();
+            (overlayFeatures || []).forEach((overlayFeature: Feature<any>) => {
                 // retrieve overlay feature properties
                 const overlayProperties: any = overlayFeature.getProperties ? overlayFeature.getProperties() : null;
 
@@ -937,7 +937,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                 });
 
                 // if not under any group then we should not hide it
-                const featureStyle: Style = overlayFeature.getStyle();
+                const featureStyle: any = overlayFeature.getStyle();
                 const featureProperties: any = overlayFeature.getProperties();
                 if (!featureGroups) {
                     // show feature & remove hide properties
@@ -1177,7 +1177,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
             // create cluster layer
             const clusterVectorLayer = new VectorLayer({
                 source: this.mapClusterSource,
-                style: (feature: Feature): Style => {
+                style: (feature: Feature<any>): Style => {
                     // render cluster feature
                     return this.clusterStyleFeature(feature);
                 }
@@ -1199,9 +1199,9 @@ export class WorldMapComponent implements OnInit, OnDestroy {
             // EVENTS LISTENERS
             this.map.on('click', (event) => {
                 // determine feature with bigger priority
-                const selectedFeatures: Feature[] = this.map.getFeaturesAtPixel(event.pixel);
-                let selectFeature: Feature;
-                _.each(selectedFeatures, (feature: Feature) => {
+                const selectedFeatures: (RenderFeature | Feature<any>)[] = this.map.getFeaturesAtPixel(event.pixel);
+                let selectFeature: Feature<any>;
+                _.each(selectedFeatures, (feature: Feature<any>) => {
                     // get feature properties
                     const properties = feature.getProperties();
                     if (!_.isEmpty(properties.features)) {
@@ -1231,8 +1231,8 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                             });
 
                             // go through cluster features and determine which overlay data should be hidden and which should be visible
-                            const overlayFeatures: Feature[] = this.mapOverlayLayerSource.getFeatures();
-                            (overlayFeatures || []).forEach((overlayFeature: Feature) => {
+                            const overlayFeatures: Feature<any>[] = this.mapOverlayLayerSource.getFeatures();
+                            (overlayFeatures || []).forEach((overlayFeature: Feature<any>) => {
                                 // retrieve overlay feature properties
                                 const overlayProperties: any = overlayFeature.getProperties ? overlayFeature.getProperties() : null;
 

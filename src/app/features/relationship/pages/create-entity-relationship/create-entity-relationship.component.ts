@@ -367,7 +367,8 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
                     if (form) {
                         // wait for binding to take effect
                         setTimeout(() => {
-                            const formDirectives = _.get(form, '_directives', []);
+                            let formDirectives = _.get(form, '_directives', []);
+                            formDirectives = formDirectives ? Array.from(formDirectives) : formDirectives;
                             _.forEach(formDirectives, (ngModel: NgModel) => {
                                 if (
                                     ngModel.valueAccessor &&

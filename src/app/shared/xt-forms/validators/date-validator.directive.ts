@@ -58,11 +58,11 @@ export class DateValidatorDirective implements Validator {
     ];
 
     // date must be bigger than
-    @Input() dateAfter: DateValidatorFieldComparator | DateValidatorFieldComparator[];
-    @Input() dateSameOrAfter: DateValidatorFieldComparator | DateValidatorFieldComparator[];
-    @Input() dateSame: DateValidatorFieldComparator | DateValidatorFieldComparator[];
-    @Input() dateBefore: DateValidatorFieldComparator | DateValidatorFieldComparator[];
-    @Input() dateSameOrBefore: DateValidatorFieldComparator | DateValidatorFieldComparator[];
+    @Input() dateAfter: any;
+    @Input() dateSameOrAfter: any;
+    @Input() dateSame: any;
+    @Input() dateBefore: any;
+    @Input() dateSameOrBefore: any;
 
     /**
      * Constructor
@@ -134,9 +134,11 @@ export class DateValidatorDirective implements Validator {
                         this.controlContainer instanceof NgForm &&
                         this.controlContainer.controls[compareItem.compareItemValue as string]
                     ) {
+                        let directives = (this.controlContainer as any)._directives;
+                        directives = directives ? Array.from(directives) : directives;
                         compareItem = new DateValidatorFieldComparator(
                             (_.find(
-                                (this.controlContainer as any)._directives, {
+                                directives, {
                                     name: compareItem.compareItemValue as string
                                 }
                             ) as NgModel).valueAccessor as ElementBase<any>,

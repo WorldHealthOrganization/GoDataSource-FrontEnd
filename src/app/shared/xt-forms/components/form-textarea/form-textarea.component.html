@@ -3,7 +3,7 @@
 
     <mat-form-field>
         <textarea matInput [(ngModel)]="value" [maxlength]="maxlength" [attr.name]="name" [placeholder]="placeholder"
-                  matTextareaAutosize [matAutosizeMinRows]="minRows" [matAutosizeMaxRows]="maxRows"
+                  cdkTextareaAutosize [cdkAutosizeMinRows]="minRows" [cdkAutosizeMaxRows]="maxRows"
                   [required]="required" [disabled]="disabled" [readonly]="readonly"
                   (blur)="onBlur()" (change)="onChange()">
         </textarea>
