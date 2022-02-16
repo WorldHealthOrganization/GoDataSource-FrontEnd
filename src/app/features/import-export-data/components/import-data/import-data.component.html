@@ -215,19 +215,11 @@
                             fxFlex>
 
                             <!-- details popover -->
-                            <mde-popover
-                                #arrayIndexMdePopover="mdePopover"
-                                class="mdePopover"
-                                mdePopoverTriggerOn="hover">
-                                <span
-                                    [innerHTML]="'LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX_DESCRIPTION' | translate | safeHtml">
-                                </span>
-                            </mde-popover>
-
-                            <!-- info button -->
-                            <span
-                                class="xt-icon xt-icon-xsmall"
-                                [mdePopoverTriggerFor]="arrayIndexMdePopover">info</span>
+                            <app-fancy-tooltip
+                                tooltip="LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX_DESCRIPTION"
+                                tooltipIcon="info"
+                                tooltipIconClasses="xt-icon-xsmall">
+                            </app-fancy-tooltip>
                         </div>
                     </div>
                 </div>
@@ -242,19 +234,11 @@
                     <div
                         fxFlex>
                         <!-- details popover -->
-                        <mde-popover
-                            #mappingMdePopover="mdePopover"
-                            class="mdePopover"
-                            mdePopoverTriggerOn="hover">
-                                <span
-                                    [innerHTML]="'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_DESCRIPTION' | translate | safeHtml">
-                                </span>
-                        </mde-popover>
-
-                        <!-- info button -->
-                        <span
-                            class="xt-icon xt-icon-xsmall"
-                            [mdePopoverTriggerFor]="mappingMdePopover">info</span>
+                        <app-fancy-tooltip
+                            tooltip="LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_DESCRIPTION"
+                            tooltipIcon="info"
+                            tooltipIconClasses="xt-icon-xsmall">
+                        </app-fancy-tooltip>
                     </div>
                 </div>
 

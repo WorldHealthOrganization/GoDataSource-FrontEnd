@@ -9,9 +9,9 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { components } from './components';
 import { validatorDirectives } from './validators';
 import { ScrollingModule } from '@angular/cdk/scrolling';
-import { MdePopoverModule } from '@material-extended/mde';
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
+import { NgxPopperjsModule } from 'ngx-popperjs';
 
 @NgModule({
     imports: [
@@ -19,10 +19,10 @@ import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
         FormsModule,
         FlexLayoutModule,
         AngularMaterialModule,
-        MdePopoverModule,
-        NgxSliderModule,
         NgxMaterialTimepickerModule,
         NgxMatSelectSearchModule,
+        NgxPopperjsModule,
+        NgxSliderModule,
         TranslateModule,
         ScrollingModule
     ],
@@ -36,7 +36,7 @@ import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
         FormsModule,
         FlexLayoutModule,
         AngularMaterialModule,
-        MdePopoverModule,
+        NgxPopperjsModule,
         NgxSliderModule,
         ScrollingModule,
         ...components,

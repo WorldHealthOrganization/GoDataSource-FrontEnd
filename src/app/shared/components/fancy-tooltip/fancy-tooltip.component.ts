@@ -25,10 +25,15 @@ export class FancyTooltipComponent implements OnDestroy {
             this.sanitized.bypassSecurityTrustHtml(this._tooltip as string) :
             this._tooltip;
     }
-
     get tooltip(): string | SafeHtml {
         return this._tooltip;
     }
+
+    // tooltip icon
+    @Input() tooltipIcon: string = 'help';
+
+    // tooltip icon classes
+    @Input() tooltipIconClasses: string = '';
 
     // language subscription
     private languageSubscription: Subscription;

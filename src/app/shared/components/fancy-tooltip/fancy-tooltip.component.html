@@ -2,18 +2,23 @@
 <span
     *ngIf="tooltip"
     class="form-icon-fancy">
-    <!-- details popover -->
-    <mde-popover
-        #mappingMdePopover="mdePopover"
-        class="mdePopover"
-        mdePopoverTriggerOn="hover">
-        <span
-            [innerHTML]="tooltip">
-        </span>
-    </mde-popover>
+
+    <!-- Content -->
+    <popper-content
+      #popperContent>
+      <div
+        [innerHtml]="tooltip">
+      </div>
+    </popper-content>
 
     <!-- help button -->
     <span
-        class="xt-icon"
-        [mdePopoverTriggerFor]="mappingMdePopover">help</span>
+        class="xt-icon {{tooltipIconClasses}}"
+        [popper]="popperContent"
+        popperTrigger="hover"
+        popperPlacement="bottom"
+        popperApplyClass="form-icon-fancy-content"
+        [popperPreventOverflow]="true"
+        [popperPositionFixed]="true"
+        popperAppendTo="body">{{tooltipIcon}}</span>
 </span>
