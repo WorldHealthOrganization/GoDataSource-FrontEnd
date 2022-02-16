@@ -308,6 +308,24 @@ form.form-view-only {
     font-size: 14px !important;
 }
 
+.form-icon-fancy {
+    &:hover {
+        cursor: pointer;
+    }
+}
+.form-icon-fancy-content {
+    width: 450px;
+    max-width: 450px;
+    color: white;
+    background-color: #707070;
+    padding: 8px;
+    border-radius: 5px;
+    font-size: 15px;
+    font-weight: normal;
+    text-align: justify;
+    z-index: 10000;
+}
+
 // handle the tooltips on input fields
 .form-input-tooltip,
 .form-timepicker-tooltip,
@@ -526,21 +544,6 @@ a.xlink-button {
     &:hover {
         cursor: pointer;
         text-decoration: underline;
-    }
-}
-
-.mdePopover {
-    max-width: 450px;
-    color: white;
-    background-color: #707070;
-    padding: 8px;
-    border-radius: 5px;
-    font-size: 15px;
-    font-weight: normal;
-    text-align: justify;
-
-    &:hover {
-        cursor: pointer;
     }
 }
 
