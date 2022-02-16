@@ -26,7 +26,7 @@
     "@angular/router": "12.2.16",
     "@angular-slider/ngx-slider": "2.0.3",
     "@handsontable/angular": "7.0.0",
-    "@ng-select/ng-select": "7.4.0",
+    "@ng-select/ng-select": "8.1.1",
     "@ngx-translate/core": "13.0.0",
     "@popperjs/core": "2.11.2",
     "@swimlane/ngx-charts": "17.0.1",
