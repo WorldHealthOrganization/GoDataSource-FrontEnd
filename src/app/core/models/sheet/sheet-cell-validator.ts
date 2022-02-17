@@ -76,7 +76,7 @@ export class SheetCellValidator {
     switch (validationType) {
       case SheetCellValidationType.DROPDOWN:
         // 'handsontable' built-in validator for Dropdowns
-        return Handsontable.default.validators.DropdownValidator;
+        return Handsontable.default.validators.AutocompleteValidator;
 
       case SheetCellValidationType.DATE:
         // custom validator for dates
@@ -96,7 +96,7 @@ export class SheetCellValidator {
         return (value, callback) => {
           if (
             value &&
-                        value.length > 0
+            value.length > 0
           ) {
             callback(true);
             return;
