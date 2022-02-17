@@ -9,76 +9,76 @@ import { EventModel } from '../../../core/models/event.model';
 import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
-    selector: 'app-form-event-quick',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './form-event-quick.component.html',
-    styleUrls: ['./form-event-quick.component.less'],
-    providers: [{
-        provide: NG_VALUE_ACCESSOR,
-        useExisting: FormEventQuickComponent,
-        multi: true
-    }]
+  selector: 'app-form-event-quick',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './form-event-quick.component.html',
+  styleUrls: ['./form-event-quick.component.less'],
+  providers: [{
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: FormEventQuickComponent,
+    multi: true
+  }]
 })
 export class FormEventQuickComponent extends GroupBase<EventModel> implements OnInit, GroupDirtyFields, OnDestroy {
 
-    currentDate = Constants.getCurrentDate();
+  currentDate = Constants.getCurrentDate();
 
-    // selected outbreak
-    selectedOutbreak: OutbreakModel;
+  // selected outbreak
+  selectedOutbreak: OutbreakModel;
 
-    outbreakSubscriber: Subscription;
+  outbreakSubscriber: Subscription;
 
-    constructor(
-        @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
-        @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
-        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
-        private outbreakDataService: OutbreakDataService
-    ) {
-        super(controlContainer, validators, asyncValidators);
-    }
+  constructor(
+  @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
+    @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
+    @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
+    private outbreakDataService: OutbreakDataService
+  ) {
+    super(controlContainer, validators, asyncValidators);
+  }
 
-    /**
+  /**
      * Initialize component elements
      */
-    ngOnInit() {
-        // init value
-        this.value = new EventModel(this.value);
+  ngOnInit() {
+    // init value
+    this.value = new EventModel(this.value);
 
-        // subscribe to the Selected Outbreak
-        this.outbreakSubscriber = this.outbreakDataService
-            .getSelectedOutbreakSubject()
-            .subscribe((selectedOutbreak: OutbreakModel) => {
-                this.selectedOutbreak = selectedOutbreak;
-            });
+    // subscribe to the Selected Outbreak
+    this.outbreakSubscriber = this.outbreakDataService
+      .getSelectedOutbreakSubject()
+      .subscribe((selectedOutbreak: OutbreakModel) => {
+        this.selectedOutbreak = selectedOutbreak;
+      });
+  }
+
+  ngOnDestroy() {
+    // outbreak subscriber
+    if (this.outbreakSubscriber) {
+      this.outbreakSubscriber.unsubscribe();
+      this.outbreakSubscriber = null;
     }
+  }
 
-    ngOnDestroy() {
-        // outbreak subscriber
-        if (this.outbreakSubscriber) {
-            this.outbreakSubscriber.unsubscribe();
-            this.outbreakSubscriber = null;
-        }
-    }
-
-    /**
+  /**
      * Event Model
      */
-    get event(): EventModel {
-        return this.value;
-    }
+  get event(): EventModel {
+    return this.value;
+  }
 
-    /**
+  /**
      * Retrieve fields
      */
-    getDirtyFields(): {
-        [name: string]: FormControl
-    } {
-        const dirtyControls = {};
-        _.forEach(this.groupForm.controls, (control: FormControl, controlName: string) => {
-            if (control.dirty) {
-                dirtyControls[controlName] = control;
-            }
-        });
-        return dirtyControls;
-    }
+  getDirtyFields(): {
+    [name: string]: FormControl
+  } {
+    const dirtyControls = {};
+    _.forEach(this.groupForm.controls, (control: FormControl, controlName: string) => {
+      if (control.dirty) {
+        dirtyControls[controlName] = control;
+      }
+    });
+    return dirtyControls;
+  }
 }

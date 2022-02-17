@@ -13,119 +13,119 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 
 @Component({
-    selector: 'app-view-movement-contact-of-contact',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './view-movement-contact-of-contact.component.html',
-    styleUrls: ['./view-movement-contact-of-contact.component.less']
+  selector: 'app-view-movement-contact-of-contact',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './view-movement-contact-of-contact.component.html',
+  styleUrls: ['./view-movement-contact-of-contact.component.less']
 })
 export class ViewMovementContactOfContactComponent implements OnInit {
 
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs
+  breadcrumbs: BreadcrumbItemModel[] = [];
 
-    contactOfContactData: ContactOfContactModel = new ContactOfContactModel();
-    movementAddresses: AddressModel[] = [];
+  contactOfContactData: ContactOfContactModel = new ContactOfContactModel();
+  movementAddresses: AddressModel[] = [];
 
-    // loading data
-    displayLoading: boolean = true;
+  // loading data
+  displayLoading: boolean = true;
 
-    @ViewChild('mapMovement', { static: true }) mapMovement: WorldMapMovementComponent;
+  @ViewChild('mapMovement', { static: true }) mapMovement: WorldMapMovementComponent;
 
-    // constants
-    ContactOfContactModel = ContactOfContactModel;
+  // constants
+  ContactOfContactModel = ContactOfContactModel;
 
-    // authenticated user details
-    authUser: UserModel;
+  // authenticated user details
+  authUser: UserModel;
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        protected route: ActivatedRoute,
-        private contactsOfContactsDataService: ContactsOfContactsDataService,
-        private outbreakDataService: OutbreakDataService,
-        private authDataService: AuthDataService
-    ) {}
+  constructor(
+    protected route: ActivatedRoute,
+    private contactsOfContactsDataService: ContactsOfContactsDataService,
+    private outbreakDataService: OutbreakDataService,
+    private authDataService: AuthDataService
+  ) {}
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+  ngOnInit() {
+    // get the authenticated user
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
-        this.route.params.subscribe((params: { contactOfContactId }) => {
-            this.outbreakDataService
-                .getSelectedOutbreak()
-                .subscribe((selectedOutbreak: OutbreakModel) => {
-                    forkJoin([
-                        this.contactsOfContactsDataService.getContactOfContact(selectedOutbreak.id, params.contactOfContactId),
-                        this.contactsOfContactsDataService.getContactOfContactMovement(selectedOutbreak.id, params.contactOfContactId)
-                    ])
-                    .subscribe((
-                        [contactOfContactData, movementData]: [ContactOfContactModel, AddressModel[]]
-                    ) => {
-                        // contact of contact  data
-                        this.contactOfContactData = contactOfContactData;
+    this.route.params.subscribe((params: { contactOfContactId }) => {
+      this.outbreakDataService
+        .getSelectedOutbreak()
+        .subscribe((selectedOutbreak: OutbreakModel) => {
+          forkJoin([
+            this.contactsOfContactsDataService.getContactOfContact(selectedOutbreak.id, params.contactOfContactId),
+            this.contactsOfContactsDataService.getContactOfContactMovement(selectedOutbreak.id, params.contactOfContactId)
+          ])
+            .subscribe((
+              [contactOfContactData, movementData]: [ContactOfContactModel, AddressModel[]]
+            ) => {
+              // contact of contact  data
+              this.contactOfContactData = contactOfContactData;
 
-                        // initialize page breadcrumbs
-                        this.initializeBreadcrumbs();
+              // initialize page breadcrumbs
+              this.initializeBreadcrumbs();
 
-                        // movement data
-                        this.displayLoading = false;
-                        this.movementAddresses = movementData;
-                    });
-                });
+              // movement data
+              this.displayLoading = false;
+              this.movementAddresses = movementData;
+            });
         });
+    });
 
-        // initialize page breadcrumbs
-        this.initializeBreadcrumbs();
-    }
+    // initialize page breadcrumbs
+    this.initializeBreadcrumbs();
+  }
 
-    /**
+  /**
      * Initialize breadcrumbs
      */
-    initializeBreadcrumbs() {
-        // reset
-        this.breadcrumbs = [];
+  initializeBreadcrumbs() {
+    // reset
+    this.breadcrumbs = [];
 
-        // contacts of contacts list page
-        if (ContactOfContactModel.canList(this.authUser)) {
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE', '/contacts-of-contacts')
-            );
-        }
-
-        // contact of contact breadcrumbs
-        if (this.contactOfContactData) {
-            // contact of contact view page
-            if (ContactOfContactModel.canView(this.authUser)) {
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel(
-                        this.contactOfContactData.name,
-                        `/contacts-of-contacts/${this.contactOfContactData.id}/view`
-                    )
-                );
-            }
-
-            // current page
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel(
-                    'LNG_PAGE_VIEW_MOVEMENT_CONTACT_OF_CONTACT_TITLE',
-                    '.',
-                    true,
-                    {},
-                    this.contactOfContactData
-                )
-            );
-        }
+    // contacts of contacts list page
+    if (ContactOfContactModel.canList(this.authUser)) {
+      this.breadcrumbs.push(
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE', '/contacts-of-contacts')
+      );
     }
 
-    /**
+    // contact of contact breadcrumbs
+    if (this.contactOfContactData) {
+      // contact of contact view page
+      if (ContactOfContactModel.canView(this.authUser)) {
+        this.breadcrumbs.push(
+          new BreadcrumbItemModel(
+            this.contactOfContactData.name,
+            `/contacts-of-contacts/${this.contactOfContactData.id}/view`
+          )
+        );
+      }
+
+      // current page
+      this.breadcrumbs.push(
+        new BreadcrumbItemModel(
+          'LNG_PAGE_VIEW_MOVEMENT_CONTACT_OF_CONTACT_TITLE',
+          '.',
+          true,
+          {},
+          this.contactOfContactData
+        )
+      );
+    }
+  }
+
+  /**
      * Export movement map for contact
      */
-    exportContactOfContactMovementMap() {
-        this.mapMovement.exportMovementMap(EntityType.CONTACT_OF_CONTACT);
-    }
+  exportContactOfContactMovementMap() {
+    this.mapMovement.exportMovementMap(EntityType.CONTACT_OF_CONTACT);
+  }
 
 }

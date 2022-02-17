@@ -10,7 +10,7 @@ export * from './modify-event/modify-event.component';
 
 // export the list of all page components
 export const pageComponents: any[] = [
-    EventsListComponent,
-    CreateEventComponent,
-    ModifyEventComponent
+  EventsListComponent,
+  CreateEventComponent,
+  ModifyEventComponent
 ];

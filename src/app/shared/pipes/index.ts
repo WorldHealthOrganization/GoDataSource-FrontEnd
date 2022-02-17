@@ -5,9 +5,9 @@ import { HighlightSearchPipe } from './highlight-search/highlight-search';
 
 // export the list of all directives
 export const pipes: any[] = [
-    DateDefaultPipe,
-    DateTimeDefaultPipe,
-    SafeHtmlPipe,
-    HighlightSearchPipe
+  DateDefaultPipe,
+  DateTimeDefaultPipe,
+  SafeHtmlPipe,
+  HighlightSearchPipe
 ];
 

@@ -1,8 +1,8 @@
 
 export class SecurityQuestionModel {
-    question: string;
+  question: string;
 
-    constructor(data = null) {
-        this.question = data;
-    }
+  constructor(data = null) {
+    this.question = data;
+  }
 }

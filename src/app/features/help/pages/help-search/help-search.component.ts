@@ -12,8 +12,8 @@ import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import * as _ from 'lodash';
 import { catchError, tap } from 'rxjs/operators';
 import {
-    UserModel,
-    UserSettings
+  UserModel,
+  UserSettings
 } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { HoverRowAction } from '../../../../shared/components';
@@ -21,133 +21,133 @@ import { throwError } from 'rxjs/internal/observable/throwError';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
-    selector: 'app-help-search',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './help-search.component.html',
-    styleUrls: ['./help-search.component.less']
+  selector: 'app-help-search',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './help-search.component.html',
+  styleUrls: ['./help-search.component.less']
 })
 export class HelpSearchComponent extends ListComponent implements OnInit, OnDestroy {
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_GLOBAL_HELP_TITLE', '/help', true)
-    ];
+  breadcrumbs: BreadcrumbItemModel[] = [
+    new BreadcrumbItemModel('LNG_PAGE_GLOBAL_HELP_TITLE', '/help', true)
+  ];
 
-    // authenticated user
-    authUser: UserModel;
+  // authenticated user
+  authUser: UserModel;
 
-    helpItemsList$: Observable<HelpItemModel[]>;
+  helpItemsList$: Observable<HelpItemModel[]>;
 
-    helpCategoriesList$: Observable<HelpCategoryModel[]>;
+  helpCategoriesList$: Observable<HelpCategoryModel[]>;
 
-    // provide constants to template
-    Constants = Constants;
-    HelpCategoryModel = HelpCategoryModel;
-    UserSettings = UserSettings;
+  // provide constants to template
+  Constants = Constants;
+  HelpCategoryModel = HelpCategoryModel;
+  UserSettings = UserSettings;
 
-    searchedTerm: string = '';
+  searchedTerm: string = '';
 
-    recordActions: HoverRowAction[] = [
-        // View Help Item
-        new HoverRowAction({
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_GLOBAL_HELP_ACTION_VIEW_HELP_ITEM',
-            click: (item: HelpItemModel) => {
-                this.router.navigate(['/help', 'categories', item.categoryId, 'items', item.id, 'view-global']);
-            }
-        })
-    ];
+  recordActions: HoverRowAction[] = [
+    // View Help Item
+    new HoverRowAction({
+      icon: 'visibility',
+      iconTooltip: 'LNG_PAGE_GLOBAL_HELP_ACTION_VIEW_HELP_ITEM',
+      click: (item: HelpItemModel) => {
+        this.router.navigate(['/help', 'categories', item.categoryId, 'items', item.id, 'view-global']);
+      }
+    })
+  ];
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        protected listHelperService: ListHelperService,
-        private router: Router,
-        private authDataService: AuthDataService,
-        private helpDataService: HelpDataService,
-        private snackbarService: SnackbarService
-    ) {
-        super(
-            listHelperService,
-            true
-        );
-    }
+  constructor(
+    protected listHelperService: ListHelperService,
+    private router: Router,
+    private authDataService: AuthDataService,
+    private helpDataService: HelpDataService,
+    private snackbarService: SnackbarService
+  ) {
+    super(
+      listHelperService,
+      true
+    );
+  }
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+  ngOnInit() {
+    // get the authenticated user
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
-        this.helpCategoriesList$ = this.helpDataService.getHelpCategoryList();
+    this.helpCategoriesList$ = this.helpDataService.getHelpCategoryList();
 
-        // ...and re-load the list
-        this.needsRefreshList(true);
-        // initialize Side Table Columns
-        this.initializeSideTableColumns();
-    }
+    // ...and re-load the list
+    this.needsRefreshList(true);
+    // initialize Side Table Columns
+    this.initializeSideTableColumns();
+  }
 
-    /**
+  /**
      * Release resources
      */
-    ngOnDestroy() {
-        // release parent resources
-        super.ngOnDestroy();
-    }
+  ngOnDestroy() {
+    // release parent resources
+    super.ngOnDestroy();
+  }
 
-    /**
+  /**
      * Initialize Side Table Columns
      */
-    initializeSideTableColumns() {
-        // default table columns
-        this.tableColumns = [
-            new VisibleColumnModel({
-                field: 'title',
-                label: 'LNG_HELP_ITEM_FIELD_LABEL_TITLE'
-            }),
-            new VisibleColumnModel({
-                field: 'categoryId',
-                label: 'LNG_HELP_ITEM_FIELD_LABEL_CATEGORY'
-            })
-        ];
-    }
+  initializeSideTableColumns() {
+    // default table columns
+    this.tableColumns = [
+      new VisibleColumnModel({
+        field: 'title',
+        label: 'LNG_HELP_ITEM_FIELD_LABEL_TITLE'
+      }),
+      new VisibleColumnModel({
+        field: 'categoryId',
+        label: 'LNG_HELP_ITEM_FIELD_LABEL_CATEGORY'
+      })
+    ];
+  }
 
-    /**
+  /**
      * Re(load) the items list
      */
-    refreshList(finishCallback: (records: any[]) => void) {
-        this.queryBuilder.filter.where({approved: true}, true);
-        // retrieve the list of items
-        if (_.isEmpty(this.searchedTerm)) {
-            this.queryBuilder.filter.remove('token');
-            this.helpItemsList$ = this.helpDataService.getHelpItemsList(this.queryBuilder);
-        } else {
-            this.helpItemsList$ = this.helpDataService.getHelpItemsListSearch(this.queryBuilder, this.searchedTerm);
-        }
-
-        this.helpItemsList$ = this.helpItemsList$
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    finishCallback([]);
-                    return throwError(err);
-                }),
-                tap(this.checkEmptyList.bind(this)),
-                tap((data: any[]) => {
-                    finishCallback(data);
-                })
-            );
+  refreshList(finishCallback: (records: any[]) => void) {
+    this.queryBuilder.filter.where({approved: true}, true);
+    // retrieve the list of items
+    if (_.isEmpty(this.searchedTerm)) {
+      this.queryBuilder.filter.remove('token');
+      this.helpItemsList$ = this.helpDataService.getHelpItemsList(this.queryBuilder);
+    } else {
+      this.helpItemsList$ = this.helpDataService.getHelpItemsListSearch(this.queryBuilder, this.searchedTerm);
     }
 
+    this.helpItemsList$ = this.helpItemsList$
+      .pipe(
+        catchError((err) => {
+          this.snackbarService.showApiError(err);
+          finishCallback([]);
+          return throwError(err);
+        }),
+        tap(this.checkEmptyList.bind(this)),
+        tap((data: any[]) => {
+          finishCallback(data);
+        })
+      );
+  }
 
-    /**
+
+  /**
      * Filter the list by a text field
      * @param {string} value
      */
-    filterByTextFieldHelpSearch(value: string) {
-        this.searchedTerm = value;
+  filterByTextFieldHelpSearch(value: string) {
+    this.searchedTerm = value;
 
-        // refresh list
-        this.needsRefreshList();
-    }
+    // refresh list
+    this.needsRefreshList();
+  }
 }

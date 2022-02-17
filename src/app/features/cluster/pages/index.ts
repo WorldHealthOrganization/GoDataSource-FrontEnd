@@ -13,8 +13,8 @@ export * from './clusters-people-list/clusters-people-list.component';
 
 // export the list of all page components
 export const pageComponents: any[] = [
-    ClustersListComponent,
-    CreateClusterComponent,
-    ModifyClusterComponent,
-    ClustersPeopleListComponent
+  ClustersListComponent,
+  CreateClusterComponent,
+  ModifyClusterComponent,
+  ClustersPeopleListComponent
 ];

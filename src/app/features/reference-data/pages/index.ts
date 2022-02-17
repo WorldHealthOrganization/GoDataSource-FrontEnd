@@ -16,12 +16,12 @@ export * from './manage-icons-create/manage-icons-create.component';
 
 // export the list of all page components
 export const pageComponents: any[] = [
-    ReferenceDataCategoriesListComponent,
-    ReferenceDataCategoryEntriesListComponent,
-    CreateReferenceDataEntryComponent,
-    ModifyReferenceDataEntryComponent,
+  ReferenceDataCategoriesListComponent,
+  ReferenceDataCategoryEntriesListComponent,
+  CreateReferenceDataEntryComponent,
+  ModifyReferenceDataEntryComponent,
 
-    // Manage Icons
-    ManageIconsListComponent,
-    ManageIconsCreateComponent
+  // Manage Icons
+  ManageIconsListComponent,
+  ManageIconsCreateComponent
 ];

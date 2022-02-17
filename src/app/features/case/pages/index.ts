@@ -16,10 +16,10 @@ export * from './view-chronology-case/view-chronology-case.component';
 
 // export the list of all page components
 export const pageComponents: any[] = [
-    CasesListComponent,
-    CreateCaseComponent,
-    ModifyCaseComponent,
-    ModifyQuestionnaireCaseComponent,
-    ViewMovementCaseComponent,
-    ViewChronologyCaseComponent
+  CasesListComponent,
+  CreateCaseComponent,
+  ModifyCaseComponent,
+  ModifyQuestionnaireCaseComponent,
+  ViewMovementCaseComponent,
+  ViewChronologyCaseComponent
 ];

@@ -16,106 +16,106 @@ import { IconModel } from '../../../../core/models/icon.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
-    selector: 'app-reference-data-categories-list',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './reference-data-categories-list.component.html',
-    styleUrls: ['./reference-data-categories-list.component.less']
+  selector: 'app-reference-data-categories-list',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './reference-data-categories-list.component.html',
+  styleUrls: ['./reference-data-categories-list.component.less']
 })
 export class ReferenceDataCategoriesListComponent
-    extends ListComponent
-    implements OnInit, OnDestroy {
+  extends ListComponent
+  implements OnInit, OnDestroy {
 
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '..', true)
-    ];
+  // breadcrumbs
+  breadcrumbs: BreadcrumbItemModel[] = [
+    new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '..', true)
+  ];
 
-    // authenticated user
-    authUser: UserModel;
+  // authenticated user
+  authUser: UserModel;
 
-    // constants
-    ReferenceDataCategoryModel = ReferenceDataCategoryModel;
-    IconModel = IconModel;
+  // constants
+  ReferenceDataCategoryModel = ReferenceDataCategoryModel;
+  IconModel = IconModel;
 
-    // list of entries grouped by category
-    referenceData$: Observable<ReferenceDataCategoryModel[]>;
+  // list of entries grouped by category
+  referenceData$: Observable<ReferenceDataCategoryModel[]>;
 
-    referenceDataExporFileName: string = moment().format('YYYY-MM-DD');
+  referenceDataExporFileName: string = moment().format('YYYY-MM-DD');
 
-    fixedTableColumns: string[] = [
-        'categoryName',
-        'entries'
-    ];
+  fixedTableColumns: string[] = [
+    'categoryName',
+    'entries'
+  ];
 
-    recordActions: HoverRowAction[] = [
-        // View Items
-        new HoverRowAction({
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_ACTION_VIEW_CATEGORY',
-            linkGenerator: (item: ReferenceDataCategoryModel): string[] => {
-                return ['/reference-data', item.id];
-            },
-            visible: (): boolean => {
-                return ReferenceDataEntryModel.canList(this.authUser);
-            }
-        })
-    ];
+  recordActions: HoverRowAction[] = [
+    // View Items
+    new HoverRowAction({
+      icon: 'visibility',
+      iconTooltip: 'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_ACTION_VIEW_CATEGORY',
+      linkGenerator: (item: ReferenceDataCategoryModel): string[] => {
+        return ['/reference-data', item.id];
+      },
+      visible: (): boolean => {
+        return ReferenceDataEntryModel.canList(this.authUser);
+      }
+    })
+  ];
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        protected listHelperService: ListHelperService,
-        private referenceDataDataService: ReferenceDataDataService,
-        private authDataService: AuthDataService,
-        private i18nService: I18nService,
-        private snackbarService: SnackbarService
-    ) {
-        super(
-            listHelperService,
-            true
-        );
-    }
+  constructor(
+    protected listHelperService: ListHelperService,
+    private referenceDataDataService: ReferenceDataDataService,
+    private authDataService: AuthDataService,
+    private i18nService: I18nService,
+    private snackbarService: SnackbarService
+  ) {
+    super(
+      listHelperService,
+      true
+    );
+  }
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+  ngOnInit() {
+    // get the authenticated user
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
-        this.needsRefreshList(true);
+    this.needsRefreshList(true);
 
-        // add page title
-        this.referenceDataExporFileName = this.i18nService.instant('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE') +
+    // add page title
+    this.referenceDataExporFileName = this.i18nService.instant('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE') +
             ' - ' +
             this.referenceDataExporFileName;
-    }
+  }
 
-    /**
+  /**
      * Release resources
      */
-    ngOnDestroy() {
-        // release parent resources
-        super.ngOnDestroy();
-    }
+  ngOnDestroy() {
+    // release parent resources
+    super.ngOnDestroy();
+  }
 
-    /**
+  /**
      * Re(load) the Reference Data Categories list
      */
-    refreshList(finishCallback: (records: any[]) => void) {
-        // load reference data
-        this.referenceData$ = this.referenceDataDataService
-            .getReferenceData()
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    finishCallback([]);
-                    return throwError(err);
-                }),
-                tap((data: any[]) => {
-                    finishCallback(data);
-                })
-            );
-    }
+  refreshList(finishCallback: (records: any[]) => void) {
+    // load reference data
+    this.referenceData$ = this.referenceDataDataService
+      .getReferenceData()
+      .pipe(
+        catchError((err) => {
+          this.snackbarService.showApiError(err);
+          finishCallback([]);
+          return throwError(err);
+        }),
+        tap((data: any[]) => {
+          finishCallback(data);
+        })
+      );
+  }
 }

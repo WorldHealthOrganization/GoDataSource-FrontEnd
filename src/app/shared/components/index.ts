@@ -72,79 +72,79 @@ export * from './location-dialog/location-dialog.component';
 
 // export the list of all components
 export const components: any[] = [
-    // popups
-    MultipleSnackbarComponent,
+  // popups
+  MultipleSnackbarComponent,
 
-    // main layout
-    TopnavComponent,
-    TopnavUnauthenticatedComponent,
-    BreadcrumbsComponent,
-    SideFiltersComponent,
-    SideColumnsComponent,
-    GlobalEntitySearchComponent,
+  // main layout
+  TopnavComponent,
+  TopnavUnauthenticatedComponent,
+  BreadcrumbsComponent,
+  SideFiltersComponent,
+  SideColumnsComponent,
+  GlobalEntitySearchComponent,
 
-    // authentication - #TODO - this needs to be refactored & removed
-    NotAuthTemplateComponent,
+  // authentication - #TODO - this needs to be refactored & removed
+  NotAuthTemplateComponent,
 
-    // inputs
-    FormAddressComponent,
-    FormAddressListComponent,
-    FormDocumentComponent,
-    FormDocumentListComponent,
-    FormRangeComponent,
-    FormRelationshipComponent,
-    FormInputListComponent,
-    FormNameUrlListComponent,
-    FormLocationDropdownComponent,
-    FormModifyQuestionnaireComponent,
-    FormFillQuestionnaireComponent,
-    FormAgeComponent,
-    FormAgeDobComponent,
-    FormRelationshipQuickComponent,
-    FormContactQuickComponent,
-    FormContactOfContactQuickComponent,
-    FormCaseQuickComponent,
-    FormEventQuickComponent,
-    FormLocationIdentifierListComponent,
-    FormLocationIdentifierComponent,
-    FormNgxWigComponent,
-    FormVaccinesListComponent,
-    HotTableWrapperComponent,
+  // inputs
+  FormAddressComponent,
+  FormAddressListComponent,
+  FormDocumentComponent,
+  FormDocumentListComponent,
+  FormRangeComponent,
+  FormRelationshipComponent,
+  FormInputListComponent,
+  FormNameUrlListComponent,
+  FormLocationDropdownComponent,
+  FormModifyQuestionnaireComponent,
+  FormFillQuestionnaireComponent,
+  FormAgeComponent,
+  FormAgeDobComponent,
+  FormRelationshipQuickComponent,
+  FormContactQuickComponent,
+  FormContactOfContactQuickComponent,
+  FormCaseQuickComponent,
+  FormEventQuickComponent,
+  FormLocationIdentifierListComponent,
+  FormLocationIdentifierComponent,
+  FormNgxWigComponent,
+  FormVaccinesListComponent,
+  HotTableWrapperComponent,
 
-    // display information
-    CountedItemsListComponent,
-    YesNoLabelComponent,
-    ListItemLabelComponent,
-    ReferenceDataLabelComponent,
-    LocationBreadcrumbsComponent,
-    ChronologyComponent,
-    AgeLabelComponent,
-    ColorListLegendComponent,
-    TotalNumberOfRecordsComponent,
+  // display information
+  CountedItemsListComponent,
+  YesNoLabelComponent,
+  ListItemLabelComponent,
+  ReferenceDataLabelComponent,
+  LocationBreadcrumbsComponent,
+  ChronologyComponent,
+  AgeLabelComponent,
+  ColorListLegendComponent,
+  TotalNumberOfRecordsComponent,
 
-    // dialogs
-    DialogComponent,
-    ModifyContactFollowUpQuestionnaireDialogComponent,
-    LoadingDialogComponent,
-    ViewCotNodeDialogComponent,
-    ViewCotEdgeDialogComponent,
-    ViewHelpDialogComponent,
-    ViewHelpDetailsDialogComponent,
-    LocationDialogComponent,
+  // dialogs
+  DialogComponent,
+  ModifyContactFollowUpQuestionnaireDialogComponent,
+  LoadingDialogComponent,
+  ViewCotNodeDialogComponent,
+  ViewCotEdgeDialogComponent,
+  ViewHelpDialogComponent,
+  ViewHelpDetailsDialogComponent,
+  LocationDialogComponent,
 
-    // general
-    ExportButtonComponent,
-    NumberOfItemsLabelComponent,
-    FormCaseCenterDaterangeComponent,
-    FormCaseCenterDaterangeListComponent,
-    FancyTooltipComponent,
+  // general
+  ExportButtonComponent,
+  NumberOfItemsLabelComponent,
+  FormCaseCenterDaterangeComponent,
+  FormCaseCenterDaterangeListComponent,
+  FancyTooltipComponent,
 
-    // layout extensions
-    HoverRowActionsComponent,
+  // layout extensions
+  HoverRowActionsComponent,
 
-    // Graphs
-    PieDonutChartComponent,
+  // Graphs
+  PieDonutChartComponent,
 
-    // Material extensions
-    MatPaginatorExtendedComponent
+  // Material extensions
+  MatPaginatorExtendedComponent
 ];

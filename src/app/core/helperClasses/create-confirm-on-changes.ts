@@ -8,34 +8,34 @@ import { RedirectService } from '../services/helper/redirect.service';
  * Add methods specific to create component & extends ConfirmOnFormChanges functionality
  */
 export abstract class CreateConfirmOnChanges
-    extends ConfirmOnFormChanges {
+  extends ConfirmOnFormChanges {
 
-    /**
+  /**
      * Redirect to proper page after create
      */
-    redirectToProperPageAfterCreate(
-        router: Router,
-        redirectService: RedirectService,
-        authUser: UserModel,
-        model: IPermissionBasic,
-        routePath: string,
-        recordID: string,
-        redirectToCreateData?: any
-    ) {
-        // navigate to proper page
-        this.disableDirtyConfirm();
-        if (model.canModify(authUser)) {
-            router.navigate([`/${routePath}/${recordID}/modify`]);
-        } else if (model.canView(authUser)) {
-            router.navigate([`/${routePath}/${recordID}/view`]);
-        } else if (model.canList(authUser)) {
-            router.navigate([`/${routePath}`]);
-        } else {
-            // fallback to current page since we already know that we have access to this page
-            redirectService.to(
-                [`/${routePath}/create`],
-                redirectToCreateData
-            );
-        }
+  redirectToProperPageAfterCreate(
+    router: Router,
+    redirectService: RedirectService,
+    authUser: UserModel,
+    model: IPermissionBasic,
+    routePath: string,
+    recordID: string,
+    redirectToCreateData?: any
+  ) {
+    // navigate to proper page
+    this.disableDirtyConfirm();
+    if (model.canModify(authUser)) {
+      router.navigate([`/${routePath}/${recordID}/modify`]);
+    } else if (model.canView(authUser)) {
+      router.navigate([`/${routePath}/${recordID}/view`]);
+    } else if (model.canList(authUser)) {
+      router.navigate([`/${routePath}`]);
+    } else {
+      // fallback to current page since we already know that we have access to this page
+      redirectService.to(
+        [`/${routePath}/create`],
+        redirectToCreateData
+      );
     }
+  }
 }

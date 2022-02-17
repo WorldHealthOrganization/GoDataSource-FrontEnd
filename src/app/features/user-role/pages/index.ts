@@ -10,7 +10,7 @@ export * from './modify-role/modify-role.component';
 
 // export the list of all page components
 export const pageComponents: any[] = [
-    RolesListComponent,
-    CreateRoleComponent,
-    ModifyRoleComponent,
+  RolesListComponent,
+  CreateRoleComponent,
+  ModifyRoleComponent,
 ];

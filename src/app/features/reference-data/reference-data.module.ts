@@ -10,15 +10,15 @@ import { FileUploadModule } from 'ng2-file-upload';
 import * as fromPages from './pages';
 
 @NgModule({
-    imports: [
-        routing,
-        SharedModule,
-        ColorPickerModule,
-        FileUploadModule
-    ],
-    declarations: [
-        ...fromPages.pageComponents
-    ]
+  imports: [
+    routing,
+    SharedModule,
+    ColorPickerModule,
+    FileUploadModule
+  ],
+  declarations: [
+    ...fromPages.pageComponents
+  ]
 })
 export class ReferenceDataModule {
 }

@@ -16,127 +16,127 @@ import { SystemSettingsDataService } from '../../../../core/services/data/system
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 
 @Component({
-    selector: 'app-forgot-password',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './forgot-password.component.html',
-    styleUrls: ['./forgot-password.component.less']
+  selector: 'app-forgot-password',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './forgot-password.component.html',
+  styleUrls: ['./forgot-password.component.less']
 })
 export class ForgotPasswordComponent implements OnInit {
-    // captcha data
-    captchaData$: Observable<SafeHtml>;
+  // captcha data
+  captchaData$: Observable<SafeHtml>;
 
-    // loading data ?
-    loading = true;
-    displayCaptcha = false;
+  // loading data ?
+  loading = true;
+  displayCaptcha = false;
 
-    // data
-    dataModel: {
-        email: string,
-        captcha: string
-    } = {
-        email: null,
-        captcha: null
+  // data
+  dataModel: {
+    email: string,
+    captcha: string
+  } = {
+      email: null,
+      captcha: null
     };
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        private router: Router,
-        private authDataService: AuthDataService,
-        private userDataService: UserDataService,
-        private snackbarService: SnackbarService,
-        private formHelper: FormHelperService,
-        private dialogService: DialogService,
-        private captchaDataService: CaptchaDataService,
-        private systemSettingsDataService: SystemSettingsDataService
-    ) {}
+  constructor(
+    private router: Router,
+    private authDataService: AuthDataService,
+    private userDataService: UserDataService,
+    private snackbarService: SnackbarService,
+    private formHelper: FormHelperService,
+    private dialogService: DialogService,
+    private captchaDataService: CaptchaDataService,
+    private systemSettingsDataService: SystemSettingsDataService
+  ) {}
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // check if user is authenticated
-        if (this.authDataService.isAuthenticated()) {
-            // user is already authenticated; redirect to dashboard home page
-            this.router.navigate(['']);
-            return;
-        }
-
-        // retrieve if we should display captcha or not
-        // display loading while determining if we should display captcha
-        this.loading = true;
-        this.systemSettingsDataService
-            .getAPIVersion()
-            .subscribe((versionData: SystemSettingsVersionModel) => {
-                // finished
-                this.loading = false;
-
-                // display captcha ?
-                this.displayCaptcha = versionData.captcha.forgotPassword;
-                if (this.displayCaptcha) {
-                    // generate captcha
-                    this.refreshCaptcha();
-                }
-            });
+  ngOnInit() {
+    // check if user is authenticated
+    if (this.authDataService.isAuthenticated()) {
+      // user is already authenticated; redirect to dashboard home page
+      this.router.navigate(['']);
+      return;
     }
 
-    /**
+    // retrieve if we should display captcha or not
+    // display loading while determining if we should display captcha
+    this.loading = true;
+    this.systemSettingsDataService
+      .getAPIVersion()
+      .subscribe((versionData: SystemSettingsVersionModel) => {
+        // finished
+        this.loading = false;
+
+        // display captcha ?
+        this.displayCaptcha = versionData.captcha.forgotPassword;
+        if (this.displayCaptcha) {
+          // generate captcha
+          this.refreshCaptcha();
+        }
+      });
+  }
+
+  /**
      * Forgot password
      */
-    forgotPassword(form: NgForm) {
-        const dirtyFields: any = this.formHelper.getDirtyFields(form);
-        if (form.valid && !_.isEmpty(dirtyFields)) {
+  forgotPassword(form: NgForm) {
+    const dirtyFields: any = this.formHelper.getDirtyFields(form);
+    if (form.valid && !_.isEmpty(dirtyFields)) {
 
-            // display loading
-            const loadingDialog = this.dialogService.showLoadingDialog();
+      // display loading
+      const loadingDialog = this.dialogService.showLoadingDialog();
 
-            // send the "password reset" e-mail
-            this.userDataService
-                .forgotPassword(dirtyFields)
-                .pipe(
-                    catchError((err) => {
-                        // reset captcha no matter what...
-                        if (this.displayCaptcha) {
-                            this.dataModel.captcha = '';
-                            this.refreshCaptcha();
-                        }
+      // send the "password reset" e-mail
+      this.userDataService
+        .forgotPassword(dirtyFields)
+        .pipe(
+          catchError((err) => {
+            // reset captcha no matter what...
+            if (this.displayCaptcha) {
+              this.dataModel.captcha = '';
+              this.refreshCaptcha();
+            }
 
-                        // hide dialog
-                        loadingDialog.close();
+            // hide dialog
+            loadingDialog.close();
 
-                        // show error
-                        this.snackbarService.showApiError(err);
-                        return throwError(err);
-                    })
-                )
-                .subscribe(() => {
-                    this.snackbarService.showSuccess(
-                        `LNG_PAGE_FORGOT_PASSWORD_ACTION_SEND_EMAIL_SUCCESS_MESSAGE`,
-                        {email: dirtyFields.email}
-                    );
+            // show error
+            this.snackbarService.showApiError(err);
+            return throwError(err);
+          })
+        )
+        .subscribe(() => {
+          this.snackbarService.showSuccess(
+            'LNG_PAGE_FORGOT_PASSWORD_ACTION_SEND_EMAIL_SUCCESS_MESSAGE',
+            {email: dirtyFields.email}
+          );
 
-                    // hide loading
-                    loadingDialog.close();
+          // hide loading
+          loadingDialog.close();
 
-                    // redirect to login page
-                    this.router.navigate(['/auth/login']);
-                });
-        }
+          // redirect to login page
+          this.router.navigate(['/auth/login']);
+        });
     }
+  }
 
-    /**
+  /**
      * Refresh captcha
      */
-    refreshCaptcha() {
-        this.captchaData$ = this.captchaDataService
-            .generateSVG(CaptchaDataFor.FORGOT_PASSWORD)
-            .pipe(
-                catchError((err) => {
-                    // show error
-                    this.snackbarService.showApiError(err);
-                    return throwError(err);
-                })
-            );
-    }
+  refreshCaptcha() {
+    this.captchaData$ = this.captchaDataService
+      .generateSVG(CaptchaDataFor.FORGOT_PASSWORD)
+      .pipe(
+        catchError((err) => {
+          // show error
+          this.snackbarService.showApiError(err);
+          return throwError(err);
+        })
+      );
+  }
 }

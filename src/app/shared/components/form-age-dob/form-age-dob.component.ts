@@ -9,135 +9,135 @@ import { Constants } from '../../../core/models/constants';
 import { moment, Moment } from '../../../core/helperClasses/x-moment';
 
 @Component({
-    selector: 'app-form-age-dob',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './form-age-dob.component.html',
-    styleUrls: ['./form-age-dob.component.less'],
-    providers: [{
-        provide: NG_VALUE_ACCESSOR,
-        useExisting: FormAgeDobComponent,
-        multi: true
-    }]
+  selector: 'app-form-age-dob',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './form-age-dob.component.html',
+  styleUrls: ['./form-age-dob.component.less'],
+  providers: [{
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: FormAgeDobComponent,
+    multi: true
+  }]
 })
 export class FormAgeDobComponent extends GroupBase<CaseModel | ContactModel> implements OnInit {
-    // general configurations
-    @Input() disabled: boolean = false;
-    @Input() required: boolean = false;
+  // general configurations
+  @Input() disabled: boolean = false;
+  @Input() required: boolean = false;
 
-    @Input() ageButtonLabel: string;
-    @Input() ageTooltip: string;
-    @Input() dobButtonLabel: string;
-    @Input() dobPlaceholder: string;
-    @Input() dobTooltip: string;
+  @Input() ageButtonLabel: string;
+  @Input() ageTooltip: string;
+  @Input() dobButtonLabel: string;
+  @Input() dobPlaceholder: string;
+  @Input() dobTooltip: string;
 
-    ageSelected: boolean = true;
+  ageSelected: boolean = true;
 
-    today: Moment;
+  today: Moment;
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
-        @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
-        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>
-    ) {
-        super(controlContainer, validators, asyncValidators);
-    }
+  constructor(
+  @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
+    @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
+    @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>
+  ) {
+    super(controlContainer, validators, asyncValidators);
+  }
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        this.today = Constants.getCurrentDate();
-    }
+  ngOnInit() {
+    this.today = Constants.getCurrentDate();
+  }
 
-    /**
+  /**
      * Switch between Age and Date of birth
      */
-    switchAgeDob(ageSelected: boolean = true) {
-        // switch element that we want to see
-        this.ageSelected = ageSelected;
+  switchAgeDob(ageSelected: boolean = true) {
+    // switch element that we want to see
+    this.ageSelected = ageSelected;
 
-        setTimeout(() => {
-            // tell parent that data changed
-            super.validateGroup();
-        });
-    }
+    setTimeout(() => {
+      // tell parent that data changed
+      super.validateGroup();
+    });
+  }
 
-    /**
+  /**
      * Overwrite value initializer
      * @param value
      */
-    writeValue(value: CaseModel | ContactModel) {
-        // initialize
-        super.writeValue(value);
+  writeValue(value: CaseModel | ContactModel) {
+    // initialize
+    super.writeValue(value);
 
-        // set initial state
-        if (value) {
-            this.ageSelected = !value.dob;
-        }
+    // set initial state
+    if (value) {
+      this.ageSelected = !value.dob;
     }
+  }
 
-    /**
+  /**
      * Age & Dob handler
      */
-    get ageDob(): any {
-        return this.value ?
-            this.value :
-            {};
-    }
+  get ageDob(): any {
+    return this.value ?
+      this.value :
+      {};
+  }
 
-    /**
+  /**
      * DOB changed handler
      * @param dob
      * @param date
      */
-    dobChanged(
-        dob: FormDatepickerComponent,
-        date: Moment
-    ) {
-        // update age
-        if (
-            (
-                !dob ||
+  dobChanged(
+    dob: FormDatepickerComponent,
+    date: Moment
+  ) {
+    // update age
+    if (
+      (
+        !dob ||
                 !dob.invalid
-            ) &&
+      ) &&
             date &&
             date.isValid()
-        ) {
-            // add age object if we don't have one
-            if (!this.ageDob.age) {
-                this.ageDob.age = new AgeModel();
-            }
+    ) {
+      // add age object if we don't have one
+      if (!this.ageDob.age) {
+        this.ageDob.age = new AgeModel();
+      }
 
-            // add data
-            const now = moment();
-            this.ageDob.age.years = now.diff(date, 'years');
-            this.ageDob.age.months = this.ageDob.age.years < 1 ? now.diff(date, 'months') : 0;
-        } else {
-            this.ageDob.age.months = 0;
-            this.ageDob.age.years = 0;
-        }
-
-        setTimeout(() => {
-            // tell parent that data changed
-            super.onChange();
-        });
+      // add data
+      const now = moment();
+      this.ageDob.age.years = now.diff(date, 'years');
+      this.ageDob.age.months = this.ageDob.age.years < 1 ? now.diff(date, 'months') : 0;
+    } else {
+      this.ageDob.age.months = 0;
+      this.ageDob.age.years = 0;
     }
 
-    /**
+    setTimeout(() => {
+      // tell parent that data changed
+      super.onChange();
+    });
+  }
+
+  /**
      * Age changed
      */
-    ageChanged() {
-        // reset dob if we change number of months
-        this.ageDob.dob = null;
+  ageChanged() {
+    // reset dob if we change number of months
+    this.ageDob.dob = null;
 
-        setTimeout(() => {
-            // tell parent that data changed
-            super.onChange();
-        });
-    }
+    setTimeout(() => {
+      // tell parent that data changed
+      super.onChange();
+    });
+  }
 }
 
 

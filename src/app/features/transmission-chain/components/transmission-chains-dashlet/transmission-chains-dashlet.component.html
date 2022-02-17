@@ -495,9 +495,9 @@
                 <div>
                     {{nodeNameColorItem | translate}}
                 </div>
-                <div *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
-                    || transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
-                    || transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value">
+                <div *ngIf="transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+                    || transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
+                    || transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value">
                     - {{legend.nodeNameColorAdditionalInfo[nodeNameColorItem] | translate}}
                 </div>
             </div>
@@ -733,9 +733,9 @@
         </a>
     </div>
 
-    <button *ngIf="( transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
-        || transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
-        || transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value)"
+    <button *ngIf="( transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+        || transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
+        || transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value)"
         mat-raised-button
         [ngClass]="{'full-screen-bottomed-item': fullScreen}"
         (click)="switchTimelineView(timelineViewType === 'horizontal' ? 'vertical' : 'horizontal')">

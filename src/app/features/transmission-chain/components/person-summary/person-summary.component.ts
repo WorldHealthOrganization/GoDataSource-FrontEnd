@@ -11,78 +11,78 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
-    selector: 'app-person-summary',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './person-summary.component.html',
-    styleUrls: ['./person-summary.component.less']
+  selector: 'app-person-summary',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './person-summary.component.html',
+  styleUrls: ['./person-summary.component.less']
 })
 export class PersonSummaryComponent implements OnInit {
-    @Input() person: CaseModel | ContactModel | EventModel;
+  @Input() person: CaseModel | ContactModel | EventModel;
 
-    // constants
-    ContactModel = ContactModel;
-    ContactOfContactModel = ContactOfContactModel;
+  // constants
+  ContactModel = ContactModel;
+  ContactOfContactModel = ContactOfContactModel;
 
-    @Output() remove = new EventEmitter<void>();
-    @Output() modifyPerson = new EventEmitter<(CaseModel | ContactModel | EventModel)>();
-    @Output() deletePerson = new EventEmitter<(CaseModel | ContactModel | EventModel)>();
-    @Output() createContact = new EventEmitter<(CaseModel | ContactModel | EventModel)>();
-    @Output() createContactOfContact = new EventEmitter<(CaseModel | ContactModel | EventModel)>();
+  @Output() remove = new EventEmitter<void>();
+  @Output() modifyPerson = new EventEmitter<(CaseModel | ContactModel | EventModel)>();
+  @Output() deletePerson = new EventEmitter<(CaseModel | ContactModel | EventModel)>();
+  @Output() createContact = new EventEmitter<(CaseModel | ContactModel | EventModel)>();
+  @Output() createContactOfContact = new EventEmitter<(CaseModel | ContactModel | EventModel)>();
 
-    // authenticated user
-    authUser: UserModel;
+  // authenticated user
+  authUser: UserModel;
 
-    personData: LabelValuePair[] = [];
-    personLink: string;
-    personChainLink: string;
+  personData: LabelValuePair[] = [];
+  personLink: string;
+  personChainLink: string;
 
-    // provide constants to template
-    EntityType = EntityType;
+  // provide constants to template
+  EntityType = EntityType;
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        private authDataService: AuthDataService,
-        private entityDataService: EntityDataService
-    ) {}
+  constructor(
+    private authDataService: AuthDataService,
+    private entityDataService: EntityDataService
+  ) {}
 
-    ngOnInit() {
-        this.authUser = this.authDataService.getAuthenticatedUser();
+  ngOnInit() {
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
-        this.personData = this.entityDataService.getLightObjectDisplay(this.person);
-        this.personLink = this.getPersonLink();
-        this.personChainLink = this.getPersonChainLink();
-    }
+    this.personData = this.entityDataService.getLightObjectDisplay(this.person);
+    this.personLink = this.getPersonLink();
+    this.personChainLink = this.getPersonChainLink();
+  }
 
-    private getPersonLink() {
-        const entityTypeLink = EntityModel.getLinkForEntityType(this.person.type);
-        return `/${entityTypeLink}/${this.person.id}/view`;
-    }
+  private getPersonLink() {
+    const entityTypeLink = EntityModel.getLinkForEntityType(this.person.type);
+    return `/${entityTypeLink}/${this.person.id}/view`;
+  }
 
-    private getPersonChainLink() {
-        return `/transmission-chains?personId=${this.person.id}&selectedEntityType=${this.person.type}`;
-    }
+  private getPersonChainLink() {
+    return `/transmission-chains?personId=${this.person.id}&selectedEntityType=${this.person.type}`;
+  }
 
-    onRemove() {
-        this.remove.emit();
-    }
+  onRemove() {
+    this.remove.emit();
+  }
 
-    onModifyPerson() {
-        this.modifyPerson.emit(this.person);
-    }
+  onModifyPerson() {
+    this.modifyPerson.emit(this.person);
+  }
 
-    onCreateContact() {
-        this.createContact.emit(this.person);
-    }
+  onCreateContact() {
+    this.createContact.emit(this.person);
+  }
 
-    onCreateContactOfContact() {
-        this.createContactOfContact.emit(this.person);
-    }
+  onCreateContactOfContact() {
+    this.createContactOfContact.emit(this.person);
+  }
 
-    onDeletePerson() {
-        this.deletePerson.emit(this.person);
-    }
+  onDeletePerson() {
+    this.deletePerson.emit(this.person);
+  }
 }
 
 

@@ -15,145 +15,145 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 
 @Component({
-    selector: 'app-import-case-lab-data',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './import-case-lab-data.component.html',
-    styleUrls: ['./import-case-lab-data.component.less']
+  selector: 'app-import-case-lab-data',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './import-case-lab-data.component.html',
+  styleUrls: ['./import-case-lab-data.component.less']
 })
 export class ImportCaseLabDataComponent implements OnInit, OnDestroy {
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs
+  breadcrumbs: BreadcrumbItemModel[] = [];
 
-    Constants = Constants;
+  Constants = Constants;
 
-    authUser: UserModel;
+  authUser: UserModel;
 
-    allowedExtensions: string[] = [
-        ImportDataExtension.CSV,
-        ImportDataExtension.XLS,
-        ImportDataExtension.XLSX,
-        ImportDataExtension.ODS,
-        ImportDataExtension.JSON,
-        ImportDataExtension.ZIP
-    ];
+  allowedExtensions: string[] = [
+    ImportDataExtension.CSV,
+    ImportDataExtension.XLS,
+    ImportDataExtension.XLSX,
+    ImportDataExtension.ODS,
+    ImportDataExtension.JSON,
+    ImportDataExtension.ZIP
+  ];
 
-    outbreakSubscriber: Subscription;
+  outbreakSubscriber: Subscription;
 
-    displayLoading: boolean = true;
+  displayLoading: boolean = true;
 
-    importFileUrl: string = '';
-    importDataUrl: string = '';
+  importFileUrl: string = '';
+  importDataUrl: string = '';
 
-    ImportServerModelNames = ImportServerModelNames;
+  ImportServerModelNames = ImportServerModelNames;
 
-    fieldsWithoutTokens = {
-        questionnaireAnswers: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS'
-    };
+  fieldsWithoutTokens = {
+    questionnaireAnswers: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS'
+  };
 
-    requiredDestinationFields = [
-        'personId',
-        'dateSampleTaken'
-    ];
+  requiredDestinationFields = [
+    'personId',
+    'dateSampleTaken'
+  ];
 
-    formatDataBeforeUse = QuestionModel.formatQuestionnaireImportDefs;
+  formatDataBeforeUse = QuestionModel.formatQuestionnaireImportDefs;
 
-    selectedOutbreak: OutbreakModel;
+  selectedOutbreak: OutbreakModel;
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        private router: Router,
-        private outbreakDataService: OutbreakDataService,
-        private authDataService: AuthDataService,
-        private redirectService: RedirectService
-    ) {}
+  constructor(
+    private router: Router,
+    private outbreakDataService: OutbreakDataService,
+    private authDataService: AuthDataService,
+    private redirectService: RedirectService
+  ) {}
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+  ngOnInit() {
+    // get the authenticated user
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
-        // update breadcrumbs
-        this.initializeBreadcrumbs();
+    // update breadcrumbs
+    this.initializeBreadcrumbs();
 
-        // get number of deceased cases
-        this.outbreakSubscriber = this.outbreakDataService
-            .getSelectedOutbreakSubject()
-            .subscribe((selectedOutbreak: OutbreakModel) => {
-                if (selectedOutbreak && selectedOutbreak.id) {
-                    // outbreak
-                    this.selectedOutbreak = selectedOutbreak;
+    // get number of deceased cases
+    this.outbreakSubscriber = this.outbreakDataService
+      .getSelectedOutbreakSubject()
+      .subscribe((selectedOutbreak: OutbreakModel) => {
+        if (selectedOutbreak && selectedOutbreak.id) {
+          // outbreak
+          this.selectedOutbreak = selectedOutbreak;
 
-                    // set URLs
-                    this.importFileUrl = `outbreaks/${selectedOutbreak.id}/importable-files`;
-                    this.importDataUrl = `outbreaks/${selectedOutbreak.id}/cases/lab-results/import-importable-file-using-map`;
+          // set URLs
+          this.importFileUrl = `outbreaks/${selectedOutbreak.id}/importable-files`;
+          this.importDataUrl = `outbreaks/${selectedOutbreak.id}/cases/lab-results/import-importable-file-using-map`;
 
-                    // display import form
-                    this.displayLoading = false;
-                }
-            });
-    }
+          // display import form
+          this.displayLoading = false;
+        }
+      });
+  }
 
-    /**
+  /**
      * Component destroyed
      */
-    ngOnDestroy() {
-        // outbreak subscriber
-        if (this.outbreakSubscriber) {
-            this.outbreakSubscriber.unsubscribe();
-            this.outbreakSubscriber = null;
-        }
+  ngOnDestroy() {
+    // outbreak subscriber
+    if (this.outbreakSubscriber) {
+      this.outbreakSubscriber.unsubscribe();
+      this.outbreakSubscriber = null;
     }
+  }
 
-    /**
+  /**
      * Initialize breadcrumbs
      */
-    initializeBreadcrumbs() {
-        // reset
-        this.breadcrumbs = [];
+  initializeBreadcrumbs() {
+    // reset
+    this.breadcrumbs = [];
 
-        // add list breadcrumb only if we have permission
-        if (CaseModel.canList(this.authUser)) {
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel(
-                    'LNG_PAGE_LIST_CASES_TITLE',
-                    '/cases'
-                )
-            );
-        }
-
-        // add list breadcrumb only if we have permission
-        if (LabResultModel.canList(this.authUser)) {
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel(
-                    'LNG_PAGE_LIST_LAB_RESULTS_TITLE',
-                    '/lab-results'
-                )
-            );
-        }
-
-        // import breadcrumb
-        this.breadcrumbs.push(
-            new BreadcrumbItemModel(
-                'LNG_PAGE_IMPORT_CASE_LAB_DATA_TITLE',
-                '.',
-                true
-            )
-        );
+    // add list breadcrumb only if we have permission
+    if (CaseModel.canList(this.authUser)) {
+      this.breadcrumbs.push(
+        new BreadcrumbItemModel(
+          'LNG_PAGE_LIST_CASES_TITLE',
+          '/cases'
+        )
+      );
     }
 
-    /**
+    // add list breadcrumb only if we have permission
+    if (LabResultModel.canList(this.authUser)) {
+      this.breadcrumbs.push(
+        new BreadcrumbItemModel(
+          'LNG_PAGE_LIST_LAB_RESULTS_TITLE',
+          '/lab-results'
+        )
+      );
+    }
+
+    // import breadcrumb
+    this.breadcrumbs.push(
+      new BreadcrumbItemModel(
+        'LNG_PAGE_IMPORT_CASE_LAB_DATA_TITLE',
+        '.',
+        true
+      )
+    );
+  }
+
+  /**
      * Finished
      */
-    finished() {
-        if (LabResultModel.canList(this.authUser)) {
-            this.router.navigate(['/lab-results']);
-        } else {
-            // fallback
-            this.redirectService.to(['/import-export-data/case-lab-data/import']);
-        }
+  finished() {
+    if (LabResultModel.canList(this.authUser)) {
+      this.router.navigate(['/lab-results']);
+    } else {
+      // fallback
+      this.redirectService.to(['/import-export-data/case-lab-data/import']);
     }
+  }
 }

@@ -19,199 +19,199 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Component({
-    selector: 'app-create-reference-data-entry',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './create-reference-data-entry.component.html',
-    styleUrls: ['./create-reference-data-entry.component.less']
+  selector: 'app-create-reference-data-entry',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './create-reference-data-entry.component.html',
+  styleUrls: ['./create-reference-data-entry.component.less']
 })
 export class CreateReferenceDataEntryComponent
-    extends CreateConfirmOnChanges
-    implements OnInit {
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [];
+  extends CreateConfirmOnChanges
+  implements OnInit {
+  // breadcrumbs
+  breadcrumbs: BreadcrumbItemModel[] = [];
 
-    categoryId: string;
-    // new Entry model
-    entry: ReferenceDataEntryModel = new ReferenceDataEntryModel();
+  categoryId: string;
+  // new Entry model
+  entry: ReferenceDataEntryModel = new ReferenceDataEntryModel();
 
-    iconsList$: Observable<IconModel[]>;
+  iconsList$: Observable<IconModel[]>;
 
-    changeIcon: boolean = false;
+  changeIcon: boolean = false;
 
-    category: ReferenceDataCategoryModel;
+  category: ReferenceDataCategoryModel;
 
-    // authenticated user details
-    authUser: UserModel;
+  // authenticated user details
+  authUser: UserModel;
 
-    // duplicate validator
-    codeDuplicateValidator$: Observable<boolean | IGeneralAsyncValidatorResponse>;
+  // duplicate validator
+  codeDuplicateValidator$: Observable<boolean | IGeneralAsyncValidatorResponse>;
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        private router: Router,
-        private route: ActivatedRoute,
-        private referenceDataDataService: ReferenceDataDataService,
-        private snackbarService: SnackbarService,
-        private formHelper: FormHelperService,
-        private iconDataService: IconDataService,
-        private i18nService: I18nService,
-        private authDataService: AuthDataService,
-        private redirectService: RedirectService
-    ) {
-        super();
-    }
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private referenceDataDataService: ReferenceDataDataService,
+    private snackbarService: SnackbarService,
+    private formHelper: FormHelperService,
+    private iconDataService: IconDataService,
+    private i18nService: I18nService,
+    private authDataService: AuthDataService,
+    private redirectService: RedirectService
+  ) {
+    super();
+  }
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+  ngOnInit() {
+    // get the authenticated user
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
-        // icons data
-        this.iconsList$ = this.iconDataService.getIconsList();
+    // icons data
+    this.iconsList$ = this.iconDataService.getIconsList();
 
-        // check for duplicate codes
-        this.codeDuplicateValidator$ = new Observable((observer) => {
-            // is there any point to validate ?
-            if (!this.entry.code) {
-                observer.next(true);
-                observer.complete();
-                return;
-            }
+    // check for duplicate codes
+    this.codeDuplicateValidator$ = new Observable((observer) => {
+      // is there any point to validate ?
+      if (!this.entry.code) {
+        observer.next(true);
+        observer.complete();
+        return;
+      }
 
-            // validate
-            this.referenceDataDataService
-                .checkCodeUniqueness(this.entry.code)
-                .subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
-                    observer.next(isValid);
-                    observer.complete();
-                });
+      // validate
+      this.referenceDataDataService
+        .checkCodeUniqueness(this.entry.code)
+        .subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+          observer.next(isValid);
+          observer.complete();
         });
+    });
 
-        // get the route params
-        this.route.params
-            .subscribe((params: {categoryId}) => {
-                this.categoryId = params.categoryId;
+    // get the route params
+    this.route.params
+      .subscribe((params: {categoryId}) => {
+        this.categoryId = params.categoryId;
 
-                // retrieve Reference Data Category info
-                this.referenceDataDataService
-                    .getReferenceDataByCategory(params.categoryId)
-                    .subscribe((category: ReferenceDataCategoryModel) => {
-                        // set data
-                        this.category = category;
+        // retrieve Reference Data Category info
+        this.referenceDataDataService
+          .getReferenceDataByCategory(params.categoryId)
+          .subscribe((category: ReferenceDataCategoryModel) => {
+            // set data
+            this.category = category;
 
-                        // update breadcrumbs
-                        this.initializeBreadcrumbs();
-                    });
-            });
-    }
+            // update breadcrumbs
+            this.initializeBreadcrumbs();
+          });
+      });
+  }
 
-    /**
+  /**
      * Initialize breadcrumbs
      */
-    initializeBreadcrumbs() {
-        // reset
-        this.breadcrumbs = [];
+  initializeBreadcrumbs() {
+    // reset
+    this.breadcrumbs = [];
 
-        // add list breadcrumb only if we have permission
-        if (ReferenceDataCategoryModel.canList(this.authUser)) {
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
-            );
-        }
-
-        // add new breadcrumb: Category page
-        if (
-            this.category &&
-            ReferenceDataEntryModel.canList(this.authUser)
-        ) {
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel(
-                    this.category.name,
-                    `/reference-data/${this.categoryId}`,
-                    false,
-                    {},
-                    this.category
-                )
-            );
-        }
-
-        // add new breadcrumb: page title
-        this.breadcrumbs.push(
-            new BreadcrumbItemModel(
-                'LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_TITLE',
-                '.',
-                true
-            )
-        );
+    // add list breadcrumb only if we have permission
+    if (ReferenceDataCategoryModel.canList(this.authUser)) {
+      this.breadcrumbs.push(
+        new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
+      );
     }
 
-    /**
+    // add new breadcrumb: Category page
+    if (
+      this.category &&
+            ReferenceDataEntryModel.canList(this.authUser)
+    ) {
+      this.breadcrumbs.push(
+        new BreadcrumbItemModel(
+          this.category.name,
+          `/reference-data/${this.categoryId}`,
+          false,
+          {},
+          this.category
+        )
+      );
+    }
+
+    // add new breadcrumb: page title
+    this.breadcrumbs.push(
+      new BreadcrumbItemModel(
+        'LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_TITLE',
+        '.',
+        true
+      )
+    );
+  }
+
+  /**
      * Create new ref data entry
      */
-    createNewEntry(form: NgForm) {
+  createNewEntry(form: NgForm) {
 
-        // get forms fields
-        const dirtyFields: any = this.formHelper.getFields(form);
+    // get forms fields
+    const dirtyFields: any = this.formHelper.getFields(form);
 
-        if (!this.formHelper.validateForm(form)) {
-            return;
-        }
+    if (!this.formHelper.validateForm(form)) {
+      return;
+    }
 
-        // set category ID for the new entry
-        dirtyFields.categoryId = this.categoryId;
+    // set category ID for the new entry
+    dirtyFields.categoryId = this.categoryId;
 
-        // create new entry
-        this.referenceDataDataService
-            .createEntry(dirtyFields)
-            .pipe(
-                catchError((err) => {
-                    // replace error if unique id rule id is breach ?
-                    if (
-                        err &&
+    // create new entry
+    this.referenceDataDataService
+      .createEntry(dirtyFields)
+      .pipe(
+        catchError((err) => {
+          // replace error if unique id rule id is breach ?
+          if (
+            err &&
                         err.details &&
                         err.details.codes &&
                         err.details.codes.id &&
                         Array.isArray(err.details.codes.id) &&
                         err.details.codes.id.indexOf('uniqueness') > -1
-                    ) {
-                        err = {
-                            code: 'REFERENCE_ENTRY_NAME_NOT_UNIQUE'
-                        };
-                    }
+          ) {
+            err = {
+              code: 'REFERENCE_ENTRY_NAME_NOT_UNIQUE'
+            };
+          }
 
-                    // display error
-                    this.snackbarService.showApiError(
-                        err, {
-                            name: this.entry.value
-                        }
-                    );
-                    return throwError(err);
-                }),
-                switchMap((newReferenceDataEntry) => {
-                    // re-load language tokens
-                    return this.i18nService.loadUserLanguage()
-                        .pipe(
-                            map(() => newReferenceDataEntry)
-                        );
-                })
-            )
-            .subscribe((newReferenceDataEntry) => {
-                this.snackbarService.showSuccess('LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_ACTION_CREATE_ENTRY_SUCCESS_MESSAGE');
+          // display error
+          this.snackbarService.showApiError(
+            err, {
+              name: this.entry.value
+            }
+          );
+          return throwError(err);
+        }),
+        switchMap((newReferenceDataEntry) => {
+          // re-load language tokens
+          return this.i18nService.loadUserLanguage()
+            .pipe(
+              map(() => newReferenceDataEntry)
+            );
+        })
+      )
+      .subscribe((newReferenceDataEntry) => {
+        this.snackbarService.showSuccess('LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_ACTION_CREATE_ENTRY_SUCCESS_MESSAGE');
 
-                // navigate to proper page
-                // method handles disableDirtyConfirm too...
-                this.redirectToProperPageAfterCreate(
-                    this.router,
-                    this.redirectService,
-                    this.authUser,
-                    ReferenceDataEntryModel,
-                    `reference-data/${this.categoryId}`,
-                    newReferenceDataEntry.id
-                );
-            });
-    }
+        // navigate to proper page
+        // method handles disableDirtyConfirm too...
+        this.redirectToProperPageAfterCreate(
+          this.router,
+          this.redirectService,
+          this.authUser,
+          ReferenceDataEntryModel,
+          `reference-data/${this.categoryId}`,
+          newReferenceDataEntry.id
+        );
+      });
+  }
 }

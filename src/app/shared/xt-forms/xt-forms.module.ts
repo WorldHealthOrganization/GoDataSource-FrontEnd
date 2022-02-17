@@ -14,34 +14,34 @@ import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
 import { NgxPopperjsModule } from 'ngx-popperjs';
 
 @NgModule({
-    imports: [
-        CommonModule,
-        FormsModule,
-        FlexLayoutModule,
-        AngularMaterialModule,
-        NgxMaterialTimepickerModule,
-        NgxMatSelectSearchModule,
-        NgxPopperjsModule,
-        NgxSliderModule,
-        TranslateModule,
-        ScrollingModule
-    ],
-    declarations: [
-        ...components,
-        ...validatorDirectives
-    ],
-    providers: [],
-    exports: [
-        CommonModule,
-        FormsModule,
-        FlexLayoutModule,
-        AngularMaterialModule,
-        NgxPopperjsModule,
-        NgxSliderModule,
-        ScrollingModule,
-        ...components,
-        ...validatorDirectives
-    ]
+  imports: [
+    CommonModule,
+    FormsModule,
+    FlexLayoutModule,
+    AngularMaterialModule,
+    NgxMaterialTimepickerModule,
+    NgxMatSelectSearchModule,
+    NgxPopperjsModule,
+    NgxSliderModule,
+    TranslateModule,
+    ScrollingModule
+  ],
+  declarations: [
+    ...components,
+    ...validatorDirectives
+  ],
+  providers: [],
+  exports: [
+    CommonModule,
+    FormsModule,
+    FlexLayoutModule,
+    AngularMaterialModule,
+    NgxPopperjsModule,
+    NgxSliderModule,
+    ScrollingModule,
+    ...components,
+    ...validatorDirectives
+  ]
 })
 export class XtFormsModule {
 }

@@ -14,137 +14,137 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { ContactModel } from '../../../../core/models/contact.model';
 
 @Component({
-    selector: 'app-contacts-lost-to-follow-up-dashlet',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './contacts-lost-to-follow-up-dashlet.component.html',
-    styleUrls: ['./contacts-lost-to-follow-up-dashlet.component.less']
+  selector: 'app-contacts-lost-to-follow-up-dashlet',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './contacts-lost-to-follow-up-dashlet.component.html',
+  styleUrls: ['./contacts-lost-to-follow-up-dashlet.component.less']
 })
 export class ContactsLostToFollowUpDashletComponent extends DashletComponent implements OnInit, OnDestroy {
-    // number of contacts who are lost to follow-up
-    noContactsLostToFollowUp: number;
+  // number of contacts who are lost to follow-up
+  noContactsLostToFollowUp: number;
 
-    // provide constants to template
-    ContactModel = ContactModel;
+  // provide constants to template
+  ContactModel = ContactModel;
 
-    // outbreak
-    outbreakId: string;
+  // outbreak
+  outbreakId: string;
 
-    // loading data
-    displayLoading: boolean = false;
+  // loading data
+  displayLoading: boolean = false;
 
-    // subscribers
-    outbreakSubscriber: Subscription;
-    previousSubscriber: Subscription;
+  // subscribers
+  outbreakSubscriber: Subscription;
+  previousSubscriber: Subscription;
 
-    // query params
-    queryParams: {
-        [key: string]: any
-    } = {
-        applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_LOST_TO_FOLLOW_UP,
-        [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true
+  // query params
+  queryParams: {
+    [key: string]: any
+  } = {
+      applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_LOST_TO_FOLLOW_UP,
+      [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true
     };
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        private outbreakDataService: OutbreakDataService,
-        private followUpsDataService: FollowUpsDataService,
-        protected listFilterDataService: ListFilterDataService,
-        protected authDataService: AuthDataService
-    ) {
-        super(
-            listFilterDataService,
-            authDataService
-        );
-    }
+  constructor(
+    private outbreakDataService: OutbreakDataService,
+    private followUpsDataService: FollowUpsDataService,
+    protected listFilterDataService: ListFilterDataService,
+    protected authDataService: AuthDataService
+  ) {
+    super(
+      listFilterDataService,
+      authDataService
+    );
+  }
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // get number of deceased cases
-        this.displayLoading = true;
-        this.outbreakSubscriber = this.outbreakDataService
-            .getSelectedOutbreakSubject()
-            .subscribe((selectedOutbreak: OutbreakModel) => {
-                if (selectedOutbreak) {
-                    this.outbreakId = selectedOutbreak.id;
-                    this.refreshDataCaller.call();
-                }
-            });
-    }
+  ngOnInit() {
+    // get number of deceased cases
+    this.displayLoading = true;
+    this.outbreakSubscriber = this.outbreakDataService
+      .getSelectedOutbreakSubject()
+      .subscribe((selectedOutbreak: OutbreakModel) => {
+        if (selectedOutbreak) {
+          this.outbreakId = selectedOutbreak.id;
+          this.refreshDataCaller.call();
+        }
+      });
+  }
 
-    /**
+  /**
      * Component destroyed
      */
-    ngOnDestroy() {
-        // outbreak subscriber
-        if (this.outbreakSubscriber) {
-            this.outbreakSubscriber.unsubscribe();
-            this.outbreakSubscriber = null;
-        }
-
-        // release previous subscriber
-        if (this.previousSubscriber) {
-            this.previousSubscriber.unsubscribe();
-            this.previousSubscriber = null;
-        }
-
-        // parent subscribers
-        this.releaseSubscribers();
+  ngOnDestroy() {
+    // outbreak subscriber
+    if (this.outbreakSubscriber) {
+      this.outbreakSubscriber.unsubscribe();
+      this.outbreakSubscriber = null;
     }
 
-    /**
+    // release previous subscriber
+    if (this.previousSubscriber) {
+      this.previousSubscriber.unsubscribe();
+      this.previousSubscriber = null;
+    }
+
+    // parent subscribers
+    this.releaseSubscribers();
+  }
+
+  /**
      * Refresh data
      */
-    refreshData() {
-        // get the number of contacts who are lost to follow-up
-        if (this.outbreakId) {
-            // add global filters
-            const qb = new RequestQueryBuilder();
+  refreshData() {
+    // get the number of contacts who are lost to follow-up
+    if (this.outbreakId) {
+      // add global filters
+      const qb = new RequestQueryBuilder();
 
-            // change the way we build query
-            qb.filter.firstLevelConditions();
+      // change the way we build query
+      qb.filter.firstLevelConditions();
 
-            // date
-            if (this.globalFilterDate) {
-                qb.filter.where({
-                    dateOfReporting: {
-                        lte: moment(this.globalFilterDate).toISOString()
-                    }
-                });
-            }
+      // date
+      if (this.globalFilterDate) {
+        qb.filter.where({
+          dateOfReporting: {
+            lte: moment(this.globalFilterDate).toISOString()
+          }
+        });
+      }
 
-            // location
-            if (this.globalFilterLocationId) {
-                qb.filter.byEquality('addresses.parentLocationIdFilter', this.globalFilterLocationId);
-            }
+      // location
+      if (this.globalFilterLocationId) {
+        qb.filter.byEquality('addresses.parentLocationIdFilter', this.globalFilterLocationId);
+      }
 
-            // classification
-            // !!! must be on first level and not under $and
-            if (!_.isEmpty(this.globalFilterClassificationId)) {
-                qb.filter.bySelect(
-                    'classification',
-                    this.globalFilterClassificationId,
-                    false,
-                    null
-                );
-            }
+      // classification
+      // !!! must be on first level and not under $and
+      if (!_.isEmpty(this.globalFilterClassificationId)) {
+        qb.filter.bySelect(
+          'classification',
+          this.globalFilterClassificationId,
+          false,
+          null
+        );
+      }
 
-            // release previous subscriber
-            if (this.previousSubscriber) {
-                this.previousSubscriber.unsubscribe();
-                this.previousSubscriber = null;
-            }
+      // release previous subscriber
+      if (this.previousSubscriber) {
+        this.previousSubscriber.unsubscribe();
+        this.previousSubscriber = null;
+      }
 
-            this.displayLoading = true;
-            this.previousSubscriber = this.followUpsDataService
-                .getNumberOfContactsWhoAreLostToFollowUp(this.outbreakId, qb)
-                .subscribe((result: MetricContactsLostToFollowUpModel) => {
-                    this.noContactsLostToFollowUp = result.contactsCount;
-                    this.displayLoading = false;
-                });
-        }
+      this.displayLoading = true;
+      this.previousSubscriber = this.followUpsDataService
+        .getNumberOfContactsWhoAreLostToFollowUp(this.outbreakId, qb)
+        .subscribe((result: MetricContactsLostToFollowUpModel) => {
+          this.noContactsLostToFollowUp = result.contactsCount;
+          this.displayLoading = false;
+        });
     }
+  }
 }

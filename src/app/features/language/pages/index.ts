@@ -10,7 +10,7 @@ export * from './modify-language/modify-language.component';
 
 // export the list of all page components
 export const pageComponents: any[] = [
-    LanguagesListComponent,
-    CreateLanguageComponent,
-    ModifyLanguageComponent
+  LanguagesListComponent,
+  CreateLanguageComponent,
+  ModifyLanguageComponent
 ];

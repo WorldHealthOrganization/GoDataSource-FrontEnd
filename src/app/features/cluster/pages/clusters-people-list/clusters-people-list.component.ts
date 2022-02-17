@@ -26,240 +26,240 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
-    selector: 'app-clusters-people-list',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './clusters-people-list.component.html',
-    styleUrls: ['./clusters-people-list.component.less']
+  selector: 'app-clusters-people-list',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './clusters-people-list.component.html',
+  styleUrls: ['./clusters-people-list.component.less']
 })
 export class ClustersPeopleListComponent extends ListComponent implements OnInit, OnDestroy {
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs
+  breadcrumbs: BreadcrumbItemModel[] = [];
 
-    // authenticated user
-    authUser: UserModel;
-    // selected Outbreak
-    selectedOutbreak: OutbreakModel;
-    // present cluster
-    cluster: ClusterModel;
-    // cluster people list
-    clusterPeopleList$: Observable<any>;
-    clusterPeopleListCount$: Observable<IBasicCount>;
+  // authenticated user
+  authUser: UserModel;
+  // selected Outbreak
+  selectedOutbreak: OutbreakModel;
+  // present cluster
+  cluster: ClusterModel;
+  // cluster people list
+  clusterPeopleList$: Observable<any>;
+  clusterPeopleListCount$: Observable<IBasicCount>;
 
-    // reference data
-    genderList$: Observable<any[]>;
-    riskLevelsList$: Observable<any[]>;
-    personTypesListMap: { [id: string]: ReferenceDataEntryModel };
+  // reference data
+  genderList$: Observable<any[]>;
+  riskLevelsList$: Observable<any[]>;
+  personTypesListMap: { [id: string]: ReferenceDataEntryModel };
 
-    // constants
-    EntityType = EntityType;
-    ReferenceDataCategory = ReferenceDataCategory;
-    Constants = Constants;
+  // constants
+  EntityType = EntityType;
+  ReferenceDataCategory = ReferenceDataCategory;
+  Constants = Constants;
 
-    fixedTableColumns: string[] = [
-        'lastName',
-        'firstName',
-        'age',
-        'gender',
-        'riskLevel',
-        'place',
-        'address'
-    ];
+  fixedTableColumns: string[] = [
+    'lastName',
+    'firstName',
+    'age',
+    'gender',
+    'riskLevel',
+    'place',
+    'address'
+  ];
 
-    recordActions: HoverRowAction[] = [
-        // View Person
-        new HoverRowAction({
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_ACTION_VIEW',
-            linkGenerator: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): string[] => {
-                return [this.getItemRouterLink(item, 'view')];
-            },
-            visible: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): boolean => {
-                return !item.deleted &&
+  recordActions: HoverRowAction[] = [
+    // View Person
+    new HoverRowAction({
+      icon: 'visibility',
+      iconTooltip: 'LNG_PAGE_ACTION_VIEW',
+      linkGenerator: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): string[] => {
+        return [this.getItemRouterLink(item, 'view')];
+      },
+      visible: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): boolean => {
+        return !item.deleted &&
                     item.canView(this.authUser);
-            }
-        }),
+      }
+    }),
 
-        // Modify Person
-        new HoverRowAction({
-            icon: 'settings',
-            iconTooltip: 'LNG_PAGE_ACTION_MODIFY',
-            linkGenerator: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): string[] => {
-                return [this.getItemRouterLink(item, 'modify')];
-            },
-            visible: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): boolean => {
-                return !item.deleted &&
+    // Modify Person
+    new HoverRowAction({
+      icon: 'settings',
+      iconTooltip: 'LNG_PAGE_ACTION_MODIFY',
+      linkGenerator: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): string[] => {
+        return [this.getItemRouterLink(item, 'modify')];
+      },
+      visible: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): boolean => {
+        return !item.deleted &&
                     this.authUser &&
                     this.selectedOutbreak &&
                     this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
                     item.canModify(this.authUser);
-            }
-        })
-    ];
+      }
+    })
+  ];
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        protected listHelperService: ListHelperService,
-        private route: ActivatedRoute,
-        private outbreakDataService: OutbreakDataService,
-        private clusterDataService: ClusterDataService,
-        private authDataService: AuthDataService,
-        private snackbarService: SnackbarService,
-        private referenceDataDataService: ReferenceDataDataService
-    ) {
-        super(listHelperService);
-    }
+  constructor(
+    protected listHelperService: ListHelperService,
+    private route: ActivatedRoute,
+    private outbreakDataService: OutbreakDataService,
+    private clusterDataService: ClusterDataService,
+    private authDataService: AuthDataService,
+    private snackbarService: SnackbarService,
+    private referenceDataDataService: ReferenceDataDataService
+  ) {
+    super(listHelperService);
+  }
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+  ngOnInit() {
+    // get the authenticated user
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
-        // retrieve cluster info
-        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
-        this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
-        const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).pipe(share());
-        personTypes$.subscribe((personTypeCategory: ReferenceDataCategoryModel) => {
-            this.personTypesListMap = _.transform(
-                personTypeCategory.entries,
-                (result, entry: ReferenceDataEntryModel) => {
-                    // groupBy won't work here since groupBy will put an array instead of one value
-                    result[entry.id] = entry;
-                },
-                {}
-            );
+    // retrieve cluster info
+    this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
+    this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
+    const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).pipe(share());
+    personTypes$.subscribe((personTypeCategory: ReferenceDataCategoryModel) => {
+      this.personTypesListMap = _.transform(
+        personTypeCategory.entries,
+        (result, entry: ReferenceDataEntryModel) => {
+          // groupBy won't work here since groupBy will put an array instead of one value
+          result[entry.id] = entry;
+        },
+        {}
+      );
+    });
+
+    // get cluster ID from route params
+    this.route.params.subscribe((params: { clusterId }) => {
+      // get selected outbreak
+      this.outbreakDataService.getSelectedOutbreak()
+        .subscribe((selectedOutbreak) => {
+          this.selectedOutbreak = selectedOutbreak;
+          if (selectedOutbreak && selectedOutbreak.id) {
+
+            // retrieve cluster info
+            this.clusterDataService.getCluster(selectedOutbreak.id, params.clusterId)
+              .subscribe((clusterData: ClusterModel) => {
+                this.cluster = clusterData;
+
+                // initialize breadcrumbs
+                this.initializeBreadcrumbs();
+
+                // initialize pagination
+                this.initPaginator();
+                // ...and load the list of items
+                this.needsRefreshList(true);
+              });
+          }
         });
+    });
 
-        // get cluster ID from route params
-        this.route.params.subscribe((params: { clusterId }) => {
-            // get selected outbreak
-            this.outbreakDataService.getSelectedOutbreak()
-                .subscribe((selectedOutbreak) => {
-                    this.selectedOutbreak = selectedOutbreak;
-                    if (selectedOutbreak && selectedOutbreak.id) {
+    // initialize breadcrumbs
+    this.initializeBreadcrumbs();
+  }
 
-                        // retrieve cluster info
-                        this.clusterDataService.getCluster(selectedOutbreak.id, params.clusterId)
-                            .subscribe((clusterData: ClusterModel) => {
-                                this.cluster = clusterData;
-
-                                // initialize breadcrumbs
-                                this.initializeBreadcrumbs();
-
-                                // initialize pagination
-                                this.initPaginator();
-                                // ...and load the list of items
-                                this.needsRefreshList(true);
-                            });
-                    }
-                });
-        });
-
-        // initialize breadcrumbs
-        this.initializeBreadcrumbs();
-    }
-
-    /**
+  /**
      * Release resources
      */
-    ngOnDestroy() {
-        // release parent resources
-        super.ngOnDestroy();
-    }
+  ngOnDestroy() {
+    // release parent resources
+    super.ngOnDestroy();
+  }
 
-    /**
+  /**
      * Initialize breadcrumbs
      */
-    private initializeBreadcrumbs() {
-        // reset
-        this.breadcrumbs = [];
+  private initializeBreadcrumbs() {
+    // reset
+    this.breadcrumbs = [];
 
-        // add list breadcrumb only if we have permission
-        if (ClusterModel.canList(this.authUser)) {
-            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_CLUSTERS_TITLE', '/clusters'));
-        }
-
-        // cluster breadcrumb
-        if (
-            this.cluster &&
-            ClusterModel.canView(this.authUser)
-        ) {
-            this.breadcrumbs.push(new BreadcrumbItemModel(
-                this.cluster.name,
-                `/clusters/${this.cluster.id}/view`
-            ));
-        }
-
-        // people breadcrumb
-        this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_VIEW_CLUSTERS_PEOPLE_TITLE', '.', true));
+    // add list breadcrumb only if we have permission
+    if (ClusterModel.canList(this.authUser)) {
+      this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_CLUSTERS_TITLE', '/clusters'));
     }
 
-    /**
+    // cluster breadcrumb
+    if (
+      this.cluster &&
+            ClusterModel.canView(this.authUser)
+    ) {
+      this.breadcrumbs.push(new BreadcrumbItemModel(
+        this.cluster.name,
+        `/clusters/${this.cluster.id}/view`
+      ));
+    }
+
+    // people breadcrumb
+    this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_VIEW_CLUSTERS_PEOPLE_TITLE', '.', true));
+  }
+
+  /**
      * Re(load) the Cluster people list, based on the applied filter, sort criterias
      */
-    refreshList(finishCallback: (records: any[]) => void) {
-        if (this.selectedOutbreak) {
-            this.clusterPeopleList$ = this.clusterDataService
-                .getClusterPeople(this.selectedOutbreak.id, this.cluster.id, this.queryBuilder)
-                .pipe(
-                    catchError((err) => {
-                        this.snackbarService.showApiError(err);
-                        finishCallback([]);
-                        return throwError(err);
-                    }),
-                    tap(this.checkEmptyList.bind(this)),
-                    tap((data: any[]) => {
-                        finishCallback(data);
-                    })
-                );
-        } else {
+  refreshList(finishCallback: (records: any[]) => void) {
+    if (this.selectedOutbreak) {
+      this.clusterPeopleList$ = this.clusterDataService
+        .getClusterPeople(this.selectedOutbreak.id, this.cluster.id, this.queryBuilder)
+        .pipe(
+          catchError((err) => {
+            this.snackbarService.showApiError(err);
             finishCallback([]);
-        }
+            return throwError(err);
+          }),
+          tap(this.checkEmptyList.bind(this)),
+          tap((data: any[]) => {
+            finishCallback(data);
+          })
+        );
+    } else {
+      finishCallback([]);
     }
+  }
 
-    /**
+  /**
      * Get total number of items, based on the applied filters
      */
-    refreshListCount() {
-        // remove paginator from query builder
-        const countQueryBuilder = _.cloneDeep(this.queryBuilder);
-        countQueryBuilder.paginator.clear();
-        countQueryBuilder.sort.clear();
-        this.clusterPeopleListCount$ = this.clusterDataService
-            .getClusterPeopleCount(this.selectedOutbreak.id, this.cluster.id, countQueryBuilder)
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    return throwError(err);
-                }),
-                share()
-            );
-    }
+  refreshListCount() {
+    // remove paginator from query builder
+    const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+    countQueryBuilder.paginator.clear();
+    countQueryBuilder.sort.clear();
+    this.clusterPeopleListCount$ = this.clusterDataService
+      .getClusterPeopleCount(this.selectedOutbreak.id, this.cluster.id, countQueryBuilder)
+      .pipe(
+        catchError((err) => {
+          this.snackbarService.showApiError(err);
+          return throwError(err);
+        }),
+        share()
+      );
+  }
 
-    /**
+  /**
      * Get the link to redirect to view page depending on item type and action
      */
-    getItemRouterLink (item, action: string): string {
-        switch (item.type) {
-            case EntityType.CASE:
-                return `/cases/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
-            case EntityType.CONTACT:
-                return `/contacts/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
-            case EntityType.CONTACT_OF_CONTACT:
-                return `/contacts-of-contacts/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
-            case EntityType.EVENT:
-                return `/events/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
-        }
+  getItemRouterLink (item, action: string): string {
+    switch (item.type) {
+      case EntityType.CASE:
+        return `/cases/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
+      case EntityType.CONTACT:
+        return `/contacts/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
+      case EntityType.CONTACT_OF_CONTACT:
+        return `/contacts-of-contacts/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
+      case EntityType.EVENT:
+        return `/events/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
     }
+  }
 
-    /**
+  /**
      * Retrieve Person Type color
      */
-    getPersonTypeColor(personType: string) {
-        const personTypeData = _.get(this.personTypesListMap, personType);
-        return _.get(personTypeData, 'colorCode', '');
-    }
+  getPersonTypeColor(personType: string) {
+    const personTypeData = _.get(this.personTypesListMap, personType);
+    return _.get(personTypeData, 'colorCode', '');
+  }
 }

@@ -9,137 +9,137 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
-    selector: 'app-world-map-movement',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './world-map-movement.component.html',
-    styleUrls: ['./world-map-movement.component.less']
+  selector: 'app-world-map-movement',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './world-map-movement.component.html',
+  styleUrls: ['./world-map-movement.component.less']
 })
 export class WorldMapMovementComponent {
-    @Input() width: string = '100%';
-    @Input() height: string = '400px';
+  @Input() width: string = '100%';
+  @Input() height: string = '400px';
 
-    @ViewChild(WorldMapComponent) worldMapComponent: WorldMapComponent;
+  @ViewChild(WorldMapComponent) worldMapComponent: WorldMapComponent;
 
-    markers: WorldMapMarker[] = [];
-    arrowLines: WorldMapPath[] = [];
+  markers: WorldMapMarker[] = [];
+  arrowLines: WorldMapPath[] = [];
 
-    selectedGeoPoint: WorldMapPoint;
+  selectedGeoPoint: WorldMapPoint;
 
-    // still loading data ?
-    @Input() displayLoading: boolean = false;
+  // still loading data ?
+  @Input() displayLoading: boolean = false;
 
-    // addresses
-    private _addresses: AddressModel[] = [];
-    @Input() set addresses(items: AddressModel[]) {
-        // init
-        this.markers = [];
-        const path = new WorldMapPath({
-            points: [],
-            type: WorldMapPathType.ARROW
-        });
-        this.arrowLines = [ path ];
+  // addresses
+  private _addresses: AddressModel[] = [];
+  @Input() set addresses(items: AddressModel[]) {
+    // init
+    this.markers = [];
+    const path = new WorldMapPath({
+      points: [],
+      type: WorldMapPathType.ARROW
+    });
+    this.arrowLines = [ path ];
 
-        // sort addresses
-        this._addresses = _.chain(items).filter((item: AddressModel) => {
-            return item.geoLocation &&
+    // sort addresses
+    this._addresses = _.chain(items).filter((item: AddressModel) => {
+      return item.geoLocation &&
                 _.isNumber(item.geoLocation.lat) &&
                 _.isNumber(item.geoLocation.lng);
-        }).sortBy((item: AddressModel) => {
-            return moment(item.date);
-        }).map((item, index) => {
-            // add marker
-            this.markers.push(new WorldMapMarker({
-                point: new WorldMapPoint(
-                    item.geoLocation.lat,
-                    item.geoLocation.lng
-                ),
-                label: (index + 1).toString()
-            }));
+    }).sortBy((item: AddressModel) => {
+      return moment(item.date);
+    }).map((item, index) => {
+      // add marker
+      this.markers.push(new WorldMapMarker({
+        point: new WorldMapPoint(
+          item.geoLocation.lat,
+          item.geoLocation.lng
+        ),
+        label: (index + 1).toString()
+      }));
 
-            // display lines only between usual place addresses ( current & history )
-            const currentAddress = new AddressModel(item);
-            if (
-                currentAddress.typeId === AddressType.CURRENT_ADDRESS ||
+      // display lines only between usual place addresses ( current & history )
+      const currentAddress = new AddressModel(item);
+      if (
+        currentAddress.typeId === AddressType.CURRENT_ADDRESS ||
                 currentAddress.typeId === AddressType.PREVIOUS_ADDRESS
-            ) {
-                // add arrow line point path
-                path.add(new WorldMapPoint(
-                    currentAddress.geoLocation.lat,
-                    currentAddress.geoLocation.lng
-                ));
-            }
+      ) {
+        // add arrow line point path
+        path.add(new WorldMapPoint(
+          currentAddress.geoLocation.lat,
+          currentAddress.geoLocation.lng
+        ));
+      }
 
-            // finished
-            return currentAddress;
-        }).value();
+      // finished
+      return currentAddress;
+    }).value();
 
-        // set center to first item
-        if (!_.isEmpty(this.markers)) {
-            this.selectedGeoPoint = this.markers[0].point;
-        }
+    // set center to first item
+    if (!_.isEmpty(this.markers)) {
+      this.selectedGeoPoint = this.markers[0].point;
     }
-    get addresses(): AddressModel[] {
-        return this._addresses;
-    }
+  }
+  get addresses(): AddressModel[] {
+    return this._addresses;
+  }
 
-    /**
+  /**
      * Constructor
      */
-    constructor (
-        private dialogService: DialogService,
-        private i18nService: I18nService
-    ) {}
+  constructor (
+    private dialogService: DialogService,
+    private i18nService: I18nService
+  ) {}
 
-    /**
+  /**
      * Change map position
      * @param index
      */
-    gotoLocation(index: number) {
-        // force center
-        this.selectedGeoPoint = new WorldMapPoint(
-            this.markers[index].point.latitude,
-            this.markers[index].point.longitude
-        );
-    }
+  gotoLocation(index: number) {
+    // force center
+    this.selectedGeoPoint = new WorldMapPoint(
+      this.markers[index].point.latitude,
+      this.markers[index].point.longitude
+    );
+  }
 
-    /**
+  /**
      * Zoom in / out & center to view all markers
      */
-    public fitMarkerBounds() {
-        if (this.worldMapComponent) {
-            this.worldMapComponent.fitMarkerBounds();
-        }
+  public fitMarkerBounds() {
+    if (this.worldMapComponent) {
+      this.worldMapComponent.fitMarkerBounds();
     }
+  }
 
-    /**
+  /**
      * Export entity movement
      */
-    exportMovementMap(entityType: EntityType) {
-        if (this.worldMapComponent) {
-            const loadingDialog = this.dialogService.showLoadingDialog();
-            this.worldMapComponent
-                .printToBlob()
-                .subscribe((blob) => {
-                    // determine entity token for filename
-                    let entityToken;
-                    switch (entityType) {
-                        case EntityType.CASE:
-                            entityToken = 'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE';
-                            break;
-                        case EntityType.CONTACT:
-                            entityToken = 'LNG_PAGE_VIEW_MOVEMENT_CONTACT_TITLE';
-                            break;
-                        case EntityType.CONTACT_OF_CONTACT:
-                            entityToken = 'LNG_PAGE_VIEW_MOVEMENT_CONTACT_OF_CONTACT_TITLE';
-                            break;
-                    }
-                    const fileName = this.i18nService.instant(entityToken);
-                    FileSaver.saveAs(
-                        blob,
-                        `${fileName}.png`
-                    );
-                    loadingDialog.close();
-                });
-        }
+  exportMovementMap(entityType: EntityType) {
+    if (this.worldMapComponent) {
+      const loadingDialog = this.dialogService.showLoadingDialog();
+      this.worldMapComponent
+        .printToBlob()
+        .subscribe((blob) => {
+          // determine entity token for filename
+          let entityToken;
+          switch (entityType) {
+            case EntityType.CASE:
+              entityToken = 'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE';
+              break;
+            case EntityType.CONTACT:
+              entityToken = 'LNG_PAGE_VIEW_MOVEMENT_CONTACT_TITLE';
+              break;
+            case EntityType.CONTACT_OF_CONTACT:
+              entityToken = 'LNG_PAGE_VIEW_MOVEMENT_CONTACT_OF_CONTACT_TITLE';
+              break;
+          }
+          const fileName = this.i18nService.instant(entityToken);
+          FileSaver.saveAs(
+            blob,
+            `${fileName}.png`
+          );
+          loadingDialog.close();
+        });
     }
+  }
 }

@@ -6,20 +6,20 @@ import { OutbreakDataService } from '../../../core/services/data/outbreak.data.s
 
 @Injectable()
 export class OutbreakResolver implements Resolve<Observable<OutbreakModel>> {
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        private outbreakDataService: OutbreakDataService
-    ) {}
+  constructor(
+    private outbreakDataService: OutbreakDataService
+  ) {}
 
-    /**
+  /**
      * Resolve response used later
      */
-    resolve(route: ActivatedRouteSnapshot) {
-        return this.outbreakDataService.getOutbreak(
-            route.paramMap.get('outbreakId'),
-            true
-        );
-    }
+  resolve(route: ActivatedRouteSnapshot) {
+    return this.outbreakDataService.getOutbreak(
+      route.paramMap.get('outbreakId'),
+      true
+    );
+  }
 }

@@ -21,189 +21,189 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
-    selector: 'app-saved-filters',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './saved-filters.component.html',
-    styleUrls: ['./saved-filters.component.less']
+  selector: 'app-saved-filters',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './saved-filters.component.html',
+  styleUrls: ['./saved-filters.component.less']
 })
 export class SavedFiltersComponent extends ListComponent implements OnInit, OnDestroy {
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_SAVED_FILTERS_TITLE', '.', true)
-    ];
+  // breadcrumbs
+  breadcrumbs: BreadcrumbItemModel[] = [
+    new BreadcrumbItemModel('LNG_PAGE_LIST_SAVED_FILTERS_TITLE', '.', true)
+  ];
 
-    yesNoOptionsList$: Observable<any[]>;
+  yesNoOptionsList$: Observable<any[]>;
 
-    // user list
-    userList$: Observable<UserModel[]>;
+  // user list
+  userList$: Observable<UserModel[]>;
 
-    pagesWithSavedFilters: LabelValuePair[] = _.map(Constants.APP_PAGE, (page) => {
-        return new LabelValuePair(page.label, page.value);
-    });
+  pagesWithSavedFilters: LabelValuePair[] = _.map(Constants.APP_PAGE, (page) => {
+    return new LabelValuePair(page.label, page.value);
+  });
 
-    savedFiltersList$: Observable<SavedFilterModel[]>;
-    savedFiltersListCount$: Observable<IBasicCount>;
+  savedFiltersList$: Observable<SavedFilterModel[]>;
+  savedFiltersListCount$: Observable<IBasicCount>;
 
-    // constants
-    SavedFilterModel = SavedFilterModel;
+  // constants
+  SavedFilterModel = SavedFilterModel;
 
-    fixedTableColumns: string[] = [
-        'name',
-        'public',
-        'filter-keys',
-        'createdBy',
-        'updatedBy',
-        'updatedAt'
-    ];
+  fixedTableColumns: string[] = [
+    'name',
+    'public',
+    'filter-keys',
+    'createdBy',
+    'updatedBy',
+    'updatedAt'
+  ];
 
-    // authenticated user
-    authUser: UserModel;
+  // authenticated user
+  authUser: UserModel;
 
-    recordActions: HoverRowAction[] = [
-        // Other actions
+  recordActions: HoverRowAction[] = [
+    // Other actions
+    new HoverRowAction({
+      type: HoverRowActionType.MENU,
+      icon: 'moreVertical',
+      menuOptions: [
+        // Delete Saved Filter
         new HoverRowAction({
-            type: HoverRowActionType.MENU,
-            icon: 'moreVertical',
-            menuOptions: [
-                // Delete Saved Filter
-                new HoverRowAction({
-                    menuOptionLabel: 'LNG_PAGE_LIST_SAVED_FILTERS_ACTION_DELETE_FILTER',
-                    click: (item: SavedFilterModel) => {
-                        this.deleteFilter(item.id);
-                    },
-                    visible: (item: SavedFilterModel): boolean => {
-                        return !item.readOnly || SavedFilterModel.canDelete(this.authUser);
-                    },
-                    class: 'mat-menu-item-delete'
-                })
-            ]
+          menuOptionLabel: 'LNG_PAGE_LIST_SAVED_FILTERS_ACTION_DELETE_FILTER',
+          click: (item: SavedFilterModel) => {
+            this.deleteFilter(item.id);
+          },
+          visible: (item: SavedFilterModel): boolean => {
+            return !item.readOnly || SavedFilterModel.canDelete(this.authUser);
+          },
+          class: 'mat-menu-item-delete'
         })
-    ];
+      ]
+    })
+  ];
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        protected listHelperService: ListHelperService,
-        private savedFiltersService: SavedFiltersService,
-        private snackbarService: SnackbarService,
-        private genericDataService: GenericDataService,
-        private dialogService: DialogService,
-        private userDataService: UserDataService,
-        private authDataService: AuthDataService
-    ) {
-        super(listHelperService);
-    }
+  constructor(
+    protected listHelperService: ListHelperService,
+    private savedFiltersService: SavedFiltersService,
+    private snackbarService: SnackbarService,
+    private genericDataService: GenericDataService,
+    private dialogService: DialogService,
+    private userDataService: UserDataService,
+    private authDataService: AuthDataService
+  ) {
+    super(listHelperService);
+  }
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
+  ngOnInit() {
+    this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
-        // retrieve users
-        this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
+    // retrieve users
+    this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+    // get the authenticated user
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
-        // initialize pagination
-        this.initPaginator();
-        // ...and re-load the list
-        this.needsRefreshList(true);
-    }
+    // initialize pagination
+    this.initPaginator();
+    // ...and re-load the list
+    this.needsRefreshList(true);
+  }
 
-    /**
+  /**
      * Release resources
      */
-    ngOnDestroy() {
-        // release parent resources
-        super.ngOnDestroy();
-    }
+  ngOnDestroy() {
+    // release parent resources
+    super.ngOnDestroy();
+  }
 
-    /**
+  /**
      * Re(load) the Saved filters list, based on the applied filter, sort criterias
      */
-    refreshList(finishCallback: (records: any[]) => void) {
-        // retrieve created user & modified user information
-        this.queryBuilder.include('createdByUser', true);
-        this.queryBuilder.include('updatedByUser', true);
+  refreshList(finishCallback: (records: any[]) => void) {
+    // retrieve created user & modified user information
+    this.queryBuilder.include('createdByUser', true);
+    this.queryBuilder.include('updatedByUser', true);
 
-        // retrieve list
-        this.savedFiltersList$ = this.savedFiltersService
-            .getSavedFiltersList(this.queryBuilder)
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    finishCallback([]);
-                    return throwError(err);
-                }),
-                tap(this.checkEmptyList.bind(this)),
-                tap((data: any[]) => {
-                    finishCallback(data);
-                })
-            );
-    }
+    // retrieve list
+    this.savedFiltersList$ = this.savedFiltersService
+      .getSavedFiltersList(this.queryBuilder)
+      .pipe(
+        catchError((err) => {
+          this.snackbarService.showApiError(err);
+          finishCallback([]);
+          return throwError(err);
+        }),
+        tap(this.checkEmptyList.bind(this)),
+        tap((data: any[]) => {
+          finishCallback(data);
+        })
+      );
+  }
 
-    /**
+  /**
      * Get total number of items, based on the applied filters
      */
-    refreshListCount() {
-        const countQueryBuilder = _.cloneDeep(this.queryBuilder);
-        countQueryBuilder.paginator.clear();
-        countQueryBuilder.sort.clear();
-        this.savedFiltersListCount$ = this.savedFiltersService
-            .getSavedFiltersListCount(countQueryBuilder)
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    return throwError(err);
-                }),
-                share()
-            );
-    }
+  refreshListCount() {
+    const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+    countQueryBuilder.paginator.clear();
+    countQueryBuilder.sort.clear();
+    this.savedFiltersListCount$ = this.savedFiltersService
+      .getSavedFiltersListCount(countQueryBuilder)
+      .pipe(
+        catchError((err) => {
+          this.snackbarService.showApiError(err);
+          return throwError(err);
+        }),
+        share()
+      );
+  }
 
-    /**
+  /**
      * Set a saved filter public if it's created by the current user
      * @param savedFilterId
      * @param isPublic
      */
-    setPublicItem(savedFilterId: string, isPublic: boolean) {
-        this.savedFiltersService.modifyFilter(savedFilterId, {isPublic : isPublic})
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    return throwError(err);
-                })
-            )
-            .subscribe(() => {
-                this.snackbarService.showSuccess(`LNG_PAGE_LIST_SAVED_FILTERS_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE`);
-            });
-    }
+  setPublicItem(savedFilterId: string, isPublic: boolean) {
+    this.savedFiltersService.modifyFilter(savedFilterId, {isPublic : isPublic})
+      .pipe(
+        catchError((err) => {
+          this.snackbarService.showApiError(err);
+          return throwError(err);
+        })
+      )
+      .subscribe(() => {
+        this.snackbarService.showSuccess('LNG_PAGE_LIST_SAVED_FILTERS_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE');
+      });
+  }
 
-    /**
+  /**
      * Delete a saved filter
      * @param filterId
      */
-    deleteFilter(filterId: string) {
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_SAVED_FILTER')
-            .subscribe((answer: DialogAnswer) => {
-                if (answer.button === DialogAnswerButton.Yes) {
-                    this.savedFiltersService.deleteFilter(filterId)
-                        .pipe(
-                            catchError((err) => {
-                                this.snackbarService.showApiError(err);
-                                return throwError(err);
-                            })
-                        )
-                        .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_SAVED_FILTERS_ACTION_DELETE_FILTER_SUCCESS_MESSAGE');
+  deleteFilter(filterId: string) {
+    this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_SAVED_FILTER')
+      .subscribe((answer: DialogAnswer) => {
+        if (answer.button === DialogAnswerButton.Yes) {
+          this.savedFiltersService.deleteFilter(filterId)
+            .pipe(
+              catchError((err) => {
+                this.snackbarService.showApiError(err);
+                return throwError(err);
+              })
+            )
+            .subscribe(() => {
+              this.snackbarService.showSuccess('LNG_PAGE_LIST_SAVED_FILTERS_ACTION_DELETE_FILTER_SUCCESS_MESSAGE');
 
-                            // reload data
-                            this.needsRefreshList(true);
-                        });
-                }
-        });
-    }
+              // reload data
+              this.needsRefreshList(true);
+            });
+        }
+      });
+  }
 
 }

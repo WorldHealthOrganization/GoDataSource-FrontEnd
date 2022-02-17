@@ -7,69 +7,69 @@ import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 
 const routes: Routes = [
-    // Users list
-    {
-        path: '',
-        component: fromPages.UserListComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [
-                PERMISSION.USER_LIST
-            ]
-        }
-    },
-    // Create User
-    {
-        path: 'create',
-        component: fromPages.CreateUserComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [
-                PERMISSION.USER_CREATE
-            ]
-        },
-        canDeactivate: [
-            PageChangeConfirmationGuard
-        ]
-    },
-    // View User
-    {
-        path: ':userId/view',
-        component: fromPages.ModifyUserComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [
-                PERMISSION.USER_VIEW
-            ],
-            action: ViewModifyComponentAction.VIEW
-        }
-    },
-    // Edit user
-    {
-        path: ':userId/modify',
-        component: fromPages.ModifyUserComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [
-                PERMISSION.USER_MODIFY
-            ],
-            action: ViewModifyComponentAction.MODIFY
-        },
-        canDeactivate: [
-            PageChangeConfirmationGuard
-        ]
-    },
-    // View workload
-    {
-        path: 'workload',
-        component: fromPages.UserWorkloadComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [
-                PERMISSION.USER_LIST_WORKLOAD
-            ]
-        }
+  // Users list
+  {
+    path: '',
+    component: fromPages.UserListComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.USER_LIST
+      ]
     }
+  },
+  // Create User
+  {
+    path: 'create',
+    component: fromPages.CreateUserComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.USER_CREATE
+      ]
+    },
+    canDeactivate: [
+      PageChangeConfirmationGuard
+    ]
+  },
+  // View User
+  {
+    path: ':userId/view',
+    component: fromPages.ModifyUserComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.USER_VIEW
+      ],
+      action: ViewModifyComponentAction.VIEW
+    }
+  },
+  // Edit user
+  {
+    path: ':userId/modify',
+    component: fromPages.ModifyUserComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.USER_MODIFY
+      ],
+      action: ViewModifyComponentAction.MODIFY
+    },
+    canDeactivate: [
+      PageChangeConfirmationGuard
+    ]
+  },
+  // View workload
+  {
+    path: 'workload',
+    component: fromPages.UserWorkloadComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.USER_LIST_WORKLOAD
+      ]
+    }
+  }
 ];
 
 export const routing: ModuleWithProviders<RouterModule> = RouterModule.forChild(routes);

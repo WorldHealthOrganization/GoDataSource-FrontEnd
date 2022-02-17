@@ -22,13 +22,13 @@ export * from './available-entities-for-switch-list/available-entities-for-switc
 
 // export the list of all page components
 export const pageComponents: any[] = [
-    EntityRelationshipsListComponent,
-    ModifyEntityRelationshipComponent,
-    AvailableEntitiesListComponent,
-    CreateEntityRelationshipComponent,
-    ReportCasesDateOnsetListComponent,
-    ReportRelationshipsLongPeriodListComponent,
-    EntityRelationshipsListAssignComponent,
-    CreateEntityRelationshipBulkComponent,
-    AvailableEntitiesForSwitchListComponent
+  EntityRelationshipsListComponent,
+  ModifyEntityRelationshipComponent,
+  AvailableEntitiesListComponent,
+  CreateEntityRelationshipComponent,
+  ReportCasesDateOnsetListComponent,
+  ReportRelationshipsLongPeriodListComponent,
+  EntityRelationshipsListAssignComponent,
+  CreateEntityRelationshipBulkComponent,
+  AvailableEntitiesForSwitchListComponent
 ];

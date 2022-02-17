@@ -23,126 +23,126 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({
-    selector: 'app-create-user',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './create-user.component.html',
-    styleUrls: ['./create-user.component.less']
+  selector: 'app-create-user',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './create-user.component.html',
+  styleUrls: ['./create-user.component.less']
 })
 export class CreateUserComponent
-    extends CreateConfirmOnChanges
-    implements OnInit {
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [];
+  extends CreateConfirmOnChanges
+  implements OnInit {
+  // breadcrumbs
+  breadcrumbs: BreadcrumbItemModel[] = [];
 
-    // constants
-    OutbreakModel = OutbreakModel;
-    PhoneNumberType = PhoneNumberType;
+  // constants
+  OutbreakModel = OutbreakModel;
+  PhoneNumberType = PhoneNumberType;
 
-    // authenticated user
-    authUser: UserModel;
+  // authenticated user
+  authUser: UserModel;
 
-    newUser: UserModel = new UserModel();
-    passwordConfirmModel: string;
-    rolesList$: Observable<UserRoleModel[]>;
-    outbreaksList$: Observable<OutbreakModel[]>;
-    institutionsList$: Observable<LabelValuePair[]>;
+  newUser: UserModel = new UserModel();
+  passwordConfirmModel: string;
+  rolesList$: Observable<UserRoleModel[]>;
+  outbreaksList$: Observable<OutbreakModel[]>;
+  institutionsList$: Observable<LabelValuePair[]>;
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        private router: Router,
-        private userDataService: UserDataService,
-        private userRoleDataService: UserRoleDataService,
-        private snackbarService: SnackbarService,
-        private authDataService: AuthDataService,
-        private outbreakDataService: OutbreakDataService,
-        private formHelper: FormHelperService,
-        private dialogService: DialogService,
-        private referenceDataService: ReferenceDataDataService,
-        private redirectService: RedirectService
-    ) {
-        super();
-    }
+  constructor(
+    private router: Router,
+    private userDataService: UserDataService,
+    private userRoleDataService: UserRoleDataService,
+    private snackbarService: SnackbarService,
+    private authDataService: AuthDataService,
+    private outbreakDataService: OutbreakDataService,
+    private formHelper: FormHelperService,
+    private dialogService: DialogService,
+    private referenceDataService: ReferenceDataDataService,
+    private redirectService: RedirectService
+  ) {
+    super();
+  }
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // get the list of roles to populate the dropdown in UI
-        const qb = new RequestQueryBuilder();
-        qb.sort.by('name');
-        this.rolesList$ = this.userRoleDataService.getRolesList(qb);
+  ngOnInit() {
+    // get the list of roles to populate the dropdown in UI
+    const qb = new RequestQueryBuilder();
+    qb.sort.by('name');
+    this.rolesList$ = this.userRoleDataService.getRolesList(qb);
 
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+    // get the authenticated user
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
-        this.outbreaksList$ = this.outbreakDataService.getOutbreaksListReduced();
+    this.outbreaksList$ = this.outbreakDataService.getOutbreaksListReduced();
 
-        this.institutionsList$ = this.referenceDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.INSTITUTION_NAME);
+    this.institutionsList$ = this.referenceDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.INSTITUTION_NAME);
 
-        // initialize breadcrumbs
-        this.initializeBreadcrumbs();
-    }
+    // initialize breadcrumbs
+    this.initializeBreadcrumbs();
+  }
 
-    /**
+  /**
      * Initialize breadcrumbs
      */
-    private initializeBreadcrumbs() {
-        // reset
-        this.breadcrumbs = [];
+  private initializeBreadcrumbs() {
+    // reset
+    this.breadcrumbs = [];
 
-        // add list breadcrumb only if we have permission
-        if (UserModel.canList(this.authUser)) {
-            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '/users'));
-        }
-
-        // create breadcrumb
-        this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_USER_TITLE', '.', true));
+    // add list breadcrumb only if we have permission
+    if (UserModel.canList(this.authUser)) {
+      this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '/users'));
     }
 
-    /**
+    // create breadcrumb
+    this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_USER_TITLE', '.', true));
+  }
+
+  /**
      * Create new user
      */
-    createNewUser(form: NgForm) {
-        const dirtyFields: any = this.formHelper.getDirtyFields(form);
+  createNewUser(form: NgForm) {
+    const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
-        // remove password confirm
-        if (dirtyFields.passwordConfirm) {
-            delete dirtyFields.passwordConfirm;
-        }
-
-        if (form.valid && !_.isEmpty(dirtyFields)) {
-            // modify the user
-            const loadingDialog = this.dialogService.showLoadingDialog();
-
-            // try to authenticate the user
-            this.userDataService
-                .createUser(dirtyFields)
-                .pipe(
-                    catchError((err) => {
-                        this.snackbarService.showApiError(err);
-                        loadingDialog.close();
-                        return throwError(err);
-                    })
-                )
-                .subscribe((newUser: UserModel) => {
-                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_USER_ACTION_CREATE_USER_SUCCESS_MESSAGE');
-
-                    // hide dialog
-                    loadingDialog.close();
-
-                    // navigate to proper page
-                    // method handles disableDirtyConfirm too...
-                    this.redirectToProperPageAfterCreate(
-                        this.router,
-                        this.redirectService,
-                        this.authUser,
-                        UserModel,
-                        'users',
-                        newUser.id
-                    );
-                });
-        }
+    // remove password confirm
+    if (dirtyFields.passwordConfirm) {
+      delete dirtyFields.passwordConfirm;
     }
+
+    if (form.valid && !_.isEmpty(dirtyFields)) {
+      // modify the user
+      const loadingDialog = this.dialogService.showLoadingDialog();
+
+      // try to authenticate the user
+      this.userDataService
+        .createUser(dirtyFields)
+        .pipe(
+          catchError((err) => {
+            this.snackbarService.showApiError(err);
+            loadingDialog.close();
+            return throwError(err);
+          })
+        )
+        .subscribe((newUser: UserModel) => {
+          this.snackbarService.showSuccess('LNG_PAGE_CREATE_USER_ACTION_CREATE_USER_SUCCESS_MESSAGE');
+
+          // hide dialog
+          loadingDialog.close();
+
+          // navigate to proper page
+          // method handles disableDirtyConfirm too...
+          this.redirectToProperPageAfterCreate(
+            this.router,
+            this.redirectService,
+            this.authUser,
+            UserModel,
+            'users',
+            newUser.id
+          );
+        });
+    }
+  }
 }

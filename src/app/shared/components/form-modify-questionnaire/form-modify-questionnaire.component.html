@@ -332,7 +332,7 @@
                                     [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT' | translate"
                                     tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT_DESCRIPTION"
                                     [required]="true"
-                                    (blur)="questionTextBlurred($event)">
+                                    (lostFocus)="questionTextBlurred($event)">
                                 </app-form-input>
                             </div>
 
@@ -367,7 +367,7 @@
                                     [checkObject]="questionVariables"
                                     checkErrorMsg="LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_ERROR_DUPLICATE_VARIABLE"
                                     [checkCompareValue]="questionInEditModeClone.uuid"
-                                    (blur)="questionVariableBlurred($event)"
+                                    (lostFocus)="questionVariableBlurred($event)"
                                     app-not-number-validator
                                     [notNumberValidatorDisabled]="!allowQuestionVariableChange && !questionInEditModeClone.new && questionInEditModeClone.variable">
                                 </app-form-input>

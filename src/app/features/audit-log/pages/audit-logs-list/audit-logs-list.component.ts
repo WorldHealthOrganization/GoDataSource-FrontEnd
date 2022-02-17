@@ -19,211 +19,211 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
-    selector: 'app-audit-logs-list',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './audit-logs-list.component.html',
-    styleUrls: ['./audit-logs-list.component.less']
+  selector: 'app-audit-logs-list',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './audit-logs-list.component.html',
+  styleUrls: ['./audit-logs-list.component.less']
 })
 export class AuditLogsListComponent
-    extends ListComponent
-    implements OnInit, OnDestroy {
+  extends ListComponent
+  implements OnInit, OnDestroy {
 
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_AUDIT_LOGS_TITLE', '.', true)
-    ];
+  // breadcrumbs
+  breadcrumbs: BreadcrumbItemModel[] = [
+    new BreadcrumbItemModel('LNG_PAGE_LIST_AUDIT_LOGS_TITLE', '.', true)
+  ];
 
-    // list of existing audit logs
-    auditLogsList$: Observable<AuditLogModel[]>;
-    auditLogsListCount$: Observable<IBasicCount>;
+  // list of existing audit logs
+  auditLogsList$: Observable<AuditLogModel[]>;
+  auditLogsListCount$: Observable<IBasicCount>;
 
-    // options
-    usersList$: Observable<any>;
-    auditLogActionsList$: Observable<any>;
-    dataModuleList: LabelValuePair[];
-    dataModuleMapped: {
-        [module: string]: string
-    };
+  // options
+  usersList$: Observable<any>;
+  auditLogActionsList$: Observable<any>;
+  dataModuleList: LabelValuePair[];
+  dataModuleMapped: {
+    [module: string]: string
+  };
 
-    // date filter
-    dateFilterDefaultValue: {
-        startDate,
-        endDate
-    };
+  // date filter
+  dateFilterDefaultValue: {
+    startDate,
+    endDate
+  };
 
-    // constants
-    UserSettings = UserSettings;
+  // constants
+  UserSettings = UserSettings;
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        protected listHelperService: ListHelperService,
-        private auditLogDataService: AuditLogDataService,
-        private snackbarService: SnackbarService,
-        private genericDataService: GenericDataService,
-        private userDataService: UserDataService
-    ) {
-        super(listHelperService);
-    }
+  constructor(
+    protected listHelperService: ListHelperService,
+    private auditLogDataService: AuditLogDataService,
+    private snackbarService: SnackbarService,
+    private genericDataService: GenericDataService,
+    private userDataService: UserDataService
+  ) {
+    super(listHelperService);
+  }
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // set default filter rules
-        this.initializeHeaderFilters();
+  ngOnInit() {
+    // set default filter rules
+    this.initializeHeaderFilters();
 
-        // initialize pagination
-        this.initPaginator();
-        // ...and re-load the list when the Selected Outbreak is changed
-        this.needsRefreshList(true);
+    // initialize pagination
+    this.initPaginator();
+    // ...and re-load the list when the Selected Outbreak is changed
+    this.needsRefreshList(true);
 
-        // construct user sort criteria
-        const usersFilter = new RequestQueryBuilder();
-        usersFilter.sort
-            .by('firstName', RequestSortDirection.ASC)
-            .by('lastName', RequestSortDirection.ASC);
+    // construct user sort criteria
+    const usersFilter = new RequestQueryBuilder();
+    usersFilter.sort
+      .by('firstName', RequestSortDirection.ASC)
+      .by('lastName', RequestSortDirection.ASC);
 
-        // initialize dropdown options
-        this.usersList$ = this.userDataService.getUsersList(usersFilter);
-        this.auditLogActionsList$ = this.genericDataService.getAuditLogActionOptions();
+    // initialize dropdown options
+    this.usersList$ = this.userDataService.getUsersList(usersFilter);
+    this.auditLogActionsList$ = this.genericDataService.getAuditLogActionOptions();
 
-        // data modules
-        this.genericDataService
-            .getDataModuleOptions()
-            .subscribe((data) => {
-                // data module
-                this.dataModuleList = data;
+    // data modules
+    this.genericDataService
+      .getDataModuleOptions()
+      .subscribe((data) => {
+        // data module
+        this.dataModuleList = data;
 
-                // map for easy access
-                this.dataModuleMapped = _.transform(
-                    data,
-                    (result, value: LabelValuePair) => {
-                        result[value.value] = value.label;
-                    }
-                ) as any;
-            });
+        // map for easy access
+        this.dataModuleMapped = _.transform(
+          data,
+          (result, value: LabelValuePair) => {
+            result[value.value] = value.label;
+          }
+        ) as any;
+      });
 
-        // initialize Side Table Columns
-        this.initializeSideTableColumns();
-    }
+    // initialize Side Table Columns
+    this.initializeSideTableColumns();
+  }
 
-    /**
+  /**
      * Release resources
      */
-    ngOnDestroy() {
-        // release parent resources
-        super.ngOnDestroy();
-    }
+  ngOnDestroy() {
+    // release parent resources
+    super.ngOnDestroy();
+  }
 
-    /**
+  /**
      * Initialize Side Table Columns
      */
-    initializeSideTableColumns() {
-        // default table columns
-        this.tableColumns = [
-            new VisibleColumnModel({
-                field: 'action',
-                label: 'LNG_AUDIT_LOG_FIELD_LABEL_ACTION'
-            }),
-            new VisibleColumnModel({
-                field: 'recordId',
-                label: 'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_ID'
-            }),
-            new VisibleColumnModel({
-                field: 'modelName',
-                label: 'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_NAME'
-            }),
-            new VisibleColumnModel({
-                field: 'createdAt',
-                label: 'LNG_AUDIT_LOG_FIELD_LABEL_CREATED_AT'
-            }),
-            new VisibleColumnModel({
-                field: 'changedData',
-                label: 'LNG_AUDIT_LOG_FIELD_LABEL_CHANGE_DATA'
-            }),
-            new VisibleColumnModel({
-                field: 'userId',
-                label: 'LNG_AUDIT_LOG_FIELD_LABEL_USER'
-            }),
-            new VisibleColumnModel({
-                field: 'userRole',
-                label: 'LNG_AUDIT_LOG_FIELD_LABEL_USER_ROLES'
-            }),
-            new VisibleColumnModel({
-                field: 'userIPAddress',
-                label: 'LNG_AUDIT_LOG_FIELD_LABEL_IP_ADDRESS'
-            })
-        ];
-    }
+  initializeSideTableColumns() {
+    // default table columns
+    this.tableColumns = [
+      new VisibleColumnModel({
+        field: 'action',
+        label: 'LNG_AUDIT_LOG_FIELD_LABEL_ACTION'
+      }),
+      new VisibleColumnModel({
+        field: 'recordId',
+        label: 'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_ID'
+      }),
+      new VisibleColumnModel({
+        field: 'modelName',
+        label: 'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_NAME'
+      }),
+      new VisibleColumnModel({
+        field: 'createdAt',
+        label: 'LNG_AUDIT_LOG_FIELD_LABEL_CREATED_AT'
+      }),
+      new VisibleColumnModel({
+        field: 'changedData',
+        label: 'LNG_AUDIT_LOG_FIELD_LABEL_CHANGE_DATA'
+      }),
+      new VisibleColumnModel({
+        field: 'userId',
+        label: 'LNG_AUDIT_LOG_FIELD_LABEL_USER'
+      }),
+      new VisibleColumnModel({
+        field: 'userRole',
+        label: 'LNG_AUDIT_LOG_FIELD_LABEL_USER_ROLES'
+      }),
+      new VisibleColumnModel({
+        field: 'userIPAddress',
+        label: 'LNG_AUDIT_LOG_FIELD_LABEL_IP_ADDRESS'
+      })
+    ];
+  }
 
-    /**
+  /**
      * Re(load) the list, based on the applied filter, sort criterias
      */
-    refreshList(finishCallback: (records: any[]) => void) {
-        // include user details
-        this.queryBuilder.include('user', true);
+  refreshList(finishCallback: (records: any[]) => void) {
+    // include user details
+    this.queryBuilder.include('user', true);
 
-        // default sort by time descending
-        if (this.queryBuilder.sort.isEmpty()) {
-            this.queryBuilder.sort.by('createdAt', RequestSortDirection.DESC);
-        }
-
-        // retrieve the list of Audit Logs
-        this.auditLogsList$ = this.auditLogDataService
-            .getAuditLogsList(this.queryBuilder)
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    finishCallback([]);
-                    return throwError(err);
-                }),
-                tap(this.checkEmptyList.bind(this)),
-                tap((data: any[]) => {
-                    finishCallback(data);
-                })
-            );
+    // default sort by time descending
+    if (this.queryBuilder.sort.isEmpty()) {
+      this.queryBuilder.sort.by('createdAt', RequestSortDirection.DESC);
     }
 
-    /**
+    // retrieve the list of Audit Logs
+    this.auditLogsList$ = this.auditLogDataService
+      .getAuditLogsList(this.queryBuilder)
+      .pipe(
+        catchError((err) => {
+          this.snackbarService.showApiError(err);
+          finishCallback([]);
+          return throwError(err);
+        }),
+        tap(this.checkEmptyList.bind(this)),
+        tap((data: any[]) => {
+          finishCallback(data);
+        })
+      );
+  }
+
+  /**
      * Get total number of items, based on the applied filters
      */
-    refreshListCount() {
-        // remove paginator from query builder
-        const countQueryBuilder = _.cloneDeep(this.queryBuilder);
-        countQueryBuilder.paginator.clear();
-        countQueryBuilder.sort.clear();
-        this.auditLogsListCount$ = this.auditLogDataService
-            .getAuditLogsCount(countQueryBuilder)
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    return throwError(err);
-                }),
-                share()
-            );
-    }
+  refreshListCount() {
+    // remove paginator from query builder
+    const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+    countQueryBuilder.paginator.clear();
+    countQueryBuilder.sort.clear();
+    this.auditLogsListCount$ = this.auditLogDataService
+      .getAuditLogsCount(countQueryBuilder)
+      .pipe(
+        catchError((err) => {
+          this.snackbarService.showApiError(err);
+          return throwError(err);
+        }),
+        share()
+      );
+  }
 
-    /**
+  /**
      * Initialize header filters
      */
-    initializeHeaderFilters() {
-        this.dateFilterDefaultValue = {
-            startDate: moment().startOf('day').toISOString(),
-            endDate: moment().endOf('day').toISOString()
-        };
-        this.queryBuilder.filter.byDateRange(
-            'createdAt',
-            this.dateFilterDefaultValue
-        );
-    }
+  initializeHeaderFilters() {
+    this.dateFilterDefaultValue = {
+      startDate: moment().startOf('day').toISOString(),
+      endDate: moment().endOf('day').toISOString()
+    };
+    this.queryBuilder.filter.byDateRange(
+      'createdAt',
+      this.dateFilterDefaultValue
+    );
+  }
 
-    /**
+  /**
      * Add search criteria
      */
-    resetFiltersAddDefault() {
-        this.initializeHeaderFilters();
-    }
+  resetFiltersAddDefault() {
+    this.initializeHeaderFilters();
+  }
 }
 

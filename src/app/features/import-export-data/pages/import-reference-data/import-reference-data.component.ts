@@ -8,67 +8,67 @@ import { Constants } from '../../../../core/models/constants';
 import { ImportDataExtension } from '../../components/import-data/model';
 
 @Component({
-    selector: 'app-import-case-lab-data',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './import-reference-data.component.html',
-    styleUrls: ['./import-reference-data.component.less']
+  selector: 'app-import-case-lab-data',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './import-reference-data.component.html',
+  styleUrls: ['./import-reference-data.component.less']
 })
 export class ImportReferenceDataComponent {
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel(
-            'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE',
-            '/reference-data'
-        ),
-        new BreadcrumbItemModel(
-            'LNG_PAGE_IMPORT_REFERENCE_DATA_TITLE',
-            '',
-            true
-        )
-    ];
+  breadcrumbs: BreadcrumbItemModel[] = [
+    new BreadcrumbItemModel(
+      'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE',
+      '/reference-data'
+    ),
+    new BreadcrumbItemModel(
+      'LNG_PAGE_IMPORT_REFERENCE_DATA_TITLE',
+      '',
+      true
+    )
+  ];
 
-    allowedExtensions: string[] = [
-        ImportDataExtension.CSV,
-        ImportDataExtension.XLS,
-        ImportDataExtension.XLSX,
-        ImportDataExtension.ODS,
-        ImportDataExtension.JSON,
-        ImportDataExtension.ZIP
-    ];
+  allowedExtensions: string[] = [
+    ImportDataExtension.CSV,
+    ImportDataExtension.XLS,
+    ImportDataExtension.XLSX,
+    ImportDataExtension.ODS,
+    ImportDataExtension.JSON,
+    ImportDataExtension.ZIP
+  ];
 
-    Constants = Constants;
+  Constants = Constants;
 
-    importFileUrl: string = 'importable-files';
-    importDataUrl: string = 'reference-data/import-importable-file-using-map';
+  importFileUrl: string = 'importable-files';
+  importDataUrl: string = 'reference-data/import-importable-file-using-map';
 
-    ImportServerModelNames = ImportServerModelNames;
+  ImportServerModelNames = ImportServerModelNames;
 
-    requiredDestinationFields = [
-        'categoryId',
-        'value'
-    ];
+  requiredDestinationFields = [
+    'categoryId',
+    'value'
+  ];
 
-    /**
+  /**
      * Constructor
      * @param router
      * @param route
      */
-    constructor(
-        private referenceDataDataService: ReferenceDataDataService,
-        private router: Router,
-        private i18nService: I18nService
-    ) {}
+  constructor(
+    private referenceDataDataService: ReferenceDataDataService,
+    private router: Router,
+    private i18nService: I18nService
+  ) {}
 
-    /**
+  /**
      * Finished
      */
-    finished() {
-        // reload translations
-        this.i18nService.loadUserLanguage().subscribe(() => {
-            // clear cache
-            this.referenceDataDataService.clearReferenceDataCache();
+  finished() {
+    // reload translations
+    this.i18nService.loadUserLanguage().subscribe(() => {
+      // clear cache
+      this.referenceDataDataService.clearReferenceDataCache();
 
-            // redirect
-            this.router.navigate(['/reference-data']);
-        });
-    }
+      // redirect
+      this.router.navigate(['/reference-data']);
+    });
+  }
 }

@@ -13,117 +13,117 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel } from '../../../../core/models/user.model';
 
 @Component({
-    selector: 'app-view-movement-case',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './view-movement-case.component.html',
-    styleUrls: ['./view-movement-case.component.less']
+  selector: 'app-view-movement-case',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './view-movement-case.component.html',
+  styleUrls: ['./view-movement-case.component.less']
 })
 export class ViewMovementCaseComponent implements OnInit {
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs
+  breadcrumbs: BreadcrumbItemModel[] = [];
 
-    // constants
-    CaseModel = CaseModel;
+  // constants
+  CaseModel = CaseModel;
 
-    caseData: CaseModel = new CaseModel();
-    movementAddresses: AddressModel[] = [];
+  caseData: CaseModel = new CaseModel();
+  movementAddresses: AddressModel[] = [];
 
-    @ViewChild('mapMovement', { static: true }) mapMovement: WorldMapMovementComponent;
+  @ViewChild('mapMovement', { static: true }) mapMovement: WorldMapMovementComponent;
 
-    // loading data
-    displayLoading: boolean = true;
+  // loading data
+  displayLoading: boolean = true;
 
-    // authenticated user details
-    authUser: UserModel;
+  // authenticated user details
+  authUser: UserModel;
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        protected route: ActivatedRoute,
-        private caseDataService: CaseDataService,
-        private outbreakDataService: OutbreakDataService,
-        private authDataService: AuthDataService
-    ) {}
+  constructor(
+    protected route: ActivatedRoute,
+    private caseDataService: CaseDataService,
+    private outbreakDataService: OutbreakDataService,
+    private authDataService: AuthDataService
+  ) {}
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+  ngOnInit() {
+    // get the authenticated user
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
-        this.route.params.subscribe((params: { caseId }) => {
-            this.outbreakDataService
-                .getSelectedOutbreak()
-                .subscribe((selectedOutbreak: OutbreakModel) => {
-                    forkJoin([
-                        this.caseDataService.getCase(selectedOutbreak.id, params.caseId),
-                        this.caseDataService.getCaseMovement(selectedOutbreak.id, params.caseId)
-                    ])
-                    .subscribe((
-                        [caseData, movementData]: [CaseModel, AddressModel[]]
-                    ) => {
-                        // case data
-                        this.caseData = caseData;
+    this.route.params.subscribe((params: { caseId }) => {
+      this.outbreakDataService
+        .getSelectedOutbreak()
+        .subscribe((selectedOutbreak: OutbreakModel) => {
+          forkJoin([
+            this.caseDataService.getCase(selectedOutbreak.id, params.caseId),
+            this.caseDataService.getCaseMovement(selectedOutbreak.id, params.caseId)
+          ])
+            .subscribe((
+              [caseData, movementData]: [CaseModel, AddressModel[]]
+            ) => {
+              // case data
+              this.caseData = caseData;
 
-                        // initialize page breadcrumbs
-                        this.initializeBreadcrumbs();
+              // initialize page breadcrumbs
+              this.initializeBreadcrumbs();
 
-                        // movement data
-                        this.displayLoading = false;
-                        this.movementAddresses = movementData;
-                    });
-                });
+              // movement data
+              this.displayLoading = false;
+              this.movementAddresses = movementData;
+            });
         });
+    });
 
-        // initialize page breadcrumbs
-        this.initializeBreadcrumbs();
-    }
+    // initialize page breadcrumbs
+    this.initializeBreadcrumbs();
+  }
 
-    /**
+  /**
      * Initialize breadcrumbs
      */
-    initializeBreadcrumbs() {
-        // reset
-        this.breadcrumbs = [];
+  initializeBreadcrumbs() {
+    // reset
+    this.breadcrumbs = [];
 
-        // case list page
-        if (CaseModel.canList(this.authUser)) {
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
-            );
-        }
-
-        // case breadcrumbs
-        if (this.caseData) {
-            // case view page
-            if (CaseModel.canView(this.authUser)) {
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel(
-                        this.caseData.name,
-                        `/cases/${this.caseData.id}/view`
-                    )
-                );
-            }
-
-            // current page
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel(
-                    'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE',
-                    '.',
-                    true,
-                    {},
-                    this.caseData
-                )
-            );
-        }
+    // case list page
+    if (CaseModel.canList(this.authUser)) {
+      this.breadcrumbs.push(
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
+      );
     }
 
-    /**
+    // case breadcrumbs
+    if (this.caseData) {
+      // case view page
+      if (CaseModel.canView(this.authUser)) {
+        this.breadcrumbs.push(
+          new BreadcrumbItemModel(
+            this.caseData.name,
+            `/cases/${this.caseData.id}/view`
+          )
+        );
+      }
+
+      // current page
+      this.breadcrumbs.push(
+        new BreadcrumbItemModel(
+          'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE',
+          '.',
+          true,
+          {},
+          this.caseData
+        )
+      );
+    }
+  }
+
+  /**
      * Export case movement map
      */
-    exportCaseMovementMap() {
-        this.mapMovement.exportMovementMap(EntityType.CASE);
-    }
+  exportCaseMovementMap() {
+    this.mapMovement.exportMovementMap(EntityType.CASE);
+  }
 }

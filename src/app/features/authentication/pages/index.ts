@@ -14,9 +14,9 @@ export * from './reset-password-questions/reset-password-questions.component';
 
 // export the list of all page components
 export const pageComponents: any[] = [
-    LoginComponent,
-    LogoutComponent,
-    ForgotPasswordComponent,
-    ResetPasswordComponent,
-    ResetPasswordQuestionsComponent
+  LoginComponent,
+  LogoutComponent,
+  ForgotPasswordComponent,
+  ResetPasswordComponent,
+  ResetPasswordQuestionsComponent
 ];

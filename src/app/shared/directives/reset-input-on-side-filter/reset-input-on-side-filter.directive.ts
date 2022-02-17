@@ -4,122 +4,122 @@ import { FormLocationDropdownComponent } from '../../components/form-location-dr
 import { ValueAccessorBase } from '../../xt-forms/core';
 
 @Directive({
-    selector: '[app-reset-input-on-side-filter]'
+  selector: '[app-reset-input-on-side-filter]'
 })
 export class ResetInputOnSideFilterDirective {
-    // pristine value
-    private _pristineValueHasBeenSet: boolean = false;
-    private pristineValue: any = undefined;
+  // pristine value
+  private _pristineValueHasBeenSet: boolean = false;
+  private pristineValue: any = undefined;
 
-    // reset to pristine value
-    @Input() resetToPristineValue: boolean = true;
-    @Input() disableCachedFilterOverwrite: boolean = false;
+  // reset to pristine value
+  @Input() resetToPristineValue: boolean = true;
+  @Input() disableCachedFilterOverwrite: boolean = false;
 
-    // update value to what is set after pristine value is taken
-    private _mustUpdateAfterPristine: boolean = false;
-    private _valueAfterPristine: any;
+  // update value to what is set after pristine value is taken
+  private _mustUpdateAfterPristine: boolean = false;
+  private _valueAfterPristine: any;
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        public control: NgControl
-    ) {
-        setTimeout(() => {
-            // set pristine value
-            this.pristineValue = control.value;
-            this._pristineValueHasBeenSet = true;
+  constructor(
+    public control: NgControl
+  ) {
+    setTimeout(() => {
+      // set pristine value
+      this.pristineValue = control.value;
+      this._pristineValueHasBeenSet = true;
 
-            // update control value
-            if (
-                !this.disableCachedFilterOverwrite &&
+      // update control value
+      if (
+        !this.disableCachedFilterOverwrite &&
                 this._mustUpdateAfterPristine
-            ) {
-                (control.valueAccessor as ValueAccessorBase<any>).writeValue(this._valueAfterPristine);
-            }
-        });
-    }
+      ) {
+        (control.valueAccessor as ValueAccessorBase<any>).writeValue(this._valueAfterPristine);
+      }
+    });
+  }
 
-    /**
+  /**
      * Reset
      */
-    public reset() {
-        this.control.reset(this.resetToPristineValue ? this.pristineValue : undefined);
-    }
+  public reset() {
+    this.control.reset(this.resetToPristineValue ? this.pristineValue : undefined);
+  }
 
-    /**
+  /**
      * Update input value after pristine value is taken
      */
-    public updateToAfterPristineValueIsTaken(value: any): void {
-        if (this._pristineValueHasBeenSet) {
-            if (!this.disableCachedFilterOverwrite) {
-                (this.control.valueAccessor as ValueAccessorBase<any>).writeValue(value);
-            }
-        } else {
-            this._mustUpdateAfterPristine = true;
-            this._valueAfterPristine = value;
-        }
+  public updateToAfterPristineValueIsTaken(value: any): void {
+    if (this._pristineValueHasBeenSet) {
+      if (!this.disableCachedFilterOverwrite) {
+        (this.control.valueAccessor as ValueAccessorBase<any>).writeValue(value);
+      }
+    } else {
+      this._mustUpdateAfterPristine = true;
+      this._valueAfterPristine = value;
     }
+  }
 }
 
 @Directive({
-    selector: '[app-reset-location-on-side-filter]'
+  selector: '[app-reset-location-on-side-filter]'
 })
 export class ResetLocationOnSideFilterDirective {
-    // pristine value
-    private _pristineValueHasBeenSet: boolean = false;
-    private pristineValue: any = undefined;
+  // pristine value
+  private _pristineValueHasBeenSet: boolean = false;
+  private pristineValue: any = undefined;
 
-    // reset to pristine value
-    @Input() resetToPristineValue: boolean = true;
-    @Input() disableCachedFilterOverwrite: boolean = false;
+  // reset to pristine value
+  @Input() resetToPristineValue: boolean = true;
+  @Input() disableCachedFilterOverwrite: boolean = false;
 
-    // update value to what is set after pristine value is taken
-    private _mustUpdateAfterPristine: boolean = false;
-    private _valueAfterPristine: any;
+  // update value to what is set after pristine value is taken
+  private _mustUpdateAfterPristine: boolean = false;
+  private _valueAfterPristine: any;
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        public component: FormLocationDropdownComponent
-    ) {
-        setTimeout(() => {
-            // set pristine value
-            this.pristineValue = component.value;
-            this._pristineValueHasBeenSet = true;
+  constructor(
+    public component: FormLocationDropdownComponent
+  ) {
+    setTimeout(() => {
+      // set pristine value
+      this.pristineValue = component.value;
+      this._pristineValueHasBeenSet = true;
 
-            // update control value
-            if (
-                !this.disableCachedFilterOverwrite &&
+      // update control value
+      if (
+        !this.disableCachedFilterOverwrite &&
                 this._mustUpdateAfterPristine
-            ) {
-                component.writeValue(this._valueAfterPristine);
-            }
-        });
-    }
+      ) {
+        component.writeValue(this._valueAfterPristine);
+      }
+    });
+  }
 
-    /**
+  /**
      * Reset
      */
-    public reset() {
-        this.component.value = this.resetToPristineValue ? this.pristineValue : undefined;
-        if (!this.component.value) {
-            this.component.addLocationConditionAndRefresh();
-        }
+  public reset() {
+    this.component.value = this.resetToPristineValue ? this.pristineValue : undefined;
+    if (!this.component.value) {
+      this.component.addLocationConditionAndRefresh();
     }
+  }
 
-    /**
+  /**
      * Update input value after pristine value is taken
      */
-    public updateToAfterPristineValueIsTaken(value: any): void {
-        if (this._pristineValueHasBeenSet) {
-            if (!this.disableCachedFilterOverwrite) {
-                this.component.writeValue(value);
-            }
-        } else {
-            this._mustUpdateAfterPristine = true;
-            this._valueAfterPristine = value;
-        }
+  public updateToAfterPristineValueIsTaken(value: any): void {
+    if (this._pristineValueHasBeenSet) {
+      if (!this.disableCachedFilterOverwrite) {
+        this.component.writeValue(value);
+      }
+    } else {
+      this._mustUpdateAfterPristine = true;
+      this._valueAfterPristine = value;
     }
+  }
 }

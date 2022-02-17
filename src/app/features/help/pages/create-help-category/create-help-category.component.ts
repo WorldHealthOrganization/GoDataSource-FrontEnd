@@ -17,118 +17,118 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 
 @Component({
-    selector: 'app-create-help-category',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './create-help-category.component.html',
-    styleUrls: ['./create-help-category.component.less']
+  selector: 'app-create-help-category',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './create-help-category.component.html',
+  styleUrls: ['./create-help-category.component.less']
 })
 export class CreateHelpCategoryComponent
-    extends CreateConfirmOnChanges
-    implements OnInit {
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [];
+  extends CreateConfirmOnChanges
+  implements OnInit {
+  // breadcrumbs
+  breadcrumbs: BreadcrumbItemModel[] = [];
 
-    helpCategoryData: HelpCategoryModel = new HelpCategoryModel();
+  helpCategoryData: HelpCategoryModel = new HelpCategoryModel();
 
-    // authenticated user details
-    authUser: UserModel;
+  // authenticated user details
+  authUser: UserModel;
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        private router: Router,
-        private helpDataService: HelpDataService,
-        private snackbarService: SnackbarService,
-        private formHelper: FormHelperService,
-        private i18nService: I18nService,
-        private dialogService: DialogService,
-        private authDataService: AuthDataService,
-        private redirectService: RedirectService
-    ) {
-        super();
-    }
+  constructor(
+    private router: Router,
+    private helpDataService: HelpDataService,
+    private snackbarService: SnackbarService,
+    private formHelper: FormHelperService,
+    private i18nService: I18nService,
+    private dialogService: DialogService,
+    private authDataService: AuthDataService,
+    private redirectService: RedirectService
+  ) {
+    super();
+  }
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+  ngOnInit() {
+    // get the authenticated user
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
-        // initialize breadcrumbs
-        this.initializeBreadcrumbs();
-    }
+    // initialize breadcrumbs
+    this.initializeBreadcrumbs();
+  }
 
-    /**
+  /**
      * Initialize breadcrumbs
      */
-    private initializeBreadcrumbs() {
-        // reset
-        this.breadcrumbs = [];
+  private initializeBreadcrumbs() {
+    // reset
+    this.breadcrumbs = [];
 
-        // add list breadcrumb only if we have permission
-        if (HelpCategoryModel.canList(this.authUser)) {
-            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_CATEGORIES_TITLE', '/help/categories'));
-        }
-
-        // create breadcrumb
-        this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_HELP_CATEGORY_TITLE', '.', true));
+    // add list breadcrumb only if we have permission
+    if (HelpCategoryModel.canList(this.authUser)) {
+      this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_CATEGORIES_TITLE', '/help/categories'));
     }
 
-    /**
+    // create breadcrumb
+    this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_HELP_CATEGORY_TITLE', '.', true));
+  }
+
+  /**
      * Create Category
      * @param {NgForm[]} stepForms
      */
-    createNewCategory(stepForms: NgForm[]) {
-        // get forms fields
-        const dirtyFields: any = this.formHelper.mergeFields(stepForms);
+  createNewCategory(stepForms: NgForm[]) {
+    // get forms fields
+    const dirtyFields: any = this.formHelper.mergeFields(stepForms);
 
-        if (
-            this.formHelper.isFormsSetValid(stepForms) &&
+    if (
+      this.formHelper.isFormsSetValid(stepForms) &&
             !_.isEmpty(dirtyFields)
-        ) {
-            // add the new category
-            const loadingDialog = this.dialogService.showLoadingDialog();
-            this.helpDataService
-                .createHelpCategory(dirtyFields)
-                .pipe(
-                    catchError((err) => {
-                        this.snackbarService.showApiError(err);
-                        loadingDialog.close();
-                        return throwError(err);
-                    }),
-                    switchMap((newCategory) => {
-                        // update language tokens to get the translation of name and description
-                        return this.i18nService.loadUserLanguage()
-                            .pipe(
-                                catchError((err) => {
-                                    this.snackbarService.showApiError(err);
-                                    loadingDialog.close();
-                                    return throwError(err);
-                                }),
-                                map(() => newCategory)
-                            );
-                    })
-                )
-                .subscribe((newCategory) => {
-                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_HELP_CATEGORY_ACTION_CREATE_HELP_CATEGORY_SUCCESS_MESSAGE');
+    ) {
+      // add the new category
+      const loadingDialog = this.dialogService.showLoadingDialog();
+      this.helpDataService
+        .createHelpCategory(dirtyFields)
+        .pipe(
+          catchError((err) => {
+            this.snackbarService.showApiError(err);
+            loadingDialog.close();
+            return throwError(err);
+          }),
+          switchMap((newCategory) => {
+            // update language tokens to get the translation of name and description
+            return this.i18nService.loadUserLanguage()
+              .pipe(
+                catchError((err) => {
+                  this.snackbarService.showApiError(err);
+                  loadingDialog.close();
+                  return throwError(err);
+                }),
+                map(() => newCategory)
+              );
+          })
+        )
+        .subscribe((newCategory) => {
+          this.snackbarService.showSuccess('LNG_PAGE_CREATE_HELP_CATEGORY_ACTION_CREATE_HELP_CATEGORY_SUCCESS_MESSAGE');
 
-                    // hide dialog
-                    loadingDialog.close();
+          // hide dialog
+          loadingDialog.close();
 
-                    // navigate to proper page
-                    // method handles disableDirtyConfirm too...
-                    this.redirectToProperPageAfterCreate(
-                        this.router,
-                        this.redirectService,
-                        this.authUser,
-                        HelpCategoryModel,
-                        'help/categories',
-                        newCategory.id
-                    );
-                });
-        }
+          // navigate to proper page
+          // method handles disableDirtyConfirm too...
+          this.redirectToProperPageAfterCreate(
+            this.router,
+            this.redirectService,
+            this.authUser,
+            HelpCategoryModel,
+            'help/categories',
+            newCategory.id
+          );
+        });
     }
+  }
 
 }

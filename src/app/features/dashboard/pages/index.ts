@@ -15,15 +15,15 @@ export * from './dashboard/dashboard.component';
 
 // export the list of all page components
 export const pageComponents: any[] = [
-   DashboardComponent,
-   ContactsOnFollowupListDashletComponent,
-   CasesDeceasedDashletComponent,
-   CasesHospitalisedDashletComponent,
-   ContactsPerCaseMeanDashletComponent,
-   ContactsPerCaseMedianDashletComponent,
-   ContactsNotSeenDashletComponent,
-   CasesLessContactsDashletComponent,
-   NewCasesPreviousDaysContactsDashletComponent,
-   ContactsSeenEachDayDashletComponent
+  DashboardComponent,
+  ContactsOnFollowupListDashletComponent,
+  CasesDeceasedDashletComponent,
+  CasesHospitalisedDashletComponent,
+  ContactsPerCaseMeanDashletComponent,
+  ContactsPerCaseMedianDashletComponent,
+  ContactsNotSeenDashletComponent,
+  CasesLessContactsDashletComponent,
+  NewCasesPreviousDaysContactsDashletComponent,
+  ContactsSeenEachDayDashletComponent
 ];
 

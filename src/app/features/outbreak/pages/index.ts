@@ -16,11 +16,11 @@ export * from './search-result-list/search-result-list.component';
 
 // export the list of all page components
 export const pageComponents: any[] = [
-    CreateOutbreakComponent,
-    ModifyOutbreakComponent,
-    OutbreakListComponent,
-    OutbreakQuestionnaireComponent,
+  CreateOutbreakComponent,
+  ModifyOutbreakComponent,
+  OutbreakListComponent,
+  OutbreakQuestionnaireComponent,
 
-    InconsistenciesListComponent,
-    SearchResultListComponent
+  InconsistenciesListComponent,
+  SearchResultListComponent
 ];

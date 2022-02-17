@@ -16,20 +16,20 @@ import { GroupOptionRequirementsValidator } from './group-option-requirements-va
 import { RegexValidatorDirective } from './regex-validator.directive';
 
 export const validatorDirectives: any[] = [
-    EmailValidatorDirective,
-    EqualValidatorDirective,
-    FileExtensionValidatorDirective,
-    TruthyValidatorDirective,
-    TriggerValidationForValidatorDirective,
-    PasswordValidatorDirective,
-    NotEqualValidatorDirective,
-    UniqueValidatorDirective,
-    DateValidatorDirective,
-    RequiredOneOrOtherValidatorDirective,
-    MinMaxValidatorDirective,
-    GeneralAsyncValidatorDirective,
-    HasPropertyDirective,
-    NotNumberValidatorDirective,
-    GroupOptionRequirementsValidator,
-    RegexValidatorDirective
+  EmailValidatorDirective,
+  EqualValidatorDirective,
+  FileExtensionValidatorDirective,
+  TruthyValidatorDirective,
+  TriggerValidationForValidatorDirective,
+  PasswordValidatorDirective,
+  NotEqualValidatorDirective,
+  UniqueValidatorDirective,
+  DateValidatorDirective,
+  RequiredOneOrOtherValidatorDirective,
+  MinMaxValidatorDirective,
+  GeneralAsyncValidatorDirective,
+  HasPropertyDirective,
+  NotNumberValidatorDirective,
+  GroupOptionRequirementsValidator,
+  RegexValidatorDirective
 ];

@@ -2,6 +2,6 @@ import { GanttChartDelayOnsetDashletComponent } from './gantt-chart-delay-onset-
 import { GanttChartDelayOnsetHospitalizationDashletComponent } from './gantt-chart-delay-onset-hospitalization-dashlet/gantt-chart-delay-onset-hospitalization-dashlet.component';
 
 export const components: any[] = [
-    GanttChartDelayOnsetDashletComponent,
-    GanttChartDelayOnsetHospitalizationDashletComponent
+  GanttChartDelayOnsetDashletComponent,
+  GanttChartDelayOnsetHospitalizationDashletComponent
 ];

@@ -3,10 +3,10 @@ import { Constants } from '../../../core/models/constants';
 import * as moment from 'moment';
 
 @Pipe({
-    name: 'dateDefault'
+  name: 'dateDefault'
 })
 export class DateDefaultPipe implements PipeTransform {
-    transform(value: any): any {
-        return value ? moment.utc(value).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : '';
-    }
+  transform(value: any): any {
+    return value ? moment.utc(value).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : '';
+  }
 }

@@ -4,35 +4,35 @@ import { SystemSettingsDataService } from '../../../../core/services/data/system
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 
 @Component({
-    selector: 'app-version',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './version.component.html',
-    styleUrls: ['./version.component.less']
+  selector: 'app-version',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './version.component.html',
+  styleUrls: ['./version.component.less']
 })
 export class VersionComponent implements OnInit {
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_VERSION_TITLE', '.')
-    ];
+  // breadcrumbs
+  breadcrumbs: BreadcrumbItemModel[] = [
+    new BreadcrumbItemModel('LNG_PAGE_VERSION_TITLE', '.')
+  ];
 
-    versionData: SystemSettingsVersionModel;
+  versionData: SystemSettingsVersionModel;
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        private systemSettingsDataService: SystemSettingsDataService
-    ) {}
+  constructor(
+    private systemSettingsDataService: SystemSettingsDataService
+  ) {}
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        this.systemSettingsDataService
-            .getAPIVersion()
-            .subscribe((versionData) => {
-                this.versionData = versionData;
-            });
-    }
+  ngOnInit() {
+    this.systemSettingsDataService
+      .getAPIVersion()
+      .subscribe((versionData) => {
+        this.versionData = versionData;
+      });
+  }
 
 }

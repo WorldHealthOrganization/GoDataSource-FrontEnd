@@ -1,9 +1,9 @@
 import * as _ from 'lodash';
 
 export class SystemSyncModel {
-    syncLogId: string;
+  syncLogId: string;
 
-    constructor(data = null) {
-        this.syncLogId = _.get(data, 'syncLogId', true);
-    }
+  constructor(data = null) {
+    this.syncLogId = _.get(data, 'syncLogId', true);
+  }
 }

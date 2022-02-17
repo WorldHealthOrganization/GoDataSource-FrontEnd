@@ -4,6 +4,6 @@ import { LogEntryChangesComponent } from './log-entry-changes/log-entry-changes.
 
 // export the list of all components
 export const components: any[] = [
-    FieldChangesComponent,
-    LogEntryChangesComponent
+  FieldChangesComponent,
+  LogEntryChangesComponent
 ];

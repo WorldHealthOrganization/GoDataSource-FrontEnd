@@ -12,147 +12,147 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { ContactModel } from '../../../../core/models/contact.model';
 
 @Component({
-    selector: 'app-contacts-on-followup-list-dashlet',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './contacts-on-followup-list-dashlet.component.html',
-    styleUrls: ['./contacts-on-followup-list-dashlet.component.less']
+  selector: 'app-contacts-on-followup-list-dashlet',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './contacts-on-followup-list-dashlet.component.html',
+  styleUrls: ['./contacts-on-followup-list-dashlet.component.less']
 })
 export class ContactsOnFollowupListDashletComponent extends DashletComponent implements OnInit, OnDestroy {
-    // number of contacts on the followup list
-    contactsOnFollowUpListCount: number = 0;
+  // number of contacts on the followup list
+  contactsOnFollowUpListCount: number = 0;
 
-    // constants to be used for applyListFilters
-    ContactModel = ContactModel;
+  // constants to be used for applyListFilters
+  ContactModel = ContactModel;
 
-    // outbreak
-    outbreakId: string;
+  // outbreak
+  outbreakId: string;
 
-    // for which date do we display data ?
-    dataForDate: Moment = moment();
+  // for which date do we display data ?
+  dataForDate: Moment = moment();
 
-    // loading data
-    displayLoading: boolean = false;
+  // loading data
+  displayLoading: boolean = false;
 
-    // subscribers
-    outbreakSubscriber: Subscription;
-    previousSubscriber: Subscription;
+  // subscribers
+  outbreakSubscriber: Subscription;
+  previousSubscriber: Subscription;
 
-    // query params
-    queryParams: {
-        [key: string]: any
-    } = {
-        applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWUP_LIST,
-        [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true
+  // query params
+  queryParams: {
+    [key: string]: any
+  } = {
+      applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWUP_LIST,
+      [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true
     };
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        private followUpDataService: FollowUpsDataService,
-        private outbreakDataService: OutbreakDataService,
-        protected listFilterDataService: ListFilterDataService,
-        protected authDataService: AuthDataService
-    ) {
-        super(
-            listFilterDataService,
-            authDataService
-        );
-    }
+  constructor(
+    private followUpDataService: FollowUpsDataService,
+    private outbreakDataService: OutbreakDataService,
+    protected listFilterDataService: ListFilterDataService,
+    protected authDataService: AuthDataService
+  ) {
+    super(
+      listFilterDataService,
+      authDataService
+    );
+  }
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        this.displayLoading = true;
-        this.outbreakSubscriber = this.outbreakDataService
-            .getSelectedOutbreakSubject()
-            .subscribe((selectedOutbreak: OutbreakModel) => {
-                if (selectedOutbreak) {
-                    this.outbreakId = selectedOutbreak.id;
-                    this.refreshDataCaller.call();
-                }
-            });
-    }
+  ngOnInit() {
+    this.displayLoading = true;
+    this.outbreakSubscriber = this.outbreakDataService
+      .getSelectedOutbreakSubject()
+      .subscribe((selectedOutbreak: OutbreakModel) => {
+        if (selectedOutbreak) {
+          this.outbreakId = selectedOutbreak.id;
+          this.refreshDataCaller.call();
+        }
+      });
+  }
 
-    /**
+  /**
      * Component destroyed
      */
-    ngOnDestroy() {
-        // outbreak subscriber
-        if (this.outbreakSubscriber) {
-            this.outbreakSubscriber.unsubscribe();
-            this.outbreakSubscriber = null;
-        }
-
-        // release previous subscriber
-        if (this.previousSubscriber) {
-            this.previousSubscriber.unsubscribe();
-            this.previousSubscriber = null;
-        }
-
-        // parent subscribers
-        this.releaseSubscribers();
+  ngOnDestroy() {
+    // outbreak subscriber
+    if (this.outbreakSubscriber) {
+      this.outbreakSubscriber.unsubscribe();
+      this.outbreakSubscriber = null;
     }
 
-    /**
+    // release previous subscriber
+    if (this.previousSubscriber) {
+      this.previousSubscriber.unsubscribe();
+      this.previousSubscriber = null;
+    }
+
+    // parent subscribers
+    this.releaseSubscribers();
+  }
+
+  /**
      * Refresh data
      */
-    refreshData() {
-        if (this.outbreakId) {
-            // add global filters
-            // classification is handled by api...
-            const qb = this.getGlobalFilterQB(
-                null,
-                'address.parentLocationIdFilter',
-                false
-            );
+  refreshData() {
+    if (this.outbreakId) {
+      // add global filters
+      // classification is handled by api...
+      const qb = this.getGlobalFilterQB(
+        null,
+        'address.parentLocationIdFilter',
+        false
+      );
 
-            // classification
-            // !!! must be on first level and not under $and
-            if (!_.isEmpty(this.globalFilterClassificationId)) {
-                qb.filter.bySelect(
-                    'classification',
-                    this.globalFilterClassificationId,
-                    false,
-                    null
-                );
-            }
+      // classification
+      // !!! must be on first level and not under $and
+      if (!_.isEmpty(this.globalFilterClassificationId)) {
+        qb.filter.bySelect(
+          'classification',
+          this.globalFilterClassificationId,
+          false,
+          null
+        );
+      }
 
-            // update date
-            this.dataForDate = this.globalFilterDate ?
-                this.globalFilterDate.clone() :
-                moment();
+      // update date
+      this.dataForDate = this.globalFilterDate ?
+        this.globalFilterDate.clone() :
+        moment();
 
-            // date
-            if (this.globalFilterDate) {
-                qb.filter
-                    .byEquality(
-                        'startDate',
-                        this.globalFilterDate.startOf('day').toISOString()
-                    ).byEquality(
-                        'endDate',
-                        this.globalFilterDate.endOf('day').toISOString()
-                    );
-            }
+      // date
+      if (this.globalFilterDate) {
+        qb.filter
+          .byEquality(
+            'startDate',
+            this.globalFilterDate.startOf('day').toISOString()
+          ).byEquality(
+            'endDate',
+            this.globalFilterDate.endOf('day').toISOString()
+          );
+      }
 
-            // change the way we build query
-            qb.filter.firstLevelConditions();
+      // change the way we build query
+      qb.filter.firstLevelConditions();
 
-            // release previous subscriber
-            if (this.previousSubscriber) {
-                this.previousSubscriber.unsubscribe();
-                this.previousSubscriber = null;
-            }
+      // release previous subscriber
+      if (this.previousSubscriber) {
+        this.previousSubscriber.unsubscribe();
+        this.previousSubscriber = null;
+      }
 
-            // retrieve data
-            this.displayLoading = true;
-            this.previousSubscriber = this.followUpDataService
-                .getCountIdsOfContactsOnTheFollowUpList(this.outbreakId, qb)
-                .subscribe((result) => {
-                    this.contactsOnFollowUpListCount = result.contactsCount;
-                    this.displayLoading = false;
-                });
-        }
+      // retrieve data
+      this.displayLoading = true;
+      this.previousSubscriber = this.followUpDataService
+        .getCountIdsOfContactsOnTheFollowUpList(this.outbreakId, qb)
+        .subscribe((result) => {
+          this.contactsOnFollowUpListCount = result.contactsCount;
+          this.displayLoading = false;
+        });
     }
+  }
 }

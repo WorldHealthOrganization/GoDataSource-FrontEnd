@@ -21,258 +21,258 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { Constants } from '../../../../core/models/constants';
 
 @Component({
-    selector: 'app-transmission-chains-snapshot-list',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './transmission-chains-snapshot-list.component.html',
-    styleUrls: ['./transmission-chains-snapshot-list.component.less']
+  selector: 'app-transmission-chains-snapshot-list',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './transmission-chains-snapshot-list.component.html',
+  styleUrls: ['./transmission-chains-snapshot-list.component.less']
 })
 export class TransmissionChainsSnapshotListComponent extends ListComponent implements OnInit, OnDestroy {
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE', '/transmission-chains', false),
-        new BreadcrumbItemModel('LNG_PAGE_LIST_ASYNC_COT_TITLE', null, true)
-    ];
+  // breadcrumbs
+  breadcrumbs: BreadcrumbItemModel[] = [
+    new BreadcrumbItemModel('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE', '/transmission-chains', false),
+    new BreadcrumbItemModel('LNG_PAGE_LIST_ASYNC_COT_TITLE', null, true)
+  ];
 
-    // constants
-    UserSettings = UserSettings;
-    Constants = Constants;
+  // constants
+  UserSettings = UserSettings;
+  Constants = Constants;
 
-    // authenticated user
-    authUser: UserModel;
+  // authenticated user
+  authUser: UserModel;
 
-    // selected Outbreak
-    selectedOutbreak: OutbreakModel;
+  // selected Outbreak
+  selectedOutbreak: OutbreakModel;
 
-    // list of existing cot snapshots
-    cotSnapshotsList$: Observable<CotSnapshotModel[]>;
-    cotSnapshotsListCount$: Observable<IBasicCount>;
+  // list of existing cot snapshots
+  cotSnapshotsList$: Observable<CotSnapshotModel[]>;
+  cotSnapshotsListCount$: Observable<IBasicCount>;
 
-    // filters
-    statusList$: Observable<any>;
+  // filters
+  statusList$: Observable<any>;
 
-    // subscribers
-    outbreakSubscriber: Subscription;
+  // subscribers
+  outbreakSubscriber: Subscription;
 
-    // actions
-    recordActions: HoverRowAction[] = [
-        // Other actions
+  // actions
+  recordActions: HoverRowAction[] = [
+    // Other actions
+    new HoverRowAction({
+      type: HoverRowActionType.MENU,
+      icon: 'moreVertical',
+      menuOptions: [
+        // Delete snapshot
         new HoverRowAction({
-            type: HoverRowActionType.MENU,
-            icon: 'moreVertical',
-            menuOptions: [
-                // Delete snapshot
-                new HoverRowAction({
-                    menuOptionLabel: 'LNG_PAGE_LIST_ASYNC_COT_ACTION_DELETE_SNAPSHOT',
-                    click: (item: CotSnapshotModel) => {
-                        this.deleteSnapshot(item);
-                    },
-                    visible: (item: CotSnapshotModel): boolean => {
-                        return !item.deleted &&
+          menuOptionLabel: 'LNG_PAGE_LIST_ASYNC_COT_ACTION_DELETE_SNAPSHOT',
+          click: (item: CotSnapshotModel) => {
+            this.deleteSnapshot(item);
+          },
+          visible: (item: CotSnapshotModel): boolean => {
+            return !item.deleted &&
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
                             CotSnapshotModel.canDelete(this.authUser);
-                    },
-                    class: 'mat-menu-item-delete'
-                })
-            ]
+          },
+          class: 'mat-menu-item-delete'
         })
-    ];
+      ]
+    })
+  ];
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        protected listHelperService: ListHelperService,
-        private authDataService: AuthDataService,
-        private snackbarService: SnackbarService,
-        private outbreakDataService: OutbreakDataService,
-        private transmissionChainDataService: TransmissionChainDataService,
-        private genericDataService: GenericDataService,
-        private dialogService: DialogService
-    ) {
-        super(listHelperService);
-    }
+  constructor(
+    protected listHelperService: ListHelperService,
+    private authDataService: AuthDataService,
+    private snackbarService: SnackbarService,
+    private outbreakDataService: OutbreakDataService,
+    private transmissionChainDataService: TransmissionChainDataService,
+    private genericDataService: GenericDataService,
+    private dialogService: DialogService
+  ) {
+    super(listHelperService);
+  }
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+  ngOnInit() {
+    // get the authenticated user
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
-        // status options
-        this.statusList$ = this.genericDataService.getCotSnapshotStatusList();
+    // status options
+    this.statusList$ = this.genericDataService.getCotSnapshotStatusList();
 
-        // subscribe to the Selected Outbreak Subject stream
-        this.outbreakSubscriber = this.outbreakDataService
-            .getSelectedOutbreakSubject()
-            .subscribe((selectedOutbreak: OutbreakModel) => {
-                // selected outbreak
-                this.selectedOutbreak = selectedOutbreak;
+    // subscribe to the Selected Outbreak Subject stream
+    this.outbreakSubscriber = this.outbreakDataService
+      .getSelectedOutbreakSubject()
+      .subscribe((selectedOutbreak: OutbreakModel) => {
+        // selected outbreak
+        this.selectedOutbreak = selectedOutbreak;
 
-                // initialize pagination
-                this.initPaginator();
+        // initialize pagination
+        this.initPaginator();
 
-                // ...and re-load the list when the Selected Outbreak is changed
-                this.needsRefreshList(true);
-            });
+        // ...and re-load the list when the Selected Outbreak is changed
+        this.needsRefreshList(true);
+      });
 
-        // initialize Side Table Columns
-        this.initializeSideTableColumns();
-    }
+    // initialize Side Table Columns
+    this.initializeSideTableColumns();
+  }
 
-    /**
+  /**
      * Component destroyed
      */
-    ngOnDestroy() {
-        // release parent resources
-        super.ngOnDestroy();
+  ngOnDestroy() {
+    // release parent resources
+    super.ngOnDestroy();
 
-        // outbreak subscriber
-        if (this.outbreakSubscriber) {
-            this.outbreakSubscriber.unsubscribe();
-            this.outbreakSubscriber = null;
-        }
+    // outbreak subscriber
+    if (this.outbreakSubscriber) {
+      this.outbreakSubscriber.unsubscribe();
+      this.outbreakSubscriber = null;
     }
+  }
 
-    /**
+  /**
      * Initialize Side Table Columns
      */
-    initializeSideTableColumns() {
-        // default table columns
-        this.tableColumns = [
-            new VisibleColumnModel({
-                field: 'name',
-                label: 'LNG_ASYNC_COT_FIELD_LABEL_NAME'
-            }),
-            new VisibleColumnModel({
-                field: 'startDate',
-                label: 'LNG_ASYNC_COT_FIELD_LABEL_START_DATE'
-            }),
-            new VisibleColumnModel({
-                field: 'endDate',
-                label: 'LNG_ASYNC_COT_FIELD_LABEL_END_DATE'
-            }),
-            new VisibleColumnModel({
-                field: 'status',
-                label: 'LNG_ASYNC_COT_FIELD_LABEL_STATUS'
-            }),
-            new VisibleColumnModel({
-                field: 'fileSize',
-                label: 'LNG_ASYNC_COT_FIELD_LABEL_FILE_SIZE'
-            }),
-            new VisibleColumnModel({
-                field: 'error',
-                label: 'LNG_ASYNC_COT_FIELD_LABEL_ERROR'
-            })
-        ];
-    }
+  initializeSideTableColumns() {
+    // default table columns
+    this.tableColumns = [
+      new VisibleColumnModel({
+        field: 'name',
+        label: 'LNG_ASYNC_COT_FIELD_LABEL_NAME'
+      }),
+      new VisibleColumnModel({
+        field: 'startDate',
+        label: 'LNG_ASYNC_COT_FIELD_LABEL_START_DATE'
+      }),
+      new VisibleColumnModel({
+        field: 'endDate',
+        label: 'LNG_ASYNC_COT_FIELD_LABEL_END_DATE'
+      }),
+      new VisibleColumnModel({
+        field: 'status',
+        label: 'LNG_ASYNC_COT_FIELD_LABEL_STATUS'
+      }),
+      new VisibleColumnModel({
+        field: 'fileSize',
+        label: 'LNG_ASYNC_COT_FIELD_LABEL_FILE_SIZE'
+      }),
+      new VisibleColumnModel({
+        field: 'error',
+        label: 'LNG_ASYNC_COT_FIELD_LABEL_ERROR'
+      })
+    ];
+  }
 
-    /**
+  /**
      * Re(load) the Cases list, based on the applied filter, sort criterias
      */
-    refreshList(finishCallback: (records: any[]) => void) {
-        // we need the outbreak to continue
-        if (
-            !this.selectedOutbreak ||
+  refreshList(finishCallback: (records: any[]) => void) {
+    // we need the outbreak to continue
+    if (
+      !this.selectedOutbreak ||
             !this.selectedOutbreak.id
-        ) {
-            finishCallback([]);
-            return;
-        }
-
-        // default sort order ?
-        if (this.queryBuilder.sort.isEmpty()) {
-            this.queryBuilder.sort.by(
-                'startDate',
-                RequestSortDirection.DESC
-            );
-        }
-
-        // created by current user
-        this.queryBuilder.filter.byEquality(
-            'createdBy',
-            this.authUser.id
-        );
-
-        // retrieve the list of Cases
-        this.cotSnapshotsList$ = this.transmissionChainDataService
-            .getSnapshotsList(
-                this.selectedOutbreak.id,
-                this.queryBuilder
-            )
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    finishCallback([]);
-                    return throwError(err);
-                }),
-                tap(this.checkEmptyList.bind(this)),
-                tap((data: any[]) => {
-                    finishCallback(data);
-                })
-            );
+    ) {
+      finishCallback([]);
+      return;
     }
 
-    /**
+    // default sort order ?
+    if (this.queryBuilder.sort.isEmpty()) {
+      this.queryBuilder.sort.by(
+        'startDate',
+        RequestSortDirection.DESC
+      );
+    }
+
+    // created by current user
+    this.queryBuilder.filter.byEquality(
+      'createdBy',
+      this.authUser.id
+    );
+
+    // retrieve the list of Cases
+    this.cotSnapshotsList$ = this.transmissionChainDataService
+      .getSnapshotsList(
+        this.selectedOutbreak.id,
+        this.queryBuilder
+      )
+      .pipe(
+        catchError((err) => {
+          this.snackbarService.showApiError(err);
+          finishCallback([]);
+          return throwError(err);
+        }),
+        tap(this.checkEmptyList.bind(this)),
+        tap((data: any[]) => {
+          finishCallback(data);
+        })
+      );
+  }
+
+  /**
      * Get total number of items, based on the applied filters
      */
-    refreshListCount() {
-        // we need the outbreak to continue
-        if (
-            !this.selectedOutbreak ||
+  refreshListCount() {
+    // we need the outbreak to continue
+    if (
+      !this.selectedOutbreak ||
             !this.selectedOutbreak.id
-        ) {
-            return;
-        }
-
-        // remove paginator from query builder
-        const countQueryBuilder = _.cloneDeep(this.queryBuilder);
-        countQueryBuilder.paginator.clear();
-        countQueryBuilder.sort.clear();
-        this.cotSnapshotsListCount$ = this.transmissionChainDataService
-            .getSnapshotsCount(
-                this.selectedOutbreak.id,
-                countQueryBuilder
-            )
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    return throwError(err);
-                }),
-                share()
-            );
+    ) {
+      return;
     }
 
-    /**
+    // remove paginator from query builder
+    const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+    countQueryBuilder.paginator.clear();
+    countQueryBuilder.sort.clear();
+    this.cotSnapshotsListCount$ = this.transmissionChainDataService
+      .getSnapshotsCount(
+        this.selectedOutbreak.id,
+        countQueryBuilder
+      )
+      .pipe(
+        catchError((err) => {
+          this.snackbarService.showApiError(err);
+          return throwError(err);
+        }),
+        share()
+      );
+  }
+
+  /**
      * Delete item
      */
-    deleteSnapshot(cotSnapshotModel: CotSnapshotModel) {
-        this.dialogService
-            .showConfirm('LNG_DIALOG_CONFIRM_DELETE_COT_SNAPSHOT')
-            .subscribe((answer: DialogAnswer) => {
-                if (answer.button === DialogAnswerButton.Yes) {
-                    // delete case
-                    this.transmissionChainDataService
-                        .deleteSnapshot(
-                            this.selectedOutbreak.id,
-                            cotSnapshotModel.id
-                        )
-                        .pipe(
-                            catchError((err) => {
-                                this.snackbarService.showApiError(err);
-                                return throwError(err);
-                            })
-                        )
-                        .subscribe(() => {
-                            // show message
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_ASYNC_COT_ACTION_DELETE_SUCCESS_MESSAGE');
+  deleteSnapshot(cotSnapshotModel: CotSnapshotModel) {
+    this.dialogService
+      .showConfirm('LNG_DIALOG_CONFIRM_DELETE_COT_SNAPSHOT')
+      .subscribe((answer: DialogAnswer) => {
+        if (answer.button === DialogAnswerButton.Yes) {
+          // delete case
+          this.transmissionChainDataService
+            .deleteSnapshot(
+              this.selectedOutbreak.id,
+              cotSnapshotModel.id
+            )
+            .pipe(
+              catchError((err) => {
+                this.snackbarService.showApiError(err);
+                return throwError(err);
+              })
+            )
+            .subscribe(() => {
+              // show message
+              this.snackbarService.showSuccess('LNG_PAGE_LIST_ASYNC_COT_ACTION_DELETE_SUCCESS_MESSAGE');
 
-                            // reload data
-                            this.needsRefreshList(true);
-                        });
-                }
+              // reload data
+              this.needsRefreshList(true);
             });
-    }
+        }
+      });
+  }
 }

@@ -4,6 +4,6 @@ import { SelectedFollowUpDatesComponent } from './selected-follow-up-dates/selec
 
 // export the list of all page components
 export const components: any[] = [
-    SelectedContactsListComponent,
-    SelectedFollowUpDatesComponent
+  SelectedContactsListComponent,
+  SelectedFollowUpDatesComponent
 ];

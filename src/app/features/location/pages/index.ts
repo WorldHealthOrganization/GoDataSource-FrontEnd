@@ -12,8 +12,8 @@ export * from './location-usage-list/location-usage-list.component';
 
 // export the list of all page components
 export const pageComponents: any[] = [
-    LocationsListComponent,
-    CreateLocationComponent,
-    ModifyLocationComponent,
-    LocationUsageListComponent
+  LocationsListComponent,
+  CreateLocationComponent,
+  ModifyLocationComponent,
+  LocationUsageListComponent
 ];

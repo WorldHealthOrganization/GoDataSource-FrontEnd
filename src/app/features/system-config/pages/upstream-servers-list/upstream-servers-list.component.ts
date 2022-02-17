@@ -23,396 +23,396 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
-    selector: 'app-upstream-servers-list',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './upstream-servers-list.component.html',
-    styleUrls: ['./upstream-servers-list.component.less']
+  selector: 'app-upstream-servers-list',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './upstream-servers-list.component.html',
+  styleUrls: ['./upstream-servers-list.component.less']
 })
 export class UpstreamServersListComponent extends ListComponent implements OnInit, OnDestroy {
-    // Breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_TITLE', '.', true)
-    ];
+  // Breadcrumbs
+  breadcrumbs: BreadcrumbItemModel[] = [
+    new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_TITLE', '.', true)
+  ];
 
-    // constants
-    SystemUpstreamServerModel = SystemUpstreamServerModel;
+  // constants
+  SystemUpstreamServerModel = SystemUpstreamServerModel;
 
-    // authenticated user
-    authUser: UserModel;
+  // authenticated user
+  authUser: UserModel;
 
-    // upstream servers
-    upstreamServerList: SystemUpstreamServerModel[] = [];
-    upstreamServerListCount: IBasicCount;
-    upstreamServerListAll: SystemUpstreamServerModel[];
+  // upstream servers
+  upstreamServerList: SystemUpstreamServerModel[] = [];
+  upstreamServerListCount: IBasicCount;
+  upstreamServerListAll: SystemUpstreamServerModel[];
 
-    // sync in progress ?
-    loading: boolean = false;
+  // sync in progress ?
+  loading: boolean = false;
 
-    // settings
-    settings: SystemSettingsModel;
+  // settings
+  settings: SystemSettingsModel;
 
-    // constants
-    UserSettings = UserSettings;
+  // constants
+  UserSettings = UserSettings;
 
-    recordActions: HoverRowAction[] = [
-        // Start sync
-        new HoverRowAction({
-            icon: 'swapVertical',
-            iconTooltip: 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_START_SYNC',
-            click: (item: SystemUpstreamServerModel) => {
-                this.startSync(item);
-            },
-            visible: (): boolean => {
-                return SystemUpstreamServerModel.canSync(this.authUser);
-            }
-        }),
+  recordActions: HoverRowAction[] = [
+    // Start sync
+    new HoverRowAction({
+      icon: 'swapVertical',
+      iconTooltip: 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_START_SYNC',
+      click: (item: SystemUpstreamServerModel) => {
+        this.startSync(item);
+      },
+      visible: (): boolean => {
+        return SystemUpstreamServerModel.canSync(this.authUser);
+      }
+    }),
 
-        // Disable sync
-        new HoverRowAction({
-            icon: 'visibilityOf',
-            iconTooltip: 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_DISABLE_SYNC',
-            click: (item: SystemUpstreamServerModel, handler: HoverRowActionsDirective) => {
-                this.toggleSyncEnableFlag(item);
-                handler.redraw();
-            },
-            visible: (item: SystemUpstreamServerModel): boolean => {
-                return item.syncEnabled &&
+    // Disable sync
+    new HoverRowAction({
+      icon: 'visibilityOf',
+      iconTooltip: 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_DISABLE_SYNC',
+      click: (item: SystemUpstreamServerModel, handler: HoverRowActionsDirective) => {
+        this.toggleSyncEnableFlag(item);
+        handler.redraw();
+      },
+      visible: (item: SystemUpstreamServerModel): boolean => {
+        return item.syncEnabled &&
                     SystemUpstreamServerModel.canDisableSync(this.authUser);
-            }
-        }),
+      }
+    }),
 
-        // Enable sync
-        new HoverRowAction({
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_ENABLE_SYNC',
-            click: (item: SystemUpstreamServerModel, handler: HoverRowActionsDirective) => {
-                this.toggleSyncEnableFlag(item);
-                handler.redraw();
-            },
-            visible: (item: SystemUpstreamServerModel): boolean => {
-                return !item.syncEnabled &&
+    // Enable sync
+    new HoverRowAction({
+      icon: 'visibility',
+      iconTooltip: 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_ENABLE_SYNC',
+      click: (item: SystemUpstreamServerModel, handler: HoverRowActionsDirective) => {
+        this.toggleSyncEnableFlag(item);
+        handler.redraw();
+      },
+      visible: (item: SystemUpstreamServerModel): boolean => {
+        return !item.syncEnabled &&
                     SystemUpstreamServerModel.canEnableSync(this.authUser);
-            }
-        }),
+      }
+    }),
 
-        // Other actions
+    // Other actions
+    new HoverRowAction({
+      type: HoverRowActionType.MENU,
+      icon: 'moreVertical',
+      menuOptions: [
+        // Delete Upstream Server
         new HoverRowAction({
-            type: HoverRowActionType.MENU,
-            icon: 'moreVertical',
-            menuOptions: [
-                // Delete Upstream Server
-                new HoverRowAction({
-                    menuOptionLabel: 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_DELETE_SERVER',
-                    click: (item: SystemUpstreamServerModel) => {
-                        this.deleteUpstreamServer(item);
-                    },
-                    visible: (): boolean => {
-                        return SystemUpstreamServerModel.canDelete(this.authUser);
-                    },
-                    class: 'mat-menu-item-delete'
-                })
-            ]
+          menuOptionLabel: 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_DELETE_SERVER',
+          click: (item: SystemUpstreamServerModel) => {
+            this.deleteUpstreamServer(item);
+          },
+          visible: (): boolean => {
+            return SystemUpstreamServerModel.canDelete(this.authUser);
+          },
+          class: 'mat-menu-item-delete'
         })
-    ];
+      ]
+    })
+  ];
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        protected listHelperService: ListHelperService,
-        private authDataService: AuthDataService,
-        private systemSettingsDataService: SystemSettingsDataService,
-        private snackbarService: SnackbarService,
-        private dialogService: DialogService,
-        private systemSyncDataService: SystemSyncDataService,
-        private systemSyncLogDataService: SystemSyncLogDataService
-    ) {
-        super(listHelperService);
-    }
+  constructor(
+    protected listHelperService: ListHelperService,
+    private authDataService: AuthDataService,
+    private systemSettingsDataService: SystemSettingsDataService,
+    private snackbarService: SnackbarService,
+    private dialogService: DialogService,
+    private systemSyncDataService: SystemSyncDataService,
+    private systemSyncLogDataService: SystemSyncLogDataService
+  ) {
+    super(listHelperService);
+  }
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+  ngOnInit() {
+    // get the authenticated user
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
-        // initialize Side Table Columns
-        this.initializeSideTableColumns();
+    // initialize Side Table Columns
+    this.initializeSideTableColumns();
 
-        // initialize pagination
-        this.initPaginator();
+    // initialize pagination
+    this.initPaginator();
 
-        // retrieve data
-        this.needsRefreshList(true);
-    }
+    // retrieve data
+    this.needsRefreshList(true);
+  }
 
-    /**
+  /**
      * Release resources
      */
-    ngOnDestroy() {
-        // release parent resources
-        super.ngOnDestroy();
-    }
+  ngOnDestroy() {
+    // release parent resources
+    super.ngOnDestroy();
+  }
 
-    /**
+  /**
      * Initialize Side Table Columns
      */
-    initializeSideTableColumns() {
-        // default table columns
-        this.tableColumns = [
-            new VisibleColumnModel({
-                field: 'name',
-                label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_NAME'
-            }),
-            new VisibleColumnModel({
-                field: 'url',
-                label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_URL'
-            }),
-            new VisibleColumnModel({
-                field: 'credentials',
-                label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_CREDENTIALS'
-            }),
-            new VisibleColumnModel({
-                field: 'description',
-                label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_DESCRIPTION'
-            }),
-            new VisibleColumnModel({
-                field: 'timeout',
-                label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_TIMEOUT'
-            }),
-            new VisibleColumnModel({
-                field: 'syncInterval',
-                label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_INTERVAL'
-            }),
-            new VisibleColumnModel({
-                field: 'syncOnEveryChange',
-                label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ON_EVERY_CHANGE'
-            }),
-            new VisibleColumnModel({
-                field: 'syncEnabled',
-                label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ENABLED'
-            })
-        ];
-    }
+  initializeSideTableColumns() {
+    // default table columns
+    this.tableColumns = [
+      new VisibleColumnModel({
+        field: 'name',
+        label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_NAME'
+      }),
+      new VisibleColumnModel({
+        field: 'url',
+        label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_URL'
+      }),
+      new VisibleColumnModel({
+        field: 'credentials',
+        label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_CREDENTIALS'
+      }),
+      new VisibleColumnModel({
+        field: 'description',
+        label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_DESCRIPTION'
+      }),
+      new VisibleColumnModel({
+        field: 'timeout',
+        label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_TIMEOUT'
+      }),
+      new VisibleColumnModel({
+        field: 'syncInterval',
+        label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_INTERVAL'
+      }),
+      new VisibleColumnModel({
+        field: 'syncOnEveryChange',
+        label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ON_EVERY_CHANGE'
+      }),
+      new VisibleColumnModel({
+        field: 'syncEnabled',
+        label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ENABLED'
+      })
+    ];
+  }
 
-    /**
+  /**
      * Refresh list
      */
-    refreshList(finishCallback: (records: any[]) => void) {
-        this.upstreamServerList = [];
-        this.upstreamServerListAll = undefined;
+  refreshList(finishCallback: (records: any[]) => void) {
+    this.upstreamServerList = [];
+    this.upstreamServerListAll = undefined;
+    this.refreshListCount();
+    this.systemSettingsDataService
+      .getSystemSettings()
+      .pipe(
+        catchError((err) => {
+          this.snackbarService.showApiError(err);
+          finishCallback([]);
+          return throwError(err);
+        })
+      )
+      .subscribe((settings: SystemSettingsModel) => {
+        this.settings = settings;
+        this.upstreamServerListAll = _.get(this.settings, 'upstreamServers');
+        this.upstreamServerListAll = this.upstreamServerListAll ? this.upstreamServerListAll : [];
+
+        // display only items from this page
+        if (this.queryBuilder.paginator) {
+          this.upstreamServerList = this.upstreamServerListAll.slice(
+            this.queryBuilder.paginator.skip,
+            this.queryBuilder.paginator.skip + this.queryBuilder.paginator.limit
+          );
+        }
+
+        // refresh the total count
         this.refreshListCount();
-        this.systemSettingsDataService
-            .getSystemSettings()
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    finishCallback([]);
-                    return throwError(err);
-                })
-            )
-            .subscribe((settings: SystemSettingsModel) => {
-                this.settings = settings;
-                this.upstreamServerListAll = _.get(this.settings, 'upstreamServers');
-                this.upstreamServerListAll = this.upstreamServerListAll ? this.upstreamServerListAll : [];
 
-                // display only items from this page
-                if (this.queryBuilder.paginator) {
-                    this.upstreamServerList = this.upstreamServerListAll.slice(
-                        this.queryBuilder.paginator.skip,
-                        this.queryBuilder.paginator.skip + this.queryBuilder.paginator.limit
-                    );
-                }
+        // flag if list is empty
+        this.checkEmptyList(this.upstreamServerList);
 
-                // refresh the total count
-                this.refreshListCount();
+        // finished
+        finishCallback(this.upstreamServerList);
+      });
+  }
 
-                // flag if list is empty
-                this.checkEmptyList(this.upstreamServerList);
-
-                // finished
-                finishCallback(this.upstreamServerList);
-            });
-    }
-
-    /**
+  /**
      * Get total number of items
      */
-    refreshListCount() {
-        this.upstreamServerListCount = {
-            count: this.upstreamServerListAll !== undefined ?
-                this.upstreamServerListAll.length :
-                null
-        };
-    }
+  refreshListCount() {
+    this.upstreamServerListCount = {
+      count: this.upstreamServerListAll !== undefined ?
+        this.upstreamServerListAll.length :
+        null
+    };
+  }
 
-    /**
+  /**
      * Delete record
      * @param item
      */
-    deleteUpstreamServer(upstreamServer: SystemUpstreamServerModel) {
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_SYSTEM_UPSTREAM_SERVER', upstreamServer)
-            .subscribe((answer: DialogAnswer) => {
-                if (answer.button === DialogAnswerButton.Yes) {
-                    this.systemSettingsDataService
-                        .getSystemSettings()
-                        .pipe(
-                            catchError((err) => {
-                                this.snackbarService.showApiError(err);
-                                return throwError(err);
-                            })
-                        )
-                        .subscribe((settings: SystemSettingsModel) => {
-                            // remove upstream server
-                            const upIndex: number = _.findIndex(settings.upstreamServers, { url: upstreamServer.url });
-                            if (upIndex > -1) {
-                                // remove server
-                                settings.upstreamServers.splice(upIndex, 1);
+  deleteUpstreamServer(upstreamServer: SystemUpstreamServerModel) {
+    this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_SYSTEM_UPSTREAM_SERVER', upstreamServer)
+      .subscribe((answer: DialogAnswer) => {
+        if (answer.button === DialogAnswerButton.Yes) {
+          this.systemSettingsDataService
+            .getSystemSettings()
+            .pipe(
+              catchError((err) => {
+                this.snackbarService.showApiError(err);
+                return throwError(err);
+              })
+            )
+            .subscribe((settings: SystemSettingsModel) => {
+              // remove upstream server
+              const upIndex: number = _.findIndex(settings.upstreamServers, { url: upstreamServer.url });
+              if (upIndex > -1) {
+                // remove server
+                settings.upstreamServers.splice(upIndex, 1);
 
-                                // save upstream servers
-                                this.systemSettingsDataService
-                                    .modifySystemSettings({
-                                        upstreamServers: settings.upstreamServers
-                                    })
-                                    .pipe(
-                                        catchError((err) => {
-                                            this.snackbarService.showApiError(err);
-                                            return throwError(err);
-                                        })
-                                    )
-                                    .subscribe(() => {
-                                        // display success message
-                                        this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_DELETE_SUCCESS_MESSAGE');
+                // save upstream servers
+                this.systemSettingsDataService
+                  .modifySystemSettings({
+                    upstreamServers: settings.upstreamServers
+                  })
+                  .pipe(
+                    catchError((err) => {
+                      this.snackbarService.showApiError(err);
+                      return throwError(err);
+                    })
+                  )
+                  .subscribe(() => {
+                    // display success message
+                    this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_DELETE_SUCCESS_MESSAGE');
 
-                                        // refresh
-                                        this.needsRefreshList(true);
-                                    });
-                            } else {
-                                // not found ?
-                                // IGNORE...
-                                this.needsRefreshList(true);
-                            }
-                        });
-                }
+                    // refresh
+                    this.needsRefreshList(true);
+                  });
+              } else {
+                // not found ?
+                // IGNORE...
+                this.needsRefreshList(true);
+              }
             });
-    }
+        }
+      });
+  }
 
-    /**
+  /**
      * Toggle sync enabled flag
      * @param upstreamServer
      */
-    toggleSyncEnableFlag(upstreamServer: SystemUpstreamServerModel) {
-        // toggle flag
-        upstreamServer.syncEnabled = !upstreamServer.syncEnabled;
+  toggleSyncEnableFlag(upstreamServer: SystemUpstreamServerModel) {
+    // toggle flag
+    upstreamServer.syncEnabled = !upstreamServer.syncEnabled;
 
-        // save sync
-        this.systemSettingsDataService
-            .getSystemSettings()
+    // save sync
+    this.systemSettingsDataService
+      .getSystemSettings()
+      .pipe(
+        catchError((err) => {
+          this.snackbarService.showApiError(err);
+          return throwError(err);
+        })
+      )
+      .subscribe((settings: SystemSettingsModel) => {
+        // upstream server
+        const upstreamItem: SystemUpstreamServerModel = _.find(settings.upstreamServers, { url: upstreamServer.url });
+        if (upstreamItem) {
+          // set flag
+          upstreamItem.syncEnabled = upstreamServer.syncEnabled;
+
+          // save upstream servers
+          this.systemSettingsDataService
+            .modifySystemSettings({
+              upstreamServers: settings.upstreamServers
+            })
             .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    return throwError(err);
-                })
+              catchError((err) => {
+                this.snackbarService.showApiError(err);
+                return throwError(err);
+              })
             )
-            .subscribe((settings: SystemSettingsModel) => {
-                // upstream server
-                const upstreamItem: SystemUpstreamServerModel = _.find(settings.upstreamServers, { url: upstreamServer.url });
-                if (upstreamItem) {
-                    // set flag
-                    upstreamItem.syncEnabled = upstreamServer.syncEnabled;
-
-                    // save upstream servers
-                    this.systemSettingsDataService
-                        .modifySystemSettings({
-                            upstreamServers: settings.upstreamServers
-                        })
-                        .pipe(
-                            catchError((err) => {
-                                this.snackbarService.showApiError(err);
-                                return throwError(err);
-                            })
-                        )
-                        .subscribe(() => {
-                            // display success message
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_TOGGLE_SYNC_ENABLED_SUCCESS_MESSAGE');
-                        });
-                } else {
-                    // not found ?
-                    // IGNORE...
-                    this.needsRefreshList(true);
-                }
+            .subscribe(() => {
+              // display success message
+              this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_TOGGLE_SYNC_ENABLED_SUCCESS_MESSAGE');
             });
-    }
+        } else {
+          // not found ?
+          // IGNORE...
+          this.needsRefreshList(true);
+        }
+      });
+  }
 
-    /**
+  /**
      * Start sync
      * @param upstreamServer
      */
-    startSync(upstreamServer: SystemUpstreamServerModel) {
-        // check if sync is done
-        const syncCheckIfDone = (syncLogId: string) => {
-            setTimeout(
-                () => {
-                    // check if backup is ready
-                    this.systemSyncLogDataService
-                        .getSyncLog(syncLogId)
-                        .pipe(
-                            catchError((err) => {
-                                this.loading = false;
-                                this.snackbarService.showApiError(err);
-                                return throwError(err);
-                            })
-                        )
-                        .subscribe((systemSyncLogModel: SystemSyncLogModel) => {
-                            switch (systemSyncLogModel.status) {
-                                // sync ready ?
-                                case Constants.SYSTEM_SYNC_LOG_STATUS.SUCCESS.value:
-                                case Constants.SYSTEM_SYNC_LOG_STATUS.SUCCESS_WITH_WARNINGS.value:
-                                    // display success message
-                                    this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_SYNC_SUCCESS_MESSAGE');
-                                    this.loading = false;
-                                    break;
+  startSync(upstreamServer: SystemUpstreamServerModel) {
+    // check if sync is done
+    const syncCheckIfDone = (syncLogId: string) => {
+      setTimeout(
+        () => {
+          // check if backup is ready
+          this.systemSyncLogDataService
+            .getSyncLog(syncLogId)
+            .pipe(
+              catchError((err) => {
+                this.loading = false;
+                this.snackbarService.showApiError(err);
+                return throwError(err);
+              })
+            )
+            .subscribe((systemSyncLogModel: SystemSyncLogModel) => {
+              switch (systemSyncLogModel.status) {
+                // sync ready ?
+                case Constants.SYSTEM_SYNC_LOG_STATUS.SUCCESS.value:
+                case Constants.SYSTEM_SYNC_LOG_STATUS.SUCCESS_WITH_WARNINGS.value:
+                  // display success message
+                  this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_SYNC_SUCCESS_MESSAGE');
+                  this.loading = false;
+                  break;
 
-                                // sync error ?
-                                case Constants.SYSTEM_SYNC_LOG_STATUS.FAILED.value:
-                                    this.snackbarService.showError('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_SYNC_FAILED_MESSAGE');
-                                    this.loading = false;
-                                    break;
+                  // sync error ?
+                case Constants.SYSTEM_SYNC_LOG_STATUS.FAILED.value:
+                  this.snackbarService.showError('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_SYNC_FAILED_MESSAGE');
+                  this.loading = false;
+                  break;
 
-                                // sync isn't ready ?
-                                // Constants.SYSTEM_SYNC_LOG_STATUS.IN_PROGRESS.value
-                                default:
-                                    syncCheckIfDone(syncLogId);
-                                    break;
-                            }
-                        });
-                },
-                Constants.DEFAULT_FILTER_POOLING_MS_CHECK_AGAIN
-            );
-        };
-
-        // start sync ?
-        this.dialogService
-            .showConfirm('LNG_DIALOG_CONFIRM_DELETE_SYSTEM_UPSTREAM_SYNC_CONFIRMATION', upstreamServer)
-            .subscribe((answer: DialogAnswer) => {
-                if (answer.button === DialogAnswerButton.Yes) {
-                    // start sync
-                    this.loading = true;
-                    this.systemSyncDataService
-                        .sync(upstreamServer.url)
-                        .pipe(
-                            catchError((err) => {
-                                this.loading = false;
-                                this.snackbarService.showApiError(err);
-                                return throwError(err);
-                            })
-                        )
-                        .subscribe((result: SystemSyncModel) => {
-                            syncCheckIfDone(result.syncLogId);
-                        });
-                }
+                  // sync isn't ready ?
+                  // Constants.SYSTEM_SYNC_LOG_STATUS.IN_PROGRESS.value
+                default:
+                  syncCheckIfDone(syncLogId);
+                  break;
+              }
             });
+        },
+        Constants.DEFAULT_FILTER_POOLING_MS_CHECK_AGAIN
+      );
+    };
 
-    }
+    // start sync ?
+    this.dialogService
+      .showConfirm('LNG_DIALOG_CONFIRM_DELETE_SYSTEM_UPSTREAM_SYNC_CONFIRMATION', upstreamServer)
+      .subscribe((answer: DialogAnswer) => {
+        if (answer.button === DialogAnswerButton.Yes) {
+          // start sync
+          this.loading = true;
+          this.systemSyncDataService
+            .sync(upstreamServer.url)
+            .pipe(
+              catchError((err) => {
+                this.loading = false;
+                this.snackbarService.showApiError(err);
+                return throwError(err);
+              })
+            )
+            .subscribe((result: SystemSyncModel) => {
+              syncCheckIfDone(result.syncLogId);
+            });
+        }
+      });
+
+  }
 }

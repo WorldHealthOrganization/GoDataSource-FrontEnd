@@ -9,13 +9,13 @@ import { SharedModule } from '../../shared/shared.module';
 import * as fromPages from './pages';
 
 @NgModule({
-    imports: [
-        routing,
-        SharedModule,
-        FileUploadModule
-    ],
-    declarations: [
-        ...fromPages.pageComponents
-    ]
+  imports: [
+    routing,
+    SharedModule,
+    FileUploadModule
+  ],
+  declarations: [
+    ...fromPages.pageComponents
+  ]
 })
 export class ImportExportDataModule { }

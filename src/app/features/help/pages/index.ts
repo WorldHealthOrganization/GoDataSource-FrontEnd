@@ -20,12 +20,12 @@ export * from './view-help/view-help.component';
 
 // export the list of all page components
 export const pageComponents: any[] = [
-    HelpCategoriesListComponent,
-    CreateHelpCategoryComponent,
-    ModifyHelpCategoryComponent,
-    HelpItemsListComponent,
-    CreateHelpItemComponent,
-    ModifyHelpItemComponent,
-    HelpSearchComponent,
-    ViewHelpComponent
+  HelpCategoriesListComponent,
+  CreateHelpCategoryComponent,
+  ModifyHelpCategoryComponent,
+  HelpItemsListComponent,
+  CreateHelpItemComponent,
+  ModifyHelpItemComponent,
+  HelpSearchComponent,
+  ViewHelpComponent
 ];

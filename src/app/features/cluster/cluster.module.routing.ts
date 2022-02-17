@@ -7,70 +7,70 @@ import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 
 const routes: Routes = [
-    // Clusters list
-    {
-        path: '',
-        component: fromPages.ClustersListComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [
-                PERMISSION.CLUSTER_LIST
-            ]
-        }
-    },
-    // Create Cluster
-    {
-        path: 'create',
-        component: fromPages.CreateClusterComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [
-                PERMISSION.CLUSTER_CREATE
-            ]
-        },
-        canDeactivate: [
-            PageChangeConfirmationGuard
-        ]
-    },
-    // View Cluster
-    {
-        path: ':clusterId/view',
-        component: fromPages.ModifyClusterComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [
-                PERMISSION.CLUSTER_VIEW
-            ],
-            action: ViewModifyComponentAction.VIEW
-        }
-    },
-    // Edit Cluster
-    {
-        path: ':clusterId/modify',
-        component: fromPages.ModifyClusterComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [
-                PERMISSION.CLUSTER_VIEW,
-                PERMISSION.CLUSTER_MODIFY
-            ],
-            action: ViewModifyComponentAction.MODIFY
-        },
-        canDeactivate: [
-            PageChangeConfirmationGuard
-        ]
-    },
-    // View clusters people
-    {
-        path: ':clusterId/people',
-        component: fromPages.ClustersPeopleListComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [
-                PERMISSION.CLUSTER_LIST_PEOPLE
-            ]
-        }
+  // Clusters list
+  {
+    path: '',
+    component: fromPages.ClustersListComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.CLUSTER_LIST
+      ]
     }
+  },
+  // Create Cluster
+  {
+    path: 'create',
+    component: fromPages.CreateClusterComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.CLUSTER_CREATE
+      ]
+    },
+    canDeactivate: [
+      PageChangeConfirmationGuard
+    ]
+  },
+  // View Cluster
+  {
+    path: ':clusterId/view',
+    component: fromPages.ModifyClusterComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.CLUSTER_VIEW
+      ],
+      action: ViewModifyComponentAction.VIEW
+    }
+  },
+  // Edit Cluster
+  {
+    path: ':clusterId/modify',
+    component: fromPages.ModifyClusterComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.CLUSTER_VIEW,
+        PERMISSION.CLUSTER_MODIFY
+      ],
+      action: ViewModifyComponentAction.MODIFY
+    },
+    canDeactivate: [
+      PageChangeConfirmationGuard
+    ]
+  },
+  // View clusters people
+  {
+    path: ':clusterId/people',
+    component: fromPages.ClustersPeopleListComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.CLUSTER_LIST_PEOPLE
+      ]
+    }
+  }
 ];
 
 export const routing: ModuleWithProviders<RouterModule> = RouterModule.forChild(routes);

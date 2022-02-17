@@ -12,17 +12,17 @@ import * as fromComponents from './components';
 import * as fromServices from './services';
 
 @NgModule({
-    imports: [
-        routing,
-        SharedModule
-    ],
-    declarations: [
-        ...fromPages.pageComponents,
-        ...fromComponents.components
-    ],
-    providers: [
-        ...fromServices.services
-    ]
+  imports: [
+    routing,
+    SharedModule
+  ],
+  declarations: [
+    ...fromPages.pageComponents,
+    ...fromComponents.components
+  ],
+  providers: [
+    ...fromServices.services
+  ]
 })
 export class D3GraphsModule {
 }

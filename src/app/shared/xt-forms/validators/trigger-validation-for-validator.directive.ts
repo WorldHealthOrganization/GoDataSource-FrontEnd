@@ -6,31 +6,31 @@ import { Validator, AbstractControl, NG_VALIDATORS } from '@angular/forms';
  *  the validations for other (target) elements within the same form
  */
 @Directive({
-    selector: '[app-trigger-validation-for][ngModel]',
-    providers: [
-        {
-            provide: NG_VALIDATORS,
-            useExisting: forwardRef(() => TriggerValidationForValidatorDirective),
-            multi: true
-        }
-    ]
+  selector: '[app-trigger-validation-for][ngModel]',
+  providers: [
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => TriggerValidationForValidatorDirective),
+      multi: true
+    }
+  ]
 })
 export class TriggerValidationForValidatorDirective implements Validator {
-    constructor(
-        @Attribute('app-trigger-validation-for') public target: string
-    ) {
+  constructor(
+    @Attribute('app-trigger-validation-for') public target: string
+  ) {
+  }
+
+  validate(control: AbstractControl): { [key: string]: any } {
+
+    // get the target control
+    const targetControl = control.root.get(this.target);
+
+    // trigger validation
+    if (targetControl) {
+      targetControl.updateValueAndValidity();
     }
 
-    validate(control: AbstractControl): { [key: string]: any } {
-
-        // get the target control
-        const targetControl = control.root.get(this.target);
-
-        // trigger validation
-        if (targetControl) {
-            targetControl.updateValueAndValidity();
-        }
-
-        return null;
-    }
+    return null;
+  }
 }
