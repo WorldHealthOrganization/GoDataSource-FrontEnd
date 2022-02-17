@@ -96,8 +96,3 @@ Use the IDE of your choice (Webstorm recommended).
 8. If you want to remove a Language Token that is not being used (anymore), just add a comment in "english_us.ts" and it will be taken into account when merging the file with the API translations (see item #6 from above).
 
 ### Known issues
-
-1. **numbro** npm package must be limited to version **2.1.1** in **package.json** file. It is a dependency of **handsontable** npm package which, by default, installs a newer version which triggers an error in production environment when using cells of type Number (e.g. age Years/Months):
-```
-Uncaught RangeError: toFixed() digits argument must be between 0 and 100
-``` 
