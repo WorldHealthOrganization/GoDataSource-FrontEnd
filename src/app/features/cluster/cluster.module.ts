@@ -8,14 +8,14 @@ import * as fromPages from './pages';
 
 
 @NgModule({
-    imports: [
-        routing,
-        ColorPickerModule,
-        SharedModule
-    ],
-    declarations: [
-        ...fromPages.pageComponents
-    ]
+  imports: [
+    routing,
+    ColorPickerModule,
+    SharedModule
+  ],
+  declarations: [
+    ...fromPages.pageComponents
+  ]
 })
 export class ClusterModule {
 }

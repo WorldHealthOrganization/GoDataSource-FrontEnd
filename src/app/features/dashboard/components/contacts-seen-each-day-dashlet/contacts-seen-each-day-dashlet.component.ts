@@ -9,93 +9,93 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { ContactModel } from '../../../../core/models/contact.model';
 
 @Component({
-    selector: 'app-contacts-seen-each-day-dashlet',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './contacts-seen-each-day-dashlet.component.html',
-    styleUrls: ['./contacts-seen-each-day-dashlet.component.less']
+  selector: 'app-contacts-seen-each-day-dashlet',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './contacts-seen-each-day-dashlet.component.html',
+  styleUrls: ['./contacts-seen-each-day-dashlet.component.less']
 })
 export class ContactsSeenEachDayDashletComponent extends DashletComponent implements OnInit, OnDestroy {
-    // number of contacts seen each day
-    contactsSeenEachDay: number;
+  // number of contacts seen each day
+  contactsSeenEachDay: number;
 
-    // params
-    queryParams: any = {
-        applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_SEEN,
-        [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true
-    };
+  // params
+  queryParams: any = {
+    applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_SEEN,
+    [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true
+  };
 
-    // for which date do we display data ?
-    dataForDate: Moment = moment();
+  // for which date do we display data ?
+  dataForDate: Moment = moment();
 
-    // constants to be used for applyListFilter
-    Constants = Constants;
-    ContactModel = ContactModel;
+  // constants to be used for applyListFilter
+  Constants = Constants;
+  ContactModel = ContactModel;
 
-    // loading data
-    displayLoading: boolean = false;
+  // loading data
+  displayLoading: boolean = false;
 
-    // subscribers
-    previousSubscriber: Subscription;
+  // subscribers
+  previousSubscriber: Subscription;
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        protected listFilterDataService: ListFilterDataService,
-        protected authDataService: AuthDataService
-    ) {
-        super(
-            listFilterDataService,
-            authDataService
-        );
-    }
+  constructor(
+    protected listFilterDataService: ListFilterDataService,
+    protected authDataService: AuthDataService
+  ) {
+    super(
+      listFilterDataService,
+      authDataService
+    );
+  }
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        this.refreshDataCaller.call();
-    }
+  ngOnInit() {
+    this.refreshDataCaller.call();
+  }
 
-    /**
+  /**
      * Component destroyed
      */
-    ngOnDestroy() {
-        // release previous subscriber
-        if (this.previousSubscriber) {
-            this.previousSubscriber.unsubscribe();
-            this.previousSubscriber = null;
-        }
-
-        // parent subscribers
-        this.releaseSubscribers();
+  ngOnDestroy() {
+    // release previous subscriber
+    if (this.previousSubscriber) {
+      this.previousSubscriber.unsubscribe();
+      this.previousSubscriber = null;
     }
 
-    /**
+    // parent subscribers
+    this.releaseSubscribers();
+  }
+
+  /**
      * Refresh data
      */
-    refreshData() {
-        // release previous subscriber
-        if (this.previousSubscriber) {
-            this.previousSubscriber.unsubscribe();
-            this.previousSubscriber = null;
-        }
-
-        // update date
-        this.dataForDate = this.globalFilterDate ?
-            this.globalFilterDate.clone() :
-            moment();
-
-        this.displayLoading = true;
-        this.previousSubscriber = this.listFilterDataService
-            .filterContactsSeen(
-                this.globalFilterDate,
-                this.globalFilterLocationId,
-                this.globalFilterClassificationId
-            )
-            .subscribe((result: MetricContactsSeenEachDays) => {
-                this.contactsSeenEachDay = result.contactsSeenCount;
-                this.displayLoading = false;
-            });
+  refreshData() {
+    // release previous subscriber
+    if (this.previousSubscriber) {
+      this.previousSubscriber.unsubscribe();
+      this.previousSubscriber = null;
     }
+
+    // update date
+    this.dataForDate = this.globalFilterDate ?
+      this.globalFilterDate.clone() :
+      moment();
+
+    this.displayLoading = true;
+    this.previousSubscriber = this.listFilterDataService
+      .filterContactsSeen(
+        this.globalFilterDate,
+        this.globalFilterLocationId,
+        this.globalFilterClassificationId
+      )
+      .subscribe((result: MetricContactsSeenEachDays) => {
+        this.contactsSeenEachDay = result.contactsSeenCount;
+        this.displayLoading = false;
+      });
+  }
 }

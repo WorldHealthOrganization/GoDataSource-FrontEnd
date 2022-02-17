@@ -22,8 +22,8 @@ import { FollowUpPage } from '../../typings/follow-up-page';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import {
-    catchError,
-    share
+  catchError,
+  share
 } from 'rxjs/operators';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -31,377 +31,377 @@ import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 
 @Component({
-    selector: 'app-modify-follow-up',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './modify-contact-follow-up.component.html',
-    styleUrls: ['./modify-contact-follow-up.component.less']
+  selector: 'app-modify-follow-up',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './modify-contact-follow-up.component.html',
+  styleUrls: ['./modify-contact-follow-up.component.less']
 })
 export class ModifyContactFollowUpComponent extends ViewModifyComponent implements OnInit {
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs
+  breadcrumbs: BreadcrumbItemModel[] = [];
 
-    // authenticated user
-    authUser: UserModel;
-    // selected outbreak
-    selectedOutbreak: OutbreakModel;
-    // route params
-    contactId: string;
-    followUpId: string;
-    // root follow-ups list page
-    rootPage: FollowUpPage;
-    // when user came from the list of follow-ups of contacts that are related to a case
-    rootCaseId: string;
-    rootCaseData: CaseModel;
+  // authenticated user
+  authUser: UserModel;
+  // selected outbreak
+  selectedOutbreak: OutbreakModel;
+  // route params
+  contactId: string;
+  followUpId: string;
+  // root follow-ups list page
+  rootPage: FollowUpPage;
+  // when user came from the list of follow-ups of contacts that are related to a case
+  rootCaseId: string;
+  rootCaseData: CaseModel;
 
-    followUpData: FollowUpModel = new FollowUpModel();
-    relatedPersonData: ContactModel | CaseModel;
+  followUpData: FollowUpModel = new FollowUpModel();
+  relatedPersonData: ContactModel | CaseModel;
 
-    teamsList$: Observable<TeamModel[]>;
-    dailyStatusTypeOptions$: Observable<any[]>;
-    userList$: Observable<UserModel[]>;
+  teamsList$: Observable<TeamModel[]>;
+  dailyStatusTypeOptions$: Observable<any[]>;
+  userList$: Observable<UserModel[]>;
 
-    // provide constants to template
-    Constants = Constants;
-    FollowUpModel = FollowUpModel;
-    ContactModel = ContactModel;
-    CaseModel = CaseModel;
-    EntityType = EntityType;
-    UserModel = UserModel;
+  // provide constants to template
+  Constants = Constants;
+  FollowUpModel = FollowUpModel;
+  ContactModel = ContactModel;
+  CaseModel = CaseModel;
+  EntityType = EntityType;
+  UserModel = UserModel;
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        private router: Router,
-        protected route: ActivatedRoute,
-        private caseDataService: CaseDataService,
-        private outbreakDataService: OutbreakDataService,
-        private snackbarService: SnackbarService,
-        private formHelper: FormHelperService,
-        private followUpsDataService: FollowUpsDataService,
-        private authDataService: AuthDataService,
-        private referenceDataDataService: ReferenceDataDataService,
-        private teamDataService: TeamDataService,
-        protected dialogService: DialogService,
-        private userDataService: UserDataService
-    ) {
-        super(
-            route,
-            dialogService
-        );
-    }
+  constructor(
+    private router: Router,
+    protected route: ActivatedRoute,
+    private caseDataService: CaseDataService,
+    private outbreakDataService: OutbreakDataService,
+    private snackbarService: SnackbarService,
+    private formHelper: FormHelperService,
+    private followUpsDataService: FollowUpsDataService,
+    private authDataService: AuthDataService,
+    private referenceDataDataService: ReferenceDataDataService,
+    private teamDataService: TeamDataService,
+    protected dialogService: DialogService,
+    private userDataService: UserDataService
+  ) {
+    super(
+      route,
+      dialogService
+    );
+  }
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+  ngOnInit() {
+    // get the authenticated user
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
-        // get users only if we're allowed to
-        if (UserModel.canList(this.authUser)) {
-            this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
-        }
-
-        this.teamsList$ = this.teamDataService.getTeamsList();
-        this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
-
-        // show loading
-        this.showLoadingDialog(false);
-
-        // read route query params
-        this.route.queryParams
-            .subscribe((queryParams: { rootPage: FollowUpPage, rootCaseId: string }) => {
-                this.rootPage = queryParams.rootPage;
-                this.rootCaseId = queryParams.rootCaseId;
-
-                this.loadRootCase();
-                this.initializeBreadcrumbs();
-            });
-
-        // read route params
-        this.route.params
-            .subscribe((params: { contactId, followUpId }) => {
-                this.contactId = params.contactId;
-                this.followUpId = params.followUpId;
-
-                this.loadFollowUp();
-            });
-
-        this.outbreakDataService
-            .getSelectedOutbreak()
-            .subscribe((selectedOutbreak: OutbreakModel) => {
-                this.selectedOutbreak = selectedOutbreak;
-
-                this.loadFollowUp();
-                this.loadRootCase();
-            });
+    // get users only if we're allowed to
+    if (UserModel.canList(this.authUser)) {
+      this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
     }
 
-    /**
+    this.teamsList$ = this.teamDataService.getTeamsList();
+    this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
+
+    // show loading
+    this.showLoadingDialog(false);
+
+    // read route query params
+    this.route.queryParams
+      .subscribe((queryParams: { rootPage: FollowUpPage, rootCaseId: string }) => {
+        this.rootPage = queryParams.rootPage;
+        this.rootCaseId = queryParams.rootCaseId;
+
+        this.loadRootCase();
+        this.initializeBreadcrumbs();
+      });
+
+    // read route params
+    this.route.params
+      .subscribe((params: { contactId, followUpId }) => {
+        this.contactId = params.contactId;
+        this.followUpId = params.followUpId;
+
+        this.loadFollowUp();
+      });
+
+    this.outbreakDataService
+      .getSelectedOutbreak()
+      .subscribe((selectedOutbreak: OutbreakModel) => {
+        this.selectedOutbreak = selectedOutbreak;
+
+        this.loadFollowUp();
+        this.loadRootCase();
+      });
+  }
+
+  /**
      * Load root case
      */
-    private loadRootCase() {
-        if (
-            this.rootCaseId &&
+  private loadRootCase() {
+    if (
+      this.rootCaseId &&
             this.selectedOutbreak
-        ) {
-            // retrieve root case information
-            this.caseDataService
-                .getCase(this.selectedOutbreak.id, this.rootCaseId)
-                .pipe(
-                    catchError((err) => {
-                        // show error message
-                        this.snackbarService.showApiError(err);
+    ) {
+      // retrieve root case information
+      this.caseDataService
+        .getCase(this.selectedOutbreak.id, this.rootCaseId)
+        .pipe(
+          catchError((err) => {
+            // show error message
+            this.snackbarService.showApiError(err);
 
-                        // redirect
-                        this.disableDirtyConfirm();
-                        this.router.navigate([this.rootPageUrl]);
+            // redirect
+            this.disableDirtyConfirm();
+            this.router.navigate([this.rootPageUrl]);
 
-                        return throwError(err);
-                    })
-                )
-                .subscribe((caseData) => {
-                    this.rootCaseData = caseData;
+            return throwError(err);
+          })
+        )
+        .subscribe((caseData) => {
+          this.rootCaseData = caseData;
 
-                    this.initializeBreadcrumbs();
-                });
-        }
+          this.initializeBreadcrumbs();
+        });
     }
+  }
 
-    /**
+  /**
      * Load follow-up
      */
-    private loadFollowUp() {
-        if (
-            this.contactId &&
+  private loadFollowUp() {
+    if (
+      this.contactId &&
             this.followUpId &&
             this.selectedOutbreak &&
             this.selectedOutbreak.id
-        ) {
-            // show loading
-            this.showLoadingDialog(false);
+    ) {
+      // show loading
+      this.showLoadingDialog(false);
 
-            // retrieve follow-up information
-            this.followUpsDataService
-                .getFollowUp(this.selectedOutbreak.id, this.followUpId, true)
-                .pipe(
-                    catchError((err) => {
-                        // show error message
-                        this.snackbarService.showApiError(err);
+      // retrieve follow-up information
+      this.followUpsDataService
+        .getFollowUp(this.selectedOutbreak.id, this.followUpId, true)
+        .pipe(
+          catchError((err) => {
+            // show error message
+            this.snackbarService.showApiError(err);
 
-                        // redirect
-                        this.disableDirtyConfirm();
-                        this.router.navigate([this.rootPageUrl]);
+            // redirect
+            this.disableDirtyConfirm();
+            this.router.navigate([this.rootPageUrl]);
 
-                        // hide loading
-                        this.hideLoadingDialog();
+            // hide loading
+            this.hideLoadingDialog();
 
-                        return throwError(err);
-                    })
-                )
-                .subscribe((followUpData: FollowUpModel) => {
-                    this.followUpData = new FollowUpModel(followUpData);
-                    this.relatedPersonData = followUpData.person;
+            return throwError(err);
+          })
+        )
+        .subscribe((followUpData: FollowUpModel) => {
+          this.followUpData = new FollowUpModel(followUpData);
+          this.relatedPersonData = followUpData.person;
 
-                    this.initializeBreadcrumbs();
+          this.initializeBreadcrumbs();
 
-                    // hide loading
-                    this.hideLoadingDialog();
-                });
-        }
+          // hide loading
+          this.hideLoadingDialog();
+        });
     }
+  }
 
-    /**
+  /**
      * Initialize breadcrumbs
      */
-    initializeBreadcrumbs() {
-        // reset
-        this.breadcrumbs = [];
+  initializeBreadcrumbs() {
+    // reset
+    this.breadcrumbs = [];
 
-        // do we have follow-up data
-        if (
-            this.followUpData &&
+    // do we have follow-up data
+    if (
+      this.followUpData &&
             this.followUpData.id
-        ) {
-            switch (this.rootPage) {
-                case FollowUpPage.FOR_CONTACT:
-                    // contacts list page
-                    if (ContactModel.canList(this.authUser)) {
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-                        );
-                    }
+    ) {
+      switch (this.rootPage) {
+        case FollowUpPage.FOR_CONTACT:
+          // contacts list page
+          if (ContactModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+              new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+            );
+          }
 
-                    // contacts view page
-                    if (ContactModel.canView(this.authUser)) {
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel(this.followUpData.person.name, `/contacts/${this.followUpData.person.id}/view`)
-                        );
-                    }
+          // contacts view page
+          if (ContactModel.canView(this.authUser)) {
+            this.breadcrumbs.push(
+              new BreadcrumbItemModel(this.followUpData.person.name, `/contacts/${this.followUpData.person.id}/view`)
+            );
+          }
 
-                    // follow-ups list page
-                    if (FollowUpModel.canList(this.authUser)) {
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', this.rootPageUrl)
-                        );
-                    }
+          // follow-ups list page
+          if (FollowUpModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+              new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', this.rootPageUrl)
+            );
+          }
 
-                    // finished
-                    break;
+          // finished
+          break;
 
-                case FollowUpPage.CASE_RELATED:
-                    // cases list page
-                    if (CaseModel.canList(this.authUser)) {
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
-                        );
-                    }
+        case FollowUpPage.CASE_RELATED:
+          // cases list page
+          if (CaseModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+              new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
+            );
+          }
 
-                    // case view page
-                    if (
-                        this.rootCaseData &&
+          // case view page
+          if (
+            this.rootCaseData &&
                         CaseModel.canView(this.authUser)
-                    ) {
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel(this.rootCaseData.name, `/cases/${this.rootCaseId}/view`)
-                        );
-                    }
+          ) {
+            this.breadcrumbs.push(
+              new BreadcrumbItemModel(this.rootCaseData.name, `/cases/${this.rootCaseId}/view`)
+            );
+          }
 
-                    // follow-ups related list page
-                    if (FollowUpModel.canList(this.authUser)) {
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_FOR_RELATED_CONTACTS_TITLE', this.rootPageUrl)
-                        );
-                    }
+          // follow-ups related list page
+          if (FollowUpModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+              new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_FOR_RELATED_CONTACTS_TITLE', this.rootPageUrl)
+            );
+          }
 
-                    // finished
-                    break;
+          // finished
+          break;
 
-                case FollowUpPage.RANGE:
-                    // contacts list page
-                    if (ContactModel.canList(this.authUser)) {
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-                        );
-                    }
+        case FollowUpPage.RANGE:
+          // contacts list page
+          if (ContactModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+              new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+            );
+          }
 
-                    // follow-ups range list page
-                    if (FollowUpModel.canListDashboard(this.authUser)) {
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', this.rootPageUrl)
-                        );
-                    }
+          // follow-ups range list page
+          if (FollowUpModel.canListDashboard(this.authUser)) {
+            this.breadcrumbs.push(
+              new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', this.rootPageUrl)
+            );
+          }
 
-                    // finished
-                    break;
+          // finished
+          break;
 
-                default:
-                    // contacts list page
-                    if (ContactModel.canList(this.authUser)) {
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-                        );
-                    }
+        default:
+          // contacts list page
+          if (ContactModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+              new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+            );
+          }
 
-                    // follow-ups list page
-                    if (FollowUpModel.canList(this.authUser)) {
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel(
-                                this.history ? 'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE' : 'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
-                                this.rootPageUrl
-                            )
-                        );
-                    }
+          // follow-ups list page
+          if (FollowUpModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+              new BreadcrumbItemModel(
+                this.history ? 'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE' : 'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
+                this.rootPageUrl
+              )
+            );
+          }
 
-                    // finished
-                    break;
-            }
-        }
-
-        // add breadcrumb for current page
-        this.breadcrumbs.push(
-            new BreadcrumbItemModel(
-                this.viewOnly ? 'LNG_PAGE_VIEW_FOLLOW_UP_TITLE' : 'LNG_PAGE_MODIFY_FOLLOW_UP_TITLE',
-                '.',
-                true,
-                {},
-                this.followUpData ? {
-                    ...this.followUpData, ...{
-                        dateFormatted: moment(this.followUpData.date).format('YYYY-MM-DD')
-                    }
-                } : {}
-            )
-        );
+          // finished
+          break;
+      }
     }
 
-    get rootPageUrl(): string {
-        switch (this.rootPage) {
-            case FollowUpPage.FOR_CONTACT:
-                return `/contacts/contact-related-follow-ups/${this.contactId}`;
+    // add breadcrumb for current page
+    this.breadcrumbs.push(
+      new BreadcrumbItemModel(
+        this.viewOnly ? 'LNG_PAGE_VIEW_FOLLOW_UP_TITLE' : 'LNG_PAGE_MODIFY_FOLLOW_UP_TITLE',
+        '.',
+        true,
+        {},
+        this.followUpData ? {
+          ...this.followUpData, ...{
+            dateFormatted: moment(this.followUpData.date).format('YYYY-MM-DD')
+          }
+        } : {}
+      )
+    );
+  }
 
-            case FollowUpPage.CASE_RELATED:
-                return `/contacts/case-related-follow-ups/${this.rootCaseId}`;
+  get rootPageUrl(): string {
+    switch (this.rootPage) {
+      case FollowUpPage.FOR_CONTACT:
+        return `/contacts/contact-related-follow-ups/${this.contactId}`;
 
-            case FollowUpPage.RANGE:
-                return '/contacts/range-follow-ups';
+      case FollowUpPage.CASE_RELATED:
+        return `/contacts/case-related-follow-ups/${this.rootCaseId}`;
 
-            case FollowUpPage.DAILY:
-            default:
-                return this.history ? `/contacts/case-follow-ups/${this.contactId}` : '/contacts/follow-ups';
-        }
+      case FollowUpPage.RANGE:
+        return '/contacts/range-follow-ups';
+
+      case FollowUpPage.DAILY:
+      default:
+        return this.history ? `/contacts/case-follow-ups/${this.contactId}` : '/contacts/follow-ups';
     }
+  }
 
-    /**
+  /**
      * Modify Follow-up
      * @param {NgForm[]} stepForms
      */
-    modifyFollowUp(form: NgForm) {
-        // retrieve changed fields
-        const dirtyFields: any = this.formHelper.getDirtyFields(form);
+  modifyFollowUp(form: NgForm) {
+    // retrieve changed fields
+    const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
-        // validate fields
-        if (!this.formHelper.validateForm(form)) {
-            return;
-        }
-
-        // show loading
-        this.showLoadingDialog();
-
-        // modify follow-up
-        this.followUpsDataService
-            .modifyFollowUp(
-                this.selectedOutbreak.id,
-                this.followUpData.personId,
-                this.followUpData.id,
-                dirtyFields,
-                true
-            )
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    // hide loading
-                    this.hideLoadingDialog();
-                    return throwError(err);
-                })
-            )
-            .subscribe((followUpData) => {
-                // update model
-                const contact = this.followUpData.person;
-                this.followUpData = followUpData;
-                this.followUpData.person = contact;
-
-                // mark form as pristine
-                form.form.markAsPristine();
-
-                // display message
-                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE');
-
-                // update breadcrumb
-                this.initializeBreadcrumbs();
-
-                // hide loading
-                this.hideLoadingDialog();
-            });
+    // validate fields
+    if (!this.formHelper.validateForm(form)) {
+      return;
     }
+
+    // show loading
+    this.showLoadingDialog();
+
+    // modify follow-up
+    this.followUpsDataService
+      .modifyFollowUp(
+        this.selectedOutbreak.id,
+        this.followUpData.personId,
+        this.followUpData.id,
+        dirtyFields,
+        true
+      )
+      .pipe(
+        catchError((err) => {
+          this.snackbarService.showApiError(err);
+          // hide loading
+          this.hideLoadingDialog();
+          return throwError(err);
+        })
+      )
+      .subscribe((followUpData) => {
+        // update model
+        const contact = this.followUpData.person;
+        this.followUpData = followUpData;
+        this.followUpData.person = contact;
+
+        // mark form as pristine
+        form.form.markAsPristine();
+
+        // display message
+        this.snackbarService.showSuccess('LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE');
+
+        // update breadcrumb
+        this.initializeBreadcrumbs();
+
+        // hide loading
+        this.hideLoadingDialog();
+      });
+  }
 }

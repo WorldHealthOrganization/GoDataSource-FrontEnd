@@ -12,8 +12,8 @@ import * as _ from 'lodash';
 import { AddressType } from '../../../../core/models/address.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import {
-    catchError,
-    share
+  catchError,
+  share
 } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
@@ -25,131 +25,131 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { Observable } from 'rxjs/index';
 
 @Component({
-    selector: 'app-create-event',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './create-event.component.html',
-    styleUrls: ['./create-event.component.less']
+  selector: 'app-create-event',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './create-event.component.html',
+  styleUrls: ['./create-event.component.less']
 })
 export class CreateEventComponent
-    extends CreateConfirmOnChanges
-    implements OnInit {
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [];
+  extends CreateConfirmOnChanges
+  implements OnInit {
+  // breadcrumbs
+  breadcrumbs: BreadcrumbItemModel[] = [];
 
-    // selected outbreak ID
-    outbreakId: string;
+  // selected outbreak ID
+  outbreakId: string;
 
-    eventData: EventModel = new EventModel();
+  eventData: EventModel = new EventModel();
 
-    userList$: Observable<UserModel[]>;
+  userList$: Observable<UserModel[]>;
 
-    serverToday: Moment = moment();
+  serverToday: Moment = moment();
 
-    // authenticated user details
-    authUser: UserModel;
+  // authenticated user details
+  authUser: UserModel;
 
-    // constants
-    UserModel = UserModel;
+  // constants
+  UserModel = UserModel;
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        private router: Router,
-        private eventDataService: EventDataService,
-        private outbreakDataService: OutbreakDataService,
-        private snackbarService: SnackbarService,
-        private formHelper: FormHelperService,
-        private dialogService: DialogService,
-        private authDataService: AuthDataService,
-        private redirectService: RedirectService,
-        private userDataService: UserDataService
-    ) {
-        super();
-    }
+  constructor(
+    private router: Router,
+    private eventDataService: EventDataService,
+    private outbreakDataService: OutbreakDataService,
+    private snackbarService: SnackbarService,
+    private formHelper: FormHelperService,
+    private dialogService: DialogService,
+    private authDataService: AuthDataService,
+    private redirectService: RedirectService,
+    private userDataService: UserDataService
+  ) {
+    super();
+  }
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+  ngOnInit() {
+    // get the authenticated user
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
-        // get users only if we're allowed to
-        if (UserModel.canList(this.authUser)) {
-            this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
-        }
-
-        // get selected outbreak
-        this.outbreakDataService
-            .getSelectedOutbreak()
-            .subscribe((selectedOutbreak: OutbreakModel) => {
-                this.outbreakId = selectedOutbreak.id;
-            });
-
-        // pre-set the initial address as "current address"
-        this.eventData.address.typeId = AddressType.CURRENT_ADDRESS;
-
-        // initialize breadcrumbs
-        this.initializeBreadcrumbs();
+    // get users only if we're allowed to
+    if (UserModel.canList(this.authUser)) {
+      this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
     }
 
-    /**
+    // get selected outbreak
+    this.outbreakDataService
+      .getSelectedOutbreak()
+      .subscribe((selectedOutbreak: OutbreakModel) => {
+        this.outbreakId = selectedOutbreak.id;
+      });
+
+    // pre-set the initial address as "current address"
+    this.eventData.address.typeId = AddressType.CURRENT_ADDRESS;
+
+    // initialize breadcrumbs
+    this.initializeBreadcrumbs();
+  }
+
+  /**
      * Initialize breadcrumbs
      */
-    private initializeBreadcrumbs() {
-        // reset
-        this.breadcrumbs = [];
+  private initializeBreadcrumbs() {
+    // reset
+    this.breadcrumbs = [];
 
-        // add list breadcrumb only if we have permission
-        if (EventModel.canList(this.authUser)) {
-            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events'));
-        }
-
-        // create breadcrumb
-        this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_EVENT_TITLE', '.', true));
+    // add list breadcrumb only if we have permission
+    if (EventModel.canList(this.authUser)) {
+      this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events'));
     }
 
-    /**
+    // create breadcrumb
+    this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_EVENT_TITLE', '.', true));
+  }
+
+  /**
      * Create Event
      * @param {NgForm[]} stepForms
      */
-    createNewEvent(stepForms: NgForm[]) {
-        // get forms fields
-        const dirtyFields: any = this.formHelper.mergeFields(stepForms);
+  createNewEvent(stepForms: NgForm[]) {
+    // get forms fields
+    const dirtyFields: any = this.formHelper.mergeFields(stepForms);
 
-        if (
-            this.formHelper.isFormsSetValid(stepForms) &&
+    if (
+      this.formHelper.isFormsSetValid(stepForms) &&
             !_.isEmpty(dirtyFields)
-        ) {
-            // add the new Event
-            const loadingDialog = this.dialogService.showLoadingDialog();
-            this.eventDataService
-                .createEvent(this.outbreakId, dirtyFields)
-                .pipe(
-                    catchError((err) => {
-                        this.snackbarService.showApiError(err);
-                        loadingDialog.close();
-                        return throwError(err);
-                    })
-                )
-                .subscribe((newEvent: EventModel) => {
-                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_SUCCESS_MESSAGE');
+    ) {
+      // add the new Event
+      const loadingDialog = this.dialogService.showLoadingDialog();
+      this.eventDataService
+        .createEvent(this.outbreakId, dirtyFields)
+        .pipe(
+          catchError((err) => {
+            this.snackbarService.showApiError(err);
+            loadingDialog.close();
+            return throwError(err);
+          })
+        )
+        .subscribe((newEvent: EventModel) => {
+          this.snackbarService.showSuccess('LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_SUCCESS_MESSAGE');
 
-                    // hide dialog
-                    loadingDialog.close();
+          // hide dialog
+          loadingDialog.close();
 
-                    // navigate to proper page
-                    // method handles disableDirtyConfirm too...
-                    this.redirectToProperPageAfterCreate(
-                        this.router,
-                        this.redirectService,
-                        this.authUser,
-                        EventModel,
-                        'events',
-                        newEvent.id
-                    );
-                });
-        }
+          // navigate to proper page
+          // method handles disableDirtyConfirm too...
+          this.redirectToProperPageAfterCreate(
+            this.router,
+            this.redirectService,
+            this.authUser,
+            EventModel,
+            'events',
+            newEvent.id
+          );
+        });
     }
+  }
 }

@@ -17,14 +17,14 @@ export * from './bulk-modify-contacts-of-contacts/bulk-modify-contacts-of-contac
 
 // export the list of all page components
 export const pageComponents: any[] = [
-    ContactsOfContactsListComponent,
-    CreateContactOfContactComponent,
-    ModifyContactOfContactComponent,
+  ContactsOfContactsListComponent,
+  CreateContactOfContactComponent,
+  ModifyContactOfContactComponent,
 
-    // bulk components
-    BulkCreateContactsOfContactsComponent,
-    BulkModifyContactsOfContactsComponent,
+  // bulk components
+  BulkCreateContactsOfContactsComponent,
+  BulkModifyContactsOfContactsComponent,
 
-    ViewChronologyContactOfContactComponent,
-    ViewMovementContactOfContactComponent
+  ViewChronologyContactOfContactComponent,
+  ViewMovementContactOfContactComponent
 ];

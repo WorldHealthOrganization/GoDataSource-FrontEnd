@@ -8,46 +8,46 @@ import { DialogAnswer, DialogAnswerButton } from '../../../components/dialog/dia
 import { Moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
-    selector: 'app-form-daterange-list',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './form-daterange-list.component.html',
-    styleUrls: ['./form-daterange-list.component.less'],
-    providers: [{
-        provide: NG_VALUE_ACCESSOR,
-        useExisting: FormDaterangeListComponent,
-        multi: true
-    }]
+  selector: 'app-form-daterange-list',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './form-daterange-list.component.html',
+  styleUrls: ['./form-daterange-list.component.less'],
+  providers: [{
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: FormDaterangeListComponent,
+    multi: true
+  }]
 })
 export class FormDaterangeListComponent extends ListBase<DateRangeModel> implements OnInit {
-    @Input() disabled: boolean = false;
-    @Input() required: boolean = false;
-    @Input() readOnly: boolean = false;
+  @Input() disabled: boolean = false;
+  @Input() required: boolean = false;
+  @Input() readOnly: boolean = false;
 
-    @Input() componentTitle: string;
+  @Input() componentTitle: string;
 
-    @Input() fromTooltip: string;
-    @Input() toTooltip: string;
+  @Input() fromTooltip: string;
+  @Input() toTooltip: string;
 
-    @Input() minDate: Moment;
+  @Input() minDate: Moment;
 
-    constructor(
-        @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
-        @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
-        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
-        private dialogService: DialogService
-    ) {
-        super(controlContainer, validators, asyncValidators);
-    }
+  constructor(
+  @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
+    @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
+    @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
+    private dialogService: DialogService
+  ) {
+    super(controlContainer, validators, asyncValidators);
+  }
 
-    ngOnInit() {
-        // handle remove item confirmation
-        this.deleteConfirm.subscribe((observer: Subscriber<void>) => {
-            this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_DATE_RANGE')
-                .subscribe((answer: DialogAnswer) => {
-                    if (answer.button === DialogAnswerButton.Yes) {
-                        observer.next();
-                    }
-                });
+  ngOnInit() {
+    // handle remove item confirmation
+    this.deleteConfirm.subscribe((observer: Subscriber<void>) => {
+      this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_DATE_RANGE')
+        .subscribe((answer: DialogAnswer) => {
+          if (answer.button === DialogAnswerButton.Yes) {
+            observer.next();
+          }
         });
-    }
+    });
+  }
 }

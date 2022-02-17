@@ -4,11 +4,11 @@ import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { ModuleWithProviders } from '@angular/core';
 
 const routes: Routes = [
-    {
-        path: '',
-        component: fromPages.TermsOfUseComponent,
-        canActivate: [AuthGuard]
-    }
+  {
+    path: '',
+    component: fromPages.TermsOfUseComponent,
+    canActivate: [AuthGuard]
+  }
 ];
 
 export const routing: ModuleWithProviders<RouterModule> = RouterModule.forChild(routes);

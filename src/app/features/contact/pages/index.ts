@@ -34,22 +34,22 @@ export * from './individual-contact-follow-ups-list/individual-contact-follow-up
 
 // export the list of all page components
 export const pageComponents: any[] = [
-    ContactsListComponent,
-    CreateContactComponent,
-    BulkCreateContactsComponent,
-    ModifyContactComponent,
-    ModifyQuestionnaireContactComponent,
-    BulkModifyContactsComponent,
+  ContactsListComponent,
+  CreateContactComponent,
+  BulkCreateContactsComponent,
+  ModifyContactComponent,
+  ModifyQuestionnaireContactComponent,
+  BulkModifyContactsComponent,
 
-    ViewMovementContactComponent,
+  ViewMovementContactComponent,
 
-    ContactDailyFollowUpsListComponent,
-    ContactRangeFollowUpsListComponent,
-    CreateContactFollowUpComponent,
-    ModifyContactFollowUpComponent,
-    ModifyQuestionnaireContactFollowUpComponent,
-    ModifyContactFollowUpListComponent,
-    IndividualContactFollowUpsListComponent,
+  ContactDailyFollowUpsListComponent,
+  ContactRangeFollowUpsListComponent,
+  CreateContactFollowUpComponent,
+  ModifyContactFollowUpComponent,
+  ModifyQuestionnaireContactFollowUpComponent,
+  ModifyContactFollowUpListComponent,
+  IndividualContactFollowUpsListComponent,
 
-    ViewChronologyContactComponent
+  ViewChronologyContactComponent
 ];

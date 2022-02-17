@@ -8,33 +8,33 @@ import * as _ from 'lodash';
  *  - must contain at least: 1 lowercase letter, 1 uppercase letter, 1 number and 1 symbol
  */
 @Directive({
-    selector: '[app-password-validator][ngModel]',
-    providers: [
-        {
-            provide: NG_VALIDATORS,
-            useExisting: forwardRef(() => PasswordValidatorDirective),
-            multi: true
-        }
-    ]
+  selector: '[app-password-validator][ngModel]',
+  providers: [
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => PasswordValidatorDirective),
+      multi: true
+    }
+  ]
 })
 export class PasswordValidatorDirective implements Validator {
-    constructor() {
+  constructor() {
+  }
+
+  validate(control: AbstractControl): { [key: string]: any } {
+    if (_.isEmpty(control.value)) {
+      return null;
     }
 
-    validate(control: AbstractControl): { [key: string]: any } {
-        if (_.isEmpty(control.value)) {
-            return null;
-        }
+    const isValid = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).+$/.test(control.value);
 
-        const isValid = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).+$/.test(control.value);
-
-        // check if the value is a valid password
-        if (!isValid || control.value.length < 6) {
-            return {
-                passwordValidator: true
-            };
-        }
-
-        return null;
+    // check if the value is a valid password
+    if (!isValid || control.value.length < 6) {
+      return {
+        passwordValidator: true
+      };
     }
+
+    return null;
+  }
 }

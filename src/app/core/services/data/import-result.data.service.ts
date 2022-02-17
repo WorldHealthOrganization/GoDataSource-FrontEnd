@@ -9,34 +9,34 @@ import { ImportResultModel } from '../../models/import-result.model';
 
 @Injectable()
 export class ImportResultDataService {
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        private http: HttpClient,
-        private modelHelper: ModelHelperService
-    ) {}
+  constructor(
+    private http: HttpClient,
+    private modelHelper: ModelHelperService
+  ) {}
 
-    /**
+  /**
      * Retrieve the list of Import results
      */
-    getImportResultsList(
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<EventModel[]> {
-        const filter = queryBuilder.buildQuery();
-        return this.modelHelper.mapObservableListToModel(
-            this.http.get(`import-results?filter=${filter}`),
-            ImportResultModel
-        );
-    }
+  getImportResultsList(
+    queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+  ): Observable<EventModel[]> {
+    const filter = queryBuilder.buildQuery();
+    return this.modelHelper.mapObservableListToModel(
+      this.http.get(`import-results?filter=${filter}`),
+      ImportResultModel
+    );
+  }
 
-    /**
+  /**
      * Return total number of import results
      */
-    getImportResultsCount(
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<IBasicCount> {
-        const whereFilter = queryBuilder.filter.generateCondition(true);
-        return this.http.get(`import-results/count?where=${whereFilter}`);
-    }
+  getImportResultsCount(
+    queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+  ): Observable<IBasicCount> {
+    const whereFilter = queryBuilder.filter.generateCondition(true);
+    return this.http.get(`import-results/count?where=${whereFilter}`);
+  }
 }

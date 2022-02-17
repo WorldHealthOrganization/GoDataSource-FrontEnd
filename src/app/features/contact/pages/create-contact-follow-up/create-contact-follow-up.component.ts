@@ -25,197 +25,197 @@ import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-co
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 
 @Component({
-    selector: 'app-create-follow-up',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './create-contact-follow-up.component.html',
-    styleUrls: ['./create-contact-follow-up.component.less']
+  selector: 'app-create-follow-up',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './create-contact-follow-up.component.html',
+  styleUrls: ['./create-contact-follow-up.component.less']
 })
 export class CreateContactFollowUpComponent
-    extends CreateConfirmOnChanges
-    implements OnInit {
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [];
+  extends CreateConfirmOnChanges
+  implements OnInit {
+  // breadcrumbs
+  breadcrumbs: BreadcrumbItemModel[] = [];
 
-    // selected outbreak
-    selectedOutbreak: OutbreakModel;
-    // route params
-    contactId: string;
-    contactData: ContactModel;
+  // selected outbreak
+  selectedOutbreak: OutbreakModel;
+  // route params
+  contactId: string;
+  contactData: ContactModel;
 
-    followUpData: FollowUpModel = new FollowUpModel();
+  followUpData: FollowUpModel = new FollowUpModel();
 
-    dailyStatusTypeOptions$: Observable<any[]>;
+  dailyStatusTypeOptions$: Observable<any[]>;
 
-    // provide constants to template
-    EntityType = EntityType;
-    ContactModel = ContactModel;
+  // provide constants to template
+  EntityType = EntityType;
+  ContactModel = ContactModel;
 
-    // authenticated user
-    authUser: UserModel;
+  // authenticated user
+  authUser: UserModel;
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        private router: Router,
-        private route: ActivatedRoute,
-        private contactDataService: ContactDataService,
-        private outbreakDataService: OutbreakDataService,
-        private snackbarService: SnackbarService,
-        private formHelper: FormHelperService,
-        private followUpsDataService: FollowUpsDataService,
-        private referenceDataDataService: ReferenceDataDataService,
-        private dialogService: DialogService,
-        private authDataService: AuthDataService,
-        private redirectService: RedirectService
-    ) {
-        super();
-    }
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private contactDataService: ContactDataService,
+    private outbreakDataService: OutbreakDataService,
+    private snackbarService: SnackbarService,
+    private formHelper: FormHelperService,
+    private followUpsDataService: FollowUpsDataService,
+    private referenceDataDataService: ReferenceDataDataService,
+    private dialogService: DialogService,
+    private authDataService: AuthDataService,
+    private redirectService: RedirectService
+  ) {
+    super();
+  }
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+  ngOnInit() {
+    // get the authenticated user
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
-        // daily status types
-        this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
-        this.followUpData.statusId = Constants.FOLLOW_UP_STATUS.NO_DATA.value;
+    // daily status types
+    this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
+    this.followUpData.statusId = Constants.FOLLOW_UP_STATUS.NO_DATA.value;
 
-        // read route params
-        this.route.params
-            .subscribe((params: { contactId }) => {
-                this.contactId = params.contactId;
+    // read route params
+    this.route.params
+      .subscribe((params: { contactId }) => {
+        this.contactId = params.contactId;
 
-                this.loadContact();
-            });
+        this.loadContact();
+      });
 
-        this.outbreakDataService
-            .getSelectedOutbreak()
-            .subscribe((selectedOutbreak: OutbreakModel) => {
-                this.selectedOutbreak = selectedOutbreak;
+    this.outbreakDataService
+      .getSelectedOutbreak()
+      .subscribe((selectedOutbreak: OutbreakModel) => {
+        this.selectedOutbreak = selectedOutbreak;
 
-                this.loadContact();
-            });
-    }
+        this.loadContact();
+      });
+  }
 
-    /**
+  /**
      * Load contact data
      */
-    private loadContact() {
-        if (
-            this.contactId &&
+  private loadContact() {
+    if (
+      this.contactId &&
             this.selectedOutbreak
-        ) {
-            // retrieve contact information
-            this.contactDataService
-                .getContact(this.selectedOutbreak.id, this.contactId)
-                .pipe(
-                    catchError((err) => {
-                        this.snackbarService.showApiError(err);
+    ) {
+      // retrieve contact information
+      this.contactDataService
+        .getContact(this.selectedOutbreak.id, this.contactId)
+        .pipe(
+          catchError((err) => {
+            this.snackbarService.showApiError(err);
 
-                        this.disableDirtyConfirm();
-                        this.router.navigate(['/contacts']);
+            this.disableDirtyConfirm();
+            this.router.navigate(['/contacts']);
 
-                        return throwError(err);
-                    })
-                )
-                .subscribe((contactData: ContactModel) => {
-                    this.contactData = contactData;
+            return throwError(err);
+          })
+        )
+        .subscribe((contactData: ContactModel) => {
+          this.contactData = contactData;
 
-                    this.initializeBreadcrumbs();
-                });
-        }
+          this.initializeBreadcrumbs();
+        });
     }
+  }
 
-    /**
+  /**
      * Initialize breadcrumbs
      */
-    private initializeBreadcrumbs() {
-        // init breadcrumbs
-        this.breadcrumbs = [];
+  private initializeBreadcrumbs() {
+    // init breadcrumbs
+    this.breadcrumbs = [];
 
-        // add list breadcrumb only if we have permission
-        if (ContactModel.canList(this.authUser)) {
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-            );
-        }
-
-        // create from follow-ups / related follow-ups
-        if (this.contactData) {
-            // contact view
-            if (ContactModel.canView(this.authUser)) {
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel(this.contactData.name, `/contacts/${this.contactData.id}/view`)
-                );
-            }
-
-            // contact related follow-ups list
-            if (ContactModel.canList(this.authUser)) {
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', `/contacts/contact-related-follow-ups/${this.contactId}`)
-                );
-            }
-        } else {
-            // list
-            if (FollowUpModel.canList(this.authUser)) {
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '/contacts/follow-ups')
-                );
-            }
-        }
-
-        // current page breadcrumb
-        this.breadcrumbs.push(
-            new BreadcrumbItemModel('LNG_PAGE_CREATE_FOLLOW_UP_TITLE', '.', true)
-        );
+    // add list breadcrumb only if we have permission
+    if (ContactModel.canList(this.authUser)) {
+      this.breadcrumbs.push(
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+      );
     }
 
-    /**
+    // create from follow-ups / related follow-ups
+    if (this.contactData) {
+      // contact view
+      if (ContactModel.canView(this.authUser)) {
+        this.breadcrumbs.push(
+          new BreadcrumbItemModel(this.contactData.name, `/contacts/${this.contactData.id}/view`)
+        );
+      }
+
+      // contact related follow-ups list
+      if (ContactModel.canList(this.authUser)) {
+        this.breadcrumbs.push(
+          new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', `/contacts/contact-related-follow-ups/${this.contactId}`)
+        );
+      }
+    } else {
+      // list
+      if (FollowUpModel.canList(this.authUser)) {
+        this.breadcrumbs.push(
+          new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '/contacts/follow-ups')
+        );
+      }
+    }
+
+    // current page breadcrumb
+    this.breadcrumbs.push(
+      new BreadcrumbItemModel('LNG_PAGE_CREATE_FOLLOW_UP_TITLE', '.', true)
+    );
+  }
+
+  /**
      * Create Follow-up
      * @param {NgForm[]} stepForms
      */
-    createNewFollowUp(stepForms: NgForm[]) {
-        // get forms fields
-        const dirtyFields: any = this.formHelper.mergeFields(stepForms);
-        if (
-            this.formHelper.isFormsSetValid(stepForms) &&
+  createNewFollowUp(stepForms: NgForm[]) {
+    // get forms fields
+    const dirtyFields: any = this.formHelper.mergeFields(stepForms);
+    if (
+      this.formHelper.isFormsSetValid(stepForms) &&
             !_.isEmpty(dirtyFields)
-        ) {
-            // add the new Follow-up
-            const loadingDialog = this.dialogService.showLoadingDialog();
-            this.followUpsDataService
-                .createFollowUp(this.selectedOutbreak.id, this.contactData.id, dirtyFields)
-                .pipe(
-                    catchError((err) => {
-                        this.snackbarService.showApiError(err);
-                        loadingDialog.close();
-                        return throwError(err);
-                    })
-                )
-                .subscribe((newContactFollowup: FollowUpModel) => {
-                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_SUCCESS_MESSAGE');
+    ) {
+      // add the new Follow-up
+      const loadingDialog = this.dialogService.showLoadingDialog();
+      this.followUpsDataService
+        .createFollowUp(this.selectedOutbreak.id, this.contactData.id, dirtyFields)
+        .pipe(
+          catchError((err) => {
+            this.snackbarService.showApiError(err);
+            loadingDialog.close();
+            return throwError(err);
+          })
+        )
+        .subscribe((newContactFollowup: FollowUpModel) => {
+          this.snackbarService.showSuccess('LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_SUCCESS_MESSAGE');
 
-                    // hide dialog
-                    loadingDialog.close();
+          // hide dialog
+          loadingDialog.close();
 
-                    // navigate to proper page
-                    this.disableDirtyConfirm();
-                    if (FollowUpModel.canModify(this.authUser)) {
-                        this.router.navigate([`/contacts/${newContactFollowup.personId}/follow-ups/${newContactFollowup.id}/modify`]);
-                    } else if (FollowUpModel.canView(this.authUser)) {
-                        this.router.navigate([`/contacts/${newContactFollowup.personId}/follow-ups/${newContactFollowup.id}/view`]);
-                    } else if (FollowUpModel.canList(this.authUser)) {
-                        this.router.navigate(['/contacts/follow-ups']);
-                    } else {
-                        // fallback to current page since we already know that we have access to this page
-                        this.redirectService.to(
-                            [`/contacts/${newContactFollowup.personId}/follow-ups/create`]
-                        );
-                    }
-                });
-        }
+          // navigate to proper page
+          this.disableDirtyConfirm();
+          if (FollowUpModel.canModify(this.authUser)) {
+            this.router.navigate([`/contacts/${newContactFollowup.personId}/follow-ups/${newContactFollowup.id}/modify`]);
+          } else if (FollowUpModel.canView(this.authUser)) {
+            this.router.navigate([`/contacts/${newContactFollowup.personId}/follow-ups/${newContactFollowup.id}/view`]);
+          } else if (FollowUpModel.canList(this.authUser)) {
+            this.router.navigate(['/contacts/follow-ups']);
+          } else {
+            // fallback to current page since we already know that we have access to this page
+            this.redirectService.to(
+              [`/contacts/${newContactFollowup.personId}/follow-ups/create`]
+            );
+          }
+        });
     }
+  }
 }

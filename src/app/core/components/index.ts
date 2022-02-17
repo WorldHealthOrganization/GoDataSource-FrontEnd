@@ -6,8 +6,8 @@ import { AppFormDebugComponent } from './form-debug/app-form-debug.component';
 
 // export the list of all components
 export const components: any[] = [
-    AuthenticatedComponent,
-    SidenavComponent,
-    RedirectComponent,
-    AppFormDebugComponent
+  AuthenticatedComponent,
+  SidenavComponent,
+  RedirectComponent,
+  AppFormDebugComponent
 ];

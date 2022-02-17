@@ -6,36 +6,36 @@ import * as _ from 'lodash';
  * Custom form validation for fields that should have the same value (e.g. password and confirm password)
  */
 @Directive({
-    selector: '[app-equal-validator][ngModel]',
-    providers: [
-        {
-            provide: NG_VALIDATORS,
-            useExisting: forwardRef(() => EqualValidatorDirective),
-            multi: true
-        }
-    ]
+  selector: '[app-equal-validator][ngModel]',
+  providers: [
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => EqualValidatorDirective),
+      multi: true
+    }
+  ]
 })
 export class EqualValidatorDirective implements Validator {
-    constructor(
-        @Attribute('app-equal-validator') public equalValidator: string
-    ) {
+  constructor(
+    @Attribute('app-equal-validator') public equalValidator: string
+  ) {
+  }
+
+  validate(control: AbstractControl): { [key: string]: any } {
+    if (_.isEmpty(control.value)) {
+      return null;
     }
 
-    validate(control: AbstractControl): { [key: string]: any } {
-        if (_.isEmpty(control.value)) {
-            return null;
-        }
+    // get the target control
+    const targetControl = control.root.get(this.equalValidator);
 
-        // get the target control
-        const targetControl = control.root.get(this.equalValidator);
-
-        // check if the current value and target value match
-        if (targetControl && control.value !== targetControl.value) {
-            return {
-                equalValidator: false
-            };
-        }
-
-        return null;
+    // check if the current value and target value match
+    if (targetControl && control.value !== targetControl.value) {
+      return {
+        equalValidator: false
+      };
     }
+
+    return null;
+  }
 }

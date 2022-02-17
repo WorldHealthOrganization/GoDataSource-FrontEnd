@@ -13,118 +13,118 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { ContactOfContactChronology } from './typings/contact-of-contact-chronology';
 
 @Component({
-    selector: 'app-view-chronology-contact-of-contact',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './view-chronology-contact-of-contact.component.html',
-    styleUrls: ['./view-chronology-contact-of-contact.component.less']
+  selector: 'app-view-chronology-contact-of-contact',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './view-chronology-contact-of-contact.component.html',
+  styleUrls: ['./view-chronology-contact-of-contact.component.less']
 })
 export class ViewChronologyContactOfContactComponent implements OnInit {
 
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs
+  breadcrumbs: BreadcrumbItemModel[] = [];
 
-    contactOfContactData: ContactOfContactModel = new ContactOfContactModel();
-    chronologyEntries: ChronologyItem[] = [];
+  contactOfContactData: ContactOfContactModel = new ContactOfContactModel();
+  chronologyEntries: ChronologyItem[] = [];
 
-    // authenticated user details
-    authUser: UserModel;
+  // authenticated user details
+  authUser: UserModel;
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        protected route: ActivatedRoute,
-        private contactOfContactDataService: ContactsOfContactsDataService,
-        private outbreakDataService: OutbreakDataService,
-        private relationshipDataService: RelationshipDataService,
-        private authDataService: AuthDataService
-    ) {}
+  constructor(
+    protected route: ActivatedRoute,
+    private contactOfContactDataService: ContactsOfContactsDataService,
+    private outbreakDataService: OutbreakDataService,
+    private relationshipDataService: RelationshipDataService,
+    private authDataService: AuthDataService
+  ) {}
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+  ngOnInit() {
+    // get the authenticated user
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
-        this.route.params.subscribe((params: { contactOfContactId }) => {
-            // get current outbreak
-            this.outbreakDataService
-                .getSelectedOutbreak()
-                .subscribe((selectedOutbreak: OutbreakModel) => {
-                    // get case
-                    this.contactOfContactDataService
-                        .getContactOfContact(selectedOutbreak.id, params.contactOfContactId)
-                        .subscribe((contactOfContactDataReturned: ContactOfContactModel) => {
-                            this.contactOfContactData = contactOfContactDataReturned;
+    this.route.params.subscribe((params: { contactOfContactId }) => {
+      // get current outbreak
+      this.outbreakDataService
+        .getSelectedOutbreak()
+        .subscribe((selectedOutbreak: OutbreakModel) => {
+          // get case
+          this.contactOfContactDataService
+            .getContactOfContact(selectedOutbreak.id, params.contactOfContactId)
+            .subscribe((contactOfContactDataReturned: ContactOfContactModel) => {
+              this.contactOfContactData = contactOfContactDataReturned;
 
-                            // initialize page breadcrumbs
-                            this.initializeBreadcrumbs();
+              // initialize page breadcrumbs
+              this.initializeBreadcrumbs();
 
-                            const qb = new RequestQueryBuilder();
-                            qb.include('people', true);
+              const qb = new RequestQueryBuilder();
+              qb.include('people', true);
 
-                            if (this.contactOfContactData) {
-                                // get relationships
-                                this.relationshipDataService
-                                    .getEntityRelationships(
-                                        selectedOutbreak.id,
-                                        this.contactOfContactData.type,
-                                        this.contactOfContactData.id,
-                                        qb
-                                    ).subscribe((relationshipsData) => {
-                                    // set data
-                                    this.chronologyEntries = ContactOfContactChronology.getChronologyEntries(
-                                        this.contactOfContactData,
-                                        relationshipsData
-                                    );
-                                });
-                            }
-                        });
-                });
+              if (this.contactOfContactData) {
+                // get relationships
+                this.relationshipDataService
+                  .getEntityRelationships(
+                    selectedOutbreak.id,
+                    this.contactOfContactData.type,
+                    this.contactOfContactData.id,
+                    qb
+                  ).subscribe((relationshipsData) => {
+                    // set data
+                    this.chronologyEntries = ContactOfContactChronology.getChronologyEntries(
+                      this.contactOfContactData,
+                      relationshipsData
+                    );
+                  });
+              }
+            });
         });
+    });
 
-        // initialize page breadcrumbs
-        this.initializeBreadcrumbs();
-    }
+    // initialize page breadcrumbs
+    this.initializeBreadcrumbs();
+  }
 
-    /**
+  /**
      * Initialize breadcrumbs
      */
-    initializeBreadcrumbs() {
-        // reset
-        this.breadcrumbs = [];
+  initializeBreadcrumbs() {
+    // reset
+    this.breadcrumbs = [];
 
-        // contacts of contacts list page
-        if (ContactOfContactModel.canList(this.authUser)) {
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE', '/contacts-of-contacts')
-            );
-        }
-
-        // contact of contact breadcrumbs
-        if (this.contactOfContactData) {
-            // contacts view page
-            if (ContactOfContactModel.canView(this.authUser)) {
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel(
-                        this.contactOfContactData.name,
-                        `/contacts-of-contacts/${this.contactOfContactData.id}/view`
-                    )
-                );
-            }
-
-            // current page
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel(
-                    'LNG_PAGE_VIEW_CHRONOLOGY_CONTACT_OF_CONTACT_TITLE',
-                    '.',
-                    true,
-                    {},
-                    this.contactOfContactData
-                )
-            );
-        }
+    // contacts of contacts list page
+    if (ContactOfContactModel.canList(this.authUser)) {
+      this.breadcrumbs.push(
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE', '/contacts-of-contacts')
+      );
     }
+
+    // contact of contact breadcrumbs
+    if (this.contactOfContactData) {
+      // contacts view page
+      if (ContactOfContactModel.canView(this.authUser)) {
+        this.breadcrumbs.push(
+          new BreadcrumbItemModel(
+            this.contactOfContactData.name,
+            `/contacts-of-contacts/${this.contactOfContactData.id}/view`
+          )
+        );
+      }
+
+      // current page
+      this.breadcrumbs.push(
+        new BreadcrumbItemModel(
+          'LNG_PAGE_VIEW_CHRONOLOGY_CONTACT_OF_CONTACT_TITLE',
+          '.',
+          true,
+          {},
+          this.contactOfContactData
+        )
+      );
+    }
+  }
 
 }

@@ -14,144 +14,144 @@ import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
-    selector: 'app-modify-system-device',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './modify-system-device.component.html',
-    styleUrls: ['./modify-system-device.component.less']
+  selector: 'app-modify-system-device',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './modify-system-device.component.html',
+  styleUrls: ['./modify-system-device.component.less']
 })
 export class ModifySystemDeviceComponent extends ViewModifyComponent implements OnInit {
-    breadcrumbs: BreadcrumbItemModel[] = [];
+  breadcrumbs: BreadcrumbItemModel[] = [];
 
-    // constants
-    DeviceModel = DeviceModel;
+  // constants
+  DeviceModel = DeviceModel;
 
-    deviceId: string;
+  deviceId: string;
 
-    authUser: UserModel;
+  authUser: UserModel;
 
-    deviceData: DeviceModel = new DeviceModel();
+  deviceData: DeviceModel = new DeviceModel();
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        protected route: ActivatedRoute,
-        private snackbarService: SnackbarService,
-        private formHelper: FormHelperService,
-        protected dialogService: DialogService,
-        private deviceDataService: DeviceDataService,
-        private authDataService: AuthDataService
-    ) {
-        super(
-            route,
-            dialogService
-        );
-    }
+  constructor(
+    protected route: ActivatedRoute,
+    private snackbarService: SnackbarService,
+    private formHelper: FormHelperService,
+    protected dialogService: DialogService,
+    private deviceDataService: DeviceDataService,
+    private authDataService: AuthDataService
+  ) {
+    super(
+      route,
+      dialogService
+    );
+  }
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+  ngOnInit() {
+    // get the authenticated user
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
-        // show loading
-        this.showLoadingDialog(false);
+    // show loading
+    this.showLoadingDialog(false);
 
-        // retrieve query params
-        this.route.params
-            .subscribe((params: { deviceId }) => {
-                this.deviceId = params.deviceId;
-                this.retrieveDeviceData();
-            });
-    }
+    // retrieve query params
+    this.route.params
+      .subscribe((params: { deviceId }) => {
+        this.deviceId = params.deviceId;
+        this.retrieveDeviceData();
+      });
+  }
 
-    /**
+  /**
      * Initialize breadcrumbs
      */
-    initializeBreadcrumbs() {
-        // reset
-        this.breadcrumbs = [];
+  initializeBreadcrumbs() {
+    // reset
+    this.breadcrumbs = [];
 
-        // add list breadcrumb only if we have permission
-        if (DeviceModel.canList(this.authUser)) {
-            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_DEVICES_TITLE', '/system-config/devices'));
-        }
-
-        // view / modify breadcrumb
-        this.breadcrumbs.push(new BreadcrumbItemModel(
-            this.viewOnly ?
-                'LNG_PAGE_VIEW_SYSTEM_DEVICE_TITLE' :
-                'LNG_PAGE_MODIFY_SYSTEM_DEVICE_TITLE',
-            '.',
-            true,
-            {},
-            this.deviceData
-        ));
+    // add list breadcrumb only if we have permission
+    if (DeviceModel.canList(this.authUser)) {
+      this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_DEVICES_TITLE', '/system-config/devices'));
     }
 
-    /**
+    // view / modify breadcrumb
+    this.breadcrumbs.push(new BreadcrumbItemModel(
+      this.viewOnly ?
+        'LNG_PAGE_VIEW_SYSTEM_DEVICE_TITLE' :
+        'LNG_PAGE_MODIFY_SYSTEM_DEVICE_TITLE',
+      '.',
+      true,
+      {},
+      this.deviceData
+    ));
+  }
+
+  /**
      * Device data
      */
-    retrieveDeviceData() {
-        // get device
-        if (this.deviceId) {
-            // show loading
-            this.showLoadingDialog(false);
+  retrieveDeviceData() {
+    // get device
+    if (this.deviceId) {
+      // show loading
+      this.showLoadingDialog(false);
 
-            this.deviceDataService
-                .getDevice(this.deviceId)
-                .subscribe( (device) => {
-                    this.deviceData = device;
+      this.deviceDataService
+        .getDevice(this.deviceId)
+        .subscribe( (device) => {
+          this.deviceData = device;
 
-                    // update breadcrumbs
-                    this.initializeBreadcrumbs();
+          // update breadcrumbs
+          this.initializeBreadcrumbs();
 
-                    // hide loading
-                    this.hideLoadingDialog();
-                });
-        }
+          // hide loading
+          this.hideLoadingDialog();
+        });
     }
+  }
 
-    /**
+  /**
      * Modify device
      */
-    modifyDevice(form: NgForm) {
-        // validate form
-        if (!this.formHelper.validateForm(form)) {
-            return;
-        }
-
-        // retrieve dirty fields
-        const dirtyFields: any = this.formHelper.getDirtyFields(form);
-
-        // show loading
-        this.showLoadingDialog();
-
-        // modify the Device
-        this.deviceDataService
-            .modifyDevice(this.deviceId, dirtyFields)
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    // hide loading
-                    this.hideLoadingDialog();
-                    return throwError(err);
-                })
-            )
-            .subscribe((modifiedDevice: DeviceModel) => {
-                // update model
-                this.deviceData = modifiedDevice;
-
-                // mark form as pristine
-                form.form.markAsPristine();
-
-                // display message
-                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_SYSTEM_DEVICE_ACTION_MODIFY_SYSTEM_DEVICE_SUCCESS_MESSAGE');
-
-                // hide loading
-                this.hideLoadingDialog();
-            });
+  modifyDevice(form: NgForm) {
+    // validate form
+    if (!this.formHelper.validateForm(form)) {
+      return;
     }
+
+    // retrieve dirty fields
+    const dirtyFields: any = this.formHelper.getDirtyFields(form);
+
+    // show loading
+    this.showLoadingDialog();
+
+    // modify the Device
+    this.deviceDataService
+      .modifyDevice(this.deviceId, dirtyFields)
+      .pipe(
+        catchError((err) => {
+          this.snackbarService.showApiError(err);
+          // hide loading
+          this.hideLoadingDialog();
+          return throwError(err);
+        })
+      )
+      .subscribe((modifiedDevice: DeviceModel) => {
+        // update model
+        this.deviceData = modifiedDevice;
+
+        // mark form as pristine
+        form.form.markAsPristine();
+
+        // display message
+        this.snackbarService.showSuccess('LNG_PAGE_MODIFY_SYSTEM_DEVICE_ACTION_MODIFY_SYSTEM_DEVICE_SUCCESS_MESSAGE');
+
+        // hide loading
+        this.hideLoadingDialog();
+      });
+  }
 
 }

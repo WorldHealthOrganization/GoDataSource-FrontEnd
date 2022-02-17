@@ -17,21 +17,21 @@ import { FormIconPickerComponent } from './form-icon-picker/form-icon-picker.com
 import { FormTimepickerComponent } from './form-timepicker/form-timepicker.component';
 
 export const components: any[] = [
-    FormValidationComponent,
-    FormInputComponent,
-    FormTextareaComponent,
-    FormSelectComponent,
-    FormSelectVscrollComponent,
-    FormDatepickerComponent,
-    FormIconPickerComponent,
-    FormSlideToggleComponent,
-    FormCheckboxComponent,
-    FormDaterangeComponent,
-    FormDaterangeListComponent,
-    FormRadioComponent,
-    FormDateSliderComponent,
-    FormDateRangeSliderComponent,
-    FormHiddenInputComponent,
-    FormSelectGroupsComponent,
-    FormTimepickerComponent
+  FormValidationComponent,
+  FormInputComponent,
+  FormTextareaComponent,
+  FormSelectComponent,
+  FormSelectVscrollComponent,
+  FormDatepickerComponent,
+  FormIconPickerComponent,
+  FormSlideToggleComponent,
+  FormCheckboxComponent,
+  FormDaterangeComponent,
+  FormDaterangeListComponent,
+  FormRadioComponent,
+  FormDateSliderComponent,
+  FormDateRangeSliderComponent,
+  FormHiddenInputComponent,
+  FormSelectGroupsComponent,
+  FormTimepickerComponent
 ];

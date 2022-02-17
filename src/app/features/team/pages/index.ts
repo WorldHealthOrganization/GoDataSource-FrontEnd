@@ -12,8 +12,8 @@ export * from './team-workload/team-workload.component';
 
 // export the list of all page components
 export const pageComponents: any[] = [
-    TeamListComponent,
-    CreateTeamComponent,
-    ModifyTeamComponent,
-    TeamWorkloadComponent
+  TeamListComponent,
+  CreateTeamComponent,
+  ModifyTeamComponent,
+  TeamWorkloadComponent
 ];

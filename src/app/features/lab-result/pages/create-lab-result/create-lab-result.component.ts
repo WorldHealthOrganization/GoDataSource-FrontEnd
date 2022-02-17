@@ -29,287 +29,287 @@ import { EntityModel } from '../../../../core/models/entity-and-relationship.mod
 import { Constants } from '../../../../core/models/constants';
 
 @Component({
-    selector: 'app-create-lab-result',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './create-lab-result.component.html',
-    styleUrls: ['./create-lab-result.component.less']
+  selector: 'app-create-lab-result',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './create-lab-result.component.html',
+  styleUrls: ['./create-lab-result.component.less']
 })
 export class CreateLabResultComponent
-    extends CreateConfirmOnChanges
-    implements OnInit {
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [];
+  extends CreateConfirmOnChanges
+  implements OnInit {
+  // breadcrumbs
+  breadcrumbs: BreadcrumbItemModel[] = [];
 
-    labResultData: LabResultModel = new LabResultModel();
+  labResultData: LabResultModel = new LabResultModel();
 
-    sampleTypesList$: Observable<any[]>;
-    testTypesList$: Observable<any[]>;
-    resultTypesList$: Observable<any[]>;
-    labNameOptionsList$: Observable<any[]>;
-    progressOptionsList$: Observable<any[]>;
-    sequenceLabOptionsList$: Observable<any[]>;
-    sequenceResultOptionsList$: Observable<any[]>;
+  sampleTypesList$: Observable<any[]>;
+  testTypesList$: Observable<any[]>;
+  resultTypesList$: Observable<any[]>;
+  labNameOptionsList$: Observable<any[]>;
+  progressOptionsList$: Observable<any[]>;
+  sequenceLabOptionsList$: Observable<any[]>;
+  sequenceResultOptionsList$: Observable<any[]>;
 
-    selectedOutbreak: OutbreakModel = new OutbreakModel();
+  selectedOutbreak: OutbreakModel = new OutbreakModel();
 
-    // entity data
-    entityData: CaseModel | ContactModel;
-    personType: EntityType;
+  // entity data
+  entityData: CaseModel | ContactModel;
+  personType: EntityType;
 
-    serverToday: Moment = moment();
+  serverToday: Moment = moment();
 
-    // constants
-    CaseModel = CaseModel;
-    ContactModel = ContactModel;
-    EntityType = EntityType;
-    EntityModel = EntityModel;
-    Constants = Constants;
+  // constants
+  CaseModel = CaseModel;
+  ContactModel = ContactModel;
+  EntityType = EntityType;
+  EntityModel = EntityModel;
+  Constants = Constants;
 
-    // authenticated user
-    authUser: UserModel;
+  // authenticated user
+  authUser: UserModel;
 
-    /**
+  /**
      * Check if we need to display warning message that case date of onset is after sample taken date
      */
-    get displayOnsetDateWarningMessage(): boolean {
-        return this.entityData &&
+  get displayOnsetDateWarningMessage(): boolean {
+    return this.entityData &&
             this.labResultData &&
             this.personType === EntityType.CASE &&
             (this.entityData as CaseModel).dateOfOnset &&
             this.labResultData.dateSampleTaken &&
             moment((this.entityData as CaseModel).dateOfOnset).startOf('day').isAfter(moment(this.labResultData.dateSampleTaken).startOf('day'));
-    }
+  }
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        private route: ActivatedRoute,
-        private outbreakDataService: OutbreakDataService,
-        private caseDataService: CaseDataService,
-        private contactDataService: ContactDataService,
-        private snackbarService: SnackbarService,
-        private router: Router,
-        private referenceDataDataService: ReferenceDataDataService,
-        private genericDataService: GenericDataService,
-        private authDataService: AuthDataService,
-        private formHelper: FormHelperService,
-        private labResultDataService: LabResultDataService,
-        private dialogService: DialogService,
-        private redirectService: RedirectService
-    ) {
-        super();
-    }
+  constructor(
+    private route: ActivatedRoute,
+    private outbreakDataService: OutbreakDataService,
+    private caseDataService: CaseDataService,
+    private contactDataService: ContactDataService,
+    private snackbarService: SnackbarService,
+    private router: Router,
+    private referenceDataDataService: ReferenceDataDataService,
+    private genericDataService: GenericDataService,
+    private authDataService: AuthDataService,
+    private formHelper: FormHelperService,
+    private labResultDataService: LabResultDataService,
+    private dialogService: DialogService,
+    private redirectService: RedirectService
+  ) {
+    super();
+  }
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+  ngOnInit() {
+    // get the authenticated user
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
-        this.sampleTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_SAMPLE);
-        this.testTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_LAB_TEST);
-        this.resultTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_TEST_RESULT);
-        this.labNameOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_NAME);
-        this.progressOptionsList$ = this.genericDataService.getProgressOptionsList();
-        this.sequenceLabOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_SEQUENCE_LABORATORY);
-        this.sequenceResultOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_SEQUENCE_RESULT);
+    this.sampleTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_SAMPLE);
+    this.testTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_LAB_TEST);
+    this.resultTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_TEST_RESULT);
+    this.labNameOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_NAME);
+    this.progressOptionsList$ = this.genericDataService.getProgressOptionsList();
+    this.sequenceLabOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_SEQUENCE_LABORATORY);
+    this.sequenceResultOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_SEQUENCE_RESULT);
 
-        // retrieve page information
-        this.route.data.subscribe((data: { personType: EntityType }) => {
-            // set page person type
-            this.personType = data.personType;
+    // retrieve page information
+    this.route.data.subscribe((data: { personType: EntityType }) => {
+      // set page person type
+      this.personType = data.personType;
 
-            // retrieve entity information
-            this.route.params
-                .subscribe((params: { caseId?: string, contactId?: string }) => {
-                    // get selected outbreak
-                    this.outbreakDataService
-                        .getSelectedOutbreak()
-                        .subscribe((selectedOutbreak: OutbreakModel) => {
-                            // outbreak
-                            this.selectedOutbreak = selectedOutbreak;
+      // retrieve entity information
+      this.route.params
+        .subscribe((params: { caseId?: string, contactId?: string }) => {
+          // get selected outbreak
+          this.outbreakDataService
+            .getSelectedOutbreak()
+            .subscribe((selectedOutbreak: OutbreakModel) => {
+              // outbreak
+              this.selectedOutbreak = selectedOutbreak;
 
-                            // determine entity endpoint that we need to call
-                            const entitySubscriber: Observable<CaseModel | ContactModel> = this.personType === EntityType.CONTACT ?
-                                this.contactDataService.getContact(this.selectedOutbreak.id, params.contactId) :
-                                this.caseDataService.getCase(this.selectedOutbreak.id, params.caseId);
+              // determine entity endpoint that we need to call
+              const entitySubscriber: Observable<CaseModel | ContactModel> = this.personType === EntityType.CONTACT ?
+                this.contactDataService.getContact(this.selectedOutbreak.id, params.contactId) :
+                this.caseDataService.getCase(this.selectedOutbreak.id, params.caseId);
 
-                            // get case data
-                            entitySubscriber
-                                .pipe(
-                                    catchError((err) => {
-                                        this.snackbarService.showApiError(err);
+              // get case data
+              entitySubscriber
+                .pipe(
+                  catchError((err) => {
+                    this.snackbarService.showApiError(err);
 
-                                        // Case / Contact not found
-                                        this.disableDirtyConfirm();
-                                        this.router.navigate(['/']);
+                    // Case / Contact not found
+                    this.disableDirtyConfirm();
+                    this.router.navigate(['/']);
 
-                                        return throwError(err);
-                                    })
-                                )
-                                .subscribe((entityData: CaseModel | ContactModel) => {
-                                    this.entityData = entityData;
+                    return throwError(err);
+                  })
+                )
+                .subscribe((entityData: CaseModel | ContactModel) => {
+                  this.entityData = entityData;
 
-                                    // initialize page breadcrumbs
-                                    this.initializeBreadcrumbs();
-                                });
-                        });
+                  // initialize page breadcrumbs
+                  this.initializeBreadcrumbs();
                 });
-
-            // initialize page breadcrumbs
-            this.initializeBreadcrumbs();
+            });
         });
-    }
 
-    /**
+      // initialize page breadcrumbs
+      this.initializeBreadcrumbs();
+    });
+  }
+
+  /**
      * Initialize breadcrumbs
      */
-    private initializeBreadcrumbs() {
-        // reset
-        this.breadcrumbs = [];
+  private initializeBreadcrumbs() {
+    // reset
+    this.breadcrumbs = [];
 
-        // entity list
-        if (
-            this.personType === EntityType.CONTACT &&
+    // entity list
+    if (
+      this.personType === EntityType.CONTACT &&
             ContactModel.canList(this.authUser)
-        ) {
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-            );
-        } else if (
-            this.personType === EntityType.CASE &&
+    ) {
+      this.breadcrumbs.push(
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+      );
+    } else if (
+      this.personType === EntityType.CASE &&
             CaseModel.canList(this.authUser)
-        ) {
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
-            );
-        }
-
-        // person breadcrumbs
-        if (this.entityData) {
-            // entity view
-            if (
-                this.personType === EntityType.CONTACT &&
-                ContactModel.canView(this.authUser)
-            ) {
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel(this.entityData.name, `/contacts/${this.entityData.id}/view`)
-                );
-            } else if (
-                this.personType === EntityType.CASE &&
-                CaseModel.canView(this.authUser)
-            ) {
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel(this.entityData.name, `/cases/${this.entityData.id}/view`)
-                );
-            }
-
-            // lab result list
-            if (
-                this.personType === EntityType.CONTACT &&
-                ContactModel.canListLabResult(this.authUser)
-            ) {
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE', `/lab-results/contacts/${this.entityData.id}`)
-                );
-            } else if (
-                this.personType === EntityType.CASE &&
-                CaseModel.canListLabResult(this.authUser)
-            ) {
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE', `/lab-results/cases/${this.entityData.id}`)
-                );
-            }
-        }
-
-        // current page
-        this.breadcrumbs.push(
-            new BreadcrumbItemModel('LNG_PAGE_CREATE_LAB_RESULT_TITLE', '.', true)
-        );
+    ) {
+      this.breadcrumbs.push(
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
+      );
     }
 
-    /**
+    // person breadcrumbs
+    if (this.entityData) {
+      // entity view
+      if (
+        this.personType === EntityType.CONTACT &&
+                ContactModel.canView(this.authUser)
+      ) {
+        this.breadcrumbs.push(
+          new BreadcrumbItemModel(this.entityData.name, `/contacts/${this.entityData.id}/view`)
+        );
+      } else if (
+        this.personType === EntityType.CASE &&
+                CaseModel.canView(this.authUser)
+      ) {
+        this.breadcrumbs.push(
+          new BreadcrumbItemModel(this.entityData.name, `/cases/${this.entityData.id}/view`)
+        );
+      }
+
+      // lab result list
+      if (
+        this.personType === EntityType.CONTACT &&
+                ContactModel.canListLabResult(this.authUser)
+      ) {
+        this.breadcrumbs.push(
+          new BreadcrumbItemModel('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE', `/lab-results/contacts/${this.entityData.id}`)
+        );
+      } else if (
+        this.personType === EntityType.CASE &&
+                CaseModel.canListLabResult(this.authUser)
+      ) {
+        this.breadcrumbs.push(
+          new BreadcrumbItemModel('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE', `/lab-results/cases/${this.entityData.id}`)
+        );
+      }
+    }
+
+    // current page
+    this.breadcrumbs.push(
+      new BreadcrumbItemModel('LNG_PAGE_CREATE_LAB_RESULT_TITLE', '.', true)
+    );
+  }
+
+  /**
      * Create lab result
      * @param stepForms
      */
-    createLabResult(stepForms: NgForm[]) {
-        // no entity ?
-        if (!this.entityData) {
-            return;
-        }
-
-        // get forms fields
-        const dirtyFields: any = this.formHelper.mergeFields(stepForms);
-        if (
-            this.formHelper.isFormsSetValid(stepForms) &&
-            !_.isEmpty(dirtyFields)
-        ) {
-            // add new Lab Result
-            const loadingDialog = this.dialogService.showLoadingDialog();
-            this.labResultDataService
-                .createLabResult(
-                    this.selectedOutbreak.id,
-                    EntityModel.getLinkForEntityType(this.personType),
-                    this.entityData.id,
-                    dirtyFields
-                )
-                .pipe(
-                    catchError((err) => {
-                        this.snackbarService.showApiError(err);
-
-                        // hide dialog
-                        loadingDialog.close();
-
-                        return throwError(err);
-                    })
-                )
-                .subscribe((newLabResult: LabResultModel) => {
-                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_SUCCESS_MESSAGE');
-
-                    // hide dialog
-                    loadingDialog.close();
-
-                    // navigate to proper page
-                    this.disableDirtyConfirm();
-                    if (
-                        this.personType === EntityType.CONTACT &&
-                        ContactModel.canModifyLabResult(this.authUser)
-                    ) {
-                        this.router.navigate([`/lab-results/contacts/${this.entityData.id}/${newLabResult.id}/modify`]);
-                    } else if (
-                        this.personType === EntityType.CASE &&
-                        CaseModel.canModifyLabResult(this.authUser)
-                    ) {
-                        this.router.navigate([`/lab-results/cases/${this.entityData.id}/${newLabResult.id}/modify`]);
-                    } else if (
-                        this.personType === EntityType.CONTACT &&
-                        ContactModel.canViewLabResult(this.authUser)
-                    ) {
-                        this.router.navigate([`/lab-results/contacts/${this.entityData.id}/${newLabResult.id}/view`]);
-                    } else if (
-                        this.personType === EntityType.CASE &&
-                        CaseModel.canViewLabResult(this.authUser)
-                    ) {
-                        this.router.navigate([`/lab-results/cases/${this.entityData.id}/${newLabResult.id}/view`]);
-                    } else if (
-                        this.personType === EntityType.CONTACT &&
-                        ContactModel.canListLabResult(this.authUser)
-                    ) {
-                        this.router.navigate([`/lab-results/contacts/${this.entityData.id}`]);
-                    } else if (
-                        this.personType === EntityType.CASE &&
-                        CaseModel.canListLabResult(this.authUser)
-                    ) {
-                        this.router.navigate([`/lab-results/cases/${this.entityData.id}`]);
-                    } else {
-                        // fallback to current page since we already know that we have access to this page
-                        this.redirectService.to(
-                            [`/lab-results/${EntityModel.getLinkForEntityType(this.personType)}/${this.entityData.id}/create`]
-                        );
-                    }
-                });
-        }
+  createLabResult(stepForms: NgForm[]) {
+    // no entity ?
+    if (!this.entityData) {
+      return;
     }
+
+    // get forms fields
+    const dirtyFields: any = this.formHelper.mergeFields(stepForms);
+    if (
+      this.formHelper.isFormsSetValid(stepForms) &&
+            !_.isEmpty(dirtyFields)
+    ) {
+      // add new Lab Result
+      const loadingDialog = this.dialogService.showLoadingDialog();
+      this.labResultDataService
+        .createLabResult(
+          this.selectedOutbreak.id,
+          EntityModel.getLinkForEntityType(this.personType),
+          this.entityData.id,
+          dirtyFields
+        )
+        .pipe(
+          catchError((err) => {
+            this.snackbarService.showApiError(err);
+
+            // hide dialog
+            loadingDialog.close();
+
+            return throwError(err);
+          })
+        )
+        .subscribe((newLabResult: LabResultModel) => {
+          this.snackbarService.showSuccess('LNG_PAGE_CREATE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_SUCCESS_MESSAGE');
+
+          // hide dialog
+          loadingDialog.close();
+
+          // navigate to proper page
+          this.disableDirtyConfirm();
+          if (
+            this.personType === EntityType.CONTACT &&
+                        ContactModel.canModifyLabResult(this.authUser)
+          ) {
+            this.router.navigate([`/lab-results/contacts/${this.entityData.id}/${newLabResult.id}/modify`]);
+          } else if (
+            this.personType === EntityType.CASE &&
+                        CaseModel.canModifyLabResult(this.authUser)
+          ) {
+            this.router.navigate([`/lab-results/cases/${this.entityData.id}/${newLabResult.id}/modify`]);
+          } else if (
+            this.personType === EntityType.CONTACT &&
+                        ContactModel.canViewLabResult(this.authUser)
+          ) {
+            this.router.navigate([`/lab-results/contacts/${this.entityData.id}/${newLabResult.id}/view`]);
+          } else if (
+            this.personType === EntityType.CASE &&
+                        CaseModel.canViewLabResult(this.authUser)
+          ) {
+            this.router.navigate([`/lab-results/cases/${this.entityData.id}/${newLabResult.id}/view`]);
+          } else if (
+            this.personType === EntityType.CONTACT &&
+                        ContactModel.canListLabResult(this.authUser)
+          ) {
+            this.router.navigate([`/lab-results/contacts/${this.entityData.id}`]);
+          } else if (
+            this.personType === EntityType.CASE &&
+                        CaseModel.canListLabResult(this.authUser)
+          ) {
+            this.router.navigate([`/lab-results/cases/${this.entityData.id}`]);
+          } else {
+            // fallback to current page since we already know that we have access to this page
+            this.redirectService.to(
+              [`/lab-results/${EntityModel.getLinkForEntityType(this.personType)}/${this.entityData.id}/create`]
+            );
+          }
+        });
+    }
+  }
 }

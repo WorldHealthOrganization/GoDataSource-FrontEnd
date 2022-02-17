@@ -4,8 +4,8 @@ import { TransmissionChainsFiltersComponent } from './transmission-chains-filter
 import { RelationshipSummaryComponent } from './relationship-summary/relationship-summary.component';
 
 export const components: any[] = [
-    TransmissionChainsDashletComponent,
-    PersonSummaryComponent,
-    TransmissionChainsFiltersComponent,
-    RelationshipSummaryComponent
+  TransmissionChainsDashletComponent,
+  PersonSummaryComponent,
+  TransmissionChainsFiltersComponent,
+  RelationshipSummaryComponent
 ];

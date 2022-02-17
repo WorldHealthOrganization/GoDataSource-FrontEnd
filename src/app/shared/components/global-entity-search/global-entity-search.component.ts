@@ -19,187 +19,187 @@ import { RedirectService } from '../../../core/services/helper/redirect.service'
 import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
 
 @Component({
-    selector: 'app-global-entity-search',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './global-entity-search.component.html',
-    styleUrls: ['./global-entity-search.component.less']
+  selector: 'app-global-entity-search',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './global-entity-search.component.html',
+  styleUrls: ['./global-entity-search.component.less']
 })
 export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
 
-    globalSearchValue: string;
-    selectedOutbreak: OutbreakModel;
+  globalSearchValue: string;
+  selectedOutbreak: OutbreakModel;
 
-    // subscribers
-    outbreakSubscriber: Subscription;
+  // subscribers
+  outbreakSubscriber: Subscription;
 
-    loadingDialog: LoadingDialogModel;
+  loadingDialog: LoadingDialogModel;
 
-    // Side Nav
-    @ViewChild('sideNav', { static: true }) sideNav: MatSidenav;
+  // Side Nav
+  @ViewChild('sideNav', { static: true }) sideNav: MatSidenav;
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        private formHelper: FormHelperService,
-        private snackbarService: SnackbarService,
-        private globalEntitySearchDataService: GlobalEntitySearchDataService,
-        private outbreakDataService: OutbreakDataService,
-        private dialogService: DialogService,
-        private router: Router,
-        private redirectService: RedirectService
-    ) {
-    }
+  constructor(
+    private formHelper: FormHelperService,
+    private snackbarService: SnackbarService,
+    private globalEntitySearchDataService: GlobalEntitySearchDataService,
+    private outbreakDataService: OutbreakDataService,
+    private dialogService: DialogService,
+    private router: Router,
+    private redirectService: RedirectService
+  ) {
+  }
 
-    ngOnInit() {
-        // subscribe to the Selected Outbreak Subject stream
-        this.outbreakSubscriber = this.outbreakDataService
-            .getSelectedOutbreakSubject()
-            .subscribe((selectedOutbreak: OutbreakModel) => {
-                this.selectedOutbreak = selectedOutbreak;
-            });
-    }
+  ngOnInit() {
+    // subscribe to the Selected Outbreak Subject stream
+    this.outbreakSubscriber = this.outbreakDataService
+      .getSelectedOutbreakSubject()
+      .subscribe((selectedOutbreak: OutbreakModel) => {
+        this.selectedOutbreak = selectedOutbreak;
+      });
+  }
 
-    ngOnDestroy() {
-        // outbreak subscriber
-        if (this.outbreakSubscriber) {
-            this.outbreakSubscriber.unsubscribe();
-            this.outbreakSubscriber = null;
-        }
+  ngOnDestroy() {
+    // outbreak subscriber
+    if (this.outbreakSubscriber) {
+      this.outbreakSubscriber.unsubscribe();
+      this.outbreakSubscriber = null;
     }
+  }
 
-    /**
+  /**
      * Close Side Nav
      */
-    closeSideNav() {
-        this.sideNav.close();
-    }
+  closeSideNav() {
+    this.sideNav.close();
+  }
 
-    /**
+  /**
      * Open Side Nav
      */
-    openSideNav() {
-        // show side nav
-        this.sideNav.open();
-    }
+  openSideNav() {
+    // show side nav
+    this.sideNav.open();
+  }
 
-    /**
+  /**
      * Search entity
      */
-    search(form: NgForm) {
-        // get fields
-        const fields: any = this.formHelper.getFields(form);
-        if (!_.isEmpty(fields.globalSearchValue)) {
-            if (this.selectedOutbreak.id) {
-                this.showLoadingDialog();
+  search(form: NgForm) {
+    // get fields
+    const fields: any = this.formHelper.getFields(form);
+    if (!_.isEmpty(fields.globalSearchValue)) {
+      if (this.selectedOutbreak.id) {
+        this.showLoadingDialog();
 
-                // search for the entity
-                const qb: RequestQueryBuilder = new RequestQueryBuilder();
-                qb.filter.firstLevelConditions();
-                qb.limit(2);
-                this.globalEntitySearchDataService.searchEntity(
-                    this.selectedOutbreak.id,
-                    this.globalSearchValue,
-                    qb
-                )
-                    .pipe(
-                        catchError((err) => {
-                            this.closeLoadingDialog();
-                            this.snackbarService.showApiError(err);
+        // search for the entity
+        const qb: RequestQueryBuilder = new RequestQueryBuilder();
+        qb.filter.firstLevelConditions();
+        qb.limit(2);
+        this.globalEntitySearchDataService.searchEntity(
+          this.selectedOutbreak.id,
+          this.globalSearchValue,
+          qb
+        )
+          .pipe(
+            catchError((err) => {
+              this.closeLoadingDialog();
+              this.snackbarService.showApiError(err);
 
-                            return throwError(err);
-                        })
-                    )
-                    .subscribe((results) => {
-                        // close side nav
-                        this.closeSideNav();
+              return throwError(err);
+            })
+          )
+          .subscribe((results) => {
+            // close side nav
+            this.closeSideNav();
 
-                        // check the number of results
-                        if (
-                            results &&
+            // check the number of results
+            if (
+              results &&
                             results.length > 0
-                        ) {
-                            // if there is a single result, navigate to the entity view page, otherwise display all results in a new page
-                            if (results.length === 1) {
-                                // generate the link for the entity view
-                                const personLink = EntityModel.getPersonLink(results[0]);
+            ) {
+              // if there is a single result, navigate to the entity view page, otherwise display all results in a new page
+              if (results.length === 1) {
+                // generate the link for the entity view
+                const personLink = EntityModel.getPersonLink(results[0]);
 
-                                // navigate to the person view page
-                                this.router.navigate([personLink]);
+                // navigate to the person view page
+                this.router.navigate([personLink]);
 
-                                // empty search field
-                                this.globalSearchValue = '';
+                // empty search field
+                this.globalSearchValue = '';
 
-                                // close side nav
-                                this.closeSideNav();
+                // close side nav
+                this.closeSideNav();
 
-                                // hide loading
-                                this.closeLoadingDialog();
-                            } else {
-                                // display all results
-                                this.redirectService.to(
-                                    [`/outbreaks/${this.selectedOutbreak.id}/search-results`],
-                                    {
-                                        search: fields.globalSearchValue
-                                    }
-                                );
+                // hide loading
+                this.closeLoadingDialog();
+              } else {
+                // display all results
+                this.redirectService.to(
+                  [`/outbreaks/${this.selectedOutbreak.id}/search-results`],
+                  {
+                    search: fields.globalSearchValue
+                  }
+                );
 
-                                // hide loading
-                                this.closeLoadingDialog();
-                            }
+                // hide loading
+                this.closeLoadingDialog();
+              }
 
-                            // empty search field
-                            this.globalSearchValue = '';
-                        } else {
-                            this.snackbarService.showError('LNG_GLOBAL_ENTITY_SEARCH_NO_ENTITIES_MESSAGE');
+              // empty search field
+              this.globalSearchValue = '';
+            } else {
+              this.snackbarService.showError('LNG_GLOBAL_ENTITY_SEARCH_NO_ENTITIES_MESSAGE');
 
-                            // hide loading
-                            this.closeLoadingDialog();
+              // hide loading
+              this.closeLoadingDialog();
 
-                            // did user enter a UID?
-                            if (fields.globalSearchValue.length === 36) {
-                                // ask user about creating a new case with the given UID
-                                this.askCreateCaseWithUID(fields.globalSearchValue);
-                            }
-                        }
-                    });
-
+              // did user enter a UID?
+              if (fields.globalSearchValue.length === 36) {
+                // ask user about creating a new case with the given UID
+                this.askCreateCaseWithUID(fields.globalSearchValue);
+              }
             }
-        }
-    }
+          });
 
-    /**
+      }
+    }
+  }
+
+  /**
      * Ask user about creating a new case with a given UID
      */
-    askCreateCaseWithUID(uid: string) {
-        // show confirm dialog to confirm the action
-        this.dialogService.showConfirm('LNG_GLOBAL_ENTITY_SEARCH_DIALOG_CREATE_CASE_WITH_UID_TITLE')
-            .subscribe((answer: DialogAnswer) => {
-                if (answer.button === DialogAnswerButton.Yes) {
-                    this.router.navigate(['/cases/create'], { queryParams: { uid: uid } });
+  askCreateCaseWithUID(uid: string) {
+    // show confirm dialog to confirm the action
+    this.dialogService.showConfirm('LNG_GLOBAL_ENTITY_SEARCH_DIALOG_CREATE_CASE_WITH_UID_TITLE')
+      .subscribe((answer: DialogAnswer) => {
+        if (answer.button === DialogAnswerButton.Yes) {
+          this.router.navigate(['/cases/create'], { queryParams: { uid: uid } });
 
-                    // close side nav
-                    this.closeSideNav();
-                }
-            });
-    }
+          // close side nav
+          this.closeSideNav();
+        }
+      });
+  }
 
-    /**
+  /**
      * Display loading dialog
      */
-    showLoadingDialog() {
-        this.loadingDialog = this.dialogService.showLoadingDialog();
-    }
+  showLoadingDialog() {
+    this.loadingDialog = this.dialogService.showLoadingDialog();
+  }
 
-    /**
+  /**
      * Hide loading dialog
      */
-    closeLoadingDialog() {
-        if (this.loadingDialog) {
-            this.loadingDialog.close();
-            this.loadingDialog = null;
-        }
+  closeLoadingDialog() {
+    if (this.loadingDialog) {
+      this.loadingDialog.close();
+      this.loadingDialog = null;
     }
+  }
 
 
 }

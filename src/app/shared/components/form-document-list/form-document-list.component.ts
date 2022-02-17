@@ -8,38 +8,38 @@ import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 import { DialogService } from '../../../core/services/helper/dialog.service';
 
 @Component({
-    selector: 'app-form-document-list',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './form-document-list.component.html',
-    styleUrls: ['./form-document-list.component.less'],
-    providers: [{
-        provide: NG_VALUE_ACCESSOR,
-        useExisting: FormDocumentListComponent,
-        multi: true
-    }]
+  selector: 'app-form-document-list',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './form-document-list.component.html',
+  styleUrls: ['./form-document-list.component.less'],
+  providers: [{
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: FormDocumentListComponent,
+    multi: true
+  }]
 })
 export class FormDocumentListComponent extends ListBase<DocumentModel> implements OnInit {
-    @Input() required: boolean = false;
-    @Input() disabled: boolean = false;
+  @Input() required: boolean = false;
+  @Input() disabled: boolean = false;
 
-    constructor(
-        @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
-        @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
-        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
-        private dialogService: DialogService
-    ) {
-        super(controlContainer, validators, asyncValidators);
-    }
+  constructor(
+  @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
+    @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
+    @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
+    private dialogService: DialogService
+  ) {
+    super(controlContainer, validators, asyncValidators);
+  }
 
-    ngOnInit() {
-        // handle remove item confirmation
-        this.deleteConfirm.subscribe((observer: Subscriber<void>) => {
-            this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_DOCUMENT')
-                .subscribe((answer: DialogAnswer) => {
-                    if (answer.button === DialogAnswerButton.Yes) {
-                        observer.next();
-                    }
-                });
+  ngOnInit() {
+    // handle remove item confirmation
+    this.deleteConfirm.subscribe((observer: Subscriber<void>) => {
+      this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_DOCUMENT')
+        .subscribe((answer: DialogAnswer) => {
+          if (answer.button === DialogAnswerButton.Yes) {
+            observer.next();
+          }
         });
-    }
+    });
+  }
 }

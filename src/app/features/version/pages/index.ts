@@ -6,5 +6,5 @@ export * from './version/version.component';
 
 // export the list of all page components
 export const pageComponents: any[] = [
-    VersionComponent
+  VersionComponent
 ];

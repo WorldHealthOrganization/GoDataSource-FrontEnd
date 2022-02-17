@@ -12,112 +12,112 @@ import { ContactModel } from '../../../core/models/contact.model';
 import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
-    selector: 'app-form-contact-quick',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './form-contact-quick.component.html',
-    styleUrls: ['./form-contact-quick.component.less'],
-    providers: [{
-        provide: NG_VALUE_ACCESSOR,
-        useExisting: FormContactQuickComponent,
-        multi: true
-    }]
+  selector: 'app-form-contact-quick',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './form-contact-quick.component.html',
+  styleUrls: ['./form-contact-quick.component.less'],
+  providers: [{
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: FormContactQuickComponent,
+    multi: true
+  }]
 })
 export class FormContactQuickComponent extends GroupBase<ContactModel> implements OnInit, GroupDirtyFields, OnDestroy {
-    genderList$: Observable<any[]>;
-    riskLevelsList$: Observable<any[]>;
-    occupationsList$: Observable<any[]>;
-    finalFollowUpStatus$: Observable<any[]>;
+  genderList$: Observable<any[]>;
+  riskLevelsList$: Observable<any[]>;
+  occupationsList$: Observable<any[]>;
+  finalFollowUpStatus$: Observable<any[]>;
 
-    currentDate = Constants.getCurrentDate();
+  currentDate = Constants.getCurrentDate();
 
-    // selected outbreak
-    selectedOutbreak: OutbreakModel;
-    displayRefresh: boolean = false;
+  // selected outbreak
+  selectedOutbreak: OutbreakModel;
+  displayRefresh: boolean = false;
 
-    outbreakSubscriber: Subscription;
+  outbreakSubscriber: Subscription;
 
-    visualIDTranslateData: {
-        mask: string
-    };
+  visualIDTranslateData: {
+    mask: string
+  };
 
-    constructor(
-        @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
-        @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
-        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
-        private outbreakDataService: OutbreakDataService,
-        private referenceDataDataService: ReferenceDataDataService
-    ) {
-        super(controlContainer, validators, asyncValidators);
-    }
+  constructor(
+  @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
+    @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
+    @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
+    private outbreakDataService: OutbreakDataService,
+    private referenceDataDataService: ReferenceDataDataService
+  ) {
+    super(controlContainer, validators, asyncValidators);
+  }
 
-    /**
+  /**
      * Initialize component elements
      */
-    ngOnInit() {
-        // init value
-        this.value = new ContactModel(this.value);
+  ngOnInit() {
+    // init value
+    this.value = new ContactModel(this.value);
 
-        // reference data
-        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
-        this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
-        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
-        this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);
+    // reference data
+    this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
+    this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
+    this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
+    this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);
 
-        // subscribe to the Selected Outbreak
-        this.outbreakSubscriber = this.outbreakDataService
-            .getSelectedOutbreakSubject()
-            .subscribe((selectedOutbreak: OutbreakModel) => {
-                this.selectedOutbreak = selectedOutbreak;
-                // if contact id mask is not empty show refresh contact id mask button
-                if (!_.isEmpty(this.selectedOutbreak.contactIdMask)) {
-                    this.displayRefresh = true;
-                }
-
-                // set visual ID translate data
-                this.visualIDTranslateData = {
-                    mask: ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask)
-                };
-            });
-    }
-
-    ngOnDestroy() {
-        // outbreak subscriber
-        if (this.outbreakSubscriber) {
-            this.outbreakSubscriber.unsubscribe();
-            this.outbreakSubscriber = null;
+    // subscribe to the Selected Outbreak
+    this.outbreakSubscriber = this.outbreakDataService
+      .getSelectedOutbreakSubject()
+      .subscribe((selectedOutbreak: OutbreakModel) => {
+        this.selectedOutbreak = selectedOutbreak;
+        // if contact id mask is not empty show refresh contact id mask button
+        if (!_.isEmpty(this.selectedOutbreak.contactIdMask)) {
+          this.displayRefresh = true;
         }
-    }
 
-    /**
+        // set visual ID translate data
+        this.visualIDTranslateData = {
+          mask: ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask)
+        };
+      });
+  }
+
+  ngOnDestroy() {
+    // outbreak subscriber
+    if (this.outbreakSubscriber) {
+      this.outbreakSubscriber.unsubscribe();
+      this.outbreakSubscriber = null;
+    }
+  }
+
+  /**
      * Contact Model
      */
-    get contact(): ContactModel {
-        return this.value;
-    }
+  get contact(): ContactModel {
+    return this.value;
+  }
 
-    /**
+  /**
      * Generate visual ID for contact
      */
-    generateVisualId() {
-        if (!_.isEmpty(this.selectedOutbreak.contactIdMask)) {
-            this.contact.visualId = ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask);
-            this.groupForm.controls.visualId.markAsDirty();
-            this.onChange();
-        }
+  generateVisualId() {
+    if (!_.isEmpty(this.selectedOutbreak.contactIdMask)) {
+      this.contact.visualId = ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask);
+      this.groupForm.controls.visualId.markAsDirty();
+      this.onChange();
     }
+  }
 
-    /**
+  /**
      * Retrieve fields
      */
-    getDirtyFields(): {
-        [name: string]: FormControl
-    } {
-        const dirtyControls = {};
-        _.forEach(this.groupForm.controls, (control: FormControl, controlName: string) => {
-            if (control.dirty) {
-                dirtyControls[controlName] = control;
-            }
-        });
-        return dirtyControls;
-    }
+  getDirtyFields(): {
+    [name: string]: FormControl
+  } {
+    const dirtyControls = {};
+    _.forEach(this.groupForm.controls, (control: FormControl, controlName: string) => {
+      if (control.dirty) {
+        dirtyControls[controlName] = control;
+      }
+    });
+    return dirtyControls;
+  }
 }

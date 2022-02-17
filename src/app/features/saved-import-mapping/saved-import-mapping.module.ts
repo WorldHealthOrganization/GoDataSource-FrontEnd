@@ -4,13 +4,13 @@ import { routing } from './saved-import-mapping.module.routing';
 
 import * as fromPages from './pages';
 @NgModule({
-    imports: [
-        routing,
-        SharedModule
-    ],
-    declarations: [
-        ...fromPages.pageComponents,
-    ]
+  imports: [
+    routing,
+    SharedModule
+  ],
+  declarations: [
+    ...fromPages.pageComponents,
+  ]
 })
 
 export class SavedImportMappingModule {

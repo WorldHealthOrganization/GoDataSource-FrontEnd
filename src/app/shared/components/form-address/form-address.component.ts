@@ -12,124 +12,124 @@ import { Observable } from 'rxjs';
 import { moment, Moment } from '../../../core/helperClasses/x-moment';
 
 @Component({
-    selector: 'app-form-address',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './form-address.component.html',
-    styleUrls: ['./form-address.component.less'],
-    providers: [{
-        provide: NG_VALUE_ACCESSOR,
-        useExisting: FormAddressComponent,
-        multi: true
-    }]
+  selector: 'app-form-address',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './form-address.component.html',
+  styleUrls: ['./form-address.component.less'],
+  providers: [{
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: FormAddressComponent,
+    multi: true
+  }]
 })
 export class FormAddressComponent extends GroupBase<AddressModel> implements OnInit, GroupFilteredValue<any> {
-    @Input() disabled: boolean = false;
-    @Input() required: boolean = false;
+  @Input() disabled: boolean = false;
+  @Input() required: boolean = false;
 
-    @Input() componentTitle: string;
+  @Input() componentTitle: string;
 
-    addressTypes$: Observable<any[]>;
+  addressTypes$: Observable<any[]>;
 
-    @Input() displayCopyField: boolean = false;
-    @Input() displayCopyFieldDescription: string;
-    @Output() copyValue = new EventEmitter<string>();
+  @Input() displayCopyField: boolean = false;
+  @Input() displayCopyFieldDescription: string;
+  @Output() copyValue = new EventEmitter<string>();
 
-    serverToday: Moment = moment();
+  serverToday: Moment = moment();
 
-    constructor(
-        @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
-        @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
-        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
-        private referenceDataDataService: ReferenceDataDataService,
-        private dialogService: DialogService
-    ) {
-        super(controlContainer, validators, asyncValidators);
-    }
+  constructor(
+  @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
+    @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
+    @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
+    private referenceDataDataService: ReferenceDataDataService,
+    private dialogService: DialogService
+  ) {
+    super(controlContainer, validators, asyncValidators);
+  }
 
-    /**
+  /**
      * Initialize component elements
      */
-    ngOnInit() {
-        // init value
-        this.value = new AddressModel(this.value);
+  ngOnInit() {
+    // init value
+    this.value = new AddressModel(this.value);
 
-        this.addressTypes$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.ADDRESS_TYPE);
-    }
+    this.addressTypes$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.ADDRESS_TYPE);
+  }
 
-    /**
+  /**
      * Address Model
      */
-    get address(): AddressModel {
-        return this.value ? this.value : {} as AddressModel;
-    }
+  get address(): AddressModel {
+    return this.value ? this.value : {} as AddressModel;
+  }
 
-    /**
+  /**
      * Copy value
      * @param property
      */
-    triggerCopyValue(property) {
-        this.copyValue.emit(property);
-    }
+  triggerCopyValue(property) {
+    this.copyValue.emit(property);
+  }
 
-    /**
+  /**
      * Get Filtered Value
      */
-    getFilteredValue(): any {
-        // strip unnecessary data
-        return this.value ?
-            new AddressModel(this.address).sanitize() :
-            this.value;
-    }
+  getFilteredValue(): any {
+    // strip unnecessary data
+    return this.value ?
+      new AddressModel(this.address).sanitize() :
+      this.value;
+  }
 
-    /**
+  /**
      * Location Changed
      * @param data
      */
-    locationChanged(data: LocationAutoItem) {
-        if (
-            data &&
+  locationChanged(data: LocationAutoItem) {
+    if (
+      data &&
             data.geoLocation &&
             data.geoLocation.lat &&
             data.geoLocation.lng
-        ) {
-            this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_REPLACE_GEOLOCATION')
-                .subscribe((answer: DialogAnswer) => {
-                    if (answer.button === DialogAnswerButton.Yes) {
-                        this.address.geoLocation.lat = data.geoLocation.lat;
-                        this.address.geoLocation.lng = data.geoLocation.lng;
-                    }
-                });
-        }
+    ) {
+      this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_REPLACE_GEOLOCATION')
+        .subscribe((answer: DialogAnswer) => {
+          if (answer.button === DialogAnswerButton.Yes) {
+            this.address.geoLocation.lat = data.geoLocation.lat;
+            this.address.geoLocation.lng = data.geoLocation.lng;
+          }
+        });
     }
+  }
 
-    /**
+  /**
      * Update Lat Lng
      * @param property
      * @param data
      */
-    onChangeLatLng(
-        property: string,
-        value
-    ) {
-        _.set(
-            this.address,
-            `geoLocation.${property}`,
-            value ? parseFloat(value) : undefined
-        );
+  onChangeLatLng(
+    property: string,
+    value
+  ) {
+    _.set(
+      this.address,
+      `geoLocation.${property}`,
+      value ? parseFloat(value) : undefined
+    );
 
-        // on change trigger
-        setTimeout(() => {
-            super.onChange();
-        });
-    }
+    // on change trigger
+    setTimeout(() => {
+      super.onChange();
+    });
+  }
 
-    /**
+  /**
      * Check if lat & lng are required
      */
-    isLatLngRequired(value: any) {
-        return _.isString(value) ?
-            value.length > 0 : (
-                value || value === 0
-            );
-    }
+  isLatLngRequired(value: any) {
+    return _.isString(value) ?
+      value.length > 0 : (
+        value || value === 0
+      );
+  }
 }

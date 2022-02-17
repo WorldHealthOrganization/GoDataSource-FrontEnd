@@ -16,10 +16,10 @@ export * from './modify-questionnaire-lab-result/modify-questionnaire-lab-result
 
 // export the list of all page components
 export const pageComponents: any[] = [
-    EntityLabResultsListComponent,
-    CreateLabResultComponent,
-    GanttChartComponent,
-    LabResultsListComponent,
-    ModifyLabResultComponent,
-    ModifyQuestionnaireLabResultComponent
+  EntityLabResultsListComponent,
+  CreateLabResultComponent,
+  GanttChartComponent,
+  LabResultsListComponent,
+  ModifyLabResultComponent,
+  ModifyQuestionnaireLabResultComponent
 ];

@@ -8,58 +8,58 @@ import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 
 const routes: Routes = [
-    // Language list
-    {
-        path: '',
-        component: fromPages.LanguagesListComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [
-                PERMISSION.LANGUAGE_LIST
-            ]
-        }
-    },
-    // Create Language
-    {
-        path: 'create',
-        component: fromPages.CreateLanguageComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [
-                PERMISSION.LANGUAGE_CREATE
-            ]
-        },
-        canDeactivate: [
-            PageChangeConfirmationGuard
-        ]
-    },
-    // View Language
-    {
-        path: ':languageId/view',
-        component: fromPages.ModifyLanguageComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [
-                PERMISSION.LANGUAGE_VIEW
-            ],
-            action: ViewModifyComponentAction.VIEW
-        }
-    },
-    // Modify Language
-    {
-        path: ':languageId/modify',
-        component: fromPages.ModifyLanguageComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [
-                PERMISSION.LANGUAGE_MODIFY
-            ],
-            action: ViewModifyComponentAction.MODIFY
-        },
-        canDeactivate: [
-            PageChangeConfirmationGuard
-        ]
+  // Language list
+  {
+    path: '',
+    component: fromPages.LanguagesListComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.LANGUAGE_LIST
+      ]
     }
+  },
+  // Create Language
+  {
+    path: 'create',
+    component: fromPages.CreateLanguageComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.LANGUAGE_CREATE
+      ]
+    },
+    canDeactivate: [
+      PageChangeConfirmationGuard
+    ]
+  },
+  // View Language
+  {
+    path: ':languageId/view',
+    component: fromPages.ModifyLanguageComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.LANGUAGE_VIEW
+      ],
+      action: ViewModifyComponentAction.VIEW
+    }
+  },
+  // Modify Language
+  {
+    path: ':languageId/modify',
+    component: fromPages.ModifyLanguageComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.LANGUAGE_MODIFY
+      ],
+      action: ViewModifyComponentAction.MODIFY
+    },
+    canDeactivate: [
+      PageChangeConfirmationGuard
+    ]
+  }
 ];
 
 export const routing: ModuleWithProviders<RouterModule> = RouterModule.forChild(routes);

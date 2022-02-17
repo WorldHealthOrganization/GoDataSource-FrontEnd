@@ -9,14 +9,14 @@ import { SharedModule } from '../../shared/shared.module';
 import * as fromPages from './pages';
 
 @NgModule({
-    imports: [
-        routing,
-        SharedModule,
-        HotTableModule.forRoot()
-    ],
-    declarations: [
-        ...fromPages.pageComponents
-    ]
+  imports: [
+    routing,
+    SharedModule,
+    HotTableModule.forRoot()
+  ],
+  declarations: [
+    ...fromPages.pageComponents
+  ]
 })
 export class DuplicateRecordsModule {
 }

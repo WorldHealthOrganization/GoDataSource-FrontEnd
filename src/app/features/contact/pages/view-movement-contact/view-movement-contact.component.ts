@@ -13,117 +13,117 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel } from '../../../../core/models/user.model';
 
 @Component({
-    selector: 'app-view-movement-contact',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './view-movement-contact.component.html',
-    styleUrls: ['./view-movement-contact.component.less']
+  selector: 'app-view-movement-contact',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './view-movement-contact.component.html',
+  styleUrls: ['./view-movement-contact.component.less']
 })
 export class ViewMovementContactComponent implements OnInit {
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs
+  breadcrumbs: BreadcrumbItemModel[] = [];
 
-    contactData: ContactModel = new ContactModel();
-    movementAddresses: AddressModel[] = [];
+  contactData: ContactModel = new ContactModel();
+  movementAddresses: AddressModel[] = [];
 
-    // loading data
-    displayLoading: boolean = true;
+  // loading data
+  displayLoading: boolean = true;
 
-    @ViewChild('mapMovement', { static: true }) mapMovement: WorldMapMovementComponent;
+  @ViewChild('mapMovement', { static: true }) mapMovement: WorldMapMovementComponent;
 
-    // constants
-    ContactModel = ContactModel;
+  // constants
+  ContactModel = ContactModel;
 
-    // authenticated user details
-    authUser: UserModel;
+  // authenticated user details
+  authUser: UserModel;
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        protected route: ActivatedRoute,
-        private contactDataService: ContactDataService,
-        private outbreakDataService: OutbreakDataService,
-        private authDataService: AuthDataService
-    ) {}
+  constructor(
+    protected route: ActivatedRoute,
+    private contactDataService: ContactDataService,
+    private outbreakDataService: OutbreakDataService,
+    private authDataService: AuthDataService
+  ) {}
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+  ngOnInit() {
+    // get the authenticated user
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
-        this.route.params.subscribe((params: { contactId }) => {
-            this.outbreakDataService
-                .getSelectedOutbreak()
-                .subscribe((selectedOutbreak: OutbreakModel) => {
-                    forkJoin([
-                        this.contactDataService.getContact(selectedOutbreak.id, params.contactId),
-                        this.contactDataService.getContactMovement(selectedOutbreak.id, params.contactId)
-                    ])
-                    .subscribe((
-                        [contactData, movementData]: [ContactModel, AddressModel[]]
-                    ) => {
-                        // contact data
-                        this.contactData = contactData;
+    this.route.params.subscribe((params: { contactId }) => {
+      this.outbreakDataService
+        .getSelectedOutbreak()
+        .subscribe((selectedOutbreak: OutbreakModel) => {
+          forkJoin([
+            this.contactDataService.getContact(selectedOutbreak.id, params.contactId),
+            this.contactDataService.getContactMovement(selectedOutbreak.id, params.contactId)
+          ])
+            .subscribe((
+              [contactData, movementData]: [ContactModel, AddressModel[]]
+            ) => {
+              // contact data
+              this.contactData = contactData;
 
-                        // initialize page breadcrumbs
-                        this.initializeBreadcrumbs();
+              // initialize page breadcrumbs
+              this.initializeBreadcrumbs();
 
-                        // movement data
-                        this.displayLoading = false;
-                        this.movementAddresses = movementData;
-                    });
-                });
+              // movement data
+              this.displayLoading = false;
+              this.movementAddresses = movementData;
+            });
         });
+    });
 
-        // initialize page breadcrumbs
-        this.initializeBreadcrumbs();
-    }
+    // initialize page breadcrumbs
+    this.initializeBreadcrumbs();
+  }
 
-    /**
+  /**
      * Initialize breadcrumbs
      */
-    initializeBreadcrumbs() {
-        // reset
-        this.breadcrumbs = [];
+  initializeBreadcrumbs() {
+    // reset
+    this.breadcrumbs = [];
 
-        // contacts list page
-        if (ContactModel.canList(this.authUser)) {
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-            );
-        }
-
-        // contact breadcrumbs
-        if (this.contactData) {
-            // contacts view page
-            if (ContactModel.canView(this.authUser)) {
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel(
-                        this.contactData.name,
-                        `/contacts/${this.contactData.id}/view`
-                    )
-                );
-            }
-
-            // current page
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel(
-                    'LNG_PAGE_VIEW_MOVEMENT_CONTACT_TITLE',
-                    '.',
-                    true,
-                    {},
-                    this.contactData
-                )
-            );
-        }
+    // contacts list page
+    if (ContactModel.canList(this.authUser)) {
+      this.breadcrumbs.push(
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+      );
     }
 
-    /**
+    // contact breadcrumbs
+    if (this.contactData) {
+      // contacts view page
+      if (ContactModel.canView(this.authUser)) {
+        this.breadcrumbs.push(
+          new BreadcrumbItemModel(
+            this.contactData.name,
+            `/contacts/${this.contactData.id}/view`
+          )
+        );
+      }
+
+      // current page
+      this.breadcrumbs.push(
+        new BreadcrumbItemModel(
+          'LNG_PAGE_VIEW_MOVEMENT_CONTACT_TITLE',
+          '.',
+          true,
+          {},
+          this.contactData
+        )
+      );
+    }
+  }
+
+  /**
      * Export movement map for contact
      */
-    exportContactMovementMap() {
-        this.mapMovement.exportMovementMap(EntityType.CONTACT);
-    }
+  exportContactMovementMap() {
+    this.mapMovement.exportMovementMap(EntityType.CONTACT);
+  }
 }

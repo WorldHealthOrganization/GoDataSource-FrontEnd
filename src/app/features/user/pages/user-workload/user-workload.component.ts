@@ -20,277 +20,277 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 interface IUserMap {
-    id: string;
-    dates: {};
-    name: string;
+  id: string;
+  dates: {};
+  name: string;
 }
 
 @Component({
-    selector: 'app-user-workload',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './user-workload.component.html',
-    styleUrls: ['./user-workload.component.less']
+  selector: 'app-user-workload',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './user-workload.component.html',
+  styleUrls: ['./user-workload.component.less']
 })
 export class UserWorkloadComponent extends ListComponent implements OnInit, OnDestroy {
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs
+  breadcrumbs: BreadcrumbItemModel[] = [];
 
-    selectedOutbreak: OutbreakModel;
+  selectedOutbreak: OutbreakModel;
 
-    dates: string[] = [];
-    usersDataShow: IUserMap[] = [];
-    usersData: IUserMap[];
+  dates: string[] = [];
+  usersDataShow: IUserMap[] = [];
+  usersData: IUserMap[];
 
-    // loading flag - display spinner instead of table
-    displayLoading: boolean = false;
+  // loading flag - display spinner instead of table
+  displayLoading: boolean = false;
 
-    // Filter slider data
-    slideFilterData: {
-        minDate: Moment,
-        maxDate: Moment,
-        maxRange: number
-    } = {
-        minDate: moment().startOf('day'),
-        maxDate: moment().endOf('day'),
-        maxRange: 0
+  // Filter slider data
+  slideFilterData: {
+    minDate: Moment,
+    maxDate: Moment,
+    maxRange: number
+  } = {
+      minDate: moment().startOf('day'),
+      maxDate: moment().endOf('day'),
+      maxRange: 0
     };
 
-    // authenticated user
-    authUser: UserModel;
+  // authenticated user
+  authUser: UserModel;
 
-    // Slider Date Filter Value
-    sliderDateFilterValue: FormDateRangeSliderData;
+  // Slider Date Filter Value
+  sliderDateFilterValue: FormDateRangeSliderData;
 
-    getSelectedOutbreakSubject: Subscription;
+  getSelectedOutbreakSubject: Subscription;
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        protected listHelperService: ListHelperService,
-        private outbreakDataService: OutbreakDataService,
-        private followUpsDataService: FollowUpsDataService,
-        private snackbarService: SnackbarService,
-        private i18nService: I18nService,
-        private userDataService: UserDataService,
-        private authDataService: AuthDataService
-    ) {
-        super(
-            listHelperService,
-            true
-        );
-    }
+  constructor(
+    protected listHelperService: ListHelperService,
+    private outbreakDataService: OutbreakDataService,
+    private followUpsDataService: FollowUpsDataService,
+    private snackbarService: SnackbarService,
+    private i18nService: I18nService,
+    private userDataService: UserDataService,
+    private authDataService: AuthDataService
+  ) {
+    super(
+      listHelperService,
+      true
+    );
+  }
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+  ngOnInit() {
+    // get the authenticated user
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
-        // get users
-        this.displayLoading = true;
-        this.userDataService
-            .getUsersList()
-            .subscribe((users) => {
-                // map users
-                this.usersData = [{
-                    id: null,
-                    name: this.i18nService.instant('LNG_PAGE_USERS_WORKLOAD_NO_USER_LABEL'),
-                    dates: {}
-                }];
-                _.forEach(users, (user: UserModel) => {
-                    this.usersData.push({
-                        id: user.id,
-                        name: user.name,
-                        dates: {}
-                    });
-                });
+    // get users
+    this.displayLoading = true;
+    this.userDataService
+      .getUsersList()
+      .subscribe((users) => {
+        // map users
+        this.usersData = [{
+          id: null,
+          name: this.i18nService.instant('LNG_PAGE_USERS_WORKLOAD_NO_USER_LABEL'),
+          dates: {}
+        }];
+        _.forEach(users, (user: UserModel) => {
+          this.usersData.push({
+            id: user.id,
+            name: user.name,
+            dates: {}
+          });
+        });
 
-                // retrieve outbreak data
-                this.getSelectedOutbreakSubject = this.outbreakDataService
-                    .getSelectedOutbreakSubject()
-                    .subscribe((selectedOutbreak: OutbreakModel) => {
-                        // selected outbreak
-                        this.selectedOutbreak = selectedOutbreak;
-                        if (
-                            this.selectedOutbreak &&
+        // retrieve outbreak data
+        this.getSelectedOutbreakSubject = this.outbreakDataService
+          .getSelectedOutbreakSubject()
+          .subscribe((selectedOutbreak: OutbreakModel) => {
+            // selected outbreak
+            this.selectedOutbreak = selectedOutbreak;
+            if (
+              this.selectedOutbreak &&
                             this.selectedOutbreak.id
-                        ) {
-                            // set min & max dates
-                            this.slideFilterData.minDate = moment(this.selectedOutbreak.startDate).startOf('day');
-                            this.slideFilterData.maxDate = moment().add(1, 'days').endOf('day');
-                            this.slideFilterData.maxRange = this.selectedOutbreak.periodOfFollowup;
-                            this.sliderDateFilterValue = new FormDateRangeSliderData({
-                                low: moment().add(-this.selectedOutbreak.periodOfFollowup + 1, 'days').startOf('day'),
-                                high: moment().add(1, 'days').endOf('day')
-                            });
-                        } else {
-                            // hide loading
-                            this.displayLoading = false;
-                        }
-                    });
-            });
+            ) {
+              // set min & max dates
+              this.slideFilterData.minDate = moment(this.selectedOutbreak.startDate).startOf('day');
+              this.slideFilterData.maxDate = moment().add(1, 'days').endOf('day');
+              this.slideFilterData.maxRange = this.selectedOutbreak.periodOfFollowup;
+              this.sliderDateFilterValue = new FormDateRangeSliderData({
+                low: moment().add(-this.selectedOutbreak.periodOfFollowup + 1, 'days').startOf('day'),
+                high: moment().add(1, 'days').endOf('day')
+              });
+            } else {
+              // hide loading
+              this.displayLoading = false;
+            }
+          });
+      });
 
-        // initialize breadcrumbs
-        this.initializeBreadcrumbs();
-    }
+    // initialize breadcrumbs
+    this.initializeBreadcrumbs();
+  }
 
-    /**
+  /**
      * Initialize breadcrumbs
      */
-    private initializeBreadcrumbs() {
-        // reset
-        this.breadcrumbs = [];
+  private initializeBreadcrumbs() {
+    // reset
+    this.breadcrumbs = [];
 
-        // add list breadcrumb only if we have permission
-        if (UserModel.canList(this.authUser)) {
-            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '/users'));
-        }
-
-        // workload breadcrumb
-        this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_USERS_WORKLOAD_TITLE', '.', true));
+    // add list breadcrumb only if we have permission
+    if (UserModel.canList(this.authUser)) {
+      this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '/users'));
     }
 
-    /**
+    // workload breadcrumb
+    this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_USERS_WORKLOAD_TITLE', '.', true));
+  }
+
+  /**
      * Remove component resources
      */
-    ngOnDestroy() {
-        // release parent resources
-        super.ngOnDestroy();
+  ngOnDestroy() {
+    // release parent resources
+    super.ngOnDestroy();
 
-        if (this.getSelectedOutbreakSubject) {
-            this.getSelectedOutbreakSubject.unsubscribe();
-            this.getSelectedOutbreakSubject = null;
-        }
+    if (this.getSelectedOutbreakSubject) {
+      this.getSelectedOutbreakSubject.unsubscribe();
+      this.getSelectedOutbreakSubject = null;
     }
+  }
 
-    /**
+  /**
      * Refresh list
      */
-    refreshList(finishCallback: (records: any[]) => void) {
-        if (
-            this.selectedOutbreak &&
+  refreshList(finishCallback: (records: any[]) => void) {
+    if (
+      this.selectedOutbreak &&
             !_.isEmpty(this.usersData)
-        ) {
-            // construct array of dates
-            this.displayLoading = true;
-            this.dates = [];
-            const dates = [
-                this.i18nService.instant('LNG_PAGE_USERS_WORKLOAD_USER_LABEL')
-            ];
-            const currentDate = moment(this.sliderDateFilterValue.low);
-            while (currentDate.isSameOrBefore(this.sliderDateFilterValue.high)) {
-                dates.push(currentDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
-                currentDate.add(1, 'days');
-            }
+    ) {
+      // construct array of dates
+      this.displayLoading = true;
+      this.dates = [];
+      const dates = [
+        this.i18nService.instant('LNG_PAGE_USERS_WORKLOAD_USER_LABEL')
+      ];
+      const currentDate = moment(this.sliderDateFilterValue.low);
+      while (currentDate.isSameOrBefore(this.sliderDateFilterValue.high)) {
+        dates.push(currentDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
+        currentDate.add(1, 'days');
+      }
 
-            // retrieve data
-            if (dates.length > 1) {
-                // add filter period
-                this.queryBuilder.filter.byDateRange(
-                    'date', {
-                        startDate: moment(this.sliderDateFilterValue.low).startOf('day'),
-                        endDate: moment(this.sliderDateFilterValue.high).endOf('day')
-                    }
-                );
+      // retrieve data
+      if (dates.length > 1) {
+        // add filter period
+        this.queryBuilder.filter.byDateRange(
+          'date', {
+            startDate: moment(this.sliderDateFilterValue.low).startOf('day'),
+            endDate: moment(this.sliderDateFilterValue.high).endOf('day')
+          }
+        );
 
-                // retrieve the list of Follow Ups
-                this.followUpsDataService
-                    .getFollowUpsPerDayUser(this.selectedOutbreak.id, this.queryBuilder)
-                    .pipe(
-                        catchError((err) => {
-                            // hide loading
-                            this.displayLoading = false;
+        // retrieve the list of Follow Ups
+        this.followUpsDataService
+          .getFollowUpsPerDayUser(this.selectedOutbreak.id, this.queryBuilder)
+          .pipe(
+            catchError((err) => {
+              // hide loading
+              this.displayLoading = false;
 
-                            this.snackbarService.showApiError(err);
-                            finishCallback([]);
-                            return throwError(err);
-                        })
-                    )
-                    .subscribe((metricUsersFollowups: UserFollowupsPerDayModel) => {
-                        // set headers
-                        this.dates = dates;
+              this.snackbarService.showApiError(err);
+              finishCallback([]);
+              return throwError(err);
+            })
+          )
+          .subscribe((metricUsersFollowups: UserFollowupsPerDayModel) => {
+            // set headers
+            this.dates = dates;
 
-                        // format data
-                        this.formatData(metricUsersFollowups);
-
-                        // finished
-                        finishCallback([]);
-                    });
-            } else {
-                // hide loading
-                this.displayLoading = false;
-
-                // finished
-                finishCallback([]);
-            }
-        } else {
-            // hide loading
-            this.displayLoading = false;
+            // format data
+            this.formatData(metricUsersFollowups);
 
             // finished
             finishCallback([]);
-        }
-    }
-
-    /**
-     * Format the data
-     */
-    formatData(metricUsersFollowups: UserFollowupsPerDayModel) {
-        // format received data
-        if (
-            !_.isEmpty(this.usersData) &&
-            !_.isEmpty(metricUsersFollowups)
-        ) {
-            // map users for user search
-            const usersMap = {};
-            this.usersData.forEach((userData) => {
-                usersMap[userData.id ? userData.id : 'N'] = _.cloneDeep(userData);
-            });
-
-            // go through users and create list of date information
-            _.forEach(metricUsersFollowups.users, (user) => {
-                // construct list of dates
-                const dates = {};
-                if (user.dates) {
-                    _.forEach(user.dates, (date) => {
-                        dates[moment(date.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)] = {
-                            totalFollowupsCount: date.totalFollowupsCount,
-                            successfulFollowupsCount: date.successfulFollowupsCount
-                        };
-                    });
-                }
-
-                // assign dates
-                if (
-                    user.id &&
-                    usersMap[user.id]
-                ) {
-                    usersMap[user.id].dates = dates;
-                } else {
-                    usersMap['N'].dates = dates;
-                }
-            });
-
-            // set data to show
-            this.usersDataShow = _.filter(usersMap, (v: IUserMap) => {
-                return !_.isEmpty(v.dates);
-            });
-        }
-
+          });
+      } else {
         // hide loading
         this.displayLoading = false;
+
+        // finished
+        finishCallback([]);
+      }
+    } else {
+      // hide loading
+      this.displayLoading = false;
+
+      // finished
+      finishCallback([]);
+    }
+  }
+
+  /**
+     * Format the data
+     */
+  formatData(metricUsersFollowups: UserFollowupsPerDayModel) {
+    // format received data
+    if (
+      !_.isEmpty(this.usersData) &&
+            !_.isEmpty(metricUsersFollowups)
+    ) {
+      // map users for user search
+      const usersMap = {};
+      this.usersData.forEach((userData) => {
+        usersMap[userData.id ? userData.id : 'N'] = _.cloneDeep(userData);
+      });
+
+      // go through users and create list of date information
+      _.forEach(metricUsersFollowups.users, (user) => {
+        // construct list of dates
+        const dates = {};
+        if (user.dates) {
+          _.forEach(user.dates, (date) => {
+            dates[moment(date.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)] = {
+              totalFollowupsCount: date.totalFollowupsCount,
+              successfulFollowupsCount: date.successfulFollowupsCount
+            };
+          });
+        }
+
+        // assign dates
+        if (
+          user.id &&
+                    usersMap[user.id]
+        ) {
+          usersMap[user.id].dates = dates;
+        } else {
+          usersMap['N'].dates = dates;
+        }
+      });
+
+      // set data to show
+      this.usersDataShow = _.filter(usersMap, (v: IUserMap) => {
+        return !_.isEmpty(v.dates);
+      });
     }
 
-    /**
+    // hide loading
+    this.displayLoading = false;
+  }
+
+  /**
      * Filter by slider value
      */
-    filterByDateRange(value: FormDateRangeSliderData) {
-        // set the new value
-        this.sliderDateFilterValue = value;
+  filterByDateRange(value: FormDateRangeSliderData) {
+    // set the new value
+    this.sliderDateFilterValue = value;
 
-        // refresh list
-        this.needsRefreshList();
-    }
+    // refresh list
+    this.needsRefreshList();
+  }
 }

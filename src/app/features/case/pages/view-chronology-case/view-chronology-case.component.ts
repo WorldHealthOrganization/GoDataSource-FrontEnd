@@ -19,134 +19,134 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
-    selector: 'app-view-chronology-case',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './view-chronology-case.component.html',
-    styleUrls: ['./view-chronology-case.component.less']
+  selector: 'app-view-chronology-case',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './view-chronology-case.component.html',
+  styleUrls: ['./view-chronology-case.component.less']
 })
 export class ViewChronologyCaseComponent implements OnInit {
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs
+  breadcrumbs: BreadcrumbItemModel[] = [];
 
-    caseData: CaseModel = new CaseModel();
-    chronologyEntries: ChronologyItem[] = [];
+  caseData: CaseModel = new CaseModel();
+  chronologyEntries: ChronologyItem[] = [];
 
-    // authenticated user details
-    authUser: UserModel;
+  // authenticated user details
+  authUser: UserModel;
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        protected route: ActivatedRoute,
-        private caseDataService: CaseDataService,
-        private outbreakDataService: OutbreakDataService,
-        private labResultDataService: LabResultDataService,
-        private i18nService: I18nService,
-        private relationshipDataService: RelationshipDataService,
-        private authDataService: AuthDataService
-    ) {}
+  constructor(
+    protected route: ActivatedRoute,
+    private caseDataService: CaseDataService,
+    private outbreakDataService: OutbreakDataService,
+    private labResultDataService: LabResultDataService,
+    private i18nService: I18nService,
+    private relationshipDataService: RelationshipDataService,
+    private authDataService: AuthDataService
+  ) {}
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+  ngOnInit() {
+    // get the authenticated user
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
-        this.route.params.subscribe((params: { caseId }) => {
-            // get current outbreak
-            this.outbreakDataService
-                .getSelectedOutbreak()
-                .subscribe((selectedOutbreak: OutbreakModel) => {
-                    // get case
-                    this.caseDataService
-                        .getCase(selectedOutbreak.id, params.caseId)
-                        .subscribe((caseDataReturned) => {
-                            this.caseData = caseDataReturned;
+    this.route.params.subscribe((params: { caseId }) => {
+      // get current outbreak
+      this.outbreakDataService
+        .getSelectedOutbreak()
+        .subscribe((selectedOutbreak: OutbreakModel) => {
+          // get case
+          this.caseDataService
+            .getCase(selectedOutbreak.id, params.caseId)
+            .subscribe((caseDataReturned) => {
+              this.caseData = caseDataReturned;
 
-                            // initialize page breadcrumbs
-                            this.initializeBreadcrumbs();
+              // initialize page breadcrumbs
+              this.initializeBreadcrumbs();
 
-                            const qb = new RequestQueryBuilder();
-                            qb.include('people', true);
+              const qb = new RequestQueryBuilder();
+              qb.include('people', true);
 
-                            forkJoin([
-                                // get relationships
-                                this.relationshipDataService
-                                    .getEntityRelationships(
-                                        selectedOutbreak.id,
-                                        this.caseData.type,
-                                        this.caseData.id,
-                                        qb
-                                    ),
+              forkJoin([
+                // get relationships
+                this.relationshipDataService
+                  .getEntityRelationships(
+                    selectedOutbreak.id,
+                    this.caseData.type,
+                    this.caseData.id,
+                    qb
+                  ),
 
-                                // lab sample taken and lab result dates
-                                this.labResultDataService
-                                    .getEntityLabResults(
-                                        selectedOutbreak.id,
-                                        EntityModel.getLinkForEntityType(EntityType.CASE),
-                                        this.caseData.id
-                                    )
-                            ]).subscribe(([
-                                relationshipData,
-                                labResults
-                            ]: [
-                                RelationshipModel[],
-                                LabResultModel[]
-                            ]) => {
-                                // set data
-                                this.chronologyEntries = CaseChronology.getChronologyEntries(
-                                    this.i18nService,
-                                    this.caseData,
-                                    labResults,
-                                    relationshipData
-                                );
-                            });
-                        });
-                });
+                // lab sample taken and lab result dates
+                this.labResultDataService
+                  .getEntityLabResults(
+                    selectedOutbreak.id,
+                    EntityModel.getLinkForEntityType(EntityType.CASE),
+                    this.caseData.id
+                  )
+              ]).subscribe(([
+                relationshipData,
+                labResults
+              ]: [
+                RelationshipModel[],
+                LabResultModel[]
+              ]) => {
+                // set data
+                this.chronologyEntries = CaseChronology.getChronologyEntries(
+                  this.i18nService,
+                  this.caseData,
+                  labResults,
+                  relationshipData
+                );
+              });
+            });
         });
+    });
 
-        // initialize page breadcrumbs
-        this.initializeBreadcrumbs();
-    }
+    // initialize page breadcrumbs
+    this.initializeBreadcrumbs();
+  }
 
-    /**
+  /**
      * Initialize breadcrumbs
      */
-    initializeBreadcrumbs() {
-        // reset
-        this.breadcrumbs = [];
+  initializeBreadcrumbs() {
+    // reset
+    this.breadcrumbs = [];
 
-        // case list page
-        if (CaseModel.canList(this.authUser)) {
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
-            );
-        }
-
-        // case breadcrumbs
-        if (this.caseData) {
-            // case view page
-            if (CaseModel.canView(this.authUser)) {
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel(
-                        this.caseData.name,
-                        `/cases/${this.caseData.id}/view`
-                    )
-                );
-            }
-
-            // current page
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel(
-                    'LNG_PAGE_VIEW_CHRONOLOGY_CASE_TITLE',
-                    '.',
-                    true,
-                    {},
-                    this.caseData
-                )
-            );
-        }
+    // case list page
+    if (CaseModel.canList(this.authUser)) {
+      this.breadcrumbs.push(
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
+      );
     }
+
+    // case breadcrumbs
+    if (this.caseData) {
+      // case view page
+      if (CaseModel.canView(this.authUser)) {
+        this.breadcrumbs.push(
+          new BreadcrumbItemModel(
+            this.caseData.name,
+            `/cases/${this.caseData.id}/view`
+          )
+        );
+      }
+
+      // current page
+      this.breadcrumbs.push(
+        new BreadcrumbItemModel(
+          'LNG_PAGE_VIEW_CHRONOLOGY_CASE_TITLE',
+          '.',
+          true,
+          {},
+          this.caseData
+        )
+      );
+    }
+  }
 }

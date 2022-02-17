@@ -5,9 +5,9 @@ import { HoverRowActionsDirective } from './hover-row-actions/hover-row-actions.
 
 // export the list of all directives
 export const directives: any[] = [
-    SelectedOutbreakIsActiveDirective,
-    ResetInputOnSideFilterDirective,
-    ResetLocationOnSideFilterDirective,
-    NgOptionHighlightFixedDirective,
-    HoverRowActionsDirective
+  SelectedOutbreakIsActiveDirective,
+  ResetInputOnSideFilterDirective,
+  ResetLocationOnSideFilterDirective,
+  NgOptionHighlightFixedDirective,
+  HoverRowActionsDirective
 ];

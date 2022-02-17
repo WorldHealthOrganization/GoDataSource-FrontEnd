@@ -7,29 +7,29 @@ import * as fromCoreComponents from './components';
 import * as fromCoreServices from './services';
 
 @NgModule({
-    imports: [
-        HttpClientModule,
-        SharedModule
-    ],
-    declarations: [
-        ...fromCoreComponents.components
-    ],
-    providers: [
-        ...fromCoreServices.services,
-        {
-            provide: HTTP_INTERCEPTORS,
-            useClass: RequestInterceptor,
-            multi: true
-        },
-        {
-            provide: HTTP_INTERCEPTORS,
-            useClass: ResponseInterceptor,
-            multi: true
-        }
-    ],
-    exports: [
-        ...fromCoreComponents.components
-    ]
+  imports: [
+    HttpClientModule,
+    SharedModule
+  ],
+  declarations: [
+    ...fromCoreComponents.components
+  ],
+  providers: [
+    ...fromCoreServices.services,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: RequestInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ResponseInterceptor,
+      multi: true
+    }
+  ],
+  exports: [
+    ...fromCoreComponents.components
+  ]
 })
 export class CoreModule {
 

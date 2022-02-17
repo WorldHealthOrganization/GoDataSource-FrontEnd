@@ -8,14 +8,14 @@ import { SharedModule } from '../../shared/shared.module';
 import * as fromPages from './pages';
 
 @NgModule({
-    imports: [
-        routing,
-        SharedModule
+  imports: [
+    routing,
+    SharedModule
 
-    ],
-    declarations: [
-        ...fromPages.pageComponents
-    ]
+  ],
+  declarations: [
+    ...fromPages.pageComponents
+  ]
 })
 export class RelationshipModule {
 }

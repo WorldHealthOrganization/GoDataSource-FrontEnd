@@ -6,16 +6,16 @@ import { SharedModule } from '../../shared/shared.module';
 import * as fromComponents from './components';
 
 @NgModule({
-    imports: [
-        SharedModule
-    ],
-    declarations: [
-        ...fromComponents.components
-    ],
-    providers: [],
-    exports: [
-        ...fromComponents.components
-    ]
+  imports: [
+    SharedModule
+  ],
+  declarations: [
+    ...fromComponents.components
+  ],
+  providers: [],
+  exports: [
+    ...fromComponents.components
+  ]
 })
 export class WorldMapModule {
 }

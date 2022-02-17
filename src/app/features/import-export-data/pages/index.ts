@@ -31,17 +31,17 @@ export * from './import-contact-of-contact-data/import-contact-of-contact-data.c
 
 // export the list of all page components
 export const pageComponents: any[] = [
-    ImportDataComponent,
-    ImportLocationDataComponent,
-    ImportHierarchicalLocationsComponent,
-    ImportCaseLabDataComponent,
-    ImportReferenceDataComponent,
-    ImportCaseDataComponent,
-    ImportEventDataComponent,
-    ImportContactDataComponent,
-    ImportContactOfContactDataComponent,
-    ImportLanguageTokensComponent,
-    ImportSyncPackageComponent,
-    ImportContactLabDataComponent,
-    ImportRelationshipDataComponent
+  ImportDataComponent,
+  ImportLocationDataComponent,
+  ImportHierarchicalLocationsComponent,
+  ImportCaseLabDataComponent,
+  ImportReferenceDataComponent,
+  ImportCaseDataComponent,
+  ImportEventDataComponent,
+  ImportContactDataComponent,
+  ImportContactOfContactDataComponent,
+  ImportLanguageTokensComponent,
+  ImportSyncPackageComponent,
+  ImportContactLabDataComponent,
+  ImportRelationshipDataComponent
 ];

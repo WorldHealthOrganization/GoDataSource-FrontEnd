@@ -21,152 +21,152 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 
 @Component({
-    selector: 'app-view-chronology-contact',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './view-chronology-contact.component.html',
-    styleUrls: ['./view-chronology-contact.component.less']
+  selector: 'app-view-chronology-contact',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './view-chronology-contact.component.html',
+  styleUrls: ['./view-chronology-contact.component.less']
 })
 export class ViewChronologyContactComponent implements OnInit {
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs
+  breadcrumbs: BreadcrumbItemModel[] = [];
 
-    contactData: ContactModel = new ContactModel();
-    chronologyEntries: ChronologyItem[] = [];
+  contactData: ContactModel = new ContactModel();
+  chronologyEntries: ChronologyItem[] = [];
 
-    // authenticated user details
-    authUser: UserModel;
+  // authenticated user details
+  authUser: UserModel;
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        protected route: ActivatedRoute,
-        private contactDataService: ContactDataService,
-        private outbreakDataService: OutbreakDataService,
-        private followUpsDataService: FollowUpsDataService,
-        private relationshipDataService: RelationshipDataService,
-        private i18nService: I18nService,
-        private authDataService: AuthDataService,
-        private labResultDataService: LabResultDataService
-    ) {}
+  constructor(
+    protected route: ActivatedRoute,
+    private contactDataService: ContactDataService,
+    private outbreakDataService: OutbreakDataService,
+    private followUpsDataService: FollowUpsDataService,
+    private relationshipDataService: RelationshipDataService,
+    private i18nService: I18nService,
+    private authDataService: AuthDataService,
+    private labResultDataService: LabResultDataService
+  ) {}
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+  ngOnInit() {
+    // get the authenticated user
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
-        this.route.params.subscribe((params: { contactId }) => {
-            // get current outbreak
-            this.outbreakDataService
-                .getSelectedOutbreak()
-                .subscribe((selectedOutbreak: OutbreakModel) => {
-                    // get contact
-                    this.contactDataService
-                        .getContact(selectedOutbreak.id, params.contactId)
-                        .subscribe((contactDataReturned) => {
-                            this.contactData = contactDataReturned;
+    this.route.params.subscribe((params: { contactId }) => {
+      // get current outbreak
+      this.outbreakDataService
+        .getSelectedOutbreak()
+        .subscribe((selectedOutbreak: OutbreakModel) => {
+          // get contact
+          this.contactDataService
+            .getContact(selectedOutbreak.id, params.contactId)
+            .subscribe((contactDataReturned) => {
+              this.contactData = contactDataReturned;
 
-                            // initialize page breadcrumbs
-                            this.initializeBreadcrumbs();
+              // initialize page breadcrumbs
+              this.initializeBreadcrumbs();
 
-                            // build query to get the followUps for specified contact
-                            const qb = new RequestQueryBuilder;
-                            qb.filter.byEquality(
-                                'personId',
-                                this.contactData.id
-                            );
+              // build query to get the followUps for specified contact
+              const qb = new RequestQueryBuilder;
+              qb.filter.byEquality(
+                'personId',
+                this.contactData.id
+              );
 
-                            // build query to get the people for all relationships
-                            const qqb = new RequestQueryBuilder();
-                            qqb.include('people', true);
+              // build query to get the people for all relationships
+              const qqb = new RequestQueryBuilder();
+              qqb.include('people', true);
 
-                            forkJoin([
-                                // get relationships
-                                this.relationshipDataService
-                                    .getEntityRelationships(
-                                        selectedOutbreak.id,
-                                        this.contactData.type,
-                                        this.contactData.id,
-                                        qqb
-                                    ),
+              forkJoin([
+                // get relationships
+                this.relationshipDataService
+                  .getEntityRelationships(
+                    selectedOutbreak.id,
+                    this.contactData.type,
+                    this.contactData.id,
+                    qqb
+                  ),
 
-                                // get follow-ups
-                                this.followUpsDataService.getFollowUpsList(selectedOutbreak.id, qb),
+                // get follow-ups
+                this.followUpsDataService.getFollowUpsList(selectedOutbreak.id, qb),
 
-                                // get lab results
-                                !selectedOutbreak.isContactLabResultsActive ?
-                                    of<LabResultModel[]>([]) :
-                                    this.labResultDataService
-                                        .getEntityLabResults(
-                                            selectedOutbreak.id,
-                                            EntityModel.getLinkForEntityType(EntityType.CONTACT),
-                                            this.contactData.id
-                                        )
-                            ]).subscribe(([
-                                relationshipsData,
-                                followUps,
-                                labResults
-                            ]: [
-                                RelationshipModel[],
-                                FollowUpModel[],
-                                LabResultModel[]
-                            ]) => {
-                                // set data
-                                this.chronologyEntries = ContactChronology.getChronologyEntries(
-                                    this.i18nService,
-                                    this.contactData,
-                                    followUps,
-                                    relationshipsData,
-                                    labResults
-                                );
-                            });
+                // get lab results
+                !selectedOutbreak.isContactLabResultsActive ?
+                  of<LabResultModel[]>([]) :
+                  this.labResultDataService
+                    .getEntityLabResults(
+                      selectedOutbreak.id,
+                      EntityModel.getLinkForEntityType(EntityType.CONTACT),
+                      this.contactData.id
+                    )
+              ]).subscribe(([
+                relationshipsData,
+                followUps,
+                labResults
+              ]: [
+                RelationshipModel[],
+                FollowUpModel[],
+                LabResultModel[]
+              ]) => {
+                // set data
+                this.chronologyEntries = ContactChronology.getChronologyEntries(
+                  this.i18nService,
+                  this.contactData,
+                  followUps,
+                  relationshipsData,
+                  labResults
+                );
+              });
 
-                        });
-                });
+            });
         });
+    });
 
-        // initialize page breadcrumbs
-        this.initializeBreadcrumbs();
-    }
+    // initialize page breadcrumbs
+    this.initializeBreadcrumbs();
+  }
 
-    /**
+  /**
      * Initialize breadcrumbs
      */
-    initializeBreadcrumbs() {
-        // reset
-        this.breadcrumbs = [];
+  initializeBreadcrumbs() {
+    // reset
+    this.breadcrumbs = [];
 
-        // contacts list page
-        if (ContactModel.canList(this.authUser)) {
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-            );
-        }
-
-        // contact breadcrumbs
-        if (this.contactData) {
-            // contacts view page
-            if (ContactModel.canView(this.authUser)) {
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel(
-                        this.contactData.name,
-                        `/contacts/${this.contactData.id}/view`
-                    )
-                );
-            }
-
-            // current page
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel(
-                    'LNG_PAGE_VIEW_CHRONOLOGY_CONTACT_TITLE',
-                    '.',
-                    true,
-                    {},
-                    this.contactData
-                )
-            );
-        }
+    // contacts list page
+    if (ContactModel.canList(this.authUser)) {
+      this.breadcrumbs.push(
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+      );
     }
+
+    // contact breadcrumbs
+    if (this.contactData) {
+      // contacts view page
+      if (ContactModel.canView(this.authUser)) {
+        this.breadcrumbs.push(
+          new BreadcrumbItemModel(
+            this.contactData.name,
+            `/contacts/${this.contactData.id}/view`
+          )
+        );
+      }
+
+      // current page
+      this.breadcrumbs.push(
+        new BreadcrumbItemModel(
+          'LNG_PAGE_VIEW_CHRONOLOGY_CONTACT_TITLE',
+          '.',
+          true,
+          {},
+          this.contactData
+        )
+      );
+    }
+  }
 }

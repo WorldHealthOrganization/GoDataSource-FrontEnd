@@ -6,19 +6,19 @@ import { TransmissionChainBarsModel } from '../typings/transmission-chain-bars.m
 
 @Injectable()
 export class TransmissionChainBarsDataService {
-    constructor(
-        private http: HttpClient
-    ) {}
+  constructor(
+    private http: HttpClient
+  ) {}
 
-    /**
+  /**
      * Retrieve the list of Cases to build up the transmission chain
      */
-    getTransmissionChainBarsData(
-        outbreakId: string,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<TransmissionChainBarsModel> {
-        const filter = queryBuilder.buildQuery();
+  getTransmissionChainBarsData(
+    outbreakId: string,
+    queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+  ): Observable<TransmissionChainBarsModel> {
+    const filter = queryBuilder.buildQuery();
 
-        return this.http.get(`outbreaks/${outbreakId}/cases/bars-transmission-chains?filter=${filter}`) as Observable<TransmissionChainBarsModel>;
-    }
+    return this.http.get(`outbreaks/${outbreakId}/cases/bars-transmission-chains?filter=${filter}`) as Observable<TransmissionChainBarsModel>;
+  }
 }

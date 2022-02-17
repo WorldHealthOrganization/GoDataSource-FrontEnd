@@ -20,47 +20,47 @@ import * as fromSharedDirectives from './directives';
 import * as fromSharedPipes from './pipes';
 
 @NgModule({
-    imports: [
-        CommonModule,
-        DragDropModule,
-        RouterModule,
-        NgSelectModule,
-        FormsModule,
-        FlexLayoutModule,
-        XtFormsModule,
-        AngularMaterialModule,
-        TranslateModule,
-        FileUploadModule,
-        MglTimelineModule,
-        NgxWigModule,
-        NgxMatSelectSearchModule,
-        HotTableModule.forRoot(),
-        ScrollingModule,
-        ExperimentalScrollingModule
-    ],
-    declarations: [
-        ...fromSharedComponents.components,
-        ...fromSharedDirectives.directives,
-        ...fromSharedPipes.pipes
-    ],
-    providers: [],
-    exports: [
-        CommonModule,
-        DragDropModule,
-        RouterModule,
-        NgSelectModule,
-        FormsModule,
-        FlexLayoutModule,
-        TranslateModule,
-        XtFormsModule,
-        AngularMaterialModule,
-        MglTimelineModule,
-        ScrollingModule,
-        ExperimentalScrollingModule,
-        ...fromSharedDirectives.directives,
-        ...fromSharedPipes.pipes,
-        ...fromSharedComponents.components
-    ]
+  imports: [
+    CommonModule,
+    DragDropModule,
+    RouterModule,
+    NgSelectModule,
+    FormsModule,
+    FlexLayoutModule,
+    XtFormsModule,
+    AngularMaterialModule,
+    TranslateModule,
+    FileUploadModule,
+    MglTimelineModule,
+    NgxWigModule,
+    NgxMatSelectSearchModule,
+    HotTableModule.forRoot(),
+    ScrollingModule,
+    ExperimentalScrollingModule
+  ],
+  declarations: [
+    ...fromSharedComponents.components,
+    ...fromSharedDirectives.directives,
+    ...fromSharedPipes.pipes
+  ],
+  providers: [],
+  exports: [
+    CommonModule,
+    DragDropModule,
+    RouterModule,
+    NgSelectModule,
+    FormsModule,
+    FlexLayoutModule,
+    TranslateModule,
+    XtFormsModule,
+    AngularMaterialModule,
+    MglTimelineModule,
+    ScrollingModule,
+    ExperimentalScrollingModule,
+    ...fromSharedDirectives.directives,
+    ...fromSharedPipes.pipes,
+    ...fromSharedComponents.components
+  ]
 })
 export class SharedModule {
 }

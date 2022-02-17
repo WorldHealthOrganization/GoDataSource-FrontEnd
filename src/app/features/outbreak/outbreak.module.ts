@@ -10,17 +10,17 @@ import * as fromPages from './pages';
 import * as fromServices from './services';
 
 @NgModule({
-    imports: [
-        routing,
-        SharedModule
+  imports: [
+    routing,
+    SharedModule
 
-    ],
-    declarations: [
-        ...fromPages.pageComponents
-    ],
-    providers: [
-        ...fromServices.services
-    ]
+  ],
+  declarations: [
+    ...fromPages.pageComponents
+  ],
+  providers: [
+    ...fromServices.services
+  ]
 })
 export class OutbreakModule {
 }

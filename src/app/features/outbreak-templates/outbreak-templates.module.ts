@@ -8,13 +8,13 @@ import { SharedModule } from '../../shared/shared.module';
 import * as fromPages from './pages';
 
 @NgModule({
-    imports: [
-        routing,
-        SharedModule,
-    ],
-    declarations: [
-        ...fromPages.pageComponents,
-    ]
+  imports: [
+    routing,
+    SharedModule,
+  ],
+  declarations: [
+    ...fromPages.pageComponents,
+  ]
 })
 export class OutbreakTemplatesModule {
 }

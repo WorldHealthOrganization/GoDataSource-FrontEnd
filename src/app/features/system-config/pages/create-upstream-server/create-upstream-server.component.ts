@@ -17,143 +17,143 @@ import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-co
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 
 @Component({
-    selector: 'app-create-upstream-server',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './create-upstream-server.component.html',
-    styleUrls: ['./create-upstream-server.component.less']
+  selector: 'app-create-upstream-server',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './create-upstream-server.component.html',
+  styleUrls: ['./create-upstream-server.component.less']
 })
 export class CreateUpstreamServerComponent
-    extends CreateConfirmOnChanges
-    implements OnInit {
-    // breadcrumb header
-    breadcrumbs: BreadcrumbItemModel[] = [];
+  extends CreateConfirmOnChanges
+  implements OnInit {
+  // breadcrumb header
+  breadcrumbs: BreadcrumbItemModel[] = [];
 
-    // check for duplicate urls
-    duplicateUrls: { [ name: string ]: AbstractControl };
+  // check for duplicate urls
+  duplicateUrls: { [ name: string ]: AbstractControl };
 
-    upstreamServerData: SystemUpstreamServerModel = new SystemUpstreamServerModel();
+  upstreamServerData: SystemUpstreamServerModel = new SystemUpstreamServerModel();
 
-    // authenticated user details
-    authUser: UserModel;
+  // authenticated user details
+  authUser: UserModel;
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        private router: Router,
-        private snackbarService: SnackbarService,
-        private formHelper: FormHelperService,
-        private systemSettingsDataService: SystemSettingsDataService,
-        private dialogService: DialogService,
-        private authDataService: AuthDataService,
-        private redirectService: RedirectService
-    ) {
-        super();
-    }
+  constructor(
+    private router: Router,
+    private snackbarService: SnackbarService,
+    private formHelper: FormHelperService,
+    private systemSettingsDataService: SystemSettingsDataService,
+    private dialogService: DialogService,
+    private authDataService: AuthDataService,
+    private redirectService: RedirectService
+  ) {
+    super();
+  }
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+  ngOnInit() {
+    // get the authenticated user
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
-        this.systemSettingsDataService
-            .getSystemSettings()
-            .subscribe((settings: SystemSettingsModel) => {
-                this.duplicateUrls = _.transform(settings.upstreamServers, (result, upstreamServer: SystemUpstreamServerModel, index: number) => {
-                    result[index + 'url'] = {
-                        value: upstreamServer.url
-                    } as any;
-                }, {});
-            });
+    this.systemSettingsDataService
+      .getSystemSettings()
+      .subscribe((settings: SystemSettingsModel) => {
+        this.duplicateUrls = _.transform(settings.upstreamServers, (result, upstreamServer: SystemUpstreamServerModel, index: number) => {
+          result[index + 'url'] = {
+            value: upstreamServer.url
+          } as any;
+        }, {});
+      });
 
-        // initialize breadcrumbs
-        this.initializeBreadcrumbs();
-    }
+    // initialize breadcrumbs
+    this.initializeBreadcrumbs();
+  }
 
-    /**
+  /**
      * Initialize breadcrumbs
      */
-    private initializeBreadcrumbs() {
-        // reset
-        this.breadcrumbs = [];
+  private initializeBreadcrumbs() {
+    // reset
+    this.breadcrumbs = [];
 
-        // add list breadcrumb only if we have permission
-        if (SystemUpstreamServerModel.canList(this.authUser)) {
-            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_TITLE', '/system-config/upstream-servers'));
-        }
-
-        // create breadcrumb
-        this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_SYSTEM_UPSTREAM_SERVER_TITLE', '.', true));
+    // add list breadcrumb only if we have permission
+    if (SystemUpstreamServerModel.canList(this.authUser)) {
+      this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_TITLE', '/system-config/upstream-servers'));
     }
 
-    /**
+    // create breadcrumb
+    this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_SYSTEM_UPSTREAM_SERVER_TITLE', '.', true));
+  }
+
+  /**
      * Create Upstream server
      * @param {NgForm[]} stepForms
      */
-    createNewUpstreamServer(stepForms: NgForm[]) {
-        // get forms fields
-        const dirtyFields: any = this.formHelper.mergeFields(stepForms);
+  createNewUpstreamServer(stepForms: NgForm[]) {
+    // get forms fields
+    const dirtyFields: any = this.formHelper.mergeFields(stepForms);
 
-        // create record
-        if (
-            this.formHelper.isFormsSetValid(stepForms) &&
+    // create record
+    if (
+      this.formHelper.isFormsSetValid(stepForms) &&
             !_.isEmpty(dirtyFields)
-        ) {
-            const loadingDialog = this.dialogService.showLoadingDialog();
-            this.systemSettingsDataService
-                .getSystemSettings()
-                .pipe(
-                    catchError((err) => {
-                        this.snackbarService.showApiError(err);
-                        loadingDialog.close();
-                        return throwError(err);
-                    })
-                )
-                .subscribe((settings: SystemSettingsModel) => {
-                    // add the new upstream server
-                    settings.upstreamServers.push(dirtyFields);
+    ) {
+      const loadingDialog = this.dialogService.showLoadingDialog();
+      this.systemSettingsDataService
+        .getSystemSettings()
+        .pipe(
+          catchError((err) => {
+            this.snackbarService.showApiError(err);
+            loadingDialog.close();
+            return throwError(err);
+          })
+        )
+        .subscribe((settings: SystemSettingsModel) => {
+          // add the new upstream server
+          settings.upstreamServers.push(dirtyFields);
 
-                    // save upstream servers
-                    this.systemSettingsDataService
-                        .modifySystemSettings({
-                            upstreamServers: settings.upstreamServers
-                        })
-                        .pipe(
-                            catchError((err) => {
-                                this.snackbarService.showApiError(err);
-                                loadingDialog.close();
-                                return throwError(err);
-                            })
-                        )
-                        .subscribe(() => {
-                            // display success message
-                            this.snackbarService.showSuccess('LNG_PAGE_CREATE_SYSTEM_UPSTREAM_SERVER_ACTION_CREATE_UPSTREAM_SERVER_SUCCESS_MESSAGE');
+          // save upstream servers
+          this.systemSettingsDataService
+            .modifySystemSettings({
+              upstreamServers: settings.upstreamServers
+            })
+            .pipe(
+              catchError((err) => {
+                this.snackbarService.showApiError(err);
+                loadingDialog.close();
+                return throwError(err);
+              })
+            )
+            .subscribe(() => {
+              // display success message
+              this.snackbarService.showSuccess('LNG_PAGE_CREATE_SYSTEM_UPSTREAM_SERVER_ACTION_CREATE_UPSTREAM_SERVER_SUCCESS_MESSAGE');
 
-                            // hide dialog
-                            loadingDialog.close();
+              // hide dialog
+              loadingDialog.close();
 
-                            // navigate to listing page
-                            this.disableDirtyConfirm();
-                            if (SystemUpstreamServerModel.canList(this.authUser)) {
-                                this.router.navigate(['/system-config/upstream-servers']);
-                            } else {
-                                // fallback to current page since we already know that we have access to this page
-                                this.redirectService.to(['/system-config/upstream-servers/create']);
-                            }
-                        });
+              // navigate to listing page
+              this.disableDirtyConfirm();
+              if (SystemUpstreamServerModel.canList(this.authUser)) {
+                this.router.navigate(['/system-config/upstream-servers']);
+              } else {
+                // fallback to current page since we already know that we have access to this page
+                this.redirectService.to(['/system-config/upstream-servers/create']);
+              }
+            });
 
-                });
-        }
+        });
     }
+  }
 
-    /**
+  /**
      * Make url in proper format
      * @param {string} url
      */
-    formatUrl(url: string) {
-        // if url is not empty format it
-        this.upstreamServerData.url = url ? url.replace(/\s/g, '') : '';
-    }
+  formatUrl(url: string) {
+    // if url is not empty format it
+    this.upstreamServerData.url = url ? url.replace(/\s/g, '') : '';
+  }
 }

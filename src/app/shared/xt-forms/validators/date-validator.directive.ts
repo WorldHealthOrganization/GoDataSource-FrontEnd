@@ -11,11 +11,11 @@ import * as momentOriginal from 'moment';
  * Handle Date compare input
  */
 export class DateValidatorFieldComparator {
-    constructor(
-        public compareItemValue: string | Moment | ElementBase<any>,
-        public fieldLabel: string = null
-    ) {
-    }
+  constructor(
+    public compareItemValue: string | Moment | ElementBase<any>,
+    public fieldLabel: string = null
+  ) {
+  }
 }
 
 /**
@@ -40,279 +40,279 @@ export class DateValidatorFieldComparator {
  * dateSameOrBefore="[[elementBaseItem1, 'label']]"
  */
 @Directive({
-    selector: '[app-date-validator][ngModel]',
-    providers: [
-        {
-            provide: NG_VALIDATORS,
-            useExisting: forwardRef(() => DateValidatorDirective),
-            multi: true
-        }
-    ]
+  selector: '[app-date-validator][ngModel]',
+  providers: [
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => DateValidatorDirective),
+      multi: true
+    }
+  ]
 })
 export class DateValidatorDirective implements Validator {
-    // allowed formats
-    @Input() displayFormat: string = Constants.DEFAULT_DATE_DISPLAY_FORMAT;
-    @Input() allowedDateFormats: (string | MomentBuiltinFormat)[] = [
-        Constants.DEFAULT_DATE_DISPLAY_FORMAT,
-        moment.ISO_8601
-    ];
+  // allowed formats
+  @Input() displayFormat: string = Constants.DEFAULT_DATE_DISPLAY_FORMAT;
+  @Input() allowedDateFormats: (string | MomentBuiltinFormat)[] = [
+    Constants.DEFAULT_DATE_DISPLAY_FORMAT,
+    moment.ISO_8601
+  ];
 
-    // date must be bigger than
-    @Input() dateAfter: any;
-    @Input() dateSameOrAfter: any;
-    @Input() dateSame: any;
-    @Input() dateBefore: any;
-    @Input() dateSameOrBefore: any;
+  // date must be bigger than
+  @Input() dateAfter: any;
+  @Input() dateSameOrAfter: any;
+  @Input() dateSame: any;
+  @Input() dateBefore: any;
+  @Input() dateSameOrBefore: any;
 
-    /**
+  /**
      * Constructor
      * @param i18nService
      */
-    constructor(
-        private i18nService: I18nService,
-        private controlContainer: ControlContainer
-    ) {
-    }
+  constructor(
+    private i18nService: I18nService,
+    private controlContainer: ControlContainer
+  ) {
+  }
 
-    /**
+  /**
      * Compare control date with provided dates
      * @param propertyArray
      * @param controlDate
      * @param method
      * @param methodLabel
      */
-    private compareDate(
-        propertyArray: DateValidatorFieldComparator | DateValidatorFieldComparator[],
-        controlDate: Moment,
-        method: string,
-        methodLabel: string
-    ): {} | null {
-        // go through items and check if our condition passes
-        let invalid: {} | null = null;
-        _.each(
-            _.isArray(propertyArray) ?
-                propertyArray as any[] :
-                [propertyArray],
-            (compare: any[] | DateValidatorFieldComparator | string) => {
-                // convert array to object
-                let compareItem: DateValidatorFieldComparator;
-                if (_.isArray(compare)) {
-                    compareItem = new DateValidatorFieldComparator(
-                        compare[0],
-                        (compare as any[]).length > 1 ? compare[1] : null
-                    );
-                } else if (
-                    compare instanceof ElementBase ||
+  private compareDate(
+    propertyArray: DateValidatorFieldComparator | DateValidatorFieldComparator[],
+    controlDate: Moment,
+    method: string,
+    methodLabel: string
+  ): {} | null {
+    // go through items and check if our condition passes
+    let invalid: {} | null = null;
+    _.each(
+      _.isArray(propertyArray) ?
+        propertyArray as any[] :
+        [propertyArray],
+      (compare: any[] | DateValidatorFieldComparator | string) => {
+        // convert array to object
+        let compareItem: DateValidatorFieldComparator;
+        if (_.isArray(compare)) {
+          compareItem = new DateValidatorFieldComparator(
+            compare[0],
+            (compare as any[]).length > 1 ? compare[1] : null
+          );
+        } else if (
+          compare instanceof ElementBase ||
                     compare instanceof momentOriginal ||
                     _.isString(compare)
-                ) {
-                    compareItem = new DateValidatorFieldComparator(
-                        compare as string | ElementBase<any> | Moment
-                    );
-                } else {
-                    compareItem = compare as DateValidatorFieldComparator;
-                }
+        ) {
+          compareItem = new DateValidatorFieldComparator(
+            compare as string | ElementBase<any> | Moment
+          );
+        } else {
+          compareItem = compare as DateValidatorFieldComparator;
+        }
 
-                // if compare is empty, then we can't validate
-                if (_.isEmpty(compareItem)) {
-                    return;
-                }
+        // if compare is empty, then we can't validate
+        if (_.isEmpty(compareItem)) {
+          return;
+        }
 
-                // retrieve date from brother control
-                // & label if necessary
-                let compareWithDate: Moment;
-                let fieldLabel = compareItem.fieldLabel;
-                if (compareItem.compareItemValue instanceof momentOriginal) {
-                    compareWithDate = compareItem.compareItemValue as Moment;
-                }
+        // retrieve date from brother control
+        // & label if necessary
+        let compareWithDate: Moment;
+        let fieldLabel = compareItem.fieldLabel;
+        if (compareItem.compareItemValue instanceof momentOriginal) {
+          compareWithDate = compareItem.compareItemValue as Moment;
+        }
 
-                // check if we have a name or a string date
-                if (_.isString(compareItem.compareItemValue)) {
-                    // form control
-                    if (
-                        this.controlContainer &&
+        // check if we have a name or a string date
+        if (_.isString(compareItem.compareItemValue)) {
+          // form control
+          if (
+            this.controlContainer &&
                         this.controlContainer instanceof NgForm &&
                         this.controlContainer.controls[compareItem.compareItemValue as string]
-                    ) {
-                        let directives = (this.controlContainer as any)._directives;
-                        directives = directives ? Array.from(directives) : directives;
-                        compareItem = new DateValidatorFieldComparator(
-                            (_.find(
-                                directives, {
-                                    name: compareItem.compareItemValue as string
-                                }
-                            ) as NgModel).valueAccessor as ElementBase<any>,
-                            fieldLabel
-                        );
-                    } else {
-                        // value from string
-                        (moment as any).suppressDeprecationWarnings = true;
-                        compareWithDate = moment(compareItem.compareItemValue as string);
-                        (moment as any).suppressDeprecationWarnings = false;
-                    }
+          ) {
+            let directives = (this.controlContainer as any)._directives;
+            directives = directives ? Array.from(directives) : directives;
+            compareItem = new DateValidatorFieldComparator(
+              (_.find(
+                directives, {
+                  name: compareItem.compareItemValue as string
                 }
+              ) as NgModel).valueAccessor as ElementBase<any>,
+              fieldLabel
+            );
+          } else {
+            // value from string
+            (moment as any).suppressDeprecationWarnings = true;
+            compareWithDate = moment(compareItem.compareItemValue as string);
+            (moment as any).suppressDeprecationWarnings = false;
+          }
+        }
 
-                // check for element
-                let element: ElementBase<any> = null;
-                if (compareItem.compareItemValue instanceof ElementBase) {
-                    // retrieve component form control
-                    element = compareItem.compareItemValue as ElementBase<any>;
+        // check for element
+        let element: ElementBase<any> = null;
+        if (compareItem.compareItemValue instanceof ElementBase) {
+          // retrieve component form control
+          element = compareItem.compareItemValue as ElementBase<any>;
 
-                    // value
-                    compareWithDate = element.value ? moment(element.value) : null;
+          // value
+          compareWithDate = element.value ? moment(element.value) : null;
 
-                    // label
-                    if (!fieldLabel) {
-                        fieldLabel = (element as any).placeholder;
-                    }
-                }
+          // label
+          if (!fieldLabel) {
+            fieldLabel = (element as any).placeholder;
+          }
+        }
 
-                // don't check empty values
-                compareWithDate = compareWithDate && compareWithDate.isValid() ? compareWithDate : null;
-                if (!compareWithDate) {
-                    return true;
-                }
-
-                // validate date
-                if (!controlDate.startOf('day')[method](compareWithDate.startOf('day'))) {
-                    invalid = {
-                        dateValidator: {
-                            field: fieldLabel ? fieldLabel : compareWithDate.format(this.displayFormat),
-                            comparator: this.i18nService.instant(methodLabel),
-                            compareDate: compareWithDate.format(this.displayFormat),
-                            currentDate: controlDate.format(this.displayFormat)
-                        }
-                    };
-                }
-
-                // do we need to validate counterpart as well ?
-                if (
-                    element &&
-                    element.invalid !== (invalid ? true : false)
-                ) {
-                    (function (localElement: ElementBase<any>) {
-                        setTimeout(() => {
-                            // trigger validation
-                            localElement.control.updateValueAndValidity();
-                            if ((localElement as any).onChange) {
-                                (localElement as any).onChange();
-                            }
-                        }, 500);
-                    })(element);
-                }
-
-                // stop "for" since element is invalid
-                if (invalid) {
-                    return false;
-                }
-            }
-        );
-
-        // finished
-        return invalid;
-    }
-
-    /**
-     * Validate
-     * @param control
-     */
-    validate(control: AbstractControl): { [key: string]: any } {
-        // no point in validating empty values, this is handled by required validator
-        if (_.isEmpty(control.value)) {
-            return null;
+        // don't check empty values
+        compareWithDate = compareWithDate && compareWithDate.isValid() ? compareWithDate : null;
+        if (!compareWithDate) {
+          return true;
         }
 
         // validate date
-        let value: any = control.value;
-        if (control.value instanceof momentOriginal) {
-            value = _.isObject(value._i) ? value : value._i;
+        if (!controlDate.startOf('day')[method](compareWithDate.startOf('day'))) {
+          invalid = {
+            dateValidator: {
+              field: fieldLabel ? fieldLabel : compareWithDate.format(this.displayFormat),
+              comparator: this.i18nService.instant(methodLabel),
+              compareDate: compareWithDate.format(this.displayFormat),
+              currentDate: controlDate.format(this.displayFormat)
+            }
+          };
         }
 
-        // check if we have a valid date
-        let controlDate: Moment;
-        let invalid: {} | null = {
-            invalidDateValidator: true
-        };
-        this.allowedDateFormats.forEach((format) => {
-            controlDate = moment(value, format, true);
-            if (controlDate.isValid()) {
-                // at least one format is valid
-                invalid = null;
-
-                // stop "for"
-                return false;
-            }
-        });
-
-        // check if our date must be bigger than other dates
-        if (controlDate) {
-            // after
-            if (
-                !invalid &&
-                this.dateAfter
-            ) {
-                invalid = this.compareDate(
-                    this.dateAfter,
-                    controlDate,
-                    'isAfter',
-                    'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_AFTER'
-                );
-            }
-
-            // same or after
-            if (
-                !invalid &&
-                this.dateSameOrAfter
-            ) {
-                invalid = this.compareDate(
-                    this.dateSameOrAfter,
-                    controlDate,
-                    'isSameOrAfter',
-                    'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME_OR_AFTER'
-                );
-            }
-
-            // same
-            if (
-                !invalid &&
-                this.dateSame
-            ) {
-                invalid = this.compareDate(
-                    this.dateSame,
-                    controlDate,
-                    'isSame',
-                    'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME'
-                );
-            }
-
-            // before
-            if (
-                !invalid &&
-                this.dateBefore
-            ) {
-                invalid = this.compareDate(
-                    this.dateBefore,
-                    controlDate,
-                    'isBefore',
-                    'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_BEFORE'
-                );
-            }
-
-            // same or before
-            if (
-                !invalid &&
-                this.dateSameOrBefore
-            ) {
-                invalid = this.compareDate(
-                    this.dateSameOrBefore,
-                    controlDate,
-                    'isSameOrBefore',
-                    'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME_OR_BEFORE'
-                );
-            }
+        // do we need to validate counterpart as well ?
+        if (
+          element &&
+                    element.invalid !== (invalid ? true : false)
+        ) {
+          (function (localElement: ElementBase<any>) {
+            setTimeout(() => {
+              // trigger validation
+              localElement.control.updateValueAndValidity();
+              if ((localElement as any).onChange) {
+                (localElement as any).onChange();
+              }
+            }, 500);
+          })(element);
         }
 
-        // valid
-        return invalid;
+        // stop "for" since element is invalid
+        if (invalid) {
+          return false;
+        }
+      }
+    );
+
+    // finished
+    return invalid;
+  }
+
+  /**
+     * Validate
+     * @param control
+     */
+  validate(control: AbstractControl): { [key: string]: any } {
+    // no point in validating empty values, this is handled by required validator
+    if (_.isEmpty(control.value)) {
+      return null;
     }
+
+    // validate date
+    let value: any = control.value;
+    if (control.value instanceof momentOriginal) {
+      value = _.isObject(value._i) ? value : value._i;
+    }
+
+    // check if we have a valid date
+    let controlDate: Moment;
+    let invalid: {} | null = {
+      invalidDateValidator: true
+    };
+    this.allowedDateFormats.forEach((format) => {
+      controlDate = moment(value, format, true);
+      if (controlDate.isValid()) {
+        // at least one format is valid
+        invalid = null;
+
+        // stop "for"
+        return false;
+      }
+    });
+
+    // check if our date must be bigger than other dates
+    if (controlDate) {
+      // after
+      if (
+        !invalid &&
+                this.dateAfter
+      ) {
+        invalid = this.compareDate(
+          this.dateAfter,
+          controlDate,
+          'isAfter',
+          'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_AFTER'
+        );
+      }
+
+      // same or after
+      if (
+        !invalid &&
+                this.dateSameOrAfter
+      ) {
+        invalid = this.compareDate(
+          this.dateSameOrAfter,
+          controlDate,
+          'isSameOrAfter',
+          'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME_OR_AFTER'
+        );
+      }
+
+      // same
+      if (
+        !invalid &&
+                this.dateSame
+      ) {
+        invalid = this.compareDate(
+          this.dateSame,
+          controlDate,
+          'isSame',
+          'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME'
+        );
+      }
+
+      // before
+      if (
+        !invalid &&
+                this.dateBefore
+      ) {
+        invalid = this.compareDate(
+          this.dateBefore,
+          controlDate,
+          'isBefore',
+          'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_BEFORE'
+        );
+      }
+
+      // same or before
+      if (
+        !invalid &&
+                this.dateSameOrBefore
+      ) {
+        invalid = this.compareDate(
+          this.dateSameOrBefore,
+          controlDate,
+          'isSameOrBefore',
+          'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME_OR_BEFORE'
+        );
+      }
+    }
+
+    // valid
+    return invalid;
+  }
 }

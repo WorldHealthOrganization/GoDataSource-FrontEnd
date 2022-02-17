@@ -20,120 +20,120 @@ import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-co
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Component({
-    selector: 'app-create-outbreak-template',
-    templateUrl: './create-outbreak-template.component.html',
-    styleUrls: ['./create-outbreak-template.component.less']
+  selector: 'app-create-outbreak-template',
+  templateUrl: './create-outbreak-template.component.html',
+  styleUrls: ['./create-outbreak-template.component.less']
 })
 export class CreateOutbreakTemplateComponent
-    extends CreateConfirmOnChanges
-    implements OnInit {
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [];
+  extends CreateConfirmOnChanges
+  implements OnInit {
+  // breadcrumbs
+  breadcrumbs: BreadcrumbItemModel[] = [];
 
-    // authenticated user details
-    authUser: UserModel;
+  // authenticated user details
+  authUser: UserModel;
 
-    diseasesList$: Observable<any[]>;
-    followUpsTeamAssignmentAlgorithm$: Observable<any[]>;
+  diseasesList$: Observable<any[]>;
+  followUpsTeamAssignmentAlgorithm$: Observable<any[]>;
 
-    newOutbreakTemplate: OutbreakTemplateModel = new OutbreakTemplateModel();
+  newOutbreakTemplate: OutbreakTemplateModel = new OutbreakTemplateModel();
 
-    outbreakTemplateNameValidator$: Observable<boolean | IGeneralAsyncValidatorResponse>;
+  outbreakTemplateNameValidator$: Observable<boolean | IGeneralAsyncValidatorResponse>;
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        private referenceDataDataService: ReferenceDataDataService,
-        private formHelper: FormHelperService,
-        private outbreakTemplateDataService: OutbreakTemplateDataService,
-        private snackbarService: SnackbarService,
-        private router: Router,
-        private dialogService: DialogService,
-        private authDataService: AuthDataService,
-        private redirectService: RedirectService
-    ) {
-        super();
-    }
+  constructor(
+    private referenceDataDataService: ReferenceDataDataService,
+    private formHelper: FormHelperService,
+    private outbreakTemplateDataService: OutbreakTemplateDataService,
+    private snackbarService: SnackbarService,
+    private router: Router,
+    private dialogService: DialogService,
+    private authDataService: AuthDataService,
+    private redirectService: RedirectService
+  ) {
+    super();
+  }
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+  ngOnInit() {
+    // get the authenticated user
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
-        // get the lists for forms
-        this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
-        this.followUpsTeamAssignmentAlgorithm$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM);
+    // get the lists for forms
+    this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
+    this.followUpsTeamAssignmentAlgorithm$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM);
 
-        this.outbreakTemplateNameValidator$ = new Observable((observer) => {
-            this.outbreakTemplateDataService.checkOutbreakTemplateNameUniquenessValidity(this.newOutbreakTemplate.name)
-                .subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
-                    observer.next(isValid);
-                    observer.complete();
-                });
+    this.outbreakTemplateNameValidator$ = new Observable((observer) => {
+      this.outbreakTemplateDataService.checkOutbreakTemplateNameUniquenessValidity(this.newOutbreakTemplate.name)
+        .subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+          observer.next(isValid);
+          observer.complete();
         });
+    });
 
-        // initialize breadcrumbs
-        this.initializeBreadcrumbs();
-    }
+    // initialize breadcrumbs
+    this.initializeBreadcrumbs();
+  }
 
-    /**
+  /**
      * Initialize breadcrumbs
      */
-    private initializeBreadcrumbs() {
-        // reset
-        this.breadcrumbs = [];
+  private initializeBreadcrumbs() {
+    // reset
+    this.breadcrumbs = [];
 
-        // add list breadcrumb only if we have permission
-        if (OutbreakTemplateModel.canList(this.authUser)) {
-            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE', '/outbreak-templates'));
-        }
-
-        // create breadcrumb
-        this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TITLE', '.', true));
+    // add list breadcrumb only if we have permission
+    if (OutbreakTemplateModel.canList(this.authUser)) {
+      this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE', '/outbreak-templates'));
     }
 
-    /**
+    // create breadcrumb
+    this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TITLE', '.', true));
+  }
+
+  /**
      * Create Outbreak Template
      */
-    createOutbreakTemplate(stepForms: NgForm[]) {
-        // get forms fields
-        const dirtyFields: any = this.formHelper.mergeFields(stepForms);
+  createOutbreakTemplate(stepForms: NgForm[]) {
+    // get forms fields
+    const dirtyFields: any = this.formHelper.mergeFields(stepForms);
 
-        if (this.formHelper.isFormsSetValid(stepForms) &&
+    if (this.formHelper.isFormsSetValid(stepForms) &&
             !_.isEmpty(dirtyFields)
-        ) {
-            const outbreakTemplateData = new OutbreakTemplateModel(dirtyFields);
+    ) {
+      const outbreakTemplateData = new OutbreakTemplateModel(dirtyFields);
 
-            const loadingDialog = this.dialogService.showLoadingDialog();
-            this.outbreakTemplateDataService
-                .createOutbreakTemplate(outbreakTemplateData)
-                .pipe(
-                    catchError((err) => {
-                        this.snackbarService.showError((err.message));
-                        loadingDialog.close();
-                        return throwError(err);
-                    })
-                )
-                .subscribe((newOutbreakTemplate) => {
-                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_OUTBREAK_TEMPLATES_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON');
+      const loadingDialog = this.dialogService.showLoadingDialog();
+      this.outbreakTemplateDataService
+        .createOutbreakTemplate(outbreakTemplateData)
+        .pipe(
+          catchError((err) => {
+            this.snackbarService.showError((err.message));
+            loadingDialog.close();
+            return throwError(err);
+          })
+        )
+        .subscribe((newOutbreakTemplate) => {
+          this.snackbarService.showSuccess('LNG_PAGE_CREATE_OUTBREAK_TEMPLATES_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON');
 
-                    // hide dialog
-                    loadingDialog.close();
+          // hide dialog
+          loadingDialog.close();
 
-                    // navigate to proper page
-                    // method handles disableDirtyConfirm too...
-                    this.redirectToProperPageAfterCreate(
-                        this.router,
-                        this.redirectService,
-                        this.authUser,
-                        OutbreakTemplateModel,
-                        'outbreak-templates',
-                        newOutbreakTemplate.id
-                    );
-                });
-        }
+          // navigate to proper page
+          // method handles disableDirtyConfirm too...
+          this.redirectToProperPageAfterCreate(
+            this.router,
+            this.redirectService,
+            this.authUser,
+            OutbreakTemplateModel,
+            'outbreak-templates',
+            newOutbreakTemplate.id
+          );
+        });
     }
+  }
 }

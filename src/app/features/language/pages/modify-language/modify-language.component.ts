@@ -15,154 +15,154 @@ import { catchError, map, switchMap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 
 @Component({
-    selector: 'app-modify-language',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './modify-language.component.html',
-    styleUrls: ['./modify-language.component.less']
+  selector: 'app-modify-language',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './modify-language.component.html',
+  styleUrls: ['./modify-language.component.less']
 })
 export class ModifyLanguageComponent extends ViewModifyComponent implements OnInit {
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs
+  breadcrumbs: BreadcrumbItemModel[] = [];
 
-    // constants
-    LanguageModel = LanguageModel;
+  // constants
+  LanguageModel = LanguageModel;
 
-    languageId: string;
-    languageData: LanguageModel = new LanguageModel();
+  languageId: string;
+  languageData: LanguageModel = new LanguageModel();
 
-    // authenticated user
-    authUser: UserModel;
+  // authenticated user
+  authUser: UserModel;
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        protected route: ActivatedRoute,
-        private languageDataService: LanguageDataService,
-        private formHelper: FormHelperService,
-        private snackbarService: SnackbarService,
-        private cacheService: CacheService,
-        private authDataService: AuthDataService,
-        protected dialogService: DialogService
-    ) {
-        super(
-            route,
-            dialogService
-        );
-    }
+  constructor(
+    protected route: ActivatedRoute,
+    private languageDataService: LanguageDataService,
+    private formHelper: FormHelperService,
+    private snackbarService: SnackbarService,
+    private cacheService: CacheService,
+    private authDataService: AuthDataService,
+    protected dialogService: DialogService
+  ) {
+    super(
+      route,
+      dialogService
+    );
+  }
 
-    /**
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+  ngOnInit() {
+    // get the authenticated user
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
-        // show loading
-        this.showLoadingDialog(false);
+    // show loading
+    this.showLoadingDialog(false);
 
-        this.route.params
-            .subscribe((params: {languageId}) => {
-                // get language
-                this.languageId = params.languageId;
-                this.languageDataService
-                    .getLanguage(this.languageId)
-                    .subscribe((languageData: LanguageModel) => {
-                        // since this is cached we need to clone it because otherwise we modify the existing object and if we chose to discard changes...
-                        this.languageData = new LanguageModel(languageData);
+    this.route.params
+      .subscribe((params: {languageId}) => {
+        // get language
+        this.languageId = params.languageId;
+        this.languageDataService
+          .getLanguage(this.languageId)
+          .subscribe((languageData: LanguageModel) => {
+            // since this is cached we need to clone it because otherwise we modify the existing object and if we chose to discard changes...
+            this.languageData = new LanguageModel(languageData);
 
-                        // update breadcrumbs
-                        this.initializeBreadcrumbs();
+            // update breadcrumbs
+            this.initializeBreadcrumbs();
 
-                        // hide loading
-                        this.hideLoadingDialog();
-                    });
-            });
-    }
+            // hide loading
+            this.hideLoadingDialog();
+          });
+      });
+  }
 
-    /**
+  /**
      * Initialize breadcrumbs
      */
-    initializeBreadcrumbs() {
-        // reset
-        this.breadcrumbs = [];
+  initializeBreadcrumbs() {
+    // reset
+    this.breadcrumbs = [];
 
-        // add list breadcrumb only if we have permission
-        if (LanguageModel.canList(this.authUser)) {
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel('LNG_PAGE_LIST_LANGUAGES_TITLE', '/languages')
-            );
-        }
-
-        // view / modify breadcrumb
-        this.breadcrumbs.push(
-            new BreadcrumbItemModel(
-                this.viewOnly ?
-                    'LNG_PAGE_VIEW_LANGUAGE_TITLE' :
-                    'LNG_PAGE_MODIFY_LANGUAGE_TITLE',
-                null,
-                true,
-                {},
-                this.languageData
-            )
-        );
+    // add list breadcrumb only if we have permission
+    if (LanguageModel.canList(this.authUser)) {
+      this.breadcrumbs.push(
+        new BreadcrumbItemModel('LNG_PAGE_LIST_LANGUAGES_TITLE', '/languages')
+      );
     }
 
-    /**
+    // view / modify breadcrumb
+    this.breadcrumbs.push(
+      new BreadcrumbItemModel(
+        this.viewOnly ?
+          'LNG_PAGE_VIEW_LANGUAGE_TITLE' :
+          'LNG_PAGE_MODIFY_LANGUAGE_TITLE',
+        null,
+        true,
+        {},
+        this.languageData
+      )
+    );
+  }
+
+  /**
      * Modify Language
      */
-    modifyLanguage(form: NgForm) {
-        const dirtyFields: any = this.formHelper.getDirtyFields(form);
+  modifyLanguage(form: NgForm) {
+    const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
-        if (!this.formHelper.validateForm(form)) {
-            return;
-        }
+    if (!this.formHelper.validateForm(form)) {
+      return;
+    }
 
-        // show loading
-        this.showLoadingDialog();
+    // show loading
+    this.showLoadingDialog();
 
-        // modify the event
-        this.languageDataService
-            .modifyLanguage(this.languageId, dirtyFields)
+    // modify the event
+    this.languageDataService
+      .modifyLanguage(this.languageId, dirtyFields)
+      .pipe(
+        catchError((err) => {
+          this.snackbarService.showApiError(err);
+          // hide loading
+          this.hideLoadingDialog();
+          return throwError(err);
+        }),
+        switchMap((modifiedLanguage) => {
+          // remove help items from cache
+          this.cacheService.remove(CacheKey.LANGUAGES);
+
+          // update language tokens
+          return this.languageDataService.getLanguagesList()
             .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    // hide loading
-                    this.hideLoadingDialog();
-                    return throwError(err);
-                }),
-                switchMap((modifiedLanguage) => {
-                    // remove help items from cache
-                    this.cacheService.remove(CacheKey.LANGUAGES);
-
-                    // update language tokens
-                    return this.languageDataService.getLanguagesList()
-                        .pipe(
-                            catchError((err) => {
-                                this.snackbarService.showApiError(err);
-                                // hide loading
-                                this.hideLoadingDialog();
-                                return throwError(err);
-                            }),
-                            map(() => modifiedLanguage)
-                        );
-                })
-            )
-            .subscribe((modifiedLanguage: LanguageModel) => {
-                // update model
-                this.languageData = modifiedLanguage;
-
-                // mark form as pristine
-                form.form.markAsPristine();
-
-                // display message
-                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_LANGUAGE_ACTION_MODIFY_LANGUAGE_SUCCESS_MESSAGE');
-
-                // update breadcrumbs
-                this.initializeBreadcrumbs();
-
+              catchError((err) => {
+                this.snackbarService.showApiError(err);
                 // hide loading
                 this.hideLoadingDialog();
-        });
-    }
+                return throwError(err);
+              }),
+              map(() => modifiedLanguage)
+            );
+        })
+      )
+      .subscribe((modifiedLanguage: LanguageModel) => {
+        // update model
+        this.languageData = modifiedLanguage;
+
+        // mark form as pristine
+        form.form.markAsPristine();
+
+        // display message
+        this.snackbarService.showSuccess('LNG_PAGE_MODIFY_LANGUAGE_ACTION_MODIFY_LANGUAGE_SUCCESS_MESSAGE');
+
+        // update breadcrumbs
+        this.initializeBreadcrumbs();
+
+        // hide loading
+        this.hideLoadingDialog();
+      });
+  }
 }

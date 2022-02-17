@@ -11,8 +11,8 @@ export * from './outbreak-template-questionnaire/outbreak-template-questionnaire
 
 // export the list of all page components
 export const pageComponents: any[] = [
-    OutbreakTemplatesListComponent,
-    CreateOutbreakTemplateComponent,
-    ModifyOutbreakTemplateComponent,
-    OutbreakTemplateQuestionnaireComponent
+  OutbreakTemplatesListComponent,
+  CreateOutbreakTemplateComponent,
+  ModifyOutbreakTemplateComponent,
+  OutbreakTemplateQuestionnaireComponent
 ];
