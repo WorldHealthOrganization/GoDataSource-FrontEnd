@@ -23,7 +23,7 @@ export class UserRoleDataService {
     ) {
         this.userRoleList$ = this.http.get('roles').pipe(share());
         this.availablePermissions$ = this.http
-            .get(`roles/available-permissions`)
+            .get('roles/available-permissions')
             .pipe(
                 map((data: PermissionModel[]) => {
                     // sort permissions

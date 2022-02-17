@@ -36,8 +36,7 @@ export class LanguageResolver
                 const loadingDialog = this.dialogService.showLoadingDialog();
 
                 // load language - need to initialize like this because otherwise in some situations languageSubscriber variable isn't found when token expired
-                let languageSubscriber;
-                languageSubscriber = this.i18nService.waitForLanguageInitialization()
+                const languageSubscriber = this.i18nService.waitForLanguageInitialization()
                     .pipe(
                         catchError((err) => {
                             // unsubscribe - hack for observable that isn't a subject..it  still being called

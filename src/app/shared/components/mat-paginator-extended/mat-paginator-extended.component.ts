@@ -101,7 +101,7 @@ class CustomMatPaginatorIntl
                     afterLength: this.i18nService.instant('LNG_COMMON_LABEL_PAGINATOR_COUNT_AFTER_LENGTH')
                 }
             );
-    }
+    };
 }
 
 @Component({

@@ -140,7 +140,7 @@ export class CreateUpstreamServerComponent
                                 this.router.navigate(['/system-config/upstream-servers']);
                             } else {
                                 // fallback to current page since we already know that we have access to this page
-                                this.redirectService.to([`/system-config/upstream-servers/create`]);
+                                this.redirectService.to(['/system-config/upstream-servers/create']);
                             }
                         });
 

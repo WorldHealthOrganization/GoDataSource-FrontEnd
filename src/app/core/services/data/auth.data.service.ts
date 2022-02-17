@@ -164,7 +164,7 @@ export class AuthDataService {
      */
     logout(): Observable<any> {
         return this.http
-            .post(`users/logout`, null)
+            .post('users/logout', null)
             .pipe(
                 tap(() => {
                     // clear token info

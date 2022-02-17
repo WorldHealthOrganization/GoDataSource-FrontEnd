@@ -24,7 +24,7 @@ export class LocationDataService {
         private modelHelper: ModelHelperService,
         private cacheService: CacheService
     ) {
-        this.locationList$ = this.http.get(`locations`).pipe(share());
+        this.locationList$ = this.http.get('locations').pipe(share());
         this.groupedLocations$ = this.http.get('locations/hierarchical?filter={"order":["name asc"]}').pipe(share());
     }
 

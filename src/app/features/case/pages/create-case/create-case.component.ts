@@ -433,7 +433,7 @@ export class CreateCaseComponent
                     )
                     .pipe(
                         catchError((err) => {
-                            if (_.includes(_.get(err, 'details.codes.id'), `uniqueness`)) {
+                            if (_.includes(_.get(err, 'details.codes.id'), 'uniqueness')) {
                                 this.snackbarService.showError('LNG_PAGE_CREATE_CASE_ERROR_UNIQUE_ID');
                             } else {
                                 this.snackbarService.showApiError(err);

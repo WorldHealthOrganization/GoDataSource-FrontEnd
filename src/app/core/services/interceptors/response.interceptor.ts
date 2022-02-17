@@ -60,7 +60,7 @@ export class ResponseInterceptor implements HttpInterceptor {
                             `Incoming HTTP Error Response for: ${request.method} ${request.url}`,
                             `Response status: ${error.status} ${error.statusText}`,
                             `Response Transaction ID: ${transactionId}`,
-                            `Error:`, error.error
+                            'Error:', error.error
                         );
                     }
 

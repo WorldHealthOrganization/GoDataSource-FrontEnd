@@ -158,7 +158,7 @@ export class CasesByGeographicLocationDashletComponent
         }
 
         // redirect
-        this.router.navigate([`cases`],
+        this.router.navigate(['cases'],
             {
                 queryParams: {
                     global: JSON.stringify(global),

@@ -428,7 +428,7 @@ export class OutbreakTemplatesListComponent
                                     } else if (OutbreakTemplateModel.canView(this.authUser)) {
                                         this.router.navigate([`/outbreak-templates/${clonedOutbreakTemplate.id}/view`]);
                                     } else if (OutbreakTemplateModel.canList(this.authUser)) {
-                                        this.router.navigate([`/outbreak-templates`]);
+                                        this.router.navigate(['/outbreak-templates']);
                                     } else {
                                         // fallback to current page since we already know that we have access to this page
                                         // Don't redirect :)

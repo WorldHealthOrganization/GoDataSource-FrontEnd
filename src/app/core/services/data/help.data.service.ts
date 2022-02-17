@@ -49,7 +49,7 @@ export class HelpDataService {
      * @returns {Observable<any>}
      */
     createHelpCategory(helpCategoryData): Observable<any> {
-        return this.http.post(`help-categories`, helpCategoryData);
+        return this.http.post('help-categories', helpCategoryData);
     }
 
     /**

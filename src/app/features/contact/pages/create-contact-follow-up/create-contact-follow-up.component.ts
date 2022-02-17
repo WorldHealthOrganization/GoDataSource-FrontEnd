@@ -208,7 +208,7 @@ export class CreateContactFollowUpComponent
                     } else if (FollowUpModel.canView(this.authUser)) {
                         this.router.navigate([`/contacts/${newContactFollowup.personId}/follow-ups/${newContactFollowup.id}/view`]);
                     } else if (FollowUpModel.canList(this.authUser)) {
-                        this.router.navigate([`/contacts/follow-ups`]);
+                        this.router.navigate(['/contacts/follow-ups']);
                     } else {
                         // fallback to current page since we already know that we have access to this page
                         this.redirectService.to(

@@ -1527,7 +1527,7 @@ export class ImportDataComponent
                                     loadingDialog.close();
 
                                     // display success message
-                                    this.snackbarService.showSuccess(`LNG_PAGE_IMPORT_DATA_LOAD_SAVED_IMPORT_MAPPING_SUCCESS_MESSAGE`);
+                                    this.snackbarService.showSuccess('LNG_PAGE_IMPORT_DATA_LOAD_SAVED_IMPORT_MAPPING_SUCCESS_MESSAGE');
                                 });
                             });
                     }

@@ -27,7 +27,7 @@ export class LoggingDataService {
             })
         };
 
-        return this.http.post(`logs`, data);
+        return this.http.post('logs', data);
     }
 }
 

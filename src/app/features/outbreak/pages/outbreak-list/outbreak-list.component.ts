@@ -699,7 +699,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
                                     } else if (OutbreakModel.canView(this.authUser)) {
                                         this.router.navigate([`/outbreaks/${clonedOutbreak.id}/view`]);
                                     } else if (OutbreakModel.canList(this.authUser)) {
-                                        this.router.navigate([`/outbreaks`]);
+                                        this.router.navigate(['/outbreaks']);
                                     } else {
                                         // fallback to current page since we already know that we have access to this page
                                         // Don't redirect :)

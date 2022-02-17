@@ -112,7 +112,7 @@ export class ForgotPasswordComponent implements OnInit {
                 )
                 .subscribe(() => {
                     this.snackbarService.showSuccess(
-                        `LNG_PAGE_FORGOT_PASSWORD_ACTION_SEND_EMAIL_SUCCESS_MESSAGE`,
+                        'LNG_PAGE_FORGOT_PASSWORD_ACTION_SEND_EMAIL_SUCCESS_MESSAGE',
                         {email: dirtyFields.email}
                     );
 

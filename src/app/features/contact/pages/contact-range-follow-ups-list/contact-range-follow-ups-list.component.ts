@@ -508,12 +508,12 @@ export class ContactRangeFollowUpsListComponent
         }
 
         if (this.filters.contactName !== null) {
-            this.queryBuilder.addChildQueryBuilder(`contact`)
+            this.queryBuilder.addChildQueryBuilder('contact')
                 .filter.byTextMultipleProperties([ 'firstName', 'lastName'], this.filters.contactName);
         }
 
         if (this.filters.visualId !== null) {
-            this.queryBuilder.addChildQueryBuilder(`contact`)
+            this.queryBuilder.addChildQueryBuilder('contact')
                 .filter.byText('visualId', this.filters.visualId);
         }
 

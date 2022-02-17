@@ -1217,7 +1217,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     };
                     this.dialogService.showConfirm(
                         exposedContacts.count > 0 ?
-                            `LNG_DIALOG_CONFIRM_DELETE_CASE_WITH_EXPOSED_CONTACTS` :
+                            'LNG_DIALOG_CONFIRM_DELETE_CASE_WITH_EXPOSED_CONTACTS' :
                             'LNG_DIALOG_CONFIRM_DELETE_CASE', translateData)
                         .subscribe((answer: DialogAnswer) => {
                             if (answer.button === DialogAnswerButton.Yes) {

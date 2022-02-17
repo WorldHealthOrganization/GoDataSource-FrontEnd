@@ -177,7 +177,7 @@ export class SavedFiltersComponent extends ListComponent implements OnInit, OnDe
                 })
             )
             .subscribe(() => {
-                this.snackbarService.showSuccess(`LNG_PAGE_LIST_SAVED_FILTERS_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE`);
+                this.snackbarService.showSuccess('LNG_PAGE_LIST_SAVED_FILTERS_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE');
             });
     }
 

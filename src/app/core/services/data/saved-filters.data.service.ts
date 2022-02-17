@@ -45,7 +45,7 @@ export class SavedFiltersService {
      * @param filterData
      */
     createFilter(filterData: SavedFilterModel) {
-        return this.http.post(`filter-mappings`, filterData);
+        return this.http.post('filter-mappings', filterData);
     }
 
     /**

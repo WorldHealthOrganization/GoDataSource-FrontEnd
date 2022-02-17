@@ -273,6 +273,7 @@ export class UserModel
             // concatenate to determine hash later
             for (let i = 0; i < v.length; i++) {
                 const char = v.charCodeAt(i);
+                // eslint-disable-next-line no-bitwise
                 this._permissionIdsHash = ((this._permissionIdsHash << 5) - this._permissionIdsHash) + char;
             }
         }, {});

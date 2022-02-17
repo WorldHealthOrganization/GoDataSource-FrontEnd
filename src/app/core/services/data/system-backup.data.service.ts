@@ -40,7 +40,7 @@ export class SystemBackupDataService {
         }
 
         // include user data
-        queryBuilder.include(`user`);
+        queryBuilder.include('user');
         qb.merge(queryBuilder);
 
         const filter = qb.buildQuery();

@@ -176,7 +176,7 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
         this.dialogService.showConfirm('LNG_GLOBAL_ENTITY_SEARCH_DIALOG_CREATE_CASE_WITH_UID_TITLE')
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
-                    this.router.navigate([`/cases/create`], { queryParams: { uid: uid } });
+                    this.router.navigate(['/cases/create'], { queryParams: { uid: uid } });
 
                     // close side nav
                     this.closeSideNav();

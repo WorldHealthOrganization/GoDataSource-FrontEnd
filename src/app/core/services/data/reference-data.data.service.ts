@@ -28,7 +28,7 @@ export class ReferenceDataDataService {
         private i18nService: I18nService
     ) {
         this.categoriesList$ = this.http
-            .get(`reference-data/available-categories`)
+            .get('reference-data/available-categories')
             .pipe(
                 map((categories: any[]) => {
                    return (categories || []).sort((item1: ReferenceDataCategoryModel, item2: ReferenceDataCategoryModel) => {
@@ -199,7 +199,7 @@ export class ReferenceDataDataService {
      * @returns {Observable<any>}
      */
     createEntry(entry): Observable<any> {
-        return this.http.post(`reference-data`, entry)
+        return this.http.post('reference-data', entry)
             .pipe(
                 tap(() => {
                     // invalidate list cache

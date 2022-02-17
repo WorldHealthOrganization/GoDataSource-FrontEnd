@@ -240,7 +240,7 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
       * @param {DeviceModel} device
      */
     deleteDevice(device: DeviceModel) {
-        this.dialogService.showConfirm(`LNG_DIALOG_CONFIRM_DELETE_DEVICE`, device)
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_DEVICE', device)
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.showLoadingDialog();
@@ -254,7 +254,7 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
                             })
                         )
                         .subscribe( () => {
-                            this.snackbarService.showSuccess(`LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE_SUCCESS_MESSAGE`);
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE_SUCCESS_MESSAGE');
 
                             this.needsRefreshList();
                             this.closeLoadingDialog();
@@ -269,7 +269,7 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
      * @param {DeviceModel} device
      */
     wipeDevice(device: DeviceModel) {
-        this.dialogService.showConfirm(`LNG_DIALOG_CONFIRM_WIPE_DEVICE`, device)
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_WIPE_DEVICE', device)
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.showLoadingDialog();

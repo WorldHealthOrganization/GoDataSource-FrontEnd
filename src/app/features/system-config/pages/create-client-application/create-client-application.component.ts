@@ -141,7 +141,7 @@ export class CreateClientApplicationComponent extends ConfirmOnFormChanges imple
                                 this.router.navigate(['/system-config/client-applications']);
                             } else {
                                 // fallback to current page since we already know that we have access to this page
-                                this.redirectService.to([`/system-config/client-applications/create`]);
+                                this.redirectService.to(['/system-config/client-applications/create']);
                             }
                         });
 

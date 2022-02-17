@@ -342,7 +342,7 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
                                 if (andAnotherOne) {
                                     this.disableDirtyConfirm();
                                     this.redirectService.to(
-                                        [`/contacts-of-contacts/create`],
+                                        ['/contacts-of-contacts/create'],
                                         {
                                             entityId: this.entityId
                                         }

@@ -259,7 +259,7 @@ export class RolesListComponent extends ListComponent implements OnInit, OnDestr
      */
     private cloneRole(userRole: UserRoleModel) {
         this.router.navigate(
-            [`/user-roles/create`], {
+            ['/user-roles/create'], {
                 queryParams: {
                     cloneId: userRole.id
                 }

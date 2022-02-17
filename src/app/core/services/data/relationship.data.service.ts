@@ -64,8 +64,7 @@ export class RelationshipDataService {
         relationshipId: string,
         sourceId: string,
         targetId: string
-    )
-    : Observable<RelationshipModel> {
+    ): Observable<RelationshipModel> {
         return this.modelHelper.mapObservableToModel(
             this.http.post(`outbreaks/${outbreakId}/relationships/${relationshipId}/replace-source-and-target`,
                 {

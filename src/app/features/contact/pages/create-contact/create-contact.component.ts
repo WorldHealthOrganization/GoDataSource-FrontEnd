@@ -493,7 +493,7 @@ export class CreateContactComponent
                                 if (andAnotherOne) {
                                     this.disableDirtyConfirm();
                                     this.redirectService.to(
-                                        [`/contacts/create`],
+                                        ['/contacts/create'],
                                         {
                                             entityType: this.entityType,
                                             entityId: this.entityId

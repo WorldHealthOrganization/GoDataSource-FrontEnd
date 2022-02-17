@@ -43,7 +43,7 @@ export class SystemSettingsDataService {
      * @returns {Observable<any>}
      */
     getCloudBackupPaths(): Observable<any> {
-        return this.http.get(`/system-settings/backup-location`);
+        return this.http.get('/system-settings/backup-location');
     }
 
     /**

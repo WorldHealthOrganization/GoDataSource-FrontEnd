@@ -173,7 +173,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
             () => this.hasOutbreak.apply(this) // provide context to keep this functionality
         ),
         new NavItem(
-            `lab-results-group`,
+            'lab-results-group',
             'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL',
             'lab',
             [],

@@ -202,7 +202,7 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
                 })
             )
             .subscribe(() => {
-                this.snackbarService.showSuccess(`LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE`);
+                this.snackbarService.showSuccess('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE');
             });
     }
 
