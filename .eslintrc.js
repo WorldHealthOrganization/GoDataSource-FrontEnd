@@ -69,7 +69,10 @@ module.exports = {
                 "accessibility": "explicit"
             }
         ],
-        "@typescript-eslint/indent": "off",
+        "@typescript-eslint/indent": [
+            "error",
+            2
+        ],
         "@typescript-eslint/member-delimiter-style": "off",
         "@typescript-eslint/member-ordering": [
             "error", {
