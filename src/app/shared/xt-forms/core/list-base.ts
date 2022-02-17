@@ -8,7 +8,6 @@ import { Observable } from 'rxjs';
  * Base class to be extended by components that implement lists of group components or single components
  */
 @Directive()
-// tslint:disable-next-line:directive-class-suffix
 export abstract class ListBase<T> extends GroupValidator<T[]> {
     static _identifier: number = 0;
 

@@ -1,4 +1,3 @@
-// tslint:disable:max-line-length
 export const EnglishUsLang = {
     id: 'english_us',
     tokens: {

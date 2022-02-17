@@ -45,7 +45,7 @@ export class LoggerService {
 
         // log messages on client side?
         if (environment.enableClientLogging) {
-            // tslint:disable-next-line:no-console
+            // eslint-disable-next-line no-console
             console.log(logMessage);
         }
 

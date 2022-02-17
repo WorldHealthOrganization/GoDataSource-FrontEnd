@@ -15,7 +15,6 @@ import { debounceTime } from 'rxjs/operators';
  * Base class to be extended by custom form controls
  */
 @Directive()
-// tslint:disable-next-line:directive-class-suffix
 export abstract class ElementBase<T> extends ValueAccessorBase<T> implements AfterViewInit {
     // form control name
     protected abstract name: string;

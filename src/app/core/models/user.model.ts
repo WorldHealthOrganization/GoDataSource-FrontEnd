@@ -1,4 +1,3 @@
-// tslint:disable:no-use-before-declare
 import * as _ from 'lodash';
 import { IPermissionChildModel, PERMISSION, PermissionModel } from './permission.model';
 import { SecurityQuestionModel } from './securityQuestion.model';
@@ -274,7 +273,6 @@ export class UserModel
             // concatenate to determine hash later
             for (let i = 0; i < v.length; i++) {
                 const char = v.charCodeAt(i);
-                // tslint:disable-next-line:no-bitwise
                 this._permissionIdsHash = ((this._permissionIdsHash << 5) - this._permissionIdsHash) + char;
             }
         }, {});

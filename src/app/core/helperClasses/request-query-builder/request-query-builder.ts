@@ -155,7 +155,6 @@ export class RequestQueryBuilder {
     ): RequestRelationBuilder {
         if (!this.includedRelations[relationName]) {
             // add new relation
-            // tslint:disable-next-line:no-use-before-declare
             this.includedRelations[relationName] = new RequestRelationBuilder(
                 relationName,
                 () => {
@@ -624,7 +623,6 @@ export class RequestQueryBuilder {
             serializedValueObject.includedRelations,
             (result: {[relationName: string]: RequestRelationBuilder}, value: ISerializedQueryBuilderRelation, key: string) => {
                 // create new relationship if necessary
-                // tslint:disable-next-line:no-use-before-declare
                 result[key] = new RequestRelationBuilder(
                     key,
                     () => {

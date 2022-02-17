@@ -13,7 +13,6 @@ import { Constants } from '../../../core/models/constants';
  * Dashlet
  */
 @Directive()
-// tslint:disable-next-line:directive-class-suffix
 export abstract class DashletComponent {
     // authenticated user
     authUser: UserModel;

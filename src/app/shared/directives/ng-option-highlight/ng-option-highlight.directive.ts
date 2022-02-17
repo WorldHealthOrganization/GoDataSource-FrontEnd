@@ -12,7 +12,6 @@ import {
 })
 export class NgOptionHighlightFixedDirective implements OnChanges, AfterViewInit {
 
-    // tslint:disable-next-line:no-input-rename
     @Input('app-ng-option-highlight') term: string;
 
     private diacritics = {

@@ -74,7 +74,6 @@ interface ICachedInputsValues {
  * List component
  */
 @Directive()
-// tslint:disable-next-line:directive-class-suffix
 export abstract class ListComponent implements OnDestroy {
     // handle pop state changes
     private static locationSubscription: SubscriptionLike;

@@ -63,7 +63,6 @@ export class TButtonExtended implements TButton {
     public refreshTranslation() {
         // determine parent button
         const originalButton: TButtonExtended = _.find(
-            // tslint:disable-next-line:no-use-before-declare
             NgxWigCustomLibraryButtons.defaultButtonsConf, {
                 id: this.id
             }
@@ -71,11 +70,9 @@ export class TButtonExtended implements TButton {
 
         // translate
         this.label = originalButton.label ?
-            // tslint:disable-next-line:no-use-before-declare
             NgxWigCustomLibraryButtons.i18nService.instant(originalButton.label) :
             originalButton.label;
         this.title = originalButton.title ?
-            // tslint:disable-next-line:no-use-before-declare
             NgxWigCustomLibraryButtons.i18nService.instant(originalButton.title) :
             originalButton.title;
     }

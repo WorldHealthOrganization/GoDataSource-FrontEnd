@@ -1,4 +1,3 @@
-// tslint:disable:no-use-before-declare
 import * as _ from 'lodash';
 import { Constants } from './constants';
 import { Moment } from '../helperClasses/x-moment';

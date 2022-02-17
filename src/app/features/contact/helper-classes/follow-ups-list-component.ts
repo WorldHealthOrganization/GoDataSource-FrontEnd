@@ -31,7 +31,6 @@ import { UserDataService } from '../../../core/services/data/user.data.service';
  * Follow-up list component
  */
 @Directive()
-// tslint:disable-next-line:directive-class-suffix
 export abstract class FollowUpsListComponent extends ListComponent implements OnInit, OnDestroy {
     // authenticated user
     authUser: UserModel;

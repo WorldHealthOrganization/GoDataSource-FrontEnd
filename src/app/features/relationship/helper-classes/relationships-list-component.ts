@@ -20,7 +20,6 @@ import { ContactOfContactModel } from '../../../core/models/contact-of-contact.m
  * Relationship list
  */
 @Directive()
-// tslint:disable-next-line:directive-class-suffix
 export abstract class RelationshipsListComponent extends ListComponent implements OnInit, OnDestroy {
     // Entities Map for specific data
     entityMap: {

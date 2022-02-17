@@ -18,11 +18,14 @@ module.exports = {
         "node": true
     },
     "ignorePatterns": [
-        "projects/**/*"
+        "src/**/*.html"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
-        "project": "tsconfig.json",
+        "project": [
+            "tsconfig.json",
+            "src/tsconfig.app.json"
+        ],
         "sourceType": "module"
     },
     "plugins": [
@@ -86,12 +89,7 @@ module.exports = {
         "@typescript-eslint/no-inferrable-types": "off",
         "@typescript-eslint/no-misused-new": "error",
         "@typescript-eslint/no-non-null-assertion": "error",
-        "@typescript-eslint/no-shadow": [
-            "error",
-            {
-                "hoist": "all"
-            }
-        ],
+        "@typescript-eslint/no-shadow": "error",
         "@typescript-eslint/no-unused-expressions": "error",
         "@typescript-eslint/prefer-function-type": "error",
         "@typescript-eslint/quotes": [
@@ -105,10 +103,7 @@ module.exports = {
         "@typescript-eslint/type-annotation-spacing": "error",
         "@typescript-eslint/unified-signatures": "error",
         "arrow-body-style": "off",
-        "brace-style": [
-            "error",
-            "1tbs"
-        ],
+        "brace-style": "off",
         "constructor-super": "error",
         "curly": "error",
         "dot-notation": "off",
@@ -165,7 +160,7 @@ module.exports = {
             "error",
             "rxjs/Rx"
         ],
-        "no-shadow": "error",
+        "no-shadow": "off",
         "no-throw-literal": "error",
         "no-trailing-spaces": "error",
         "no-undef-init": "error",

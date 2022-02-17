@@ -9,7 +9,6 @@ import { NgSelectComponent } from '@ng-select/ng-select';
  * Base class to be extended by custom form controls to handle groups of atomic form components
  */
 @Directive()
-// tslint:disable-next-line:directive-class-suffix
 export abstract class GroupValidator<T> extends ElementBase<T> implements AfterViewInit {
     // Group Form
     @ViewChild('groupForm') groupForm: NgForm;

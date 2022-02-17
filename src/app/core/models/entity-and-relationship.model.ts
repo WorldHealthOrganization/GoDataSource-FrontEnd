@@ -1,4 +1,3 @@
-// tslint:disable:no-use-before-declare
 import * as _ from 'lodash';
 import { ContactModel } from './contact.model';
 import { CaseModel } from './case.model';
