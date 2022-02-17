@@ -43,7 +43,7 @@
                                 required="true"
                                 app-unique-validator="url$"
                                 [additionalControlsToCheck]="duplicateUrls"
-                                (blur)="formatUrl($event)">
+                                (lostFocus)="formatUrl($event)">
                             </app-form-input>
                         </div>
 

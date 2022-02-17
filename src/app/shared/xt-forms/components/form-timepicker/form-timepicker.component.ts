@@ -59,7 +59,6 @@ export class FormTimepickerComponent
   }
 
   @Output() optionChanged = new EventEmitter<any>();
-  @Output() blur = new EventEmitter<any>();
 
   public identifier = `form-timepicker-${FormTimepickerComponent.identifier++}`;
 
@@ -92,14 +91,6 @@ export class FormTimepickerComponent
       this.languageSubscription.unsubscribe();
       this.languageSubscription = null;
     }
-  }
-
-  /**
-     * Trigger the 'touch' action on the custom form control
-     */
-  onBlur() {
-    this.touch();
-    this.blur.emit(this.value);
   }
 
   /**

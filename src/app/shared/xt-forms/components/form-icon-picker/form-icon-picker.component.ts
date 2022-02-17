@@ -6,9 +6,7 @@ import {
   Inject,
   Host,
   SkipSelf,
-  HostBinding,
-  Output,
-  EventEmitter
+  HostBinding
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { ElementBase } from '../../core/index';
@@ -835,9 +833,6 @@ export class FormIconPickerComponent
   @Input() name: string;
   @Input() disabled: boolean = false;
 
-  // output
-  @Output() blur = new EventEmitter<any>();
-
   // material icon options
   matOptions: LabelValuePair[] = FormIconPickerComponent.MAT_ICONS.map((icon) => new LabelValuePair(
     icon,
@@ -853,13 +848,5 @@ export class FormIconPickerComponent
     @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>
   ) {
     super(controlContainer, validators, asyncValidators);
-  }
-
-  /**
-     * Trigger the 'touch' action on the custom form control
-     */
-  onBlur() {
-    this.touch();
-    this.blur.emit(this.value);
   }
 }

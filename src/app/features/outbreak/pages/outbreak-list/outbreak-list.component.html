@@ -240,7 +240,7 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let outbreak">
-                <app-yes-no-label [value]="outbreak.id == authUser.activeOutbreakId"></app-yes-no-label>
+                <app-yes-no-label [value]="outbreak.id === authUser.activeOutbreakId"></app-yes-no-label>
             </mat-cell>
         </ng-container>
 
