@@ -1,2 +1,4 @@
 .eslintrc.json
 .eslintrc.js
+/.angular
+/node_modules
