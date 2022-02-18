@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -26,9 +26,7 @@ import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-co
 
 @Component({
   selector: 'app-create-outbreak',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './create-outbreak.component.html',
-  styleUrls: ['./create-outbreak.component.less']
+  templateUrl: './create-outbreak.component.html'
 })
 export class CreateOutbreakComponent
   extends CreateConfirmOnChanges

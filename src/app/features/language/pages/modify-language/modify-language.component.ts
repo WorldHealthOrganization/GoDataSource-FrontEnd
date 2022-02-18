@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -16,9 +16,7 @@ import { throwError } from 'rxjs';
 
 @Component({
   selector: 'app-modify-language',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './modify-language.component.html',
-  styleUrls: ['./modify-language.component.less']
+  templateUrl: './modify-language.component.html'
 })
 export class ModifyLanguageComponent extends ViewModifyComponent implements OnInit {
   // breadcrumbs
