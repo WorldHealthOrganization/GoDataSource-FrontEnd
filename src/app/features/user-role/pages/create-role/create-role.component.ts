@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
@@ -21,9 +21,7 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
 
 @Component({
   selector: 'app-create-role',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './create-role.component.html',
-  styleUrls: ['./create-role.component.less']
+  templateUrl: './create-role.component.html'
 })
 export class CreateRoleComponent
   extends CreateConfirmOnChanges
