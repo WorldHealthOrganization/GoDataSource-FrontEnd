@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
@@ -23,9 +23,7 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
 
 @Component({
   selector: 'app-create-client-application',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './create-client-application.component.html',
-  styleUrls: ['./create-client-application.component.less']
+  templateUrl: './create-client-application.component.html'
 })
 export class CreateClientApplicationComponent extends ConfirmOnFormChanges implements OnInit {
   // breadcrumb header

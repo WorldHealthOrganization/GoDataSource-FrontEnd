@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Observable } from 'rxjs';
@@ -24,9 +24,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 
 @Component({
   selector: 'app-team-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './team-list.component.html',
-  styleUrls: ['./team-list.component.less']
+  templateUrl: './team-list.component.html'
 })
 export class TeamListComponent extends ListComponent implements OnInit, OnDestroy {
   // breadcrumb header
