@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
 import { UserModel } from '../../../../core/models/user.model';
@@ -23,9 +23,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 
 @Component({
   selector: 'app-report-cases-date-onset-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './report-cases-date-onset-list.component.html',
-  styleUrls: ['./report-cases-date-onset-list.component.less']
+  templateUrl: './report-cases-date-onset-list.component.html'
 })
 export class ReportCasesDateOnsetListComponent extends ListComponent implements OnInit, OnDestroy {
   // breadcrumbs

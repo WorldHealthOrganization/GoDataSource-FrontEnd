@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -21,9 +21,7 @@ import { RelationshipModel } from '../../../../core/models/entity-and-relationsh
 
 @Component({
   selector: 'app-create-entity-relationship-bulk',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './create-entity-relationship-bulk.component.html',
-  styleUrls: ['./create-entity-relationship-bulk.component.less']
+  templateUrl: './create-entity-relationship-bulk.component.html'
 })
 export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges implements OnInit {
 
