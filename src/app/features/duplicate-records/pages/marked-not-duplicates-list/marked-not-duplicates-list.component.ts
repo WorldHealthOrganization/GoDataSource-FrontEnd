@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable, Subscription } from 'rxjs';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -31,9 +31,7 @@ import { ContactsOfContactsDataService } from '../../../../core/services/data/co
 
 @Component({
   selector: 'app-cases-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './marked-not-duplicates-list.component.html',
-  styleUrls: ['./marked-not-duplicates-list.component.less']
+  templateUrl: './marked-not-duplicates-list.component.html'
 })
 export class MarkedNotDuplicatesListComponent
   extends ListComponent

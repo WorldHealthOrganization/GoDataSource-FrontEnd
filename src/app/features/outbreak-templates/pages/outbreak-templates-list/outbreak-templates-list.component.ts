@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -24,9 +24,7 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 
 @Component({
   selector: 'app-outbreak-templates-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './outbreak-templates-list.component.html',
-  styleUrls: ['./outbreak-templates-list.component.less']
+  templateUrl: './outbreak-templates-list.component.html'
 })
 export class OutbreakTemplatesListComponent
   extends ListComponent

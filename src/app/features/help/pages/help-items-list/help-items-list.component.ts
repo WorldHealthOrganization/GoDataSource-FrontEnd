@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -27,9 +27,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 
 @Component({
   selector: 'app-help-items-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './help-items-list.component.html',
-  styleUrls: ['./help-items-list.component.less']
+  templateUrl: './help-items-list.component.html'
 })
 export class HelpItemsListComponent extends ListComponent implements OnInit, OnDestroy {
   // breadcrumbs

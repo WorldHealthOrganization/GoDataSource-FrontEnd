@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
@@ -17,9 +17,7 @@ import { ContactModel } from '../../../../core/models/contact.model';
 
 @Component({
   selector: 'app-modify-questionnaire-contact',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './modify-questionnaire-contact.component.html',
-  styleUrls: ['./modify-questionnaire-contact.component.less']
+  templateUrl: './modify-questionnaire-contact.component.html'
 })
 export class ModifyQuestionnaireContactComponent extends ViewModifyComponent implements OnInit {
   // breadcrumbs

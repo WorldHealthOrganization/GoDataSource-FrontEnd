@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -26,9 +26,7 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
 
 @Component({
   selector: 'app-create-follow-up',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './create-contact-follow-up.component.html',
-  styleUrls: ['./create-contact-follow-up.component.less']
+  templateUrl: './create-contact-follow-up.component.html'
 })
 export class CreateContactFollowUpComponent
   extends CreateConfirmOnChanges

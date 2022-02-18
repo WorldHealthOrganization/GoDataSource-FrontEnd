@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ChronologyItem } from '../../../../shared/components/chronology/typings/chronology-item';
 import { UserModel } from '../../../../core/models/user.model';
@@ -14,9 +14,7 @@ import { ContactOfContactChronology } from './typings/contact-of-contact-chronol
 
 @Component({
   selector: 'app-view-chronology-contact-of-contact',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './view-chronology-contact-of-contact.component.html',
-  styleUrls: ['./view-chronology-contact-of-contact.component.less']
+  templateUrl: './view-chronology-contact-of-contact.component.html'
 })
 export class ViewChronologyContactOfContactComponent implements OnInit {
 

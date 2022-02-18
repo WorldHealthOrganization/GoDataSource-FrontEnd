@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 import * as _ from 'lodash';
@@ -45,9 +45,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 
 @Component({
   selector: 'app-create-contact-of-contact',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './create-contact-of-contact.component.html',
-  styleUrls: ['./create-contact-of-contact.component.less']
+  templateUrl: './create-contact-of-contact.component.html'
 })
 export class CreateContactOfContactComponent extends CreateConfirmOnChanges implements OnInit {
   // breadcrumbs

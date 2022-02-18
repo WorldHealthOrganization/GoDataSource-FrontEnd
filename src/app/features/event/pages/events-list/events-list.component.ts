@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable, throwError } from 'rxjs';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -39,9 +39,7 @@ import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
   selector: 'app-events-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './events-list.component.html',
-  styleUrls: ['./events-list.component.less']
+  templateUrl: './events-list.component.html'
 })
 export class EventsListComponent extends ListComponent implements OnInit, OnDestroy {
   // breadcrumbs
