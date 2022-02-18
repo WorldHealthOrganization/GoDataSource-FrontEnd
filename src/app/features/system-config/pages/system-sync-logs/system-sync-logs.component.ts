@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -29,9 +29,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 
 @Component({
   selector: 'app-system-sync-logs-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './system-sync-logs.component.html',
-  styleUrls: ['./system-sync-logs.component.less']
+  templateUrl: './system-sync-logs.component.html'
 })
 export class SystemSyncLogsComponent
   extends ListComponent

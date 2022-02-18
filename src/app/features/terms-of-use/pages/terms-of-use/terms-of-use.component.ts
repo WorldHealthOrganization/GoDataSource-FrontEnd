@@ -3,8 +3,7 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 
 @Component({
   selector: 'app-terms-of-use',
-  templateUrl: './terms-of-use.component.html',
-  styleUrls: ['./terms-of-use.component.less']
+  templateUrl: './terms-of-use.component.html'
 })
 export class TermsOfUseComponent {
   // breadcrumbs
