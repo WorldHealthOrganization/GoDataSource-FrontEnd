@@ -1,4 +1,4 @@
-import { Component, Host, Inject, Input, OnInit, Optional, SkipSelf, ViewEncapsulation } from '@angular/core';
+import { Component, Host, Inject, Input, OnInit, Optional, SkipSelf } from '@angular/core';
 import { ListBase } from '../../xt-forms/core/list-base';
 import { VaccineModel } from '../../../core/models/vaccine.model';
 import { ControlContainer, NG_ASYNC_VALIDATORS, NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -11,9 +11,7 @@ import { Moment, moment } from '../../../core/helperClasses/x-moment';
 
 @Component({
   selector: 'app-form-vaccines-list',
-  encapsulation: ViewEncapsulation.None,
   templateUrl: './form-vaccines-list.component.html',
-  styleUrls: ['./form-vaccines-list.component.less'],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
     useExisting: FormVaccinesListComponent,

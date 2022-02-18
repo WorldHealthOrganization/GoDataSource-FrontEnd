@@ -6,7 +6,6 @@ import { LocationIdentifierModel } from '../../../core/models/location-identifie
 @Component({
   selector: 'app-form-location-identifier-list',
   templateUrl: './form-location-identifier-list.component.html',
-  styleUrls: ['./form-location-identifier-list.component.less'],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
     useExisting: FormLocationIdentifierListComponent,
