@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Observable, throwError } from 'rxjs';
@@ -40,9 +40,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 
 @Component({
   selector: 'app-lab-results',
-  templateUrl: './lab-results-list.component.html',
-  encapsulation: ViewEncapsulation.None,
-  styleUrls: ['./lab-results-list.component.less']
+  templateUrl: './lab-results-list.component.html'
 })
 export class LabResultsListComponent extends ListComponent implements OnInit, OnDestroy {
   // breadcrumbs
