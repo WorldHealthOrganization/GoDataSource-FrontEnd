@@ -29,8 +29,7 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 
 @Component({
   selector: 'app-available-entities-for-switch-list',
-  templateUrl: './available-entities-for-switch-list.component.html',
-  styleUrls: ['./available-entities-for-switch-list.component.less']
+  templateUrl: './available-entities-for-switch-list.component.html'
 })
 export class AvailableEntitiesForSwitchListComponent extends RelationshipsListComponent implements OnInit, OnDestroy {
   breadcrumbs: BreadcrumbItemModel[] = [];
