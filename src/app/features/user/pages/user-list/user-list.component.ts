@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserModel, UserRoleModel, PhoneNumberType, UserSettings } from '../../../../core/models/user.model';
@@ -27,9 +27,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 
 @Component({
   selector: 'app-user-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './user-list.component.html',
-  styleUrls: ['./user-list.component.less']
+  templateUrl: './user-list.component.html'
 })
 export class UserListComponent extends ListComponent implements OnInit, OnDestroy {
   breadcrumbs: BreadcrumbItemModel[] = [
