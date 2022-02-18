@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -28,9 +28,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 
 @Component({
   selector: 'app-entity-relationships-list-assign',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './entity-relationships-list-assign.component.html',
-  styleUrls: ['./entity-relationships-list-assign.component.less']
+  templateUrl: './entity-relationships-list-assign.component.html'
 })
 export class EntityRelationshipsListAssignComponent extends RelationshipsListComponent implements OnInit, OnDestroy {
   breadcrumbs: BreadcrumbItemModel[] = [];
