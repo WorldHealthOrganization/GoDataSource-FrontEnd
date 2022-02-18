@@ -17,8 +17,7 @@ import { ContactOfContactModel } from '../../../../core/models/contact-of-contac
 
 @Component({
   selector: 'app-import-relationship-data',
-  templateUrl: './import-relationship-data.component.html',
-  styleUrls: ['./import-relationship-data.component.less']
+  templateUrl: './import-relationship-data.component.html'
 })
 export class ImportRelationshipDataComponent implements OnInit, OnDestroy {
 

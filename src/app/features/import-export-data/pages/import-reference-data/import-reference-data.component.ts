@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ImportServerModelNames } from '../../components/import-data/import-data.component';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
@@ -9,9 +9,7 @@ import { ImportDataExtension } from '../../components/import-data/model';
 
 @Component({
   selector: 'app-import-case-lab-data',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './import-reference-data.component.html',
-  styleUrls: ['./import-reference-data.component.less']
+  templateUrl: './import-reference-data.component.html'
 })
 export class ImportReferenceDataComponent {
   breadcrumbs: BreadcrumbItemModel[] = [
