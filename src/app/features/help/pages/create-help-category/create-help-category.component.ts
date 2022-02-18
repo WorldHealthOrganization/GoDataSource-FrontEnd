@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
@@ -18,9 +18,7 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
 
 @Component({
   selector: 'app-create-help-category',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './create-help-category.component.html',
-  styleUrls: ['./create-help-category.component.less']
+  templateUrl: './create-help-category.component.html'
 })
 export class CreateHelpCategoryComponent
   extends CreateConfirmOnChanges

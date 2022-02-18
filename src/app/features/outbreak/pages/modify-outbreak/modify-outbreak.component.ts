@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ActivatedRoute } from '@angular/router';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -22,9 +22,7 @@ import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
   selector: 'app-modify-outbreak',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './modify-outbreak.component.html',
-  styleUrls: ['./modify-outbreak.component.less']
+  templateUrl: './modify-outbreak.component.html'
 })
 export class ModifyOutbreakComponent extends ViewModifyComponent implements OnInit {
   // breadcrumbs

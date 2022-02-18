@@ -21,8 +21,7 @@ import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/vali
 
 @Component({
   selector: 'app-create-outbreak-template',
-  templateUrl: './create-outbreak-template.component.html',
-  styleUrls: ['./create-outbreak-template.component.less']
+  templateUrl: './create-outbreak-template.component.html'
 })
 export class CreateOutbreakTemplateComponent
   extends CreateConfirmOnChanges

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { NgForm } from '@angular/forms';
@@ -24,9 +24,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 
 @Component({
   selector: 'app-create-user',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './create-user.component.html',
-  styleUrls: ['./create-user.component.less']
+  templateUrl: './create-user.component.html'
 })
 export class CreateUserComponent
   extends CreateConfirmOnChanges

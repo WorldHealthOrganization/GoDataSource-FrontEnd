@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { FormModifyQuestionnaireBreadcrumbsData, FormModifyQuestionnaireComponent, FormModifyQuestionnaireUpdateData } from '../../../../shared/components';
@@ -16,9 +16,7 @@ import { VisibleColumnModel } from '../../../../shared/components/side-columns/m
 
 @Component({
   selector: 'app-outbreak-template-questionnaire',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './outbreak-template-questionnaire.component.html',
-  styleUrls: ['./outbreak-template-questionnaire.component.less']
+  templateUrl: './outbreak-template-questionnaire.component.html'
 })
 export class OutbreakTemplateQuestionnaireComponent extends ConfirmOnFormChanges implements OnInit {
   // breadcrumbs

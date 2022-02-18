@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -9,8 +9,7 @@ import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
   selector: 'app-logout',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './logout.component.html'
+  template: ''
 })
 export class LogoutComponent implements OnInit {
   /**

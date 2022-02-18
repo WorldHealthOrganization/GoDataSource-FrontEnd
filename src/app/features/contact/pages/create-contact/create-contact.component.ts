@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -47,9 +47,7 @@ import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 
 @Component({
   selector: 'app-create-contact',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './create-contact.component.html',
-  styleUrls: ['./create-contact.component.less']
+  templateUrl: './create-contact.component.html'
 })
 export class CreateContactComponent
   extends CreateConfirmOnChanges

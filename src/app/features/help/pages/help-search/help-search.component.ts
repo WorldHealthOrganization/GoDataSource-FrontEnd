@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -22,9 +22,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 
 @Component({
   selector: 'app-help-search',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './help-search.component.html',
-  styleUrls: ['./help-search.component.less']
+  templateUrl: './help-search.component.html'
 })
 export class HelpSearchComponent extends ListComponent implements OnInit, OnDestroy {
   breadcrumbs: BreadcrumbItemModel[] = [

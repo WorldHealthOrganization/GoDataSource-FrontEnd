@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -40,9 +40,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 
 @Component({
   selector: 'app-modify-contact-of-contact',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './modify-contact-of-contact.component.html',
-  styleUrls: ['./modify-contact-of-contact.component.less']
+  templateUrl: './modify-contact-of-contact.component.html'
 })
 export class ModifyContactOfContactComponent extends ViewModifyComponent implements OnInit {
 

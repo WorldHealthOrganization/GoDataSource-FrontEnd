@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute } from '@angular/router';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
@@ -20,9 +20,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 
 @Component({
   selector: 'app-manage-icons-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './manage-icons-list.component.html',
-  styleUrls: ['./manage-icons-list.component.less']
+  templateUrl: './manage-icons-list.component.html'
 })
 export class ManageIconsListComponent extends ListComponent implements OnInit, OnDestroy {
   // Breadcrumbs

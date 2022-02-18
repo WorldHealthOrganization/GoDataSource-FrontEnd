@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
@@ -15,9 +15,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 
 @Component({
   selector: 'app-modify-system-device',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './modify-system-device.component.html',
-  styleUrls: ['./modify-system-device.component.less']
+  templateUrl: './modify-system-device.component.html'
 })
 export class ModifySystemDeviceComponent extends ViewModifyComponent implements OnInit {
   breadcrumbs: BreadcrumbItemModel[] = [];

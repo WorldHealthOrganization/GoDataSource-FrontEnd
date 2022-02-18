@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
@@ -20,9 +20,7 @@ import { UserRoleHelper } from '../../../../core/helperClasses/user-role.helper'
 
 @Component({
   selector: 'app-modify-role',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './modify-role.component.html',
-  styleUrls: ['./modify-role.component.less']
+  templateUrl: './modify-role.component.html'
 })
 export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
   // breadcrumbs

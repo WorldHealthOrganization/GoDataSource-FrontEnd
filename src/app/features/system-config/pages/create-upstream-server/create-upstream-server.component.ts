@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
@@ -18,9 +18,7 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
 
 @Component({
   selector: 'app-create-upstream-server',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './create-upstream-server.component.html',
-  styleUrls: ['./create-upstream-server.component.less']
+  templateUrl: './create-upstream-server.component.html'
 })
 export class CreateUpstreamServerComponent
   extends CreateConfirmOnChanges

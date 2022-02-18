@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
@@ -22,9 +22,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
   selector: 'app-transmission-chains-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './transmission-chains-list.component.html',
-  styleUrls: ['./transmission-chains-list.component.less']
+  templateUrl: './transmission-chains-list.component.html'
 })
 export class TransmissionChainsListComponent extends ListComponent implements OnInit, OnDestroy {
   // breadcrumbs

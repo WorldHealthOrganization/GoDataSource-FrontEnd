@@ -1,10 +1,8 @@
-import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-yes-no-label',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './yes-no-label.component.html',
-  styleUrls: ['./yes-no-label.component.less']
+  templateUrl: './yes-no-label.component.html'
 })
 export class YesNoLabelComponent {
   @Input() value: boolean;

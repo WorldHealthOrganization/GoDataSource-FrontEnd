@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -22,9 +22,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 
 @Component({
   selector: 'app-saved-filters',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './saved-filters.component.html',
-  styleUrls: ['./saved-filters.component.less']
+  templateUrl: './saved-filters.component.html'
 })
 export class SavedFiltersComponent extends ListComponent implements OnInit, OnDestroy {
   // breadcrumbs

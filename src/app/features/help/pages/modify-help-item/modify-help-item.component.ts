@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -19,9 +19,7 @@ import { throwError } from 'rxjs';
 
 @Component({
   selector: 'app-modify-help-item',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './modify-help-item.component.html',
-  styleUrls: ['./modify-help-item.component.less']
+  templateUrl: './modify-help-item.component.html'
 })
 export class ModifyHelpItemComponent extends ViewModifyComponent implements OnInit {
   // breadcrumbs

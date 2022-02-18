@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -34,9 +34,7 @@ import { ClusterModel } from '../../../../core/models/cluster.model';
 
 @Component({
   selector: 'app-entity-relationships-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './entity-relationships-list.component.html',
-  styleUrls: ['./entity-relationships-list.component.less']
+  templateUrl: './entity-relationships-list.component.html'
 })
 export class EntityRelationshipsListComponent extends RelationshipsListComponent implements OnInit, OnDestroy {
   breadcrumbs: BreadcrumbItemModel[] = [];

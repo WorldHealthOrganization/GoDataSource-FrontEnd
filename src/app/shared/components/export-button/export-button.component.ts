@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { DialogExportProgressAnswer, DialogService, ExportDataExtension } from '../../../core/services/helper/dialog.service';
@@ -8,9 +8,7 @@ import { IExportFieldsGroupRequired } from '../../../core/models/export-fields-g
 
 @Component({
   selector: 'app-export-button',
-  encapsulation: ViewEncapsulation.None,
   templateUrl: './export-button.component.html',
-  styleUrls: ['./export-button.component.less'],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
     useExisting: ExportButtonComponent,

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -29,9 +29,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 
 @Component({
   selector: 'app-outbreak-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './outbreak-list.component.html',
-  styleUrls: ['./outbreak-list.component.less']
+  templateUrl: './outbreak-list.component.html'
 })
 export class OutbreakListComponent extends ListComponent implements OnInit, OnDestroy {
   breadcrumbs: BreadcrumbItemModel[] = [

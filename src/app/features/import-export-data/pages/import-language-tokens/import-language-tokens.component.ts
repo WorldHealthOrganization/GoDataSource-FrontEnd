@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
@@ -10,9 +10,7 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
 
 @Component({
   selector: 'app-import-language-tokens',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './import-language-tokens.component.html',
-  styleUrls: ['./import-language-tokens.component.less']
+  templateUrl: './import-language-tokens.component.html'
 })
 export class ImportLanguageTokensComponent implements OnInit {
   // breadcrumbs

@@ -19,8 +19,7 @@ import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/vali
 
 @Component({
   selector: 'app-modify-outbreak-template',
-  templateUrl: './modify-outbreak-template.component.html',
-  styleUrls: ['./modify-outbreak-template.component.less']
+  templateUrl: './modify-outbreak-template.component.html'
 })
 export class ModifyOutbreakTemplateComponent extends ViewModifyComponent implements OnInit {
   // breadcrumbs

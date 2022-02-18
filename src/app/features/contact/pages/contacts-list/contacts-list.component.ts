@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable, throwError } from 'rxjs';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -49,9 +49,7 @@ import {
 
 @Component({
   selector: 'app-contacts-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './contacts-list.component.html',
-  styleUrls: ['./contacts-list.component.less']
+  templateUrl: './contacts-list.component.html'
 })
 export class ContactsListComponent extends ListComponent implements OnInit, OnDestroy {
   // breadcrumbs

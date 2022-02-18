@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -17,9 +17,7 @@ import { HelpItemModel } from '../../../../core/models/help-item.model';
 
 @Component({
   selector: 'app-modify-help-category',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './modify-help-category.component.html',
-  styleUrls: ['./modify-help-category.component.less']
+  templateUrl: './modify-help-category.component.html'
 })
 export class ModifyHelpCategoryComponent extends ViewModifyComponent implements OnInit {
   // breadcrumbs

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -27,9 +27,7 @@ import { ContactOfContactModel } from '../../../../core/models/contact-of-contac
 
 @Component({
   selector: 'app-clusters-people-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './clusters-people-list.component.html',
-  styleUrls: ['./clusters-people-list.component.less']
+  templateUrl: './clusters-people-list.component.html'
 })
 export class ClustersPeopleListComponent extends ListComponent implements OnInit, OnDestroy {
   // breadcrumbs

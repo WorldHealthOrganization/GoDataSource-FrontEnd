@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -25,9 +25,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 
 @Component({
   selector: 'app-client-applications-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './client-applications-list.component.html',
-  styleUrls: ['./client-applications-list.component.less']
+  templateUrl: './client-applications-list.component.html'
 })
 export class ClientApplicationsListComponent
   extends ListComponent

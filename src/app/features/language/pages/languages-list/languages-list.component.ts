@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -20,9 +20,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 
 @Component({
   selector: 'app-languages-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './languages-list.component.html',
-  styleUrls: ['./languages-list.component.less']
+  templateUrl: './languages-list.component.html'
 })
 export class LanguagesListComponent
   extends ListComponent

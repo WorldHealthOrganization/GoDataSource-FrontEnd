@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
@@ -20,9 +20,7 @@ import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-co
 
 @Component({
   selector: 'app-create-help-item',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './create-help-item.component.html',
-  styleUrls: ['./create-help-item.component.less']
+  templateUrl: './create-help-item.component.html'
 })
 export class CreateHelpItemComponent
   extends CreateConfirmOnChanges

@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, Input } from '@angular/core';
+import { Component, Optional, Inject, Host, SkipSelf, OnInit, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 
 import { ListBase } from '../../xt-forms/core';
@@ -9,9 +9,7 @@ import { DialogService } from '../../../core/services/helper/dialog.service';
 
 @Component({
   selector: 'app-form-document-list',
-  encapsulation: ViewEncapsulation.None,
   templateUrl: './form-document-list.component.html',
-  styleUrls: ['./form-document-list.component.less'],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
     useExisting: FormDocumentListComponent,

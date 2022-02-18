@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -27,9 +27,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 
 @Component({
   selector: 'app-available-entities-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './available-entities-list.component.html',
-  styleUrls: ['./available-entities-list.component.less']
+  templateUrl: './available-entities-list.component.html'
 })
 export class AvailableEntitiesListComponent extends RelationshipsListComponent implements OnInit, OnDestroy {
   breadcrumbs: BreadcrumbItemModel[] = [];

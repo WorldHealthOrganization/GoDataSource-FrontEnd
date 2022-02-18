@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -30,9 +30,7 @@ import { Constants } from '../../../../core/models/constants';
 
 @Component({
   selector: 'app-create-lab-result',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './create-lab-result.component.html',
-  styleUrls: ['./create-lab-result.component.less']
+  templateUrl: './create-lab-result.component.html'
 })
 export class CreateLabResultComponent
   extends CreateConfirmOnChanges

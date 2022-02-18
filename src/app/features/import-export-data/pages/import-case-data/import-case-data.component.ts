@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -15,9 +15,7 @@ import { CaseModel } from '../../../../core/models/case.model';
 
 @Component({
   selector: 'app-import-case-data',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './import-case-data.component.html',
-  styleUrls: ['./import-case-data.component.less']
+  templateUrl: './import-case-data.component.html'
 })
 export class ImportCaseDataComponent implements OnInit, OnDestroy {
   // breadcrumbs

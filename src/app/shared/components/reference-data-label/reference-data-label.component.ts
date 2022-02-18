@@ -1,13 +1,11 @@
-import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../core/models/reference-data.model';
 import * as _ from 'lodash';
 
 @Component({
   selector: 'app-reference-data-label',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './reference-data-label.component.html',
-  styleUrls: ['./reference-data-label.component.less']
+  templateUrl: './reference-data-label.component.html'
 })
 export class ReferenceDataLabelComponent {
   @Input() listSplitter: string = ' / ';

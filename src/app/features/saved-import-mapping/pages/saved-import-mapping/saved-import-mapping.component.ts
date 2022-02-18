@@ -22,8 +22,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 
 @Component({
   selector: 'app-saved-import-mapping',
-  templateUrl: './saved-import-mapping.component.html',
-  styleUrls: ['./saved-import-mapping.component.less']
+  templateUrl: './saved-import-mapping.component.html'
 })
 export class SavedImportMappingComponent extends ListComponent implements OnInit, OnDestroy {
   // breadcrumbs

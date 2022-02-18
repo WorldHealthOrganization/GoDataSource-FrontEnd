@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ImportServerModelNames } from '../../components/import-data/import-data.component';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
@@ -12,9 +12,7 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
 
 @Component({
   selector: 'app-import-case-data',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './import-location-data.component.html',
-  styleUrls: ['./import-location-data.component.less']
+  templateUrl: './import-location-data.component.html'
 })
 export class ImportLocationDataComponent {
   breadcrumbs: BreadcrumbItemModel[] = [];

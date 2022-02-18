@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { NgForm } from '@angular/forms';
@@ -25,9 +25,7 @@ import { SystemSettingsDataService } from '../../../../core/services/data/system
 
 @Component({
   selector: 'app-modify-user',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './modify-user.component.html',
-  styleUrls: ['./modify-user.component.less']
+  templateUrl: './modify-user.component.html'
 })
 export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
   breadcrumbs: BreadcrumbItemModel[] = [];

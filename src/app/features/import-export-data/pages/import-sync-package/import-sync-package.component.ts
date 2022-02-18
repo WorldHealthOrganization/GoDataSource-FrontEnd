@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ImportDataExtension } from '../../components/import-data/model';
@@ -9,9 +9,7 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
 
 @Component({
   selector: 'app-import-sync-package',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './import-sync-package.component.html',
-  styleUrls: ['./import-sync-package.component.less']
+  templateUrl: './import-sync-package.component.html'
 })
 export class ImportSyncPackageComponent {
   breadcrumbs: BreadcrumbItemModel[] = [];
