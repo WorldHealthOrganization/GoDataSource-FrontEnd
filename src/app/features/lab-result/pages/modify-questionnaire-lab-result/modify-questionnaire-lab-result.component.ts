@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
@@ -20,9 +20,7 @@ import { LabResultModel } from '../../../../core/models/lab-result.model';
 
 @Component({
   selector: 'app-modify-questionnaire-lab-result',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './modify-questionnaire-lab-result.component.html',
-  styleUrls: ['./modify-questionnaire-lab-result.component.less']
+  templateUrl: './modify-questionnaire-lab-result.component.html'
 })
 export class ModifyQuestionnaireLabResultComponent extends ViewModifyComponent implements OnInit {
   // breadcrumbs
