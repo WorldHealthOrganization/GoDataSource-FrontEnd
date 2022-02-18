@@ -1,10 +1,8 @@
-import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-list-item-label',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './list-item-label.component.html',
-  styleUrls: ['./list-item-label.component.less']
+  templateUrl: './list-item-label.component.html'
 })
 export class ListItemLabelComponent {
   @Input() options: any[] = [];

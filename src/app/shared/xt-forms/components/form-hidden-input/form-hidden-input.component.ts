@@ -1,7 +1,6 @@
 import {
   Component,
   Input,
-  ViewEncapsulation,
   Inject,
   Host,
   SkipSelf,
@@ -13,9 +12,7 @@ import { ElementBase } from '../../core/index';
 
 @Component({
   selector: 'app-form-hidden-input',
-  encapsulation: ViewEncapsulation.None,
   templateUrl: './form-hidden-input.component.html',
-  styleUrls: ['./form-hidden-input.component.less'],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
     useExisting: FormHiddenInputComponent,
