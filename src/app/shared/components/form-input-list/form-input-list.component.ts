@@ -1,4 +1,4 @@
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit } from '@angular/core';
+import { Component, Input, Optional, Inject, Host, SkipSelf, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { ListBase } from '../../xt-forms/core';
 import { Subscriber, Observable } from 'rxjs';
@@ -8,9 +8,7 @@ import * as _ from 'lodash';
 
 @Component({
   selector: 'app-form-input-list',
-  encapsulation: ViewEncapsulation.None,
   templateUrl: './form-input-list.component.html',
-  styleUrls: ['./form-input-list.component.less'],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
     useExisting: FormInputListComponent,

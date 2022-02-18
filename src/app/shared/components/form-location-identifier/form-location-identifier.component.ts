@@ -6,7 +6,6 @@ import { GroupBase } from '../../xt-forms/core/group-base';
 @Component({
   selector: 'app-form-location-identifier',
   templateUrl: './form-location-identifier.component.html',
-  styleUrls: ['./form-location-identifier.component.less'],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
     useExisting: FormLocationIdentifierComponent,
