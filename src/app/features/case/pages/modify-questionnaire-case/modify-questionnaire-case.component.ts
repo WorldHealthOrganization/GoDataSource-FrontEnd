@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute } from '@angular/router';
@@ -17,9 +17,7 @@ import { catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-modify-questionnaire-case',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './modify-questionnaire-case.component.html',
-  styleUrls: ['./modify-questionnaire-case.component.less']
+  templateUrl: './modify-questionnaire-case.component.html'
 })
 export class ModifyQuestionnaireCaseComponent extends ViewModifyComponent implements OnInit {
   // breadcrumbs

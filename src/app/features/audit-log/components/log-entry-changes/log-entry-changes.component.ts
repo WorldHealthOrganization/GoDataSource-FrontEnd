@@ -1,13 +1,11 @@
-import { Component, Input, OnChanges, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { AuditLogChangeDataModel, AuditLogModel } from '../../../../core/models/audit-log.model';
 import { AuditLogValue } from '../../types/field-value-type';
 import { AuditLogsService } from '../../services/audit-logs.service';
 
 @Component({
   selector: 'app-log-entry-changes',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './log-entry-changes.component.html',
-  styleUrls: ['./log-entry-changes.component.less']
+  templateUrl: './log-entry-changes.component.html'
 })
 export class LogEntryChangesComponent implements OnChanges {
   // value

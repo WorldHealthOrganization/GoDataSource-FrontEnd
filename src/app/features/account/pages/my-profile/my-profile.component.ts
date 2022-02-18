@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute } from '@angular/router';
@@ -13,9 +13,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
   selector: 'app-my-profile',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './my-profile.component.html',
-  styleUrls: ['./my-profile.component.less']
+  templateUrl: './my-profile.component.html'
 })
 export class MyProfileComponent extends ViewModifyComponent implements OnInit {
   // breadcrumbs

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -44,9 +44,7 @@ import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 
 @Component({
   selector: 'app-create-case',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './create-case.component.html',
-  styleUrls: ['./create-case.component.less']
+  templateUrl: './create-case.component.html'
 })
 export class CreateCaseComponent
   extends CreateConfirmOnChanges
