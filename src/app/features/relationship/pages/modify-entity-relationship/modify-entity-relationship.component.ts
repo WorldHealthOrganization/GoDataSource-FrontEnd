@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -26,9 +26,7 @@ import { ContactOfContactModel } from '../../../../core/models/contact-of-contac
 
 @Component({
   selector: 'app-modify-entity-relationship',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './modify-entity-relationship.component.html',
-  styleUrls: ['./modify-entity-relationship.component.less']
+  templateUrl: './modify-entity-relationship.component.html'
 })
 export class ModifyEntityRelationshipComponent extends ViewModifyComponent implements OnInit {
   // breadcrumbs
