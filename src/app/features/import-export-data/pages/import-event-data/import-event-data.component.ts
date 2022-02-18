@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -14,9 +14,7 @@ import { CaseModel } from '../../../../core/models/case.model';
 
 @Component({
   selector: 'app-import-event-data',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './import-event-data.component.html',
-  styleUrls: ['./import-event-data.component.less']
+  templateUrl: './import-event-data.component.html'
 })
 export class ImportEventDataComponent implements OnInit, OnDestroy {
   // breadcrumbs

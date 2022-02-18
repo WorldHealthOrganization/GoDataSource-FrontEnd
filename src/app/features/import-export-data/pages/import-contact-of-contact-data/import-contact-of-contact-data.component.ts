@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { UserModel } from '../../../../core/models/user.model';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
@@ -14,9 +14,7 @@ import { ContactOfContactModel } from '../../../../core/models/contact-of-contac
 
 @Component({
   selector: 'app-import-contact-of-contact-data',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './import-contact-of-contact-data.component.html',
-  styleUrls: ['./import-contact-of-contact-data.component.less']
+  templateUrl: './import-contact-of-contact-data.component.html'
 })
 export class ImportContactOfContactDataComponent implements OnInit, OnDestroy {
   // breadcrumbs

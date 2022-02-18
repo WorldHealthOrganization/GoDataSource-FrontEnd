@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -16,9 +16,7 @@ import { LabResultModel } from '../../../../core/models/lab-result.model';
 
 @Component({
   selector: 'app-import-case-lab-data',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './import-case-lab-data.component.html',
-  styleUrls: ['./import-case-lab-data.component.less']
+  templateUrl: './import-case-lab-data.component.html'
 })
 export class ImportCaseLabDataComponent implements OnInit, OnDestroy {
   // breadcrumbs

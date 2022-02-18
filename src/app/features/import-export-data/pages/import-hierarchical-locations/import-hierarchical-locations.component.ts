@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component } from '@angular/core';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { Router } from '@angular/router';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
@@ -10,9 +10,7 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
 
 @Component({
   selector: 'app-import-hierarchical-locations',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './import-hierarchical-locations.component.html',
-  styleUrls: ['./import-hierarchical-locations.component.less']
+  templateUrl: './import-hierarchical-locations.component.html'
 })
 export class ImportHierarchicalLocationsComponent {
   breadcrumbs: BreadcrumbItemModel[] = [];

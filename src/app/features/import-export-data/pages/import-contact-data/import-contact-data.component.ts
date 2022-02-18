@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -15,9 +15,7 @@ import { QuestionModel } from '../../../../core/models/question.model';
 
 @Component({
   selector: 'app-import-contact-data',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './import-contact-data.component.html',
-  styleUrls: ['./import-contact-data.component.less']
+  templateUrl: './import-contact-data.component.html'
 })
 export class ImportContactDataComponent implements OnInit, OnDestroy {
   // breadcrumbs
