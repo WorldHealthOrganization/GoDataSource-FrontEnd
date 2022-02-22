@@ -1,0 +1,306 @@
+@import 'mixins';
+@import 'colors';
+@import 'font';
+
+/* Reset */
+*,
+*:before,
+*:after {
+  @include box-sizing(border-box);
+}
+
+*:focus {
+  outline: 0 none;
+}
+
+html,
+body {
+  -moz-osx-font-smoothing: antialiased;
+  -ms-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  margin: 0;
+  min-height: 100%;
+  padding: 0;
+  text-rendering: optimizeLegibility;
+}
+
+html {
+  font-size: 10px;
+}
+
+body {
+  background: var(--gd-background);
+  color: var(--gd-text);
+  font-family: $gd-font-family;
+  font-size: $gd-font-size;
+  font-weight: 400;
+  line-height: $gd-line-height;
+}
+
+::-webkit-scrollbar {
+  -webkit-appearance: none;
+  background-color: rgba(var(--gd-secondary-rgb), 0.15);
+  @include border-radius(0.8rem);
+  height: 0;
+  width: 0.8rem;
+
+  .theme-dark & {
+    background-color: rgba(var(--gd-text-rgb), 0.15);
+  }
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(var(--gd-text-rgb), 0.3);
+  @include border-radius(0.8rem);
+}
+
+a {
+  color: var(--gd-primary);
+  cursor: pointer;
+  text-decoration: none;
+  @include transition(0.4s ease);
+
+  &:visited,
+  &:active {
+    color: var(--gd-primary);
+  }
+
+  &:hover {
+    color: var(--gd-primary-alt);
+  }
+}
+
+hr {
+  background-color: var(--gd-secondary);
+  border: none;
+  color: var(--gd-secondary);
+  font-family: $gd-font-family;
+  height: 0;
+  overflow: initial;
+}
+
+@include selection(var(--gd-background), var(--gd-primary));
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-family: $gd-font-family;
+  font-size: $gd-font-size;
+  width: 100%;
+
+  thead {
+    background: rgba(var(--gd-secondary-rgb), 0.1);
+
+    tr {
+      th {
+        border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+        color: var(--gd-text);
+        font-weight: bold;
+        padding: 1rem 1.6rem;
+        text-align: left;
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      td {
+        border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+        outline: none;
+        padding: 1rem 1.6rem;
+        text-align: left;
+
+        img {
+          max-width: initial;
+        }
+      }
+    }
+  }
+}
+
+p {
+  margin: 0 0 1.6rem;
+}
+
+small {
+  font-size: 80%;
+}
+
+b,
+strong {
+  font-weight: bold;
+}
+
+em {
+  font-style: italic;
+}
+
+kbd,
+pre,
+samp {
+  font-family: monospace, monospace;
+  font-size: 1rem;
+}
+
+pre {
+  overflow: auto;
+
+  > code {
+    display: block;
+    padding: 0.8rem 1.6rem;
+    white-space: pre;
+  }
+}
+
+sup,
+sub {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+sup {
+  top: -0.5em;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-top: 0;
+  margin-bottom: 1.6rem;
+
+  a {
+    color: inherit;
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+h1 {
+  color: var(--gd-primary);
+  font-size: 3rem;
+  font-weight: bold;
+
+  > span {
+    color: var(--gd-primary-alt);
+  }
+}
+
+h2 {
+  color: var(--gd-primary);
+  font-size: 2.4rem;
+  font-weight: bold;
+
+  > span {
+    color: var(--gd-primary-alt);
+  }
+}
+
+h3 {
+  color: var(--gd-primary-alt);
+  font-size: 1.8rem;
+  font-weight: bold;
+
+  > span {
+    color: var(--gd-primary-alt);
+  }
+}
+
+h4 {
+  font-size: 1.6rem;
+  font-weight: normal;
+}
+
+h5 {
+  font-size: 1.5rem;
+  font-weight: normal;
+}
+
+h6 {
+  font-size: 1.4rem;
+  font-weight: normal;
+}
+
+ol,
+ul {
+  margin-top: 0;
+  padding-left: 1.6rem;
+
+  ul,
+  ol {
+    font-size: 90%;
+    margin: 1.6rem 0;
+  }
+
+  &.unstyled {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+li {
+  margin-bottom: 0.8rem;
+}
+
+article,
+aside,
+details,
+figcaption,
+figure,
+hgroup,
+section,
+summary {
+  display: block;
+}
+
+audio,
+canvas,
+progress,
+video {
+  display: inline-block;
+  vertical-align: baseline;
+}
+
+audio:not([controls]) {
+  display: none;
+  height: 0;
+}
+
+[hidden],
+.hidden {
+  display: none;
+}
+
+abbr[title] {
+  border-bottom: 0.1rem dotted;
+}
+
+dfn {
+  font-style: italic;
+}
+
+mark {
+  background: var(--gd-warning);
+  color: var(--gd-text);
+}
+
+img {
+  border: 0;
+  max-width: 100%;
+}
+
+svg:not(:root) {
+  overflow: hidden;
+}
