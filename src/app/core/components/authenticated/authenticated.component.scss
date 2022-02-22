@@ -1,0 +1,123 @@
+// variables
+:host {
+  --gd-menu-width-expanded: 330px;
+  --gd-menu-width-collapsed: 70px;
+  --gd-top-bar-height: 70px;
+}
+
+// page
+mat-sidenav-container {
+  // authenticated body layout
+  &.gd-body-content {
+    height: 100vh;
+    width: 100vw;
+    padding: 0;
+    margin: 0;
+
+    // left side
+    .gd-body-content-left {
+      overflow: visible;
+      width: var(--gd-menu-width-collapsed);
+      transition: all 0.24s ease-in-out 0s;
+      &.gd-body-content-left-expanded {
+        width: var(--gd-menu-width-expanded);
+      }
+
+      // left content - logo & body
+      .gd-body-content-left-content {
+        overflow: hidden;
+
+        .gd-body-content-left-content-logo {
+          display: block;
+          width: 100%;
+          height: 36px;
+          // #TODO - must resize png for out needs..optimize
+          background: no-repeat center url("/assets/images/gd-logo.png");
+          background-size: contain;
+
+          &:hover {
+            cursor: pointer;
+          }
+        }
+      }
+
+      // expand / collapse button
+      .gd-expand-collapse-button {
+        position: absolute;
+        top: 0;
+        left: calc(100% - 20px);
+        z-index: 1000;
+      }
+    }
+
+    // right side
+    .gd-body-content-right {
+      margin: 0 0 0 var(--gd-menu-width-collapsed);
+      width: calc(100% - var(--gd-menu-width-collapsed));
+      transition: all 0.24s ease-in-out 0s;
+      &.gd-body-content-right-expanded {
+        width: calc(100% - var(--gd-menu-width-expanded));
+        margin-left: var(--gd-menu-width-expanded) !important;
+      }
+
+      // top bar
+      .gd-body-content-right-top {
+        height: var(--gd-top-bar-height);
+      }
+
+      // page content
+      .gd-body-content-right-bottom {
+        height: calc(100% - var(--gd-top-bar-height));
+        padding: 40px;
+      }
+    }
+  }
+}
+
+
+
+/*
+#TODO - OLD less code - MUST remove once not needed
+@color-accent-main: #4DB0A0;
+.authenticated {
+
+    .sidenav-toggle {
+        position: fixed;
+        z-index: 2;
+        min-width: 0;
+        width: auto;
+        margin-top: 105px;
+        font-size: 14px;
+        line-height: 1;
+        padding: 10px 7px;
+    }
+
+    .context-help-trigger {
+        position: fixed;
+        z-index: 2;
+        min-width: 0;
+        width: auto;
+        bottom: 10px;
+        padding: 10px;
+        background-color: @color-accent-main;
+        color: #fff;
+        text-decoration: none;
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+    .sidenav-container {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+
+        mat-sidenav {
+            z-index: 10;
+        }
+    }
+}
+*/

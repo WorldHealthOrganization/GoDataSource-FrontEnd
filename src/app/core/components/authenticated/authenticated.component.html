@@ -1,8 +1,65 @@
-<div class="authenticated app-theme" fxLayout="column" *ngIf="authUser">
-    <!-- Debug -->
-    <app-form-debug *ngIf="debugVisible"></app-form-debug>
-    <!-- End of Debug -->
+<mat-sidenav-container
+  class="gd-body-content">
 
+  <!-- Left Side - Logo & Main Menu -->
+  <mat-sidenav
+    class="gd-body-content-left"
+    [class.gd-body-content-left-expanded]="expandMenu"
+    opened="true"
+    mode="side"
+    fixedInViewport="true">
+
+    <!-- Content -->
+    <div
+      class="gd-body-content-left-content">
+
+      <!-- Logo -->
+      <div
+        class="gd-body-content-left-content-logo"
+        [routerLink]="['/']"
+        tabindex="-1"></div>
+
+      <!-- Main Menu -->
+      <div>Menu</div>
+
+    </div>
+
+    <!-- Expand / Collapse button -->
+    <button
+      type="button"
+      mat-icon-button
+      (click)="expandMenu = !expandMenu"
+      class="gd-expand-collapse-button">
+      <span class="material-icons">chevron_left</span>
+    </button>
+
+  </mat-sidenav>
+
+  <!-- Right side - top bar & page content -->
+  <mat-sidenav-content
+    class="gd-body-content-right"
+    [class.gd-body-content-right-expanded]="expandMenu">
+
+    <!-- top bar -->
+    <div
+      class="gd-body-content-right-top">
+      top
+    </div>
+
+    <!-- Bottom part - page content -->
+    <div
+      class="gd-body-content-right-bottom">
+      <router-outlet></router-outlet>
+    </div>
+
+  </mat-sidenav-content>
+</mat-sidenav-container>
+
+
+
+<!--
+#TODO - old html code - must remove once not needed anymore
+<div class="authenticated app-theme" fxLayout="column" *ngIf="authUser">
     <mat-sidenav-container class="sidenav-container">
 
         <mat-sidenav #snav mode="over" fixedInViewport>
@@ -15,11 +72,9 @@
                 {{ 'LNG_LAYOUT_MENU_BUTTON_LABEL' | translate }}
             </button>
 
-            <!-- global search entities by identifier -->
             <app-global-entity-search>
             </app-global-entity-search>
 
-            <!-- context help - display help items based on the page you are on -->
             <div *ngIf="contextSearchHelpItems"
                 class="context-help-trigger"
                 (click)="displayHelpDialog()">
@@ -32,3 +87,4 @@
     </mat-sidenav-container>
 
 </div>
+-->
