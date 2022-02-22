@@ -1,5 +1,3 @@
-@import '~styles/common';
-
 // variables
 @topnav-height: 90px;
 @topnav-height-mobile: 65px;
@@ -45,33 +43,33 @@
         }
     }
 
-    @media @mobile-devices {
-        &.mat-toolbar-single-row {
-            /* overriding Material behavior */
-            height: @topnav-height-mobile;
-        }
-
-        .topnav-list {
-            height: @topnav-height-mobile;
-
-            .topnav-static-actions {
-                position: absolute;
-                right: 0;
-                top: 90px;
-
-                .mat-divider {
-                    display: none;
-                }
-            }
-        }
-    }
+    //@media @mobile-devices {
+    //    &.mat-toolbar-single-row {
+    //        /* overriding Material behavior */
+    //        height: @topnav-height-mobile;
+    //    }
+    //
+    //    .topnav-list {
+    //        height: @topnav-height-mobile;
+    //
+    //        .topnav-static-actions {
+    //            position: absolute;
+    //            right: 0;
+    //            top: 90px;
+    //
+    //            .mat-divider {
+    //                display: none;
+    //            }
+    //        }
+    //    }
+    //}
 }
 
 .topnav-static-actions-placeholder {
     height: 75px;
     display: none;
 
-    @media @mobile-devices {
-        display: block;
-    }
+    //@media @mobile-devices {
+    //    display: block;
+    //}
 }
