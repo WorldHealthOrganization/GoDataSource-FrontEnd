@@ -1,21 +1,168 @@
+<!-- Common -->
+<ng-template
+  #commonPart
+  let-option="option">
+  <div
+    class="gd-main-menu-option-label"
+    [class.gd-main-menu-option-label-active]="!!option"
+    fxLayout="row">
+
+    <!-- Icon -->
+    <div
+      fxGrow="0"
+      class="xt-icon gd-main-menu-option-label-icon">{{option.icon}}</div>
+
+    <!-- label -->
+    <div
+      fxFlex
+      class="gd-main-menu-option-label-text">
+      {{option.label | translate}}
+    </div>
+  </div>
+</ng-template>
+
+<!-- Menu -->
+<mat-accordion
+  class="gd-main-menu"
+  [class.gd-version-not-visible]="!expanded || !versionData"
+  displayMode="flat">
+
+  <!-- Menu options -->
+  <ng-container
+    *ngFor="let group of menuGroups">
+    <ng-container
+      *ngIf="group.visible">
+
+      <!-- Label -->
+      <div
+        class="gd-main-menu-group-label">
+        <ng-container
+          *ngIf="expanded">
+          {{group.label | translate}}
+        </ng-container>
+      </div>
+
+      <!-- Children -->
+      <ng-container
+        *ngFor="let menuOption of group.options">
+        <ng-container
+          *ngIf="menuOption.visible">
+
+          <!-- Menu without children - link -->
+          <div
+            *ngIf="menuOption.link; else childrenPanel"
+            class="gd-main-menu-option gd-main-menu-option-link"
+            [routerLink]="menuOption.link">
+            <div
+              class="gd-main-menu-option-header">
+              <ng-template
+                [ngTemplateOutlet]="commonPart"
+                [ngTemplateOutletContext]="{ option: menuOption }"></ng-template>
+            </div>
+          </div>
+
+          <!-- Menu with children -->
+          <ng-template
+            #childrenPanel>
+
+            <!-- Panel -->
+            <mat-expansion-panel
+              *ngIf="expanded; else floatingMenu"
+              class="gd-main-menu-option">
+
+              <!-- Menu Header -->
+              <mat-expansion-panel-header
+                class="gd-main-menu-option-header">
+                <mat-panel-title>
+                  <ng-template
+                    [ngTemplateOutlet]="commonPart"
+                    [ngTemplateOutletContext]="{ option: menuOption }"></ng-template>
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+
+              <!-- Children when menu is expanded -->
+              <div
+                class="gd-main-menu-option-children">
+                <ng-container
+                  *ngFor="let menuOptionChild of menuOption.children">
+                  <ng-container
+                    *ngIf="menuOptionChild.visible">
+
+                    <!-- Child Menu link -->
+                    <div
+                      class="gd-main-menu-option gd-main-menu-option-link"
+                      [routerLink]="menuOptionChild.link">
+                      <div
+                        class="gd-main-menu-option-header">
+                        <ng-template
+                          [ngTemplateOutlet]="commonPart"
+                          [ngTemplateOutletContext]="{ option: menuOptionChild }"></ng-template>
+                      </div>
+                    </div>
+
+                  </ng-container>
+                </ng-container>
+              </div>
+
+            </mat-expansion-panel>
+
+            <!-- Floating menu -->
+            <ng-template
+              #floatingMenu>
+
+              <!-- Icon -->
+              <div
+                class="gd-main-menu-option"
+                [matMenuTriggerFor]="menu">
+                <div
+                  class="gd-main-menu-option-header">
+                  <ng-template
+                    [ngTemplateOutlet]="commonPart"
+                    [ngTemplateOutletContext]="{ option: menuOption }"></ng-template>
+                </div>
+              </div>
+
+              <!-- Floating menu -->
+              <mat-menu
+                #menu="matMenu">
+                <ng-container
+                  *ngFor="let menuOptionChild of menuOption.children">
+                  <ng-container
+                    *ngIf="menuOptionChild.visible">
+
+                    <!-- Child Menu link -->
+                    <button
+                      class="gd-main-menu-option-header-button"
+                      mat-menu-item
+                      [routerLink]="menuOptionChild.link">
+                      <ng-template
+                        [ngTemplateOutlet]="commonPart"
+                        [ngTemplateOutletContext]="{ option: menuOptionChild }"></ng-template>
+                    </button>
+
+                  </ng-container>
+                </ng-container>
+              </mat-menu>
+            </ng-template>
+
+          </ng-template>
+        </ng-container>
+      </ng-container>
+    </ng-container>
+  </ng-container>
+</mat-accordion>
+
+<!-- Version -->
+<div
+  *ngIf="expanded && versionData"
+  class="gd-version">
+  {{ 'LNG_LAYOUT_MENU_VERSION_LABEL' | translate: { version: versionData.version, build: versionData.build } }}
+</div>
+
+<!--
 <div class="sidenav" fxLayout="column">
 
-    <!-- Logo -->
-    <div class="logo" fxLayout="row" fxLayoutAlign="center">
-        <div class="logo-image-container">
-            <a
-                [routerLink]="['/']"
-                tabindex="-1"
-                class="a-no-style">
-                <img src="/assets/images/go-data-logo-with-text.png" />
-            </a>
-        </div>
-    </div>
-
-    <!-- Account Menu Item -->
     <div class="item account-item" fxLayout="row">
-
-        <!-- Submenu -->
         <mat-menu #menu="matMenu" xPosition="before" yPosition="below">
             <ng-container
                 *ngFor="let childItem of accountItem.children">
@@ -28,18 +175,14 @@
             </ng-container>
         </mat-menu>
 
-        <!-- Menu Item Button -->
         <button fxFlex mat-button color="primary" [matMenuTriggerFor]="menu">
 
             <div class="item-content" fxLayout="row" fxLayoutAlign="space-between center">
 
-                <!-- Item icon and label -->
                 <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
 
-                    <!-- Item icon -->
                     <span class="xt-icon">{{accountItem.icon}}</span>
 
-                    <!-- Item label -->
                     <div class="item-name" fxLayout="column" fxLayoutAlign="center start">
                         <div class="user-name">
                             {{authUser.firstName}} {{authUser.lastName}}
@@ -50,7 +193,6 @@
                     </div>
                 </div>
 
-                <!-- "Expand" icon -->
                 <span class="xt-icon expand">thinArrowDown</span>
             </div>
 
@@ -59,23 +201,18 @@
 
     <div class="item-separator account-item-separator"></div>
 
-    <!-- Main Menu Items  -->
     <ng-container *ngFor="let item of mainItems; let itemIndex = index">
 
-        <!-- Menu Item with Link -->
         <div *ngIf="item.link && shouldDisplayItem(item)" class="item" fxLayout="row">
 
             <button fxFlex mat-button color="primary" [routerLink]="item.link">
 
                 <div class="item-content" fxLayout="row" fxLayoutAlign="start center">
 
-                    <!-- Item icon and label -->
                     <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
 
-                        <!-- Item icon -->
                         <span class="xt-icon">{{item.icon}}</span>
 
-                        <!-- Item label -->
                         <div class="item-name">{{item.label | translate}}</div>
                     </div>
                 </div>
@@ -83,11 +220,9 @@
             </button>
         </div>
 
-        <!-- Menu Item with Submenu -->
         <div *ngIf="item.children?.length > 0 && shouldDisplayItem(item)" class="item" fxLayout="row">
 
-            <!-- Submenu -->
-            <mat-menu #menu="matMenu" xPosition="before" yPosition="below">
+            <mat-menu #menu="matMenu" >
                 <ng-container *ngFor="let childItem of item.children">
                     <button *ngIf="shouldDisplayItem(childItem)" mat-menu-item  [routerLink]="[childItem.link]">
                         {{childItem.label | translate}}
@@ -95,31 +230,26 @@
                 </ng-container>
             </mat-menu>
 
-            <!-- Menu Item Button -->
             <button fxFlex mat-button color="primary" [matMenuTriggerFor]="menu">
 
                 <div class="item-content" fxLayout="row" fxLayoutAlign="space-between center">
 
-                    <!-- Item icon and label -->
                     <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
 
-                        <!-- Item icon -->
                         <span class="xt-icon">{{item.icon}}</span>
 
-                        <!-- Item label -->
                         <div class="item-name">{{item.label | translate}}</div>
                     </div>
 
-                    <!-- "Expand" icon -->
                     <span class="xt-icon expand">thinArrowDown</span>
                 </div>
 
             </button>
         </div>
 
-        <!-- Separator -->
         <div *ngIf="item.separator && shouldDisplayItem(item, mainItems, itemIndex)" class="item-separator"></div>
 
     </ng-container>
 
 </div>
+-->

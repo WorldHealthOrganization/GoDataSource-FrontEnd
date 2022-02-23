@@ -1,0 +1,66 @@
+:host {
+  // #TODO - all sizes, space etc are just random..all of them can / need to be changed
+
+  // variables
+  --gd-version-height: 2rem;
+
+  .gd-version {
+    height: var(--gd-version-height);
+  }
+
+  .gd-main-menu {
+    // variables
+    --gd-menu-option-active-border-width: 0.7rem;
+    --gd-menu-option-height: 4.8rem;
+
+    display: block;
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: calc(100% - var(--gd-version-height));
+
+    &.gd-version-not-visible {
+      height: 100%;
+    }
+
+    .gd-main-menu-group-label {
+      color: red;
+      // #TODO must have min height otherwise on collapse will move icons because label becomes hidden
+      // used px because 30px is just random...needs to be replaced with proper rem an not 3rem
+      height: 30px;
+    }
+
+    .gd-main-menu-option {
+      // ...
+
+      &.gd-main-menu-option-link {
+        cursor: pointer;
+      }
+
+      .gd-main-menu-option-header {
+        padding: 0;
+        height: var(--gd-menu-option-height);
+
+        .gd-main-menu-option-label {
+          border-left: var(--gd-menu-option-active-border-width) solid transparent;
+
+          &.gd-main-menu-option-label-active {
+            border-left: var(--gd-menu-option-active-border-width) solid black;
+          }
+
+          .gd-main-menu-option-label-icon {
+
+          }
+
+          .gd-main-menu-option-label-text {
+            // no wrap, ellipsis !?
+          }
+        }
+      }
+
+      .gd-main-menu-option-children {
+
+      }
+    }
+  }
+}

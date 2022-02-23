@@ -24,6 +24,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   imports: [
@@ -39,6 +40,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatCardModule,
     MatNativeDateModule,
     MatDatepickerModule,
+    MatIconModule,
     MatSidenavModule,
     MatToolbarModule,
     MatListModule,
@@ -75,6 +77,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatCardModule,
     MatNativeDateModule,
     MatDatepickerModule,
+    MatIconModule,
     MatSidenavModule,
     MatToolbarModule,
     MatListModule,
