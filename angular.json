@@ -39,6 +39,11 @@
               "node_modules/@ng-select/ng-select/themes/material.theme.css",
               "src/styles/app.scss"
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/styles/"
+              ]
+            },
             "scripts": [],
             "allowedCommonJsDependencies": [
               "@handsontable/formulajs",

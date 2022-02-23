@@ -1,5 +1,5 @@
-@import '../../../../styles/mixins';
-@import '../../../../styles/colors';
+@import 'mixins';
+@import 'colors';
 
 mat-sidenav-container {
   // Variables
@@ -40,7 +40,7 @@ mat-sidenav-container {
           padding: 1.6rem 0.8rem;
           @include transition(all 0.24s ease-in-out 0s);
           width: 100%;
-          
+
           img {
             height: 3.8rem;
             max-width: 18.05rem;
