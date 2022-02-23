@@ -1,12 +1,10 @@
-// variables
-:host {
+// #TODO mixins to cover other browsers
+mat-sidenav-container {
+  // variables
   --gd-menu-width-expanded: 330px;
   --gd-menu-width-collapsed: 70px;
   --gd-top-bar-height: 70px;
-}
 
-// page
-mat-sidenav-container {
   // authenticated body layout
   &.gd-body-content {
     height: 100vh;
@@ -16,6 +14,7 @@ mat-sidenav-container {
 
     // left side
     .gd-body-content-left {
+      //#TODO - style for left side panel, remove border...etc
       overflow: visible;
       width: var(--gd-menu-width-collapsed);
       transition: all 0.24s ease-in-out 0s;
@@ -26,25 +25,32 @@ mat-sidenav-container {
       // left content - logo & body
       .gd-body-content-left-content {
         overflow: hidden;
+        height: 100%;
 
         .gd-body-content-left-content-logo {
           display: block;
           width: 100%;
-          height: 36px;
+          height: var(--gd-top-bar-height);
           // #TODO - must resize png for out needs..optimize
           background: no-repeat center url("/assets/images/gd-logo.png");
+          //background-size: auto 36px;
           background-size: contain;
 
           &:hover {
             cursor: pointer;
           }
         }
+
+        .gd-body-content-left-content-menu {
+          height: calc(100% - 50px);
+          border-right: 1px solid #000;
+        }
       }
 
       // expand / collapse button
       .gd-expand-collapse-button {
         position: absolute;
-        top: 0;
+        top: calc(var(--gd-top-bar-height) + 5px);
         left: calc(100% - 20px);
         z-index: 1000;
       }
@@ -63,6 +69,7 @@ mat-sidenav-container {
       // top bar
       .gd-body-content-right-top {
         height: var(--gd-top-bar-height);
+        border-bottom: 1px solid #000;
       }
 
       // page content
