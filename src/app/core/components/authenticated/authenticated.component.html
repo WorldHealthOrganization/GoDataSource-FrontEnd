@@ -17,7 +17,9 @@
       <div
         class="gd-body-content-left-content-logo"
         [routerLink]="['/']"
-        tabindex="-1"></div>
+        tabindex="-1">
+        <img src="../../../../assets/images/gd-logo.svg" alt="Go.Data Logo" />
+      </div>
 
       <!-- Main Menu -->
       <div
@@ -33,7 +35,7 @@
       mat-icon-button
       (click)="expandMenu = !expandMenu"
       class="gd-expand-collapse-button">
-      <span class="material-icons">chevron_left</span>
+      <span class="material-icons">{{expandMenu ? 'chevron_left' : 'chevron_right'}}</span>
     </button>
 
   </mat-sidenav>
@@ -43,7 +45,7 @@
     class="gd-body-content-right"
     [class.gd-body-content-right-expanded]="expandMenu">
 
-    <!-- top bar -->
+    <!-- Top bar -->
     <div
       class="gd-body-content-right-top">
       top
