@@ -144,7 +144,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
         new NavItem(
           'dashboard',
           'LNG_LAYOUT_MENU_ITEM_DASHBOARD_LABEL',
-          'barChart',
+          'grid_view',
           DashboardModel.canViewDashboard,
           [],
           '/dashboard'
@@ -152,7 +152,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
         new NavItem(
           'outbreaks-group',
           'LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL',
-          'bug',
+          'bug_report',
           [],
           [
             new ChildNavItem(
@@ -176,7 +176,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
         new NavItem(
           'cases',
           'LNG_LAYOUT_MENU_ITEM_CASES_LABEL',
-          'addFolder',
+          'add',
           [
             PERMISSION.CASE_LIST
           ],
@@ -187,7 +187,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
         new NavItem(
           'lab-results-group',
           'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL',
-          'lab',
+          'science',
           [],
           [
             new ChildNavItem(
@@ -280,7 +280,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
         new NavItem(
           'duplicated-records',
           'LNG_LAYOUT_MENU_ITEM_DUPLICATED_RECORDS_LABEL',
-          'fileCopy',
+          'file_copy',
           [
             PERMISSION.DUPLICATE_LIST
           ],
@@ -291,7 +291,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
         new NavItem(
           'clusters',
           'LNG_LAYOUT_MENU_ITEM_CLUSTERS_LABEL',
-          'groupWork',
+          'group_work',
           [
             PERMISSION.CLUSTER_LIST
           ],
@@ -302,7 +302,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
         new NavItem(
           'data-visualisation',
           'LNG_LAYOUT_MENU_ITEM_DATA_VISUALISATION',
-          'barChart',
+          'assignment',
           [],
           [
             new ChildNavItem(
@@ -368,7 +368,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
         new NavItem(
           'reference-data',
           'LNG_LAYOUT_MENU_ITEM_REFERENCE_DATA_LABEL',
-          'language',
+          'public',
           [
             PERMISSION.REFERENCE_DATA_LIST
           ],
@@ -378,7 +378,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
         new NavItem(
           'locations',
           'LNG_LAYOUT_MENU_ITEM_LOCATIONS_LABEL',
-          'location',
+          'location_on',
           [
             PERMISSION.LOCATION_LIST
           ],
@@ -388,7 +388,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
         new NavItem(
           'admin-group',
           'LNG_LAYOUT_MENU_ITEM_ADMIN_LABEL',
-          'supervisor',
+          'supervised_user_circle',
           [],
           [
             new ChildNavItem(
@@ -631,6 +631,6 @@ export class SidenavComponent implements OnInit, OnDestroy {
    */
   private hasOutbreakAndCoCEnabled(): boolean {
     return this.hasOutbreak() &&
-            this.selectedOutbreak.isContactsOfContactsActive;
+      this.selectedOutbreak.isContactsOfContactsActive;
   }
 }
