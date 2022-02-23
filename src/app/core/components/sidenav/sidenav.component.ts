@@ -10,6 +10,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { DashboardModel } from '../../models/dashboard.model';
 import { SystemSettingsDataService } from '../../services/data/system-settings.data.service';
 import { SystemSettingsVersionModel } from '../../models/system-settings-version.model';
+import { IsActiveMatchOptions } from '@angular/router';
 
 @Component({
   selector: 'app-sidenav',
@@ -32,6 +33,13 @@ export class SidenavComponent implements OnInit, OnDestroy {
   // version information
   versionData: SystemSettingsVersionModel;
 
+  // active setup
+  activeSetup: IsActiveMatchOptions = {
+    matrixParams: 'exact',
+    queryParams: 'ignored',
+    paths: 'exact',
+    fragment: 'exact'
+  };
 
   // // Nav Item - Account
   // accountItem: NavItem = new NavItem(
