@@ -4,7 +4,6 @@
   let-option="option">
   <div
     class="gd-main-menu-option-label"
-    [class.gd-main-menu-option-label-active]="!!option"
     fxLayout="row">
 
     <!-- Icon -->
@@ -52,7 +51,8 @@
           <div
             *ngIf="menuOption.link; else childrenPanel"
             class="gd-main-menu-option gd-main-menu-option-link"
-            [routerLink]="menuOption.link">
+            [routerLink]="menuOption.link"
+            routerLinkActive="gd-main-menu-option-active">
             <div
               class="gd-main-menu-option-header">
               <ng-template
@@ -91,7 +91,8 @@
                     <!-- Child Menu link -->
                     <div
                       class="gd-main-menu-option gd-main-menu-option-link"
-                      [routerLink]="menuOptionChild.link">
+                      [routerLink]="menuOptionChild.link"
+                      routerLinkActive="gd-main-menu-option-active">
                       <div
                         class="gd-main-menu-option-header">
                         <ng-template
@@ -134,7 +135,8 @@
                     <button
                       class="gd-main-menu-option-header-button"
                       mat-menu-item
-                      [routerLink]="menuOptionChild.link">
+                      [routerLink]="menuOptionChild.link"
+                      routerLinkActive="gd-main-menu-option-active">
                       <ng-template
                         [ngTemplateOutlet]="commonPart"
                         [ngTemplateOutletContext]="{ option: menuOptionChild }"></ng-template>

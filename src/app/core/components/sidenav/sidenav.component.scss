@@ -44,16 +44,20 @@
         .gd-main-menu-option-label {
           border-left: var(--gd-menu-option-active-border-width) solid transparent;
 
-          &.gd-main-menu-option-label-active {
-            border-left: var(--gd-menu-option-active-border-width) solid black;
-          }
-
           .gd-main-menu-option-label-icon {
 
           }
 
           .gd-main-menu-option-label-text {
             // no wrap, ellipsis !?
+          }
+        }
+      }
+
+      &.gd-main-menu-option-active {
+        .gd-main-menu-option-header {
+          .gd-main-menu-option-label {
+            border-left: var(--gd-menu-option-active-border-width) solid black;
           }
         }
       }
