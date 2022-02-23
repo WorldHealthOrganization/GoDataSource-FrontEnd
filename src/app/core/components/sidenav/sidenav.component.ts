@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { AuthDataService } from '../../services/data/auth.data.service';
 import { PermissionExpression, UserModel } from '../../models/user.model';
 import { PERMISSION } from '../../models/permission.model';
@@ -15,11 +15,22 @@ import { IsActiveMatchOptions } from '@angular/router';
 @Component({
   selector: 'app-sidenav',
   templateUrl: './sidenav.component.html',
-  styleUrls: ['./sidenav.component.scss']
+  styleUrls: ['./sidenav.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SidenavComponent implements OnInit, OnDestroy {
   // expanded / collapsed mode
-  @Input() expanded: boolean = false;
+  private _expanded: boolean = false;
+  @Input() set expanded(expanded: boolean) {
+    // set data
+    this._expanded = expanded;
+
+    // update ui
+    this.changeDetectorRef.detectChanges();
+  }
+  get expanded(): boolean {
+    return this._expanded;
+  }
 
   // subscriptions
   outbreakSubscriber: Subscription;
@@ -507,7 +518,8 @@ export class SidenavComponent implements OnInit, OnDestroy {
     private authDataService: AuthDataService,
     private outbreakDataService: OutbreakDataService,
     private snackbarService: SnackbarService,
-    private systemSettingsDataService: SystemSettingsDataService
+    private systemSettingsDataService: SystemSettingsDataService,
+    private changeDetectorRef: ChangeDetectorRef
   ) {
     // get the authenticated user
     this.authUser = this.authDataService.getAuthenticatedUser();
@@ -546,7 +558,11 @@ export class SidenavComponent implements OnInit, OnDestroy {
     this.systemSettingsDataService
       .getAPIVersion()
       .subscribe((versionData) => {
+        // set data version
         this.versionData = versionData;
+
+        // update ui
+        this.changeDetectorRef.detectChanges();
       });
 
     // update menu visibility
@@ -625,6 +641,9 @@ export class SidenavComponent implements OnInit, OnDestroy {
       // update group visibility
       menu.visible = groupVisible;
     });
+
+    // update ui
+    this.changeDetectorRef.detectChanges();
   }
 
   /**
