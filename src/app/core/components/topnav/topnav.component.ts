@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { Observable, Subscription } from 'rxjs';
@@ -15,9 +15,8 @@ import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
   selector: 'app-topnav',
-  encapsulation: ViewEncapsulation.None,
   templateUrl: './topnav.component.html',
-  styleUrls: ['./topnav.component.less']
+  styleUrls: ['./topnav.component.scss']
 })
 export class TopnavComponent implements OnInit, OnDestroy {
   @Input() activeOutbreakEditable: boolean = true;

@@ -1,3 +1,4 @@
+<!--
 <app-topnav>
     <ng-container dynamic-section>
         <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
@@ -15,7 +16,6 @@
 
                     <mat-menu #quickActionsMenu="matMenu">
                         <ng-container *ngIf="settings">
-                            <!-- Modify settings -->
                             <button
                                 *ngIf="BackupModel.canSetAutomaticBackupSettings(authUser)"
                                 mat-menu-item
@@ -23,7 +23,6 @@
                                 {{ 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_BUTTON' | translate }}
                             </button>
 
-                            <!-- Create backup -->
                             <button
                                 *ngIf="BackupModel.canCreate(authUser)"
                                 mat-menu-item
@@ -37,6 +36,7 @@
         </div>
     </ng-container>
 </app-topnav>
+-->
 
 <!-- Side columns -->
 <app-side-columns
