@@ -20,7 +20,7 @@
 
   <!-- Right -->
   <div
-    fxGrow="0"
+    fxGrow="0" fxLayout="row"
     class="gd-top-right">
 
     <!-- Outbreaks -->
@@ -32,6 +32,20 @@
       [options]="outbreakListOptions"
       optionTooltipKey="details">
     </app-form-select-v2>
+
+    <!-- Help -->
+    <button
+      type="button"
+      mat-icon-button>
+      <mat-icon>help</mat-icon>
+    </button>
+
+    <!-- Profile -->
+    <button
+      type="button"
+      mat-icon-button>
+      <mat-icon>person</mat-icon>
+    </button>
 
   </div>
 </div>
