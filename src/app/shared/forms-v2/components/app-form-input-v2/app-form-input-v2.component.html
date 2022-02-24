@@ -1,0 +1,51 @@
+<div
+  class="gd-form-input-v2">
+
+  <!-- Input data -->
+  <mat-form-field
+    appearance="outline">
+
+    <!-- Place holder -->
+    <mat-label>
+      {{ placeholder | translate }}
+    </mat-label>
+
+    <!-- Input -->
+    <input
+      matInput
+      [(ngModel)]="value"
+      (blur)="onTouchItem()"
+      [errorStateMatcher]="errMatcher"
+      [disabled]="disabled"
+      [required]="required">
+
+    <!-- Left - Icon buttons -->
+    <mat-icon
+      *ngFor="let iconB of prefixIconButtons"
+      matPrefix
+      (click)="iconButtonClick($event, iconB)">{{iconB.icon}}</mat-icon>
+
+    <!-- Spinner -->
+    <span
+      *ngIf="control?.pending"
+      matSuffix>
+        <mat-spinner
+          [diameter]="16"
+          color="accent">
+        </mat-spinner>
+    </span>
+
+    <!-- Right - Icon buttons -->
+    <mat-icon
+      *ngFor="let iconB of suffixIconButtons"
+      matSuffix
+      (click)="iconButtonClick($event, iconB)">{{iconB.icon}}</mat-icon>
+
+    <!-- Errors -->
+    <mat-error
+      *ngIf="control?.invalid && control?.touched">
+      {{ getErrorMessages() }}
+    </mat-error>
+
+  </mat-form-field>
+</div>

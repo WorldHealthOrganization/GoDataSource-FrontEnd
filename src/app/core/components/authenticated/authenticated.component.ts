@@ -1,4 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { UserModel } from '../../models/user.model';
+import { AuthDataService } from '../../services/data/auth.data.service';
+import { OutbreakModel } from '../../models/outbreak.model';
+import { OutbreakDataService } from '../../services/data/outbreak.data.service';
 // import { NavigationEnd, NavigationStart, RouteConfigLoadEnd, RouteConfigLoadStart, Router } from '@angular/router';
 // import { AuthDataService } from '../../services/data/auth.data.service';
 // import { UserModel } from '../../models/user.model';
@@ -33,90 +37,88 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
   // expand menu
   expandMenu: boolean = false;
 
-  /*
-  // display popup when less then 2 minutes
-  static NO_ACTIVITY_POPUP_SHOULD_REDIRECT_IF_LESS_THAN_SECONDS = -5;
-  static NO_ACTIVITY_POPUP_SHOULD_APPEAR_WHEN_LESS_THAN_SECONDS = 120;
-  static NO_ACTIVITY_POPUP_SHOULD_REFRESH_TOKEN_IF_USER_ACTIVE = 240;
-  static REFRESH_IF_USER_WAS_ACTIVE_IN_THE_LAST_SECONDS = 20;
-  static REFRESH_DISABLE_SECONDS = 7;
-
-  // slide nav menu
-  @ViewChild('snav') sideNav: MatSidenav;
-
+  //
+  // // display popup when less then 2 minutes
+  // static NO_ACTIVITY_POPUP_SHOULD_REDIRECT_IF_LESS_THAN_SECONDS = -5;
+  // static NO_ACTIVITY_POPUP_SHOULD_APPEAR_WHEN_LESS_THAN_SECONDS = 120;
+  // static NO_ACTIVITY_POPUP_SHOULD_REFRESH_TOKEN_IF_USER_ACTIVE = 240;
+  // static REFRESH_IF_USER_WAS_ACTIVE_IN_THE_LAST_SECONDS = 20;
+  // static REFRESH_DISABLE_SECONDS = 7;
+  //
+  // // slide nav menu
+  // @ViewChild('snav') sideNav: MatSidenav;
+  //
   // authenticated user
   authUser: UserModel;
 
-  // used to keep subscription and release it if we don't need it anymore
-  tokenInfoSubjectSubscription: Subscription;
-
-  // router events subscription
-  routerEventsSubscriptionLoad: Subscription;
-  routerEventsSubscriptionRepetitive: Subscription;
-
-  // help items for search
-  contextSearchHelpItems: string[];
-
-  // constants
-  Constants = Constants;
-
-  // menu loading dialog
-  private menuLoadingDialog: LoadingDialogModel;
-
-  // token expire data
-  private lastRefreshUserTokenOrLogOut: Moment;
-  private lastInputTime: Moment;
-  private loadingDialog: LoadingDialogModel;
-  private confirmDialog: MatDialogRef<DialogComponent>;
-  private tokenInfo: ITokenInfo;
-  private tokenExpirePopupIsVisible: boolean = false;
-  private documentKeyUp: () => void;
-  private documentMouseMove: () => void;
-  private tokenCheckIfLoggedOutCaller: DebounceTimeCaller = new DebounceTimeCaller(
-    new Subscriber<void>(() => {
-      // check if we must check if we;re logged out
-      // -7 seconds error marje
-      if (
-        !this.tokenInfo ||
-                this.tokenInfo.isValid ||
-                this.tokenInfo.approximatedExpireInSecondsReal > AuthenticatedComponent.NO_ACTIVITY_POPUP_SHOULD_REDIRECT_IF_LESS_THAN_SECONDS
-      ) {
-        // if user is active, then we need to refresh token
-        if (
-          this.lastInputTime &&
-                    this.tokenInfo &&
-                    this.tokenInfo.approximatedExpireInSecondsReal > AuthenticatedComponent.NO_ACTIVITY_POPUP_SHOULD_APPEAR_WHEN_LESS_THAN_SECONDS &&
-                    this.tokenInfo.approximatedExpireInSecondsReal < AuthenticatedComponent.NO_ACTIVITY_POPUP_SHOULD_REFRESH_TOKEN_IF_USER_ACTIVE &&
-                    Math.floor(moment().diff(this.lastInputTime) / 1000) < AuthenticatedComponent.REFRESH_IF_USER_WAS_ACTIVE_IN_THE_LAST_SECONDS
-        ) {
-          // retrieve the user instance or log out
-          this.refreshUserTokenOrLogOut(true);
-        } else {
-          // check again later
-          this.tokenCheckIfLoggedOutCaller.call();
-        }
-      } else {
-        // retrieve the user instance or log out
-        this.refreshUserTokenOrLogOut(false);
-      }
-    }),
-    800,
-    DebounceTimeCallerType.DONT_RESET_AND_WAIT
-  );*/
+  // // used to keep subscription and release it if we don't need it anymore
+  // tokenInfoSubjectSubscription: Subscription;
+  //
+  // // router events subscription
+  // routerEventsSubscriptionLoad: Subscription;
+  // routerEventsSubscriptionRepetitive: Subscription;
+  //
+  // // help items for search
+  // contextSearchHelpItems: string[];
+  //
+  // // constants
+  // Constants = Constants;
+  //
+  // // menu loading dialog
+  // private menuLoadingDialog: LoadingDialogModel;
+  //
+  // // token expire data
+  // private lastRefreshUserTokenOrLogOut: Moment;
+  // private lastInputTime: Moment;
+  // private loadingDialog: LoadingDialogModel;
+  // private confirmDialog: MatDialogRef<DialogComponent>;
+  // private tokenInfo: ITokenInfo;
+  // private tokenExpirePopupIsVisible: boolean = false;
+  // private documentKeyUp: () => void;
+  // private documentMouseMove: () => void;
+  // private tokenCheckIfLoggedOutCaller: DebounceTimeCaller = new DebounceTimeCaller(
+  //   new Subscriber<void>(() => {
+  //     // check if we must check if we;re logged out
+  //     // -7 seconds error marje
+  //     if (
+  //       !this.tokenInfo ||
+  //               this.tokenInfo.isValid ||
+  //               this.tokenInfo.approximatedExpireInSecondsReal > AuthenticatedComponent.NO_ACTIVITY_POPUP_SHOULD_REDIRECT_IF_LESS_THAN_SECONDS
+  //     ) {
+  //       // if user is active, then we need to refresh token
+  //       if (
+  //         this.lastInputTime &&
+  //                   this.tokenInfo &&
+  //                   this.tokenInfo.approximatedExpireInSecondsReal > AuthenticatedComponent.NO_ACTIVITY_POPUP_SHOULD_APPEAR_WHEN_LESS_THAN_SECONDS &&
+  //                   this.tokenInfo.approximatedExpireInSecondsReal < AuthenticatedComponent.NO_ACTIVITY_POPUP_SHOULD_REFRESH_TOKEN_IF_USER_ACTIVE &&
+  //                   Math.floor(moment().diff(this.lastInputTime) / 1000) < AuthenticatedComponent.REFRESH_IF_USER_WAS_ACTIVE_IN_THE_LAST_SECONDS
+  //       ) {
+  //         // retrieve the user instance or log out
+  //         this.refreshUserTokenOrLogOut(true);
+  //       } else {
+  //         // check again later
+  //         this.tokenCheckIfLoggedOutCaller.call();
+  //       }
+  //     } else {
+  //       // retrieve the user instance or log out
+  //       this.refreshUserTokenOrLogOut(false);
+  //     }
+  //   }),
+  //   800,
+  //   DebounceTimeCallerType.DONT_RESET_AND_WAIT
+  // );
 
   /**
      * Constructor
      */
   constructor(
-    /*
-    private router: Router,
     private authDataService: AuthDataService,
-    private outbreakDataService: OutbreakDataService,
-    private referenceDataDataService: ReferenceDataDataService,
-    private helpDataService: HelpDataService,
-    private dialogService: DialogService,
-    private userDataService: UserDataService
-     */
+    private outbreakDataService: OutbreakDataService
+    // private router: Router,
+    // private referenceDataDataService: ReferenceDataDataService,
+    // private helpDataService: HelpDataService,
+    // private dialogService: DialogService,
+    // private userDataService: UserDataService
   ) {
     // detect when the route is changed
     /*
@@ -143,20 +145,19 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
   /**
      * Component initialized
      */
-  ngOnInit() {
-    /*
+  ngOnInit(): void {
     // get the authenticated user
     this.authUser = this.authDataService.getAuthenticatedUser();
 
     // check if user is authenticated
     if (!this.authUser) {
-      // user is NOT authenticated; redirect to Login page
-      this.prepareForRedirect();
-      return this.router.navigate(['/auth/login']);
+      // // user is NOT authenticated; redirect to Login page
+      // this.prepareForRedirect();
+      // return this.router.navigate(['/auth/login']);
     }
 
-    // handle auth token expire popup
-    this.initializeTokenExpireHandler();
+    // // handle auth token expire popup
+    // this.initializeTokenExpireHandler();
 
     // determine the Selected Outbreak and display message if different than the active one.
     if (OutbreakModel.canView(this.authUser)) {
@@ -171,63 +172,63 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
     }
 
     // cache reference data
-    this.referenceDataDataService.getReferenceData().subscribe();
+    // this.referenceDataDataService.getReferenceData().subscribe();
 
-    // redirect root to landing page
-    const redirectRootToLandingPage = () => {
-      // determine to which page we should send this user
-      // #TODO - accordingly to user DEFAULT landing page and PERMISSIONS
-
-      // redirect to default landing page
-      if (DashboardModel.canViewDashboard(this.authUser)) {
-        this.router.navigate(['/dashboard']);
-      } else {
-        this.router.navigate(['/version']);
-      }
-    };
-
-    // subscribe to uri changes
-    this.routerEventsSubscriptionRepetitive = this.router.events.subscribe((navStart: NavigationEnd) => {
-      // handle only final navigation events, since we need to retrieve data only after we get to that page ( guards, etc )
-      if (!(navStart instanceof NavigationEnd)) {
-        return;
-      }
-
-      // redirect root to landing page
-      if (navStart.url === '/') {
-        return redirectRootToLandingPage();
-      }
-
-      // check for context help
-      if (
-        this.router.url &&
-                this.router.url !== '/'
-      ) {
-        this.helpDataService.getContextHelpItems(this.router.url)
-          .subscribe((items) => {
-            if (_.isEmpty(items)) {
-              this.contextSearchHelpItems = null;
-            } else {
-              this.contextSearchHelpItems = _.map(items, 'id');
-            }
-          });
-      }
-    });
-
-    // redirect root to landing page
-    if (this.router.url === '/') {
-      return redirectRootToLandingPage();
-    }
-
-    //  help items
-    this.helpDataService.getContextHelpItems(this.router.url)
-      .subscribe((items) => {
-        if (_.isEmpty(items)) {
-          this.contextSearchHelpItems = null;
-        } else {
-          this.contextSearchHelpItems = _.map(items, 'id');
-        }
-      });*/
+    // // redirect root to landing page
+    // const redirectRootToLandingPage = () => {
+    //   // determine to which page we should send this user
+    //   // #TODO - accordingly to user DEFAULT landing page and PERMISSIONS
+    //
+    //   // redirect to default landing page
+    //   if (DashboardModel.canViewDashboard(this.authUser)) {
+    //     this.router.navigate(['/dashboard']);
+    //   } else {
+    //     this.router.navigate(['/version']);
+    //   }
+    // };
+    //
+    // // subscribe to uri changes
+    // this.routerEventsSubscriptionRepetitive = this.router.events.subscribe((navStart: NavigationEnd) => {
+    //   // handle only final navigation events, since we need to retrieve data only after we get to that page ( guards, etc )
+    //   if (!(navStart instanceof NavigationEnd)) {
+    //     return;
+    //   }
+    //
+    //   // redirect root to landing page
+    //   if (navStart.url === '/') {
+    //     return redirectRootToLandingPage();
+    //   }
+    //
+    //   // check for context help
+    //   if (
+    //     this.router.url &&
+    //             this.router.url !== '/'
+    //   ) {
+    //     this.helpDataService.getContextHelpItems(this.router.url)
+    //       .subscribe((items) => {
+    //         if (_.isEmpty(items)) {
+    //           this.contextSearchHelpItems = null;
+    //         } else {
+    //           this.contextSearchHelpItems = _.map(items, 'id');
+    //         }
+    //       });
+    //   }
+    // });
+    //
+    // // redirect root to landing page
+    // if (this.router.url === '/') {
+    //   return redirectRootToLandingPage();
+    // }
+    //
+    // //  help items
+    // this.helpDataService.getContextHelpItems(this.router.url)
+    //   .subscribe((items) => {
+    //     if (_.isEmpty(items)) {
+    //       this.contextSearchHelpItems = null;
+    //     } else {
+    //       this.contextSearchHelpItems = _.map(items, 'id');
+    //     }
+    //   });
   }
 
   /**

@@ -1,5 +1,4 @@
 // import each component
-import { TopnavComponent } from './topnav/topnav.component';
 import { BreadcrumbsComponent } from './breadcrumbs/breadcrumbs.component';
 import { FormAddressComponent } from './form-address/form-address.component';
 import { FormAddressListComponent } from './form-address-list/form-address-list.component';
@@ -49,7 +48,6 @@ import { FormNgxWigComponent } from './form-ngx-wig/form-ngx-wig.component';
 import { FormVaccinesListComponent } from './form-vaccines-list/form-vaccines-list.component';
 import { HotTableWrapperComponent } from './hot-table-wrapper/hot-table-wrapper.component';
 import { LocationDialogComponent } from './location-dialog/location-dialog.component';
-import { TopnavUnauthenticatedComponent } from './topnav-unauthenticated/topnav-unauthenticated.component';
 import { FormContactOfContactQuickComponent } from './form-contact-of-contact-quick/form-contact-of-contact-quick.component';
 import { MultipleSnackbarComponent } from './multiple-snackbar/multiple-snackbar.component';
 import { FancyTooltipComponent } from './fancy-tooltip/fancy-tooltip.component';
@@ -76,8 +74,6 @@ export const components: any[] = [
   MultipleSnackbarComponent,
 
   // main layout
-  TopnavComponent,
-  TopnavUnauthenticatedComponent,
   BreadcrumbsComponent,
   SideFiltersComponent,
   SideColumnsComponent,

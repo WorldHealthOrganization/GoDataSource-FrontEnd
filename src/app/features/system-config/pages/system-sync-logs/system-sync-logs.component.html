@@ -1,3 +1,4 @@
+<!--
 <app-topnav>
     <ng-container dynamic-section>
         <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
@@ -16,7 +17,6 @@
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
-                    <!-- Sync general settings -->
                     <button
                         *ngIf="SystemSyncLogModel.canSetSettings(authUser)"
                         mat-menu-item
@@ -24,7 +24,6 @@
                         {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_SYNC_SETTINGS_BUTTON' | translate }}
                     </button>
 
-                    <!-- Delete sync logs -->
                     <button
                         *ngIf="SystemSyncLogModel.canBulkDelete(authUser)"
                         mat-menu-item
@@ -32,7 +31,6 @@
                         {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_DELETE_LOGS_BUTTON' | translate }}
                     </button>
 
-                    <!-- Import Sync Package -->
                     <button
                         *ngIf="SystemSyncLogModel.canImportPackage(authUser)"
                         mat-menu-item
@@ -40,7 +38,6 @@
                         {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_IMPORT_SYNC_PACKAGE_BUTTON' | translate }}
                     </button>
 
-                    <!-- Export Sync Package -->
                     <button
                         *ngIf="SystemSyncLogModel.canExportPackage(authUser)"
                         mat-menu-item
@@ -52,6 +49,7 @@
         </div>
     </ng-container>
 </app-topnav>
+-->
 
 <!-- Side columns -->
 <app-side-columns

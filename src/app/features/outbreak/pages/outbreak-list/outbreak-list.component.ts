@@ -20,12 +20,12 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { Router } from '@angular/router';
-import { TopnavComponent } from '../../../../shared/components/topnav/topnav.component';
 import { catchError, map, share, switchMap, tap } from 'rxjs/operators';
 import { AnswerModel, QuestionModel } from '../../../../core/models/question.model';
 import { throwError } from 'rxjs';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 
 @Component({
   selector: 'app-outbreak-list',
