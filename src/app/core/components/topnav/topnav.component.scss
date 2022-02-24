@@ -1,0 +1,19 @@
+:host {
+  display: block;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+
+  .gd-top {
+    height: 100%;
+
+    .gd-top-left {
+      padding-left: 4rem;
+    }
+
+    .gd-top-right {
+      // #TODO - replace with global variable for 40px if we have one !?
+      padding-right: 4rem;
+    }
+  }
+}

@@ -49,7 +49,7 @@
     <!-- Top bar -->
     <div
       class="gd-body-content-right-top">
-      top
+      <app-topnav></app-topnav>
     </div>
 
     <!-- Bottom part - page content -->
@@ -77,9 +77,6 @@
             <button class="sidenav-toggle" mat-raised-button color="accent" (click)="snav.toggle()">
                 {{ 'LNG_LAYOUT_MENU_BUTTON_LABEL' | translate }}
             </button>
-
-            <app-global-entity-search>
-            </app-global-entity-search>
 
             <div *ngIf="contextSearchHelpItems"
                 class="context-help-trigger"

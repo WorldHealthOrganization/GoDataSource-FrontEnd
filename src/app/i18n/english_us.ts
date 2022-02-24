@@ -16,11 +16,9 @@ export const EnglishUsLang = {
 
 
 
-
-
     /**
      * REMOVE the tokens from below
      */
-    // ...
+    // LNG_LAYOUT_ACTIVE_OUTBREAK_LABEL
   }
 };

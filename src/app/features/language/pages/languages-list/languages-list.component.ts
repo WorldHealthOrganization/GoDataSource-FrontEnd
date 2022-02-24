@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -16,7 +16,6 @@ import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 
 @Component({
   selector: 'app-languages-list',
@@ -40,8 +39,6 @@ export class LanguagesListComponent
   // list of existing languages
   languagesList$: Observable<LanguageModel[]>;
   languagesListCount$: Observable<IBasicCount>;
-
-  @ViewChild('topNav', { static: true }) topNav: TopnavComponent;
 
   recordActions: HoverRowAction[] = [
     // View Language
@@ -235,7 +232,6 @@ export class LanguagesListComponent
 
               // clear cache
               this.cacheService.remove(CacheKey.LANGUAGES);
-              this.topNav.refreshLanguageList();
 
               // reload data
               this.needsRefreshList(true);
