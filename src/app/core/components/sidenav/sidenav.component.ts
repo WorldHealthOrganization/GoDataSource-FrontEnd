@@ -20,17 +20,7 @@ import { IsActiveMatchOptions } from '@angular/router';
 })
 export class SidenavComponent implements OnInit, OnDestroy {
   // expanded / collapsed mode
-  private _expanded: boolean = false;
-  @Input() set expanded(expanded: boolean) {
-    // set data
-    this._expanded = expanded;
-
-    // update ui
-    this.changeDetectorRef.detectChanges();
-  }
-  get expanded(): boolean {
-    return this._expanded;
-  }
+  @Input() expanded: boolean = false;
 
   // subscriptions
   outbreakSubscriber: Subscription;
