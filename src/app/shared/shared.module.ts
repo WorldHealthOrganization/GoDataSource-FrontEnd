@@ -18,6 +18,7 @@ import { MglTimelineModule } from 'angular-mgl-timeline';
 import * as fromSharedComponents from './components';
 import * as fromSharedDirectives from './directives';
 import * as fromSharedPipes from './pipes';
+import * as formV2Components from './forms-v2/components';
 
 @NgModule({
   imports: [
@@ -41,7 +42,8 @@ import * as fromSharedPipes from './pipes';
   declarations: [
     ...fromSharedComponents.components,
     ...fromSharedDirectives.directives,
-    ...fromSharedPipes.pipes
+    ...fromSharedPipes.pipes,
+    ...formV2Components.components
   ],
   providers: [],
   exports: [
@@ -59,7 +61,8 @@ import * as fromSharedPipes from './pipes';
     ExperimentalScrollingModule,
     ...fromSharedDirectives.directives,
     ...fromSharedPipes.pipes,
-    ...fromSharedComponents.components
+    ...fromSharedComponents.components,
+    ...formV2Components.components
   ]
 })
 export class SharedModule {
