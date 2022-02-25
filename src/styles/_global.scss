@@ -1,6 +1,10 @@
 /* OpenLayers */
 @import './components/ol.min.css';
 
+/* AG-Grid */
+@import "~@ag-grid-community/core/dist/styles/ag-grid.css";
+@import "~@ag-grid-community/core/dist/styles/ag-theme-balham.css";
+
 /* Global Components */
 @import './components/icon-button';
 @import './components/mat-select-panel';

@@ -6,7 +6,8 @@
     appearance="outline">
 
     <!-- Place holder -->
-    <mat-label>
+    <mat-label
+      *ngIf="!neverFloatLabel">
       {{ placeholder | translate }}
     </mat-label>
 
@@ -23,7 +24,8 @@
       (blur)="onTouchItem()"
       [errorStateMatcher]="errMatcher"
       [disabled]="disabled"
-      [required]="required">
+      [required]="required"
+      [placeholder]="neverFloatLabel ? (placeholder | translate) : undefined">
 
     <!-- Spinner -->
     <mat-spinner

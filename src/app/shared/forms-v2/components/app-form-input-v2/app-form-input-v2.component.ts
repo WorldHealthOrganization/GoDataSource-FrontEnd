@@ -33,6 +33,9 @@ export class AppFormInputV2Component
   // right - icon buttons
   @Input() suffixIconButtons: AppFormIconButtonV2[];
 
+  // float label
+  @Input() neverFloatLabel: boolean = false;
+
   /**
    * Constructor
    */
