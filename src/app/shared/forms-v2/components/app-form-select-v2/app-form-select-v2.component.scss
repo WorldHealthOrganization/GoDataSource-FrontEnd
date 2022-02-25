@@ -1,5 +1,178 @@
-:host {
-  .gd-form-select-v2 {
+@import 'mixins';
+@import 'font';
 
+.gd-form-select-v2 {
+  .mat-form-field {
+    font-family: $gd-font-family;
+    font-size: $gd-font-size;
+    line-height: $gd-line-height;
+
+    .mat-form-field-wrapper {
+      margin: 0;
+      padding-bottom: 1.6rem;
+
+      .mat-form-field-flex {
+        margin-top: 0;
+        padding: 0 1.6rem;
+
+        .mat-form-field-outline {
+          color: var(--gd-secondary);
+          top: 0;
+
+          .mat-form-field-outline-start,
+          .mat-form-field-outline-gap,
+          .mat-form-field-outline-end {
+            border-width: 0.1rem;
+          }
+
+          .mat-form-field-outline-start {
+            @include border-radius(0.4rem 0 0 0.4rem);
+          }
+
+          .mat-form-field-outline-gap {
+            @include border-radius(0);
+          }
+
+          .mat-form-field-outline-end {
+            @include border-radius(0 0.4rem 0.4rem 0);
+          }
+        }
+
+        .mat-form-field-outline-thick {
+          color: var(--gd-primary);
+
+          .mat-form-field-outline-start,
+          .mat-form-field-outline-gap,
+          .mat-form-field-outline-end {
+            border-width: 0.1rem;
+          }
+
+          .mat-form-field-outline-start {
+            @include border-radius(0.4rem 0 0 0.4rem);
+          }
+
+          .mat-form-field-outline-gap {
+            @include border-radius(0);
+          }
+
+          .mat-form-field-outline-end {
+            @include border-radius(0 0.4rem 0.4rem 0);
+          }
+        }
+
+        .mat-form-field-prefix {
+          left: -0.4rem;
+          top: 0.3rem;
+
+          .mat-icon {
+            color: rgba(var(--gd-text-rgb), 0.75);
+            text-align: center;
+          }
+
+          .mat-icon-button {
+            font-size: 1.6rem;
+            height: 2.4rem;
+            width: 2.4rem;
+          }
+        }
+
+        .mat-form-field-infix {
+          border-top: 0 none;
+          @include flex(flex);
+          padding: 0.8rem 0;
+
+          .mat-select {
+            font-family: $gd-font-family;
+            font-size: $gd-font-size;
+            line-height: 1.1rem;
+            margin-top: 0;
+
+            .mat-select-trigger {
+              height: 2.4rem;
+
+              .mat-select-value {
+                color: var(--gd-text);
+
+                .mat-select-value-text {
+                  mat-select-trigger {
+                    @include flex(flex);
+                    @include flex_align_items(center);
+                  }
+
+                  .mat-icon {
+                    color: var(--gd-primary);
+                    font-size: 2.4rem;
+                    height: 2.4rem;
+                    margin-right: 1.6rem;
+                    width: 2.4rem;
+                  }
+                }
+              }
+
+              .mat-select-arrow-wrapper {
+                position: relative;
+                top: 0;
+                @include transform(none);
+
+                .mat-select-arrow {
+                  color: var(--gd-secondary);
+                }
+              }
+            }
+          }
+
+          .mat-form-field-label-wrapper {
+            .mat-form-field-label {
+              color: var(--gd-secondary);
+              line-height: 2.4rem;
+              margin-top: 0;
+            }
+          }
+        }
+
+        .mat-form-field-suffix {
+          top: 0.3rem;
+
+          .mat-icon {
+            color: rgba(var(--gd-text-rgb), 0.75);
+            text-align: center;
+          }
+
+          .mat-icon-button {
+            font-size: 1.6rem;
+            height: 2.4rem;
+            width: 2.4rem;
+          }
+        }
+      }
+
+      .mat-form-field-subscript-wrapper {
+        font-size: 1.2rem;
+        margin-top: 0.4rem;
+        padding: 0 1.6rem;
+
+        .mat-form-field-hint-wrapper {
+          .mat-form-field-hint-spacer {}
+        }
+      }
+    }
+
+    &:focus,
+    &.mat-focused {
+      .mat-form-field-wrapper {
+        .mat-form-field-flex {
+          .mat-form-field-infix {
+            .mat-form-field-label-wrapper {
+              .mat-form-field-label {
+                color: var(--gd-primary);
+                margin-top: -0.7rem;
+                transform: translateY(-1.6rem) scale(0.75);
+                width: 100%;
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }

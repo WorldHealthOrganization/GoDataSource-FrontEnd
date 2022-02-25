@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { AppFormIconButtonV2 } from '../../../shared/forms-v2/core/app-form-icon-button-v2';
 import { UserModel } from '../../models/user.model';
 import { AuthDataService } from '../../services/data/auth.data.service';
@@ -14,7 +14,8 @@ import { Subscription } from 'rxjs/internal/Subscription';
 @Component({
   selector: 'app-topnav',
   templateUrl: './topnav.component.html',
-  styleUrls: ['./topnav.component.scss']
+  styleUrls: ['./topnav.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class TopnavComponent implements OnInit, OnDestroy {
   // global search
@@ -111,7 +112,7 @@ export class TopnavComponent implements OnInit, OnDestroy {
           // active outbreak ?
           let icon: string;
           if (outbreak.id === this.authUser.activeOutbreakId) {
-            icon = 'done';
+            icon = 'check_circle';
           }
 
           // add to outbreak list of items

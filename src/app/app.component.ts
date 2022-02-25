@@ -35,14 +35,6 @@ export class AppComponent implements OnInit {
     script.src = 'https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL';
     document.head.appendChild(script);
 
-    // used by OpenLayers
-    // css
-    const style = document.createElement('link');
-    style.rel = 'stylesheet';
-    style.type = 'text/css';
-    style.href = 'https://openlayers.org/en/v5.3.0/css/ol.css';
-    document.head.appendChild(style);
-
     // determine if this is a demo or production instance
     this.systemSettingsDataService
       .getAPIVersion()

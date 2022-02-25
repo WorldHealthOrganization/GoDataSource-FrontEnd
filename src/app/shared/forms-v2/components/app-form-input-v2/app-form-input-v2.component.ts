@@ -5,7 +5,8 @@ import {
   Host,
   Input,
   Optional,
-  SkipSelf
+  SkipSelf,
+  ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
@@ -21,6 +22,7 @@ import { AppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
     useExisting: forwardRef(() => AppFormInputV2Component),
     multi: true
   }],
+  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppFormInputV2Component
