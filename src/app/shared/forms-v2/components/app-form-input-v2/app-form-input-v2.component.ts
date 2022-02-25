@@ -1,12 +1,11 @@
 import {
-  ChangeDetectionStrategy,
+  ChangeDetectionStrategy, ChangeDetectorRef,
   Component,
   forwardRef,
   Host,
-  Input,
+  Input, OnDestroy,
   Optional,
-  SkipSelf,
-  ViewEncapsulation
+  SkipSelf, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
@@ -26,7 +25,7 @@ import { AppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppFormInputV2Component
-  extends AppFormBaseV2<string> {
+  extends AppFormBaseV2<string> implements OnDestroy {
 
   // left - icon buttons
   @Input() prefixIconButtons: AppFormIconButtonV2[];
@@ -38,13 +37,22 @@ export class AppFormInputV2Component
    * Constructor
    */
   constructor(
-    @Optional() @Host() @SkipSelf() public controlContainer: ControlContainer,
-    protected translateService: TranslateService
+    @Optional() @Host() @SkipSelf() protected controlContainer: ControlContainer,
+    protected translateService: TranslateService,
+    protected changeDetectorRef: ChangeDetectorRef
   ) {
     super(
       controlContainer,
-      translateService
+      translateService,
+      changeDetectorRef
     );
+  }
+
+  /**
+   * Release resources
+   */
+  ngOnDestroy(): void {
+    super.onDestroy();
   }
 
   /**

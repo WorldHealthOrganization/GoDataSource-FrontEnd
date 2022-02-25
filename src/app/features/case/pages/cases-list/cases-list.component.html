@@ -1,3 +1,7 @@
+<app-list-table-v2
+  [records$]="casesList$"
+  [columns]="tableColumns"></app-list-table-v2>
+
 <!--
 <app-topnav>
     <ng-container dynamic-section>
@@ -124,14 +128,13 @@
 </app-topnav>
 -->
 
-<!-- Side columns -->
+<!--
 <app-side-columns
     [tableColumnsUserSettingsKey]="appliedListFilter !== Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS ? UserSettings.CASE_FIELDS : UserSettings.CASE_WITHOUT_RELATIONSHIPS_FIELDS"
     [tableColumns]="tableColumns"
     (visibleColumnsChanged)="applySideColumnsChanged($event)">
 </app-side-columns>
 
-<!-- Side filters -->
 <app-side-filters
     [filterOptions]="availableSideFilters"
     (filtersApplied)="applySideFilters($event)"
@@ -139,13 +142,11 @@
 </app-side-filters>
 
 <div fxLayout fxLayoutAlign="space-between end">
-    <!--Total number of records from the list-->
     <app-total-number-of-records
         [value]="casesListCount$ | async"
         (showAll)="refreshListCount(false)">
     </app-total-number-of-records>
 
-    <!--Cases grouped by classification-->
     <a
         *ngIf="!appliedListFilter && !showCountPills; else countPills"
         class="xlink-button margin-right-x"
@@ -171,17 +172,14 @@
         </div>
     </div>
 
-    <!-- Table top info -->
     <div
         fxLayout="row">
-        <!-- Filters message -->
         <div
             fxFlex fxGrow="0" fxLayoutAlign="start center"
             class="filters-applied">
             {{ queryBuilder.isEmptyOnlyFilters() ? '' : ('LNG_COMMON_LABEL_FILTERS_USED' | translate) }}
         </div>
 
-        <!-- Filter buttons -->
         <div
             fxFlex
             class="reset-filters">
@@ -202,7 +200,6 @@
         </div>
     </div>
 
-    <!-- Hover question effects / actions -->
     <app-hover-row-actions
         #hoverRow
         [active]="!refreshingList"
@@ -210,7 +207,6 @@
     ></app-hover-row-actions>
 
     <mat-table #table [dataSource]="casesList$ | async" matSort (matSortChange)="sortBy($event, { age: [ 'years', 'months' ] })">
-        <!-- Checkbox -->
         <ng-container matColumnDef="checkbox">
             <mat-header-cell *matHeaderCellDef fxFlex="60px">
                 <div class="table-header-cell">
@@ -266,7 +262,6 @@
                         </mat-menu>
                     </div>
                     <div class="column-filter">
-                        <!-- placeholder -->
                     </div>
                 </div>
             </mat-header-cell>
@@ -281,7 +276,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Last Name -->
         <ng-container matColumnDef="lastName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column" >
@@ -304,7 +298,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- First Name -->
         <ng-container matColumnDef="firstName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -326,7 +319,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Middle Name -->
         <ng-container matColumnDef="middleName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -348,7 +340,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Case Visual Id -->
         <ng-container matColumnDef="visualId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column" >
@@ -371,7 +362,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Location  -->
         <ng-container matColumnDef="location">
             <mat-header-cell *matHeaderCellDef
                              class="location-drop-down-column-header">
@@ -399,7 +389,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Address -->
         <ng-container matColumnDef="addresses.addressLine1">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column" >
@@ -422,7 +411,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- City -->
         <ng-container matColumnDef="addresses.city">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column" >
@@ -445,7 +433,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Latitude -->
         <ng-container matColumnDef="addresses.geoLocation.lat">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -453,7 +440,6 @@
                         {{'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT' | translate}}
                     </div>
                     <div class="column-filter">
-                        <!-- placeholder -->
                     </div>
                 </div>
             </mat-header-cell>
@@ -462,7 +448,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Longitude -->
         <ng-container matColumnDef="addresses.geoLocation.lng">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -470,7 +455,6 @@
                         {{'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG' | translate}}
                     </div>
                     <div class="column-filter">
-                        <!-- placeholder -->
                     </div>
                 </div>
             </mat-header-cell>
@@ -479,7 +463,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Postal Code -->
         <ng-container matColumnDef="addresses.postalCode">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -503,7 +486,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Coordinates are accurate? -->
         <ng-container matColumnDef="addresses.geoLocationAccurate">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -532,7 +514,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Email  -->
         <ng-container matColumnDef="addresses.emailAddress">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -554,7 +535,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Classification -->
         <ng-container matColumnDef="classification">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -583,7 +563,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Outcome -->
         <ng-container matColumnDef="outcome">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -608,7 +587,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Outcome date -->
         <ng-container matColumnDef="dateOfOutcome">
             <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -628,7 +606,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Age -->
         <ng-container matColumnDef="age">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -652,7 +629,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Gender -->
         <ng-container matColumnDef="gender">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -678,7 +654,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Phone number -->
         <ng-container matColumnDef="phoneNumber">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -700,7 +675,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Date of onset -->
         <ng-container matColumnDef="dateOfOnset">
             <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -720,7 +694,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Date of reporting -->
         <ng-container matColumnDef="dateOfReporting">
             <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -740,7 +713,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Not a Case classification -->
         <ng-container matColumnDef="notACase">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -766,7 +738,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Number of Contacts -->
         <ng-container matColumnDef="numberOfContacts">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -802,7 +773,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Number of Exposures -->
         <ng-container matColumnDef="numberOfExposures">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -838,7 +808,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Responsible User -->
         <ng-container matColumnDef="responsibleUserId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -869,7 +838,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Deleted -->
         <ng-container matColumnDef="deleted">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -894,7 +862,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Was contact -->
         <ng-container matColumnDef="wasContact">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -919,7 +886,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Created By -->
         <ng-container matColumnDef="createdBy">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -950,7 +916,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Created At -->
         <ng-container matColumnDef="createdAt">
             <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -975,7 +940,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Modified By -->
         <ng-container matColumnDef="updatedBy">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -1006,7 +970,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Updated At -->
         <ng-container matColumnDef="updatedAt">
             <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -1047,14 +1010,12 @@
         <mat-spinner></mat-spinner>
     </div>
 
-    <!-- No data -->
     <div
         *ngIf="!refreshingList && isEmptyList"
         class="empty-table-text">
         {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
     </div>
 
-    <!-- Pages (need to be hidden and not ngIf, otherwise it makes a new duplicate request) -->
     <app-mat-paginator-extended
         [hidden]="refreshingList || isEmptyList"
         [pageIndex]="pageIndex"
@@ -1065,3 +1026,4 @@
     </app-mat-paginator-extended>
 
 </mat-card>
+-->

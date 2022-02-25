@@ -66,8 +66,8 @@ export class Constants {
   static DEFAULT_FILTER_POOLING_MS_CHECK_AGAIN = 2000; // 2 seconds ?
 
   // pagination defaults and configuration
-  static PAGE_SIZE_OPTIONS = [10, 25, 50];
-  static DEFAULT_PAGE_SIZE = 25;
+  static PAGE_SIZE_OPTIONS = [50, 100, 500, 1000];
+  static DEFAULT_PAGE_SIZE = 1000;
   static DEFAULT_USAGE_MAX_RECORDS_DISPLAYED = 10;
 
   // static gender

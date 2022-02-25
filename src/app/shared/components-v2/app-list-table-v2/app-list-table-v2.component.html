@@ -1,0 +1,11 @@
+<ag-grid-angular
+  class="ag-theme-balham gd-list-table"
+  [rowData]="records"
+  [columnDefs]="columnDefs"
+  [modules]="modules"
+  rowSelection="multiple"
+  suppressRowClickSelection="true"
+  (firstDataRendered)="firstDataRendered($event)">
+</ag-grid-angular>
+
+

@@ -19,9 +19,12 @@ import * as fromSharedComponents from './components';
 import * as fromSharedDirectives from './directives';
 import * as fromSharedPipes from './pipes';
 import * as formV2Components from './forms-v2/components';
+import * as v2Components from './components-v2';
+import { AgGridModule } from '@ag-grid-community/angular';
 
 @NgModule({
   imports: [
+    AgGridModule.withComponents([]),
     CommonModule,
     DragDropModule,
     RouterModule,
@@ -43,10 +46,12 @@ import * as formV2Components from './forms-v2/components';
     ...fromSharedComponents.components,
     ...fromSharedDirectives.directives,
     ...fromSharedPipes.pipes,
-    ...formV2Components.components
+    ...formV2Components.components,
+    ...v2Components.components
   ],
   providers: [],
   exports: [
+    AgGridModule.withComponents([]),
     CommonModule,
     DragDropModule,
     RouterModule,
@@ -62,7 +67,8 @@ import * as formV2Components from './forms-v2/components';
     ...fromSharedDirectives.directives,
     ...fromSharedPipes.pipes,
     ...fromSharedComponents.components,
-    ...formV2Components.components
+    ...formV2Components.components,
+    ...v2Components.components
   ]
 })
 export class SharedModule {

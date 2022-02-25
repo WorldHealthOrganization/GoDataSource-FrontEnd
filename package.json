@@ -11,6 +11,9 @@
   },
   "private": true,
   "dependencies": {
+    "@ag-grid-community/core": "27.0.1",
+    "@ag-grid-community/client-side-row-model": "27.0.0",
+    "@ag-grid-community/angular": "27.0.0",
     "@angular-slider/ngx-slider": "2.0.4",
     "@angular/animations": "13.2.2",
     "@angular/cdk": "13.2.2",

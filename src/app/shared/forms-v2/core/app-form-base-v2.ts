@@ -1,9 +1,10 @@
-import { AbstractControl, ControlContainer, ControlValueAccessor } from '@angular/forms';
+import { AbstractControl, ControlContainer, ControlValueAccessor, FormGroup } from '@angular/forms';
 import { noop } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseErrorStateMatcherV2 } from './app-form-base-error-state-matcher-v2';
 import { AppFormBaseErrorMsgV2 } from './app-form-base-error-msg-v2';
-import { Directive, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectorRef, Directive, EventEmitter, Input, Output } from '@angular/core';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 /**
  * Input handler
@@ -22,8 +23,40 @@ export abstract class AppFormBaseV2<T> implements ControlValueAccessor {
   // control name - required - must be unique in the same control container
   protected controlName: string;
 
+  // status changed subscription
+  private statusChangesSubscription: Subscription;
+
   // control
-  public control: AbstractControl;
+  public get control(): AbstractControl {
+    // input has no parent so there is no way to retrieve form control
+    if (!this.controlContainer) {
+      return undefined;
+    }
+
+    // retrieve control
+    let control: AbstractControl;
+    if (this.controlContainer.control instanceof FormGroup) {
+      // FIX for dotted path, since get uses paths, but we don't always want to use paths
+      control = this.controlContainer.control.controls[this.controlName];
+    } else {
+      // default one
+      control = this.controlContainer.control.get(this.controlName);
+    }
+
+    // listen for status changes
+    if (
+      control &&
+      !this.statusChangesSubscription
+    ) {
+      this.statusChangesSubscription = control.statusChanges
+        .subscribe(() => {
+          this.changeDetectorRef.detectChanges();
+        });
+    }
+
+    // finished
+    return control;
+  };
 
   // display error message?
   errMatcher = new AppFormBaseErrorStateMatcherV2(this);
@@ -73,17 +106,20 @@ export abstract class AppFormBaseV2<T> implements ControlValueAccessor {
    * Constructor
    */
   constructor(
-    public controlContainer: ControlContainer,
-    protected translateService: TranslateService
-  ) {
-    // retrieve control
-    // console.log(this.controlContainer);
-    // if (this.controlContainer.control instanceof FormGroup) {
-    //   // FIX for dotted path, since get uses paths but we don't always want to use paths
-    //   this.control = this.controlContainer.control.controls[this.controlName];
-    // } else {
-    //   this.control = this.controlContainer.control.get(this.controlName);
-    // }
+    protected controlContainer: ControlContainer,
+    protected translateService: TranslateService,
+    protected changeDetectorRef: ChangeDetectorRef
+  ) {}
+
+  /**
+   * Release resources
+   */
+  onDestroy(): void {
+    // release status changed subscription
+    if (this.statusChangesSubscription) {
+      this.statusChangesSubscription.unsubscribe();
+      this.statusChangesSubscription = undefined;
+    }
   }
 
   /**

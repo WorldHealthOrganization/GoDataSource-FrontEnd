@@ -1,12 +1,11 @@
 import {
-  ChangeDetectionStrategy,
+  ChangeDetectionStrategy, ChangeDetectorRef,
   Component,
   forwardRef,
   Host,
-  Input,
+  Input, OnDestroy,
   Optional,
-  SkipSelf,
-  ViewEncapsulation
+  SkipSelf, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
@@ -25,7 +24,8 @@ import { LabelValuePairModel } from '../../core/label-value-pair.model';
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppFormSelectV2Component extends AppFormBaseV2<string | string[]> {
+export class AppFormSelectV2Component
+  extends AppFormBaseV2<string | string[]> implements OnDestroy {
 
   // multiple ?
   @Input() multiple: boolean = false;
@@ -68,13 +68,22 @@ export class AppFormSelectV2Component extends AppFormBaseV2<string | string[]> {
    * Constructor
    */
   constructor(
-    @Optional() @Host() @SkipSelf() public controlContainer: ControlContainer,
-    protected translateService: TranslateService
+    @Optional() @Host() @SkipSelf() protected controlContainer: ControlContainer,
+    protected translateService: TranslateService,
+    protected changeDetectorRef: ChangeDetectorRef
   ) {
     super(
       controlContainer,
-      translateService
+      translateService,
+      changeDetectorRef
     );
+  }
+
+  /**
+   * Release resources
+   */
+  ngOnDestroy(): void {
+    super.onDestroy();
   }
 
   /**

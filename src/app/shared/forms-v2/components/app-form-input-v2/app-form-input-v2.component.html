@@ -10,6 +10,12 @@
       {{ placeholder | translate }}
     </mat-label>
 
+    <!-- Left - Icon buttons -->
+    <mat-icon
+      *ngFor="let iconB of prefixIconButtons"
+      matPrefix
+      (click)="iconButtonClick($event, iconB)">{{iconB.icon}}</mat-icon>
+
     <!-- Input -->
     <input
       matInput
@@ -19,21 +25,13 @@
       [disabled]="disabled"
       [required]="required">
 
-    <!-- Left - Icon buttons -->
-    <mat-icon
-      *ngFor="let iconB of prefixIconButtons"
-      matPrefix
-      (click)="iconButtonClick($event, iconB)">{{iconB.icon}}</mat-icon>
-
     <!-- Spinner -->
-    <span
+    <mat-spinner
       *ngIf="control?.pending"
-      matSuffix>
-        <mat-spinner
-          [diameter]="16"
-          color="accent">
-        </mat-spinner>
-    </span>
+      matSuffix
+      [diameter]="16"
+      color="accent">
+    </mat-spinner>
 
     <!-- Right - Icon buttons -->
     <button

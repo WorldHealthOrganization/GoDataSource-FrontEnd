@@ -1,3 +1,7 @@
+export enum VisibleColumnModelPinned {
+  LEFT = 'left',
+  RIGHT = 'right'
+}
 /**
  * Visible column
  */
@@ -11,6 +15,7 @@ export class VisibleColumnModel {
   visible: boolean = true;
   excludeFromSave: boolean = false;
   excludeFromDisplay: (VisibleColumnModel) => boolean;
+  pinned: VisibleColumnModelPinned | boolean = false;
 
   /**
      * Constructor
@@ -25,7 +30,8 @@ export class VisibleColumnModel {
     required?: boolean,
     visible?: boolean,
     excludeFromSave?: boolean,
-    excludeFromDisplay?: (VisibleColumnModel) => boolean
+    excludeFromDisplay?: (VisibleColumnModel) => boolean,
+    pinned?: VisibleColumnModelPinned | boolean
   }) {
     // assign properties
     Object.assign(

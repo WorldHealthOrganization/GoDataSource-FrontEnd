@@ -23,7 +23,7 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import * as _ from 'lodash';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
+import { VisibleColumnModel, VisibleColumnModelPinned } from '../../../../shared/components/side-columns/model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
@@ -669,27 +669,31 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   initializeSideTableColumns() {
     // default table columns
     this.tableColumns = [
-      new VisibleColumnModel({
-        field: 'checkbox',
-        required: true,
-        excludeFromSave: true
-      }),
+      // new VisibleColumnModel({
+      //   field: 'checkbox',
+      //   required: true,
+      //   excludeFromSave: true
+      // }),
       new VisibleColumnModel({
         field: 'lastName',
-        label: 'LNG_CASE_FIELD_LABEL_LAST_NAME'
+        label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
+        pinned: VisibleColumnModelPinned.LEFT
       }),
       new VisibleColumnModel({
         field: 'firstName',
-        label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME'
+        label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
+        pinned: VisibleColumnModelPinned.LEFT
       }),
       new VisibleColumnModel({
         field: 'middleName',
         label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
-        visible: false
+        visible: false,
+        pinned: VisibleColumnModelPinned.LEFT
       }),
       new VisibleColumnModel({
         field: 'visualId',
-        label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID'
+        label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
+        pinned: VisibleColumnModelPinned.LEFT
       }),
       new VisibleColumnModel({
         field: 'classification',
