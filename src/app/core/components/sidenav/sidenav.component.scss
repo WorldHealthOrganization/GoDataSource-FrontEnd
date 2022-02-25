@@ -1,69 +1,185 @@
-:host {
-  // #TODO - all sizes, space etc are just random..all of them can / need to be changed
+@import 'mixins';
+@import 'font';
 
+app-sidenav {
   // variables
-  --gd-version-height: 2rem;
+  --gd-version-height: 4.2rem;
+}
 
-  .gd-version {
-    height: var(--gd-version-height);
+.gd-version {
+  background: var(--gd-background);
+  color: var(--gd-secondary);
+  font-size: 1.2rem;
+  height: var(--gd-version-height);
+  padding: 1.6rem 1.6rem 0.8rem;
+  white-space: nowrap;
+}
+
+.gd-main-menu {
+  // variables
+  --gd-menu-option-active-border-width: 0.7rem;
+  --gd-menu-option-height: 4.8rem;
+
+  display: block;
+  height: calc(100% - var(--gd-version-height));
+  overflow-x: hidden;
+  overflow-y: auto;
+  width: 100%;
+
+  &.gd-version-not-visible {
+    height: 100%;
   }
 
-  .gd-main-menu {
-    // variables
-    --gd-menu-option-active-border-width: 0.7rem;
-    --gd-menu-option-height: 4.8rem;
+  .gd-main-menu-group-label {
+    color: var(--gd-secondary);
+    font-size: 1.2rem;
+    height: 1.8rem;
+    letter-spacing: 0.05rem;
+    margin: 3.6rem 0 0.8rem;
+    padding: 0 2.4rem;
+    text-transform: uppercase;
+    white-space: nowrap;
 
-    display: block;
-    width: 100%;
-    overflow-x: hidden;
-    overflow-y: auto;
-    height: calc(100% - var(--gd-version-height));
+    &:first-child {
+      margin-top: 1.7rem;
+    }
+  }
 
-    &.gd-version-not-visible {
-      height: 100%;
+  mat-menu {
+    + .gd-main-menu-option {
+      margin-top: 0.8rem;
+    }
+  }
+
+  .gd-main-menu-option {
+    cursor: pointer;
+
+    + .gd-main-menu-option {
+      margin-top: 0.8rem;
     }
 
-    .gd-main-menu-group-label {
-      color: red;
-      // #TODO must have min height otherwise on collapse will move icons because label becomes hidden
-      // used px because 30px is just random...needs to be replaced with proper rem an not 3rem
-      height: 30px;
+    &.gd-main-menu-option-link {
+      cursor: pointer;
     }
 
-    .gd-main-menu-option {
-      // ...
+    .gd-main-menu-option-header {
+      @include flex(flex);
+      @include flex_align_items(center);
+      height: var(--gd-menu-option-height);
+      padding: 0;
 
-      &.gd-main-menu-option-link {
-        cursor: pointer;
+      .gd-main-menu-option-label {
+        border-left: var(--gd-menu-option-active-border-width) solid transparent;
+        overflow: hidden;
+        padding: 1.2rem 2.4rem 1.2rem 0;
+        width: 100%;
+
+        .gd-main-menu-option-label-icon {
+          font-size: 2.4rem;
+          margin: 0 2.4rem 0 1.7rem;
+        }
+
+        .gd-main-menu-option-label-text {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
       }
+    }
 
+    &:hover {
+      > .gd-main-menu-option-header {
+        > .gd-main-menu-option-label {
+          background: rgba(var(--gd-primary-rgb), 0.1);
+        }
+      }
+    }
+
+    &.gd-main-menu-option-active {
       .gd-main-menu-option-header {
-        padding: 0;
-        height: var(--gd-menu-option-height);
-
         .gd-main-menu-option-label {
-          border-left: var(--gd-menu-option-active-border-width) solid transparent;
+          background: rgba(var(--gd-primary-rgb), 0.1);
+          border-left-color: var(--gd-primary);
 
           .gd-main-menu-option-label-icon {
-
+            color: var(--gd-primary);
           }
 
           .gd-main-menu-option-label-text {
-            // no wrap, ellipsis !?
+            color: var(--gd-primary);
+            font-weight: 500;
+          }
+        }
+      }
+    }
+
+    &.mat-expansion-panel {
+      @include border-radius(0);
+      @include box-shadow(none);
+      @include box-sizing(border-box);
+      color: var(--gd-text);
+
+      .mat-expansion-panel-header {
+        font-family: $gd-font-family;
+        font-size: $gd-font-size;
+        padding-right: 2.4rem;
+
+        &:hover {
+          background: rgba(var(--gd-primary-rgb), 0.1);
+        }
+
+        .mat-expansion-panel-header-title {
+          color: var(--gd-text);
+          margin-right: 0;
+          width: 100%;
+        }
+
+        .mat-expansion-indicator {
+          height: 2.4rem;
+          text-align: center;
+          width: 2.4rem;
+
+          &:after {
+            color: var(--gd-text);
           }
         }
       }
 
-      &.gd-main-menu-option-active {
-        .gd-main-menu-option-header {
-          .gd-main-menu-option-label {
-            border-left: var(--gd-menu-option-active-border-width) solid black;
+      .mat-expansion-panel-content {
+        font-family: $gd-font-family;
+        font-size: $gd-font-size;
+        font-weight: 400;
+        line-height: $gd-line-height;
+
+        .mat-expansion-panel-body {
+          padding: 0;
+
+          .gd-main-menu-option-children {
+            background: rgba(var(--gd-secondary-rgb), 0.1);
+
+            .gd-main-menu-option {
+              + .gd-main-menu-option {
+                margin-top: 0;
+              }
+
+              .gd-main-menu-option-label-icon {
+                margin-right: 4.8rem;
+              }
+
+              .gd-main-menu-option-label-text {
+                line-height: 2.4rem;
+              }
+
+              &.gd-main-menu-option-active {
+                .gd-main-menu-option-header {
+                  .gd-main-menu-option-label {
+                    border-left-color: transparent;
+                  }
+                }
+              }
+            }
           }
         }
-      }
-
-      .gd-main-menu-option-children {
-
       }
     }
   }

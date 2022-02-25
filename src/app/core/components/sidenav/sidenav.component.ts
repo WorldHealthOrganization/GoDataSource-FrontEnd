@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnDestroy,
+  OnInit,
+  ViewEncapsulation
+} from '@angular/core';
 import { AuthDataService } from '../../services/data/auth.data.service';
 import { PermissionExpression, UserModel } from '../../models/user.model';
 import { PERMISSION } from '../../models/permission.model';
@@ -16,6 +24,7 @@ import { IsActiveMatchOptions } from '@angular/router';
   selector: 'app-sidenav',
   templateUrl: './sidenav.component.html',
   styleUrls: ['./sidenav.component.scss'],
+  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SidenavComponent implements OnInit, OnDestroy {

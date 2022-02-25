@@ -1,0 +1,65 @@
+/* Select Dropdown Options */
+.mat-select-panel-wrap {
+  .mat-select-panel {
+    .mat-select-search-inside-mat-option {
+      .mat-select-search-input {
+        background: rgba(var(--gd-secondary-rgb), 0.1);
+      }
+  
+      .mat-select-search-inner {
+        font-family: $gd-font-family;
+        font-size: $gd-font-size;
+        line-height: $gd-line-height;
+  
+        .mat-select-search-clear {
+          top: 0.9rem;
+        }
+  
+        .mat-button-wrapper {
+          @include flex(flex);
+        }
+        
+        .mat-icon {
+          height: auto;
+          line-height: 1;
+        }
+      }
+    }
+
+    .mat-option {
+      font-size: $gd-font-size;
+      height: auto;
+      line-height: 2.4rem;
+      padding: 0.8rem 1.6rem;
+
+      .mat-tooltip-trigger {
+        @include flex(flex);
+        @include flex_align_items(center);
+      }
+
+      .mat-icon {
+        font-size: 2.4rem;
+        height: 2.4rem;
+        margin-right: 1.6rem;
+        width: 2.4rem;
+      }
+
+      &:hover,
+      &:focus {
+        &:not(.mat-option-disabled) {
+          background: rgba(var(--gd-primary-rgb), 0.1);
+        }
+      }
+
+      &.mat-selected {
+        &:not(.mat-option-multiple) {
+          background: rgba(var(--gd-primary-rgb), 0.1);
+        }
+
+        &:not(.mat-option-disabled) {
+          color: var(--gd-primary);
+        }
+      }
+    }
+  }
+}

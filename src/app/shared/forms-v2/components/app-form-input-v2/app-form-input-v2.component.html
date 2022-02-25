@@ -36,10 +36,12 @@
     </span>
 
     <!-- Right - Icon buttons -->
-    <mat-icon
+    <button
       *ngFor="let iconB of suffixIconButtons"
+      type="button"
+      mat-icon-button
       matSuffix
-      (click)="iconButtonClick($event, iconB)">{{iconB.icon}}</mat-icon>
+      (click)="iconButtonClick($event, iconB)"><mat-icon>{{iconB.icon}}</mat-icon></button>
 
     <!-- Errors -->
     <mat-error

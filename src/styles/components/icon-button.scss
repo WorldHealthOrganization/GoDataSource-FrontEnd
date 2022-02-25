@@ -1,0 +1,20 @@
+/* Icon Button */
+button.mat-icon-button {
+  background: rgba(var(--gd-secondary-rgb), 0.2);
+  @include border-radius(0.4rem);
+  color: var(--gd-text);
+  font-size: 1.6rem;
+  height: 2.4rem;
+  line-height: 1;
+  padding: 0.4rem;
+  text-align: center;
+  width: 2.4rem;
+
+  .mat-button-wrapper {
+    @include flex(flex);
+  }
+
+  .mat-icon {
+    font-size: 1.6rem;
+  }
+}

@@ -1,5 +1,4 @@
 @import 'mixins';
-@import 'colors';
 
 mat-sidenav-container {
   // Variables
@@ -76,6 +75,7 @@ mat-sidenav-container {
         height: 2rem;
         left: calc(100% - 1rem);
         line-height: 1;
+        padding: 0;
         position: absolute;
         top: calc(var(--gd-top-bar-height) + 1.6rem);
         width: 2rem;
