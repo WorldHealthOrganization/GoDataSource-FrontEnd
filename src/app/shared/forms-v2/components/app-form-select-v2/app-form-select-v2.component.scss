@@ -1,6 +1,10 @@
 @import 'mixins';
 @import 'font';
 
+.cdk-overlay-pane:has(.gd-form-select-v2-panel) {
+  margin-top: 3.2rem;
+}
+
 .gd-form-select-v2 {
   .mat-form-field {
     font-family: $gd-font-family;

@@ -127,7 +127,8 @@
 
               <!-- Floating menu -->
               <mat-menu
-                #menu="matMenu">
+                #menu="matMenu"
+                class="gd-main-menu-option-float-menu">
                 <ng-container
                   *ngFor="let menuOptionChild of menuOption.children">
                   <ng-container
@@ -137,7 +138,9 @@
                     <button
                       class="gd-main-menu-option-header-button"
                       mat-menu-item
-                      [routerLink]="menuOptionChild.link">
+                      [routerLink]="menuOptionChild.link"
+                      routerLinkActive="gd-main-menu-option-active"
+                      [routerLinkActiveOptions]="activeSetup">
                       <ng-template
                         [ngTemplateOutlet]="commonPart"
                         [ngTemplateOutletContext]="{ option: menuOptionChild }"></ng-template>
