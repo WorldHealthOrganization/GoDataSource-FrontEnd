@@ -60,13 +60,13 @@
       <!-- Search filter -->
       <mat-option>
         <ngx-mat-select-search
+          ngModel
           [placeholderLabel]="'LNG_COMMON_LABEL_SEARCH' | translate"
           [noEntriesFoundLabel]="null"
           [clearSearchInput]="true"
-          ngModel
-          (ngModelChange)="filterOptions($event)"
           [disableScrollToActiveOnOptionsChanged]="true"
-          [preventHomeEndKeyPropagation]="true">
+          [preventHomeEndKeyPropagation]="true"
+          (ngModelChange)="filterOptions($event)">
         </ngx-mat-select-search>
       </mat-option>
 
