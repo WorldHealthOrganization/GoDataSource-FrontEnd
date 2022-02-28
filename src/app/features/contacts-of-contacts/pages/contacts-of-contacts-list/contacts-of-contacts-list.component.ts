@@ -529,7 +529,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
         visible: false,
         excludeFromDisplay: (): boolean => {
-          return UserModel.canList(this.authUser);
+          return !UserModel.canList(this.authUser);
         }
       }),
       new VisibleColumnModel({

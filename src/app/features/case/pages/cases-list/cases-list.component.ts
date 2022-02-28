@@ -23,7 +23,7 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import * as _ from 'lodash';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { VisibleColumnModel, VisibleColumnModelPinned } from '../../../../shared/components/side-columns/model';
+import { VisibleColumnModel, VisibleColumnModelFormat, VisibleColumnModelPinned } from '../../../../shared/components/side-columns/model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
@@ -706,11 +706,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       new VisibleColumnModel({
         field: 'dateOfOutcome',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
+        format: VisibleColumnModelFormat.DATE,
         visible: false
       }),
       new VisibleColumnModel({
         field: 'age',
-        label: 'LNG_CASE_FIELD_LABEL_AGE'
+        label: 'LNG_CASE_FIELD_LABEL_AGE',
+        format: VisibleColumnModelFormat.AGE
       }),
       new VisibleColumnModel({
         field: 'gender',
@@ -718,72 +720,100 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       }),
       new VisibleColumnModel({
         field: 'phoneNumber',
-        label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER'
+        label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
+        format: 'mainAddress.phoneNumber'
       }),
       new VisibleColumnModel({
         field: 'location',
-        label: 'LNG_CASE_FIELD_LABEL_ADDRESS_LOCATION'
+        label: 'LNG_CASE_FIELD_LABEL_ADDRESS_LOCATION',
+        format: 'mainAddress.location.name',
+        link: (data) => {
+          return data.mainAddress?.location?.name ?
+            `/locations/${data.mainAddress.location.id}/view` :
+            undefined;
+        }
       }),
       new VisibleColumnModel({
         field: 'addresses.emailAddress',
         label: 'LNG_CASE_FIELD_LABEL_EMAIL',
-        visible: false
+        visible: false,
+        format: 'mainAddress.emailAddress'
       }),
       new VisibleColumnModel({
         field: 'addresses.addressLine1',
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS',
-        visible: false
+        visible: false,
+        format: 'mainAddress.addressLine1'
       }),
       new VisibleColumnModel({
         field: 'addresses.city',
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
-        visible: false
+        visible: false,
+        format: 'mainAddress.city'
       }),
       new VisibleColumnModel({
         field: 'addresses.geoLocation.lat',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
-        visible: false
+        visible: false,
+        format: 'mainAddress.geoLocation.lat'
       }),
       new VisibleColumnModel({
         field: 'addresses.geoLocation.lng',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
-        visible: false
+        visible: false,
+        format: 'mainAddress.geoLocation.lng'
       }),
       new VisibleColumnModel({
         field: 'addresses.postalCode',
         label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
-        visible: false
+        visible: false,
+        format: 'mainAddress.postalCode'
       }),
       new VisibleColumnModel({
         field: 'addresses.geoLocationAccurate',
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
-        visible: false
+        visible: false,
+        format: VisibleColumnModelFormat.BOOLEAN,
+        formatField: 'mainAddress.geoLocationAccurate'
       }),
       new VisibleColumnModel({
         field: 'dateOfOnset',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET'
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
+        format: VisibleColumnModelFormat.DATE
       }),
       new VisibleColumnModel({
         field: 'dateOfReporting',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
-        visible: false
+        visible: false,
+        format: VisibleColumnModelFormat.DATE
       }),
       new VisibleColumnModel({
         field: 'notACase',
         label: 'LNG_CASE_FIELD_LABEL_NOT_A_CASE',
-        visible: false
+        visible: false,
+        format: VisibleColumnModelFormat.BOOLEAN,
+        formatValue: (data) => {
+          return data.classification === Constants.CASE_CLASSIFICATION.NOT_A_CASE;
+        }
       }),
       new VisibleColumnModel({
         field: 'wasContact',
         label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
-        visible: false
+        visible: false,
+        format: VisibleColumnModelFormat.BOOLEAN
       }),
       new VisibleColumnModel({
         field: 'responsibleUserId',
         label: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
         visible: false,
+        format: 'responsibleUser.name',
         excludeFromDisplay: (): boolean => {
-          return UserModel.canList(this.authUser);
+          return !UserModel.canList(this.authUser);
+        },
+        link: (data) => {
+          return data.responsibleUserId ?
+            `/users/${data.responsibleUserId}/view` :
+            undefined;
         }
       })
     ];
@@ -808,27 +838,48 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       new VisibleColumnModel({
         field: 'deleted',
         label: 'LNG_CASE_FIELD_LABEL_DELETED',
-        visible: false
+        visible: false,
+        format: VisibleColumnModelFormat.BOOLEAN
       }),
       new VisibleColumnModel({
         field: 'createdBy',
         label: 'LNG_CASE_FIELD_LABEL_CREATED_BY',
-        visible: false
+        visible: false,
+        format: 'createdByUser.name',
+        excludeFromDisplay: (): boolean => {
+          return !UserModel.canView(this.authUser);
+        },
+        link: (data) => {
+          return data.createdBy ?
+            `/users/${data.createdBy}/view` :
+            undefined;
+        }
       }),
       new VisibleColumnModel({
         field: 'createdAt',
         label: 'LNG_CASE_FIELD_LABEL_CREATED_AT',
-        visible: false
+        visible: false,
+        format: VisibleColumnModelFormat.DATETIME
       }),
       new VisibleColumnModel({
         field: 'updatedBy',
         label: 'LNG_CASE_FIELD_LABEL_UPDATED_BY',
-        visible: false
+        visible: false,
+        format: 'updatedByUser.name',
+        excludeFromDisplay: (): boolean => {
+          return !UserModel.canView(this.authUser);
+        },
+        link: (data) => {
+          return data.updatedBy ?
+            `/users/${data.updatedBy}/view` :
+            undefined;
+        }
       }),
       new VisibleColumnModel({
         field: 'updatedAt',
         label: 'LNG_CASE_FIELD_LABEL_UPDATED_AT',
-        visible: false
+        visible: false,
+        format: VisibleColumnModelFormat.DATETIME
       })
     );
   }

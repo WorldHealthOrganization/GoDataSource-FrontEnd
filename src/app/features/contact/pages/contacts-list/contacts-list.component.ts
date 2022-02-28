@@ -814,7 +814,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
         visible: false,
         excludeFromDisplay: (): boolean => {
-          return TeamModel.canList(this.authUser);
+          return !TeamModel.canList(this.authUser);
         }
       }),
       new VisibleColumnModel({
@@ -835,7 +835,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
         visible: false,
         excludeFromDisplay: (): boolean => {
-          return UserModel.canList(this.authUser);
+          return !UserModel.canList(this.authUser);
         }
       }),
       new VisibleColumnModel({

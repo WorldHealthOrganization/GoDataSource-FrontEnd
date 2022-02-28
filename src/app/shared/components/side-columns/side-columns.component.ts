@@ -120,7 +120,7 @@ export class SideColumnsComponent {
       // exclude from list ?
       if (
         column.excludeFromDisplay &&
-                !column.excludeFromDisplay(column)
+        column.excludeFromDisplay(column)
       ) {
         return;
       }

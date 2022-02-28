@@ -445,7 +445,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
         label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
         visible: false,
         excludeFromDisplay: (): boolean => {
-          return UserModel.canList(this.authUser);
+          return !UserModel.canList(this.authUser);
         }
       })
     ];

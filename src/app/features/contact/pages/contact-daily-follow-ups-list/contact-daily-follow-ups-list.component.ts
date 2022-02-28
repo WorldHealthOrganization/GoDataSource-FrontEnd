@@ -590,7 +590,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID',
         visible: false,
         excludeFromDisplay: (): boolean => {
-          return UserModel.canList(this.authUser);
+          return !UserModel.canList(this.authUser);
         }
       }),
       new VisibleColumnModel({
