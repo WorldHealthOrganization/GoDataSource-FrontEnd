@@ -1,9 +1,9 @@
 @import 'mixins';
 @import 'font';
 
-.cdk-overlay-pane:has(.gd-form-select-v2-panel) {
-  margin-top: 3.2rem;
-}
+// .cdk-overlay-pane:has(.gd-form-select-v2-panel) {
+//   margin-top: 3.2rem;
+// }
 
 .gd-form-select-v2 {
   .mat-form-field {
@@ -88,7 +88,8 @@
           .mat-select {
             font-family: $gd-font-family;
             font-size: $gd-font-size;
-            line-height: 1.1rem;
+            height: 2.4rem;
+            line-height: 2.4rem;
             margin-top: 0;
 
             .mat-select-trigger {
