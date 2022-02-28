@@ -18,7 +18,9 @@
       [disabled]="disabled"
       [required]="required"
       [multiple]="multiple"
-      panelClass="gd-form-select-v2-panel">
+      panelClass="gd-form-select-v2-panel"
+      (click)="dropdownOpened()"
+      (opened)="dropdownOpened()">
 
       <!-- Selected value -->
       <mat-select-trigger

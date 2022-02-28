@@ -1,9 +1,11 @@
 @import 'mixins';
 @import 'font';
 
-// .cdk-overlay-pane:has(.gd-form-select-v2-panel) {
-//   margin-top: 3.2rem;
-// }
+ .cdk-overlay-pane {
+   &.cdk-overlay-pane-dropdown {
+     margin-top: 3.2rem;
+   }
+ }
 
 .gd-form-select-v2 {
   .mat-form-field {

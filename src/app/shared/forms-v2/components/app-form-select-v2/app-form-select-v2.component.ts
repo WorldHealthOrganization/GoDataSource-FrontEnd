@@ -113,4 +113,13 @@ export class AppFormSelectV2Component
       return item.label.toLowerCase().indexOf(byValue) > -1;
     });
   }
+
+  /**
+   * Dropdown opened
+   */
+  dropdownOpened(): void {
+    if (!document.querySelector('.gd-form-select-v2-panel').closest('.cdk-overlay-pane').classList.contains('cdk-overlay-pane-dropdown')) {
+      document.querySelector('.gd-form-select-v2-panel').closest('.cdk-overlay-pane').classList.add('cdk-overlay-pane-dropdown');
+    }
+  }
 }
