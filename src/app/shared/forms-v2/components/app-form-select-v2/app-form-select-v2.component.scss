@@ -4,6 +4,11 @@
  .cdk-overlay-pane {
    &.gd-cdk-overlay-pane-dropdown {
      margin-top: 3.2rem;
+
+     .gd-mat-option-vscroll-selected {
+       visibility: hidden;
+       position: absolute;
+     }
    }
  }
 

@@ -104,6 +104,48 @@
 
       </cdk-virtual-scroll-viewport>
 
+      <!-- Selected option(s) hack to handle not visible in virtual scroll options -->
+      <ng-container
+        *ngIf="value">
+
+        <!-- multiple select ? -->
+        <ng-container
+          *ngIf="multiple; else singleSelect">
+          <mat-option
+            *ngFor="let selectedValue of value"
+            class="gd-mat-option-vscroll-selected"
+            [value]="selectedValue">
+
+            <!-- Icon -->
+            <mat-icon
+              *ngIf="allOptionsMap[selectedValue]?.icon">{{allOptionsMap[selectedValue].icon}}</mat-icon>
+
+            <!-- Label -->
+            {{allOptionsMap[selectedValue]?.label}}
+
+          </mat-option>
+        </ng-container>
+
+        <!-- Single select -->
+        <ng-template
+          #singleSelect>
+
+          <!-- Option -->
+          <mat-option
+            class="gd-mat-option-vscroll-selected"
+            [value]="valueAsString">
+
+            <!-- Icon -->
+            <mat-icon
+              *ngIf="allOptionsMap[valueAsString]?.icon">{{allOptionsMap[valueAsString].icon}}</mat-icon>
+
+            <!-- Label -->
+            {{allOptionsMap[valueAsString]?.label}}
+          </mat-option>
+        </ng-template>
+
+      </ng-container>
+
     </mat-select>
 
     <!-- Errors -->
