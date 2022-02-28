@@ -664,8 +664,17 @@ export class SidenavComponent implements OnInit, OnDestroy {
    * Main menu opened
    */
   mainMenuOpened(): void {
-    const classList = document.querySelector('.gd-main-menu-option-float-menu').closest('.cdk-overlay-pane').classList;
-    if (!classList.contains('gd-cdk-overlay-pane-main-menu')) {
+    // retrieve parent element
+    let classList: any = document.querySelector('.gd-main-menu-option-float-menu');
+    classList = classList ?
+      classList.closest('.cdk-overlay-pane').classList :
+      classList;
+
+    // attach custom class
+    if (
+      classList &&
+      !classList.contains('gd-cdk-overlay-pane-main-menu')
+    ) {
       classList.add('gd-cdk-overlay-pane-main-menu');
     }
   }
