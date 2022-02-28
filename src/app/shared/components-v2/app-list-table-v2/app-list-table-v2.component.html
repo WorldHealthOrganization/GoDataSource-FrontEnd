@@ -53,7 +53,8 @@
     <button
       type="button"
       mat-icon-button
-      [matTooltip]="'LNG_SIDE_COLUMNS_SECTION_COLUMNS_TO_DISPLAY_TITLE' | translate">
+      [matTooltip]="'LNG_SIDE_COLUMNS_SECTION_COLUMNS_TO_DISPLAY_TITLE' | translate"
+      (click)="setVisibleColumns()">
       <mat-icon>view_column</mat-icon>
     </button>
 

@@ -891,7 +891,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     // if there is no outbreak, we can't fully initialize side filters
     if (
       !this.selectedOutbreak ||
-            !this.selectedOutbreak.id
+      !this.selectedOutbreak.id
     ) {
       return;
     }

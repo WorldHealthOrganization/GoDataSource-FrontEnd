@@ -317,4 +317,13 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // resize all columns
     event.columnApi.autoSizeAllColumns();
   }
+
+  /**
+   * Visible Columns
+   */
+  setVisibleColumns(): void {
+    // #TODO
+    this._columns.forEach((col) => col.visible = true);
+    this.columns = this._columns;
+  }
 }
