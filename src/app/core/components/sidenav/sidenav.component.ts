@@ -31,6 +31,11 @@ export class SidenavComponent implements OnInit, OnDestroy {
   // expanded / collapsed mode
   @Input() expanded: boolean = false;
 
+  // used for main menu hover animation
+  enteredButton = false;
+  isMatMenuOpen = false;
+  prevButtonTrigger;
+
   // subscriptions
   outbreakSubscriber: Subscription;
 
@@ -663,9 +668,9 @@ export class SidenavComponent implements OnInit, OnDestroy {
   /**
    * Main menu opened
    */
-  mainMenuOpened(): void {
+  mainMenuOpened(menuId: string): void {
     // retrieve parent element
-    let classList: any = document.querySelector('.gd-main-menu-option-float-menu');
+    let classList: any = document.querySelector(`.gd-main-menu-option-float-menu.${menuId}`);
     classList = classList ?
       classList.closest('.cdk-overlay-pane').classList :
       classList;
@@ -677,5 +682,62 @@ export class SidenavComponent implements OnInit, OnDestroy {
     ) {
       classList.add('gd-cdk-overlay-pane-main-menu');
     }
+  }
+
+  /**
+   * Floating menu enter
+   */
+  floatingMenuEnter() {
+    this.isMatMenuOpen = true;
+  }
+
+  /**
+   * Floating menu leave
+   */
+  floatingMenuLeave(trigger) {
+    setTimeout(() => {
+      if (!this.enteredButton) {
+        this.isMatMenuOpen = false;
+        trigger.closeMenu();
+      } else {
+        this.isMatMenuOpen = false;
+      }
+    }, 80);
+  }
+
+  /**
+   * Menu option enter
+   */
+  menuOptionEnter(trigger) {
+    setTimeout(() => {
+      if (this.prevButtonTrigger && this.prevButtonTrigger !== trigger) {
+        this.prevButtonTrigger.closeMenu();
+        this.prevButtonTrigger = trigger;
+        this.isMatMenuOpen = false;
+        trigger.openMenu();
+      } else if (!this.isMatMenuOpen) {
+        this.enteredButton = true;
+        this.prevButtonTrigger = trigger;
+        trigger.openMenu();
+      } else {
+        this.enteredButton = true;
+        this.prevButtonTrigger = trigger;
+      }
+    });
+  }
+
+  /**
+   * Menu option leave
+   */
+  menuOptionLeave(trigger) {
+    setTimeout(() => {
+      if (this.enteredButton && !this.isMatMenuOpen) {
+        trigger.closeMenu();
+      } if (!this.isMatMenuOpen) {
+        trigger.closeMenu();
+      } else {
+        this.enteredButton = false;
+      }
+    }, 100);
   }
 }

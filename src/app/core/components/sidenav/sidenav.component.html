@@ -4,7 +4,8 @@
   let-option="option">
   <div
     class="gd-main-menu-option-label"
-    fxLayout="row">
+    fxLayout="row"
+    [matTooltip]="expanded || !option.link || !option.icon ? undefined : (option.label | translate)">
 
     <!-- Icon -->
     <div
@@ -115,9 +116,12 @@
 
               <!-- Icon -->
               <div
+                #levelOneTrigger="matMenuTrigger"
                 class="gd-main-menu-option"
                 [matMenuTriggerFor]="menu"
-                (menuOpened)="mainMenuOpened()">
+                (menuOpened)="mainMenuOpened(menuOption.id)"
+                (mouseenter)="menuOptionEnter(levelOneTrigger)"
+                (mouseleave)="menuOptionLeave(levelOneTrigger)">
                 <div
                   class="gd-main-menu-option-header">
                   <ng-template
@@ -129,26 +133,31 @@
               <!-- Floating menu -->
               <mat-menu
                 #menu="matMenu"
-                class="gd-main-menu-option-float-menu">
-                <ng-container
-                  *ngFor="let menuOptionChild of menuOption.children">
+                class="gd-main-menu-option-float-menu {{menuOption.id}}"
+                [hasBackdrop]="false">
+                <div
+                  (mouseenter)="floatingMenuEnter()"
+                  (mouseleave)="floatingMenuLeave(levelOneTrigger)">
                   <ng-container
-                    *ngIf="menuOptionChild.visible">
+                    *ngFor="let menuOptionChild of menuOption.children">
+                    <ng-container
+                      *ngIf="menuOptionChild.visible">
 
-                    <!-- Child Menu link -->
-                    <button
-                      class="gd-main-menu-option-header-button"
-                      mat-menu-item
-                      [routerLink]="menuOptionChild.link"
-                      routerLinkActive="gd-main-menu-option-active"
-                      [routerLinkActiveOptions]="activeSetup">
-                      <ng-template
-                        [ngTemplateOutlet]="commonPart"
-                        [ngTemplateOutletContext]="{ option: menuOptionChild }"></ng-template>
-                    </button>
+                      <!-- Child Menu link -->
+                      <button
+                        class="gd-main-menu-option-header-button"
+                        mat-menu-item
+                        [routerLink]="menuOptionChild.link"
+                        routerLinkActive="gd-main-menu-option-active"
+                        [routerLinkActiveOptions]="activeSetup">
+                        <ng-template
+                          [ngTemplateOutlet]="commonPart"
+                          [ngTemplateOutletContext]="{ option: menuOptionChild }"></ng-template>
+                      </button>
 
+                    </ng-container>
                   </ng-container>
-                </ng-container>
+                </div>
               </mat-menu>
             </ng-template>
 

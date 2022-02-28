@@ -22,6 +22,11 @@ export class ChildNavItem extends AbstractNavItem {
     public additionalVisibilityCheck?: () => boolean
   ) {
     super(false);
+
+    // validate
+    if (this.id.indexOf(' ') > -1) {
+      throw new Error('Spaces not allowed');
+    }
   }
 }
 
@@ -39,5 +44,10 @@ export class NavItem extends AbstractNavItem {
     public additionalVisibilityCheck?: () => boolean
   ) {
     super(false);
+
+    // validate
+    if (this.id.indexOf(' ') > -1) {
+      throw new Error('Spaces not allowed');
+    }
   }
 }
