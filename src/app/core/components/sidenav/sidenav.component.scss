@@ -167,6 +167,7 @@ app-sidenav {
       @include box-shadow(none);
       @include box-sizing(border-box);
       color: var(--gd-text);
+      min-width: 33rem;
 
       .mat-expansion-panel-header {
         font-family: $gd-font-family;
