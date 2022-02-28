@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inpu
 import { BaseModel } from '../../../core/models/base.model';
 import { Observable } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { ColDef, Column, ColumnApi, ValueFormatterParams } from '@ag-grid-community/core';
+import { ColDef, ColumnApi, ValueFormatterParams } from '@ag-grid-community/core';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { VisibleColumnModel, VisibleColumnModelFormat, VisibleColumnModelPinned } from '../../components/side-columns/model';
 import { TranslateService } from '@ngx-translate/core';
@@ -314,24 +314,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   firstDataRendered(event: {
     columnApi: ColumnApi
   }): void {
-    // if pinned start with column fitting content
-    const pinnedColumns: Column[] = [];
-    event.columnApi.getAllColumns().forEach((column) => {
-      // jump over column ?
-      if (!column.isPinned()) {
-        return;
-      }
-
-      // add to list of columns to fit content
-      pinnedColumns.push(column);
-    });
-
-    // anything to resize ?
-    if (pinnedColumns.length < 1) {
-      return;
-    }
-
-    // resize
-    event.columnApi.autoSizeColumns(pinnedColumns);
+    // resize all columns
+    event.columnApi.autoSizeAllColumns();
   }
 }

@@ -1,3 +1,66 @@
+<!-- ... -->
+<div>
+  breadcrumbs on left / other things on the right (not sure if they will remain in this component)
+</div>
+
+<!-- Grouped data -->
+<div>
+  grouped data... gradient color from referenceData.color to a lighter one...
+</div>
+
+<!-- Table header -->
+<div
+  fxLayout="row"
+  class="gd-list-table-header">
+
+  <!-- Left -->
+  <div
+    fxFlex
+    class="gd-list-table-header-left">
+    more than enough...
+  </div>
+
+  <!-- Right -->
+  <div
+    fxGrow="0" fxLayoutGap="1rem"
+    class="gd-list-table-header-right">
+
+    <!-- Reset filters -->
+    <button
+      type="button"
+      mat-icon-button
+      [matTooltip]="'LNG_COMMON_BUTTON_RESET_FILTERS' | translate">
+      <mat-icon>restart_alt</mat-icon>
+    </button>
+
+    <!-- Advanced filters -->
+    <button
+      type="button"
+      mat-raised-button>
+      <mat-icon>filter_alt</mat-icon>
+      {{'LNG_SIDE_FILTERS_TITLE' | translate}}
+    </button>
+
+    <!-- Refresh data -->
+    <button
+      type="button"
+      mat-icon-button
+      [matTooltip]="'LNG_COMMON_BUTTON_REFRESH_LIST' | translate">
+      <mat-icon>refresh</mat-icon>
+    </button>
+
+    <!-- Visible columns -->
+    <button
+      type="button"
+      mat-icon-button
+      [matTooltip]="'LNG_SIDE_COLUMNS_SECTION_COLUMNS_TO_DISPLAY_TITLE' | translate">
+      <mat-icon>view_column</mat-icon>
+    </button>
+
+  </div>
+</div>
+
+<!-- Table -->
 <ag-grid-angular
   class="ag-theme-balham gd-list-table"
   [rowData]="records"
