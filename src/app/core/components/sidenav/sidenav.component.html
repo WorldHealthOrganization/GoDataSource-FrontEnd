@@ -116,7 +116,8 @@
               <!-- Icon -->
               <div
                 class="gd-main-menu-option"
-                [matMenuTriggerFor]="menu">
+                [matMenuTriggerFor]="menu"
+                (menuOpened)="mainMenuOpened()">
                 <div
                   class="gd-main-menu-option-header">
                   <ng-template

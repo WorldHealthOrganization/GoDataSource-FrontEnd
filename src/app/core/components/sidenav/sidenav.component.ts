@@ -659,4 +659,14 @@ export class SidenavComponent implements OnInit, OnDestroy {
     return this.hasOutbreak() &&
       this.selectedOutbreak.isContactsOfContactsActive;
   }
+
+  /**
+   * Main menu opened
+   */
+  mainMenuOpened(): void {
+    const classList = document.querySelector('.gd-main-menu-option-float-menu').closest('.cdk-overlay-pane').classList;
+    if (!classList.contains('gd-cdk-overlay-pane-main-menu')) {
+      classList.add('gd-cdk-overlay-pane-main-menu');
+    }
+  }
 }

@@ -118,8 +118,9 @@ export class AppFormSelectV2Component
    * Dropdown opened
    */
   dropdownOpened(): void {
-    if (!document.querySelector('.gd-form-select-v2-panel').closest('.cdk-overlay-pane').classList.contains('cdk-overlay-pane-dropdown')) {
-      document.querySelector('.gd-form-select-v2-panel').closest('.cdk-overlay-pane').classList.add('cdk-overlay-pane-dropdown');
+    const classList = document.querySelector('.gd-form-select-v2-panel').closest('.cdk-overlay-pane').classList;
+    if (!classList.contains('cgd-cdk-overlay-pane-dropdown')) {
+      classList.add('gd-cdk-overlay-pane-dropdown');
     }
   }
 }
