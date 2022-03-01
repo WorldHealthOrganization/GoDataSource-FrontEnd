@@ -1,6 +1,9 @@
 :host {
   .gd-list-table {
     width: 100%;
-    height: 100%;
+
+    .gd-list-table-data {
+      width: 100%;
+    }
   }
 }

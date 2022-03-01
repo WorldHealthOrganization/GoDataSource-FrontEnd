@@ -1,76 +1,96 @@
-<!-- ... -->
-<div>
-  breadcrumbs on left / other things on the right (not sure if they will remain in this component)
-</div>
-
-<!-- Grouped data -->
-<div>
-  grouped data... gradient color from referenceData.color to a lighter one...
-</div>
-
-<!-- Table header -->
+<!-- List page top -->
 <div
-  fxLayout="row"
-  class="gd-list-table-header">
+  class="gd-list-top">
 
-  <!-- Left -->
-  <div
-    fxFlex
-    class="gd-list-table-header-left">
-    more than enough...
+  <!-- #TODO: breads, title... -->
+  <div>
+    breadcrumbs on left / other things on the right (not sure if they will remain in this component)
   </div>
 
-  <!-- Right -->
-  <div
-    fxGrow="0" fxLayoutGap="1rem"
-    class="gd-list-table-header-right">
-
-    <!-- Reset filters -->
-    <button
-      type="button"
-      mat-icon-button
-      [matTooltip]="'LNG_COMMON_BUTTON_RESET_FILTERS' | translate">
-      <mat-icon>restart_alt</mat-icon>
-    </button>
-
-    <!-- Advanced filters -->
-    <button
-      type="button"
-      mat-raised-button>
-      <mat-icon>filter_alt</mat-icon>
-      {{'LNG_SIDE_FILTERS_TITLE' | translate}}
-    </button>
-
-    <!-- Refresh data -->
-    <button
-      type="button"
-      mat-icon-button
-      [matTooltip]="'LNG_COMMON_BUTTON_REFRESH_LIST' | translate">
-      <mat-icon>refresh</mat-icon>
-    </button>
-
-    <!-- Visible columns -->
-    <button
-      type="button"
-      mat-icon-button
-      [matTooltip]="'LNG_SIDE_COLUMNS_SECTION_COLUMNS_TO_DISPLAY_TITLE' | translate"
-      (click)="setVisibleColumns()">
-      <mat-icon>view_column</mat-icon>
-    </button>
-
+  <!-- @TODO: Grouped data -->
+  <div>
+    grouped data... gradient color from referenceData.color to a lighter one...
   </div>
 </div>
 
-<!-- Table -->
-<ag-grid-angular
-  class="ag-theme-balham gd-list-table"
-  [rowData]="records"
-  [columnDefs]="columnDefs"
-  [modules]="modules"
-  rowSelection="multiple"
-  suppressRowClickSelection="true"
-  suppressPropertyNamesCheck="true"
-  (firstDataRendered)="firstDataRendered($event)">
-</ag-grid-angular>
+<!-- Table related -->
+<mat-card
+  class="gd-list-table">
 
+  <!-- Table header -->
+  <div
+    fxLayout="row"
+    class="gd-list-table-header">
 
+    <!-- Left -->
+    <div
+      fxFlex
+      class="gd-list-table-header-left">
+      more than enough...o sa fie text + un link cu text care o sa afiseze total count la on click (pb tb stilizat dupa ce implementam pt ca o sa sufere schimbari continutul html)
+    </div>
+
+    <!-- Right -->
+    <div
+      fxGrow="0" fxLayoutGap="1rem"
+      class="gd-list-table-header-right">
+
+      <!-- Reset filters -->
+      <button
+        type="button"
+        mat-icon-button
+        [matTooltip]="'LNG_COMMON_BUTTON_RESET_FILTERS' | translate">
+        <mat-icon>restart_alt</mat-icon>
+      </button>
+
+      <!-- Advanced filters -->
+      <button
+        type="button"
+        mat-raised-button>
+        <mat-icon>filter_alt</mat-icon>
+        {{'LNG_SIDE_FILTERS_TITLE' | translate}}
+      </button>
+
+      <!-- Refresh data -->
+      <button
+        type="button"
+        mat-icon-button
+        [matTooltip]="'LNG_COMMON_BUTTON_REFRESH_LIST' | translate">
+        <mat-icon>refresh</mat-icon>
+      </button>
+
+      <!-- Visible columns -->
+      <button
+        type="button"
+        mat-icon-button
+        [matTooltip]="'LNG_SIDE_COLUMNS_SECTION_COLUMNS_TO_DISPLAY_TITLE' | translate"
+        (click)="setVisibleColumns()">
+        <mat-icon>view_column</mat-icon>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Table -->
+  <ag-grid-angular
+    class="ag-theme-balham gd-list-table-data"
+    [rowData]="records"
+    [columnDefs]="columnDefs"
+    [modules]="modules"
+    rowSelection="multiple"
+    suppressRowClickSelection="true"
+    suppressPropertyNamesCheck="true"
+    (firstDataRendered)="firstDataRendered($event)">
+  </ag-grid-angular>
+
+  <!-- Table paginator -->
+  <div
+    class="gd-list-table-bottom">
+    <app-mat-paginator-extended
+      [pageIndex]="0"
+      [countData]="{count: 10, hasMore: true}"
+      [pageSize]="500"
+      [pageSizeOptions]="[50, 100, 500, 1000]">
+    </app-mat-paginator-extended>
+  </div>
+
+</mat-card>
