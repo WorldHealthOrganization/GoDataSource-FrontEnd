@@ -16,7 +16,6 @@ import * as _ from 'lodash';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { catchError, share, tap } from 'rxjs/operators';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
@@ -245,89 +244,89 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
      */
   initializeSideTableColumns() {
     // default table columns
-    this.tableColumns = [
-      new VisibleColumnModel({
-        field: 'checkbox',
-        required: true,
-        excludeFromSave: true
-      }),
-      new VisibleColumnModel({
-        field: 'lastName',
-        label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_LAST_NAME'
-      }),
-      new VisibleColumnModel({
-        field: 'firstName',
-        label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_FIRST_NAME'
-      }),
-      new VisibleColumnModel({
-        field: 'visualId',
-        label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_VISUAL_ID'
-      }),
-      new VisibleColumnModel({
-        field: 'contactDate',
-        label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE'
-      }),
-      new VisibleColumnModel({
-        field: 'certaintyLevelId',
-        label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL'
-      }),
-      new VisibleColumnModel({
-        field: 'exposureTypeId',
-        label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE'
-      }),
-      new VisibleColumnModel({
-        field: 'exposureFrequencyId',
-        label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'exposureDurationId',
-        label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'socialRelationshipTypeId',
-        label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION'
-      }),
-      new VisibleColumnModel({
-        field: 'socialRelationshipDetail',
-        label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL',
-        visible: false
-      })
-    ];
-
-    if (ClusterModel.canList(this.authUser)) {
-      this.tableColumns.push(
-        new VisibleColumnModel({
-          field: 'clusterId',
-          label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
-          visible: false
-        })
-      );
-    }
-
-    this.tableColumns.push(
-      new VisibleColumnModel({
-        field: 'createdBy',
-        label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_BY',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'createdAt',
-        label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_AT',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'updatedBy',
-        label: 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_BY',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'updatedAt',
-        label: 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_AT',
-        visible: false
-      })
-    );
+    // this.tableColumns = [
+    //   new VisibleColumnModel({
+    //     field: 'checkbox',
+    //     required: true,
+    //     excludeFromSave: true
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'lastName',
+    //     label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_LAST_NAME'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'firstName',
+    //     label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_FIRST_NAME'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'visualId',
+    //     label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_VISUAL_ID'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'contactDate',
+    //     label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'certaintyLevelId',
+    //     label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'exposureTypeId',
+    //     label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'exposureFrequencyId',
+    //     label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'exposureDurationId',
+    //     label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'socialRelationshipTypeId',
+    //     label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'socialRelationshipDetail',
+    //     label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL',
+    //     visible: false
+    //   })
+    // ];
+    //
+    // if (ClusterModel.canList(this.authUser)) {
+    //   this.tableColumns.push(
+    //     new VisibleColumnModel({
+    //       field: 'clusterId',
+    //       label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+    //       visible: false
+    //     })
+    //   );
+    // }
+    //
+    // this.tableColumns.push(
+    //   new VisibleColumnModel({
+    //     field: 'createdBy',
+    //     label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_BY',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'createdAt',
+    //     label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_AT',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'updatedBy',
+    //     label: 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_BY',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'updatedAt',
+    //     label: 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_AT',
+    //     visible: false
+    //   })
+    // );
   }
 
   /**

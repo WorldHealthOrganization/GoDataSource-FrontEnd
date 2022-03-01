@@ -6,7 +6,6 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { Observable } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
-import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
 import { DialogAnswer, DialogAnswerButton, DialogConfiguration, DialogField } from '../../../../shared/components/dialog/dialog.component';
@@ -239,40 +238,40 @@ export class OutbreakTemplatesListComponent
      */
   initializeSideTableColumns() {
     // default table columns
-    this.tableColumns = [
-      new VisibleColumnModel({
-        field: 'name',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_NAME'
-      }),
-      new VisibleColumnModel({
-        field: 'description',
-        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DESCRIPTION'
-      }),
-      new VisibleColumnModel({
-        field: 'disease',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_DISEASE'
-      }),
-      new VisibleColumnModel({
-        field: 'generateFollowUpsTeamAssignmentAlgorithm',
-        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'generateFollowUpsOverwriteExisting',
-        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'generateFollowUpsKeepTeamAssignment',
-        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'generateFollowUpsDateOfLastContact',
-        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT',
-        visible: false
-      }),
-    ];
+    // this.tableColumns = [
+    //   new VisibleColumnModel({
+    //     field: 'name',
+    //     label: 'LNG_OUTBREAK_FIELD_LABEL_NAME'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'description',
+    //     label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DESCRIPTION'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'disease',
+    //     label: 'LNG_OUTBREAK_FIELD_LABEL_DISEASE'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'generateFollowUpsTeamAssignmentAlgorithm',
+    //     label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'generateFollowUpsOverwriteExisting',
+    //     label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'generateFollowUpsKeepTeamAssignment',
+    //     label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'generateFollowUpsDateOfLastContact',
+    //     label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT',
+    //     visible: false
+    //   }),
+    // ];
   }
 
   /**

@@ -7,7 +7,6 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import * as _ from 'lodash';
-import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { DialogAnswer, DialogAnswerButton, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { SystemClientApplicationModel } from '../../../../core/models/system-client-application.model';
@@ -167,30 +166,30 @@ export class ClientApplicationsListComponent
      */
   initializeSideTableColumns() {
     // default table columns
-    this.tableColumns = [
-      new VisibleColumnModel({
-        field: 'name',
-        label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_NAME'
-      }),
-      new VisibleColumnModel({
-        field: 'credentials',
-        label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CREDENTIALS'
-      }),
-      new VisibleColumnModel({
-        field: 'active',
-        label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_ACTIVE'
-      })
-    ];
-
-    // outbreaks
-    if (OutbreakModel.canList(this.authUser)) {
-      this.tableColumns.push(
-        new VisibleColumnModel({
-          field: 'outbreaks',
-          label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_OUTBREAKS'
-        })
-      );
-    }
+    // this.tableColumns = [
+    //   new VisibleColumnModel({
+    //     field: 'name',
+    //     label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_NAME'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'credentials',
+    //     label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CREDENTIALS'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'active',
+    //     label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_ACTIVE'
+    //   })
+    // ];
+    //
+    // // outbreaks
+    // if (OutbreakModel.canList(this.authUser)) {
+    //   this.tableColumns.push(
+    //     new VisibleColumnModel({
+    //       field: 'outbreaks',
+    //       label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_OUTBREAKS'
+    //     })
+    //   );
+    // }
   }
 
   /**

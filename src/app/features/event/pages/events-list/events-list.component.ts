@@ -16,7 +16,6 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
-import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { catchError, share, tap } from 'rxjs/operators';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
@@ -412,123 +411,123 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
      */
   initializeSideTableColumns() {
     // default table columns
-    this.tableColumns = [
-      new VisibleColumnModel({
-        field: 'checkbox',
-        required: true,
-        excludeFromSave: true
-      }),
-      new VisibleColumnModel({
-        field: 'name',
-        label: 'LNG_EVENT_FIELD_LABEL_NAME'
-      }),
-      new VisibleColumnModel({
-        field: 'date',
-        label: 'LNG_EVENT_FIELD_LABEL_DATE'
-      }),
-      new VisibleColumnModel({
-        field: 'description',
-        label: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION'
-      }),
-      new VisibleColumnModel({
-        field: 'phoneNumber',
-        label: 'LNG_EVENT_FIELD_LABEL_PHONE_NUMBER',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'address.emailAddress',
-        label: 'LNG_EVENT_FIELD_LABEL_EMAIL',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'responsibleUserId',
-        label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
-        visible: false,
-        excludeFromDisplay: (): boolean => {
-          return !UserModel.canList(this.authUser);
-        }
-      })
-    ];
-
-    // number of contacts & exposures columns should be visible only on pages where we have relationships
-    // for cases without relationships we don't need these columns
-    if (this.appliedListFilter !== Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS) {
-      this.tableColumns.push(
-        new VisibleColumnModel({
-          field: 'numberOfContacts',
-          label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS',
-          visible: false
-        }),
-        new VisibleColumnModel({
-          field: 'numberOfExposures',
-          label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
-          visible: false
-        })
-      );
-    }
-
-    // rest of columns :)
-    this.tableColumns.push(
-      new VisibleColumnModel({
-        field: 'deleted',
-        label: 'LNG_EVENT_FIELD_LABEL_DELETED'
-      }),
-      new VisibleColumnModel({
-        field: 'createdBy',
-        label: 'LNG_EVENT_FIELD_LABEL_CREATED_BY',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'createdAt',
-        label: 'LNG_EVENT_FIELD_LABEL_CREATED_AT',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'updatedBy',
-        label: 'LNG_EVENT_FIELD_LABEL_UPDATED_BY',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'updatedAt',
-        label: 'LNG_EVENT_FIELD_LABEL_UPDATED_AT',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'location',
-        label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'address.addressLine1',
-        label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'address.city',
-        label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'address.geoLocation.lat',
-        label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'address.geoLocation.lng',
-        label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'address.postalCode',
-        label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'address.geoLocationAccurate',
-        label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
-        visible: false
-      })
-    );
+    // this.tableColumns = [
+    //   new VisibleColumnModel({
+    //     field: 'checkbox',
+    //     required: true,
+    //     excludeFromSave: true
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'name',
+    //     label: 'LNG_EVENT_FIELD_LABEL_NAME'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'date',
+    //     label: 'LNG_EVENT_FIELD_LABEL_DATE'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'description',
+    //     label: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'phoneNumber',
+    //     label: 'LNG_EVENT_FIELD_LABEL_PHONE_NUMBER',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'address.emailAddress',
+    //     label: 'LNG_EVENT_FIELD_LABEL_EMAIL',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'responsibleUserId',
+    //     label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+    //     visible: false,
+    //     excludeFromDisplay: (): boolean => {
+    //       return !UserModel.canList(this.authUser);
+    //     }
+    //   })
+    // ];
+    //
+    // // number of contacts & exposures columns should be visible only on pages where we have relationships
+    // // for cases without relationships we don't need these columns
+    // if (this.appliedListFilter !== Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS) {
+    //   this.tableColumns.push(
+    //     new VisibleColumnModel({
+    //       field: 'numberOfContacts',
+    //       label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS',
+    //       visible: false
+    //     }),
+    //     new VisibleColumnModel({
+    //       field: 'numberOfExposures',
+    //       label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+    //       visible: false
+    //     })
+    //   );
+    // }
+    //
+    // // rest of columns :)
+    // this.tableColumns.push(
+    //   new VisibleColumnModel({
+    //     field: 'deleted',
+    //     label: 'LNG_EVENT_FIELD_LABEL_DELETED'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'createdBy',
+    //     label: 'LNG_EVENT_FIELD_LABEL_CREATED_BY',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'createdAt',
+    //     label: 'LNG_EVENT_FIELD_LABEL_CREATED_AT',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'updatedBy',
+    //     label: 'LNG_EVENT_FIELD_LABEL_UPDATED_BY',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'updatedAt',
+    //     label: 'LNG_EVENT_FIELD_LABEL_UPDATED_AT',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'location',
+    //     label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'address.addressLine1',
+    //     label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'address.city',
+    //     label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'address.geoLocation.lat',
+    //     label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'address.geoLocation.lng',
+    //     label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'address.postalCode',
+    //     label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'address.geoLocationAccurate',
+    //     label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
+    //     visible: false
+    //   })
+    // );
   }
 
   /**

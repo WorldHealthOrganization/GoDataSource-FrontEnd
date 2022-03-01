@@ -10,7 +10,6 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { DialogAnswer, DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { CotSnapshotModel } from '../../../../core/models/cot-snapshot.model';
-import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
 import { catchError, share, tap } from 'rxjs/operators';
@@ -141,32 +140,32 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent imple
      */
   initializeSideTableColumns() {
     // default table columns
-    this.tableColumns = [
-      new VisibleColumnModel({
-        field: 'name',
-        label: 'LNG_ASYNC_COT_FIELD_LABEL_NAME'
-      }),
-      new VisibleColumnModel({
-        field: 'startDate',
-        label: 'LNG_ASYNC_COT_FIELD_LABEL_START_DATE'
-      }),
-      new VisibleColumnModel({
-        field: 'endDate',
-        label: 'LNG_ASYNC_COT_FIELD_LABEL_END_DATE'
-      }),
-      new VisibleColumnModel({
-        field: 'status',
-        label: 'LNG_ASYNC_COT_FIELD_LABEL_STATUS'
-      }),
-      new VisibleColumnModel({
-        field: 'fileSize',
-        label: 'LNG_ASYNC_COT_FIELD_LABEL_FILE_SIZE'
-      }),
-      new VisibleColumnModel({
-        field: 'error',
-        label: 'LNG_ASYNC_COT_FIELD_LABEL_ERROR'
-      })
-    ];
+    // this.tableColumns = [
+    //   new VisibleColumnModel({
+    //     field: 'name',
+    //     label: 'LNG_ASYNC_COT_FIELD_LABEL_NAME'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'startDate',
+    //     label: 'LNG_ASYNC_COT_FIELD_LABEL_START_DATE'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'endDate',
+    //     label: 'LNG_ASYNC_COT_FIELD_LABEL_END_DATE'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'status',
+    //     label: 'LNG_ASYNC_COT_FIELD_LABEL_STATUS'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'fileSize',
+    //     label: 'LNG_ASYNC_COT_FIELD_LABEL_FILE_SIZE'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'error',
+    //     label: 'LNG_ASYNC_COT_FIELD_LABEL_ERROR'
+    //   })
+    // ];
   }
 
   /**

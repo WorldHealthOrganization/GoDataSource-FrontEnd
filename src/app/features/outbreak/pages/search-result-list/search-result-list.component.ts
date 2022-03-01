@@ -17,7 +17,6 @@ import {
   share,
   tap
 } from 'rxjs/operators';
-import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { HoverRowAction } from '../../../../shared/components';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
@@ -183,20 +182,20 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
      */
   initializeSideTableColumns() {
     // default table columns
-    this.tableColumns = [
-      new VisibleColumnModel({
-        field: 'id',
-        label: 'LNG_ENTITY_FIELD_LABEL_ID'
-      }),
-      new VisibleColumnModel({
-        field: 'visualId',
-        label: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID'
-      }),
-      new VisibleColumnModel({
-        field: 'name',
-        label: 'LNG_ENTITY_FIELD_LABEL_NAME'
-      })
-    ];
+    // this.tableColumns = [
+    //   new VisibleColumnModel({
+    //     field: 'id',
+    //     label: 'LNG_ENTITY_FIELD_LABEL_ID'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'visualId',
+    //     label: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'name',
+    //     label: 'LNG_ENTITY_FIELD_LABEL_NAME'
+    //   })
+    // ];
   }
 
   /**

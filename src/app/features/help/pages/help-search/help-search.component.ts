@@ -5,7 +5,6 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { Router } from '@angular/router';
-import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
@@ -98,16 +97,16 @@ export class HelpSearchComponent extends ListComponent implements OnInit, OnDest
      */
   initializeSideTableColumns() {
     // default table columns
-    this.tableColumns = [
-      new VisibleColumnModel({
-        field: 'title',
-        label: 'LNG_HELP_ITEM_FIELD_LABEL_TITLE'
-      }),
-      new VisibleColumnModel({
-        field: 'categoryId',
-        label: 'LNG_HELP_ITEM_FIELD_LABEL_CATEGORY'
-      })
-    ];
+    // this.tableColumns = [
+    //   new VisibleColumnModel({
+    //     field: 'title',
+    //     label: 'LNG_HELP_ITEM_FIELD_LABEL_TITLE'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'categoryId',
+    //     label: 'LNG_HELP_ITEM_FIELD_LABEL_CATEGORY'
+    //   })
+    // ];
   }
 
   /**

@@ -4,7 +4,6 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { Observable } from 'rxjs';
@@ -160,40 +159,40 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
      */
   initializeSideTableColumns() {
     // default table columns
-    this.tableColumns = [
-      new VisibleColumnModel({
-        field: 'name',
-        label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_NAME'
-      }),
-      new VisibleColumnModel({
-        field: 'description',
-        label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_DESCRIPTION'
-      }),
-      new VisibleColumnModel({
-        field: 'physicalDeviceId',
-        label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_PHYSICAL_DEVICE_ID'
-      }),
-      new VisibleColumnModel({
-        field: 'manufacturer',
-        label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_MANUFACTURER'
-      }),
-      new VisibleColumnModel({
-        field: 'model',
-        label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_MODEL'
-      }),
-      new VisibleColumnModel({
-        field: 'os',
-        label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_OPERATING_SYSTEM'
-      }),
-      new VisibleColumnModel({
-        field: 'status',
-        label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_STATUS'
-      }),
-      new VisibleColumnModel({
-        field: 'lastSeen',
-        label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_LAST_SEEN'
-      })
-    ];
+    // this.tableColumns = [
+    //   new VisibleColumnModel({
+    //     field: 'name',
+    //     label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_NAME'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'description',
+    //     label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_DESCRIPTION'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'physicalDeviceId',
+    //     label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_PHYSICAL_DEVICE_ID'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'manufacturer',
+    //     label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_MANUFACTURER'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'model',
+    //     label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_MODEL'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'os',
+    //     label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_OPERATING_SYSTEM'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'status',
+    //     label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_STATUS'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'lastSeen',
+    //     label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_LAST_SEEN'
+    //   })
+    // ];
   }
 
   /**

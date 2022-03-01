@@ -20,7 +20,6 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
@@ -170,48 +169,48 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
      */
   initializeSideTableColumns() {
     // default table columns
-    this.tableColumns = [
-      new VisibleColumnModel({
-        field: 'lastName',
-        label: 'LNG_USER_FIELD_LABEL_LAST_NAME'
-      }),
-      new VisibleColumnModel({
-        field: 'firstName',
-        label: 'LNG_USER_FIELD_LABEL_FIRST_NAME'
-      }),
-      new VisibleColumnModel({
-        field: 'email',
-        label: 'LNG_USER_FIELD_LABEL_EMAIL'
-      }),
-      new VisibleColumnModel({
-        field: 'institutionName',
-        label: 'LNG_USER_FIELD_LABEL_INSTITUTION_NAME'
-      }),
-      new VisibleColumnModel({
-        field: 'telephoneNumbers',
-        label: 'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS'
-      }),
-      new VisibleColumnModel({
-        field: 'role',
-        label: 'LNG_USER_FIELD_LABEL_ROLES'
-      }),
-      new VisibleColumnModel({
-        field: 'activeOutbreak',
-        label: 'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK'
-      }),
-      new VisibleColumnModel({
-        field: 'availableOutbreaks',
-        label: 'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS'
-      })
-    ];
-
-    // can see teams ?
-    if (TeamModel.canList(this.authUser)) {
-      this.tableColumns.push(new VisibleColumnModel({
-        field: 'teams',
-        label: 'LNG_USER_FIELD_LABEL_TEAMS'
-      }));
-    }
+    // this.tableColumns = [
+    //   new VisibleColumnModel({
+    //     field: 'lastName',
+    //     label: 'LNG_USER_FIELD_LABEL_LAST_NAME'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'firstName',
+    //     label: 'LNG_USER_FIELD_LABEL_FIRST_NAME'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'email',
+    //     label: 'LNG_USER_FIELD_LABEL_EMAIL'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'institutionName',
+    //     label: 'LNG_USER_FIELD_LABEL_INSTITUTION_NAME'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'telephoneNumbers',
+    //     label: 'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'role',
+    //     label: 'LNG_USER_FIELD_LABEL_ROLES'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'activeOutbreak',
+    //     label: 'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'availableOutbreaks',
+    //     label: 'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS'
+    //   })
+    // ];
+    //
+    // // can see teams ?
+    // if (TeamModel.canList(this.authUser)) {
+    //   this.tableColumns.push(new VisibleColumnModel({
+    //     field: 'teams',
+    //     label: 'LNG_USER_FIELD_LABEL_TEAMS'
+    //   }));
+    // }
   }
 
   /**

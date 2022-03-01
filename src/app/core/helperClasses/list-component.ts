@@ -13,7 +13,6 @@ import { DebounceTimeCaller } from './debounce-time-caller';
 import { MetricContactsSeenEachDays } from '../models/metrics/metric-contacts-seen-each-days.model';
 import { FormCheckboxComponent } from '../../shared/xt-forms/components/form-checkbox/form-checkbox.component';
 import { ContactFollowedUp, MetricContactsWithSuccessfulFollowUp } from '../models/metrics/metric.contacts-with-success-follow-up.model';
-import { VisibleColumnModel } from '../../shared/components/side-columns/model';
 import {
   AddressModel,
   AddressType
@@ -28,6 +27,7 @@ import { SavedFilterData } from '../models/saved-filters.model';
 import * as LzString from 'lz-string';
 import { LoadingDialogModel } from '../../shared/components';
 import { DialogExportProgressAnswer } from '../services/helper/dialog.service';
+import { IV2Column } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 
 /**
  * Used by caching filter
@@ -109,9 +109,9 @@ export abstract class ListComponent implements OnDestroy {
   @ViewChildren('listCheckedIndividual') protected listCheckedIndividualInputs: QueryList<FormCheckboxComponent>;
 
   /**
-     * List table columns
-     */
-  tableColumns: VisibleColumnModel[] = [];
+   * List table columns
+   */
+  tableColumns: IV2Column[] = [];
 
   /**
      * List table visible columns

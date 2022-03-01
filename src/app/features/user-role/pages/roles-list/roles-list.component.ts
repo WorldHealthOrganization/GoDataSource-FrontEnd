@@ -14,7 +14,6 @@ import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
-import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
@@ -160,24 +159,24 @@ export class RolesListComponent extends ListComponent implements OnInit, OnDestr
      */
   initializeSideTableColumns() {
     // default table columns
-    this.tableColumns = [
-      new VisibleColumnModel({
-        field: 'name',
-        label: 'LNG_USER_ROLE_FIELD_LABEL_NAME'
-      }),
-      new VisibleColumnModel({
-        field: 'description',
-        label: 'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION'
-      }),
-      new VisibleColumnModel({
-        field: 'users',
-        label: 'LNG_USER_ROLE_FIELD_LABEL_USERS'
-      }),
-      new VisibleColumnModel({
-        field: 'permissions',
-        label: 'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS'
-      })
-    ];
+    // this.tableColumns = [
+    //   new VisibleColumnModel({
+    //     field: 'name',
+    //     label: 'LNG_USER_ROLE_FIELD_LABEL_NAME'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'description',
+    //     label: 'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'users',
+    //     label: 'LNG_USER_ROLE_FIELD_LABEL_USERS'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'permissions',
+    //     label: 'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS'
+    //   })
+    // ];
   }
 
   /**

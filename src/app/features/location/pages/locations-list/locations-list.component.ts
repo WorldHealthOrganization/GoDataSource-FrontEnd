@@ -19,7 +19,6 @@ import { FormLocationDropdownComponent, LocationAutoItem } from '../../../../sha
 import { catchError, share, tap } from 'rxjs/operators';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder';
 import { throwError } from 'rxjs';
 import { moment } from '../../../../core/helperClasses/x-moment';
@@ -213,56 +212,56 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
      */
   initializeSideTableColumns() {
     // default table columns
-    this.tableColumns = [
-      new VisibleColumnModel({
-        field: 'name',
-        label: 'LNG_LOCATION_FIELD_LABEL_NAME'
-      }),
-      new VisibleColumnModel({
-        field: 'synonyms',
-        label: 'LNG_LOCATION_FIELD_LABEL_SYNONYMS'
-      }),
-      new VisibleColumnModel({
-        field: 'identifiers',
-        label: 'LNG_LOCATION_FIELD_LABEL_IDENTIFIERS'
-      }),
-      new VisibleColumnModel({
-        field: 'latLng',
-        label: 'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION'
-      }),
-      new VisibleColumnModel({
-        field: 'active',
-        label: 'LNG_LOCATION_FIELD_LABEL_ACTIVE'
-      }),
-      new VisibleColumnModel({
-        field: 'populationDensity',
-        label: 'LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY'
-      }),
-      new VisibleColumnModel({
-        field: 'geographicalLevelId',
-        label: 'LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL'
-      }),
-      new VisibleColumnModel({
-        field: 'createdBy',
-        label: 'LNG_LOCATION_FIELD_LABEL_CREATED_BY',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'createdAt',
-        label: 'LNG_LOCATION_FIELD_LABEL_CREATED_AT',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'updatedBy',
-        label: 'LNG_LOCATION_FIELD_LABEL_UPDATED_BY',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'updatedAt',
-        label: 'LNG_LOCATION_FIELD_LABEL_UPDATED_AT',
-        visible: false
-      })
-    ];
+    // this.tableColumns = [
+    //   new VisibleColumnModel({
+    //     field: 'name',
+    //     label: 'LNG_LOCATION_FIELD_LABEL_NAME'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'synonyms',
+    //     label: 'LNG_LOCATION_FIELD_LABEL_SYNONYMS'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'identifiers',
+    //     label: 'LNG_LOCATION_FIELD_LABEL_IDENTIFIERS'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'latLng',
+    //     label: 'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'active',
+    //     label: 'LNG_LOCATION_FIELD_LABEL_ACTIVE'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'populationDensity',
+    //     label: 'LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'geographicalLevelId',
+    //     label: 'LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'createdBy',
+    //     label: 'LNG_LOCATION_FIELD_LABEL_CREATED_BY',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'createdAt',
+    //     label: 'LNG_LOCATION_FIELD_LABEL_CREATED_AT',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'updatedBy',
+    //     label: 'LNG_LOCATION_FIELD_LABEL_UPDATED_BY',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'updatedAt',
+    //     label: 'LNG_LOCATION_FIELD_LABEL_UPDATED_AT',
+    //     visible: false
+    //   })
+    // ];
   }
 
   /**

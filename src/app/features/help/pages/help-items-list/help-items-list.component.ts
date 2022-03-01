@@ -13,7 +13,6 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { ActivatedRoute } from '@angular/router';
-import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
@@ -204,28 +203,28 @@ export class HelpItemsListComponent extends ListComponent implements OnInit, OnD
      */
   initializeSideTableColumns() {
     // default table columns
-    this.tableColumns = [
-      new VisibleColumnModel({
-        field: 'title',
-        label: 'LNG_HELP_ITEM_FIELD_LABEL_TITLE'
-      }),
-      new VisibleColumnModel({
-        field: 'comment',
-        label: 'LNG_HELP_ITEM_FIELD_LABEL_COMMENT'
-      }),
-      new VisibleColumnModel({
-        field: 'approved',
-        label: 'LNG_HELP_ITEM_FIELD_LABEL_APPROVED'
-      }),
-      new VisibleColumnModel({
-        field: 'approvedBy',
-        label: 'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_BY'
-      }),
-      new VisibleColumnModel({
-        field: 'approvedDate',
-        label: 'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_DATE'
-      })
-    ];
+    // this.tableColumns = [
+    //   new VisibleColumnModel({
+    //     field: 'title',
+    //     label: 'LNG_HELP_ITEM_FIELD_LABEL_TITLE'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'comment',
+    //     label: 'LNG_HELP_ITEM_FIELD_LABEL_COMMENT'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'approved',
+    //     label: 'LNG_HELP_ITEM_FIELD_LABEL_APPROVED'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'approvedBy',
+    //     label: 'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_BY'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'approvedDate',
+    //     label: 'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_DATE'
+    //   })
+    // ];
   }
 
   /**

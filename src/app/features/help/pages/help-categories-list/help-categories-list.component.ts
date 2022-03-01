@@ -13,7 +13,6 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { Router } from '@angular/router';
-import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -153,20 +152,20 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
      */
   initializeSideTableColumns() {
     // default table columns
-    this.tableColumns = [
-      new VisibleColumnModel({
-        field: 'name',
-        label: 'LNG_HELP_CATEGORY_FIELD_LABEL_NAME'
-      }),
-      new VisibleColumnModel({
-        field: 'description',
-        label: 'LNG_HELP_CATEGORY_FIELD_LABEL_DESCRIPTION'
-      }),
-      new VisibleColumnModel({
-        field: 'order',
-        label: 'LNG_HELP_CATEGORY_FIELD_LABEL_ORDER'
-      })
-    ];
+    // this.tableColumns = [
+    //   new VisibleColumnModel({
+    //     field: 'name',
+    //     label: 'LNG_HELP_CATEGORY_FIELD_LABEL_NAME'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'description',
+    //     label: 'LNG_HELP_CATEGORY_FIELD_LABEL_DESCRIPTION'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'order',
+    //     label: 'LNG_HELP_CATEGORY_FIELD_LABEL_ORDER'
+    //   })
+    // ];
   }
 
   /**

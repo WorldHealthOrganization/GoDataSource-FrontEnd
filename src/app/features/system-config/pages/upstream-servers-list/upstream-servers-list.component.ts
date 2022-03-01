@@ -8,7 +8,6 @@ import { SystemSettingsModel } from '../../../../core/models/system-settings.mod
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { SystemUpstreamServerModel } from '../../../../core/models/system-upstream-server.model';
 import * as _ from 'lodash';
-import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { DialogAnswer, DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { SystemSyncDataService } from '../../../../core/services/data/system-sync.data.service';
@@ -160,40 +159,40 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
      */
   initializeSideTableColumns() {
     // default table columns
-    this.tableColumns = [
-      new VisibleColumnModel({
-        field: 'name',
-        label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_NAME'
-      }),
-      new VisibleColumnModel({
-        field: 'url',
-        label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_URL'
-      }),
-      new VisibleColumnModel({
-        field: 'credentials',
-        label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_CREDENTIALS'
-      }),
-      new VisibleColumnModel({
-        field: 'description',
-        label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_DESCRIPTION'
-      }),
-      new VisibleColumnModel({
-        field: 'timeout',
-        label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_TIMEOUT'
-      }),
-      new VisibleColumnModel({
-        field: 'syncInterval',
-        label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_INTERVAL'
-      }),
-      new VisibleColumnModel({
-        field: 'syncOnEveryChange',
-        label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ON_EVERY_CHANGE'
-      }),
-      new VisibleColumnModel({
-        field: 'syncEnabled',
-        label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ENABLED'
-      })
-    ];
+    // this.tableColumns = [
+    //   new VisibleColumnModel({
+    //     field: 'name',
+    //     label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_NAME'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'url',
+    //     label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_URL'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'credentials',
+    //     label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_CREDENTIALS'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'description',
+    //     label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_DESCRIPTION'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'timeout',
+    //     label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_TIMEOUT'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'syncInterval',
+    //     label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_INTERVAL'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'syncOnEveryChange',
+    //     label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ON_EVERY_CHANGE'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'syncEnabled',
+    //     label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ENABLED'
+    //   })
+    // ];
   }
 
   /**

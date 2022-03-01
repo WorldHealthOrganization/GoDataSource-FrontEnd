@@ -1,0 +1,118 @@
+import { V2RowAction } from './action.model';
+
+/**
+ * Column pinned
+ */
+export enum IV2ColumnPinned {
+  LEFT = 'left',
+  RIGHT = 'right'
+}
+
+/**
+ * Format value
+ */
+export interface IV2ColumnBasicFormatType {
+  // format
+  type: string | ((item: any) => string);
+}
+
+/**
+ * Format value
+ */
+export interface IV2ColumnBasicFormat extends IV2ColumnBasicFormatType {
+  // optional
+  field?: string;
+  value?: (item: any) => any;
+}
+
+/**
+ * Basic column
+ */
+export interface IV2ColumnBasic {
+  // required
+  field: string;
+  label: string;
+
+  // optional
+  format?: IV2ColumnBasicFormat;
+  notVisible?: boolean;
+  exclude?: (IV2Column) => boolean;
+  pinned?: IV2ColumnPinned | boolean;
+  resizable?: boolean;
+  link?: (any) => string;
+}
+
+/**
+ * Format
+ */
+export enum V2ColumnFormat {
+  AGE,
+  DATE,
+  DATETIME,
+  BOOLEAN,
+  ACTIONS
+}
+
+/**
+ * Age column
+ */
+interface IV2ColumnAge extends Omit<IV2ColumnBasic, 'format'> {
+  // required
+  format: Omit<IV2ColumnBasicFormat, 'type'> & {
+    type: V2ColumnFormat.AGE
+  };
+}
+
+/**
+ * Date column
+ */
+interface IV2ColumnDate extends Omit<IV2ColumnBasic, 'format'> {
+  // required
+  format: Omit<IV2ColumnBasicFormat, 'type'> & {
+    type: V2ColumnFormat.DATE
+  };
+}
+
+/**
+ * Datetime column
+ */
+interface IV2ColumnDatetime extends Omit<IV2ColumnBasic, 'format'> {
+  // required
+  format: Omit<IV2ColumnBasicFormat, 'type'> & {
+    type: V2ColumnFormat.DATETIME
+  };
+}
+
+/**
+ * Boolean column
+ */
+interface IV2ColumnBoolean extends Omit<IV2ColumnBasic, 'format'> {
+  // required
+  format: Omit<IV2ColumnBasicFormat, 'type'> & {
+    type: V2ColumnFormat.BOOLEAN
+  };
+}
+
+/**
+ * Action column
+ */
+interface IV2ColumnAction {
+  // required
+  format: Omit<IV2ColumnBasicFormatType, 'type'> & {
+    type: V2ColumnFormat.ACTIONS
+  };
+  field: string;
+  label: string;
+  actions: V2RowAction[];
+
+  // optional
+  notVisible?: boolean;
+  exclude?: (IV2Column) => boolean;
+  pinned?: IV2ColumnPinned | boolean;
+  resizable?: boolean;
+}
+
+/**
+ * Column
+ */
+export type IV2Column = IV2ColumnBasic | IV2ColumnAge | IV2ColumnDate | IV2ColumnDatetime | IV2ColumnBoolean | IV2ColumnAction;

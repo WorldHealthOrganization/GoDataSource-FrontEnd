@@ -8,7 +8,6 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import * as _ from 'lodash';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
@@ -399,136 +398,136 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
      */
   initializeSideTableColumns() {
     // default table columns
-    this.tableColumns = [
-      new VisibleColumnModel({
-        field: 'checkbox',
-        required: true,
-        excludeFromSave: true
-      }),
-      new VisibleColumnModel({
-        field: 'person.visualId',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON_ID'
-      }),
-      new VisibleColumnModel({
-        field: 'person.lastName',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_LAST_NAME'
-      }),
-      new VisibleColumnModel({
-        field: 'person.firstName',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_FIRST_NAME'
-      }),
-      new VisibleColumnModel({
-        field: 'person.classification',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION'
-      }),
-      new VisibleColumnModel({
-        field: 'sampleIdentifier',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID'
-      }),
-      new VisibleColumnModel({
-        field: 'dateSampleTaken',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN'
-      }),
-      new VisibleColumnModel({
-        field: 'dateSampleDelivered',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED'
-      }),
-      new VisibleColumnModel({
-        field: 'dateOfResult',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT'
-      }),
-      new VisibleColumnModel({
-        field: 'labName',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME'
-      }),
-      new VisibleColumnModel({
-        field: 'sampleType',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE'
-      }),
-      new VisibleColumnModel({
-        field: 'testType',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE'
-      }),
-      new VisibleColumnModel({
-        field: 'result',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT'
-      }),
-      new VisibleColumnModel({
-        field: 'status',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS'
-      }),
-      new VisibleColumnModel({
-        field: 'testedFor',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR'
-      }),
-      new VisibleColumnModel({
-        field: 'sequence.hasSequence',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'sequence.dateSampleSent',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'sequence.labId',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'sequence.dateResult',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'sequence.resultId',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'sequence.noSequenceReason',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'deleted',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'createdBy',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_BY',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'createdAt',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_AT',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'updatedBy',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_BY',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'updatedAt',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_AT',
-        visible: false
-      })
-    ];
-
-    // add to list type only if we're allowed to
-    if (
-      this.selectedOutbreak &&
-            this.selectedOutbreak.isContactLabResultsActive
-    ) {
-      this.tableColumns.push(new VisibleColumnModel({
-        field: 'personType',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_TYPE',
-        visible: false
-      }));
-    }
+    // this.tableColumns = [
+    //   new VisibleColumnModel({
+    //     field: 'checkbox',
+    //     required: true,
+    //     excludeFromSave: true
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'person.visualId',
+    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON_ID'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'person.lastName',
+    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_LAST_NAME'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'person.firstName',
+    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_FIRST_NAME'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'person.classification',
+    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'sampleIdentifier',
+    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'dateSampleTaken',
+    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'dateSampleDelivered',
+    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'dateOfResult',
+    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'labName',
+    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'sampleType',
+    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'testType',
+    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'result',
+    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'status',
+    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'testedFor',
+    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'sequence.hasSequence',
+    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'sequence.dateSampleSent',
+    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'sequence.labId',
+    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'sequence.dateResult',
+    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'sequence.resultId',
+    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'sequence.noSequenceReason',
+    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'deleted',
+    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'createdBy',
+    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_BY',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'createdAt',
+    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_AT',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'updatedBy',
+    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_BY',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'updatedAt',
+    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_AT',
+    //     visible: false
+    //   })
+    // ];
+    //
+    // // add to list type only if we're allowed to
+    // if (
+    //   this.selectedOutbreak &&
+    //         this.selectedOutbreak.isContactLabResultsActive
+    // ) {
+    //   this.tableColumns.push(new VisibleColumnModel({
+    //     field: 'personType',
+    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_TYPE',
+    //     visible: false
+    //   }));
+    // }
   }
   /**
      * Initialize Side Filters
