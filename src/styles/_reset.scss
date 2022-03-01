@@ -37,7 +37,7 @@ body {
 ::-webkit-scrollbar {
   -webkit-appearance: none;
   background-color: rgba(var(--gd-secondary-rgb), 0.15);
-  height: 0;
+  height: 0.8rem;
   width: 0.8rem;
 
   .theme-dark & {
