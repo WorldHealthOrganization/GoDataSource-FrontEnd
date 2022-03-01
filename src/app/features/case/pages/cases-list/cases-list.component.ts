@@ -15,7 +15,7 @@ import { Constants } from '../../../../core/models/constants';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { Router } from '@angular/router';
+import { Params, Router } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -39,6 +39,7 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
 import { AddressModel } from '../../../../core/models/address.model';
 import { ExportFieldsGroupModelNameEnum, IExportFieldsGroupRequired } from '../../../../core/models/export-fields-group.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2RowActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 
 @Component({
   selector: 'app-cases-list',
@@ -933,7 +934,132 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: V2ColumnFormat.ACTIONS
         },
-        actions: []
+        actions: [
+          // View Case
+          {
+            type: V2RowActionType.ICON,
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_CASE',
+            link: (data: CaseModel): string[] => {
+              return ['/cases', data.id, 'view'];
+            },
+            visible: (item: CaseModel): boolean => {
+              return !item.deleted &&
+                CaseModel.canView(this.authUser);
+            }
+          },
+
+          // Modify Case
+          {
+            type: V2RowActionType.ICON,
+            icon: 'edit',
+            iconTooltip: 'LNG_PAGE_LIST_CASES_ACTION_MODIFY_CASE',
+            link: (item: CaseModel): string[] => {
+              return ['/cases', item.id, 'modify'];
+            },
+            visible: (item: CaseModel): boolean => {
+              return !item.deleted &&
+                this.authUser &&
+                this.selectedOutbreak &&
+                this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                CaseModel.canModify(this.authUser);
+            }
+          },
+
+          // Other actions
+          {
+            type: V2RowActionType.MENU,
+            icon: 'more_horiz',
+            menuOptions: [
+              // Delete Case
+              {
+                label: 'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE',
+                cssClasses: 'gd-list-table-actions-action-menu-warning',
+                click: (item: CaseModel): void => {
+                  this.deleteCase(item);
+                },
+                visible: (item: CaseModel): boolean => {
+                  return !item.deleted &&
+                    this.authUser &&
+                    this.selectedOutbreak &&
+                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    CaseModel.canDelete(this.authUser);
+                }
+              },
+
+              // Divider
+              {
+                visible: (item: CaseModel): boolean => {
+                  // visible only if at least one of the first two items is visible
+                  return !item.deleted &&
+                    this.authUser &&
+                    this.selectedOutbreak &&
+                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    CaseModel.canDelete(this.authUser);
+                }
+              },
+
+              // Convert Case To Contact
+              {
+                label: 'LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT',
+                cssClasses: 'mat-menu-item-delete',
+                click: (item: CaseModel): void => {
+                  this.convertCaseToContact(item);
+                },
+                // linkQueryParams: (item: CaseModel): Params => {
+                //   return {
+                //     entityType: EntityType.CASE,
+                //     entityId: item.id
+                //   };
+                // },
+                // link: (): string[] => {
+                //   return ['aaa'];
+                // },
+                visible: (item: CaseModel): boolean => {
+                  return !item.deleted &&
+                    this.authUser &&
+                    this.selectedOutbreak &&
+                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    CaseModel.canConvertToContact(this.authUser);
+                }
+              },
+
+              // Divider
+              {
+                visible: (item: CaseModel): boolean => {
+                  // visible only if at least one of the first two items is visible
+                  return !item.deleted &&
+                    this.authUser &&
+                    this.selectedOutbreak &&
+                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    CaseModel.canConvertToContact(this.authUser);
+                }
+              },
+
+              // Add Contact to Case
+              {
+                label: 'LNG_PAGE_ACTION_ADD_CONTACT',
+                link: (): string[] => {
+                  return ['/contacts', 'create'];
+                },
+                linkQueryParams: (item: CaseModel): Params => {
+                  return {
+                    entityType: EntityType.CASE,
+                    entityId: item.id
+                  };
+                },
+                visible: (item: CaseModel): boolean => {
+                  return !item.deleted &&
+                    this.authUser &&
+                    this.selectedOutbreak &&
+                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    ContactModel.canCreate(this.authUser) &&
+                    CaseModel.canCreateContact(this.authUser);
+                }
+              }
+            ]
+          }
+        ]
       }
     );
   }

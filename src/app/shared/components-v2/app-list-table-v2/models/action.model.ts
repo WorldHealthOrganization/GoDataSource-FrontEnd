@@ -1,9 +1,35 @@
+import { Params } from '@angular/router';
+
 /**
  * Action Type
  */
-enum V2RowActionType {
+export enum V2RowActionType {
   ICON = 'icon',
   MENU = 'menu'
+}
+
+/**
+ * Click
+ */
+interface IV2RowActionClick {
+  // required
+  click: (data: any) => void;
+
+  // make sure we don't use these together because IV2RowActionIcon & (IV2RowActionClick | IV2RowActionLink) isn't working properly
+  link?: never;
+  linkQueryParams?: never;
+}
+
+/**
+ * Link
+ */
+interface IV2RowActionLink {
+  // required
+  link: (data: any) => string[];
+
+  // make sure we don't use these together because IV2RowActionIcon & (IV2RowActionClick | IV2RowActionLink) isn't working properly
+  click?: never;
+  linkQueryParams?: (data: any) => Params;
 }
 
 /**
@@ -13,12 +39,11 @@ interface IV2RowActionIcon {
   // type
   type: V2RowActionType.ICON;
   icon: string;
-  click: (item: any, handler: any, index: any) => void;
 
   // optional
   iconTooltip?: string;
-  visible?: (item: any, index: any) => boolean;
-  disable?: (item: any, index: any) => boolean;
+  visible?: (data: any) => boolean;
+  disable?: (data: any) => boolean;
 }
 
 /**
@@ -27,11 +52,11 @@ interface IV2RowActionIcon {
 interface IV2RowActionMenuOption {
   // menu option
   label: string;
-  click: (item: any, handler: any, index: any) => void;
 
   // optional
-  visible?: (item: any, index: any) => boolean;
-  disable?: (item: any, index: any) => boolean;
+  cssClasses?: string;
+  visible?: (data: any) => boolean;
+  disable?: (data: any) => boolean;
 }
 
 /**
@@ -39,7 +64,7 @@ interface IV2RowActionMenuOption {
  */
 interface IV2RowActionMenuDivider {
   // optional
-  visible?: (item: any, index: any) => boolean;
+  visible?: (data: any) => boolean;
 }
 
 /**
@@ -49,15 +74,15 @@ interface IV2RowActionMenu {
   // type
   type: V2RowActionType.MENU;
   icon: string;
-  menuOptions: (IV2RowActionMenuOption | IV2RowActionMenuDivider)[];
+  menuOptions: ((IV2RowActionMenuOption & (IV2RowActionClick | IV2RowActionLink)) | IV2RowActionMenuDivider)[];
 
   // optional
   iconTooltip?: string;
-  visible?: (item: any, index: any) => boolean;
-  disable?: (item: any, index: any) => boolean;
+  visible?: (data: any) => boolean;
+  disable?: (item: any) => boolean;
 }
 
 /**
  * Action
  */
-export type V2RowAction = IV2RowActionIcon | IV2RowActionMenu;
+export type V2RowAction = (IV2RowActionIcon & (IV2RowActionClick | IV2RowActionLink)) | IV2RowActionMenu;

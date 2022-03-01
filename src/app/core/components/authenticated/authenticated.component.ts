@@ -232,8 +232,8 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Component destroyed
-     */
+   * Component destroyed
+   */
   ngOnDestroy(): void {
     /*
     // hide loading in case it is still visible

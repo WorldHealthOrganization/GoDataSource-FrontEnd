@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inpu
 import { BaseModel } from '../../../core/models/base.model';
 import { Observable } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { ColDef, ColumnApi, ValueFormatterParams } from '@ag-grid-community/core';
+import { ColumnApi, ValueFormatterParams } from '@ag-grid-community/core';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { TranslateService } from '@ngx-translate/core';
 import * as _ from 'lodash';
@@ -11,15 +11,9 @@ import { moment } from '../../../core/helperClasses/x-moment';
 import { Constants } from '../../../core/models/constants';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-import { IV2Column, IV2ColumnBasic, IV2ColumnBasicFormat, IV2ColumnPinned, V2ColumnFormat } from './models/column.model';
-
-/**
- * Extended AG-Grid column definition
- */
-interface IExtendedColDef extends ColDef {
-  // column definition
-  columnDefinition?: IV2Column;
-}
+import { IV2Column, IV2ColumnAction, IV2ColumnBasic, IV2ColumnBasicFormat, IV2ColumnPinned, V2ColumnFormat } from './models/column.model';
+import { AppListTableV2ActionsComponent } from './components/actions/app-list-table-v2-actions.component';
+import { IExtendedColDef } from './models/extended-column.model';
 
 /**
  * Component
@@ -286,7 +280,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
           // ACTIONS
           case V2ColumnFormat.ACTIONS:
-            return 'qqq';
+
+            // nothing to do here
+            return null;
 
           default:
             throw new Error('V2ColumnFormat: Not supported');
@@ -305,7 +301,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   /**
    * Custom renderer
    */
-  private handleCellRenderer(column: IV2Column): (ValueFormatterParams) => any {
+  private handleCellRenderer(column: IV2Column): any {
     // link ?
     const basicColumn: IV2ColumnBasic = column as IV2ColumnBasic;
     if (basicColumn.link) {
@@ -321,6 +317,15 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           `<a class="gd-list-table-link" href="${this.location.prepareExternalUrl(url)}"><span is-link="${url}">${value}</span><a/>` :
           value;
       };
+    }
+
+    // actions ?
+    const actionColumn: IV2ColumnAction = column as IV2ColumnAction;
+    if (
+      actionColumn.format &&
+      actionColumn.format.type === V2ColumnFormat.ACTIONS
+    ) {
+      return AppListTableV2ActionsComponent;
     }
 
     // nothing to do ?

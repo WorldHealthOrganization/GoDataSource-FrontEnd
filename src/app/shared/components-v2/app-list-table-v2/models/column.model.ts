@@ -96,7 +96,7 @@ interface IV2ColumnBoolean extends Omit<IV2ColumnBasic, 'format'> {
 /**
  * Action column
  */
-interface IV2ColumnAction {
+export interface IV2ColumnAction {
   // required
   format: Omit<IV2ColumnBasicFormatType, 'type'> & {
     type: V2ColumnFormat.ACTIONS
