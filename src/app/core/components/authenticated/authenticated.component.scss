@@ -50,6 +50,26 @@ mat-sidenav-container {
         // Menu
         .gd-body-content-left-content-menu {
           height: calc(100% - var(--gd-top-bar-height));
+          position: relative;
+
+          // Top gradient which appears only when collapsed menu has scrollbar
+          &:before {
+            background: -moz-linear-gradient(top, var(--gd-background) 0%, transparent 100%);
+            background: -webkit-linear-gradient(top, var(--gd-background) 0%, transparent 100%);
+            background: linear-gradient(to bottom, var(--gd-background) 0%, transparent 100%);
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#00ffffff',GradientType=0 );
+            content: '';
+            display: none;
+            height: 1rem;
+            left: 0;
+            position: absolute;
+            top: 0;
+            width: 100%;
+
+            @media screen and (max-height: 950px) {
+              display: block;
+            }
+          }
         }
       }
 
@@ -61,6 +81,12 @@ mat-sidenav-container {
           .gd-body-content-left-content-logo {
             padding-left: 2.4rem;
             padding-right: 2.4rem;
+          }
+
+          .gd-body-content-left-content-menu {
+            &:before {
+              display: none;
+            }
           }
         }
       }
@@ -121,7 +147,7 @@ mat-sidenav-container {
         height: calc(100vh - var(--gd-top-bar-height));
         padding: 4rem;
         overflow-x: hidden;
-        overflow-y: auto;
+        overflow-y: overlay;
       }
     }
   }

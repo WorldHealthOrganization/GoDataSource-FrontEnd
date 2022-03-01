@@ -50,6 +50,13 @@ body {
   @include border-radius(0.4rem);
 }
 
+@-moz-document url-prefix() {
+  * {
+    scrollbar-color: rgba(var(--gd-text-rgb), 0.3) rgba(var(--gd-secondary-rgb), 0.15);
+    scrollbar-width: thin;
+  }
+}
+
 a {
   color: var(--gd-primary);
   cursor: pointer;
@@ -139,7 +146,7 @@ samp {
 }
 
 pre {
-  overflow: auto;
+  overflow: overlay;
 
   > code {
     display: block;

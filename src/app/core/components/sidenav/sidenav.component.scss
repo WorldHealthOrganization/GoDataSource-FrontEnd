@@ -56,7 +56,7 @@ app-sidenav {
   display: block;
   height: calc(100% - var(--gd-version-height));
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: overlay;
   width: 100%;
 
   // Hide menu scrollbar and show it on hover
@@ -75,10 +75,6 @@ app-sidenav {
     }
   }
 
-  &.gd-version-not-visible {
-    height: 100%;
-  }
-
   .gd-main-menu-group-label {
     color: var(--gd-secondary);
     font-size: 1.2rem;
@@ -91,6 +87,18 @@ app-sidenav {
 
     &:first-child {
       margin-top: 1.7rem;
+    }
+  }
+
+  &.gd-version-not-visible {
+    height: calc(100% - 4rem);
+    margin-top: 4rem;
+
+    .gd-main-menu-group-label {
+      &:first-child {
+        height: 0;
+        margin: 0;
+      }
     }
   }
 
