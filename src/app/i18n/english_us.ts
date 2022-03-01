@@ -12,7 +12,8 @@ export const EnglishUsLang = {
     // 'LNG_EXAMPLE_TOKEN': 'Example value'
     'LNG_LAYOUT_MENU_VERSION_LABEL': 'Go.Data version: {{version}} - build {{build}}',
     'LNG_LAYOUT_MENU_MAIN_MENU_LABEL': 'MAIN MENU',
-    'LNG_LAYOUT_MENU_GENERAL_MENU_LABEL': 'GENERAL'
+    'LNG_LAYOUT_MENU_GENERAL_MENU_LABEL': 'GENERAL',
+    'LNG_COMMON_BUTTON_PINNED_COLUMNS_LIST': 'Pinned columns'
 
 
 
