@@ -63,7 +63,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   ];
 
   // click listener
-  clickListener: () => void;
+  private clickListener: () => void;
 
   /**
    * Constructor
@@ -104,6 +104,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         this.router.navigate([event.target.getAttribute('is-link')]);
       }
     );
+
+    // update table size
+    this.onResize();
   }
 
   /**
@@ -134,7 +137,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   /**
    * Retrieve data
    */
-  retrieveData(): void {
+  private retrieveData(): void {
     // nothing to do ?
     if (!this._records$) {
       // reset data
@@ -160,7 +163,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   /**
    * Update column definitions
    */
-  updateColumnDefinitions(): void {
+  private updateColumnDefinitions(): void {
     // nothing to do ?
     if (!this._columns) {
       // reset
@@ -325,5 +328,93 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // #TODO
     this._columns.forEach((col) => col.visible = true);
     this.columns = this._columns;
+  }
+
+  /**
+   * Should update height of table
+   */
+  private onResize(): void {
+    // local variables
+    let margins;
+
+    // determine top part used space
+    let topHeight: number = 0;
+    const top = this.elementRef.nativeElement.querySelector('.gd-list-top');
+    if (top) {
+      // add height
+      topHeight += top.offsetHeight;
+
+      // get top margins
+      margins = getComputedStyle(top);
+      if (margins) {
+        // top margin
+        if (margins.marginTop) {
+          topHeight += parseInt(margins.marginTop, 10);
+        }
+
+        // bottom margin
+        if (margins.marginBottom) {
+          topHeight += parseInt(margins.marginBottom, 10);
+        }
+      }
+    }
+
+    // set table height
+    const table = this.elementRef.nativeElement.querySelector('.gd-list-table');
+    if (table) {
+      // set main table height - mat card
+      table.style.height = `calc(100% - ${topHeight}px)`;
+
+      // determine used space by table header
+      let tableHeaderHeight: number = 0;
+      const tableHeader = table.querySelector('.gd-list-table-header');
+      if (tableHeader) {
+        // add height
+        tableHeaderHeight += tableHeader.offsetHeight;
+
+        // get top margins
+        margins = getComputedStyle(tableHeader);
+        if (margins) {
+          // top margin
+          if (margins.marginTop) {
+            tableHeaderHeight += parseInt(margins.marginTop, 10);
+          }
+
+          // bottom margin
+          if (margins.marginBottom) {
+            tableHeaderHeight += parseInt(margins.marginBottom, 10);
+          }
+        }
+      }
+
+      // determine used space by table header
+      let tableBottomHeight: number = 0;
+      const tableBottom = table.querySelector('.gd-list-table-bottom');
+      if (tableBottom) {
+        // add height
+        tableBottomHeight += tableBottom.offsetHeight;
+
+        // get top margins
+        margins = getComputedStyle(tableBottom);
+        if (margins) {
+          // top margin
+          if (margins.marginTop) {
+            tableBottomHeight += parseInt(margins.marginTop, 10);
+          }
+
+          // bottom margin
+          if (margins.marginBottom) {
+            tableBottomHeight += parseInt(margins.marginBottom, 10);
+          }
+        }
+      }
+
+      // determine table data height
+      const tableData = table.querySelector('.gd-list-table-data');
+      if (tableData) {
+        // set main table data height
+        tableData.style.height = `calc(100% - ${tableHeaderHeight + tableBottomHeight}px)`;
+      }
+    }
   }
 }
