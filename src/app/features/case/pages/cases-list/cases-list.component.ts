@@ -940,8 +940,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             type: V2RowActionType.ICON,
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_CASE',
-            link: (data: CaseModel): string[] => {
-              return ['/cases', data.id, 'view'];
+            action: {
+              link: (data: CaseModel): string[] => {
+                return ['/cases', data.id, 'view'];
+              }
             },
             visible: (item: CaseModel): boolean => {
               return !item.deleted &&
@@ -954,8 +956,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             type: V2RowActionType.ICON,
             icon: 'edit',
             iconTooltip: 'LNG_PAGE_LIST_CASES_ACTION_MODIFY_CASE',
-            link: (item: CaseModel): string[] => {
-              return ['/cases', item.id, 'modify'];
+            action: {
+              link: (item: CaseModel): string[] => {
+                return ['/cases', item.id, 'modify'];
+              },
             },
             visible: (item: CaseModel): boolean => {
               return !item.deleted &&
@@ -975,8 +979,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
               {
                 label: 'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE',
                 cssClasses: 'gd-list-table-actions-action-menu-warning',
-                click: (item: CaseModel): void => {
-                  this.deleteCase(item);
+                action: {
+                  click: (item: CaseModel): void => {
+                    this.deleteCase(item);
+                  },
                 },
                 visible: (item: CaseModel): boolean => {
                   return !item.deleted &&
@@ -1002,19 +1008,12 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
               // Convert Case To Contact
               {
                 label: 'LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT',
-                cssClasses: 'mat-menu-item-delete',
-                click: (item: CaseModel): void => {
-                  this.convertCaseToContact(item);
+                cssClasses: 'gd-list-table-actions-action-menu-warning',
+                action: {
+                  click: (item: CaseModel): void => {
+                    this.convertCaseToContact(item);
+                  }
                 },
-                // linkQueryParams: (item: CaseModel): Params => {
-                //   return {
-                //     entityType: EntityType.CASE,
-                //     entityId: item.id
-                //   };
-                // },
-                // link: (): string[] => {
-                //   return ['aaa'];
-                // },
                 visible: (item: CaseModel): boolean => {
                   return !item.deleted &&
                     this.authUser &&
@@ -1039,14 +1038,16 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
               // Add Contact to Case
               {
                 label: 'LNG_PAGE_ACTION_ADD_CONTACT',
-                link: (): string[] => {
-                  return ['/contacts', 'create'];
-                },
-                linkQueryParams: (item: CaseModel): Params => {
-                  return {
-                    entityType: EntityType.CASE,
-                    entityId: item.id
-                  };
+                action: {
+                  link: (): string[] => {
+                    return ['/contacts', 'create'];
+                  },
+                  linkQueryParams: (item: CaseModel): Params => {
+                    return {
+                      entityType: EntityType.CASE,
+                      entityId: item.id
+                    };
+                  }
                 },
                 visible: (item: CaseModel): boolean => {
                   return !item.deleted &&

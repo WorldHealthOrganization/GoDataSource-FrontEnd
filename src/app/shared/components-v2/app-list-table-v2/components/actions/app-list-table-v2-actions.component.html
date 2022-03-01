@@ -15,16 +15,13 @@
       <a
         *ngIf="action.type === V2RowActionType.ICON; else notIcon"
         class="gd-list-table-actions-action-icon"
-        [routerLink]="action.link && (!action.disable || !action.disable(data)) ? action.link(data) : undefined"
-        [queryParams]="action.linkQueryParams ? action.linkQueryParams(data) : undefined">
-        <button
-          type="button"
-          mat-icon-button
-          [matTooltip]="action.iconTooltip | translate"
-          [disabled]="action.disable && action.disable(data)"
-          (click)="action.click ? action.click(data) : undefined">
-          <mat-icon>{{action.icon}}</mat-icon>
-        </button>
+        mat-icon-button
+        [routerLink]="action.action.link && (!action.disable || !action.disable(data)) ? action.action.link(data) : undefined"
+        [queryParams]="action.action.linkQueryParams ? action.action.linkQueryParams(data) : undefined"
+        [matTooltip]="action.iconTooltip | translate"
+        [disabled]="action.disable && action.disable(data)"
+        (click)="action.action.click ? action.action.click(data) : undefined">
+        <mat-icon>{{action.icon}}</mat-icon>
       </a>
 
       <!-- Not icon - Menu -->
@@ -55,15 +52,11 @@
                 *ngIf="menuOption.label; else divider"
                 mat-menu-item
                 class="gd-list-table-actions-action-menu-button {{menuOption.cssClasses}}"
-                [routerLink]="menuOption.link && (!menuOption.disable || !menuOption.disable(data)) ? menuOption.link(data) : undefined"
-                [queryParams]="action.linkQueryParams ? action.linkQueryParams(data) : undefined">
-                <button
-                  type="button"
-                  mat-icon-button
-                  [disabled]="menuOption.disable && menuOption.disable(data)"
-                  (click)="menuOption.click ? menuOption.click(data) : undefined">
-                  {{menuOption.label | translate}}
-                </button>
+                [routerLink]="menuOption.action.link && (!menuOption.disable || !menuOption.disable(data)) ? menuOption.action.link(data) : undefined"
+                [queryParams]="menuOption.action.linkQueryParams ? menuOption.action.linkQueryParams(data) : undefined"
+                [disabled]="menuOption.disable && menuOption.disable(data)"
+                (click)="menuOption.action.click ? menuOption.action.click(data) : undefined">
+                {{menuOption.label | translate}}
               </a>
 
               <!-- Divider -->

@@ -14,10 +14,6 @@ export enum V2RowActionType {
 interface IV2RowActionClick {
   // required
   click: (data: any) => void;
-
-  // make sure we don't use these together because IV2RowActionIcon & (IV2RowActionClick | IV2RowActionLink) isn't working properly
-  link?: never;
-  linkQueryParams?: never;
 }
 
 /**
@@ -27,8 +23,7 @@ interface IV2RowActionLink {
   // required
   link: (data: any) => string[];
 
-  // make sure we don't use these together because IV2RowActionIcon & (IV2RowActionClick | IV2RowActionLink) isn't working properly
-  click?: never;
+  // optional
   linkQueryParams?: (data: any) => Params;
 }
 
@@ -39,6 +34,7 @@ interface IV2RowActionIcon {
   // type
   type: V2RowActionType.ICON;
   icon: string;
+  action: IV2RowActionClick | IV2RowActionLink;
 
   // optional
   iconTooltip?: string;
@@ -52,6 +48,7 @@ interface IV2RowActionIcon {
 interface IV2RowActionMenuOption {
   // menu option
   label: string;
+  action: IV2RowActionClick | IV2RowActionLink;
 
   // optional
   cssClasses?: string;
@@ -64,6 +61,7 @@ interface IV2RowActionMenuOption {
  */
 interface IV2RowActionMenuDivider {
   // optional
+  label?: never;
   visible?: (data: any) => boolean;
 }
 
@@ -74,7 +72,7 @@ interface IV2RowActionMenu {
   // type
   type: V2RowActionType.MENU;
   icon: string;
-  menuOptions: ((IV2RowActionMenuOption & (IV2RowActionClick | IV2RowActionLink)) | IV2RowActionMenuDivider)[];
+  menuOptions: (IV2RowActionMenuOption | IV2RowActionMenuDivider)[];
 
   // optional
   iconTooltip?: string;
@@ -85,4 +83,4 @@ interface IV2RowActionMenu {
 /**
  * Action
  */
-export type V2RowAction = (IV2RowActionIcon & (IV2RowActionClick | IV2RowActionLink)) | IV2RowActionMenu;
+export type V2RowAction = IV2RowActionIcon | IV2RowActionMenu;
