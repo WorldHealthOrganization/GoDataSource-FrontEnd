@@ -138,6 +138,15 @@
                 <div
                   (mouseenter)="floatingMenuEnter()"
                   (mouseleave)="floatingMenuLeave(levelOneTrigger)">
+
+                  <!-- Floating menu title -->
+                  <div
+                    class="gd-main-menu-option-float-menu-title"
+                    (click)="$event.preventDefault(); $event.stopPropagation(); $event.stopImmediatePropagation();">
+                    {{menuOption.label | translate}}
+                  </div>
+
+                  <!-- Menu options -->
                   <ng-container
                     *ngFor="let menuOptionChild of menuOption.children">
                     <ng-container
