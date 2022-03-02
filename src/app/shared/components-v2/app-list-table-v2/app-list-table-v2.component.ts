@@ -114,7 +114,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     );
 
     // update table size
-    this.onResize();
+    this.resizeTable();
   }
 
   /**
@@ -365,7 +365,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   /**
    * Should update height of table
    */
-  private onResize(): void {
+  resizeTable(): void {
     // local variables
     let margins;
 
