@@ -16,7 +16,7 @@
     <div
       fxFlex
       class="gd-list-top-tile-buttons-title">
-      {{title | translate}}
+      {{pageTitle | translate}}
     </div>
 
     <!-- Buttons -->
@@ -30,6 +30,48 @@
       <!-- Quick actions -->
       <ng-container
         *ngIf="quickActions">
+
+        <!-- Menu -->
+        <!-- IMPORTANT: Menu of type icon isn't supported here -->
+        <button
+          type="button"
+          class="gd-list-top-tile-buttons-button-quick"
+          mat-flat-button
+          [disabled]="quickActions.disable && quickActions.disable(null)"
+          [matMenuTriggerFor]="menu">
+          quick ...
+        </button>
+
+        <!-- Floating menu -->
+        <mat-menu
+          #menu="matMenu"
+          class="gd-list-top-tile-buttons-button-quick-options">
+          <ng-container
+            *ngFor="let menuOption of quickActions.menuOptions">
+            <ng-container
+              *ngIf="!menuOption.visible || menuOption.visible(null)">
+
+              <!-- Child Menu link -->
+              <a
+                *ngIf="menuOption.label; else divider"
+                mat-menu-item
+                class="d-list-top-tile-buttons-button-quick-options-option {{menuOption.cssClasses}}"
+                [routerLink]="menuOption.action.link && (!menuOption.disable || !menuOption.disable(null)) ? menuOption.action.link(null) : undefined"
+                [queryParams]="menuOption.action.linkQueryParams ? menuOption.action.linkQueryParams(null) : undefined"
+                [disabled]="menuOption.disable && menuOption.disable(null)"
+                (click)="menuOption.action.click ? menuOption.action.click(null) : undefined">
+                {{menuOption.label | translate}}
+              </a>
+
+              <!-- Divider -->
+              <ng-template
+                #divider>
+                <mat-divider></mat-divider>
+              </ng-template>
+
+            </ng-container>
+          </ng-container>
+        </mat-menu>
 
       </ng-container>
 
@@ -121,6 +163,7 @@
     rowSelection="multiple"
     suppressRowClickSelection="true"
     suppressPropertyNamesCheck="true"
+    enableCellTextSelection="true"
     (firstDataRendered)="firstDataRendered($event)">
   </ag-grid-angular>
 

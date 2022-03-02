@@ -65,7 +65,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   @Input() breadcrumbs: IV2Breadcrumb[];
 
   // title
-  @Input() title: string;
+  @Input() pageTitle: string;
 
   // quick actions
   @Input() quickActions: IV2RowActionMenuLabel;
