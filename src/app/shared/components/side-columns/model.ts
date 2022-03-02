@@ -13,7 +13,8 @@ export enum VisibleColumnModelFormat {
   AGE,
   DATE,
   DATETIME,
-  BOOLEAN
+  BOOLEAN,
+  ACTIONS
 }
 
 /**
@@ -30,6 +31,7 @@ export class VisibleColumnModel {
   excludeFromSave: boolean = false;
   excludeFromDisplay: (VisibleColumnModel) => boolean;
   pinned: VisibleColumnModelPinned | boolean = false;
+  resizable: boolean = true;
   format: string | VisibleColumnModelFormat | ((item: any) => string);
   formatField: string;
   formatValue: (item: any) => any;
@@ -50,6 +52,7 @@ export class VisibleColumnModel {
     excludeFromSave?: boolean,
     excludeFromDisplay?: (VisibleColumnModel) => boolean,
     pinned?: VisibleColumnModelPinned | boolean,
+    resizable?: boolean,
     format?: string | VisibleColumnModelFormat | ((item: any) => string),
     formatField?: string,
     formatValue?: (item: any) => any,

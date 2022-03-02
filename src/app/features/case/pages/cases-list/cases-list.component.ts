@@ -15,7 +15,7 @@ import { Constants } from '../../../../core/models/constants';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { Router } from '@angular/router';
+import { Params, Router } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -23,7 +23,6 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import * as _ from 'lodash';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { VisibleColumnModel, VisibleColumnModelFormat, VisibleColumnModelPinned } from '../../../../shared/components/side-columns/model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
@@ -39,6 +38,8 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { AddressModel } from '../../../../core/models/address.model';
 import { ExportFieldsGroupModelNameEnum, IExportFieldsGroupRequired } from '../../../../core/models/export-fields-group.model';
+import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2RowActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 
 @Component({
   selector: 'app-cases-list',
@@ -674,140 +675,172 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       //   required: true,
       //   excludeFromSave: true
       // }),
-      new VisibleColumnModel({
+      {
         field: 'lastName',
         label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
-        pinned: VisibleColumnModelPinned.LEFT
-      }),
-      new VisibleColumnModel({
+        pinned: IV2ColumnPinned.LEFT
+      },
+      {
         field: 'firstName',
         label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
-        pinned: VisibleColumnModelPinned.LEFT
-      }),
-      new VisibleColumnModel({
+        pinned: IV2ColumnPinned.LEFT
+      },
+      {
         field: 'middleName',
         label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
-        visible: false,
-        pinned: VisibleColumnModelPinned.LEFT
-      }),
-      new VisibleColumnModel({
+        notVisible: true,
+        pinned: IV2ColumnPinned.LEFT
+      },
+      {
         field: 'visualId',
         label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
-        pinned: VisibleColumnModelPinned.LEFT
-      }),
-      new VisibleColumnModel({
+        pinned: IV2ColumnPinned.LEFT
+      },
+      {
         field: 'classification',
         label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION'
-      }),
-      new VisibleColumnModel({
+      },
+      {
         field: 'outcome',
         label: 'LNG_CASE_FIELD_LABEL_OUTCOME'
-      }),
-      new VisibleColumnModel({
+      },
+      {
         field: 'dateOfOutcome',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
-        format: VisibleColumnModelFormat.DATE,
-        visible: false
-      }),
-      new VisibleColumnModel({
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        notVisible: true
+      },
+      {
         field: 'age',
         label: 'LNG_CASE_FIELD_LABEL_AGE',
-        format: VisibleColumnModelFormat.AGE
-      }),
-      new VisibleColumnModel({
+        format: {
+          type: V2ColumnFormat.AGE
+        }
+      },
+      {
         field: 'gender',
         label: 'LNG_CASE_FIELD_LABEL_GENDER'
-      }),
-      new VisibleColumnModel({
+      },
+      {
         field: 'phoneNumber',
         label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
-        format: 'mainAddress.phoneNumber'
-      }),
-      new VisibleColumnModel({
+        format: {
+          type: 'mainAddress.phoneNumber'
+        }
+      },
+      {
         field: 'location',
         label: 'LNG_CASE_FIELD_LABEL_ADDRESS_LOCATION',
-        format: 'mainAddress.location.name',
+        format: {
+          type: 'mainAddress.location.name'
+        },
         link: (data) => {
           return data.mainAddress?.location?.name ?
             `/locations/${data.mainAddress.location.id}/view` :
             undefined;
         }
-      }),
-      new VisibleColumnModel({
+      },
+      {
         field: 'addresses.emailAddress',
         label: 'LNG_CASE_FIELD_LABEL_EMAIL',
-        visible: false,
-        format: 'mainAddress.emailAddress'
-      }),
-      new VisibleColumnModel({
+        notVisible: true,
+        format: {
+          type: 'mainAddress.emailAddress'
+        }
+      },
+      {
         field: 'addresses.addressLine1',
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS',
-        visible: false,
-        format: 'mainAddress.addressLine1'
-      }),
-      new VisibleColumnModel({
+        notVisible: true,
+        format: {
+          type: 'mainAddress.addressLine1'
+        }
+      },
+      {
         field: 'addresses.city',
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
-        visible: false,
-        format: 'mainAddress.city'
-      }),
-      new VisibleColumnModel({
+        notVisible: true,
+        format: {
+          type: 'mainAddress.city'
+        }
+      },
+      {
         field: 'addresses.geoLocation.lat',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
-        visible: false,
-        format: 'mainAddress.geoLocation.lat'
-      }),
-      new VisibleColumnModel({
+        notVisible: true,
+        format: {
+          type: 'mainAddress.geoLocation.lat'
+        }
+      },
+      {
         field: 'addresses.geoLocation.lng',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
-        visible: false,
-        format: 'mainAddress.geoLocation.lng'
-      }),
-      new VisibleColumnModel({
+        notVisible: true,
+        format: {
+          type: 'mainAddress.geoLocation.lng'
+        }
+      },
+      {
         field: 'addresses.postalCode',
         label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
-        visible: false,
-        format: 'mainAddress.postalCode'
-      }),
-      new VisibleColumnModel({
+        notVisible: true,
+        format: {
+          type: 'mainAddress.postalCode'
+        }
+      },
+      {
         field: 'addresses.geoLocationAccurate',
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
-        visible: false,
-        format: VisibleColumnModelFormat.BOOLEAN,
-        formatField: 'mainAddress.geoLocationAccurate'
-      }),
-      new VisibleColumnModel({
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN,
+          field: 'mainAddress.geoLocationAccurate'
+        }
+      },
+      {
         field: 'dateOfOnset',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
-        format: VisibleColumnModelFormat.DATE
-      }),
-      new VisibleColumnModel({
+        format: {
+          type: V2ColumnFormat.DATE
+        }
+      },
+      {
         field: 'dateOfReporting',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
-        visible: false,
-        format: VisibleColumnModelFormat.DATE
-      }),
-      new VisibleColumnModel({
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATE
+        }
+      },
+      {
         field: 'notACase',
         label: 'LNG_CASE_FIELD_LABEL_NOT_A_CASE',
-        visible: false,
-        format: VisibleColumnModelFormat.BOOLEAN,
-        formatValue: (data) => {
-          return data.classification === Constants.CASE_CLASSIFICATION.NOT_A_CASE;
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN,
+          value: (data) => {
+            return data.classification === Constants.CASE_CLASSIFICATION.NOT_A_CASE;
+          }
         }
-      }),
-      new VisibleColumnModel({
+      },
+      {
         field: 'wasContact',
         label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
-        visible: false,
-        format: VisibleColumnModelFormat.BOOLEAN
-      }),
-      new VisibleColumnModel({
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        }
+      },
+      {
         field: 'responsibleUserId',
         label: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
-        visible: false,
-        format: 'responsibleUser.name',
-        excludeFromDisplay: (): boolean => {
+        notVisible: true,
+        format: {
+          type: 'responsibleUser.name'
+        },
+        exclude: (): boolean => {
           return !UserModel.canList(this.authUser);
         },
         link: (data) => {
@@ -815,38 +848,42 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             `/users/${data.responsibleUserId}/view` :
             undefined;
         }
-      })
+      }
     ];
 
     // number of contacts & exposures columns should be visible only on pages where we have relationships
     // for cases without relationships we don't need these columns
     if (this.appliedListFilter !== Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS) {
       this.tableColumns.push(
-        new VisibleColumnModel({
+        {
           field: 'numberOfContacts',
           label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS'
-        }),
-        new VisibleColumnModel({
+        },
+        {
           field: 'numberOfExposures',
           label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES'
-        })
+        }
       );
     }
 
     // rest of columns :)
     this.tableColumns.push(
-      new VisibleColumnModel({
+      {
         field: 'deleted',
         label: 'LNG_CASE_FIELD_LABEL_DELETED',
-        visible: false,
-        format: VisibleColumnModelFormat.BOOLEAN
-      }),
-      new VisibleColumnModel({
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        }
+      },
+      {
         field: 'createdBy',
         label: 'LNG_CASE_FIELD_LABEL_CREATED_BY',
-        visible: false,
-        format: 'createdByUser.name',
-        excludeFromDisplay: (): boolean => {
+        notVisible: true,
+        format: {
+          type: 'createdByUser.name'
+        },
+        exclude: (): boolean => {
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
@@ -854,19 +891,23 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             `/users/${data.createdBy}/view` :
             undefined;
         }
-      }),
-      new VisibleColumnModel({
+      },
+      {
         field: 'createdAt',
         label: 'LNG_CASE_FIELD_LABEL_CREATED_AT',
-        visible: false,
-        format: VisibleColumnModelFormat.DATETIME
-      }),
-      new VisibleColumnModel({
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        }
+      },
+      {
         field: 'updatedBy',
         label: 'LNG_CASE_FIELD_LABEL_UPDATED_BY',
-        visible: false,
-        format: 'updatedByUser.name',
-        excludeFromDisplay: (): boolean => {
+        notVisible: true,
+        format: {
+          type: 'updatedByUser.name'
+        },
+        exclude: (): boolean => {
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
@@ -874,13 +915,153 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             `/users/${data.updatedBy}/view` :
             undefined;
         }
-      }),
-      new VisibleColumnModel({
+      },
+      {
         field: 'updatedAt',
         label: 'LNG_CASE_FIELD_LABEL_UPDATED_AT',
-        visible: false,
-        format: VisibleColumnModelFormat.DATETIME
-      })
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        }
+      },
+
+      // actions
+      {
+        field: 'actions',
+        label: 'LNG_COMMON_LABEL_ACTIONS',
+        pinned: IV2ColumnPinned.RIGHT,
+        resizable: false,
+        format: {
+          type: V2ColumnFormat.ACTIONS
+        },
+        actions: [
+          // View Case
+          {
+            type: V2RowActionType.ICON,
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_CASE',
+            action: {
+              link: (data: CaseModel): string[] => {
+                return ['/cases', data.id, 'view'];
+              }
+            },
+            visible: (item: CaseModel): boolean => {
+              return !item.deleted &&
+                CaseModel.canView(this.authUser);
+            }
+          },
+
+          // Modify Case
+          {
+            type: V2RowActionType.ICON,
+            icon: 'edit',
+            iconTooltip: 'LNG_PAGE_LIST_CASES_ACTION_MODIFY_CASE',
+            action: {
+              link: (item: CaseModel): string[] => {
+                return ['/cases', item.id, 'modify'];
+              },
+            },
+            visible: (item: CaseModel): boolean => {
+              return !item.deleted &&
+                this.authUser &&
+                this.selectedOutbreak &&
+                this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                CaseModel.canModify(this.authUser);
+            }
+          },
+
+          // Other actions
+          {
+            type: V2RowActionType.MENU,
+            icon: 'more_horiz',
+            menuOptions: [
+              // Delete Case
+              {
+                label: 'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE',
+                cssClasses: 'gd-list-table-actions-action-menu-warning',
+                action: {
+                  click: (item: CaseModel): void => {
+                    this.deleteCase(item);
+                  },
+                },
+                visible: (item: CaseModel): boolean => {
+                  return !item.deleted &&
+                    this.authUser &&
+                    this.selectedOutbreak &&
+                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    CaseModel.canDelete(this.authUser);
+                }
+              },
+
+              // Divider
+              {
+                visible: (item: CaseModel): boolean => {
+                  // visible only if at least one of the first two items is visible
+                  return !item.deleted &&
+                    this.authUser &&
+                    this.selectedOutbreak &&
+                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    CaseModel.canDelete(this.authUser);
+                }
+              },
+
+              // Convert Case To Contact
+              {
+                label: 'LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT',
+                cssClasses: 'gd-list-table-actions-action-menu-warning',
+                action: {
+                  click: (item: CaseModel): void => {
+                    this.convertCaseToContact(item);
+                  }
+                },
+                visible: (item: CaseModel): boolean => {
+                  return !item.deleted &&
+                    this.authUser &&
+                    this.selectedOutbreak &&
+                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    CaseModel.canConvertToContact(this.authUser);
+                }
+              },
+
+              // Divider
+              {
+                visible: (item: CaseModel): boolean => {
+                  // visible only if at least one of the first two items is visible
+                  return !item.deleted &&
+                    this.authUser &&
+                    this.selectedOutbreak &&
+                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    CaseModel.canConvertToContact(this.authUser);
+                }
+              },
+
+              // Add Contact to Case
+              {
+                label: 'LNG_PAGE_ACTION_ADD_CONTACT',
+                action: {
+                  link: (): string[] => {
+                    return ['/contacts', 'create'];
+                  },
+                  linkQueryParams: (item: CaseModel): Params => {
+                    return {
+                      entityType: EntityType.CASE,
+                      entityId: item.id
+                    };
+                  }
+                },
+                visible: (item: CaseModel): boolean => {
+                  return !item.deleted &&
+                    this.authUser &&
+                    this.selectedOutbreak &&
+                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    ContactModel.canCreate(this.authUser) &&
+                    CaseModel.canCreateContact(this.authUser);
+                }
+              }
+            ]
+          }
+        ]
+      }
     );
   }
 

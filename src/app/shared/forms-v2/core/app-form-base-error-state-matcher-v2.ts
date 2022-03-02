@@ -1,8 +1,7 @@
 import { ErrorStateMatcher } from '@angular/material/core';
 import { AbstractControl } from '@angular/forms';
 
-export class AppFormBaseErrorStateMatcherV2
-  implements ErrorStateMatcher {
+export class AppFormBaseErrorStateMatcherV2 implements ErrorStateMatcher {
   /**
    * Control container
    */

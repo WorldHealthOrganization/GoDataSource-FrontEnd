@@ -21,7 +21,6 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 
 @Component({
@@ -171,44 +170,44 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
      */
   initializeSideTableColumns() {
     // default table columns
-    this.tableColumns = [
-      new VisibleColumnModel({
-        field: 'description',
-        label: 'LNG_BACKUP_FIELD_LABEL_DESCRIPTION'
-      }),
-      new VisibleColumnModel({
-        field: 'location',
-        label: 'LNG_BACKUP_FIELD_LABEL_LOCATION'
-      }),
-      new VisibleColumnModel({
-        field: 'modules',
-        label: 'LNG_BACKUP_FIELD_LABEL_MODULES'
-      }),
-      new VisibleColumnModel({
-        field: 'date',
-        label: 'LNG_BACKUP_FIELD_LABEL_DATE'
-      }),
-      new VisibleColumnModel({
-        field: 'status',
-        label: 'LNG_BACKUP_FIELD_LABEL_STATUS'
-      }),
-      new VisibleColumnModel({
-        field: 'fileSize',
-        label: 'LNG_BACKUP_FIELD_LABEL_FILE_SIZE'
-      }),
-      new VisibleColumnModel({
-        field: 'duration',
-        label: 'LNG_BACKUP_FIELD_LABEL_DURATION'
-      }),
-      new VisibleColumnModel({
-        field: 'user',
-        label: 'LNG_BACKUP_FIELD_LABEL_USER'
-      }),
-      new VisibleColumnModel({
-        field: 'error',
-        label: 'LNG_BACKUP_FIELD_LABEL_ERROR'
-      })
-    ];
+    // this.tableColumns = [
+    //   new VisibleColumnModel({
+    //     field: 'description',
+    //     label: 'LNG_BACKUP_FIELD_LABEL_DESCRIPTION'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'location',
+    //     label: 'LNG_BACKUP_FIELD_LABEL_LOCATION'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'modules',
+    //     label: 'LNG_BACKUP_FIELD_LABEL_MODULES'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'date',
+    //     label: 'LNG_BACKUP_FIELD_LABEL_DATE'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'status',
+    //     label: 'LNG_BACKUP_FIELD_LABEL_STATUS'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'fileSize',
+    //     label: 'LNG_BACKUP_FIELD_LABEL_FILE_SIZE'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'duration',
+    //     label: 'LNG_BACKUP_FIELD_LABEL_DURATION'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'user',
+    //     label: 'LNG_BACKUP_FIELD_LABEL_USER'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'error',
+    //     label: 'LNG_BACKUP_FIELD_LABEL_ERROR'
+    //   })
+    // ];
   }
 
   /**

@@ -14,7 +14,6 @@ import { Constants } from '../../../../core/models/constants';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ActivatedRoute } from '@angular/router';
-import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { catchError, share, tap } from 'rxjs/operators';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ContactModel } from '../../../../core/models/contact.model';
@@ -354,32 +353,32 @@ export class MarkedNotDuplicatesListComponent
      */
   initializeSideTableColumns() {
     // default table columns
-    this.tableColumns = [
-      new VisibleColumnModel({
-        field: 'lastName',
-        label: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME'
-      }),
-      new VisibleColumnModel({
-        field: 'firstName',
-        label: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME'
-      }),
-      new VisibleColumnModel({
-        field: 'visualId',
-        label: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID'
-      }),
-      new VisibleColumnModel({
-        field: 'age',
-        label: 'LNG_ENTITY_FIELD_LABEL_AGE'
-      }),
-      new VisibleColumnModel({
-        field: 'gender',
-        label: 'LNG_ENTITY_FIELD_LABEL_GENDER'
-      }),
-      new VisibleColumnModel({
-        field: 'phoneNumber',
-        label: 'LNG_ENTITY_FIELD_LABEL_PHONE_NUMBER'
-      })
-    ];
+    // this.tableColumns = [
+    //   new VisibleColumnModel({
+    //     field: 'lastName',
+    //     label: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'firstName',
+    //     label: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'visualId',
+    //     label: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'age',
+    //     label: 'LNG_ENTITY_FIELD_LABEL_AGE'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'gender',
+    //     label: 'LNG_ENTITY_FIELD_LABEL_GENDER'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'phoneNumber',
+    //     label: 'LNG_ENTITY_FIELD_LABEL_PHONE_NUMBER'
+    //   })
+    // ];
   }
 
   /**

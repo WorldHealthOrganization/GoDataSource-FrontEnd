@@ -4,7 +4,6 @@ import { Observable } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import * as _ from 'lodash';
-import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { AuditLogDataService } from '../../../../core/services/data/audit-log.data.service';
 import { AuditLogModel } from '../../../../core/models/audit-log.model';
 import { UserSettings } from '../../../../core/models/user.model';
@@ -122,40 +121,40 @@ export class AuditLogsListComponent
      */
   initializeSideTableColumns() {
     // default table columns
-    this.tableColumns = [
-      new VisibleColumnModel({
-        field: 'action',
-        label: 'LNG_AUDIT_LOG_FIELD_LABEL_ACTION'
-      }),
-      new VisibleColumnModel({
-        field: 'recordId',
-        label: 'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_ID'
-      }),
-      new VisibleColumnModel({
-        field: 'modelName',
-        label: 'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_NAME'
-      }),
-      new VisibleColumnModel({
-        field: 'createdAt',
-        label: 'LNG_AUDIT_LOG_FIELD_LABEL_CREATED_AT'
-      }),
-      new VisibleColumnModel({
-        field: 'changedData',
-        label: 'LNG_AUDIT_LOG_FIELD_LABEL_CHANGE_DATA'
-      }),
-      new VisibleColumnModel({
-        field: 'userId',
-        label: 'LNG_AUDIT_LOG_FIELD_LABEL_USER'
-      }),
-      new VisibleColumnModel({
-        field: 'userRole',
-        label: 'LNG_AUDIT_LOG_FIELD_LABEL_USER_ROLES'
-      }),
-      new VisibleColumnModel({
-        field: 'userIPAddress',
-        label: 'LNG_AUDIT_LOG_FIELD_LABEL_IP_ADDRESS'
-      })
-    ];
+    // this.tableColumns = [
+    //   new VisibleColumnModel({
+    //     field: 'action',
+    //     label: 'LNG_AUDIT_LOG_FIELD_LABEL_ACTION'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'recordId',
+    //     label: 'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_ID'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'modelName',
+    //     label: 'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_NAME'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'createdAt',
+    //     label: 'LNG_AUDIT_LOG_FIELD_LABEL_CREATED_AT'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'changedData',
+    //     label: 'LNG_AUDIT_LOG_FIELD_LABEL_CHANGE_DATA'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'userId',
+    //     label: 'LNG_AUDIT_LOG_FIELD_LABEL_USER'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'userRole',
+    //     label: 'LNG_AUDIT_LOG_FIELD_LABEL_USER_ROLES'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'userIPAddress',
+    //     label: 'LNG_AUDIT_LOG_FIELD_LABEL_IP_ADDRESS'
+    //   })
+    // ];
   }
 
   /**

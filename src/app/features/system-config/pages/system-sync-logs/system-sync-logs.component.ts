@@ -4,7 +4,6 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { SystemSyncLogDataService } from '../../../../core/services/data/system-sync-log.data.service';
 import { SystemSyncLogModel } from '../../../../core/models/system-sync-log.model';
@@ -203,36 +202,36 @@ export class SystemSyncLogsComponent
      */
   initializeSideTableColumns() {
     // default table columns
-    this.tableColumns = [
-      new VisibleColumnModel({
-        field: 'syncServerUrl',
-        label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_SERVER_URL'
-      }),
-      new VisibleColumnModel({
-        field: 'syncClientId',
-        label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_CLIENT_ID'
-      }),
-      new VisibleColumnModel({
-        field: 'actionStartDate',
-        label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_ACTION_START_DATE'
-      }),
-      new VisibleColumnModel({
-        field: 'actionCompletionDate',
-        label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_ACTION_COMPLETION_DATE'
-      }),
-      new VisibleColumnModel({
-        field: 'outbreaks',
-        label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_OUTBREAKS'
-      }),
-      new VisibleColumnModel({
-        field: 'status',
-        label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_STATUS'
-      }),
-      new VisibleColumnModel({
-        field: 'informationStartDate',
-        label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_INFORMATION_START_DATE'
-      })
-    ];
+    // this.tableColumns = [
+    //   new VisibleColumnModel({
+    //     field: 'syncServerUrl',
+    //     label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_SERVER_URL'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'syncClientId',
+    //     label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_CLIENT_ID'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'actionStartDate',
+    //     label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_ACTION_START_DATE'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'actionCompletionDate',
+    //     label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_ACTION_COMPLETION_DATE'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'outbreaks',
+    //     label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_OUTBREAKS'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'status',
+    //     label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_STATUS'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'informationStartDate',
+    //     label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_INFORMATION_START_DATE'
+    //   })
+    // ];
   }
 
   /**

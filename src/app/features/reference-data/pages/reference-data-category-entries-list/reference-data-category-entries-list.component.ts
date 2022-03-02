@@ -14,7 +14,6 @@ import { catchError, map, switchMap } from 'rxjs/operators';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
 import { throwError } from 'rxjs';
-import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { IconModel } from '../../../../core/models/icon.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
@@ -181,60 +180,60 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
      */
   initializeSideTableColumns() {
     // default table columns
-    this.tableColumns = [
-      new VisibleColumnModel({
-        field: 'label',
-        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE'
-      }),
-      new VisibleColumnModel({
-        field: 'code',
-        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CODE'
-      }),
-      new VisibleColumnModel({
-        field: 'description',
-        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION'
-      }),
-      new VisibleColumnModel({
-        field: 'icon',
-        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON'
-      }),
-      new VisibleColumnModel({
-        field: 'color',
-        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR'
-      }),
-      new VisibleColumnModel({
-        field: 'order',
-        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER'
-      }),
-      new VisibleColumnModel({
-        field: 'active',
-        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE'
-      }),
-      new VisibleColumnModel({
-        field: 'readonly',
-        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_SYSTEM_VALUE'
-      }),
-      new VisibleColumnModel({
-        field: 'createdBy',
-        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CREATED_BY',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'createdAt',
-        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CREATED_AT',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'updatedBy',
-        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_UPDATED_BY',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'updatedAt',
-        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_UPDATED_AT',
-        visible: false
-      })
-    ];
+    // this.tableColumns = [
+    //   new VisibleColumnModel({
+    //     field: 'label',
+    //     label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'code',
+    //     label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CODE'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'description',
+    //     label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'icon',
+    //     label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'color',
+    //     label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'order',
+    //     label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'active',
+    //     label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'readonly',
+    //     label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_SYSTEM_VALUE'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'createdBy',
+    //     label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CREATED_BY',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'createdAt',
+    //     label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CREATED_AT',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'updatedBy',
+    //     label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_UPDATED_BY',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'updatedAt',
+    //     label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_UPDATED_AT',
+    //     visible: false
+    //   })
+    // ];
   }
 
   refreshList(finishCallback: (records: any[]) => void) {

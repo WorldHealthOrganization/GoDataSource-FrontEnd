@@ -18,7 +18,6 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { DialogAnswer, DialogConfiguration, DialogField } from '../../../../shared/components/dialog/dialog.component';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { Router } from '@angular/router';
 import { catchError, map, share, switchMap, tap } from 'rxjs/operators';
 import { AnswerModel, QuestionModel } from '../../../../core/models/question.model';
@@ -306,93 +305,93 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
      */
   initializeSideTableColumns() {
     // default table columns
-    this.tableColumns = [
-      new VisibleColumnModel({
-        field: 'name',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_NAME'
-      }),
-      new VisibleColumnModel({
-        field: 'disease',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_DISEASE',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'country',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES'
-      }),
-      new VisibleColumnModel({
-        field: 'reportingGeographicalLevelId',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_LOCATION_GEOGRAPHICAL_LEVEL',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'startDate',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_START_DATE'
-      }),
-      new VisibleColumnModel({
-        field: 'endDate',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_END_DATE'
-      }),
-      new VisibleColumnModel({
-        field: 'active',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_ACTIVE'
-      }),
-      new VisibleColumnModel({
-        field: 'generateFollowUpsTeamAssignmentAlgorithm',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'generateFollowUpsOverwriteExisting',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'generateFollowUpsKeepTeamAssignment',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'generateFollowUpsDateOfLastContact',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'isContactLabResultsActive',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_LAB_RESULTS_ACTIVE',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'isDateOfOnsetRequired',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'deleted',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_DELETED',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'createdBy',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_CREATED_BY',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'createdAt',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_CREATED_AT',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'updatedBy',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_UPDATED_BY',
-        visible: false
-      }),
-      new VisibleColumnModel({
-        field: 'updatedAt',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_UPDATED_AT',
-        visible: false
-      })
-    ];
+    // this.tableColumns = [
+    //   new VisibleColumnModel({
+    //     field: 'name',
+    //     label: 'LNG_OUTBREAK_FIELD_LABEL_NAME'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'disease',
+    //     label: 'LNG_OUTBREAK_FIELD_LABEL_DISEASE',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'country',
+    //     label: 'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'reportingGeographicalLevelId',
+    //     label: 'LNG_OUTBREAK_FIELD_LABEL_LOCATION_GEOGRAPHICAL_LEVEL',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'startDate',
+    //     label: 'LNG_OUTBREAK_FIELD_LABEL_START_DATE'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'endDate',
+    //     label: 'LNG_OUTBREAK_FIELD_LABEL_END_DATE'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'active',
+    //     label: 'LNG_OUTBREAK_FIELD_LABEL_ACTIVE'
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'generateFollowUpsTeamAssignmentAlgorithm',
+    //     label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'generateFollowUpsOverwriteExisting',
+    //     label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'generateFollowUpsKeepTeamAssignment',
+    //     label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'generateFollowUpsDateOfLastContact',
+    //     label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'isContactLabResultsActive',
+    //     label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_LAB_RESULTS_ACTIVE',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'isDateOfOnsetRequired',
+    //     label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'deleted',
+    //     label: 'LNG_OUTBREAK_FIELD_LABEL_DELETED',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'createdBy',
+    //     label: 'LNG_OUTBREAK_FIELD_LABEL_CREATED_BY',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'createdAt',
+    //     label: 'LNG_OUTBREAK_FIELD_LABEL_CREATED_AT',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'updatedBy',
+    //     label: 'LNG_OUTBREAK_FIELD_LABEL_UPDATED_BY',
+    //     visible: false
+    //   }),
+    //   new VisibleColumnModel({
+    //     field: 'updatedAt',
+    //     label: 'LNG_OUTBREAK_FIELD_LABEL_UPDATED_AT',
+    //     visible: false
+    //   })
+    // ];
   }
 
   /**

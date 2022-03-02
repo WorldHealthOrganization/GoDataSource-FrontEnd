@@ -2,9 +2,8 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inpu
 import { BaseModel } from '../../../core/models/base.model';
 import { Observable } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { ColDef, ColumnApi, ValueFormatterParams } from '@ag-grid-community/core';
+import { ColumnApi, ValueFormatterParams } from '@ag-grid-community/core';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
-import { VisibleColumnModel, VisibleColumnModelFormat, VisibleColumnModelPinned } from '../../components/side-columns/model';
 import { TranslateService } from '@ngx-translate/core';
 import * as _ from 'lodash';
 import { I18nService } from '../../../core/services/helper/i18n.service';
@@ -12,15 +11,13 @@ import { moment } from '../../../core/helperClasses/x-moment';
 import { Constants } from '../../../core/models/constants';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
+import { IV2Column, IV2ColumnAction, IV2ColumnBasic, IV2ColumnBasicFormat, IV2ColumnPinned, V2ColumnFormat } from './models/column.model';
+import { AppListTableV2ActionsComponent } from './components/actions/app-list-table-v2-actions.component';
+import { IExtendedColDef } from './models/extended-column.model';
 
 /**
- * Extended AG-Grid column definition
+ * Component
  */
-interface IExtendedColDef extends ColDef {
-  // visible column definition
-  visibleColumnDefinition?: VisibleColumnModel;
-}
-
 @Component({
   selector: 'app-list-table-v2',
   templateUrl: './app-list-table-v2.component.html',
@@ -45,8 +42,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
   // columns
   columnDefs: IExtendedColDef[];
-  private _columns: VisibleColumnModel[];
-  @Input() set columns(columns: VisibleColumnModel[]) {
+  private _columns: IV2Column[];
+  @Input() set columns(columns: IV2Column[]) {
     // set data
     this._columns = columns;
 
@@ -175,7 +172,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // determine columns
     this.columnDefs = [{
-      pinned: VisibleColumnModelPinned.LEFT,
+      pinned: IV2ColumnPinned.LEFT,
       headerName: '',
       field: this.keyField,
       checkboxSelection: true,
@@ -184,9 +181,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     this._columns.forEach((column) => {
       // no need to take in account ?
       if (
-        !column.visible || (
-          column.excludeFromDisplay &&
-          column.excludeFromDisplay(column)
+        column.notVisible || (
+          column.exclude &&
+          column.exclude(column)
         )
       ) {
         return;
@@ -194,11 +191,13 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
       // attach column to list of visible columns
       this.columnDefs.push({
-        headerName: this.translateService.instant(column.label),
+        headerName: column.label ?
+          this.translateService.instant(column.label) :
+          '',
         field: column.field,
         pinned: column.pinned,
-        resizable: true,
-        visibleColumnDefinition: column,
+        resizable: column.resizable,
+        columnDefinition: column,
         valueFormatter: (valueFormat): string => {
           return this.formatValue(valueFormat);
         },
@@ -216,37 +215,43 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   private formatValue(valueFormat: ValueFormatterParams): string {
     // retrieve extended column definition
     const extendedColDef: IExtendedColDef = valueFormat.colDef as IExtendedColDef;
-    const field: string = extendedColDef.visibleColumnDefinition.formatField ?
-      extendedColDef.visibleColumnDefinition.formatField :
-      extendedColDef.field;
 
     // do we have a custom formatter ?
-    if (extendedColDef.visibleColumnDefinition.format !== undefined) {
+    const columnDefinition: {
+      format?: IV2ColumnBasicFormat;
+    } = extendedColDef.columnDefinition as unknown;
+    if (columnDefinition.format) {
       // path or method ?
-      const formatType: string = typeof extendedColDef.visibleColumnDefinition.format;
+      const formatType: string = typeof columnDefinition.format.type;
       if (formatType === 'string') {
         return _.get(
           valueFormat.data,
-          extendedColDef.visibleColumnDefinition.format as string,
+          columnDefinition.format.type as string,
           ''
         );
 
       } else if (formatType === 'function') {
-        return (extendedColDef.visibleColumnDefinition.format as (any) => string)(valueFormat.data);
+        return (columnDefinition.format.type as (any) => string)(valueFormat.data);
 
       } else if (formatType === 'number') {
+        // get field
+        const field: string = columnDefinition.format.field ?
+          columnDefinition.format.field :
+          extendedColDef.field;
+
         // retrieve field value
-        const fieldValue: any = extendedColDef.visibleColumnDefinition.formatValue ?
-          extendedColDef.visibleColumnDefinition.formatValue(valueFormat.data) :
+        const fieldValue: any = columnDefinition.format.value ?
+          columnDefinition.format.value(valueFormat.data) :
           _.get(
             valueFormat.data,
             field
           );
 
         // handle accordingly to format type
-        switch (extendedColDef.visibleColumnDefinition.format) {
+        const specificFormat: V2ColumnFormat = columnDefinition.format.type as any;
+        switch (specificFormat) {
           // AGE
-          case VisibleColumnModelFormat.AGE:
+          case V2ColumnFormat.AGE:
             return fieldValue?.months > 0 ?
               fieldValue?.months + ' ' + this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS') :
               (
@@ -256,25 +261,31 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
               );
 
           // DATE
-          case VisibleColumnModelFormat.DATE:
+          case V2ColumnFormat.DATE:
             return fieldValue ?
               moment(fieldValue).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
               '';
 
           // DATETIME
-          case VisibleColumnModelFormat.DATETIME:
+          case V2ColumnFormat.DATETIME:
             return fieldValue ?
               moment(fieldValue).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) :
               '';
 
           // BOOLEAN
-          case VisibleColumnModelFormat.BOOLEAN:
+          case V2ColumnFormat.BOOLEAN:
             return fieldValue ?
               this.i18nService.instant('LNG_COMMON_LABEL_YES') :
               this.i18nService.instant('LNG_COMMON_LABEL_NO');
 
+          // ACTIONS
+          case V2ColumnFormat.ACTIONS:
+
+            // nothing to do here
+            return null;
+
           default:
-            throw new Error('VisibleColumnModelFormat: Not supported');
+            throw new Error('V2ColumnFormat: Not supported');
         }
       } else {
         throw new Error('formatValue: Not supported');
@@ -290,21 +301,31 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   /**
    * Custom renderer
    */
-  private handleCellRenderer(column: VisibleColumnModel): (ValueFormatterParams) => any {
+  private handleCellRenderer(column: IV2Column): any {
     // link ?
-    if (column.link) {
+    const basicColumn: IV2ColumnBasic = column as IV2ColumnBasic;
+    if (basicColumn.link) {
       return (params: ValueFormatterParams) => {
         // determine value
         const value: string = this.formatValue(params);
 
         // retrieve url link
-        const url: string = column.link(params.data);
+        const url: string = basicColumn.link(params.data);
 
         // create link
         return url ?
           `<a class="gd-list-table-link" href="${this.location.prepareExternalUrl(url)}"><span is-link="${url}">${value}</span><a/>` :
           value;
       };
+    }
+
+    // actions ?
+    const actionColumn: IV2ColumnAction = column as IV2ColumnAction;
+    if (
+      actionColumn.format &&
+      actionColumn.format.type === V2ColumnFormat.ACTIONS
+    ) {
+      return AppListTableV2ActionsComponent;
     }
 
     // nothing to do ?
@@ -326,7 +347,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
    */
   setVisibleColumns(): void {
     // #TODO
-    this._columns.forEach((col) => col.visible = true);
+    this._columns.forEach((col) => col.notVisible = false);
     this.columns = this._columns;
   }
 
