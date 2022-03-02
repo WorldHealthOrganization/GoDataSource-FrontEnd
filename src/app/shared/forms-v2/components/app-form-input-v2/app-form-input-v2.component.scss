@@ -100,12 +100,17 @@
 
           .mat-icon {
             color: rgba(var(--gd-text-rgb), 0.75);
+            font-size: 1.6rem;
+            height: 1.6rem;
+            line-height: 1;
             text-align: center;
           }
 
           .mat-icon-button {
             font-size: 1.6rem;
             height: 2.4rem;
+            min-width: 0;
+            padding: 0;
             width: 2.4rem;
           }
         }

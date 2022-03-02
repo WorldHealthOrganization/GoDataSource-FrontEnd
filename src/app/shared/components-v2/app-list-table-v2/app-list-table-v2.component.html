@@ -19,7 +19,7 @@
 
   <!-- Table header -->
   <div
-    fxLayout="row"
+    fxLayout="row" fxLayoutAlign="space-between center"
     class="gd-list-table-header">
 
     <!-- Left -->
@@ -31,7 +31,7 @@
 
     <!-- Right -->
     <div
-      fxGrow="0" fxLayoutGap="1rem"
+      fxFlex fxLayout="row" fxGrow="0" fxLayoutGap="0.8rem"
       class="gd-list-table-header-right">
 
       <!-- Reset filters -->
@@ -39,13 +39,14 @@
         type="button"
         mat-icon-button
         [matTooltip]="'LNG_COMMON_BUTTON_RESET_FILTERS' | translate">
-        <mat-icon>restart_alt</mat-icon>
+        <mat-icon class="material-icons-outlined">settings_backup_restore</mat-icon>
       </button>
 
       <!-- Advanced filters -->
       <button
         type="button"
-        mat-raised-button>
+        mat-flat-button
+        color="primary">
         <mat-icon>filter_alt</mat-icon>
         {{'LNG_SIDE_FILTERS_TITLE' | translate}}
       </button>

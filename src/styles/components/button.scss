@@ -1,18 +1,14 @@
-/* Icon Button */
 /* Buttons */
-button.mat-icon-button,
-a.mat-icon-button {
-  background: rgba(var(--gd-secondary-rgb), 0.35);
-  @include border-radius(0.4rem);
-  color: var(--gd-text);
-  font-family: 'Material Icons';
-  font-size: 2.4rem;
-  height: 3.6rem;
-  line-height: 1;
+button.mat-flat-button,
+a.mat-flat-button {
+  background-color: var(--gd-primary);
+  color: var(--gd-background);
+  font-family: $gd-font-family;
+  font-size: $gd-font-size;
+  font-weight: 500;
+  line-height: 2rem;
   min-width: 3.6rem;
-  padding: 0.6rem;
-  text-align: center;
-  width: 3.6rem;
+  padding: 0.8rem 1.6rem;
 
   .mat-button-focus-overlay {
     background: var(--gd-background);
@@ -20,7 +16,7 @@ a.mat-icon-button {
 
   &.mat-button-disabled,
   &.mat-button-disabled.mat-button-disabled {
-    background-color: rgba(var(--gd-primary-rgb), 0.15);
+    background-color: rgba(var(--gd-primary-rgb), 0.25);
     color: var(--gd-background);
 
     &:hover {
@@ -41,26 +37,18 @@ a.mat-icon-button {
     color: var(--gd-background);
 
     &.mat-button-disabled {
-      background-color: rgba(var(--gd-primary-rgb), 0.15);
+      background-color: rgba(var(--gd-primary-rgb), 0.25);
       color: var(--gd-background);
-    }
-
-    .mat-button-focus-overlay {
-      background: var(--gd-background);
     }
   }
 
   &.mat-secondary {
-    background-color: rgba(var(--gd-secondary-rgb), 0.35);
+    background-color: rgba(var(--gd-secondary-rgb), 0.5);
     color: var(--gd-text);
 
     &.mat-button-disabled {
-      background-color: rgba(var(--gd-secondary-rgb), 0.15);
+      background-color: rgba(var(--gd-secondary-rgb), 0.25);
       color: var(--gd-secondary);
-    }
-
-    .mat-button-focus-overlay {
-      background: var(--gd-background);
     }
   }
 
@@ -69,12 +57,8 @@ a.mat-icon-button {
     color: var(--gd-background);
 
     &.mat-button-disabled {
-      background-color: rgba(var(--gd-success-rgb), 0.15);
+      background-color: rgba(var(--gd-success-rgb), 0.25);
       color: var(--gd-background);
-    }
-
-    .mat-button-focus-overlay {
-      background: var(--gd-background);
     }
   }
 
@@ -83,12 +67,8 @@ a.mat-icon-button {
     color: var(--gd-background);
 
     &.mat-button-disabled {
-      background-color: rgba(var(--gd-danger-rgb), 0.15);
+      background-color: rgba(var(--gd-danger-rgb), 0.25);
       color: var(--gd-background);
-    }
-
-    .mat-button-focus-overlay {
-      background: var(--gd-background);
     }
   }
 
@@ -100,21 +80,17 @@ a.mat-icon-button {
       background-color: transparent;
       color: var(--gd-secondary);
     }
-
-    .mat-button-focus-overlay {
-      background: var(--gd-background);
-    }
   }
 
   .mat-button-wrapper {
     @include flex(flex);
     @include flex_align_items(center);
     @include flex_direction(row);
-    @include flex_justify(center);
+    gap: 0.8rem;
   }
 
   .mat-icon {
-    font-size: 2rem;
+    font-size: 1.6rem;
     height: auto;
     line-height: 1;
     width: auto;
