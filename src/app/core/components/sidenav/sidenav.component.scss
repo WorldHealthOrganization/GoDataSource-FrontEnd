@@ -29,6 +29,18 @@ app-sidenav {
         padding: 0;
       }
 
+      .gd-main-menu-option-float-menu-title {
+        background: rgba(var(--gd-secondary-rgb), 0.05);
+        border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.1);
+        color: var(--gd-secondary);
+        font-size: 1.2rem;
+        letter-spacing: 0.05rem;
+        margin: 0;
+        padding: 0.8rem 1.6rem;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
       .gd-main-menu-option-header-button {
         &:hover {
           background: rgba(var(--gd-primary-rgb), 0.1);
@@ -56,7 +68,7 @@ app-sidenav {
   display: block;
   height: calc(100% - var(--gd-version-height));
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: overlay;
   width: 100%;
 
   // Hide menu scrollbar and show it on hover
@@ -75,10 +87,6 @@ app-sidenav {
     }
   }
 
-  &.gd-version-not-visible {
-    height: 100%;
-  }
-
   .gd-main-menu-group-label {
     color: var(--gd-secondary);
     font-size: 1.2rem;
@@ -91,6 +99,18 @@ app-sidenav {
 
     &:first-child {
       margin-top: 1.7rem;
+    }
+  }
+
+  &.gd-version-not-visible {
+    height: calc(100% - 4.3rem);
+    margin-top: 4.3rem;
+
+    .gd-main-menu-group-label {
+      &:first-child {
+        height: 0;
+        margin: 0;
+      }
     }
   }
 
@@ -167,7 +187,7 @@ app-sidenav {
       @include box-shadow(none);
       @include box-sizing(border-box);
       color: var(--gd-text);
-      min-width: 33rem;
+      min-width: var(--gd-menu-width-expanded);
 
       .mat-expansion-panel-header {
         font-family: $gd-font-family;

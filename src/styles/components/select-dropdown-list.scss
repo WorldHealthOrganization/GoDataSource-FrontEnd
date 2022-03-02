@@ -12,14 +12,24 @@
         line-height: $gd-line-height;
   
         .mat-select-search-clear {
+          right: 0.8rem;
           top: 0.9rem;
         }
   
         .mat-button-wrapper {
           @include flex(flex);
         }
+
+        .mat-icon-button {
+          font-size: 1.6rem;
+          height: 2.4rem;
+          min-width: 2.4rem;
+          padding: 0.4rem;
+          width: 2.4rem;
+        }
         
         .mat-icon {
+          font-size: 1.6rem;
           height: auto;
           line-height: 1;
         }

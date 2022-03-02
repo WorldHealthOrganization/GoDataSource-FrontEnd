@@ -3,11 +3,11 @@
 
  .cdk-overlay-pane {
    &.gd-cdk-overlay-pane-dropdown {
-     margin-top: 3.2rem;
+     margin-top: 5rem;
 
      .gd-mat-option-vscroll-selected {
-       visibility: hidden;
        position: absolute;
+       visibility: hidden;
      }
    }
  }
@@ -162,10 +162,6 @@
         font-size: 1.2rem;
         margin-top: 0.4rem;
         padding: 0 1.6rem;
-
-        .mat-form-field-hint-wrapper {
-          .mat-form-field-hint-spacer {}
-        }
       }
     }
 

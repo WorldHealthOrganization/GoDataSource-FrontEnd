@@ -37,7 +37,7 @@ body {
 ::-webkit-scrollbar {
   -webkit-appearance: none;
   background-color: rgba(var(--gd-secondary-rgb), 0.15);
-  height: 0;
+  height: 0.8rem;
   width: 0.8rem;
 
   .theme-dark & {
@@ -48,6 +48,13 @@ body {
 ::-webkit-scrollbar-thumb {
   background-color: rgba(var(--gd-text-rgb), 0.3);
   @include border-radius(0.4rem);
+}
+
+@-moz-document url-prefix() {
+  * {
+    scrollbar-color: rgba(var(--gd-text-rgb), 0.3) rgba(var(--gd-secondary-rgb), 0.15);
+    scrollbar-width: thin;
+  }
 }
 
 a {
@@ -139,7 +146,7 @@ samp {
 }
 
 pre {
-  overflow: auto;
+  overflow: overlay;
 
   > code {
     display: block;

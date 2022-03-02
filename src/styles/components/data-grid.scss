@@ -1,0 +1,102 @@
+/* AG Grid */
+.gd-list-table-data {
+  color: var(--gd-text);
+  font-family: $gd-font-family;
+  font-size: $gd-font-size;
+  font-weight: 400;
+  line-height: $gd-line-height;
+
+  &.ag-theme-balham {
+    .ag-root-wrapper {
+      border-color: rgba(var(--gd-secondary-rgb), 0.25);
+    }
+
+    .ag-header {
+      background-color: rgba(var(--gd-secondary-rgb), 0.1);
+      border-bottom-color: rgba(var(--gd-secondary-rgb), 0.25);
+
+      .ag-pinned-left-header {
+        border-right-color: rgba(var(--gd-secondary-rgb), 0.25);
+      }
+
+      .ag-pinned-right-header {
+        border-left-color: rgba(var(--gd-secondary-rgb), 0.25);
+      }
+  
+      .ag-header-row {
+        color: var(--gd-text);
+        font-weight: 700;
+      }
+  
+      .ag-header-cell,
+      .ag-header-group-cell {
+        padding: 1.2rem 1.6rem;
+  
+        &:after {
+          background-color: rgba(var(--gd-secondary-rgb), 0.25);
+          height: 100%;
+          top: 0;
+        }
+      }
+    }
+
+    .ag-body-viewport {
+      .ag-row {
+        background-color: var(--gd-background);
+        border-color: rgba(var(--gd-secondary-rgb), 0.25);
+        color: var(--gd-text);
+
+        &.ag-row-odd {
+          background-color: var(--gd-background);
+        }
+
+        &.ag-row-selected {
+          background-color: rgba(var(--gd-primary-rgb), 0.1);
+        }
+
+        .ag-cell {
+          line-height: $gd-line-height;
+          padding: 1.2rem 1.6rem;
+
+          &.ag-cell-last-left-pinned {
+            &:not(.ag-cell-range-right):not(.ag-cell-range-single-cell) {
+              border-right-color: rgba(var(--gd-secondary-rgb), 0.25);
+            }
+          }
+
+          &.ag-cell-first-right-pinned {
+            &:not(.ag-cell-range-left):not(.ag-cell-range-single-cell) {
+              border-left-color: rgba(var(--gd-secondary-rgb), 0.25);
+            }
+          }
+        }
+      }
+
+      &.ag-has-focus {
+        .ag-cell-focus:not(.ag-cell-range-selected) {
+          border-color: var(--gd-primary);
+        }
+
+        .ag-row {
+          .ag-cell {
+            &.ag-cell-last-left-pinned {
+              &:not(.ag-cell-range-right):not(.ag-cell-range-single-cell) {
+                &.ag-cell-focus {
+                  border-right-color: var(--gd-primary);
+                }
+              }
+            }
+  
+            &.ag-cell-first-right-pinned {
+              &:not(.ag-cell-range-left):not(.ag-cell-range-single-cell) {
+                &.ag-cell-focus {
+                  border-left-color: var(--gd-primary);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
