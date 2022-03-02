@@ -1,3 +1,21 @@
-.gd-breadcrumbs {
+@import 'font';
 
+.gd-breadcrumbs {
+  font-family: $gd-font-family;
+  font-size: $gd-font-size;
+  font-weight: 400;
+  line-height: 2rem;
+  margin-bottom: 0.8rem;
+
+  .gd-breadcrumbs-bread {
+    .gd-breadcrumbs-bread-separator {
+      color: var(--gd-secondary);
+      margin: 0 0.8rem;
+    }
+
+    .gd-breadcrumbs-bread-label-active {
+      color: var(--gd-secondary);
+      cursor: default;
+    }
+  }
 }
