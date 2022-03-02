@@ -9,7 +9,7 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
+import { DialogAnswerButton, DialogField, DialogFieldType } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
@@ -33,13 +33,13 @@ import { EntityHelperService } from '../../../../core/services/helper/entity-hel
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
-import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { AddressModel } from '../../../../core/models/address.model';
 import { ExportFieldsGroupModelNameEnum, IExportFieldsGroupRequired } from '../../../../core/models/export-fields-group.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2RowActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { FollowUpModel } from '../../../../core/models/follow-up.model';
 
 @Component({
   selector: 'app-cases-list',
@@ -215,330 +215,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   // subscribers
   outbreakSubscriber: Subscription;
 
-  // actions
-  recordActions: HoverRowAction[] = [
-    // View Case
-    new HoverRowAction({
-      icon: 'visibility',
-      iconTooltip: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_CASE',
-      linkGenerator: (item: CaseModel): string[] => {
-        return ['/cases', item.id, 'view'];
-      },
-      visible: (item: CaseModel): boolean => {
-        return !item.deleted &&
-                    CaseModel.canView(this.authUser);
-      }
-    }),
-
-    // Modify Case
-    new HoverRowAction({
-      icon: 'settings',
-      iconTooltip: 'LNG_PAGE_LIST_CASES_ACTION_MODIFY_CASE',
-      linkGenerator: (item: CaseModel): string[] => {
-        return ['/cases', item.id, 'modify'];
-      },
-      visible: (item: CaseModel): boolean => {
-        return !item.deleted &&
-                    this.authUser &&
-                    this.selectedOutbreak &&
-                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                    CaseModel.canModify(this.authUser);
-      }
-    }),
-
-    // Other actions
-    new HoverRowAction({
-      type: HoverRowActionType.MENU,
-      icon: 'moreVertical',
-      menuOptions: [
-        // Delete Case
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE',
-          click: (item: CaseModel) => {
-            this.deleteCase(item);
-          },
-          visible: (item: CaseModel): boolean => {
-            return !item.deleted &&
-                            this.authUser &&
-                            this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            CaseModel.canDelete(this.authUser);
-          },
-          class: 'mat-menu-item-delete'
-        }),
-
-        // Divider
-        new HoverRowAction({
-          type: HoverRowActionType.DIVIDER,
-          visible: (item: CaseModel): boolean => {
-            // visible only if at least one of the first two items is visible
-            return !item.deleted &&
-                            this.authUser &&
-                            this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            CaseModel.canDelete(this.authUser);
-          }
-        }),
-
-        // Convert Case To Contact
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT',
-          click: (item: CaseModel) => {
-            this.convertCaseToContact(item);
-          },
-          visible: (item: CaseModel): boolean => {
-            return !item.deleted &&
-                            this.authUser &&
-                            this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            CaseModel.canConvertToContact(this.authUser);
-          },
-          class: 'mat-menu-item-delete'
-        }),
-
-        // Divider
-        new HoverRowAction({
-          type: HoverRowActionType.DIVIDER,
-          visible: (item: CaseModel): boolean => {
-            // visible only if at least one of the first two items is visible
-            return !item.deleted &&
-                            this.authUser &&
-                            this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            CaseModel.canConvertToContact(this.authUser);
-          }
-        }),
-
-        // Add Contact to Case
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_ACTION_ADD_CONTACT',
-          click: (item: CaseModel) => {
-            this.router.navigate(['/contacts', 'create'], {
-              queryParams: {
-                entityType: EntityType.CASE,
-                entityId: item.id
-              }
-            });
-          },
-          visible: (item: CaseModel): boolean => {
-            return !item.deleted &&
-                            this.authUser &&
-                            this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            ContactModel.canCreate(this.authUser) &&
-                            CaseModel.canCreateContact(this.authUser);
-          }
-        }),
-
-        // Bulk add contacts to case
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_ACTION_BULK_ADD_CONTACTS',
-          click: (item: CaseModel) => {
-            this.router.navigate(['/contacts', 'create-bulk'], {
-              queryParams: {
-                entityType: EntityType.CASE,
-                entityId: item.id
-              }
-            });
-          },
-          visible: (item: CaseModel): boolean => {
-            return !item.deleted &&
-                            this.authUser &&
-                            this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            ContactModel.canBulkCreate(this.authUser) &&
-                            CaseModel.canBulkCreateContact(this.authUser);
-          }
-        }),
-
-        // Divider
-        new HoverRowAction({
-          type: HoverRowActionType.DIVIDER,
-          visible: (item: CaseModel): boolean => {
-            // visible only if at least one of the previous two items is visible
-            return !item.deleted &&
-                            this.authUser &&
-                            this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id && (
-              (
-                ContactModel.canCreate(this.authUser) &&
-                                    CaseModel.canCreateContact(this.authUser)
-              ) || (
-                ContactModel.canBulkCreate(this.authUser) &&
-                                    CaseModel.canBulkCreateContact(this.authUser)
-              )
-            );
-          }
-        }),
-
-        // See case contacts..
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM',
-          click: (item: CaseModel) => {
-            this.router.navigate(['/relationships', EntityType.CASE, item.id, 'contacts']);
-          },
-          visible: (item: CaseModel): boolean => {
-            return !item.deleted &&
-                            RelationshipModel.canList(this.authUser) &&
-                            CaseModel.canListRelationshipContacts(this.authUser);
-          }
-        }),
-
-        // See case exposures
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_ACTION_SEE_EXPOSURES_TO',
-          click: (item: CaseModel) => {
-            this.router.navigate(['/relationships', EntityType.CASE, item.id, 'exposures']);
-          },
-          visible: (item: CaseModel): boolean => {
-            return !item.deleted &&
-                            RelationshipModel.canList(this.authUser) &&
-                            CaseModel.canListRelationshipExposures(this.authUser);
-          }
-        }),
-
-        // Divider
-        new HoverRowAction({
-          type: HoverRowActionType.DIVIDER,
-          visible: (item: CaseModel): boolean => {
-            // visible only if at least one of the previous two items is visible
-            return !item.deleted &&
-                            RelationshipModel.canList(this.authUser) && (
-              CaseModel.canListRelationshipContacts(this.authUser) ||
-                                CaseModel.canListRelationshipExposures(this.authUser)
-            );
-          }
-        }),
-
-        // See records detected by the system as duplicates but they were marked as not duplicates
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_SEE_RECORDS_NOT_DUPLICATES',
-          click: (item: CaseModel) => {
-            this.router.navigate(['/duplicated-records/cases', item.id, 'marked-not-duplicates']);
-          },
-          visible: (item: CaseModel): boolean => {
-            return !item.deleted;
-          }
-        }),
-
-        // See case lab results
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS',
-          click: (item: CaseModel) => {
-            this.router.navigate(['/lab-results', 'cases', item.id]);
-          },
-          visible: (item: CaseModel): boolean => {
-            return !item.deleted &&
-                            LabResultModel.canList(this.authUser) &&
-                            CaseModel.canListLabResult(this.authUser);
-          }
-        }),
-
-        // See contacts follow-us belonging to this case
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_FOLLOW_UPS',
-          click: (item: CaseModel) => {
-            this.router.navigate(['/contacts', 'case-related-follow-ups', item.id]);
-          },
-          visible: (item: CaseModel): boolean => {
-            return !item.deleted &&
-                            FollowUpModel.canList(this.authUser);
-          }
-        }),
-
-        // See questionnaire
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE',
-          click: (item: CaseModel) => {
-            this.router.navigate(['/cases', item.id , 'view-questionnaire']);
-          },
-          visible: (item: CaseModel): boolean => {
-            return !item.deleted &&
-                            CaseModel.canView(this.authUser);
-          }
-        }),
-
-        // Divider
-        new HoverRowAction({
-          type: HoverRowActionType.DIVIDER,
-          visible: (item: CaseModel): boolean => {
-            // visible only if at least one of the previous two items is visible
-            return !item.deleted && (
-              LabResultModel.canList(this.authUser) ||
-                            FollowUpModel.canList(this.authUser)
-            );
-          }
-        }),
-
-        // View Case movement map
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_MOVEMENT',
-          click: (item: CaseModel) => {
-            this.router.navigate(['/cases', item.id, 'movement']);
-          },
-          visible: (item: CaseModel): boolean => {
-            return !item.deleted &&
-                            CaseModel.canViewMovementMap(this.authUser);
-          }
-        }),
-
-        // View case chronology timeline
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY',
-          click: (item: CaseModel) => {
-            this.router.navigate(['/cases', item.id, 'chronology']);
-          },
-          visible: (item: CaseModel): boolean => {
-            return !item.deleted &&
-                            CaseModel.canViewChronologyChart(this.authUser);
-          }
-        }),
-
-        // Divider
-        new HoverRowAction({
-          type: HoverRowActionType.DIVIDER,
-          visible: (item: CaseModel): boolean => {
-            return !item.deleted && (
-              CaseModel.canViewMovementMap(this.authUser) ||
-                            CaseModel.canViewChronologyChart(this.authUser)
-            );
-          }
-        }),
-
-        // Download case investigation form
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_CASE_INVESTIGATION_FORM',
-          click: (item: CaseModel) => {
-            this.exportCaseInvestigationForm(item);
-          },
-          visible: (item: CaseModel): boolean => {
-            return !item.deleted &&
-                            CaseModel.canExportInvestigationForm(this.authUser);
-          }
-        }),
-
-        // Restore a deleted case
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_RESTORE_CASE',
-          click: (item: CaseModel) => {
-            this.restoreCase(item);
-          },
-          visible: (item: CaseModel): boolean => {
-            return item.deleted &&
-                            this.authUser &&
-                            this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            CaseModel.canRestore(this.authUser);
-          },
-          class: 'mat-menu-item-restore'
-        })
-      ]
-    })
-  ];
-
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
     private router: Router,
@@ -1056,6 +735,230 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
                     ContactModel.canCreate(this.authUser) &&
                     CaseModel.canCreateContact(this.authUser);
+                }
+              },
+
+              // Bulk add contacts to case
+              {
+                label: 'LNG_PAGE_ACTION_BULK_ADD_CONTACTS',
+                action: {
+                  link: (): string[] => {
+                    return ['/contacts', 'create-bulk'];
+                  },
+                  linkQueryParams: (item: CaseModel): Params => {
+                    return {
+                      entityType: EntityType.CASE,
+                      entityId: item.id
+                    };
+                  }
+                },
+                visible: (item: CaseModel): boolean => {
+                  return !item.deleted &&
+                    this.authUser &&
+                    this.selectedOutbreak &&
+                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    ContactModel.canBulkCreate(this.authUser) &&
+                    CaseModel.canBulkCreateContact(this.authUser);
+                }
+              },
+
+              // Divider
+              {
+                visible: (item: CaseModel): boolean => {
+                  // visible only if at least one of the previous two items is visible
+                  return !item.deleted &&
+                    this.authUser &&
+                    this.selectedOutbreak &&
+                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    (
+                      (
+                        ContactModel.canCreate(this.authUser) &&
+                        CaseModel.canCreateContact(this.authUser)
+                      ) || (
+                        ContactModel.canBulkCreate(this.authUser) &&
+                        CaseModel.canBulkCreateContact(this.authUser)
+                      )
+                    );
+                }
+              },
+
+              // See case contacts..
+              {
+                label: 'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM',
+                action: {
+                  link: (item: CaseModel): string[] => {
+                    return ['/relationships', EntityType.CASE, item.id, 'contacts'];
+                  }
+                },
+                visible: (item: CaseModel): boolean => {
+                  return !item.deleted &&
+                    RelationshipModel.canList(this.authUser) &&
+                    CaseModel.canListRelationshipContacts(this.authUser);
+                }
+              },
+
+              // See case exposures
+              {
+                label: 'LNG_PAGE_ACTION_SEE_EXPOSURES_TO',
+                action: {
+                  link: (item: CaseModel): string[] => {
+                    return ['/relationships', EntityType.CASE, item.id, 'exposures'];
+                  }
+                },
+                visible: (item: CaseModel): boolean => {
+                  return !item.deleted &&
+                    RelationshipModel.canList(this.authUser) &&
+                    CaseModel.canListRelationshipExposures(this.authUser);
+                }
+              },
+
+              // Divider
+              {
+                visible: (item: CaseModel): boolean => {
+                  // visible only if at least one of the previous two items is visible
+                  return !item.deleted &&
+                    RelationshipModel.canList(this.authUser) &&
+                    (
+                      CaseModel.canListRelationshipContacts(this.authUser) ||
+                      CaseModel.canListRelationshipExposures(this.authUser)
+                    );
+                }
+              },
+
+              // See records detected by the system as duplicates but they were marked as not duplicates
+              {
+                label: 'LNG_PAGE_LIST_CASES_ACTION_SEE_RECORDS_NOT_DUPLICATES',
+                action: {
+                  link: (item: CaseModel): string[] => {
+                    return ['/duplicated-records/cases', item.id, 'marked-not-duplicates'];
+                  }
+                },
+                visible: (item: CaseModel): boolean => {
+                  return !item.deleted;
+                }
+              },
+
+              // See case lab results
+              {
+                label: 'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS',
+                action: {
+                  link: (item: CaseModel): string[] => {
+                    return ['/lab-results', 'cases', item.id];
+                  }
+                },
+                visible: (item: CaseModel): boolean => {
+                  return !item.deleted &&
+                    LabResultModel.canList(this.authUser) &&
+                    CaseModel.canListLabResult(this.authUser);
+                }
+              },
+
+              // See contacts follow-us belonging to this case
+              {
+                label: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_FOLLOW_UPS',
+                action: {
+                  link: (item: CaseModel): string[] => {
+                    return ['/contacts', 'case-related-follow-ups', item.id];
+                  }
+                },
+                visible: (item: CaseModel): boolean => {
+                  return !item.deleted &&
+                    FollowUpModel.canList(this.authUser);
+                }
+              },
+
+              // See questionnaire
+              {
+                label: 'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE',
+                action: {
+                  link: (item: CaseModel): string[] => {
+                    return ['/cases', item.id , 'view-questionnaire'];
+                  }
+                },
+                visible: (item: CaseModel): boolean => {
+                  return !item.deleted &&
+                    CaseModel.canView(this.authUser);
+                }
+              },
+
+              // Divider
+              {
+                visible: (item: CaseModel): boolean => {
+                  // visible only if at least one of the previous two items is visible
+                  return !item.deleted && (
+                    LabResultModel.canList(this.authUser) ||
+                    FollowUpModel.canList(this.authUser)
+                  );
+                }
+              },
+
+              // View Case movement map
+              {
+                label: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_MOVEMENT',
+                action: {
+                  link: (item: CaseModel): string[] => {
+                    return ['/cases', item.id, 'movement'];
+                  }
+                },
+                visible: (item: CaseModel): boolean => {
+                  return !item.deleted &&
+                    CaseModel.canViewMovementMap(this.authUser);
+                }
+              },
+
+              // View case chronology timeline
+              {
+                label: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY',
+                action: {
+                  link: (item: CaseModel): string[] => {
+                    return ['/cases', item.id, 'chronology'];
+                  }
+                },
+                visible: (item: CaseModel): boolean => {
+                  return !item.deleted &&
+                    CaseModel.canViewChronologyChart(this.authUser);
+                }
+              },
+
+              // Divider
+              {
+                visible: (item: CaseModel): boolean => {
+                  return !item.deleted && (
+                    CaseModel.canViewMovementMap(this.authUser) ||
+                    CaseModel.canViewChronologyChart(this.authUser)
+                  );
+                }
+              },
+
+              // Download case investigation form
+              {
+                label: 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_CASE_INVESTIGATION_FORM',
+                action: {
+                  click: (item: CaseModel) => {
+                    this.exportCaseInvestigationForm(item);
+                  }
+                },
+                visible: (item: CaseModel): boolean => {
+                  return !item.deleted &&
+                    CaseModel.canExportInvestigationForm(this.authUser);
+                }
+              },
+
+              // Restore a deleted case
+              {
+                label: 'LNG_PAGE_LIST_CASES_ACTION_RESTORE_CASE',
+                cssClasses: 'gd-list-table-actions-action-menu-warning',
+                action: {
+                  click: (item: CaseModel) => {
+                    this.restoreCase(item);
+                  }
+                },
+                visible: (item: CaseModel): boolean => {
+                  return item.deleted &&
+                    this.authUser &&
+                    this.selectedOutbreak &&
+                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    CaseModel.canRestore(this.authUser);
                 }
               }
             ]
