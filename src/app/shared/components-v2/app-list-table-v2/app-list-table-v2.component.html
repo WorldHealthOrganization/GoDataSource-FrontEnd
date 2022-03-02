@@ -26,6 +26,19 @@
     <div
       fxFlex
       class="gd-list-table-header-left">
+      <div>
+        <app-form-checkbox-v2
+          placeholder="test checkbox"></app-form-checkbox-v2>
+
+        <app-form-radio-button-v2
+          placeholder="test radio group 1"
+          [options]="[{label: 'G1R1', value: 'G1R1'}, {label: 'G1R2', value: 'G1R2'}]"></app-form-radio-button-v2>
+
+        <app-form-radio-button-v2
+          placeholder="test radio group 2"
+          [options]="[{label: 'G2R1', value: 'G2R1'}, {label: 'G2R2', value: 'G2R2'}]"></app-form-radio-button-v2>
+
+      </div>
       more than enough...o sa fie text + un link cu text care o sa afiseze total count la on click (pb tb stilizat dupa ce implementam pt ca o sa sufere schimbari continutul html)
     </div>
 
