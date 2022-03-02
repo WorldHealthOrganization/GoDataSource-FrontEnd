@@ -11,7 +11,7 @@ export interface IV2Breadcrumb {
     link: string[],
 
     // optional
-    linkQueryParams?: Params[]
+    linkQueryParams?: Params
   };
 
   // optional

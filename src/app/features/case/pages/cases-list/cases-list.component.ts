@@ -313,8 +313,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         this.fieldsGroupListRelationshipsRequired = fieldsGroupList.toRequiredList();
       });
 
-    // initialize Side Table Columns
+    // initialize table Columns
     this.initializeTableColumns();
+
+    // initialize quick actions
+    this.initializeQuickActions();
   }
 
   /**
@@ -334,7 +337,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   /**
    * Initialize Side Table Columns
    */
-  initializeTableColumns() {
+  initializeTableColumns(): void {
     // default table columns
     this.tableColumns = [
       // new VisibleColumnModel({
@@ -957,6 +960,44 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   }
 
   /**
+   * Initialize quick actions
+   */
+  initializeQuickActions(): void {
+    this.quickActions = {
+      type: V2RowActionType.MENU,
+      label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
+      visible: (): boolean => {
+        return !this.appliedListFilter && (
+          CaseModel.canListPersonsWithoutRelationships(this.authUser) ||
+          CaseModel.canListOnsetBeforePrimaryReport(this.authUser) ||
+          CaseModel.canListLongPeriodBetweenOnsetDatesReport(this.authUser) ||
+          (this.exportCasesUrl && CaseModel.canExport(this.authUser)) ||
+          CaseModel.canImport(this.authUser) ||
+          CaseModel.canExportInvestigationForm(this.authUser) ||
+          CaseModel.canExportRelationships(this.authUser));
+      },
+      menuOptions: [
+        {
+          label: 'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON',
+          action: {
+            link: (): string[] => {
+              return ['/cases'];
+            },
+            linkQueryParams: (): Params => {
+              return {
+                applyListFilter: Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS
+              };
+            }
+          },
+          visible: (): boolean => {
+            return CaseModel.canListPersonsWithoutRelationships(this.authUser);
+          }
+        }
+      ]
+    };
+  }
+
+  /**
      * Initialize Side Filters
      */
   initializeSideFilters() {
@@ -1209,14 +1250,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           link: DashboardModel.canViewDashboard(this.authUser) ?
             ['/dashboard'] :
             ['/version']
-        }
-      }, {
-        label: 'LNG_PAGE_LIST_CASES_TITLE',
-        action: {
-          link: ['/contacts'],
-          linkQueryParams: [{
-            q: '25'
-          }]
         }
       }, {
         label: 'LNG_PAGE_LIST_CASES_TITLE',

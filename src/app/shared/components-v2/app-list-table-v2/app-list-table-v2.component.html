@@ -34,17 +34,19 @@
         <!-- Menu -->
         <!-- IMPORTANT: Menu of type icon isn't supported here -->
         <button
-          type="button"
           class="gd-list-top-tile-buttons-button-quick"
+          type="button"
           mat-flat-button
           [disabled]="quickActions.disable && quickActions.disable(null)"
-          [matMenuTriggerFor]="menu">
-          quick ...
+          [matMenuTriggerFor]="quickMenu">
+          {{quickActions.label | translate}}
+
+          <^ css or mat-icon?
         </button>
 
         <!-- Floating menu -->
         <mat-menu
-          #menu="matMenu"
+          #quickMenu="matMenu"
           class="gd-list-top-tile-buttons-button-quick-options">
           <ng-container
             *ngFor="let menuOption of quickActions.menuOptions">
