@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserModel, UserRoleModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -23,9 +22,9 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
   templateUrl: './roles-list.component.html'
 })
 export class RolesListComponent extends ListComponent implements OnInit, OnDestroy {
-  breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel('Roles', '.', true)
-  ];
+  // breadcrumbs: BreadcrumbItemModel[] = [
+  //   new BreadcrumbItemModel('Roles', '.', true)
+  // ];
 
   // constants
   PermissionModel = PermissionModel;
@@ -177,6 +176,12 @@ export class RolesListComponent extends ListComponent implements OnInit, OnDestr
     //     label: 'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS'
     //   })
     // ];
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

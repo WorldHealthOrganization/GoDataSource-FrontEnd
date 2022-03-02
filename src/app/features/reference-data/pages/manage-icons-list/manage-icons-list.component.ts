@@ -1,8 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute } from '@angular/router';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategoryModel } from '../../../../core/models/reference-data.model';
 import { IconDataService } from '../../../../core/services/data/icon.data.service';
 import { IconModel } from '../../../../core/models/icon.model';
 import { Observable } from 'rxjs';
@@ -24,7 +23,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 })
 export class ManageIconsListComponent extends ListComponent implements OnInit, OnDestroy {
   // Breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // Category Name
   category: ReferenceDataCategoryModel;
@@ -114,42 +113,42 @@ export class ManageIconsListComponent extends ListComponent implements OnInit, O
   /**
      * Initialize breadcrumbs
      */
-  initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add reference categories list breadcrumb only if we have permission
-    if (ReferenceDataCategoryModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
-      );
-    }
-
-    // add category
-    if (
-      this.category &&
-            ReferenceDataEntryModel.canList(this.authUser)
-    ) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          this.category.name,
-          `/reference-data/${this.category.id}`,
-          false,
-          {},
-          this.category
-        )
-      );
-    }
-
-    // add manage icons breadcrumb
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_LIST_TITLE',
-        '',
-        true
-      )
-    );
-  }
+  // initializeBreadcrumbs() {
+  //   // reset
+  //   this.breadcrumbs = [];
+  //
+  //   // add reference categories list breadcrumb only if we have permission
+  //   if (ReferenceDataCategoryModel.canList(this.authUser)) {
+  //     this.breadcrumbs.push(
+  //       new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
+  //     );
+  //   }
+  //
+  //   // add category
+  //   if (
+  //     this.category &&
+  //           ReferenceDataEntryModel.canList(this.authUser)
+  //   ) {
+  //     this.breadcrumbs.push(
+  //       new BreadcrumbItemModel(
+  //         this.category.name,
+  //         `/reference-data/${this.category.id}`,
+  //         false,
+  //         {},
+  //         this.category
+  //       )
+  //     );
+  //   }
+  //
+  //   // add manage icons breadcrumb
+  //   this.breadcrumbs.push(
+  //     new BreadcrumbItemModel(
+  //       'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_LIST_TITLE',
+  //       '',
+  //       true
+  //     )
+  //   );
+  // }
 
   /**
      * Retrieve category
@@ -165,6 +164,12 @@ export class ManageIconsListComponent extends ListComponent implements OnInit, O
         // update breadcrumbs
         this.initializeBreadcrumbs();
       });
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

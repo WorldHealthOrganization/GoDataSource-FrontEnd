@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -19,7 +18,6 @@ import * as _ from 'lodash';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { catchError, map, share, tap } from 'rxjs/operators';
 import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
-import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import { UserSettings } from '../../../../core/models/user.model';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
@@ -30,7 +28,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
   templateUrl: './entity-relationships-list-assign.component.html'
 })
 export class EntityRelationshipsListAssignComponent extends RelationshipsListComponent implements OnInit, OnDestroy {
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // entities list relationships
   entitiesList$: Observable<(CaseModel | ContactModel | EventModel)[]>;
@@ -251,28 +249,34 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
     });
   }
 
-  private initializeBreadcrumbs() {
-    if (
-      this.relationshipType &&
-            this.entity
-    ) {
-      const assignRelationshipsPageTitle = this.relationshipType === RelationshipType.EXPOSURE ?
-        'LNG_PAGE_LIST_ENTITY_ASSIGN_EXPOSURES_TITLE' :
-        'LNG_PAGE_LIST_ENTITY_ASSIGN_CONTACTS_TITLE';
+  // private initializeBreadcrumbs() {
+  //   if (
+  //     this.relationshipType &&
+  //           this.entity
+  //   ) {
+  //     const assignRelationshipsPageTitle = this.relationshipType === RelationshipType.EXPOSURE ?
+  //       'LNG_PAGE_LIST_ENTITY_ASSIGN_EXPOSURES_TITLE' :
+  //       'LNG_PAGE_LIST_ENTITY_ASSIGN_CONTACTS_TITLE';
+  //
+  //     this.breadcrumbs = [
+  //       new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
+  //       new BreadcrumbItemModel(
+  //         this.entity.name,
+  //         `${this.entityMap[this.entityType].link}/${this.entityId}/view`
+  //       ),
+  //       new BreadcrumbItemModel(
+  //         this.relationshipsListPageTitle,
+  //         `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`
+  //       ),
+  //       new BreadcrumbItemModel(assignRelationshipsPageTitle, null, true)
+  //     ];
+  //   }
+  // }
 
-      this.breadcrumbs = [
-        new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
-        new BreadcrumbItemModel(
-          this.entity.name,
-          `${this.entityMap[this.entityType].link}/${this.entityId}/view`
-        ),
-        new BreadcrumbItemModel(
-          this.relationshipsListPageTitle,
-          `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`
-        ),
-        new BreadcrumbItemModel(assignRelationshipsPageTitle, null, true)
-      ];
-    }
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

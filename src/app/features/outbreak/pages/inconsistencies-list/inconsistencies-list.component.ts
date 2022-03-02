@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -29,7 +28,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 })
 export class InconsistenciesListComponent extends ListComponent implements OnInit, OnDestroy {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // Outbreak
   outbreak: OutbreakModel;
@@ -149,6 +148,12 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
   }
 
   /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
+  }
+
+  /**
    * Fields retrieved from api to reduce payload size
    */
   refreshListFields(): string[] {
@@ -181,45 +186,45 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
   /**
      * Init breadcrumbs
      */
-  initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (OutbreakModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAKS_TITLE', '/outbreaks')
-      );
-    }
-
-    // add outbreak details ?
-    if (this.outbreak) {
-      if (OutbreakModel.canModify(this.authUser)) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel(
-            this.outbreak.name,
-            `/outbreaks/${this.outbreak.id}/modify`
-          )
-        );
-      } else if (OutbreakModel.canView(this.authUser)) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel(
-            this.outbreak.name,
-            `/outbreaks/${this.outbreak.id}/view`
-          )
-        );
-      }
-    }
-
-    // add inconsistencies breadcrumb
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        'LNG_PAGE_LIST_INCONSISTENCIES_TITLE',
-        '.',
-        true
-      )
-    );
-  }
+  // initializeBreadcrumbs() {
+  //   // reset
+  //   this.breadcrumbs = [];
+  //
+  //   // add list breadcrumb only if we have permission
+  //   if (OutbreakModel.canList(this.authUser)) {
+  //     this.breadcrumbs.push(
+  //       new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAKS_TITLE', '/outbreaks')
+  //     );
+  //   }
+  //
+  //   // add outbreak details ?
+  //   if (this.outbreak) {
+  //     if (OutbreakModel.canModify(this.authUser)) {
+  //       this.breadcrumbs.push(
+  //         new BreadcrumbItemModel(
+  //           this.outbreak.name,
+  //           `/outbreaks/${this.outbreak.id}/modify`
+  //         )
+  //       );
+  //     } else if (OutbreakModel.canView(this.authUser)) {
+  //       this.breadcrumbs.push(
+  //         new BreadcrumbItemModel(
+  //           this.outbreak.name,
+  //           `/outbreaks/${this.outbreak.id}/view`
+  //         )
+  //       );
+  //     }
+  //   }
+  //
+  //   // add inconsistencies breadcrumb
+  //   this.breadcrumbs.push(
+  //     new BreadcrumbItemModel(
+  //       'LNG_PAGE_LIST_INCONSISTENCIES_TITLE',
+  //       '.',
+  //       true
+  //     )
+  //   );
+  // }
 
   /**
      * Retrieve Person Type color

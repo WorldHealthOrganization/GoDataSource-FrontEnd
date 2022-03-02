@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -45,8 +44,8 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
   styleUrls: ['./entity-lab-results-list.component.less']
 })
 export class EntityLabResultsListComponent extends ListComponent implements OnInit, OnDestroy {
-  // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // // breadcrumbs
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // entity
   personType: EntityType;
@@ -409,52 +408,52 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
   /**
      * Initialize breadcrumbs
      */
-  private initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // entity list
-    if (
-      this.personType === EntityType.CONTACT &&
-            ContactModel.canList(this.authUser)
-    ) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-      );
-    } else if (
-      this.personType === EntityType.CASE &&
-            CaseModel.canList(this.authUser)
-    ) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
-      );
-    }
-
-    // person breadcrumbs
-    if (this.entityData) {
-      // entity view
-      if (
-        this.personType === EntityType.CONTACT &&
-                ContactModel.canView(this.authUser)
-      ) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel(this.entityData.name, `/contacts/${this.entityData.id}/view`)
-        );
-      } else if (
-        this.personType === EntityType.CASE &&
-                CaseModel.canView(this.authUser)
-      ) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel(this.entityData.name, `/cases/${this.entityData.id}/view`)
-        );
-      }
-    }
-
-    // current page
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE', '.', true)
-    );
-  }
+  // private initializeBreadcrumbs() {
+  //   // reset
+  //   this.breadcrumbs = [];
+  //
+  //   // entity list
+  //   if (
+  //     this.personType === EntityType.CONTACT &&
+  //           ContactModel.canList(this.authUser)
+  //   ) {
+  //     this.breadcrumbs.push(
+  //       new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+  //     );
+  //   } else if (
+  //     this.personType === EntityType.CASE &&
+  //           CaseModel.canList(this.authUser)
+  //   ) {
+  //     this.breadcrumbs.push(
+  //       new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
+  //     );
+  //   }
+  //
+  //   // person breadcrumbs
+  //   if (this.entityData) {
+  //     // entity view
+  //     if (
+  //       this.personType === EntityType.CONTACT &&
+  //               ContactModel.canView(this.authUser)
+  //     ) {
+  //       this.breadcrumbs.push(
+  //         new BreadcrumbItemModel(this.entityData.name, `/contacts/${this.entityData.id}/view`)
+  //       );
+  //     } else if (
+  //       this.personType === EntityType.CASE &&
+  //               CaseModel.canView(this.authUser)
+  //     ) {
+  //       this.breadcrumbs.push(
+  //         new BreadcrumbItemModel(this.entityData.name, `/cases/${this.entityData.id}/view`)
+  //       );
+  //     }
+  //   }
+  //
+  //   // current page
+  //   this.breadcrumbs.push(
+  //     new BreadcrumbItemModel('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE', '.', true)
+  //   );
+  // }
 
   /**
      * Initialize Side Table Columns
@@ -661,6 +660,12 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
         questionnaireTemplate: this.selectedOutbreak.labResultsTemplate
       })
     ];
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

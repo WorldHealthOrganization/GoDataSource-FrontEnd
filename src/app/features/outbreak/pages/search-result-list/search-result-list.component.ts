@@ -4,7 +4,6 @@ import {
   OnInit,
   ViewEncapsulation
 } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import {
   UserModel,
@@ -51,9 +50,9 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class SearchResultListComponent extends ListComponent implements OnInit, OnDestroy {
   // Breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel('LNG_PAGE_LIST_SEARCH_RESULT_TITLE', '.', true)
-  ];
+  // breadcrumbs: BreadcrumbItemModel[] = [
+  //   new BreadcrumbItemModel('LNG_PAGE_LIST_SEARCH_RESULT_TITLE', '.', true)
+  // ];
 
   // authenticated user
   authUser: UserModel;
@@ -196,6 +195,12 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
     //     label: 'LNG_ENTITY_FIELD_LABEL_NAME'
     //   })
     // ];
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

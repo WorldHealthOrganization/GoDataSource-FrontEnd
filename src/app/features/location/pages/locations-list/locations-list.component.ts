@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LocationModel } from '../../../../core/models/location.model';
@@ -34,12 +33,12 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 })
 export class LocationsListComponent extends ListComponent implements OnInit, OnDestroy {
   // breadcrumb header
-  public breadcrumbs: BreadcrumbItemModel[] =  [
-    new BreadcrumbItemModel(
-      'LNG_PAGE_LIST_LOCATIONS_TITLE',
-      '/locations'
-    )
-  ];
+  // public breadcrumbs: BreadcrumbItemModel[] =  [
+  //   new BreadcrumbItemModel(
+  //     'LNG_PAGE_LIST_LOCATIONS_TITLE',
+  //     '/locations'
+  //   )
+  // ];
 
   // constants
   ExportDataExtension = ExportDataExtension;
@@ -262,6 +261,12 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
     //     visible: false
     //   })
     // ];
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

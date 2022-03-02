@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { Observable, Subscription } from 'rxjs';
@@ -41,7 +40,7 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 })
 export class IndividualContactFollowUpsListComponent extends FollowUpsListComponent implements OnInit, OnDestroy {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // authenticated user
   authUser: UserModel;
@@ -359,45 +358,45 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
   /**
      * Initialize breadcrumbs
      */
-  private initializeBreadcrumbs() {
-    // init
-    this.breadcrumbs = [];
-
-    // add contact/case breadcrumbs
-    if (this.isContact) {
-      if (ContactModel.canList(this.authUser)) {
-        this.breadcrumbs.push(new BreadcrumbItemModel(
-          'LNG_PAGE_LIST_CONTACTS_TITLE',
-          '/contacts'
-        ));
-      }
-    } else {
-      if (CaseModel.canList(this.authUser)) {
-        this.breadcrumbs.push(new BreadcrumbItemModel(
-          'LNG_PAGE_LIST_CASES_TITLE',
-          '/cases'
-        ));
-      }
-    }
-
-    // add record data ?
-    if (
-      this.recordData &&
-            CaseModel.canView(this.authUser)
-    ) {
-      this.breadcrumbs.push(new BreadcrumbItemModel(
-        this.recordData.name,
-        this.isContact ? `/contacts/${this.recordData.id}/view` : `/cases/${this.recordData.id}/view`
-      ));
-    }
-
-    // add follow-ups breadcrumbs
-    this.breadcrumbs.push(new BreadcrumbItemModel(
-      this.isContact ? 'LNG_PAGE_LIST_FOLLOW_UPS_TITLE' : 'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE',
-      '.',
-      true
-    ));
-  }
+  // private initializeBreadcrumbs() {
+  //   // init
+  //   this.breadcrumbs = [];
+  //
+  //   // add contact/case breadcrumbs
+  //   if (this.isContact) {
+  //     if (ContactModel.canList(this.authUser)) {
+  //       this.breadcrumbs.push(new BreadcrumbItemModel(
+  //         'LNG_PAGE_LIST_CONTACTS_TITLE',
+  //         '/contacts'
+  //       ));
+  //     }
+  //   } else {
+  //     if (CaseModel.canList(this.authUser)) {
+  //       this.breadcrumbs.push(new BreadcrumbItemModel(
+  //         'LNG_PAGE_LIST_CASES_TITLE',
+  //         '/cases'
+  //       ));
+  //     }
+  //   }
+  //
+  //   // add record data ?
+  //   if (
+  //     this.recordData &&
+  //           CaseModel.canView(this.authUser)
+  //   ) {
+  //     this.breadcrumbs.push(new BreadcrumbItemModel(
+  //       this.recordData.name,
+  //       this.isContact ? `/contacts/${this.recordData.id}/view` : `/cases/${this.recordData.id}/view`
+  //     ));
+  //   }
+  //
+  //   // add follow-ups breadcrumbs
+  //   this.breadcrumbs.push(new BreadcrumbItemModel(
+  //     this.isContact ? 'LNG_PAGE_LIST_FOLLOW_UPS_TITLE' : 'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE',
+  //     '.',
+  //     true
+  //   ));
+  // }
 
   /**
      * Initialize Side Table Columns
@@ -595,6 +594,12 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
         })
       );
     }
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

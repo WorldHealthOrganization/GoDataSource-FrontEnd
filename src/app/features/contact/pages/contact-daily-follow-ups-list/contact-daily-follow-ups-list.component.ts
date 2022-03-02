@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { Observable, Subscription, throwError } from 'rxjs';
@@ -33,7 +32,6 @@ import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { TeamModel } from '../../../../core/models/team.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { AddressModel } from '../../../../core/models/address.model';
 
@@ -45,7 +43,7 @@ import { AddressModel } from '../../../../core/models/address.model';
 })
 export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent implements OnInit, OnDestroy {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // authenticated user
   authUser: UserModel;
@@ -403,87 +401,87 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
   /**
      * Initialize breadcrumbs
      */
-  private initializeBreadcrumbs() {
-    // init breadcrumbs
-    this.breadcrumbs = [];
-
-    // add case / contact breadcrumbs
-    if (!this.caseData) {
-      // add team/user workload page if necessary
-      if (
-        this.workloadData
-      ) {
-        if (
-          this.workloadData.user !== undefined &&
-                    UserModel.canListWorkload(this.authUser)
-        ) {
-          // add user workload page
-          this.breadcrumbs.push(
-            new BreadcrumbItemModel(
-              'LNG_PAGE_USERS_WORKLOAD_TITLE',
-              '/users/workload'
-            )
-          );
-        } else if (TeamModel.canListWorkload(this.authUser)) {
-          // add team workload page
-          this.breadcrumbs.push(
-            new BreadcrumbItemModel(
-              'LNG_PAGE_TEAMS_WORKLOAD_TITLE',
-              '/teams/workload'
-            )
-          );
-        }
-      }
-
-      // list contacts
-      if (ContactModel.canList(this.authUser)) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_CONTACTS_TITLE',
-            '/contacts'
-          )
-        );
-      }
-
-      // current page
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
-          '.',
-          true
-        )
-      );
-    } else {
-      // cases list
-      if (CaseModel.canList(this.authUser)) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_CASES_TITLE',
-            '/cases'
-          )
-        );
-      }
-
-      // case view
-      if (CaseModel.canView(this.authUser)) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel(
-            this.caseData.name,
-            `/cases/${this.caseData.id}/view`
-          )
-        );
-      }
-
-      // current page
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          'LNG_PAGE_LIST_FOLLOW_UPS_FOR_RELATED_CONTACTS_TITLE',
-          '.',
-          true
-        )
-      );
-    }
-  }
+  // private initializeBreadcrumbs() {
+  //   // init breadcrumbs
+  //   this.breadcrumbs = [];
+  //
+  //   // add case / contact breadcrumbs
+  //   if (!this.caseData) {
+  //     // add team/user workload page if necessary
+  //     if (
+  //       this.workloadData
+  //     ) {
+  //       if (
+  //         this.workloadData.user !== undefined &&
+  //                   UserModel.canListWorkload(this.authUser)
+  //       ) {
+  //         // add user workload page
+  //         this.breadcrumbs.push(
+  //           new BreadcrumbItemModel(
+  //             'LNG_PAGE_USERS_WORKLOAD_TITLE',
+  //             '/users/workload'
+  //           )
+  //         );
+  //       } else if (TeamModel.canListWorkload(this.authUser)) {
+  //         // add team workload page
+  //         this.breadcrumbs.push(
+  //           new BreadcrumbItemModel(
+  //             'LNG_PAGE_TEAMS_WORKLOAD_TITLE',
+  //             '/teams/workload'
+  //           )
+  //         );
+  //       }
+  //     }
+  //
+  //     // list contacts
+  //     if (ContactModel.canList(this.authUser)) {
+  //       this.breadcrumbs.push(
+  //         new BreadcrumbItemModel(
+  //           'LNG_PAGE_LIST_CONTACTS_TITLE',
+  //           '/contacts'
+  //         )
+  //       );
+  //     }
+  //
+  //     // current page
+  //     this.breadcrumbs.push(
+  //       new BreadcrumbItemModel(
+  //         'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
+  //         '.',
+  //         true
+  //       )
+  //     );
+  //   } else {
+  //     // cases list
+  //     if (CaseModel.canList(this.authUser)) {
+  //       this.breadcrumbs.push(
+  //         new BreadcrumbItemModel(
+  //           'LNG_PAGE_LIST_CASES_TITLE',
+  //           '/cases'
+  //         )
+  //       );
+  //     }
+  //
+  //     // case view
+  //     if (CaseModel.canView(this.authUser)) {
+  //       this.breadcrumbs.push(
+  //         new BreadcrumbItemModel(
+  //           this.caseData.name,
+  //           `/cases/${this.caseData.id}/view`
+  //         )
+  //       );
+  //     }
+  //
+  //     // current page
+  //     this.breadcrumbs.push(
+  //       new BreadcrumbItemModel(
+  //         'LNG_PAGE_LIST_FOLLOW_UPS_FOR_RELATED_CONTACTS_TITLE',
+  //         '.',
+  //         true
+  //       )
+  //     );
+  //   }
+  // }
 
   /**
      * Initialize Side Table Columns
@@ -1072,6 +1070,12 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
      */
   resetFiltersAddDefault() {
     this.initializeHeaderFilters();
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import {
@@ -30,9 +29,9 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
   styleUrls: ['./help-categories-list.component.less']
 })
 export class HelpCategoriesListComponent extends ListComponent implements OnInit, OnDestroy {
-  breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_CATEGORIES_TITLE', '.', true)
-  ];
+  // breadcrumbs: BreadcrumbItemModel[] = [
+  //   new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_CATEGORIES_TITLE', '.', true)
+  // ];
 
   // authenticated user
   authUser: UserModel;
@@ -166,6 +165,12 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
     //     label: 'LNG_HELP_CATEGORY_FIELD_LABEL_ORDER'
     //   })
     // ];
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -23,9 +22,9 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 })
 export class SystemDevicesComponent extends ListComponent implements OnInit, OnDestroy {
   // Breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_DEVICES_TITLE', '.', true)
-  ];
+  // breadcrumbs: BreadcrumbItemModel[] = [
+  //   new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_DEVICES_TITLE', '.', true)
+  // ];
 
   // authenticated user
   authUser: UserModel;
@@ -193,6 +192,12 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
     //     label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_LAST_SEEN'
     //   })
     // ];
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

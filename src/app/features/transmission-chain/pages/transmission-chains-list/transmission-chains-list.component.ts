@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { TransmissionChainGroupModel, TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -26,9 +25,9 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 })
 export class TransmissionChainsListComponent extends ListComponent implements OnInit, OnDestroy {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel('LNG_PAGE_LIST_TRANSMISSION_CHAINS_TITLE', null, true)
-  ];
+  // breadcrumbs: BreadcrumbItemModel[] = [
+  //   new BreadcrumbItemModel('LNG_PAGE_LIST_TRANSMISSION_CHAINS_TITLE', null, true)
+  // ];
 
   outbreakSubscriber: Subscription;
 
@@ -229,6 +228,12 @@ export class TransmissionChainsListComponent extends ListComponent implements On
         this.queryBuilder.merge(qb);
       }
     }
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

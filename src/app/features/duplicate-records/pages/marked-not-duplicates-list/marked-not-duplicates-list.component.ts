@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable, Subscription } from 'rxjs';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -36,7 +35,7 @@ export class MarkedNotDuplicatesListComponent
   extends ListComponent
   implements OnInit, OnDestroy {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // authenticated user
   authUser: UserModel;
@@ -213,83 +212,83 @@ export class MarkedNotDuplicatesListComponent
   /**
      * Initialize breadcrumbs
      */
-  initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add list / view / modify record breadcrumbs
-    if (this.recordType === EntityType.CASE) {
-      // list
-      if (CaseModel.canList(this.authUser)) {
-        this.breadcrumbs.push(new BreadcrumbItemModel(
-          'LNG_PAGE_LIST_CASES_TITLE',
-          '/cases'
-        ));
-      }
-
-      // view / modify
-      if (this.recordData) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel(
-            CaseModel.canModify(this.authUser) ? 'LNG_PAGE_MODIFY_CASE_TITLE' : 'LNG_PAGE_VIEW_CASE_TITLE',
-            `/cases/${this.recordId}/${CaseModel.canModify(this.authUser) ? 'modify' : 'view'}`,
-            false,
-            {},
-            this.recordData
-          )
-        );
-      }
-    } else if (this.recordType === EntityType.CONTACT) {
-      // list
-      if (ContactModel.canList(this.authUser)) {
-        this.breadcrumbs.push(new BreadcrumbItemModel(
-          'LNG_PAGE_LIST_CONTACTS_TITLE',
-          '/contacts'
-        ));
-      }
-
-      // view / modify
-      if (this.recordData) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel(
-            ContactModel.canModify(this.authUser) ? 'LNG_PAGE_MODIFY_CONTACT_TITLE' : 'LNG_PAGE_VIEW_CONTACT_TITLE',
-            `/contacts/${this.recordId}/${ContactModel.canModify(this.authUser) ? 'modify' : 'view'}`,
-            false,
-            {},
-            this.recordData
-          )
-        );
-      }
-    } else if (this.recordType === EntityType.CONTACT_OF_CONTACT) {
-      // list
-      if (ContactOfContactModel.canList(this.authUser)) {
-        this.breadcrumbs.push(new BreadcrumbItemModel(
-          'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
-          '/contacts-of-contacts'
-        ));
-      }
-
-      // view / modify
-      if (this.recordData) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel(
-            ContactOfContactModel.canModify(this.authUser) ? 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TITLE' : 'LNG_PAGE_VIEW_CONTACT_OF_CONTACT_TITLE',
-            `/contacts-of-contacts/${this.recordId}/${ContactOfContactModel.canModify(this.authUser) ? 'modify' : 'view'}`,
-            false,
-            {},
-            this.recordData
-          )
-        );
-      }
-    }
-
-    // add main breadcrumb
-    this.breadcrumbs.push(new BreadcrumbItemModel(
-      'LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_TITLE',
-      '.',
-      true
-    ));
-  }
+  // initializeBreadcrumbs() {
+  //   // reset
+  //   this.breadcrumbs = [];
+  //
+  //   // add list / view / modify record breadcrumbs
+  //   if (this.recordType === EntityType.CASE) {
+  //     // list
+  //     if (CaseModel.canList(this.authUser)) {
+  //       this.breadcrumbs.push(new BreadcrumbItemModel(
+  //         'LNG_PAGE_LIST_CASES_TITLE',
+  //         '/cases'
+  //       ));
+  //     }
+  //
+  //     // view / modify
+  //     if (this.recordData) {
+  //       this.breadcrumbs.push(
+  //         new BreadcrumbItemModel(
+  //           CaseModel.canModify(this.authUser) ? 'LNG_PAGE_MODIFY_CASE_TITLE' : 'LNG_PAGE_VIEW_CASE_TITLE',
+  //           `/cases/${this.recordId}/${CaseModel.canModify(this.authUser) ? 'modify' : 'view'}`,
+  //           false,
+  //           {},
+  //           this.recordData
+  //         )
+  //       );
+  //     }
+  //   } else if (this.recordType === EntityType.CONTACT) {
+  //     // list
+  //     if (ContactModel.canList(this.authUser)) {
+  //       this.breadcrumbs.push(new BreadcrumbItemModel(
+  //         'LNG_PAGE_LIST_CONTACTS_TITLE',
+  //         '/contacts'
+  //       ));
+  //     }
+  //
+  //     // view / modify
+  //     if (this.recordData) {
+  //       this.breadcrumbs.push(
+  //         new BreadcrumbItemModel(
+  //           ContactModel.canModify(this.authUser) ? 'LNG_PAGE_MODIFY_CONTACT_TITLE' : 'LNG_PAGE_VIEW_CONTACT_TITLE',
+  //           `/contacts/${this.recordId}/${ContactModel.canModify(this.authUser) ? 'modify' : 'view'}`,
+  //           false,
+  //           {},
+  //           this.recordData
+  //         )
+  //       );
+  //     }
+  //   } else if (this.recordType === EntityType.CONTACT_OF_CONTACT) {
+  //     // list
+  //     if (ContactOfContactModel.canList(this.authUser)) {
+  //       this.breadcrumbs.push(new BreadcrumbItemModel(
+  //         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
+  //         '/contacts-of-contacts'
+  //       ));
+  //     }
+  //
+  //     // view / modify
+  //     if (this.recordData) {
+  //       this.breadcrumbs.push(
+  //         new BreadcrumbItemModel(
+  //           ContactOfContactModel.canModify(this.authUser) ? 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TITLE' : 'LNG_PAGE_VIEW_CONTACT_OF_CONTACT_TITLE',
+  //           `/contacts-of-contacts/${this.recordId}/${ContactOfContactModel.canModify(this.authUser) ? 'modify' : 'view'}`,
+  //           false,
+  //           {},
+  //           this.recordData
+  //         )
+  //       );
+  //     }
+  //   }
+  //
+  //   // add main breadcrumb
+  //   this.breadcrumbs.push(new BreadcrumbItemModel(
+  //     'LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_TITLE',
+  //     '.',
+  //     true
+  //   ));
+  // }
 
   /**
      * Retrieve case / contact data
@@ -379,6 +378,12 @@ export class MarkedNotDuplicatesListComponent
     //     label: 'LNG_ENTITY_FIELD_LABEL_PHONE_NUMBER'
     //   })
     // ];
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { UserModel } from '../../../../core/models/user.model';
@@ -27,9 +26,9 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
   styleUrls: ['./clusters-list.component.less']
 })
 export class ClustersListComponent extends ListComponent implements OnInit, OnDestroy {
-  breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel('LNG_PAGE_LIST_CLUSTERS_TITLE', '.', true)
-  ];
+  // breadcrumbs: BreadcrumbItemModel[] = [
+  //   new BreadcrumbItemModel('LNG_PAGE_LIST_CLUSTERS_TITLE', '.', true)
+  // ];
 
   // constants
   ClusterModel = ClusterModel;
@@ -172,6 +171,12 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
       this.outbreakSubscriber.unsubscribe();
       this.outbreakSubscriber = null;
     }
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

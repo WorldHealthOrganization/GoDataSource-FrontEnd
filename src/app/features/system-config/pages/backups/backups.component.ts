@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
@@ -31,9 +30,9 @@ import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 })
 export class BackupsComponent extends ListComponent implements OnInit, OnDestroy {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel('LNG_PAGE_SYSTEM_BACKUPS_TITLE', '.', true)
-  ];
+  // breadcrumbs: BreadcrumbItemModel[] = [
+  //   new BreadcrumbItemModel('LNG_PAGE_SYSTEM_BACKUPS_TITLE', '.', true)
+  // ];
 
   // constants
   BackupModel = BackupModel;
@@ -220,6 +219,12 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
       .subscribe((settings: SystemSettingsModel) => {
         this.settings = settings;
       });
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**
