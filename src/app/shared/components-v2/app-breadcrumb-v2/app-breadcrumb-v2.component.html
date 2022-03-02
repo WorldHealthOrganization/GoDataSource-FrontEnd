@@ -12,6 +12,7 @@
     <!-- Label -->
     <a
       class="gd-breadcrumbs-bread-label"
+      [class.gd-breadcrumbs-bread-label-active]="!bread.action"
       [routerLink]="bread.action && bread.action.link ? bread.action.link : undefined"
       [queryParams]="bread.action && bread.action.linkQueryParams ? bread.action.linkQueryParams : undefined">
       {{bread.label | translate}}
