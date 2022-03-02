@@ -146,7 +146,7 @@ mat-sidenav-container {
         background: rgba(var(--gd-secondary-rgb), 0.1);
         color: var(--gd-text);
         height: calc(100vh - var(--gd-top-bar-height));
-        padding: 4rem;
+        padding: 1.2rem 4rem 4rem;
         overflow-x: hidden;
         overflow-y: overlay;
       }
