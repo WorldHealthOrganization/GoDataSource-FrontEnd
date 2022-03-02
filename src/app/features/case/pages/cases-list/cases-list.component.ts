@@ -38,6 +38,7 @@ import { ExportFieldsGroupModelNameEnum, IExportFieldsGroupRequired } from '../.
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2RowActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
 
 @Component({
   selector: 'app-cases-list',
@@ -1201,12 +1202,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    * Initialize breadcrumbs
    */
   initializeBreadcrumbs(): void {
-    console.log(this.authUser);
     this.breadcrumbs = [
       {
         label: 'LNG_COMMON_LABEL_HOME',
         action: {
-          link: ['/contacts']
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/version']
         }
       }, {
         label: 'LNG_PAGE_LIST_CASES_TITLE',
