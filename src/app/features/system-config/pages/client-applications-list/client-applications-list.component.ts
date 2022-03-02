@@ -193,8 +193,15 @@ export class ClientApplicationsListComponent
   }
 
   /**
-     * Refresh list
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Refresh list
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     this.clientApplicationsServerList = [];
     this.clientApplicationsServerListAll = undefined;

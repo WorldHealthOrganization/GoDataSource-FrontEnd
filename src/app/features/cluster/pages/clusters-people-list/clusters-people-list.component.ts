@@ -196,8 +196,15 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
   }
 
   /**
-     * Re(load) the Cluster people list, based on the applied filter, sort criterias
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the Cluster people list, based on the applied filter, sort criterias
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     if (this.selectedOutbreak) {
       this.clusterPeopleList$ = this.clusterDataService

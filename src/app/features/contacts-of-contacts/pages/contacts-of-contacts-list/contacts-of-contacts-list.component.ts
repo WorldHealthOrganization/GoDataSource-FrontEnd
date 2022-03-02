@@ -655,8 +655,15 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
   }
 
   /**
-     * Re(load) the Contacts list
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the Contacts list
+   */
   refreshList(
     finishCallback: (records: any[]) => void,
     triggeredByPageChange: boolean

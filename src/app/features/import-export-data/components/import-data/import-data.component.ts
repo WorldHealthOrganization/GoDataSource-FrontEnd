@@ -3336,8 +3336,15 @@ export class ImportDataComponent
   }
 
   /**
-     * Re(load) the Events list
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the Events list
+   */
   refreshList(finishCallback: (records: any[]) => void): void {
     // do we have import log id, there is no point in continuing otherwise ?
     if (

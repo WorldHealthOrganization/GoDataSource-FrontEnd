@@ -243,8 +243,15 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
   }
 
   /**
-     * Re(load) the Cases list, based on the applied filter, sort criterias
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the Cases list, based on the applied filter, sort criterias
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     if (this.selectedOutbreak) {
       // retrieve the list

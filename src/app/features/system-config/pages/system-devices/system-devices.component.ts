@@ -196,8 +196,15 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
   }
 
   /**
-     * Refresh list
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Refresh list
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     this.devicesList$ = this.deviceDataService
       .getDevices(this.queryBuilder)

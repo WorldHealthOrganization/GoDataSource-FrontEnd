@@ -236,6 +236,16 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
     // ];
   }
 
+  /**
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the Reference Data Categories list
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     this.categoryEntries = [];
     this.categoryEntriesAll = undefined;

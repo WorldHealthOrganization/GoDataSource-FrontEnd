@@ -167,8 +167,15 @@ export class LanguagesListComponent
   }
 
   /**
-     * Re(load) the Languages list
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the Languages list
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     // retrieve the list of Languages
     this.languagesList$ = this.languageDataService

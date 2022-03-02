@@ -265,8 +265,15 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
   }
 
   /**
-     * Re(load) the list of Locations
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the list of Locations
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     // retrieve created user & modified user information
     this.queryBuilder.include('createdByUser', true);

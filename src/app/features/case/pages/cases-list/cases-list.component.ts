@@ -616,7 +616,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         this.exportCasesUrl = null;
         if (
           this.selectedOutbreak &&
-                    this.selectedOutbreak.id
+          this.selectedOutbreak.id
         ) {
           this.exportCasesUrl = `/outbreaks/${this.selectedOutbreak.id}/cases/export`;
 
@@ -701,7 +701,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION'
       },
       {
-        field: 'outcome',
+        field: 'outcomeId',
         label: 'LNG_CASE_FIELD_LABEL_OUTCOME'
       },
       {
@@ -1308,8 +1308,39 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   }
 
   /**
-     * Re(load) the Cases list, based on the applied filter, sort criterias
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [
+      'id',
+      'lastName',
+      'firstName',
+      'middleName',
+      'visualId',
+      'classification',
+      'outcomeId',
+      'dateOfOutcome',
+      'age',
+      'gender',
+      'addresses',
+      'locations',
+      'dateOfOnset',
+      'dateOfReporting',
+      'wasContact',
+      'responsibleUserId',
+      'numberOfContacts',
+      'numberOfExposures',
+      'deleted',
+      'createdBy',
+      'createdAt',
+      'updatedBy',
+      'updatedAt'
+    ];
+  }
+
+  /**
+   * Re(load) the Cases list, based on the applied filter, sort criterias
+   */
   refreshList(
     finishCallback: (records: any[]) => void,
     triggeredByPageChange: boolean

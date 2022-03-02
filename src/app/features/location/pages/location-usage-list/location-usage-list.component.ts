@@ -185,8 +185,15 @@ export class LocationUsageListComponent extends ListComponent implements OnInit,
   }
 
   /**
-     * Re(load) the list
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the list
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     if (this.locationId) {
       // retrieve outbreaks

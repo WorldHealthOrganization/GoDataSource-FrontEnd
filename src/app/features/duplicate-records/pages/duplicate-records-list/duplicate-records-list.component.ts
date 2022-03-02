@@ -115,8 +115,15 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
   }
 
   /**
-     * Re(load) the list
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the list
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     if (this.selectedOutbreak) {
       // retrieve the list

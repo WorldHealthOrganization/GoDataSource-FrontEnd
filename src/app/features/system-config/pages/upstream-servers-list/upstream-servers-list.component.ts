@@ -196,8 +196,15 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
   }
 
   /**
-     * Refresh list
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Refresh list
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     this.upstreamServerList = [];
     this.upstreamServerListAll = undefined;

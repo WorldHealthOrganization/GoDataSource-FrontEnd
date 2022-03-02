@@ -214,8 +214,15 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
   }
 
   /**
-     * Re(load) the Users list
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the Users list
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     // get the list of existing users
     this.usersList$ = this.userDataService

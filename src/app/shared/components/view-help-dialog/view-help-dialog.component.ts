@@ -103,8 +103,15 @@ export class ViewHelpDialogComponent extends ListComponent implements OnDestroy 
   }
 
   /**
-     * Re(load) the items list
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the items list
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     // make sure we retrieve only approved help items
     this.queryBuilder.filter.where({

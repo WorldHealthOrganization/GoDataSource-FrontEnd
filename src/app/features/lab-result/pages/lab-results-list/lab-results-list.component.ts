@@ -610,8 +610,15 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
   }
 
   /**
-     * Re(load) the Lab Results list
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the Lab Results list
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     if (this.selectedOutbreak) {
       // retrieve created user & modified user information

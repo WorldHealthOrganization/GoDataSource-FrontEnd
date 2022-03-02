@@ -330,8 +330,15 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
   }
 
   /**
-     * Re(load) the Relationships list, based on the applied filter, sort criterias
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the Relationships list, based on the applied filter, sort criterias
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     if (
       this.relationshipType &&

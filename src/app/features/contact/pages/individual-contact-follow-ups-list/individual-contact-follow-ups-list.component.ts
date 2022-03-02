@@ -598,8 +598,15 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
   }
 
   /**
-     * Refresh list
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Refresh list
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     if (
       this.selectedOutbreak &&
