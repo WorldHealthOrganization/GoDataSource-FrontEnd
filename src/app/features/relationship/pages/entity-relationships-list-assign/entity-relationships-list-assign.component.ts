@@ -117,7 +117,7 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
     }
 
     // initialize Side Table Columns
-    this.initializeSideTableColumns();
+    this.initializeTableColumns();
   }
 
   /**
@@ -131,7 +131,7 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
   /**
      * Initialize Side Table Columns
      */
-  initializeSideTableColumns() {
+  initializeTableColumns() {
     // default table columns
     // this.tableColumns = [
     //   new VisibleColumnModel({

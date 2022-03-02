@@ -700,7 +700,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
       });
 
     // initialize Side Table Columns
-    this.initializeSideTableColumns();
+    this.initializeTableColumns();
   }
 
   /**
@@ -718,9 +718,9 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
   }
 
   /**
-     * Initialize Side Table Columns
-     */
-  initializeSideTableColumns() {
+   * Initialize Side Table Columns
+   */
+  initializeTableColumns() {
     // default table columns
     // this.tableColumns = [
     //   new VisibleColumnModel({

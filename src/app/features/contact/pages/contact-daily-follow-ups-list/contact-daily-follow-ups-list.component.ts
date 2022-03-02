@@ -362,7 +362,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
       });
 
     // initialize Side Table Columns
-    this.initializeSideTableColumns();
+    this.initializeTableColumns();
   }
 
   /**
@@ -484,9 +484,9 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
   // }
 
   /**
-     * Initialize Side Table Columns
-     */
-  private initializeSideTableColumns() {
+   * Initialize Side Table Columns
+   */
+  private initializeTableColumns() {
     // default table columns
     // this.tableColumns = [
     //   new VisibleColumnModel({

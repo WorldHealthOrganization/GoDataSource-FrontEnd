@@ -135,7 +135,7 @@ export class RolesListComponent extends ListComponent implements OnInit, OnDestr
     this.needsRefreshList(true);
 
     // initialize Side Table Columns
-    this.initializeSideTableColumns();
+    this.initializeTableColumns();
   }
 
   /**
@@ -149,7 +149,7 @@ export class RolesListComponent extends ListComponent implements OnInit, OnDestr
   /**
      * Initialize Side Table Columns
      */
-  initializeSideTableColumns() {
+  initializeTableColumns() {
     // default table columns
     // this.tableColumns = [
     //   new VisibleColumnModel({

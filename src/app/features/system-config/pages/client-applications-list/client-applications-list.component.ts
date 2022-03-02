@@ -135,7 +135,7 @@ export class ClientApplicationsListComponent
      */
   ngOnInit() {
     // initialize Side Table Columns
-    this.initializeSideTableColumns();
+    this.initializeTableColumns();
 
     // initialize pagination
     this.initPaginator();
@@ -155,7 +155,7 @@ export class ClientApplicationsListComponent
   /**
      * Initialize Side Table Columns
      */
-  initializeSideTableColumns() {
+  initializeTableColumns() {
     // default table columns
     // this.tableColumns = [
     //   new VisibleColumnModel({

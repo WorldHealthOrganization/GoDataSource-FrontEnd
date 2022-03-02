@@ -104,7 +104,7 @@ export class AuditLogsListComponent
       });
 
     // initialize Side Table Columns
-    this.initializeSideTableColumns();
+    this.initializeTableColumns();
   }
 
   /**
@@ -116,9 +116,9 @@ export class AuditLogsListComponent
   }
 
   /**
-     * Initialize Side Table Columns
-     */
-  initializeSideTableColumns() {
+   * Initialize Side Table Columns
+   */
+  initializeTableColumns() {
     // default table columns
     // this.tableColumns = [
     //   new VisibleColumnModel({

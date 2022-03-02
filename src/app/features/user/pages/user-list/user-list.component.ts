@@ -141,7 +141,7 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
     this.needsRefreshList(true);
 
     // initialize Side Table Columns
-    this.initializeSideTableColumns();
+    this.initializeTableColumns();
 
     // retrieve teams
     if (TeamModel.canList(this.authUser)) {
@@ -160,7 +160,7 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
   /**
      * Initialize Side Table Columns
      */
-  initializeSideTableColumns() {
+  initializeTableColumns() {
     // default table columns
     // this.tableColumns = [
     //   new VisibleColumnModel({

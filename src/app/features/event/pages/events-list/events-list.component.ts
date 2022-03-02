@@ -380,7 +380,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
       });
 
     // initialize Side Table Columns
-    this.initializeSideTableColumns();
+    this.initializeTableColumns();
   }
 
   /**
@@ -400,7 +400,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
   /**
      * Initialize Side Table Columns
      */
-  initializeSideTableColumns() {
+  initializeTableColumns() {
     // default table columns
     // this.tableColumns = [
     //   new VisibleColumnModel({

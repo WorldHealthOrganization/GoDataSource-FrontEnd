@@ -128,7 +128,7 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
      */
   ngOnInit() {
     // initialize Side Table Columns
-    this.initializeSideTableColumns();
+    this.initializeTableColumns();
 
     // initialize pagination
     this.initPaginator();
@@ -148,7 +148,7 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
   /**
      * Initialize Side Table Columns
      */
-  initializeSideTableColumns() {
+  initializeTableColumns() {
     // default table columns
     // this.tableColumns = [
     //   new VisibleColumnModel({

@@ -278,7 +278,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
     this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
     // initialize Side Table Columns
-    this.initializeSideTableColumns();
+    this.initializeTableColumns();
 
     // initialize pagination
     this.initPaginator();
@@ -298,7 +298,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
   /**
      * Initialize Side Table Columns
      */
-  initializeSideTableColumns() {
+  initializeTableColumns() {
     // default table columns
     // this.tableColumns = [
     //   new VisibleColumnModel({

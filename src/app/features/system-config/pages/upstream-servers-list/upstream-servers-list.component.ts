@@ -128,7 +128,7 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
      */
   ngOnInit() {
     // initialize Side Table Columns
-    this.initializeSideTableColumns();
+    this.initializeTableColumns();
 
     // initialize pagination
     this.initPaginator();
@@ -148,7 +148,7 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
   /**
      * Initialize Side Table Columns
      */
-  initializeSideTableColumns() {
+  initializeTableColumns() {
     // default table columns
     // this.tableColumns = [
     //   new VisibleColumnModel({

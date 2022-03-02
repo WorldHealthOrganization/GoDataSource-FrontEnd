@@ -130,7 +130,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
       });
 
     // initialize Side Table Columns
-    this.initializeSideTableColumns();
+    this.initializeTableColumns();
   }
 
   /**
@@ -170,7 +170,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
   /**
      * Initialize Side Table Columns
      */
-  initializeSideTableColumns() {
+  initializeTableColumns() {
     // default table columns
     // this.tableColumns = [
     //   new VisibleColumnModel({

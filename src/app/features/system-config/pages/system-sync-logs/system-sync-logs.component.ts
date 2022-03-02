@@ -135,7 +135,7 @@ export class SystemSyncLogsComponent
       });
 
     // initialize Side Table Columns
-    this.initializeSideTableColumns();
+    this.initializeTableColumns();
 
     // retrieve collections
     this.genericDataService
@@ -191,7 +191,7 @@ export class SystemSyncLogsComponent
   /**
      * Initialize Side Table Columns
      */
-  initializeSideTableColumns() {
+  initializeTableColumns() {
     // default table columns
     // this.tableColumns = [
     //   new VisibleColumnModel({

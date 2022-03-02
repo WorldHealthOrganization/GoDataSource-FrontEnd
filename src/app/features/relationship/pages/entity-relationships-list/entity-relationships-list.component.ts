@@ -183,7 +183,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     });
 
     // initialize Side Table Columns
-    this.initializeSideTableColumns();
+    this.initializeTableColumns();
   }
 
   /**
@@ -239,7 +239,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
   /**
      * Initialize Side Table Columns
      */
-  initializeSideTableColumns() {
+  initializeTableColumns() {
     // default table columns
     // this.tableColumns = [
     //   new VisibleColumnModel({

@@ -145,7 +145,7 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
     this.needsRefreshList(true);
 
     // initialize Side Table Columns
-    this.initializeSideTableColumns();
+    this.initializeTableColumns();
   }
 
   /**
@@ -159,7 +159,7 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
   /**
      * Initialize Side Table Columns
      */
-  initializeSideTableColumns() {
+  initializeTableColumns() {
     // default table columns
     // this.tableColumns = [
     //   new VisibleColumnModel({

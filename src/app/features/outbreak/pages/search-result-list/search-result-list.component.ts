@@ -155,7 +155,7 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
       });
 
     // initialize Side Table Columns
-    this.initializeSideTableColumns();
+    this.initializeTableColumns();
   }
 
   /**
@@ -169,7 +169,7 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
   /**
      * Initialize Side Table Columns
      */
-  initializeSideTableColumns() {
+  initializeTableColumns() {
     // default table columns
     // this.tableColumns = [
     //   new VisibleColumnModel({

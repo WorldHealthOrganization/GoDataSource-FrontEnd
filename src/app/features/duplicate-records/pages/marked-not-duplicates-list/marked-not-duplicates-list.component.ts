@@ -184,7 +184,7 @@ export class MarkedNotDuplicatesListComponent
       });
 
     // initialize Side Table Columns
-    this.initializeSideTableColumns();
+    this.initializeTableColumns();
   }
 
   /**
@@ -342,7 +342,7 @@ export class MarkedNotDuplicatesListComponent
   /**
      * Initialize Side Table Columns
      */
-  initializeSideTableColumns() {
+  initializeTableColumns() {
     // default table columns
     // this.tableColumns = [
     //   new VisibleColumnModel({

@@ -189,7 +189,7 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
       });
 
     // initialize side table columns
-    this.initializeSideTableColumns();
+    this.initializeTableColumns();
   }
 
   /**
@@ -203,7 +203,7 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
   /**
      * Initialize Side Table Columns
      */
-  initializeSideTableColumns() {
+  initializeTableColumns() {
     // default table columns
     // this.tableColumns = [
     //   new VisibleColumnModel({

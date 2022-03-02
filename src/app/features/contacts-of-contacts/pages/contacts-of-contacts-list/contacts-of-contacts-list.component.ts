@@ -415,7 +415,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
       });
 
     // initialize Side Table Columns
-    this.initializeSideTableColumns();
+    this.initializeTableColumns();
   }
 
   /**
@@ -435,7 +435,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
   /**
      * Initialize Side Table Columns
      */
-  initializeSideTableColumns() {
+  initializeTableColumns() {
     // default table columns
     // this.tableColumns = [
     //   new VisibleColumnModel({

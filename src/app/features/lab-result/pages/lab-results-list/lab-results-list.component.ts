@@ -355,7 +355,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
         this.initializeSideFilters();
 
         // initialize Side Table Columns
-        this.initializeSideTableColumns();
+        this.initializeTableColumns();
 
         // initialize pagination
         this.initPaginator();
@@ -388,7 +388,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
   /**
      * Initialize Side Table Columns
      */
-  initializeSideTableColumns() {
+  initializeTableColumns() {
     // default table columns
     // this.tableColumns = [
     //   new VisibleColumnModel({

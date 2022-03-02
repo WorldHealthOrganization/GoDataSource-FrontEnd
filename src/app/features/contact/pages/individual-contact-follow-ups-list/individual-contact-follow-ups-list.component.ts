@@ -290,7 +290,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
       });
 
     // initialize Side Table Columns
-    this.initializeSideTableColumns();
+    this.initializeTableColumns();
   }
 
   /**
@@ -401,7 +401,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
   /**
      * Initialize Side Table Columns
      */
-  private initializeSideTableColumns() {
+  private initializeTableColumns() {
     // default table columns
     // this.tableColumns = [
     //   new VisibleColumnModel({

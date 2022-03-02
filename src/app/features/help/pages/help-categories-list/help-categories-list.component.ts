@@ -124,7 +124,7 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
     this.needsRefreshList(true);
 
     // initialize Side Table Columns
-    this.initializeSideTableColumns();
+    this.initializeTableColumns();
   }
 
   /**
@@ -138,7 +138,7 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
   /**
      * Initialize Side Table Columns
      */
-  initializeSideTableColumns() {
+  initializeTableColumns() {
     // default table columns
     // this.tableColumns = [
     //   new VisibleColumnModel({

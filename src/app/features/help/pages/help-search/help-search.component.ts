@@ -69,7 +69,7 @@ export class HelpSearchComponent extends ListComponent implements OnInit, OnDest
     // ...and re-load the list
     this.needsRefreshList(true);
     // initialize Side Table Columns
-    this.initializeSideTableColumns();
+    this.initializeTableColumns();
   }
 
   /**
@@ -83,7 +83,7 @@ export class HelpSearchComponent extends ListComponent implements OnInit, OnDest
   /**
      * Initialize Side Table Columns
      */
-  initializeSideTableColumns() {
+  initializeTableColumns() {
     // default table columns
     // this.tableColumns = [
     //   new VisibleColumnModel({

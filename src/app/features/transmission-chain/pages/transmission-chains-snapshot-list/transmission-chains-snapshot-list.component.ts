@@ -109,7 +109,7 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent imple
       });
 
     // initialize Side Table Columns
-    this.initializeSideTableColumns();
+    this.initializeTableColumns();
   }
 
   /**
@@ -129,7 +129,7 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent imple
   /**
      * Initialize Side Table Columns
      */
-  initializeSideTableColumns() {
+  initializeTableColumns() {
     // default table columns
     // this.tableColumns = [
     //   new VisibleColumnModel({
