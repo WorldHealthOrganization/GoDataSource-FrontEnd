@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -35,9 +34,9 @@ export class SystemSyncLogsComponent
   implements OnInit, OnDestroy {
 
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_TITLE', '.', true)
-  ];
+  // breadcrumbs: BreadcrumbItemModel[] = [
+  //   new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_TITLE', '.', true)
+  // ];
 
   // constants
   SystemSyncLogModel = SystemSyncLogModel;
@@ -232,6 +231,12 @@ export class SystemSyncLogsComponent
     //     label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_INFORMATION_START_DATE'
     //   })
     // ];
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

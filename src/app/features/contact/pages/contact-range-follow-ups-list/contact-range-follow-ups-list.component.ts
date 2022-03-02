@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
@@ -45,7 +44,7 @@ export class ContactRangeFollowUpsListComponent
   implements OnInit, OnDestroy {
 
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // authenticated user
   authUser: UserModel;
@@ -247,28 +246,34 @@ export class ContactRangeFollowUpsListComponent
   /**
      * Initialize breadcrumbs
      */
-  private initializeBreadcrumbs() {
-    // init breadcrumbs
-    this.breadcrumbs = [];
+  // private initializeBreadcrumbs() {
+  //   // init breadcrumbs
+  //   this.breadcrumbs = [];
+  //
+  //   // contacts breadcrumb
+  //   if (ContactModel.canList(this.authUser)) {
+  //     this.breadcrumbs.push(
+  //       new BreadcrumbItemModel(
+  //         'LNG_PAGE_LIST_CONTACTS_TITLE',
+  //         '/contacts'
+  //       )
+  //     );
+  //   }
+  //
+  //   // current page breadcrumb
+  //   this.breadcrumbs.push(
+  //     new BreadcrumbItemModel(
+  //       'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_TITLE',
+  //       '.',
+  //       true
+  //     )
+  //   );
+  // }
 
-    // contacts breadcrumb
-    if (ContactModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          'LNG_PAGE_LIST_CONTACTS_TITLE',
-          '/contacts'
-        )
-      );
-    }
-
-    // current page breadcrumb
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_TITLE',
-        '.',
-        true
-      )
-    );
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

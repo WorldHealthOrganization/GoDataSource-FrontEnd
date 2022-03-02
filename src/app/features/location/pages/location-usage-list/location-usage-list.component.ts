@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -30,7 +29,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
 })
 export class LocationUsageListComponent extends ListComponent implements OnInit, OnDestroy {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // authenticated user
   authUser: UserModel;
@@ -161,27 +160,33 @@ export class LocationUsageListComponent extends ListComponent implements OnInit,
   /**
      * Initialize breadcrumbs
      */
-  initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
+  // initializeBreadcrumbs() {
+  //   // reset
+  //   this.breadcrumbs = [];
+  //
+  //   // add list breadcrumb only if we have permission
+  //   if (LocationModel.canList(this.authUser)) {
+  //     this.breadcrumbs.push(
+  //       new BreadcrumbItemModel('LNG_PAGE_LIST_LOCATIONS_TITLE', '/locations')
+  //     );
+  //   }
+  //
+  //   // usage breadcrumb
+  //   this.breadcrumbs.push(
+  //     new BreadcrumbItemModel(
+  //       'LNG_PAGE_LIST_USAGE_LOCATIONS_TITLE',
+  //       '.',
+  //       true,
+  //       {},
+  //       this.locationData
+  //     )
+  //   );
+  // }
 
-    // add list breadcrumb only if we have permission
-    if (LocationModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_LOCATIONS_TITLE', '/locations')
-      );
-    }
-
-    // usage breadcrumb
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        'LNG_PAGE_LIST_USAGE_LOCATIONS_TITLE',
-        '.',
-        true,
-        {},
-        this.locationData
-      )
-    );
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

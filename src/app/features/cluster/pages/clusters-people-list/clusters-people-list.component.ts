@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ActivatedRoute } from '@angular/router';
@@ -31,7 +30,7 @@ import { ContactOfContactModel } from '../../../../core/models/contact-of-contac
 })
 export class ClustersPeopleListComponent extends ListComponent implements OnInit, OnDestroy {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // authenticated user
   authUser: UserModel;
@@ -171,28 +170,34 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
   /**
      * Initialize breadcrumbs
      */
-  private initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
+  // private initializeBreadcrumbs() {
+  //   // reset
+  //   this.breadcrumbs = [];
+  //
+  //   // add list breadcrumb only if we have permission
+  //   if (ClusterModel.canList(this.authUser)) {
+  //     this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_CLUSTERS_TITLE', '/clusters'));
+  //   }
+  //
+  //   // cluster breadcrumb
+  //   if (
+  //     this.cluster &&
+  //           ClusterModel.canView(this.authUser)
+  //   ) {
+  //     this.breadcrumbs.push(new BreadcrumbItemModel(
+  //       this.cluster.name,
+  //       `/clusters/${this.cluster.id}/view`
+  //     ));
+  //   }
+  //
+  //   // people breadcrumb
+  //   this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_VIEW_CLUSTERS_PEOPLE_TITLE', '.', true));
+  // }
 
-    // add list breadcrumb only if we have permission
-    if (ClusterModel.canList(this.authUser)) {
-      this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_CLUSTERS_TITLE', '/clusters'));
-    }
-
-    // cluster breadcrumb
-    if (
-      this.cluster &&
-            ClusterModel.canView(this.authUser)
-    ) {
-      this.breadcrumbs.push(new BreadcrumbItemModel(
-        this.cluster.name,
-        `/clusters/${this.cluster.id}/view`
-      ));
-    }
-
-    // people breadcrumb
-    this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_VIEW_CLUSTERS_PEOPLE_TITLE', '.', true));
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

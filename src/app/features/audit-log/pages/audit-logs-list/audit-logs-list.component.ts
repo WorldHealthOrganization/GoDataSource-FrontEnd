@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -28,9 +27,9 @@ export class AuditLogsListComponent
   implements OnInit, OnDestroy {
 
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel('LNG_PAGE_LIST_AUDIT_LOGS_TITLE', '.', true)
-  ];
+  // breadcrumbs: BreadcrumbItemModel[] = [
+  //   new BreadcrumbItemModel('LNG_PAGE_LIST_AUDIT_LOGS_TITLE', '.', true)
+  // ];
 
   // list of existing audit logs
   auditLogsList$: Observable<AuditLogModel[]>;
@@ -155,6 +154,12 @@ export class AuditLogsListComponent
     //     label: 'LNG_AUDIT_LOG_FIELD_LABEL_IP_ADDRESS'
     //   })
     // ];
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

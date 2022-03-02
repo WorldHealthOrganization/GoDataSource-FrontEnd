@@ -1,0 +1,19 @@
+<div
+  class="gd-breadcrumbs">
+  <span
+    *ngFor="let bread of breadcrumbs; let breadIndex = index;"
+    class="gd-breadcrumbs-bread">
+
+    <!-- Separator -->
+    <ng-container
+      *ngIf="breadIndex > 0">/</ng-container>
+
+    <!-- Label -->
+    <a
+      class="gd-breadcrumbs-bread-label"
+      [routerLink]="bread.action && bread.action.link ? bread.action.link : undefined"
+      [queryParams]="bread.action && bread.action.linkQueryParams ? bread.action.linkQueryParams : undefined">
+      {{bread.label | translate}}
+    </a>
+  </span>
+</div>

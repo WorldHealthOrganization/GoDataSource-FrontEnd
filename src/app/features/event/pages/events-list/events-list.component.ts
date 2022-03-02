@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable, throwError } from 'rxjs';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -42,9 +41,9 @@ import { moment } from '../../../../core/helperClasses/x-moment';
 })
 export class EventsListComponent extends ListComponent implements OnInit, OnDestroy {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '.', true)
-  ];
+  // breadcrumbs: BreadcrumbItemModel[] = [
+  //   new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '.', true)
+  // ];
 
   // authenticated user
   authUser: UserModel;
@@ -528,6 +527,12 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
     //     visible: false
     //   })
     // );
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

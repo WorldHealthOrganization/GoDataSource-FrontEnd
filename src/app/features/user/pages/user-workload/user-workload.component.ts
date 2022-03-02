@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -33,7 +32,7 @@ interface IUserMap {
 })
 export class UserWorkloadComponent extends ListComponent implements OnInit, OnDestroy {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   selectedOutbreak: OutbreakModel;
 
@@ -139,18 +138,18 @@ export class UserWorkloadComponent extends ListComponent implements OnInit, OnDe
   /**
      * Initialize breadcrumbs
      */
-  private initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (UserModel.canList(this.authUser)) {
-      this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '/users'));
-    }
-
-    // workload breadcrumb
-    this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_USERS_WORKLOAD_TITLE', '.', true));
-  }
+  // private initializeBreadcrumbs() {
+  //   // reset
+  //   this.breadcrumbs = [];
+  //
+  //   // add list breadcrumb only if we have permission
+  //   if (UserModel.canList(this.authUser)) {
+  //     this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '/users'));
+  //   }
+  //
+  //   // workload breadcrumb
+  //   this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_USERS_WORKLOAD_TITLE', '.', true));
+  // }
 
   /**
      * Remove component resources
@@ -163,6 +162,12 @@ export class UserWorkloadComponent extends ListComponent implements OnInit, OnDe
       this.getSelectedOutbreakSubject.unsubscribe();
       this.getSelectedOutbreakSubject = null;
     }
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

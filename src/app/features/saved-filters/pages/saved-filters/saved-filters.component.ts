@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -26,9 +25,9 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 })
 export class SavedFiltersComponent extends ListComponent implements OnInit, OnDestroy {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel('LNG_PAGE_LIST_SAVED_FILTERS_TITLE', '.', true)
-  ];
+  // breadcrumbs: BreadcrumbItemModel[] = [
+  //   new BreadcrumbItemModel('LNG_PAGE_LIST_SAVED_FILTERS_TITLE', '.', true)
+  // ];
 
   yesNoOptionsList$: Observable<any[]>;
 
@@ -117,6 +116,12 @@ export class SavedFiltersComponent extends ListComponent implements OnInit, OnDe
   ngOnDestroy() {
     // release parent resources
     super.ngOnDestroy();
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

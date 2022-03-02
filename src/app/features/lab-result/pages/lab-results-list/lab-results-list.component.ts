@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Observable, throwError } from 'rxjs';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
@@ -43,9 +42,9 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 })
 export class LabResultsListComponent extends ListComponent implements OnInit, OnDestroy {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel('LNG_PAGE_LIST_LAB_RESULTS_TITLE', '.', true),
-  ];
+  // breadcrumbs: BreadcrumbItemModel[] = [
+  //   new BreadcrumbItemModel('LNG_PAGE_LIST_LAB_RESULTS_TITLE', '.', true),
+  // ];
 
   // lab results list
   labResultsList$: Observable<any>;
@@ -607,6 +606,12 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
         questionnaireTemplate: this.selectedOutbreak.labResultsTemplate
       })
     ];
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

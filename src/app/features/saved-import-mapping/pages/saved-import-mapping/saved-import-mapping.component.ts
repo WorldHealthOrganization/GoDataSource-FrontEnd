@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SavedImportMappingService } from '../../../../core/services/data/saved-import-mapping.data.service';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { Observable } from 'rxjs';
@@ -26,9 +25,9 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 })
 export class SavedImportMappingComponent extends ListComponent implements OnInit, OnDestroy {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_TITLE', '.', true)
-  ];
+  // breadcrumbs: BreadcrumbItemModel[] = [
+  //   new BreadcrumbItemModel('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_TITLE', '.', true)
+  // ];
 
   yesNoOptionsList$: Observable<any[]>;
 
@@ -117,6 +116,12 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
   ngOnDestroy() {
     // release parent resources
     super.ngOnDestroy();
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -32,8 +31,6 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
   templateUrl: './available-entities-for-switch-list.component.html'
 })
 export class AvailableEntitiesForSwitchListComponent extends RelationshipsListComponent implements OnInit, OnDestroy {
-  breadcrumbs: BreadcrumbItemModel[] = [];
-
   entitiesList$: Observable<(CaseModel|ContactModel|EventModel)[]>;
   entitiesListCount$: Observable<IBasicCount>;
   entityType: EntityType;
@@ -189,24 +186,30 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
     });
   }
 
-  private initializeBreadcrumbs() {
-    if (
-      this.relationshipType &&
-            this.entity
-    ) {
-      this.breadcrumbs = [
-        new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
-        new BreadcrumbItemModel(
-          this.entity.name,
-          `${this.entityMap[this.entityType].link}/${this.entityId}/view`
-        ),
-        new BreadcrumbItemModel(
-          this.relationshipsListPageTitle,
-          `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`
-        ),
-        new BreadcrumbItemModel('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_TITLE', null, true)
-      ];
-    }
+  // private initializeBreadcrumbs() {
+  //   if (
+  //     this.relationshipType &&
+  //           this.entity
+  //   ) {
+  //     this.breadcrumbs = [
+  //       new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
+  //       new BreadcrumbItemModel(
+  //         this.entity.name,
+  //         `${this.entityMap[this.entityType].link}/${this.entityId}/view`
+  //       ),
+  //       new BreadcrumbItemModel(
+  //         this.relationshipsListPageTitle,
+  //         `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`
+  //       ),
+  //       new BreadcrumbItemModel('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_TITLE', null, true)
+  //     ];
+  //   }
+  // }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

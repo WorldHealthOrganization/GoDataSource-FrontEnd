@@ -3,7 +3,6 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -31,9 +30,9 @@ import { TopnavComponent } from '../../../../core/components/topnav/topnav.compo
   templateUrl: './outbreak-list.component.html'
 })
 export class OutbreakListComponent extends ListComponent implements OnInit, OnDestroy {
-  breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAKS_TITLE', '.', true)
-  ];
+  // breadcrumbs: BreadcrumbItemModel[] = [
+  //   new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAKS_TITLE', '.', true)
+  // ];
 
   // import constants into template
   Constants = Constants;
@@ -392,6 +391,12 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
     //     visible: false
     //   })
     // ];
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

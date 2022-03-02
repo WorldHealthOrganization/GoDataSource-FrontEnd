@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -29,9 +28,9 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 })
 export class UpstreamServersListComponent extends ListComponent implements OnInit, OnDestroy {
   // Breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_TITLE', '.', true)
-  ];
+  // breadcrumbs: BreadcrumbItemModel[] = [
+  //   new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_TITLE', '.', true)
+  // ];
 
   // constants
   SystemUpstreamServerModel = SystemUpstreamServerModel;
@@ -193,6 +192,12 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
     //     label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ENABLED'
     //   })
     // ];
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

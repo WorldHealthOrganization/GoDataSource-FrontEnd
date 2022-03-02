@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -26,7 +25,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 })
 export class ReferenceDataCategoryEntriesListComponent extends ListComponent implements OnInit, OnDestroy {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   categoryEntriesCount: IBasicCount;
   categoryEntries: ReferenceDataEntryModel[];
@@ -149,31 +148,31 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
     super.ngOnDestroy();
   }
 
-  /**
-     * Initialize breadcrumbs
-     */
-  initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (ReferenceDataCategoryModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
-      );
-    }
-
-    // view / modify breadcrumb
-    if (this.category) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          this.category.name,
-          '.',
-          true
-        )
-      );
-    }
-  }
+  // /**
+  //    * Initialize breadcrumbs
+  //    */
+  // initializeBreadcrumbs() {
+  //   // reset
+  //   this.breadcrumbs = [];
+  //
+  //   // add list breadcrumb only if we have permission
+  //   if (ReferenceDataCategoryModel.canList(this.authUser)) {
+  //     this.breadcrumbs.push(
+  //       new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
+  //     );
+  //   }
+  //
+  //   // view / modify breadcrumb
+  //   if (this.category) {
+  //     this.breadcrumbs.push(
+  //       new BreadcrumbItemModel(
+  //         this.category.name,
+  //         '.',
+  //         true
+  //       )
+  //     );
+  //   }
+  // }
 
   /**
      * Initialize Side Table Columns
@@ -234,6 +233,12 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
     //     visible: false
     //   })
     // ];
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

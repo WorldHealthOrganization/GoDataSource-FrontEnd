@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable, Subscription, throwError } from 'rxjs';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -48,11 +47,6 @@ import { FollowUpModel } from '../../../../core/models/follow-up.model';
   styleUrls: ['./cases-list.component.less']
 })
 export class CasesListComponent extends ListComponent implements OnInit, OnDestroy {
-  // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '.', true)
-  ];
-
   // authenticated user
   authUser: UserModel;
   // selected Outbreak
@@ -238,8 +232,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   }
 
   /**
-     * Component initialized
-     */
+   * Component initialized
+   */
   ngOnInit() {
     // add page title
     this.casesDataExportFileName = this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE') +
@@ -1208,6 +1202,31 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       // show cases classified as Not a Case
       this.queryBuilder.filter.where(falseCondition);
     }
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
+    this.breadcrumbs = [
+      {
+        label: 'LNG_PAGE_LIST_CASES_TITLE',
+        action: {
+          link: ['/contacts']
+        }
+      }, {
+        label: 'LNG_PAGE_LIST_CASES_TITLE',
+        action: {
+          link: ['/contacts'],
+          linkQueryParams: [{
+            q: '25'
+          }]
+        }
+      }, {
+        label: 'LNG_PAGE_LIST_CASES_TITLE',
+        action: null
+      }
+    ];
   }
 
   /**

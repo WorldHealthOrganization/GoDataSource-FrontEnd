@@ -3,7 +3,6 @@ import * as _ from 'lodash';
 import { Subscriber } from 'rxjs';
 import { ApplyListFilter, Constants, ExportStatusStep } from '../models/constants';
 import { FormRangeModel } from '../../shared/components/form-range/form-range.model';
-import { BreadcrumbItemModel } from '../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Directive, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ResetInputOnSideFilterDirective, ResetLocationOnSideFilterDirective } from '../../shared/directives/reset-input-on-side-filter/reset-input-on-side-filter.directive';
 import { PageEvent } from '@angular/material/paginator';
@@ -28,6 +27,7 @@ import * as LzString from 'lz-string';
 import { LoadingDialogModel } from '../../shared/components';
 import { DialogExportProgressAnswer } from '../services/helper/dialog.service';
 import { IV2Column } from '../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 
 /**
  * Used by caching filter
@@ -79,9 +79,9 @@ export abstract class ListComponent implements OnDestroy {
   private static locationSubscription: SubscriptionLike;
 
   /**
-     * Breadcrumbs
-     */
-  public breadcrumbs: BreadcrumbItemModel[];
+   * Breadcrumbs
+   */
+  public breadcrumbs: IV2Breadcrumb[];
 
   /**
      * Determine all children that we need to reset when side filters are being applied
@@ -363,12 +363,15 @@ export abstract class ListComponent implements OnDestroy {
   }));
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   protected constructor(
     protected listHelperService: ListHelperService,
     disableFilterCaching: boolean = false
   ) {
+    // initialize breadcrumbs
+    this.initializeBreadcrumbs();
+
     // clone current breadcrumbs
     let currentBreadcrumbs;
     setTimeout(() => {
@@ -429,11 +432,16 @@ export abstract class ListComponent implements OnDestroy {
   }
 
   /**
-     * Release resources
-     */
+   * Release resources
+   */
   ngOnDestroy(): void {
     this.releaseSubscribers();
   }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  public abstract initializeBreadcrumbs(): void;
 
   /**
    * Fields retrieved from api to reduce payload size
@@ -1152,38 +1160,38 @@ export abstract class ListComponent implements OnDestroy {
      * @param listFilterData
      */
   protected setListFilterBreadcrumbs(
-    listFilter: string,
-    listFilterData: any = {}
+    _listFilter: string,
+    _listFilterData: any = {}
   ) {
-    const breadcrumbToken = Constants.LIST_FILTER_TITLE[listFilter];
-    if (breadcrumbToken) {
-      // get the breadcrumb representing the list page
-      const listPageBreadcrumb: BreadcrumbItemModel = _.find(this.breadcrumbs, {active: true});
-      if (listPageBreadcrumb) {
-        // update the breadcrumb
-        const fallbackUrl: string[] | boolean = this.listHelperService.determineFallbackUrl();
-        listPageBreadcrumb.active = false;
-        listPageBreadcrumb.onClick = () => {
-          // redirect to cases list pages ( hack since we can't use navigate for the same component )
-          if (fallbackUrl) {
-            this.listHelperService.redirectService.to(fallbackUrl as string[]);
-          } else {
-            // DON'T REDIRECT
-          }
-        };
-      }
-
-      // add new breadcrumb
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          breadcrumbToken,
-          '.',
-          true,
-          {},
-          listFilterData
-        )
-      );
-    }
+    // const breadcrumbToken = Constants.LIST_FILTER_TITLE[listFilter];
+    // if (breadcrumbToken) {
+    //   // get the breadcrumb representing the list page
+    //   const listPageBreadcrumb: BreadcrumbItemModel = _.find(this.breadcrumbs, {active: true});
+    //   if (listPageBreadcrumb) {
+    //     // update the breadcrumb
+    //     const fallbackUrl: string[] | boolean = this.listHelperService.determineFallbackUrl();
+    //     listPageBreadcrumb.active = false;
+    //     listPageBreadcrumb.onClick = () => {
+    //       // redirect to cases list pages ( hack since we can't use navigate for the same component )
+    //       if (fallbackUrl) {
+    //         this.listHelperService.redirectService.to(fallbackUrl as string[]);
+    //       } else {
+    //         // DON'T REDIRECT
+    //       }
+    //     };
+    //   }
+    //
+    //   // add new breadcrumb
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel(
+    //       breadcrumbToken,
+    //       '.',
+    //       true,
+    //       {},
+    //       listFilterData
+    //     )
+    //   );
+    // }
   }
 
   /**

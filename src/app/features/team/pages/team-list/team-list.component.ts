@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Observable } from 'rxjs';
 import { UserModel } from '../../../../core/models/user.model';
@@ -28,12 +27,12 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 })
 export class TeamListComponent extends ListComponent implements OnInit, OnDestroy {
   // breadcrumb header
-  public breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel(
-      'LNG_PAGE_LIST_TEAMS_TITLE',
-      '/teams'
-    )
-  ];
+  // public breadcrumbs: BreadcrumbItemModel[] = [
+  //   new BreadcrumbItemModel(
+  //     'LNG_PAGE_LIST_TEAMS_TITLE',
+  //     '/teams'
+  //   )
+  // ];
 
   outbreakSubscriber: Subscription;
 
@@ -157,6 +156,12 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
       this.outbreakSubscriber.unsubscribe();
       this.outbreakSubscriber = null;
     }
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

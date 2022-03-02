@@ -3336,6 +3336,12 @@ export class ImportDataComponent
   }
 
   /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
+  }
+
+  /**
    * Fields retrieved from api to reduce payload size
    */
   refreshListFields(): string[] {

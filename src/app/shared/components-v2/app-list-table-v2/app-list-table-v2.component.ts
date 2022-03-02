@@ -14,6 +14,7 @@ import { Router } from '@angular/router';
 import { IV2Column, IV2ColumnAction, IV2ColumnBasic, IV2ColumnBasicFormat, IV2ColumnPinned, V2ColumnFormat } from './models/column.model';
 import { AppListTableV2ActionsComponent } from './components/actions/app-list-table-v2-actions.component';
 import { IExtendedColDef } from './models/extended-column.model';
+import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
 
 /**
  * Component
@@ -58,6 +59,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   modules = [
     ClientSideRowModelModule
   ];
+
+  // breadcrumbs
+  @Input() breadcrumbs: IV2Breadcrumb[];
 
   // click listener
   private clickListener: () => void;

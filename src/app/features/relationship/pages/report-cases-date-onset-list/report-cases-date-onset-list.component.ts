@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -27,7 +26,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 })
 export class ReportCasesDateOnsetListComponent extends ListComponent implements OnInit, OnDestroy {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // authenticated user
   authUser: UserModel;
@@ -232,21 +231,27 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
   /**
      * Initialize breadcrumbs
      */
-  private initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
+  // private initializeBreadcrumbs() {
+  //   // reset
+  //   this.breadcrumbs = [];
+  //
+  //   // cases list
+  //   if (CaseModel.canList(this.authUser)) {
+  //     this.breadcrumbs.push(
+  //       new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
+  //     );
+  //   }
+  //
+  //   // current page
+  //   this.breadcrumbs.push(
+  //     new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_DATE_ONSET_TITLE', '', true)
+  //   );
+  // }
 
-    // cases list
-    if (CaseModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
-      );
-    }
-
-    // current page
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_DATE_ONSET_TITLE', '', true)
-    );
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

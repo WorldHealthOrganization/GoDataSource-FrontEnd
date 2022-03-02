@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserModel, UserRoleModel, PhoneNumberType, UserSettings } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -29,9 +28,9 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
   templateUrl: './user-list.component.html'
 })
 export class UserListComponent extends ListComponent implements OnInit, OnDestroy {
-  breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '.', true)
-  ];
+  // breadcrumbs: BreadcrumbItemModel[] = [
+  //   new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '.', true)
+  // ];
 
   // authenticated user
   authUser: UserModel;
@@ -211,6 +210,12 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
     //     label: 'LNG_USER_FIELD_LABEL_TEAMS'
     //   }));
     // }
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

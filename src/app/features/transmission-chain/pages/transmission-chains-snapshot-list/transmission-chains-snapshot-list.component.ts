@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Observable, Subscription, throwError } from 'rxjs';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -27,10 +26,10 @@ import { Constants } from '../../../../core/models/constants';
 })
 export class TransmissionChainsSnapshotListComponent extends ListComponent implements OnInit, OnDestroy {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE', '/transmission-chains', false),
-    new BreadcrumbItemModel('LNG_PAGE_LIST_ASYNC_COT_TITLE', null, true)
-  ];
+  // breadcrumbs: BreadcrumbItemModel[] = [
+  //   new BreadcrumbItemModel('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE', '/transmission-chains', false),
+  //   new BreadcrumbItemModel('LNG_PAGE_LIST_ASYNC_COT_TITLE', null, true)
+  // ];
 
   // constants
   UserSettings = UserSettings;
@@ -166,6 +165,12 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent imple
     //     label: 'LNG_ASYNC_COT_FIELD_LABEL_ERROR'
     //   })
     // ];
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**

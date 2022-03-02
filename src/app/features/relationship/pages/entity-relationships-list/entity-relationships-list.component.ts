@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { Observable } from 'rxjs';
@@ -36,7 +35,7 @@ import { ClusterModel } from '../../../../core/models/cluster.model';
   templateUrl: './entity-relationships-list.component.html'
 })
 export class EntityRelationshipsListComponent extends RelationshipsListComponent implements OnInit, OnDestroy {
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // list of relationships
   relationshipsList$: Observable<EntityModel[]>;
@@ -223,21 +222,21 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     this.initializeBreadcrumbs();
   }
 
-  private initializeBreadcrumbs() {
-    if (
-      this.relationshipType &&
-            this.entity
-    ) {
-      this.breadcrumbs = [
-        new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
-        new BreadcrumbItemModel(
-          this.entity.name,
-          `${this.entityMap[this.entityType].link}/${this.entityId}/view`
-        ),
-        new BreadcrumbItemModel(this.relationshipsListPageTitle, null, true)
-      ];
-    }
-  }
+  // private initializeBreadcrumbs() {
+  //   if (
+  //     this.relationshipType &&
+  //           this.entity
+  //   ) {
+  //     this.breadcrumbs = [
+  //       new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
+  //       new BreadcrumbItemModel(
+  //         this.entity.name,
+  //         `${this.entityMap[this.entityType].link}/${this.entityId}/view`
+  //       ),
+  //       new BreadcrumbItemModel(this.relationshipsListPageTitle, null, true)
+  //     ];
+  //   }
+  // }
 
   /**
      * Initialize Side Table Columns
@@ -327,6 +326,12 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     //     visible: false
     //   })
     // );
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
   }
 
   /**
