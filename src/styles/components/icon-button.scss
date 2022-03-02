@@ -20,8 +20,8 @@ a.mat-icon-button {
 
   &.mat-button-disabled,
   &.mat-button-disabled.mat-button-disabled {
-    background-color: rgba(var(--gd-primary-rgb), 0.15);
-    color: var(--gd-background);
+    background-color: rgba(var(--gd-secondary-rgb), 0.15);
+    color: var(--gd-secondary);
 
     &:hover {
       .mat-button-focus-overlay {
@@ -32,7 +32,7 @@ a.mat-icon-button {
 
   &:hover {
     .mat-button-focus-overlay {
-      @include opacity(0.1);
+      @include opacity(0.25);
     }
   }
 

@@ -1,7 +1,14 @@
+@import 'mixins';
+@import 'font';
+
 :host {
   .gd-list-table {
     .gd-list-table-header {
-      margin-bottom: 1.6rem;
+      padding: 1.6rem;
     }
+  }
+
+  .gd-list-table-bottom {
+    @include border-radius(0 0 0.4rem 0.4rem);
   }
 }

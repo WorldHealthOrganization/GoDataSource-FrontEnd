@@ -11,6 +11,7 @@ import { V2RowAction, V2RowActionType } from '../../models/action.model';
 @Component({
   selector: 'app-list-table-v2-actions',
   templateUrl: './app-list-table-v2-actions.component.html',
+  styleUrls: ['./app-list-table-v2-actions.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppListTableV2ActionsComponent implements ICellRendererAngularComp {
