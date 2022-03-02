@@ -29,7 +29,7 @@
 
       <!-- Quick actions -->
       <ng-container
-        *ngIf="quickActions">
+        *ngIf="quickActions && (!quickActions.visible || quickActions.visible(null))">
 
         <!-- Menu -->
         <!-- IMPORTANT: Menu of type icon isn't supported here -->
