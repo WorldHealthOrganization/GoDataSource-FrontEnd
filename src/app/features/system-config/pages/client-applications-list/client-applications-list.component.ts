@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { UserModel, UserSettings } from '../../../../core/models/user.model';
+import { UserSettings } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
@@ -33,9 +32,6 @@ export class ClientApplicationsListComponent
   // breadcrumbs: BreadcrumbItemModel[] = [
   //   new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_TITLE', '.', true)
   // ];
-
-  // authenticated user
-  authUser: UserModel;
 
   // client applications servers
   clientApplicationsServerList: SystemClientApplicationModel[] = [];
@@ -125,7 +121,6 @@ export class ClientApplicationsListComponent
      */
   constructor(
     protected listHelperService: ListHelperService,
-    private authDataService: AuthDataService,
     private systemSettingsDataService: SystemSettingsDataService,
     private snackbarService: SnackbarService,
     private dialogService: DialogService,
@@ -139,9 +134,6 @@ export class ClientApplicationsListComponent
      * Component initialized
      */
   ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     // initialize Side Table Columns
     this.initializeSideTableColumns();
 

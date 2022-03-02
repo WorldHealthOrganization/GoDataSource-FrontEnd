@@ -1,7 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { UserModel } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -25,9 +23,6 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 export class ReportRelationshipsLongPeriodListComponent extends ListComponent implements OnInit, OnDestroy {
   // breadcrumbs
   // breadcrumbs: BreadcrumbItemModel[] = [];
-
-  // authenticated user
-  authUser: UserModel;
 
   // selected Outbreak
   selectedOutbreak: OutbreakModel;
@@ -179,7 +174,6 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
     protected listHelperService: ListHelperService,
     private router: Router,
     private snackbarService: SnackbarService,
-    private authDataService: AuthDataService,
     private outbreakDataService: OutbreakDataService,
     private relationshipDataService: RelationshipDataService
   ) {
@@ -190,9 +184,6 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
      * Component initialized
      */
   ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     // subscribe to the Selected Outbreak Subject stream
     this.outbreakSubscriber = this.outbreakDataService
       .getSelectedOutbreakSubject()

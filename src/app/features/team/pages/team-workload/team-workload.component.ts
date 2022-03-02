@@ -15,8 +15,6 @@ import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { TeamModel } from '../../../../core/models/team.model';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs/internal/observable/throwError';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { UserModel } from '../../../../core/models/user.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 interface ITeamMap {
@@ -55,9 +53,6 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
       maxRange: 0
     };
 
-  // authenticated user
-  authUser: UserModel;
-
   // Slider Date Filter Value
   sliderDateFilterValue: FormDateRangeSliderData;
 
@@ -72,8 +67,7 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
     private followUpsDataService: FollowUpsDataService,
     private snackbarService: SnackbarService,
     private i18nService: I18nService,
-    private teamDataService: TeamDataService,
-    private authDataService: AuthDataService
+    private teamDataService: TeamDataService
   ) {
     super(
       listHelperService,
@@ -85,9 +79,6 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
      * Component initialized
      */
   ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     // get teams
     this.displayLoading = true;
     this.teamDataService

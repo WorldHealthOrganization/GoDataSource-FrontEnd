@@ -13,7 +13,7 @@
 
       <!-- Icon Type -->
       <a
-        *ngIf="action.type === V2RowActionType.ICON; else notIcon"
+        *ngIf="action.type === V2RowActionType.ICON; else menuAction"
         class="gd-list-table-actions-action-icon"
         mat-icon-button
         [routerLink]="action.action.link && (!action.disable || !action.disable(data)) ? action.action.link(data) : undefined"
@@ -26,9 +26,10 @@
 
       <!-- Not icon - Menu -->
       <ng-template
-        #notIcon>
+        #menuAction>
 
         <!-- Menu -->
+        <!-- IMPORTANT: Menu of type label isn't supported in table -->
         <button
           type="button"
           mat-icon-button

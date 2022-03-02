@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -63,9 +62,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     geoLocationAccurate: null
   });
   filterAddressParentLocationIds: string[] = [];
-
-  // authenticated user
-  authUser: UserModel;
 
   // list of existing contacts
   contactsOfContactsList$: Observable<ContactOfContactModel[]>;
@@ -332,7 +328,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     protected listHelperService: ListHelperService,
     private router: Router,
     private contactsOfContactsDataService: ContactsOfContactsDataService,
-    private authDataService: AuthDataService,
     private snackbarService: SnackbarService,
     private outbreakDataService: OutbreakDataService,
     private genericDataService: GenericDataService,
@@ -356,9 +351,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
     // retrieve users
     this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
-
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
 
     this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
     this.riskLevelRefData$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL).pipe(share());

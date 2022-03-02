@@ -17,7 +17,6 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
   selector: 'app-saved-import-mapping',
@@ -43,9 +42,6 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
 
   // user list
   userList$: Observable<UserModel[]>;
-
-  // authenticated user
-  authUser: UserModel;
 
   fixedTableColumns: string[] = [
     'name',
@@ -86,8 +82,7 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
     private savedImportMappingService: SavedImportMappingService,
     private dialogService: DialogService,
     private genericDataService: GenericDataService,
-    private userDataService: UserDataService,
-    private authDataService: AuthDataService
+    private userDataService: UserDataService
   ) {
     super(listHelperService);
   }
@@ -97,9 +92,6 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
      */
   ngOnInit() {
     this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
-
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
 
     // retrieve users
     this.userList$ = this.userDataService.getUsersListSorted().pipe(share());

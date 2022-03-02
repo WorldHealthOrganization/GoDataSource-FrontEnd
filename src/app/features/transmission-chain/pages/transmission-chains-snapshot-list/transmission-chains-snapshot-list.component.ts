@@ -3,8 +3,7 @@ import { Observable, Subscription, throwError } from 'rxjs';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { UserSettings } from '../../../../core/models/user.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { DialogAnswer, DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
@@ -34,9 +33,6 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent imple
   // constants
   UserSettings = UserSettings;
   Constants = Constants;
-
-  // authenticated user
-  authUser: UserModel;
 
   // selected Outbreak
   selectedOutbreak: OutbreakModel;
@@ -82,7 +78,6 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent imple
      */
   constructor(
     protected listHelperService: ListHelperService,
-    private authDataService: AuthDataService,
     private snackbarService: SnackbarService,
     private outbreakDataService: OutbreakDataService,
     private transmissionChainDataService: TransmissionChainDataService,
@@ -96,9 +91,6 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent imple
      * Component initialized
      */
   ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     // status options
     this.statusList$ = this.genericDataService.getCotSnapshotStatusList();
 

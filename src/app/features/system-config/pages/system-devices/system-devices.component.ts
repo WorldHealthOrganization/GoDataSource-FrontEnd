@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { UserModel, UserSettings } from '../../../../core/models/user.model';
+import { UserSettings } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
@@ -25,9 +24,6 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
   // breadcrumbs: BreadcrumbItemModel[] = [
   //   new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_DEVICES_TITLE', '.', true)
   // ];
-
-  // authenticated user
-  authUser: UserModel;
 
   devicesList$: Observable<DeviceModel[]>;
   devicesListCount$: Observable<IBasicCount>;
@@ -120,7 +116,6 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
   constructor(
     protected listHelperService: ListHelperService,
     private router: Router,
-    private authDataService: AuthDataService,
     private deviceDataService: DeviceDataService,
     private snackbarService: SnackbarService,
     private dialogService: DialogService
@@ -132,9 +127,6 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
      * Component initialized
      */
   ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     // initialize Side Table Columns
     this.initializeSideTableColumns();
 

@@ -1,10 +1,8 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { Observable } from 'rxjs';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { UserModel } from '../../../../core/models/user.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -35,8 +33,6 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
 
   outbreakSubscriber: Subscription;
 
-  // authenticated user
-  authUser: UserModel;
   // selected Outbreak
   selectedOutbreak: OutbreakModel;
   // list of existing clusters
@@ -131,7 +127,6 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
     protected listHelperService: ListHelperService,
     private router: Router,
     private clusterDataService: ClusterDataService,
-    private authDataService: AuthDataService,
     private snackbarService: SnackbarService,
     private outbreakDataService: OutbreakDataService,
     private dialogService: DialogService
@@ -143,9 +138,6 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
      * Component initialized
      */
   ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     // subscribe to the Selected Outbreak Subject stream
     this.outbreakSubscriber = this.outbreakDataService
       .getSelectedOutbreakSubject()

@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { Observable, throwError } from 'rxjs/index';
@@ -69,7 +68,6 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
     protected listHelperService: ListHelperService,
     protected router: Router,
     protected route: ActivatedRoute,
-    protected authDataService: AuthDataService,
     protected outbreakDataService: OutbreakDataService,
     protected entityDataService: EntityDataService,
     private snackbarService: SnackbarService,
@@ -81,7 +79,7 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
     // parent
     super(
       listHelperService, router, route,
-      authDataService, outbreakDataService, entityDataService
+      outbreakDataService, entityDataService
     );
 
     // disable multi select for current list component

@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
@@ -59,9 +58,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
   Constants = Constants;
   ContactModel = ContactModel;
   OutbreakModel = OutbreakModel;
-
-  // authenticated user
-  authUser: UserModel;
 
   // list of existing contacts
   contactsList$: Observable<ContactModel[]>;
@@ -556,7 +552,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
     protected listHelperService: ListHelperService,
     private router: Router,
     private contactDataService: ContactDataService,
-    private authDataService: AuthDataService,
     private snackbarService: SnackbarService,
     private outbreakDataService: OutbreakDataService,
     private genericDataService: GenericDataService,
@@ -608,9 +603,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
           })
         ];
       });
-
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
 
     this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
     this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);

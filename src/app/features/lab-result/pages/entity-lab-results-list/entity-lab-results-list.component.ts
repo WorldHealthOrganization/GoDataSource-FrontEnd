@@ -20,7 +20,6 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { catchError, share, tap } from 'rxjs/operators';
 import { Constants } from '../../../../core/models/constants';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -95,9 +94,6 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
 
   // side filter
   tableColumnsUserSettingsKey: UserSettings;
-
-  // authenticated user
-  authUser: UserModel;
 
   // export outbreak lab results
   exportLabResultsUrl: string;
@@ -280,7 +276,6 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
   constructor(
     protected listHelperService: ListHelperService,
     private router: Router,
-    private authDataService: AuthDataService,
     private route: ActivatedRoute,
     private outbreakDataService: OutbreakDataService,
     private caseDataService: CaseDataService,
@@ -304,9 +299,6 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
     this.progressOptionsList$ = this.genericDataService.getProgressOptionsList();
     this.sequenceLabOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_SEQUENCE_LABORATORY);
     this.sequenceResultOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_SEQUENCE_RESULT);
-
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
 
     // retrieve users
     this.userList$ = this.userDataService.getUsersListSorted().pipe(share());

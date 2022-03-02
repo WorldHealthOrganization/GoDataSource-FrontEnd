@@ -15,6 +15,7 @@ import { IV2Column, IV2ColumnAction, IV2ColumnBasic, IV2ColumnBasicFormat, IV2Co
 import { AppListTableV2ActionsComponent } from './components/actions/app-list-table-v2-actions.component';
 import { IExtendedColDef } from './models/extended-column.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
+import { IV2RowActionMenuLabel } from './models/action.model';
 
 /**
  * Component
@@ -62,6 +63,12 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
   // breadcrumbs
   @Input() breadcrumbs: IV2Breadcrumb[];
+
+  // title
+  @Input() title: string;
+
+  // quick actions
+  @Input() quickActions: IV2RowActionMenuLabel;
 
   // click listener
   private clickListener: () => void;

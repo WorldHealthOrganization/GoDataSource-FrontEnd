@@ -1,14 +1,12 @@
 import { ListComponent } from '../../../core/helperClasses/list-component';
 import { Directive, OnDestroy, OnInit } from '@angular/core';
 import { EntityType } from '../../../core/models/entity-type';
-import { UserModel } from '../../../core/models/user.model';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { CaseModel } from '../../../core/models/case.model';
 import { ContactModel } from '../../../core/models/contact.model';
 import { EventModel } from '../../../core/models/event.model';
 import { RelationshipType } from '../../../core/enums/relationship-type.enum';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
 import { EntityDataService } from '../../../core/services/data/entity.data.service';
 import { throwError } from 'rxjs';
@@ -128,8 +126,6 @@ export abstract class RelationshipsListComponent extends ListComponent implement
       }
     };
 
-  // authenticated user
-  authUser: UserModel;
   // selected outbreak
   selectedOutbreak: OutbreakModel;
   // route params
@@ -146,7 +142,6 @@ export abstract class RelationshipsListComponent extends ListComponent implement
     protected listHelperService: ListHelperService,
     protected router: Router,
     protected route: ActivatedRoute,
-    protected authDataService: AuthDataService,
     protected outbreakDataService: OutbreakDataService,
     protected entityDataService: EntityDataService
   ) {
@@ -172,9 +167,6 @@ export abstract class RelationshipsListComponent extends ListComponent implement
      * Component initialized
      */
   ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     // get relationship type
     this.route.data.subscribe((routeData) => {
       this.relationshipType = routeData.relationshipType;

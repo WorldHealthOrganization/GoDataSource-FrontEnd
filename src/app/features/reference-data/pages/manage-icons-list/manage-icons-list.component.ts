@@ -11,8 +11,6 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import { UserModel } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import * as _ from 'lodash';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
@@ -34,9 +32,6 @@ export class ManageIconsListComponent extends ListComponent implements OnInit, O
   // Icons
   iconsList$: Observable<IconModel[]>;
   iconsListCount$: Observable<IBasicCount>;
-
-  // authenticated user
-  authUser: UserModel;
 
   fixedTableColumns: string[] = [
     'name',
@@ -73,8 +68,7 @@ export class ManageIconsListComponent extends ListComponent implements OnInit, O
     private referenceDataDataService: ReferenceDataDataService,
     private iconDataService: IconDataService,
     private dialogService: DialogService,
-    private snackbarService: SnackbarService,
-    private authDataService: AuthDataService
+    private snackbarService: SnackbarService
   ) {
     super(listHelperService);
   }
@@ -83,9 +77,6 @@ export class ManageIconsListComponent extends ListComponent implements OnInit, O
      * Component initialized
      */
   ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     // get the query params
     // retrieve Reference Data Category info
     if (!this.route.snapshot.queryParams.categoryId) {

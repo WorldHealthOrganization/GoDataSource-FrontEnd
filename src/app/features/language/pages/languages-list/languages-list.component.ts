@@ -1,7 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { UserModel } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -31,9 +29,6 @@ export class LanguagesListComponent
 
   // constants
   LanguageModel = LanguageModel;
-
-  // authenticated user
-  authUser: UserModel;
 
   // list of existing languages
   languagesList$: Observable<LanguageModel[]>;
@@ -126,7 +121,6 @@ export class LanguagesListComponent
     protected listHelperService: ListHelperService,
     private router: Router,
     private languageDataService: LanguageDataService,
-    private authDataService: AuthDataService,
     private snackbarService: SnackbarService,
     private dialogService: DialogService,
     private cacheService: CacheService
@@ -138,9 +132,6 @@ export class LanguagesListComponent
      * Component initialized
      */
   ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     // initialize pagination
     this.initPaginator();
 

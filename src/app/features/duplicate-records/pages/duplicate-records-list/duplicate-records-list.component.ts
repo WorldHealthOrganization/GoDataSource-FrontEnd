@@ -1,6 +1,4 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { UserModel } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -42,9 +40,6 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
   AddressModel = AddressModel;
   EntityModel = EntityModel;
 
-  // authenticated user
-  authUser: UserModel;
-
   // contacts outbreak
   selectedOutbreak: OutbreakModel;
 
@@ -72,7 +67,6 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
   constructor(
     protected listHelperService: ListHelperService,
     private router: Router,
-    private authDataService: AuthDataService,
     private snackbarService: SnackbarService,
     private outbreakDataService: OutbreakDataService
   ) {
@@ -83,9 +77,6 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
      * Component initialized
      */
   ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     // subscribe to the Selected Outbreak
     this.outbreakSubscriber = this.outbreakDataService
       .getSelectedOutbreakSubject()

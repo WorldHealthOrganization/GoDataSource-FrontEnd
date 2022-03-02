@@ -1,7 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { UserModel } from '../../../../core/models/user.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -45,9 +43,6 @@ export class ContactRangeFollowUpsListComponent
 
   // breadcrumbs
   // breadcrumbs: BreadcrumbItemModel[] = [];
-
-  // authenticated user
-  authUser: UserModel;
 
   outbreakSubscriber: Subscription;
 
@@ -136,7 +131,6 @@ export class ContactRangeFollowUpsListComponent
      */
   constructor(
     protected listHelperService: ListHelperService,
-    private authDataService: AuthDataService,
     private outbreakDataService: OutbreakDataService,
     private followUpsDataService: FollowUpsDataService,
     private snackbarService: SnackbarService,
@@ -156,7 +150,6 @@ export class ContactRangeFollowUpsListComponent
      */
   ngOnInit() {
     // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
     this.teamsList$ = this.teamDataService.getTeamsList().pipe(share());
 
     // add page title

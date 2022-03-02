@@ -3,8 +3,6 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { UserModel } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable } from 'rxjs';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
@@ -32,9 +30,6 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
 
   // Outbreak
   outbreak: OutbreakModel;
-
-  // authenticated user
-  authUser: UserModel;
 
   // entities
   entitiesList$: Observable<(CaseModel | ContactModel | EventModel)[]>;
@@ -90,7 +85,6 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
     protected listHelperService: ListHelperService,
     private snackbarService: SnackbarService,
     private outbreakDataService: OutbreakDataService,
-    private authDataService: AuthDataService,
     private i18nService: I18nService,
     private route: ActivatedRoute,
     private referenceDataDataService: ReferenceDataDataService
@@ -117,9 +111,6 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
         {}
       );
     });
-
-    // authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
 
     // retrieve route params
     this.route.params

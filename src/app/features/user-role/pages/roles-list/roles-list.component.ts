@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { UserModel, UserRoleModel, UserSettings } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { PermissionModel } from '../../../../core/models/permission.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -34,8 +33,6 @@ export class RolesListComponent extends ListComponent implements OnInit, OnDestr
   // user list
   userList$: Observable<UserModel[]>;
 
-  // authenticated user
-  authUser: UserModel;
   // list of existing roles
   rolesList$: Observable<UserRoleModel[]>;
   rolesListCount$: Observable<IBasicCount>;
@@ -117,15 +114,11 @@ export class RolesListComponent extends ListComponent implements OnInit, OnDestr
     protected listHelperService: ListHelperService,
     private router: Router,
     private userRoleDataService: UserRoleDataService,
-    private authDataService: AuthDataService,
     private snackbarService: SnackbarService,
     private dialogService: DialogService,
     private userDataService: UserDataService
   ) {
     super(listHelperService);
-
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
   }
 
   /**

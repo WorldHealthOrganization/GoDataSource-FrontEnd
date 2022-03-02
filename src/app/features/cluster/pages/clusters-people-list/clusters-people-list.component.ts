@@ -8,8 +8,6 @@ import { Observable } from 'rxjs';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { EntityType } from '../../../../core/models/entity-type';
-import { UserModel } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import * as _ from 'lodash';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
@@ -32,8 +30,6 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
   // breadcrumbs
   // breadcrumbs: BreadcrumbItemModel[] = [];
 
-  // authenticated user
-  authUser: UserModel;
   // selected Outbreak
   selectedOutbreak: OutbreakModel;
   // present cluster
@@ -101,7 +97,6 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
     private route: ActivatedRoute,
     private outbreakDataService: OutbreakDataService,
     private clusterDataService: ClusterDataService,
-    private authDataService: AuthDataService,
     private snackbarService: SnackbarService,
     private referenceDataDataService: ReferenceDataDataService
   ) {
@@ -112,9 +107,6 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
      * Component initialized
      */
   ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     // retrieve cluster info
     this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
     this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);

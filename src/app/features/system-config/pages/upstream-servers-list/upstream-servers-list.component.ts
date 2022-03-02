@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { UserModel, UserSettings } from '../../../../core/models/user.model';
+import { UserSettings } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
@@ -34,9 +33,6 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
 
   // constants
   SystemUpstreamServerModel = SystemUpstreamServerModel;
-
-  // authenticated user
-  authUser: UserModel;
 
   // upstream servers
   upstreamServerList: SystemUpstreamServerModel[] = [];
@@ -118,7 +114,6 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
      */
   constructor(
     protected listHelperService: ListHelperService,
-    private authDataService: AuthDataService,
     private systemSettingsDataService: SystemSettingsDataService,
     private snackbarService: SnackbarService,
     private dialogService: DialogService,
@@ -132,9 +127,6 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
      * Component initialized
      */
   ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     // initialize Side Table Columns
     this.initializeSideTableColumns();
 

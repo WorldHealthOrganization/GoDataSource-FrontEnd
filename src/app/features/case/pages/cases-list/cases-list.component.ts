@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Observable, Subscription, throwError } from 'rxjs';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
@@ -47,8 +46,6 @@ import { FollowUpModel } from '../../../../core/models/follow-up.model';
   styleUrls: ['./cases-list.component.less']
 })
 export class CasesListComponent extends ListComponent implements OnInit, OnDestroy {
-  // authenticated user
-  authUser: UserModel;
   // selected Outbreak
   selectedOutbreak: OutbreakModel;
   // list of existing cases
@@ -216,7 +213,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     protected listHelperService: ListHelperService,
     private router: Router,
     private caseDataService: CaseDataService,
-    private authDataService: AuthDataService,
     private snackbarService: SnackbarService,
     private outbreakDataService: OutbreakDataService,
     private referenceDataDataService: ReferenceDataDataService,
@@ -239,9 +235,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     this.casesDataExportFileName = this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE') +
             ' - ' +
             this.casesDataExportFileName;
-
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
 
     // retrieve users
     this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
@@ -1208,9 +1201,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    * Initialize breadcrumbs
    */
   initializeBreadcrumbs(): void {
+    console.log(this.authUser);
     this.breadcrumbs = [
       {
-        label: 'LNG_PAGE_LIST_CASES_TITLE',
+        label: 'LNG_COMMON_LABEL_HOME',
         action: {
           link: ['/contacts']
         }

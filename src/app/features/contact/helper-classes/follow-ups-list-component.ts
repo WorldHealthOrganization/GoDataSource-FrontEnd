@@ -32,8 +32,6 @@ import { UserDataService } from '../../../core/services/data/user.data.service';
  */
 @Directive()
 export abstract class FollowUpsListComponent extends ListComponent implements OnInit, OnDestroy {
-  // authenticated user
-  authUser: UserModel;
   // contacts outbreak
   selectedOutbreak: OutbreakModel;
 

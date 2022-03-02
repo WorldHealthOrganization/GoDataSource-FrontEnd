@@ -6,6 +6,37 @@
   <app-breadcrumb-v2
     [breadcrumbs]="breadcrumbs"></app-breadcrumb-v2>
 
+  <!-- Title & buttons -->
+  <div
+    fxLayout="row"
+    class="gd-list-top-tile-buttons">
+
+    <!-- Title -->
+    <div
+      fxFlex
+      class="gd-list-top-tile-buttons-title">
+      {{title | translate}}
+    </div>
+
+    <!-- Buttons -->
+    <div
+      fxFlex fxLayoutAlign="end"
+      class="gd-list-top-tile-buttons-buttons">
+
+      <!-- Hide / show groups -->
+      <!-- TODO -->
+
+      <!-- Quick actions -->
+      <ng-container
+        *ngIf="quickActions">
+
+      </ng-container>
+
+      <!-- Add -->
+      <!-- TODO -->
+    </div>
+  </div>
+
   <!-- @TODO: Grouped data -->
   <div>
     grouped data... gradient color from referenceData.color to a lighter one...

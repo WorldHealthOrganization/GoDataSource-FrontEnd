@@ -78,9 +78,10 @@ export abstract class ListComponent implements OnDestroy {
   // handle pop state changes
   private static locationSubscription: SubscriptionLike;
 
-  /**
-   * Breadcrumbs
-   */
+  // authenticated user data
+  authUser: UserModel;
+
+  // breadcrumbs
   public breadcrumbs: IV2Breadcrumb[];
 
   /**
@@ -369,6 +370,9 @@ export abstract class ListComponent implements OnDestroy {
     protected listHelperService: ListHelperService,
     disableFilterCaching: boolean = false
   ) {
+    // get auth data
+    this.authUser = this.listHelperService.authDataService.getAuthenticatedUser();
+
     // initialize breadcrumbs
     this.initializeBreadcrumbs();
 

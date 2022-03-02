@@ -15,7 +15,6 @@ import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { UserModel } from '../../../../core/models/user.model';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs/internal/observable/throwError';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 interface IUserMap {
@@ -54,9 +53,6 @@ export class UserWorkloadComponent extends ListComponent implements OnInit, OnDe
       maxRange: 0
     };
 
-  // authenticated user
-  authUser: UserModel;
-
   // Slider Date Filter Value
   sliderDateFilterValue: FormDateRangeSliderData;
 
@@ -71,8 +67,7 @@ export class UserWorkloadComponent extends ListComponent implements OnInit, OnDe
     private followUpsDataService: FollowUpsDataService,
     private snackbarService: SnackbarService,
     private i18nService: I18nService,
-    private userDataService: UserDataService,
-    private authDataService: AuthDataService
+    private userDataService: UserDataService
   ) {
     super(
       listHelperService,
@@ -84,9 +79,6 @@ export class UserWorkloadComponent extends ListComponent implements OnInit, OnDe
      * Component initialized
      */
   ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     // get users
     this.displayLoading = true;
     this.userDataService

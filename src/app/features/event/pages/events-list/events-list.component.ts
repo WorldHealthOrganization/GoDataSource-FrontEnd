@@ -4,7 +4,6 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { EventDataService } from '../../../../core/services/data/event.data.service';
 import { EventModel } from '../../../../core/models/event.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
@@ -44,9 +43,6 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
   // breadcrumbs: BreadcrumbItemModel[] = [
   //   new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '.', true)
   // ];
-
-  // authenticated user
-  authUser: UserModel;
 
   // constants
   EventModel = EventModel;
@@ -323,7 +319,6 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
     private router: Router,
     private eventDataService: EventDataService,
     private outbreakDataService: OutbreakDataService,
-    private authDataService: AuthDataService,
     private snackbarService: SnackbarService,
     private dialogService: DialogService,
     private genericDataService: GenericDataService,
@@ -339,9 +334,6 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
      * Component initialized
      */
   ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     // add page title
     this.eventsDataExportFileName = this.i18nService.instant('LNG_PAGE_LIST_EVENTS_TITLE') +
             ' - ' +

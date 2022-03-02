@@ -71,11 +71,33 @@ interface IV2RowActionMenuDivider {
 interface IV2RowActionMenu {
   // type
   type: V2RowActionType.MENU;
-  icon: string;
   menuOptions: (IV2RowActionMenuOption | IV2RowActionMenuDivider)[];
 
   // optional
+  visible?: (data: any) => boolean;
+  disable?: (item: any) => boolean;
+}
+
+/**
+ * Row icon action Menu
+ */
+interface IV2RowActionMenuIcon extends IV2RowActionMenu {
+  // required
+  icon: string;
+
+  // optional
   iconTooltip?: string;
+}
+
+/**
+ * Row label action Menu
+ */
+export interface IV2RowActionMenuLabel extends IV2RowActionMenu {
+  // required
+  label: string;
+  menuOptions: (IV2RowActionMenuOption | IV2RowActionMenuDivider)[];
+
+  // optional
   visible?: (data: any) => boolean;
   disable?: (item: any) => boolean;
 }
@@ -83,4 +105,4 @@ interface IV2RowActionMenu {
 /**
  * Action
  */
-export type V2RowAction = IV2RowActionIcon | IV2RowActionMenu;
+export type V2RowAction = IV2RowActionIcon | IV2RowActionMenuIcon | IV2RowActionMenuLabel;

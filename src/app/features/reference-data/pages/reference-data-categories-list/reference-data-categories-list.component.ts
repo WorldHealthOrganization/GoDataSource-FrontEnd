@@ -2,8 +2,6 @@ import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { UserModel } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { HoverRowAction } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -28,9 +26,6 @@ export class ReferenceDataCategoriesListComponent
   // breadcrumbs: BreadcrumbItemModel[] = [
   //   new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '..', true)
   // ];
-
-  // authenticated user
-  authUser: UserModel;
 
   // constants
   ReferenceDataCategoryModel = ReferenceDataCategoryModel;
@@ -66,7 +61,6 @@ export class ReferenceDataCategoriesListComponent
   constructor(
     protected listHelperService: ListHelperService,
     private referenceDataDataService: ReferenceDataDataService,
-    private authDataService: AuthDataService,
     private i18nService: I18nService,
     private snackbarService: SnackbarService
   ) {
@@ -80,9 +74,6 @@ export class ReferenceDataCategoriesListComponent
      * Component initialized
      */
   ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     this.needsRefreshList(true);
 
     // add page title

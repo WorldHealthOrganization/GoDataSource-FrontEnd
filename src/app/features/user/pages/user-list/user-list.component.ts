@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { UserModel, UserRoleModel, PhoneNumberType, UserSettings } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -31,9 +30,6 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
   // breadcrumbs: BreadcrumbItemModel[] = [
   //   new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '.', true)
   // ];
-
-  // authenticated user
-  authUser: UserModel;
 
   // constants
   UserModel = UserModel;
@@ -107,7 +103,6 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
   constructor(
     protected listHelperService: ListHelperService,
     private userDataService: UserDataService,
-    private authDataService: AuthDataService,
     private snackbarService: SnackbarService,
     private dialogService: DialogService,
     private outbreakDataService: OutbreakDataService,
@@ -123,7 +118,6 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
      */
   ngOnInit() {
     // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
     this.rolesList$ = this.userRoleDataService.getRolesList();
 
     this.institutionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.INSTITUTION_NAME);

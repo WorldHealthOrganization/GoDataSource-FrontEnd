@@ -6,7 +6,6 @@ import { Observable } from 'rxjs';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
@@ -57,7 +56,6 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
   yesNoOptionsList$: Observable<any[]>;
 
   // authenticated user
-  authUser: UserModel;
   UserSettings = UserSettings;
 
   @ViewChild('locationFilter', { static: true }) locationFilter: FormLocationDropdownComponent;
@@ -146,7 +144,6 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
      */
   constructor(
     protected listHelperService: ListHelperService,
-    private authDataService: AuthDataService,
     private locationDataService: LocationDataService,
     private genericDataService: GenericDataService,
     private route: ActivatedRoute,
@@ -169,9 +166,6 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
   ngOnInit() {
     // add page title
     this.hierarchicalLocationsDataExportFileName = `${this.i18nService.instant('LNG_PAGE_LIST_LOCATIONS_TITLE')} - ${this.hierarchicalLocationsDataExportFileName}`;
-
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
 
     // retrieve users
     this.userList$ = this.userDataService.getUsersListSorted().pipe(share());

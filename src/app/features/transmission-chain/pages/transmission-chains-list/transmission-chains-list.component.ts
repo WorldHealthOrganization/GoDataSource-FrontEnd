@@ -9,8 +9,6 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { ApplyListFilter, Constants } from '../../../../core/models/constants';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { EntityType } from '../../../../core/models/entity-type';
-import { UserModel } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { catchError } from 'rxjs/operators';
 import { Subscription } from 'rxjs/internal/Subscription';
@@ -30,9 +28,6 @@ export class TransmissionChainsListComponent extends ListComponent implements On
   // ];
 
   outbreakSubscriber: Subscription;
-
-  // authenticated user
-  authUser: UserModel;
 
   // selected Outbreak
   selectedOutbreak: OutbreakModel;
@@ -68,8 +63,7 @@ export class TransmissionChainsListComponent extends ListComponent implements On
     private outbreakDataService: OutbreakDataService,
     private transmissionChainDataService: TransmissionChainDataService,
     private route: ActivatedRoute,
-    private snackbarService: SnackbarService,
-    private authDataService: AuthDataService
+    private snackbarService: SnackbarService
   ) {
     super(listHelperService);
   }
@@ -78,9 +72,6 @@ export class TransmissionChainsListComponent extends ListComponent implements On
      * Component initialized
      */
   ngOnInit() {
-    // authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     // get query params
     this.queryParamsData = this.route.snapshot.queryParams;
     this.appliedListFilter = this.queryParamsData.applyListFilter;

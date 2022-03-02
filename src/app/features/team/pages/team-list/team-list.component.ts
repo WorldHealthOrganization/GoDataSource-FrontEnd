@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Observable } from 'rxjs';
 import { UserModel } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import * as _ from 'lodash';
 import { TeamModel } from '../../../../core/models/team.model';
@@ -46,8 +45,6 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
   teamsList$: Observable<TeamModel[]>;
   teamsListCount$: Observable<IBasicCount>;
 
-  // authenticated user
-  authUser: UserModel;
   // selected outbreak - needed to check assignment at delete team
   selectedOutbreak: OutbreakModel;
 
@@ -110,7 +107,6 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
      */
   constructor(
     protected listHelperService: ListHelperService,
-    private authDataService: AuthDataService,
     private teamDataService: TeamDataService,
     private dialogService: DialogService,
     private outbreakDataService: OutbreakDataService,
@@ -125,9 +121,6 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
      * Component initialized
      */
   ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     // get list of users
     if (UserModel.canList(this.authUser)) {
       this.retrieveEntireListOfUsers();

@@ -8,7 +8,6 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import * as _ from 'lodash';
@@ -128,7 +127,6 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     protected listHelperService: ListHelperService,
     protected router: Router,
     protected route: ActivatedRoute,
-    protected authDataService: AuthDataService,
     protected outbreakDataService: OutbreakDataService,
     protected entityDataService: EntityDataService,
     private snackbarService: SnackbarService,
@@ -141,7 +139,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     // parent
     super(
       listHelperService, router, route,
-      authDataService, outbreakDataService, entityDataService
+      outbreakDataService, entityDataService
     );
     // set checkbox key ( id ) path for current list component
     this.checkedKeyPath = 'relationship.id';

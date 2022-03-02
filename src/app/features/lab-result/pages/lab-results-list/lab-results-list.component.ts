@@ -5,7 +5,6 @@ import { LabResultDataService } from '../../../../core/services/data/lab-result.
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import * as _ from 'lodash';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
@@ -68,8 +67,6 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
   fieldsGroupList: LabelValuePair[];
   fieldsGroupListRequired: IExportFieldsGroupRequired;
 
-  // authenticated user
-  authUser: UserModel;
   // selected outbreak
   selectedOutbreak: OutbreakModel;
 
@@ -290,7 +287,6 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
     protected listHelperService: ListHelperService,
     private router: Router,
     private snackbarService: SnackbarService,
-    private authDataService: AuthDataService,
     private outbreakDataService: OutbreakDataService,
     private labResultDataService: LabResultDataService,
     private dialogService: DialogService,
@@ -306,9 +302,6 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
      * Component initialized
      */
   ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     this.labNamesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_NAME).pipe(share());
     this.sampleTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_SAMPLE).pipe(share());
     this.testTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_LAB_TEST).pipe(share());

@@ -1,6 +1,4 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { UserModel } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ActivatedRoute } from '@angular/router';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
@@ -30,9 +28,6 @@ import { Subscription } from 'rxjs/internal/Subscription';
 export class LocationUsageListComponent extends ListComponent implements OnInit, OnDestroy {
   // breadcrumbs
   // breadcrumbs: BreadcrumbItemModel[] = [];
-
-  // authenticated user
-  authUser: UserModel;
 
   locationId: string;
   locationData: LocationModel;
@@ -101,7 +96,6 @@ export class LocationUsageListComponent extends ListComponent implements OnInit,
   constructor(
     protected listHelperService: ListHelperService,
     private snackbarService: SnackbarService,
-    private authDataService: AuthDataService,
     private locationDataService: LocationDataService,
     private outbreakDataService: OutbreakDataService,
     protected route: ActivatedRoute
@@ -113,9 +107,6 @@ export class LocationUsageListComponent extends ListComponent implements OnInit,
      * Component initialized
      */
   ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     // subscribe to the Selected Outbreak Subject stream
     this.outbreakSubscriber = this.outbreakDataService
       .getSelectedOutbreakSubject()

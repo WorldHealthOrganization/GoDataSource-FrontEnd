@@ -6,7 +6,6 @@ import { Observable } from 'rxjs';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
@@ -72,7 +71,6 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
     protected listHelperService: ListHelperService,
     protected router: Router,
     protected route: ActivatedRoute,
-    protected authDataService: AuthDataService,
     protected outbreakDataService: OutbreakDataService,
     protected entityDataService: EntityDataService,
     private snackbarService: SnackbarService,
@@ -82,7 +80,7 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
   ) {
     super(
       listHelperService, router, route,
-      authDataService, outbreakDataService, entityDataService
+      outbreakDataService, entityDataService
     );
   }
 

@@ -4,11 +4,7 @@ import {
   OnInit,
   ViewEncapsulation
 } from '@angular/core';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import {
-  UserModel,
-  UserSettings
-} from '../../../../core/models/user.model';
+import { UserSettings } from '../../../../core/models/user.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import * as _ from 'lodash';
 import {
@@ -54,8 +50,6 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
   //   new BreadcrumbItemModel('LNG_PAGE_LIST_SEARCH_RESULT_TITLE', '.', true)
   // ];
 
-  // authenticated user
-  authUser: UserModel;
   // selected Outbreak
   selectedOutbreak: OutbreakModel;
 
@@ -112,7 +106,6 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
      */
   constructor(
     protected listHelperService: ListHelperService,
-    private authDataService: AuthDataService,
     private globalEntitySearchDataService: GlobalEntitySearchDataService,
     private outbreakDataService: OutbreakDataService,
     private snackbarService: SnackbarService,
@@ -141,9 +134,6 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
         {}
       );
     });
-
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
 
     // subscribe to the Selected Outbreak Subject stream
     this.outbreakSubscriber = this.outbreakDataService

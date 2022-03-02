@@ -50,8 +50,6 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
   countriesList$: Observable<any[]>;
   // yes/no option list for deleted
   yesNoOptionsList$: Observable<any[]>;
-  // authenticated user
-  authUser: UserModel;
 
   // user list
   userList$: Observable<UserModel[]>;
@@ -259,8 +257,6 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
      * Component initialized
      */
   ngOnInit() {
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     this.followUpsTeamAssignmentAlgorithm$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM);
     this.activeOptionsList$ = this.genericDataService.getFilterYesNoOptions();
     this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);

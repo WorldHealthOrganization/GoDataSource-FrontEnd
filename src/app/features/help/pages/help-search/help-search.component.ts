@@ -9,11 +9,7 @@ import { HelpItemModel } from '../../../../core/models/help-item.model';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import * as _ from 'lodash';
 import { catchError, tap } from 'rxjs/operators';
-import {
-  UserModel,
-  UserSettings
-} from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { UserSettings } from '../../../../core/models/user.model';
 import { HoverRowAction } from '../../../../shared/components';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
@@ -26,9 +22,6 @@ export class HelpSearchComponent extends ListComponent implements OnInit, OnDest
   // breadcrumbs: BreadcrumbItemModel[] = [
   //   new BreadcrumbItemModel('LNG_PAGE_GLOBAL_HELP_TITLE', '/help', true)
   // ];
-
-  // authenticated user
-  authUser: UserModel;
 
   helpItemsList$: Observable<HelpItemModel[]>;
 
@@ -58,7 +51,6 @@ export class HelpSearchComponent extends ListComponent implements OnInit, OnDest
   constructor(
     protected listHelperService: ListHelperService,
     private router: Router,
-    private authDataService: AuthDataService,
     private helpDataService: HelpDataService,
     private snackbarService: SnackbarService
   ) {
@@ -72,9 +64,6 @@ export class HelpSearchComponent extends ListComponent implements OnInit, OnDest
      * Component initialized
      */
   ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     this.helpCategoriesList$ = this.helpDataService.getHelpCategoryList();
 
     // ...and re-load the list

@@ -6,8 +6,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { UserSettings } from '../../../../core/models/user.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -37,8 +36,6 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
   // constants
   IconModel = IconModel;
   ReferenceDataEntryModel = ReferenceDataEntryModel;
-
-  authUser: UserModel;
 
   UserSettings = UserSettings;
 
@@ -97,7 +94,6 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
     private referenceDataDataService: ReferenceDataDataService,
     private snackbarService: SnackbarService,
     private dialogService: DialogService,
-    private authDataService: AuthDataService,
     private i18nService: I18nService
   ) {
     super(
@@ -110,9 +106,6 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
      * Component initialized
      */
   ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     // get the route params
     this.route.params
       .subscribe((params: { categoryId }) => {

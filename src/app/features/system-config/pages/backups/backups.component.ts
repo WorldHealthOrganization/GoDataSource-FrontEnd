@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -37,9 +36,6 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
   // constants
   BackupModel = BackupModel;
   UserSettings = UserSettings;
-
-  // authenticated user
-  authUser: UserModel;
 
   // settings
   settings: SystemSettingsModel;
@@ -112,7 +108,6 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
      */
   constructor(
     protected listHelperService: ListHelperService,
-    private authDataService: AuthDataService,
     private dialogService: DialogService,
     private systemSettingsDataService: SystemSettingsDataService,
     private systemBackupDataService: SystemBackupDataService,
@@ -128,9 +123,6 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
      * Component initialized
      */
   ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     // default backup settings
     this.refreshSystemSettings();
 

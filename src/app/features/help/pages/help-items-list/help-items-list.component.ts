@@ -1,10 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import {
-  UserModel,
-  UserSettings
-} from '../../../../core/models/user.model';
+import { UserSettings } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
@@ -32,7 +28,6 @@ export class HelpItemsListComponent extends ListComponent implements OnInit, OnD
   // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // authenticated user
-  authUser: UserModel;
   categoryId: string;
   selectedCategory: HelpCategoryModel;
 
@@ -108,7 +103,6 @@ export class HelpItemsListComponent extends ListComponent implements OnInit, OnD
   constructor(
     protected listHelperService: ListHelperService,
     private helpDataService: HelpDataService,
-    private authDataService: AuthDataService,
     private snackbarService: SnackbarService,
     private dialogService: DialogService,
     private route: ActivatedRoute,
@@ -122,9 +116,6 @@ export class HelpItemsListComponent extends ListComponent implements OnInit, OnD
      * Component initialized
      */
   ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     this.route.params
       .subscribe((params: { categoryId }) => {
         this.categoryId = params.categoryId;
