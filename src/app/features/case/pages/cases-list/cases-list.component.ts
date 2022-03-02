@@ -930,7 +930,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         field: 'actions',
         label: 'LNG_COMMON_LABEL_ACTIONS',
         pinned: IV2ColumnPinned.RIGHT,
-        resizable: false,
+        notResizable: true,
         format: {
           type: V2ColumnFormat.ACTIONS
         },
