@@ -196,7 +196,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           '',
         field: column.field,
         pinned: column.pinned,
-        resizable: column.resizable,
+        resizable: !column.notResizable,
         columnDefinition: column,
         valueFormatter: (valueFormat): string => {
           return this.formatValue(valueFormat);

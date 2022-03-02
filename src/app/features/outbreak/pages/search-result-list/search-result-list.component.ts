@@ -199,8 +199,15 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
   }
 
   /**
-     * Refresh list
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Refresh list
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     if (
       this.selectedOutbreak &&

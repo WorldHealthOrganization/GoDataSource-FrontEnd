@@ -160,8 +160,15 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
   }
 
   /**
-     * Re(load) the list of Teams
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the list of Teams
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     // retrieve the list of Teams
     this.teamsList$ = this.teamDataService

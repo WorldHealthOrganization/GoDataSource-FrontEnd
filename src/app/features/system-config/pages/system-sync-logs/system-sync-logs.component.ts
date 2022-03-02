@@ -235,8 +235,15 @@ export class SystemSyncLogsComponent
   }
 
   /**
-     * Refresh list
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Refresh list
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     // sync logs
     this.syncLogsList$ = this.systemSyncLogDataService

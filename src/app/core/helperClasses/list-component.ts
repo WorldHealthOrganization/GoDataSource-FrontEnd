@@ -318,6 +318,13 @@ export abstract class ListComponent implements OnDestroy {
     const triggeredByPageChange: boolean = this._triggeredByPageChange;
     this._triggeredByPageChange = false;
 
+    // attach fields restrictions
+    const fields: string[] = this.refreshListFields();
+    if (fields.length > 0) {
+      this.queryBuilder.clearFields();
+      this.queryBuilder.fields(...fields);
+    }
+
     // refresh list
     this.refreshingList = true;
     this.refreshList((records: any[]) => {
@@ -427,6 +434,11 @@ export abstract class ListComponent implements OnDestroy {
   ngOnDestroy(): void {
     this.releaseSubscribers();
   }
+
+  /**
+   * Fields retrieved from api to reduce payload size
+   */
+  public abstract refreshListFields(): string[];
 
   /**
      * Refresh list

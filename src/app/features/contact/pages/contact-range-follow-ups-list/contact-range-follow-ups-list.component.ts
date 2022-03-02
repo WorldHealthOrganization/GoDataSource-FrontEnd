@@ -272,8 +272,15 @@ export class ContactRangeFollowUpsListComponent
   }
 
   /**
-     * Refresh list
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Refresh list
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     if (this.selectedOutbreak) {
       // order by name

@@ -430,9 +430,8 @@ export class RequestQueryBuilder {
   }
 
   /**
-     * Check if the query builder is empty
-     * @returns {boolean}
-     */
+   * Check if the query builder is empty
+   */
   isEmpty(): boolean {
     // check if all child query builders are empty
     let isEmptyChildrenBuilders: boolean = true;
@@ -449,14 +448,21 @@ export class RequestQueryBuilder {
             this.sort.isEmpty() &&
             _.isEmpty(this.limitResultsNumber) &&
             this.paginator.isEmpty() &&
-            _.isEmpty(this.fieldsInResponse) &&
+            this.isEmptyFields() &&
             isEmptyChildrenBuilders &&
             _.isEmpty(this.flags);
   }
 
   /**
-     * Check if filters are empty
-     */
+   * Check if we have any fields...
+   */
+  isEmptyFields(): boolean {
+    return _.isEmpty(this.fieldsInResponse);
+  }
+
+  /**
+   * Check if filters are empty
+   */
   isEmptyOnlyFilters(): boolean {
     // check if all child query builders are empty
     let isEmptyChildrenBuilders: boolean = true;
@@ -552,10 +558,22 @@ export class RequestQueryBuilder {
   }
 
   /**
-     * Clear filter and sort criterias
-     */
+   * Clear fields
+   */
+  clearFields(): void {
+    // reset fields
+    this.fieldsInResponse = [];
+
+    // trigger change
+    this.triggerChangeListener();
+  }
+
+  /**
+   * Clear filter and sort criterias
+   */
   clear() {
     // clear
+    this.clearFields();
     this.filter.clear();
     this.includedRelations = {};
     this.sort.clear();

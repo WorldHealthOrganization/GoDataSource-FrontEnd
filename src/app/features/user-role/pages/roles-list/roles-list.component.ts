@@ -180,8 +180,15 @@ export class RolesListComponent extends ListComponent implements OnInit, OnDestr
   }
 
   /**
-     * Re(load) the User Roles list
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the User Roles list
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     // make sure we include user information
     this.queryBuilder.filter.flag(

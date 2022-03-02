@@ -195,8 +195,15 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
   }
 
   /**
-     * Re(load) the available Entities list, based on the applied filter, sort criterias
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the available Entities list, based on the applied filter, sort criterias
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     if (
       this.entityType &&

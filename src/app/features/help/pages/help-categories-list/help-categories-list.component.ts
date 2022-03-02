@@ -169,8 +169,15 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
   }
 
   /**
-     * Re(load) the categories list
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the categories list
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     // retrieve the list of Categories
     this.helpCategoriesList$ = this.helpDataService

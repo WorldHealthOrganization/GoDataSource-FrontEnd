@@ -232,8 +232,15 @@ export class TransmissionChainsListComponent extends ListComponent implements On
   }
 
   /**
-     * Re(load) the Transmission Chains list, based on the applied filter, sort criterias
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the Transmission Chains list, based on the applied filter, sort criterias
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     // reset items
     this.transmissionChains = [];

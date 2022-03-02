@@ -228,8 +228,15 @@ export class HelpItemsListComponent extends ListComponent implements OnInit, OnD
   }
 
   /**
-     * Re(load) the items list
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the items list
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     // retrieve the list of items
     this.helpItemsList$ = this.helpDataService

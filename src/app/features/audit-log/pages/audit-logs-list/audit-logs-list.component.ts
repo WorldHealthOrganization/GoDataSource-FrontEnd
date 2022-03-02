@@ -158,8 +158,15 @@ export class AuditLogsListComponent
   }
 
   /**
-     * Re(load) the list, based on the applied filter, sort criterias
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the list, based on the applied filter, sort criterias
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     // include user details
     this.queryBuilder.include('user', true);

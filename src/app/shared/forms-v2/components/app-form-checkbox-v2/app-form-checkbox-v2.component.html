@@ -1,0 +1,13 @@
+<div
+  class="gd-form-checkbox-v2">
+
+  <!-- Checkbox -->
+  <mat-checkbox
+    [(ngModel)]="value"
+    [disabled]="disabled"
+    (click)="onTouchItem()"
+    (change)="onTouchItem()">
+    {{ placeholder | translate }}
+  </mat-checkbox>
+
+</div>

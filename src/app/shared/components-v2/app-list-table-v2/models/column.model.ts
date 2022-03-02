@@ -38,7 +38,7 @@ export interface IV2ColumnBasic {
   notVisible?: boolean;
   exclude?: (IV2Column) => boolean;
   pinned?: IV2ColumnPinned | boolean;
-  resizable?: boolean;
+  notResizable?: boolean;
   link?: (any) => string;
 }
 
@@ -109,7 +109,7 @@ export interface IV2ColumnAction {
   notVisible?: boolean;
   exclude?: (IV2Column) => boolean;
   pinned?: IV2ColumnPinned | boolean;
-  resizable?: boolean;
+  notResizable?: boolean;
 }
 
 /**

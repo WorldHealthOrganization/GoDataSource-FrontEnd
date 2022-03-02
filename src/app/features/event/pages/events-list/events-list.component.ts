@@ -531,8 +531,15 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
   }
 
   /**
-     * Re(load) the Events list
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the Events list
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     if (this.selectedOutbreak) {
       // retrieve created user & modified user information

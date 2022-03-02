@@ -101,8 +101,15 @@ export class ReferenceDataCategoriesListComponent
   }
 
   /**
-     * Re(load) the Reference Data Categories list
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the Reference Data Categories list
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     // load reference data
     this.referenceData$ = this.referenceDataDataService

@@ -1,0 +1,16 @@
+<div
+  class="gd-form-radio-button-group-v2">
+
+  <!-- Radio button group -->
+  <mat-radio-group
+    [(ngModel)]="value"
+    [disabled]="disabled"
+    (change)="onTouchItem()">
+    <mat-radio-button
+      *ngFor="let option of options"
+      [value]="option.value">
+      {{option.label | translate}}
+    </mat-radio-button>
+  </mat-radio-group>
+
+</div>

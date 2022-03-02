@@ -149,8 +149,15 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
   }
 
   /**
-     * Re(load) list
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) list
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     if (this.outbreak) {
       this.entitiesList$ = this.outbreakDataService

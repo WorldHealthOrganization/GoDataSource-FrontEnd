@@ -223,8 +223,15 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
   }
 
   /**
-     * Refresh list
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Refresh list
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     this.backupsList$ = this.systemBackupDataService
       .getBackupList(this.queryBuilder)

@@ -168,8 +168,15 @@ export class ManageIconsListComponent extends ListComponent implements OnInit, O
   }
 
   /**
-     * Retrieve Icons
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Retrieve Icons
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     this.iconsList$ = this.iconDataService
       .getIconsList(this.queryBuilder)

@@ -110,8 +110,15 @@ export class HelpSearchComponent extends ListComponent implements OnInit, OnDest
   }
 
   /**
-     * Re(load) the items list
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the items list
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     this.queryBuilder.filter.where({approved: true}, true);
     // retrieve the list of items

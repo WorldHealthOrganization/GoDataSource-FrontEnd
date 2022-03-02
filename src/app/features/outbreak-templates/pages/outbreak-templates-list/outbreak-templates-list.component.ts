@@ -291,8 +291,15 @@ export class OutbreakTemplatesListComponent
   }
 
   /**
-     * Re(load) the Outbreak Templates list
-     */
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the Outbreak Templates list
+   */
   refreshList(finishCallback: (records: any[]) => void) {
     // retrieve the list of Events
     this.outbreakTemplatesList$ = this.outbreakTemplateDataService
