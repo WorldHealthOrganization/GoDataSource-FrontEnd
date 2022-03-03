@@ -1,5 +1,3 @@
-import { ChangeDetectorRef } from '@angular/core';
-
 /**
  * Grouped data
  */
@@ -10,7 +8,7 @@ export interface IV2GroupedData {
     loading: boolean,
     get: (
       data: IV2GroupedData,
-      changeDetectorRef: ChangeDetectorRef
+      refreshUI: () => void
     ) => void,
     values: {
       label: string,

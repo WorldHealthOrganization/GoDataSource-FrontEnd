@@ -491,7 +491,11 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // get grouped data
     this.groupedData.data.get(
       this.groupedData,
-      this.changeDetectorRef
+      () => {
+        // refresh html
+        this.detectChanges();
+        this.resizeTable();
+      }
     );
 
     // display data

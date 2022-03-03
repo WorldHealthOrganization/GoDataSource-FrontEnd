@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription, throwError } from 'rxjs';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -1149,7 +1149,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         values: [],
         get: (
           gData: IV2GroupedData,
-          changeDetectorRef: ChangeDetectorRef
+          refreshUI: () => void
         ) => {
           // loading data
           gData.data.loading = true;
@@ -1233,7 +1233,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                   gData.data.loading = false;
 
                   // refresh ui
-                  changeDetectorRef.detectChanges();
+                  refreshUI();
                 });
             });
         }
