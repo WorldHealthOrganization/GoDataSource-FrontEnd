@@ -248,6 +248,7 @@
     suppressPropertyNamesCheck="true"
     enableCellTextSelection="true"
     [loadingOverlayComponent]="V2LoadingComponent"
+    [noRowsOverlayComponent]="V2NoRowsComponent"
     (firstDataRendered)="firstDataRendered($event)">
   </ag-grid-angular>
 
@@ -258,6 +259,13 @@
     <mat-progress-spinner
       mode="indeterminate"
       diameter="64"></mat-progress-spinner>
+  </div>
+
+  <!-- No rows -->
+  <div
+    *ngIf="!V2NoRowsComponent.noRowsHtmlElement"
+    class="gd-list-table-data-no-rows">
+    {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
   </div>
 
   <!-- Table paginator -->

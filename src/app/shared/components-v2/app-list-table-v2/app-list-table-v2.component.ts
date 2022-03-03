@@ -18,7 +18,8 @@ import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
 import { IV2ActionIconLabel, IV2ActionMenuLabel } from './models/action.model';
 import { IV2GroupedData } from './models/grouped-data.model';
 import { AgGridAngular } from '@ag-grid-community/angular';
-import { V2LoadingComponent } from './models/loading-component';
+import { V2LoadingComponent } from './models/loading.component';
+import { V2NoRowsComponent } from './models/no-rows.component';
 
 /**
  * Component
@@ -103,6 +104,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
   // constants
   V2LoadingComponent = V2LoadingComponent;
+  V2NoRowsComponent = V2NoRowsComponent;
 
   /**
    * Constructor
@@ -180,7 +182,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // nothing to do ?
     if (!this._records$) {
       // reset data
-      this.records = undefined;
+      this.records = [];
 
       // re-render page
       this.detectChanges();
@@ -194,6 +196,11 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     this.recordsSubscription = this._records$.subscribe((data) => {
       // set data & hide loading overlay
       this.records = data;
+
+      // no records found ?
+      if (this.records.length < 1) {
+        this.agTable.api.showNoRowsOverlay();
+      }
 
       // re-render page
       this.detectChanges();
