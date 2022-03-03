@@ -126,8 +126,6 @@ export abstract class RelationshipsListComponent extends ListComponent implement
       }
     };
 
-  // selected outbreak
-  selectedOutbreak: OutbreakModel;
   // route params
   entityType: EntityType;
   entityId: string;

@@ -67,9 +67,6 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
   fieldsGroupList: LabelValuePair[];
   fieldsGroupListRequired: IExportFieldsGroupRequired;
 
-  // selected outbreak
-  selectedOutbreak: OutbreakModel;
-
   outbreakSubscriber: Subscription;
 
   // available side filters

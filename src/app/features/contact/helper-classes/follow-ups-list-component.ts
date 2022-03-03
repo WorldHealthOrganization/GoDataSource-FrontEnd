@@ -1,6 +1,5 @@
 import { ListComponent } from '../../../core/helperClasses/list-component';
 import { UserModel } from '../../../core/models/user.model';
-import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { FollowUpModel } from '../../../core/models/follow-up.model';
 import { ContactModel } from '../../../core/models/contact.model';
 import { DialogAnswer, DialogAnswerButton, DialogField, ModifyContactFollowUpQuestionnaireData, ModifyContactFollowUpQuestionnaireDialogComponent } from '../../../shared/components';
@@ -32,9 +31,6 @@ import { UserDataService } from '../../../core/services/data/user.data.service';
  */
 @Directive()
 export abstract class FollowUpsListComponent extends ListComponent implements OnInit, OnDestroy {
-  // contacts outbreak
-  selectedOutbreak: OutbreakModel;
-
   // list of export fields groups
   fieldsGroupList: LabelValuePair[];
   fieldsGroupListRequired: IExportFieldsGroupRequired;

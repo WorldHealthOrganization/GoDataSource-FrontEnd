@@ -45,7 +45,6 @@ export class LocationUsageListComponent extends ListComponent implements OnInit,
   ];
 
   // selected outbreak
-  selectedOutbreak: OutbreakModel;
   outbreakSubscriber: Subscription;
 
   recordActions: HoverRowAction[] = [

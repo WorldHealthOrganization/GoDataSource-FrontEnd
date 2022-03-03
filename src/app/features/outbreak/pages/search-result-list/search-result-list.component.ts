@@ -50,9 +50,6 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
   //   new BreadcrumbItemModel('LNG_PAGE_LIST_SEARCH_RESULT_TITLE', '.', true)
   // ];
 
-  // selected Outbreak
-  selectedOutbreak: OutbreakModel;
-
   searchValue: string;
 
   // list of search result

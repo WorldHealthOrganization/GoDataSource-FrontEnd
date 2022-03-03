@@ -40,9 +40,6 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
   AddressModel = AddressModel;
   EntityModel = EntityModel;
 
-  // contacts outbreak
-  selectedOutbreak: OutbreakModel;
-
   // duplicates
   duplicatesList: PeoplePossibleDuplicateModel;
   duplicatesListCount$: Observable<IBasicCount>;

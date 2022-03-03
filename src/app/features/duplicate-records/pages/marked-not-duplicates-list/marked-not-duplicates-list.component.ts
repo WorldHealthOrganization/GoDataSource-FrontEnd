@@ -36,9 +36,6 @@ export class MarkedNotDuplicatesListComponent
   // breadcrumbs
   // breadcrumbs: BreadcrumbItemModel[] = [];
 
-  // selected Outbreak
-  selectedOutbreak: OutbreakModel;
-
   // list of not duplicates
   recordId: string;
   recordType: EntityType;

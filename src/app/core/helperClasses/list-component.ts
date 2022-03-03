@@ -29,6 +29,7 @@ import { DialogExportProgressAnswer } from '../services/helper/dialog.service';
 import { IV2Column } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { IV2RowActionMenuLabel } from '../../shared/components-v2/app-list-table-v2/models/action.model';
+import { OutbreakModel } from '../models/outbreak.model';
 
 /**
  * Used by caching filter
@@ -87,6 +88,9 @@ export abstract class ListComponent implements OnDestroy {
 
   // quick actions
   quickActions: IV2RowActionMenuLabel;
+
+  // selected outbreak
+  selectedOutbreak: OutbreakModel;
 
   /**
      * Determine all children that we need to reset when side filters are being applied

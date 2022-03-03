@@ -46,9 +46,6 @@ export class ContactRangeFollowUpsListComponent
 
   outbreakSubscriber: Subscription;
 
-  // contacts outbreak
-  selectedOutbreak: OutbreakModel;
-
   // which follow-ups list page are we visiting?
   rootPage: FollowUpPage = FollowUpPage.RANGE;
 

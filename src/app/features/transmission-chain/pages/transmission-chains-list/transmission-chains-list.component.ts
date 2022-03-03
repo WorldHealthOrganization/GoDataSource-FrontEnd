@@ -29,9 +29,6 @@ export class TransmissionChainsListComponent extends ListComponent implements On
 
   outbreakSubscriber: Subscription;
 
-  // selected Outbreak
-  selectedOutbreak: OutbreakModel;
-
   // list of transmission chains
   transmissionChains: TransmissionChainModel[];
   transmissionChainsAll: TransmissionChainModel[];
