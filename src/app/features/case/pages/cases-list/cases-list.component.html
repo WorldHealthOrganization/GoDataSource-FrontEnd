@@ -1,12 +1,17 @@
 <app-list-table-v2
+  pageTitle="LNG_PAGE_LIST_CASES_TITLE"
   [records$]="casesList$"
   (refreshData)="needsRefreshList(true, false)"
+  (refreshDataCount)="refreshListCount(false)"
   [columns]="tableColumns"
   [breadcrumbs]="breadcrumbs"
   [quickActions]="quickActions"
   [addAction]="addAction"
   [groupedData]="groupedData"
-  pageTitle="LNG_PAGE_LIST_CASES_TITLE"></app-list-table-v2>
+  [pageCount]="pageCount"
+  [pageSize]="pageSize"
+  [pageIndex]="pageIndex"
+  (pageChange)="changePage($event)"></app-list-table-v2>
 
 <!--
 <app-topnav>

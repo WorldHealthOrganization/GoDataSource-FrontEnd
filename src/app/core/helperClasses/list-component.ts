@@ -31,6 +31,7 @@ import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/mode
 import { IV2ActionIconLabel, IV2ActionMenuLabel } from '../../shared/components-v2/app-list-table-v2/models/action.model';
 import { OutbreakModel } from '../models/outbreak.model';
 import { IV2GroupedData } from '../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
+import { IBasicCount } from '../models/basic-count.interface';
 
 /**
  * Used by caching filter
@@ -110,6 +111,13 @@ export abstract class ListComponent implements OnDestroy {
       this.selectedOutbreak.id &&
       this.selectedOutbreak.id === this.authUser.activeOutbreakId;
   }
+
+  // page information
+  pageCount: IBasicCount;
+  pageIndex: number = 0;
+
+
+
 
 
   /**
@@ -205,14 +213,10 @@ export abstract class ListComponent implements OnDestroy {
 
   // pagination
   public pageSize: number = Constants.DEFAULT_PAGE_SIZE;
-  public pageSizeOptions: number[] = Constants.PAGE_SIZE_OPTIONS;
   private paginatorInitialized = false;
 
   // flag set to true if the list is empty
   public isEmptyList: boolean;
-
-  // starting page
-  public pageIndex: number = 0;
 
   // Models for the checkbox functionality
   private checkboxModels: {
@@ -1041,8 +1045,8 @@ export abstract class ListComponent implements OnDestroy {
   }
 
   /**
-     * Change page
-     */
+   * Change page
+   */
   changePage(page: PageEvent) {
     // update API pagination params
     this.queryBuilder.paginator.setPage(page);

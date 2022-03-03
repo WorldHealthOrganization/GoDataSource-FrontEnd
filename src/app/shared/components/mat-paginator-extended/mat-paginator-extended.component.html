@@ -1,9 +1,21 @@
+<!-- Loading -->
+<div
+  *ngIf="loading; else pageInfo"
+  class="gd-list-table-header-left-loading">
+  <mat-progress-spinner
+    mode="indeterminate"
+    diameter="24">
+  </mat-progress-spinner>
+</div>
+
 <!-- Counted items -->
-<mat-paginator
-    *ngIf="countData && countData.count !== null"
+<ng-template
+  #pageInfo>
+  <mat-paginator
     [pageIndex]="pageIndex"
     [length]="countData?.count"
     [pageSize]="pageSize"
     [pageSizeOptions]="pageSizeOptions"
     (page)="page.emit($event)">
-</mat-paginator>
+  </mat-paginator>
+</ng-template>

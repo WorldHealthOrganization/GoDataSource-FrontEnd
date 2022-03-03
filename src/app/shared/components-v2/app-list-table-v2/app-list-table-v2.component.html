@@ -180,7 +180,37 @@
     <div
       fxFlex
       class="gd-list-table-header-left">
-      more than enough...o sa fie text + un link cu text care o sa afiseze total count la on click (pb tb stilizat dupa ce implementam pt ca o sa sufere schimbari continutul html)
+
+      <!-- Loading -->
+      <div
+        *ngIf="!pageCount || pageCount.count === null; else pageInfo"
+        class="gd-list-table-header-left-loading">
+        <mat-progress-spinner
+          mode="indeterminate"
+          diameter="24">
+        </mat-progress-spinner>
+      </div>
+
+      <!-- Counted items -->
+      <ng-template
+        #pageInfo>
+
+        <!-- Text -->
+        <span
+          class="gd-list-table-header-left-text">
+          {{ (pageCount.hasMore ? ('LNG_COMMON_LABEL_PAGINATOR_COUNT_BEFORE_LENGTH' | translate) + ' ' : '') + (pageCount.count | number) + (' ' + ('LNG_COMMON_LABEL_PAGINATOR_COUNT_AFTER_LENGTH' | translate)) }}
+        </span>
+
+        <!-- Determine total -->
+        <ng-container
+          *ngIf="pageCount.hasMore">
+          (<button
+            class="gd-list-table-header-left-show-total"
+            type="button"
+            mat-flat-button color="text"
+            (click)="refreshDataCountHandler()">{{'LNG_COMMON_LABEL_PAGINATOR_SHOW_EXACT_COUNT' | translate}}</button>)
+        </ng-container>
+      </ng-template>
     </div>
 
     <!-- Right -->
@@ -272,10 +302,12 @@
   <div
     class="gd-list-table-bottom">
     <app-mat-paginator-extended
-      [pageIndex]="0"
-      [countData]="{count: 10, hasMore: true}"
-      [pageSize]="500"
-      [pageSizeOptions]="[50, 100, 500, 1000]">
+      [pageIndex]="pageIndex"
+      [countData]="pageCount"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="Constants.PAGE_SIZE_OPTIONS"
+      (page)="changePage($event)"
+      [loading]="loadingDataInProgress || !pageCount">
     </app-mat-paginator-extended>
   </div>
 

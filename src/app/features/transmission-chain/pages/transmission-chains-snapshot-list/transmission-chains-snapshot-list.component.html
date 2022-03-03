@@ -16,9 +16,9 @@
 </app-side-columns>
 
 <!-- Total number of records from the list -->
-<app-total-number-of-records
-    [value]="cotSnapshotsListCount$ | async">
-</app-total-number-of-records>
+<!--<app-total-number-of-records-->
+<!--    [value]="cotSnapshotsListCount$ | async">-->
+<!--</app-total-number-of-records>-->
 
 <mat-card class="page-section page-content">
 
@@ -240,7 +240,7 @@
         [pageIndex]="pageIndex"
         [countData]="cotSnapshotsListCount$ | async"
         [pageSize]="pageSize"
-        [pageSizeOptions]="pageSizeOptions"
+        [pageSizeOptions]="[]"
         (page)="changePage($event)">
     </app-mat-paginator-extended>
 

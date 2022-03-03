@@ -25,9 +25,9 @@
 </app-side-columns>
 
 <!--Total number of records from the list-->
-<app-total-number-of-records
-    [value]="upstreamServerListCount">
-</app-total-number-of-records>
+<!--<app-total-number-of-records-->
+<!--    [value]="upstreamServerListCount">-->
+<!--</app-total-number-of-records>-->
 
 <mat-card class="page-section page-content">
     <!-- Sync ? -->
@@ -184,7 +184,7 @@
             [pageIndex]="pageIndex"
             [countData]="upstreamServerListCount"
             [pageSize]="pageSize"
-            [pageSizeOptions]="pageSizeOptions"
+            [pageSizeOptions]="[]"
             (page)="changePage($event)">
         </app-mat-paginator-extended>
     </ng-container>

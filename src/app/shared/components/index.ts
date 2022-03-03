@@ -27,7 +27,6 @@ import { FormRelationshipQuickComponent } from './form-relationship-quick/form-r
 import { ModifyContactFollowUpQuestionnaireDialogComponent } from './modify-contact-follow-up-questionnaire-dialog/modify-contact-follow-up-questionnaire-dialog.component';
 import { ColorListLegendComponent } from './color-list-legend/color-list-legend.component';
 import { FormContactQuickComponent } from './form-contact-quick/form-contact-quick.component';
-import { TotalNumberOfRecordsComponent } from './total-number-of-records/total-number-of-records.component';
 import { LoadingDialogComponent } from './loading-dialog/loading-dialog.component';
 import { GlobalEntitySearchComponent } from './global-entity-search/global-entity-search.component';
 import { NumberOfItemsLabelComponent } from './number-of-items-label/number-of-items-label.component';
@@ -116,7 +115,6 @@ export const components: any[] = [
   ChronologyComponent,
   AgeLabelComponent,
   ColorListLegendComponent,
-  TotalNumberOfRecordsComponent,
 
   // dialogs
   DialogComponent,

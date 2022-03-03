@@ -16,10 +16,10 @@
 </app-side-columns>
 
 <!--Total number of records from the list-->
-<app-total-number-of-records
-    [value]="entityListCount$ | async"
-    (showAll)="refreshListCount(false)">
-</app-total-number-of-records>
+<!--<app-total-number-of-records-->
+<!--    [value]="entityListCount$ | async"-->
+<!--    (showAll)="refreshListCount(false)">-->
+<!--</app-total-number-of-records>-->
 
 <mat-card class="page-section page-content">
     <div class="top-section-wrapper">
@@ -126,7 +126,7 @@
         [pageIndex]="pageIndex"
         [countData]="entityListCount$ | async"
         [pageSize]="pageSize"
-        [pageSizeOptions]="pageSizeOptions"
+        [pageSizeOptions]="[]"
         (page)="changePage($event)">
     </app-mat-paginator-extended>
 </mat-card>

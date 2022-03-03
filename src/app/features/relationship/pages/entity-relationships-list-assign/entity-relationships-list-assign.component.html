@@ -22,10 +22,10 @@
     (visibleColumnsChanged)="applySideColumnsChanged($event)">
 </app-side-columns>
 
-<app-total-number-of-records
-    [value]="entitiesListCount$ | async"
-    (showAll)="refreshListCount(false)">
-</app-total-number-of-records>
+<!--<app-total-number-of-records-->
+<!--    [value]="entitiesListCount$ | async"-->
+<!--    (showAll)="refreshListCount(false)">-->
+<!--</app-total-number-of-records>-->
 
 <form class="page-content form-section" #form="ngForm" (submit)="selectEntities()">
 
@@ -374,7 +374,7 @@
                 [pageIndex]="pageIndex"
                 [countData]="entitiesListCount$ | async"
                 [pageSize]="pageSize"
-                [pageSizeOptions]="pageSizeOptions"
+                [pageSizeOptions]="[]"
                 (page)="changePage($event)">
             </app-mat-paginator-extended>
 

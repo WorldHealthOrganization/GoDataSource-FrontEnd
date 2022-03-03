@@ -27,7 +27,6 @@ import { catchError, map, share, takeUntil, tap } from 'rxjs/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
-import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
@@ -47,7 +46,6 @@ import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-
 export class CasesListComponent extends ListComponent implements OnInit, OnDestroy {
   // list of existing cases
   casesList$: Observable<CaseModel[]>;
-  casesListCount$: Observable<IBasicCount>;
 
   // address model needed for filters
   filterAddressModel: AddressModel = new AddressModel({
@@ -1577,7 +1575,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           tap(this.checkEmptyList.bind(this)),
           tap((data: any[]) => {
             finishCallback(data);
-          })
+          }),
+
+          // should be the last pipe
+          takeUntil(this.destroyed$)
         );
     } else {
       finishCallback([]);
@@ -1588,39 +1589,50 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
      * Get total number of items, based on the applied filters
      */
   refreshListCount(applyHasMoreLimit?: boolean) {
-    if (this.selectedOutbreak) {
-      // set apply value
-      if (applyHasMoreLimit !== undefined) {
-        this.applyHasMoreLimit = applyHasMoreLimit;
-      }
-
-      // classification conditions
-      this.addClassificationConditions();
-
-      // remove paginator from query builder
-      const countQueryBuilder = _.cloneDeep(this.queryBuilder);
-      countQueryBuilder.paginator.clear();
-      countQueryBuilder.sort.clear();
-
-      // apply has more limit
-      if (this.applyHasMoreLimit) {
-        countQueryBuilder.flag(
-          'applyHasMoreLimit',
-          true
-        );
-      }
-
-      // count
-      this.casesListCount$ = this.caseDataService
-        .getCasesCount(this.selectedOutbreak.id, countQueryBuilder)
-        .pipe(
-          catchError((err) => {
-            this.snackbarService.showApiError(err);
-            return throwError(err);
-          }),
-          share()
-        );
+    if (!this.selectedOutbreak) {
+      return;
     }
+
+    // reset
+    this.pageCount = undefined;
+
+    // set apply value
+    if (applyHasMoreLimit !== undefined) {
+      this.applyHasMoreLimit = applyHasMoreLimit;
+    }
+
+    // classification conditions
+    this.addClassificationConditions();
+
+    // remove paginator from query builder
+    const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+    countQueryBuilder.paginator.clear();
+    countQueryBuilder.sort.clear();
+
+    // apply has more limit
+    if (this.applyHasMoreLimit) {
+      countQueryBuilder.flag(
+        'applyHasMoreLimit',
+        true
+      );
+    }
+
+    // count
+    this.caseDataService
+      .getCasesCount(this.selectedOutbreak.id, countQueryBuilder)
+      .pipe(
+        // error
+        catchError((err) => {
+          this.snackbarService.showApiError(err);
+          return throwError(err);
+        }),
+
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      )
+      .subscribe((response) => {
+        this.pageCount = response;
+      });
   }
 
   /**

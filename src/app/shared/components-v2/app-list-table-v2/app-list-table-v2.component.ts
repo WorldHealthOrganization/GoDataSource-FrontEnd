@@ -20,6 +20,8 @@ import { IV2GroupedData } from './models/grouped-data.model';
 import { AgGridAngular } from '@ag-grid-community/angular';
 import { V2LoadingComponent } from './models/loading.component';
 import { V2NoRowsComponent } from './models/no-rows.component';
+import { IBasicCount } from '../../../core/models/basic-count.interface';
+import { PageEvent } from '@angular/material/paginator';
 
 /**
  * Component
@@ -65,6 +67,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     ClientSideRowModelModule
   ];
 
+  // loading in progress
+  loadingDataInProgress: boolean = false;
+
   // breadcrumbs
   @Input() breadcrumbs: IV2Breadcrumb[];
 
@@ -93,11 +98,22 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     return this._groupedData;
   }
 
+  // page information
+  @Input() pageCount: IBasicCount;
+  @Input() pageSize: number;
+  @Input() pageIndex: number;
+
   // click listener
   private clickListener: () => void;
 
   // refresh data
   @Output() refreshData = new EventEmitter<void>();
+
+  // refresh data count
+  @Output() refreshDataCount = new EventEmitter<void>();
+
+  // change page
+  @Output() pageChange = new EventEmitter<PageEvent>();
 
   // ag table handler
   @ViewChild('agTable') agTable: AgGridAngular;
@@ -105,6 +121,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   // constants
   V2LoadingComponent = V2LoadingComponent;
   V2NoRowsComponent = V2NoRowsComponent;
+  Constants = Constants;
 
   /**
    * Constructor
@@ -193,7 +210,11 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // retrieve data
     this.agTable.api.showLoadingOverlay();
+    this.loadingDataInProgress = true;
     this.recordsSubscription = this._records$.subscribe((data) => {
+      // finished
+      this.loadingDataInProgress = false;
+
       // set data & hide loading overlay
       this.records = data;
 
@@ -530,5 +551,19 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
    */
   refreshDataHandler(): void {
     this.refreshData.emit();
+  }
+
+  /**
+   * Refresh data count
+   */
+  refreshDataCountHandler(): void {
+    this.refreshDataCount.emit();
+  }
+
+  /**
+   * Change page
+   */
+  changePage(page: PageEvent): void {
+    this.pageChange.emit(page);
   }
 }
