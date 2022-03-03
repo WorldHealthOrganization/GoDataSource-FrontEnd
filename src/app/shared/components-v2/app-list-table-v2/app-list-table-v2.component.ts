@@ -196,6 +196,11 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
    * Retrieve data
    */
   private retrieveData(): void {
+    // if first time we need to run one more time detect changes for spinner component to be loaded
+    if (!V2LoadingComponent.loadingHtmlElement) {
+      this.detectChanges();
+    }
+
     // nothing to do ?
     if (!this._records$) {
       // reset data
