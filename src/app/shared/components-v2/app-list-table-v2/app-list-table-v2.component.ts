@@ -451,4 +451,11 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       }
     }
   }
+
+  /**
+   * Refresh template
+   */
+  detectChanges(): void {
+    this.changeDetectorRef.detectChanges();
+  }
 }

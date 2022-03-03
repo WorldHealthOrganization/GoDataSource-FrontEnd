@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
+import { Params, Router } from '@angular/router';
 
 @Injectable()
 export class RedirectService {
@@ -8,8 +8,8 @@ export class RedirectService {
   ) {}
 
   /**
-     * Redirect to a specific route
-     */
+   * Redirect to a specific route
+   */
   to(
     path: string[],
     data?: any
@@ -23,6 +23,29 @@ export class RedirectService {
         }
       }
     );
+  }
+
+  /**
+   * Return link & query params
+   */
+  linkAndQueryParams(
+    path: string[],
+    data?: any
+  ):
+    {
+      link: () => string[],
+      linkQueryParams: () => Params
+    }
+  {
+    return {
+      link: () => ['/redirect'],
+      linkQueryParams: () => {
+        return {
+          path: JSON.stringify(path),
+          data: data ? JSON.stringify(data) : data
+        };
+      }
+    };
   }
 }
 

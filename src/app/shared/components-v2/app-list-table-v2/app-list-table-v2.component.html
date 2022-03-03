@@ -34,14 +34,22 @@
         <!-- Menu -->
         <!-- IMPORTANT: Menu of type icon isn't supported here -->
         <button
+          #quickMenuTrigger="matMenuTrigger"
           class="gd-list-top-tile-buttons-button-quick"
+          [class.gd-list-top-tile-buttons-button-quick-expanded]="quickMenuTrigger.menuOpen"
           type="button"
           mat-flat-button
           [disabled]="quickActions.disable && quickActions.disable(null)"
-          [matMenuTriggerFor]="quickMenu">
-          {{quickActions.label | translate}}
+          [matMenuTriggerFor]="quickMenu"
+          (menuClosed)="detectChanges()">
 
-          <^ css or mat-icon?
+          <!-- Label -->
+          <span>
+            {{quickActions.label | translate}}
+          </span>
+
+          <!-- Icon -->
+          <mat-icon>expand_more</mat-icon>
         </button>
 
         <!-- Floating menu -->

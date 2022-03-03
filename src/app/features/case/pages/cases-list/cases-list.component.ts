@@ -964,11 +964,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    * Initialize quick actions
    */
   initializeQuickActions(): void {
-    // #TODO - LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON => nu merge pt ca e catre aceasi pagina
-    // #TODO - LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON => nu merge pt ca e catre aceasi pagina
-    // #TODO - LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON => nu merge pt ca e catre aceasi pagina
-    // #TODO - LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON => nu merge pt ca e catre aceasi pagina
-    // #TODO - LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON => nu merge pt ca e catre aceasi pagina
     this.quickActions = {
       type: V2RowActionType.MENU,
       label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
@@ -985,16 +980,12 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       menuOptions: [
         {
           label: 'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON',
-          action: {
-            link: (): string[] => {
-              return ['/cases'];
-            },
-            linkQueryParams: (): Params => {
-              return {
-                applyListFilter: Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS
-              };
+          action: this.redirectService.linkAndQueryParams(
+            ['/cases'],
+            {
+              applyListFilter: Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS
             }
-          },
+          ),
           visible: (): boolean => {
             return CaseModel.canListPersonsWithoutRelationships(this.authUser);
           }
@@ -1811,17 +1802,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     this.entityHelperService.displayExposures(
       this.selectedOutbreak.id,
       entity
-    );
-  }
-
-  /**
-     * Navigate to Cases without relationships
-     */
-  navigateToCasesWithoutRelationships() {
-    this.redirectService.to(
-      ['/cases'], {
-        applyListFilter: Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS
-      }
     );
   }
 
