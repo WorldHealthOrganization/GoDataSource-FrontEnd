@@ -15,6 +15,10 @@ export enum V2ActionType {
 interface IV2ActionClick {
   // required
   click: (data: any) => void;
+
+  // exclude
+  link?: never;
+  linkQueryParams?: never;
 }
 
 /**
@@ -26,6 +30,9 @@ interface IV2ActionLink {
 
   // optional
   linkQueryParams?: (data: any) => Params;
+
+  // exclude
+  click?: never;
 }
 
 /**

@@ -21,7 +21,7 @@
 
     <!-- Buttons -->
     <div
-      fxFlex fxLayoutAlign="end"
+      fxFlex fxLayoutAlign="end" fxLayoutGap="1rem"
       class="gd-list-top-tile-buttons-buttons">
 
       <!-- Hide / show groups -->
@@ -86,7 +86,25 @@
       </ng-container>
 
       <!-- Add -->
-      <!-- TODO -->
+      <button
+        *ngIf="addAction"
+        type="button"
+        mat-flat-button
+        [routerLink]="addAction.action.link && (!addAction.disable || !addAction.disable(null)) ? addAction.action.link(null) : undefined"
+        [queryParams]="addAction.action.linkQueryParams ? addAction.action.linkQueryParams(null) : undefined"
+        [disabled]="addAction.disable && addAction.disable(null)"
+        (click)="addAction.action.click ? addAction.action.click(null) : undefined">
+
+        <!-- Icon -->
+        <mat-icon>{{addAction.icon}}</mat-icon>
+
+        <!-- Label -->
+        <span>
+            {{ addAction.label | translate }}
+        </span>
+
+      </button>
+
     </div>
   </div>
 

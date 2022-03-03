@@ -288,6 +288,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
     // initialize quick actions
     this.initializeQuickActions();
+
+    // initialize add action
+    this.initializeAddAction();
   }
 
   /**
@@ -1114,6 +1117,23 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           }
         }
       ]
+    };
+  }
+
+  /**
+   * Initialize add action
+   */
+  initializeAddAction(): void {
+    this.addAction = {
+      type: V2ActionType.ICON_LABEL,
+      label: 'LNG_COMMON_BUTTON_ADD',
+      icon: 'add_circle_outline',
+      action: {
+        link: (): string[] => ['/cases', 'create']
+      },
+      visible: (): boolean => {
+        return CaseModel.canCreate(this.authUser);
+      }
     };
   }
 
