@@ -16,6 +16,7 @@ import { AppListTableV2ActionsComponent } from './components/actions/app-list-ta
 import { IExtendedColDef } from './models/extended-column.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
 import { IV2ActionIconLabel, IV2ActionMenuLabel } from './models/action.model';
+import { IV2GroupedData } from './models/grouped-data.model';
 
 /**
  * Component
@@ -72,6 +73,22 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
   // add button
   @Input() addAction: IV2ActionIconLabel;
+
+  // grouped data
+  groupedDataExpanded: boolean = false;
+  private _groupedData: IV2GroupedData;
+  @Input() set groupedData(groupedData: IV2GroupedData) {
+    // set data
+    this._groupedData = groupedData;
+
+    // already expanded, refresh ?
+    if (this.groupedDataExpanded) {
+      this.refreshGroupedData();
+    }
+  }
+  get groupedData(): IV2GroupedData {
+    return this._groupedData;
+  }
 
   // click listener
   private clickListener: () => void;
@@ -155,7 +172,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       this.records = undefined;
 
       // re-render page
-      this.changeDetectorRef.detectChanges();
+      this.detectChanges();
 
       // finished
       return;
@@ -167,7 +184,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       this.records = data;
 
       // re-render page
-      this.changeDetectorRef.detectChanges();
+      this.detectChanges();
     });
   }
 
@@ -222,7 +239,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     });
 
     // re-render page
-    this.changeDetectorRef.detectChanges();
+    this.detectChanges();
   }
 
   /**
@@ -460,5 +477,28 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
    */
   detectChanges(): void {
     this.changeDetectorRef.detectChanges();
+  }
+
+  /**
+   * Refresh grouped data
+   */
+  refreshGroupedData(): void {
+    // nothing to refresh ?
+    if (!this.groupedData) {
+      return;
+    }
+
+    // get grouped data
+    this.groupedData.data.get(
+      this.groupedData,
+      this.changeDetectorRef
+    );
+
+    // display data
+    this.groupedDataExpanded = true;
+
+    // refresh html
+    this.detectChanges();
+    this.resizeTable();
   }
 }

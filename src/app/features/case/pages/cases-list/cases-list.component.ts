@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription, throwError } from 'rxjs';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -22,9 +22,8 @@ import * as _ from 'lodash';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
-import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
-import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
+import { catchError, map, share, takeUntil, tap } from 'rxjs/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
@@ -39,6 +38,7 @@ import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 
 @Component({
   selector: 'app-cases-list',
@@ -69,8 +69,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   fieldsGroupListRelationshipsRequired: IExportFieldsGroupRequired;
 
   caseClassifications$: Observable<any>;
-  // cases grouped by classification
-  countedCasesGroupedByClassification$: Observable<any>;
 
   caseClassificationsList$: Observable<any[]>;
   caseClassificationsListMap: { [id: string]: ReferenceDataEntryModel };
@@ -291,6 +289,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
     // initialize add action
     this.initializeAddAction();
+
+    // initialize grouped data
+    this.initializeGroupedData();
   }
 
   /**
@@ -1138,6 +1139,109 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   }
 
   /**
+   * Initialize grouped data
+   */
+  initializeGroupedData(): void {
+    this.groupedData = {
+      label: 'LNG_PAGE_LIST_CASES_ACTION_SHOW_GROUP_BY_CLASSIFICATION_PILLS',
+      data: {
+        loading: false,
+        values: [],
+        get: (
+          gData: IV2GroupedData,
+          changeDetectorRef: ChangeDetectorRef
+        ) => {
+          // loading data
+          gData.data.loading = true;
+
+          // clone queryBuilder to clear it
+          const clonedQueryBuilder = _.cloneDeep(this.queryBuilder);
+          clonedQueryBuilder.paginator.clear();
+          clonedQueryBuilder.sort.clear();
+          clonedQueryBuilder.clearFields();
+
+          // load data
+          return this.caseDataService
+            .getCasesGroupedByClassification(
+              this.selectedOutbreak.id,
+              clonedQueryBuilder
+            )
+            .pipe(
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            )
+            .subscribe((countResponse) => {
+              this.caseClassifications$
+                .pipe(
+                  // should be the last pipe
+                  takeUntil(this.destroyed$)
+                )
+                .subscribe((refClassificationData: ReferenceDataCategoryModel) => {
+                  // map reference data
+                  const refDataMap: {
+                    [entryId: string]: ReferenceDataEntryModel
+                  } = {};
+                  refClassificationData.entries.forEach((entry) => {
+                    refDataMap[entry.id] = entry;
+                  });
+
+                  // group data
+                  let values: {
+                    label: string,
+                    value: number,
+                    color?: string,
+                    order?: any
+                  }[] = [];
+                  Object.keys(countResponse.classification || {}).forEach((classificationId) => {
+                    values.push({
+                      label: classificationId,
+                      value: countResponse.classification[classificationId].count,
+                      color: refDataMap[classificationId] ? refDataMap[classificationId].getColorCode() : Constants.DEFAULT_COLOR_REF_DATA,
+                      order: refDataMap[classificationId].order !== undefined ?
+                        refDataMap[classificationId].order :
+                        Number.MAX_SAFE_INTEGER
+                    });
+                  });
+
+                  // sort values either by order or label natural order
+                  values = values.sort((item1, item2) => {
+                    // if same order, compare labels
+                    if (item1.order === item2.order) {
+                      return this.i18nService.instant(item1.label).localeCompare(this.i18nService.instant(item2.label));
+                    }
+
+                    // format order
+                    let order1: number = Number.MAX_SAFE_INTEGER;
+                    try { order1 = parseInt(item1.order, 10); } catch (e) {}
+                    let order2: number = Number.MAX_SAFE_INTEGER;
+                    try { order2 = parseInt(item2.order, 10); } catch (e) {}
+
+                    // compare order
+                    return order1 - order2;
+                  });
+
+                  // set data
+                  gData.data.values = values.map((item) => {
+                    return {
+                      label: item.label,
+                      color: item.color,
+                      value: item.value.toLocaleString('en')
+                    };
+                  });
+
+                  // finished loading data
+                  gData.data.loading = false;
+
+                  // refresh ui
+                  changeDetectorRef.detectChanges();
+                });
+            });
+        }
+      }
+    };
+  }
+
+  /**
      * Initialize Side Filters
      */
   initializeSideFilters() {
@@ -1452,7 +1556,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
       // refresh badges list with applied filter
       if (!triggeredByPageChange) {
-        this.getCasesGroupedByClassification();
+        this.initializeGroupedData();
       }
 
       // retrieve the list of Cases
@@ -1517,38 +1621,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           share()
         );
     }
-  }
-
-  /**
-     * Get cases grouped by classification with needed filter
-     */
-  getCasesGroupedByClassification() {
-    // clone queryBuilder to clear it
-    const clonedQueryBuilder = _.cloneDeep(this.queryBuilder);
-    clonedQueryBuilder.paginator.clear();
-    clonedQueryBuilder.sort.clear();
-    this.countedCasesGroupedByClassification$ = this.caseClassifications$
-      .pipe(
-        mergeMap((refClassificationData: ReferenceDataCategoryModel) => {
-          return this.caseDataService
-            .getCasesGroupedByClassification(this.selectedOutbreak.id, clonedQueryBuilder)
-            .pipe(
-              map((data) => {
-                return _.map(data ? data.classification : [], (item, itemId) => {
-                  const refItem: ReferenceDataEntryModel = _.find(refClassificationData.entries, {id: itemId});
-                  return new CountedItemsListItem(
-                    item.count,
-                    itemId as any,
-                    null,
-                    refItem ?
-                      refItem.getColorCode() :
-                      Constants.DEFAULT_COLOR_REF_DATA
-                  );
-                });
-              })
-            );
-        })
-      );
   }
 
   /**

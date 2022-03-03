@@ -25,7 +25,23 @@
       class="gd-list-top-tile-buttons-buttons">
 
       <!-- Hide / show groups -->
-      <!-- TODO -->
+      <button
+        *ngIf="groupedData"
+        type="button"
+        mat-flat-button color="text"
+        class="gd-list-top-tile-buttons-button-grouped"
+        [class.gd-list-top-tile-buttons-button-grouped-expanded]="groupedDataExpanded"
+        (click)="groupedDataExpanded ? undefined : refreshGroupedData()">
+
+        <!-- Icon -->
+        <mat-icon>expand_more</mat-icon>
+
+        <!-- Label -->
+        <span>
+          {{groupedData.label | translate}}
+        </span>
+
+      </button>
 
       <!-- Quick actions -->
       <ng-container
@@ -108,9 +124,46 @@
     </div>
   </div>
 
-  <!-- @TODO: Grouped data -->
-  <div>
-    grouped data... gradient color from referenceData.color to a lighter one...
+  <!-- Grouped data -->
+  <div
+    *ngIf="groupedDataExpanded"
+    class="gd-list-top-grouped">
+
+    <!-- Loading data -->
+    <mat-progress-bar
+      *ngIf="groupedData.data.loading; else displayGroupedData"
+      mode="indeterminate"></mat-progress-bar>
+
+    <!-- Display data -->
+    <ng-template
+      #displayGroupedData>
+      <div
+        class="gd-list-top-grouped-data">
+
+        <!-- Group value -->
+        <div
+          *ngFor="let groupValue of groupedData.data.values"
+          class="gd-list-top-grouped-data-value"
+          fxLayout="row" fxLayoutGap="1rem"
+          [style.background-color]="groupValue.color">
+
+          <!-- Label -->
+          <div
+            fxFlex>
+            {{groupValue.label | translate}}
+          </div>
+
+          <!-- Count -->
+          <div
+            fxGrow="0">
+            {{groupValue.value}}
+          </div>
+
+        </div>
+
+      </div>
+    </ng-template>
+
   </div>
 </div>
 

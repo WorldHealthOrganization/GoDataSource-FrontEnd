@@ -1,6 +1,6 @@
 import { ISerializedQueryBuilder, RequestFilter, RequestFilterOperator, RequestQueryBuilder, RequestSortDirection } from './request-query-builder';
 import * as _ from 'lodash';
-import { Subscriber, Subscription } from 'rxjs';
+import { ReplaySubject, Subscriber, Subscription } from 'rxjs';
 import { ApplyListFilter, Constants, ExportStatusStep } from '../models/constants';
 import { FormRangeModel } from '../../shared/components/form-range/form-range.model';
 import { Directive, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
@@ -30,6 +30,7 @@ import { IV2Column } from '../../shared/components-v2/app-list-table-v2/models/c
 import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { IV2ActionIconLabel, IV2ActionMenuLabel } from '../../shared/components-v2/app-list-table-v2/models/action.model';
 import { OutbreakModel } from '../models/outbreak.model';
+import { IV2GroupedData } from '../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 
 /**
  * Used by caching filter
@@ -80,6 +81,9 @@ export abstract class ListComponent implements OnDestroy {
   // handle pop state changes
   private static locationSubscription: SubscriptionLike;
 
+  // handler for stopping take until
+  protected destroyed$: ReplaySubject<boolean> = new ReplaySubject<boolean>();
+
   // authenticated user data
   authUser: UserModel;
 
@@ -91,6 +95,9 @@ export abstract class ListComponent implements OnDestroy {
 
   // add action
   addAction: IV2ActionIconLabel;
+
+  // grouped data
+  groupedData: IV2GroupedData;
 
   // selected outbreak
   selectedOutbreak: OutbreakModel;
@@ -474,7 +481,13 @@ export abstract class ListComponent implements OnDestroy {
    * Release resources
    */
   ngOnDestroy(): void {
+    // release subscribers
     this.releaseSubscribers();
+
+    // unsubscribe other requests
+    this.destroyed$.next(true);
+    this.destroyed$.complete();
+    this.destroyed$ = undefined;
   }
 
   /**
