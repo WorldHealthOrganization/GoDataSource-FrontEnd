@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription, throwError } from 'rxjs';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -42,13 +42,9 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 
 @Component({
   selector: 'app-cases-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './cases-list.component.html',
-  styleUrls: ['./cases-list.component.less']
+  templateUrl: './cases-list.component.html'
 })
 export class CasesListComponent extends ListComponent implements OnInit, OnDestroy {
-  // selected Outbreak
-  selectedOutbreak: OutbreakModel;
   // list of existing cases
   casesList$: Observable<CaseModel[]>;
   casesListCount$: Observable<IBasicCount>;
@@ -273,32 +269,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     this.yesNoOptionsWithoutAllList$ = this.genericDataService.getFilterYesNoOptions(true);
     this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
 
-    // subscribe to the Selected Outbreak Subject stream
-    this.outbreakSubscriber = this.outbreakDataService
-      .getSelectedOutbreakSubject()
-      .subscribe((selectedOutbreak: OutbreakModel) => {
-        this.selectedOutbreak = selectedOutbreak;
-
-        // export cases url
-        this.exportCasesUrl = null;
-        if (
-          this.selectedOutbreak &&
-          this.selectedOutbreak.id
-        ) {
-          this.exportCasesUrl = `/outbreaks/${this.selectedOutbreak.id}/cases/export`;
-
-          this.clustersListAsLabelValuePair$ = this.clusterDataService.getClusterListAsLabelValue(this.selectedOutbreak.id);
-
-          // initialize side filters
-          this.initializeSideFilters();
-        }
-
-        // initialize pagination
-        this.initPaginator();
-        // ...and re-load the list when the Selected Outbreak is changed
-        this.needsRefreshList(true);
-      });
-
     // retrieve the list of export fields groups for model
     this.outbreakDataService.getExportFieldsGroups(ExportFieldsGroupModelNameEnum.CASE)
       .subscribe((fieldsGroupList) => {
@@ -321,8 +291,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   }
 
   /**
-     * Component destroyed
-     */
+   * Component destroyed
+   */
   ngOnDestroy() {
     // release parent resources
     super.ngOnDestroy();
@@ -332,6 +302,30 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       this.outbreakSubscriber.unsubscribe();
       this.outbreakSubscriber = null;
     }
+  }
+
+  /**
+   * Selected outbreak was changed
+   */
+  selectedOutbreakChanged(): void {
+    // export cases url
+    this.exportCasesUrl = null;
+    if (
+      this.selectedOutbreak &&
+      this.selectedOutbreak.id
+    ) {
+      this.exportCasesUrl = `/outbreaks/${this.selectedOutbreak.id}/cases/export`;
+
+      this.clustersListAsLabelValuePair$ = this.clusterDataService.getClusterListAsLabelValue(this.selectedOutbreak.id);
+
+      // initialize side filters
+      this.initializeSideFilters();
+    }
+
+    // initialize pagination
+    this.initPaginator();
+    // ...and re-load the list when the Selected Outbreak is changed
+    this.needsRefreshList(true);
   }
 
   /**
@@ -634,9 +628,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             },
             visible: (item: CaseModel): boolean => {
               return !item.deleted &&
-                this.authUser &&
-                this.selectedOutbreak &&
-                this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                this.selectedOutbreakIsActive &&
                 CaseModel.canModify(this.authUser);
             }
           },
@@ -657,9 +649,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 },
                 visible: (item: CaseModel): boolean => {
                   return !item.deleted &&
-                    this.authUser &&
-                    this.selectedOutbreak &&
-                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    this.selectedOutbreakIsActive &&
                     CaseModel.canDelete(this.authUser);
                 }
               },
@@ -669,9 +659,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 visible: (item: CaseModel): boolean => {
                   // visible only if at least one of the first two items is visible
                   return !item.deleted &&
-                    this.authUser &&
-                    this.selectedOutbreak &&
-                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    this.selectedOutbreakIsActive &&
                     CaseModel.canDelete(this.authUser);
                 }
               },
@@ -687,9 +675,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 },
                 visible: (item: CaseModel): boolean => {
                   return !item.deleted &&
-                    this.authUser &&
-                    this.selectedOutbreak &&
-                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    this.selectedOutbreakIsActive &&
                     CaseModel.canConvertToContact(this.authUser);
                 }
               },
@@ -699,9 +685,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 visible: (item: CaseModel): boolean => {
                   // visible only if at least one of the first two items is visible
                   return !item.deleted &&
-                    this.authUser &&
-                    this.selectedOutbreak &&
-                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    this.selectedOutbreakIsActive &&
                     CaseModel.canConvertToContact(this.authUser);
                 }
               },
@@ -722,9 +706,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 },
                 visible: (item: CaseModel): boolean => {
                   return !item.deleted &&
-                    this.authUser &&
-                    this.selectedOutbreak &&
-                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    this.selectedOutbreakIsActive &&
                     ContactModel.canCreate(this.authUser) &&
                     CaseModel.canCreateContact(this.authUser);
                 }
@@ -746,9 +728,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 },
                 visible: (item: CaseModel): boolean => {
                   return !item.deleted &&
-                    this.authUser &&
-                    this.selectedOutbreak &&
-                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    this.selectedOutbreakIsActive &&
                     ContactModel.canBulkCreate(this.authUser) &&
                     CaseModel.canBulkCreateContact(this.authUser);
                 }
@@ -759,9 +739,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 visible: (item: CaseModel): boolean => {
                   // visible only if at least one of the previous two items is visible
                   return !item.deleted &&
-                    this.authUser &&
-                    this.selectedOutbreak &&
-                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    this.selectedOutbreakIsActive &&
                     (
                       (
                         ContactModel.canCreate(this.authUser) &&
@@ -947,9 +925,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 },
                 visible: (item: CaseModel): boolean => {
                   return item.deleted &&
-                    this.authUser &&
-                    this.selectedOutbreak &&
-                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    this.selectedOutbreakIsActive &&
                     CaseModel.canRestore(this.authUser);
                 }
               }
@@ -978,6 +954,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           CaseModel.canExportRelationships(this.authUser));
       },
       menuOptions: [
+        // No relationships
         {
           label: 'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON',
           action: this.redirectService.linkAndQueryParams(
@@ -988,6 +965,152 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           ),
           visible: (): boolean => {
             return CaseModel.canListPersonsWithoutRelationships(this.authUser);
+          }
+        },
+
+        // Divider
+        {
+          visible: (): boolean => {
+            return CaseModel.canListPersonsWithoutRelationships(this.authUser);
+          }
+        },
+
+        // Onset report
+        {
+          label: 'LNG_PAGE_LIST_CASES_ONSET_REPORT_BUTTON',
+          action: {
+            link: () => ['/relationships/date-onset']
+          },
+          visible: (): boolean => {
+            return CaseModel.canListOnsetBeforePrimaryReport(this.authUser);
+          }
+        },
+
+        // Cases long period report
+        {
+          label: 'LNG_PAGE_LIST_CASES_LONG_PERIOD_REPORT_BUTTON',
+          action: {
+            link: () => ['/relationships/long-period']
+          },
+          visible: (): boolean => {
+            return CaseModel.canListLongPeriodBetweenOnsetDatesReport(this.authUser);
+          }
+        },
+
+        // Divider
+        {
+          visible: (): boolean => {
+            return CaseModel.canListOnsetBeforePrimaryReport(this.authUser) ||
+              CaseModel.canListLongPeriodBetweenOnsetDatesReport(this.authUser);
+          }
+        },
+
+        // Export cases
+        {
+          label: 'LNG_PAGE_LIST_CASES_EXPORT_BUTTON',
+          action: {
+            click: () => {
+              // display export dialog
+              this.dialogService.showExportDialog({
+                // required
+                message: 'LNG_PAGE_LIST_CASES_EXPORT_TITLE',
+                url: this.exportCasesUrl,
+                fileName: this.casesDataExportFileName,
+
+                // configure
+                isAsyncExport: true,
+                displayUseDbColumns: true,
+                displayJsonReplaceUndefinedWithNull: true,
+                extraDialogFields: [
+                  new DialogField({
+                    name: 'includeContactFields',
+                    placeholder: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION',
+                    description: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION_DESCRIPTION',
+                    fieldType: DialogFieldType.BOOLEAN
+                  })
+                ],
+
+                // optional
+                allowedExportTypes: this.allowedExportTypes,
+                queryBuilder: this.queryBuilder,
+                displayEncrypt: true,
+                displayAnonymize: true,
+                displayFieldsGroupList: true,
+                displayUseQuestionVariable: true,
+                anonymizeFields: this.anonymizeFields,
+                fieldsGroupList: this.fieldsGroupList,
+                fieldsGroupListRequired: this.fieldsGroupListRequired,
+                exportStart: () => { this.showLoadingDialog(); },
+                exportFinished: () => { this.closeLoadingDialog(); },
+                exportProgress: (data) => { this.showExportProgress(data); }
+              });
+            }
+          },
+          visible: (): boolean => {
+            return this.exportCasesUrl &&
+              CaseModel.canExport(this.authUser);
+          }
+        },
+
+        // Import cases
+        {
+          label: 'LNG_PAGE_LIST_CASES_IMPORT_BUTTON',
+          action: {
+            link: () => ['/import-export-data', 'case-data', 'import']
+          },
+          visible: (): boolean => {
+            return this.selectedOutbreakIsActive &&
+              CaseModel.canImport(this.authUser);
+          }
+        },
+
+        // Divider
+        {
+          visible: (): boolean => {
+            return (
+              this.exportCasesUrl &&
+              CaseModel.canExport(this.authUser)
+            ) || CaseModel.canImport(this.authUser);
+          }
+        },
+
+        // Empty case investigation form
+        {
+          label: 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS',
+          action: {
+            click: () => {
+              this.exportEmptyCaseInvestigationForms();
+            }
+          },
+          visible: (): boolean => {
+            return CaseModel.canExportEmptyInvestigationForms(this.authUser);
+          }
+        },
+
+        // Export relationships
+        {
+          label: 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_CASES_RELATIONSHIPS',
+          action: {
+            click: () => {
+              this.exportFilteredCasesRelationships();
+            }
+          },
+          visible: (): boolean => {
+            return CaseModel.canExportRelationships(this.authUser);
+          }
+        },
+
+        // Import relationships
+        {
+          label: 'LNG_PAGE_LIST_CASES_ACTION_IMPORT_CASES_RELATIONSHIPS',
+          action: {
+            click: () => {
+              this.goToRelationshipImportPage();
+            }
+          },
+          visible: (): boolean => {
+            return OutbreakModel.canImportRelationship(this.authUser) &&
+              this.selectedOutbreakIsActive;
           }
         }
       ]

@@ -1,6 +1,6 @@
 import { ISerializedQueryBuilder, RequestFilter, RequestFilterOperator, RequestQueryBuilder, RequestSortDirection } from './request-query-builder';
 import * as _ from 'lodash';
-import { Subscriber } from 'rxjs';
+import { Subscriber, Subscription } from 'rxjs';
 import { ApplyListFilter, Constants, ExportStatusStep } from '../models/constants';
 import { FormRangeModel } from '../../shared/components/form-range/form-range.model';
 import { Directive, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
@@ -91,6 +91,16 @@ export abstract class ListComponent implements OnDestroy {
 
   // selected outbreak
   selectedOutbreak: OutbreakModel;
+  selectedOutbreakSubscription: Subscription;
+
+  // check if selected outbreak is the active one
+  get selectedOutbreakIsActive(): boolean {
+    return this.authUser &&
+      this.selectedOutbreak &&
+      this.selectedOutbreak.id &&
+      this.selectedOutbreak.id === this.authUser.activeOutbreakId;
+  }
+
 
   /**
      * Determine all children that we need to reset when side filters are being applied
@@ -384,6 +394,20 @@ export abstract class ListComponent implements OnDestroy {
     // initialize breadcrumbs
     this.initializeBreadcrumbs();
 
+    // listen for outbreak selection
+    this.selectedOutbreakSubscription = this.listHelperService.outbreakDataService
+      .getSelectedOutbreakSubject()
+      .subscribe((selectedOutbreak: OutbreakModel) => {
+        // select outbreak
+        this.selectedOutbreak = selectedOutbreak;
+
+        // trigger outbreak selection changed
+        this.selectedOutbreakChanged();
+      });
+
+
+
+
     // clone current breadcrumbs
     let currentBreadcrumbs;
     setTimeout(() => {
@@ -451,6 +475,11 @@ export abstract class ListComponent implements OnDestroy {
   }
 
   /**
+   * Selected outbreak changed
+   */
+  protected selectedOutbreakChanged(): void {}
+
+  /**
    * Initialize breadcrumbs
    */
   public abstract initializeBreadcrumbs(): void;
@@ -477,9 +506,15 @@ export abstract class ListComponent implements OnDestroy {
   }
 
   /**
-     * Release subscribers
-     */
+   * Release subscribers
+   */
   private releaseSubscribers() {
+    // selected outbreak
+    if (this.selectedOutbreakSubscription) {
+      this.selectedOutbreakSubscription.unsubscribe();
+      this.selectedOutbreakSubscription = undefined;
+    }
+
     // query builder
     this.queryBuilder.destroyListeners();
 
@@ -489,10 +524,13 @@ export abstract class ListComponent implements OnDestroy {
       ListComponent.locationSubscription = null;
     }
 
+    // refresh data
     if (this.triggerListRefresh) {
       this.triggerListRefresh.unsubscribe();
       this.triggerListRefresh = null;
     }
+
+    // refresh count
     if (this.triggerListCountRefresh) {
       this.triggerListCountRefresh.unsubscribe();
       this.triggerListCountRefresh = null;
