@@ -188,7 +188,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       field: this.keyField,
       checkboxSelection: true,
       headerCheckboxSelection: true,
-      cellClass: 'gd-cell-focused'
+      cellClass: 'gd-cell-no-focus'
     }];
     this._columns.forEach((column) => {
       // no need to take in account ?

@@ -601,7 +601,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         label: 'LNG_COMMON_LABEL_ACTIONS',
         pinned: IV2ColumnPinned.RIGHT,
         notResizable: true,
-        cssCellClasses: 'gd-cell-focused',
+        cssCellClasses: 'gd-cell-no-focus',
         format: {
           type: V2ColumnFormat.ACTIONS
         },
