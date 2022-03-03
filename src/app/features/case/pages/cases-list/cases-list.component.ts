@@ -601,6 +601,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         label: 'LNG_COMMON_LABEL_ACTIONS',
         pinned: IV2ColumnPinned.RIGHT,
         notResizable: true,
+        cssCellClasses: 'gd-cell-focused',
         format: {
           type: V2ColumnFormat.ACTIONS
         },
@@ -963,6 +964,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    * Initialize quick actions
    */
   initializeQuickActions(): void {
+    // #TODO - LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON => nu merge pt ca e catre aceasi pagina
+    // #TODO - LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON => nu merge pt ca e catre aceasi pagina
+    // #TODO - LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON => nu merge pt ca e catre aceasi pagina
+    // #TODO - LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON => nu merge pt ca e catre aceasi pagina
+    // #TODO - LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON => nu merge pt ca e catre aceasi pagina
     this.quickActions = {
       type: V2RowActionType.MENU,
       label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',

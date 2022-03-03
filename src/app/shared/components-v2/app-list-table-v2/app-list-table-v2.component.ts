@@ -187,7 +187,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       headerName: '',
       field: this.keyField,
       checkboxSelection: true,
-      headerCheckboxSelection: true
+      headerCheckboxSelection: true,
+      cellClass: 'gd-cell-focused'
     }];
     this._columns.forEach((column) => {
       // no need to take in account ?
@@ -209,6 +210,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         pinned: column.pinned,
         resizable: !column.notResizable,
         columnDefinition: column,
+        cellClass: column.cssCellClasses,
         valueFormatter: (valueFormat): string => {
           return this.formatValue(valueFormat);
         },
