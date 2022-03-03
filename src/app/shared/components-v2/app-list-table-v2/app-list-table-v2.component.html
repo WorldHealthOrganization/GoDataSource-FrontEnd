@@ -209,7 +209,8 @@
       <button
         type="button"
         mat-icon-button
-        [matTooltip]="'LNG_COMMON_BUTTON_REFRESH_LIST' | translate">
+        [matTooltip]="'LNG_COMMON_BUTTON_REFRESH_LIST' | translate"
+        (click)="refreshDataHandler()">
         <mat-icon>refresh</mat-icon>
       </button>
 
@@ -235,6 +236,7 @@
 
   <!-- Table -->
   <ag-grid-angular
+    #agTable
     class="ag-theme-balham gd-list-table-data"
     [rowData]="records"
     [columnDefs]="columnDefs"
@@ -245,8 +247,18 @@
     suppressRowClickSelection="true"
     suppressPropertyNamesCheck="true"
     enableCellTextSelection="true"
+    [loadingOverlayComponent]="V2LoadingComponent"
     (firstDataRendered)="firstDataRendered($event)">
   </ag-grid-angular>
+
+  <!-- Loading -->
+  <div
+    *ngIf="!V2LoadingComponent.loadingHtmlElement"
+    class="gd-list-table-data-loading">
+    <mat-progress-spinner
+      mode="indeterminate"
+      diameter="64"></mat-progress-spinner>
+  </div>
 
   <!-- Table paginator -->
   <div

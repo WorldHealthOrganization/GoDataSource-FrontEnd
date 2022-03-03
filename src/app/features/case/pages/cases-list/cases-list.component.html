@@ -1,5 +1,6 @@
 <app-list-table-v2
   [records$]="casesList$"
+  (refreshData)="needsRefreshList(true, false)"
   [columns]="tableColumns"
   [breadcrumbs]="breadcrumbs"
   [quickActions]="quickActions"

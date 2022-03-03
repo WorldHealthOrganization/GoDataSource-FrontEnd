@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, Renderer2, ViewChild } from '@angular/core';
 import { BaseModel } from '../../../core/models/base.model';
 import { Observable } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
@@ -17,6 +17,8 @@ import { IExtendedColDef } from './models/extended-column.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
 import { IV2ActionIconLabel, IV2ActionMenuLabel } from './models/action.model';
 import { IV2GroupedData } from './models/grouped-data.model';
+import { AgGridAngular } from '@ag-grid-community/angular';
+import { V2LoadingComponent } from './models/loading-component';
 
 /**
  * Component
@@ -92,6 +94,15 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
   // click listener
   private clickListener: () => void;
+
+  // refresh data
+  @Output() refreshData = new EventEmitter<void>();
+
+  // ag table handler
+  @ViewChild('agTable') agTable: AgGridAngular;
+
+  // constants
+  V2LoadingComponent = V2LoadingComponent;
 
   /**
    * Constructor
@@ -179,8 +190,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     }
 
     // retrieve data
+    this.agTable.api.showLoadingOverlay();
     this.recordsSubscription = this._records$.subscribe((data) => {
-      // set data
+      // set data & hide loading overlay
       this.records = data;
 
       // re-render page
@@ -504,5 +516,12 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // refresh html
     this.detectChanges();
     this.resizeTable();
+  }
+
+  /**
+   * Refresh Data
+   */
+  refreshDataHandler(): void {
+    this.refreshData.emit();
   }
 }

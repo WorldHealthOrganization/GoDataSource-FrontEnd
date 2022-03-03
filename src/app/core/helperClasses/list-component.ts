@@ -412,7 +412,10 @@ export abstract class ListComponent implements OnDestroy {
         this.selectedOutbreak = selectedOutbreak;
 
         // trigger outbreak selection changed
-        this.selectedOutbreakChanged();
+        // - wait for binding
+        setTimeout(() => {
+          this.selectedOutbreakChanged();
+        });
       });
 
 
