@@ -31,7 +31,7 @@
         mat-flat-button color="text"
         class="gd-list-top-tile-buttons-button-grouped"
         [class.gd-list-top-tile-buttons-button-grouped-expanded]="groupedDataExpanded"
-        (click)="groupedDataExpanded ? undefined : refreshGroupedData()">
+        (click)="groupedDataExpanded ? (groupedDataExpanded = false) : refreshGroupedData()">
 
         <!-- Icon -->
         <mat-icon>expand_more</mat-icon>
