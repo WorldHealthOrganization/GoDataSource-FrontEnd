@@ -14,7 +14,7 @@
 
       <!-- Icon Type -->
       <a
-        *ngIf="action.type === V2RowActionType.ICON; else menuAction"
+        *ngIf="action.type === V2ActionType.ICON; else menuAction"
         class="gd-list-table-actions-action-icon"
         mat-icon-button
         [routerLink]="action.action.link && (!action.disable || !action.disable(data)) ? action.action.link(data) : undefined"

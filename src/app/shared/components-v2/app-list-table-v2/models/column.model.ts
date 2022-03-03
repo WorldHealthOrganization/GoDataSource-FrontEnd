@@ -1,4 +1,4 @@
-import { V2RowAction } from './action.model';
+import { V2Action } from './action.model';
 
 /**
  * Column pinned
@@ -104,7 +104,7 @@ export interface IV2ColumnAction {
   };
   field: string;
   label: string;
-  actions: V2RowAction[];
+  actions: V2Action[];
 
   // optional
   notVisible?: boolean;

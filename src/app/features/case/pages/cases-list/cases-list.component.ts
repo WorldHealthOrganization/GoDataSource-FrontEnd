@@ -36,7 +36,7 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
 import { AddressModel } from '../../../../core/models/address.model';
 import { ExportFieldsGroupModelNameEnum, IExportFieldsGroupRequired } from '../../../../core/models/export-fields-group.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
-import { V2RowActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 
@@ -602,7 +602,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         actions: [
           // View Case
           {
-            type: V2RowActionType.ICON,
+            type: V2ActionType.ICON,
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_CASE',
             action: {
@@ -618,7 +618,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
           // Modify Case
           {
-            type: V2RowActionType.ICON,
+            type: V2ActionType.ICON,
             icon: 'edit',
             iconTooltip: 'LNG_PAGE_LIST_CASES_ACTION_MODIFY_CASE',
             action: {
@@ -635,7 +635,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
           // Other actions
           {
-            type: V2RowActionType.MENU,
+            type: V2ActionType.MENU,
             icon: 'more_horiz',
             menuOptions: [
               // Delete Case
@@ -941,7 +941,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    */
   initializeQuickActions(): void {
     this.quickActions = {
-      type: V2RowActionType.MENU,
+      type: V2ActionType.MENU,
       label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
       visible: (): boolean => {
         return !this.appliedListFilter && (
