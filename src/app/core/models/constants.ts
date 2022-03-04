@@ -1141,4 +1141,36 @@ export class Constants {
     return result;
   }
 
+  /**
+   * Determine color depending of base color luminosity
+   */
+  static hexColorToTextColor(color: string): string {
+    // determine text color from bg-color
+    let textColor: string = color;
+    if (textColor.length === 4) {
+      textColor = textColor.substring(0, 1) +
+        textColor.substring(1, 2) +
+        textColor.substring(1, 2) +
+        textColor.substring(2, 3) +
+        textColor.substring(2, 3) +
+        textColor.substring(3, 4) +
+        textColor.substring(3, 4);
+    }
+
+    // determine lightness
+    textColor = textColor.substring(1);
+    const rgb: number = parseInt(textColor, 16);
+    // eslint-disable-next-line no-bitwise
+    const r: number = (rgb >> 16) & 0xff;
+    // eslint-disable-next-line no-bitwise
+    const g: number = (rgb >>  8) & 0xff;
+    // eslint-disable-next-line no-bitwise
+    const b: number = (rgb >>  0) & 0xff;
+
+    // per ITU-R BT.709
+    const luma: number = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    return (luma / 255.0) > 0.4 ?
+      '#333' :
+      '#FFF';
+  }
 }

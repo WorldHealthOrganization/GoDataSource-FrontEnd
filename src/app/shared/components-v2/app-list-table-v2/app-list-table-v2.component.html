@@ -145,7 +145,8 @@
           *ngFor="let groupValue of groupedData.data.values"
           class="gd-list-top-grouped-data-value"
           fxLayout="row" fxLayoutGap="1rem"
-          [style.background-color]="groupValue.color">
+          [style.background-color]="groupValue.bgColor"
+          [style.color]="groupValue.textColor">
 
           <!-- Label -->
           <div
