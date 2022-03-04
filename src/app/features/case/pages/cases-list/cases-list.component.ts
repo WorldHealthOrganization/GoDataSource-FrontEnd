@@ -1222,7 +1222,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                   gData.data.values = values.map((item) => {
                     return {
                       label: item.label,
-                      color: item.color,
+                      bgColor: item.color,
+                      textColor: Constants.hexColorToTextColor(item.color),
                       value: item.value.toLocaleString('en')
                     };
                   });

@@ -12,7 +12,8 @@ export interface IV2GroupedData {
     ) => void,
     values: {
       label: string,
-      color: string,
+      bgColor: string,
+      textColor: string,
       value: string
     }[]
   }
