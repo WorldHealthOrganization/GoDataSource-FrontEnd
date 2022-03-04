@@ -5,12 +5,13 @@ import {
   Host,
   Input, OnDestroy,
   Optional,
-  SkipSelf, ViewEncapsulation
+  SkipSelf, ViewChild, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { LabelValuePairModel } from '../../core/label-value-pair.model';
+import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 
 @Component({
   selector: 'app-form-select-v2',
@@ -63,6 +64,9 @@ export class AppFormSelectV2Component
   get valueAsString(): string {
     return this.value as string;
   }
+
+  // vscroll handler
+  @ViewChild('cdkVirtualScrollViewport', {static: true}) cdkVirtualScrollViewport: CdkVirtualScrollViewport;
 
   /**
    * Constructor
@@ -127,9 +131,40 @@ export class AppFormSelectV2Component
     // attach custom class
     if (
       classList &&
-      !classList.contains('cgd-cdk-overlay-pane-dropdown')
+      !classList.contains('gd-cdk-overlay-pane-dropdown')
     ) {
       classList.add('gd-cdk-overlay-pane-dropdown');
+    }
+
+    // vscroll to first selected item
+    this.vScrollToFirstSelectedOption();
+  }
+
+  /**
+   * vScroll to see the first selected item
+   */
+  private vScrollToFirstSelectedOption(): void {
+    // scroll to item ?
+    if (
+      this.value &&
+      this.cdkVirtualScrollViewport
+    ) {
+      // hack to force re-render, otherwise we see an empty scroll
+      if (
+        this.value && (
+          !this.multiple ||
+          this.value.length > 0
+        )
+      ) {
+        // determine value to search
+        const valueToSearch: string = this.multiple ?
+          this.value[0] :
+          (this.value as string);
+        const index: number = this.filteredOptions.findIndex((option) => option.value === valueToSearch);
+        if (index > -1) {
+          this.cdkVirtualScrollViewport.scrollToIndex(index);
+        }
+      }
     }
   }
 }

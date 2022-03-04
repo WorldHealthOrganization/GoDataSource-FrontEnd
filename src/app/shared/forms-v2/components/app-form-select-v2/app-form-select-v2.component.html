@@ -19,7 +19,6 @@
       [required]="required"
       [multiple]="multiple"
       panelClass="gd-form-select-v2-panel"
-      (click)="dropdownOpened()"
       (opened)="dropdownOpened()">
 
       <!-- Selected value -->
@@ -72,6 +71,7 @@
 
       <!-- vscroll -->
       <cdk-virtual-scroll-viewport
+        #cdkVirtualScrollViewport
         [itemSize]="40"
         [minBufferPx]="240"
         [maxBufferPx]="480"
@@ -113,7 +113,7 @@
           *ngIf="multiple; else singleSelect">
           <mat-option
             *ngFor="let selectedValue of value"
-            class="gd-mat-option-vscroll-selected"
+            style="height: 0; display: none;"
             [value]="selectedValue">
 
             <!-- Icon -->
@@ -132,7 +132,7 @@
 
           <!-- Option -->
           <mat-option
-            class="gd-mat-option-vscroll-selected"
+            style="height: 0; display: none;"
             [value]="valueAsString">
 
             <!-- Icon -->
