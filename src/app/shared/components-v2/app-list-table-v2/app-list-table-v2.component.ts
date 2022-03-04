@@ -91,7 +91,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // already expanded, refresh ?
     if (this.groupedDataExpanded) {
-      this.refreshGroupedData();
+      this.expandRefreshGroupedData();
     }
   }
   get groupedData(): IV2GroupedData {
@@ -527,7 +527,19 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   /**
    * Refresh grouped data
    */
-  refreshGroupedData(): void {
+  collapseGroupedData(): void {
+    // collapse
+    this.groupedDataExpanded = false;
+
+    // refresh html
+    this.detectChanges();
+    this.resizeTable();
+  }
+
+  /**
+   * Expand grouped data - or refresh
+   */
+  expandRefreshGroupedData(): void {
     // nothing to refresh ?
     if (!this.groupedData) {
       return;
