@@ -2,30 +2,13 @@
 
 .cdk-overlay-pane {
   .mat-menu-panel {
-    &.gd-list-table-actions-action-menu {
-      max-height: 50vh;
-
-      .mat-menu-content:not(:empty) {
-        padding: 0;
-      }
-
-      .gd-list-table-actions-action-menu-button {
-        font-family: $gd-font-family;
-        height: 4rem;
-        line-height: 4rem;
-
-        &.gd-list-table-actions-action-menu-warning {
-          color: var(--gd-danger);
-
-          &:hover {
-            background: rgba(var(--gd-danger-rgb), 0.1);
-            color: var(--gd-danger);
-          }
-        }
+    .gd-list-table-actions-action-menu-button {
+      &.gd-list-table-actions-action-menu-warning {
+        color: var(--gd-danger);
 
         &:hover {
-          background: rgba(var(--gd-primary-rgb), 0.1);
-          color: var(--gd-primary);
+          background: rgba(var(--gd-danger-rgb), 0.1);
+          color: var(--gd-danger);
         }
       }
     }

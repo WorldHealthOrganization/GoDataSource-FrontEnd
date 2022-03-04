@@ -75,5 +75,6 @@
 
   .gd-list-table-bottom {
     @include border-radius(0 0 0.4rem 0.4rem);
+    min-height: 4.8rem;
   }
 }

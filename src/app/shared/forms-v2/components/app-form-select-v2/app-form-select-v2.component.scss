@@ -123,6 +123,17 @@
 
                 .mat-select-arrow {
                   color: var(--gd-secondary);
+                  @include transition(all 0.24s ease-in-out 0s);
+                }
+              }
+            }
+
+            &[aria-expanded="true"] {
+              .mat-select-trigger {
+                .mat-select-arrow-wrapper {
+                  .mat-select-arrow {
+                    @include rotate(180deg);
+                  }
                 }
               }
             }
