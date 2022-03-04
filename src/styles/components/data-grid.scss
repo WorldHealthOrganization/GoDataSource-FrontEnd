@@ -4,7 +4,7 @@
   font-family: $gd-font-family;
   font-size: $gd-font-size;
   font-weight: 400;
-  line-height: $gd-line-height;
+  line-height: 2.4rem;
 
   &.ag-theme-balham {
     .ag-root-wrapper {
@@ -30,7 +30,7 @@
   
       .ag-header-cell,
       .ag-header-group-cell {
-        padding: 1.2rem 1.6rem;
+        padding: 0.8rem;
   
         &:after {
           background-color: rgba(var(--gd-secondary-rgb), 0.25);
@@ -55,8 +55,8 @@
         }
 
         .ag-cell {
-          line-height: $gd-line-height;
-          padding: 1.2rem 1.6rem;
+          line-height: 2.4rem;
+          padding: 0.8rem;
 
           &.ag-cell-last-left-pinned {
             &:not(.ag-cell-range-right):not(.ag-cell-range-single-cell) {
@@ -83,6 +83,10 @@
               &:not(.ag-cell-range-right):not(.ag-cell-range-single-cell) {
                 &.ag-cell-focus {
                   border-right-color: var(--gd-primary);
+
+                  &.gd-cell-no-focus {
+                    border-right-color: rgba(var(--gd-secondary-rgb), 0.25);
+                  }
                 }
               }
             }
@@ -91,8 +95,16 @@
               &:not(.ag-cell-range-left):not(.ag-cell-range-single-cell) {
                 &.ag-cell-focus {
                   border-left-color: var(--gd-primary);
+
+                  &.gd-cell-no-focus {
+                    border-left-color: rgba(var(--gd-secondary-rgb), 0.25);
+                  }
                 }
               }
+            }
+
+            &.gd-cell-no-focus {
+              border-color: transparent;
             }
           }
         }
