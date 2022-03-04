@@ -1,3 +1,5 @@
+@import 'font';
+
 .cdk-overlay-pane {
   .mat-menu-panel {
     &.gd-list-table-actions-action-menu {
@@ -8,6 +10,10 @@
       }
 
       .gd-list-table-actions-action-menu-button {
+        font-family: $gd-font-family;
+        height: 4rem;
+        line-height: 4rem;
+
         &.gd-list-table-actions-action-menu-warning {
           color: var(--gd-danger);
 

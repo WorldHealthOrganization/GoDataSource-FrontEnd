@@ -110,5 +110,45 @@
         }
       }
     }
+
+    .ag-checkbox {
+      &.ag-header-select-all {
+        margin-right: 0;
+      }
+
+      .ag-checkbox-input-wrapper {
+        background-color: transparent;
+        font-family: 'Material Icons';
+        font-size: 2.4rem;
+        height: 2.4rem;
+        line-height: 2.4rem;
+        width: 2.4rem;
+
+        &:after {
+          color: var(--gd-secondary);
+          content: '\e835';
+        }
+
+        &.ag-checked {
+          &:after {
+            color: var(--gd-primary);
+            content: '\e834';
+          }
+        }
+
+        &.ag-indeterminate {
+          &:after {
+            color: var(--gd-primary);
+            content: '\e909';
+          }
+        }
+
+        &:focus,
+        &:focus-within,
+        &:active {
+          @include box-shadow(none);
+        }
+      }
+    }
   }
 }

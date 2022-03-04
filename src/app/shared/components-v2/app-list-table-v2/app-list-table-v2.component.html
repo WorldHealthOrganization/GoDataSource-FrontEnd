@@ -21,7 +21,7 @@
 
     <!-- Buttons -->
     <div
-      fxFlex fxLayoutAlign="end" fxLayoutGap="1rem"
+      fxFlex fxLayoutAlign="end" fxLayoutGap="0.8rem"
       class="gd-list-top-tile-buttons-buttons">
 
       <!-- Hide / show groups -->
@@ -138,23 +138,26 @@
     <ng-template
       #displayGroupedData>
       <div
-        class="gd-list-top-grouped-data">
+        class="gd-list-top-grouped-data"
+        fxLayout="row" fxLayoutAlign="space-between stretch" fxLayoutGap="2.4rem">
 
         <!-- Group value -->
         <div
           *ngFor="let groupValue of groupedData.data.values"
           class="gd-list-top-grouped-data-value"
-          fxLayout="row" fxLayoutGap="1rem"
+          fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="1.6rem"
           [style.background-color]="groupValue.color">
 
           <!-- Label -->
           <div
+            class="gd-list-top-grouped-data-value-label"
             fxFlex>
             {{groupValue.label | translate}}
           </div>
 
           <!-- Count -->
           <div
+            class="gd-list-top-grouped-data-value-count"
             fxGrow="0">
             {{groupValue.value}}
           </div>
