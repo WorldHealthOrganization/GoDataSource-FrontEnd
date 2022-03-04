@@ -78,9 +78,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
   fieldsGroupListRelationships: LabelValuePair[];
   fieldsGroupListRelationshipsRequired: IExportFieldsGroupRequired;
 
-  // contacts outbreak
-  selectedOutbreak: OutbreakModel;
-
   // address model needed for filters
   filterAddressModel: AddressModel = new AddressModel({
     geoLocationAccurate: null

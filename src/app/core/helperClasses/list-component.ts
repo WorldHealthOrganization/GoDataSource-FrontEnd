@@ -1,6 +1,6 @@
 import { ISerializedQueryBuilder, RequestFilter, RequestFilterOperator, RequestQueryBuilder, RequestSortDirection } from './request-query-builder';
 import * as _ from 'lodash';
-import { Subscriber } from 'rxjs';
+import { ReplaySubject, Subscriber, Subscription } from 'rxjs';
 import { ApplyListFilter, Constants, ExportStatusStep } from '../models/constants';
 import { FormRangeModel } from '../../shared/components/form-range/form-range.model';
 import { Directive, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
@@ -28,7 +28,10 @@ import { LoadingDialogModel } from '../../shared/components';
 import { DialogExportProgressAnswer } from '../services/helper/dialog.service';
 import { IV2Column } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
-import { IV2RowActionMenuLabel } from '../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2ActionIconLabel, IV2ActionMenuLabel } from '../../shared/components-v2/app-list-table-v2/models/action.model';
+import { OutbreakModel } from '../models/outbreak.model';
+import { IV2GroupedData } from '../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
+import { IBasicCount } from '../models/basic-count.interface';
 
 /**
  * Used by caching filter
@@ -79,6 +82,9 @@ export abstract class ListComponent implements OnDestroy {
   // handle pop state changes
   private static locationSubscription: SubscriptionLike;
 
+  // handler for stopping take until
+  protected destroyed$: ReplaySubject<boolean> = new ReplaySubject<boolean>();
+
   // authenticated user data
   authUser: UserModel;
 
@@ -86,7 +92,33 @@ export abstract class ListComponent implements OnDestroy {
   public breadcrumbs: IV2Breadcrumb[];
 
   // quick actions
-  quickActions: IV2RowActionMenuLabel;
+  quickActions: IV2ActionMenuLabel;
+
+  // add action
+  addAction: IV2ActionIconLabel;
+
+  // grouped data
+  groupedData: IV2GroupedData;
+
+  // selected outbreak
+  selectedOutbreak: OutbreakModel;
+  selectedOutbreakSubscription: Subscription;
+
+  // check if selected outbreak is the active one
+  get selectedOutbreakIsActive(): boolean {
+    return this.authUser &&
+      this.selectedOutbreak &&
+      this.selectedOutbreak.id &&
+      this.selectedOutbreak.id === this.authUser.activeOutbreakId;
+  }
+
+  // page information
+  pageCount: IBasicCount;
+  pageIndex: number = 0;
+
+
+
+
 
   /**
      * Determine all children that we need to reset when side filters are being applied
@@ -181,14 +213,10 @@ export abstract class ListComponent implements OnDestroy {
 
   // pagination
   public pageSize: number = Constants.DEFAULT_PAGE_SIZE;
-  public pageSizeOptions: number[] = Constants.PAGE_SIZE_OPTIONS;
   private paginatorInitialized = false;
 
   // flag set to true if the list is empty
   public isEmptyList: boolean;
-
-  // starting page
-  public pageIndex: number = 0;
 
   // Models for the checkbox functionality
   private checkboxModels: {
@@ -380,6 +408,23 @@ export abstract class ListComponent implements OnDestroy {
     // initialize breadcrumbs
     this.initializeBreadcrumbs();
 
+    // listen for outbreak selection
+    this.selectedOutbreakSubscription = this.listHelperService.outbreakDataService
+      .getSelectedOutbreakSubject()
+      .subscribe((selectedOutbreak: OutbreakModel) => {
+        // select outbreak
+        this.selectedOutbreak = selectedOutbreak;
+
+        // trigger outbreak selection changed
+        // - wait for binding
+        setTimeout(() => {
+          this.selectedOutbreakChanged();
+        });
+      });
+
+
+
+
     // clone current breadcrumbs
     let currentBreadcrumbs;
     setTimeout(() => {
@@ -443,8 +488,19 @@ export abstract class ListComponent implements OnDestroy {
    * Release resources
    */
   ngOnDestroy(): void {
+    // release subscribers
     this.releaseSubscribers();
+
+    // unsubscribe other requests
+    this.destroyed$.next(true);
+    this.destroyed$.complete();
+    this.destroyed$ = undefined;
   }
+
+  /**
+   * Selected outbreak changed
+   */
+  protected selectedOutbreakChanged(): void {}
 
   /**
    * Initialize breadcrumbs
@@ -473,9 +529,15 @@ export abstract class ListComponent implements OnDestroy {
   }
 
   /**
-     * Release subscribers
-     */
+   * Release subscribers
+   */
   private releaseSubscribers() {
+    // selected outbreak
+    if (this.selectedOutbreakSubscription) {
+      this.selectedOutbreakSubscription.unsubscribe();
+      this.selectedOutbreakSubscription = undefined;
+    }
+
     // query builder
     this.queryBuilder.destroyListeners();
 
@@ -485,10 +547,13 @@ export abstract class ListComponent implements OnDestroy {
       ListComponent.locationSubscription = null;
     }
 
+    // refresh data
     if (this.triggerListRefresh) {
       this.triggerListRefresh.unsubscribe();
       this.triggerListRefresh = null;
     }
+
+    // refresh count
     if (this.triggerListCountRefresh) {
       this.triggerListCountRefresh.unsubscribe();
       this.triggerListCountRefresh = null;
@@ -980,8 +1045,8 @@ export abstract class ListComponent implements OnDestroy {
   }
 
   /**
-     * Change page
-     */
+   * Change page
+   */
   changePage(page: PageEvent) {
     // update API pagination params
     this.queryBuilder.paginator.setPage(page);

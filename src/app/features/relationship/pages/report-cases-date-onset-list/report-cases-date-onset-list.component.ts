@@ -28,9 +28,6 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
 
   outbreakSubscriber: Subscription;
 
-  // selected Outbreak
-  selectedOutbreak: OutbreakModel;
-
   // list of secondary cases with onset date that is before the date of onset of the primary case
   casesWithOnsetList$: Observable<ReportCasesWithOnsetModel[]>;
 

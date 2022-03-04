@@ -60,10 +60,10 @@
 
 <div fxLayout="row" fxLayoutAlign="space-between center">
     <!--Total number of records from the list-->
-    <app-total-number-of-records
-        fxFlex
-        [value]="locationsListCount$ | async">
-    </app-total-number-of-records>
+<!--    <app-total-number-of-records-->
+<!--        fxFlex-->
+<!--        [value]="locationsListCount$ | async">-->
+<!--    </app-total-number-of-records>-->
 
     <div
         fxFlex
@@ -406,7 +406,7 @@
                 [pageIndex]="pageIndex"
                 [countData]="locationsListCount$ | async"
                 [pageSize]="pageSize"
-                [pageSizeOptions]="pageSizeOptions"
+                [pageSizeOptions]="[]"
                 (page)="changePage($event)">
             </app-mat-paginator-extended>
         </mat-card>

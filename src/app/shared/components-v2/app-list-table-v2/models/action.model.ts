@@ -3,38 +3,46 @@ import { Params } from '@angular/router';
 /**
  * Action Type
  */
-export enum V2RowActionType {
+export enum V2ActionType {
   ICON = 'icon',
-  MENU = 'menu'
+  MENU = 'menu',
+  ICON_LABEL = 'icon_label'
 }
 
 /**
  * Click
  */
-interface IV2RowActionClick {
+interface IV2ActionClick {
   // required
   click: (data: any) => void;
+
+  // exclude
+  link?: never;
+  linkQueryParams?: never;
 }
 
 /**
  * Link
  */
-interface IV2RowActionLink {
+interface IV2ActionLink {
   // required
   link: (data: any) => string[];
 
   // optional
   linkQueryParams?: (data: any) => Params;
+
+  // exclude
+  click?: never;
 }
 
 /**
- * Row action Icon
+ * Action Icon
  */
-interface IV2RowActionIcon {
+interface IV2ActionIcon {
   // type
-  type: V2RowActionType.ICON;
+  type: V2ActionType.ICON;
   icon: string;
-  action: IV2RowActionClick | IV2RowActionLink;
+  action: IV2ActionClick | IV2ActionLink;
 
   // optional
   iconTooltip?: string;
@@ -43,12 +51,28 @@ interface IV2RowActionIcon {
 }
 
 /**
- * Row action Menu option
+ * Action Icon
  */
-interface IV2RowActionMenuOption {
+export interface IV2ActionIconLabel {
+  // type
+  type: V2ActionType.ICON_LABEL;
+  icon: string;
+  label: string;
+  action: IV2ActionClick | IV2ActionLink;
+
+  // optional
+  iconTooltip?: string;
+  visible?: (data: any) => boolean;
+  disable?: (data: any) => boolean;
+}
+
+/**
+ * Action Menu option
+ */
+interface IV2ActionMenuOption {
   // menu option
   label: string;
-  action: IV2RowActionClick | IV2RowActionLink;
+  action: IV2ActionClick | IV2ActionLink;
 
   // optional
   cssClasses?: string;
@@ -57,21 +81,21 @@ interface IV2RowActionMenuOption {
 }
 
 /**
- * Row action Menu divider
+ * Action Menu divider
  */
-interface IV2RowActionMenuDivider {
+interface IV2ActionMenuDivider {
   // optional
   label?: never;
   visible?: (data: any) => boolean;
 }
 
 /**
- * Row action Menu
+ * Action Menu
  */
-interface IV2RowActionMenu {
+interface IV2ActionMenu {
   // type
-  type: V2RowActionType.MENU;
-  menuOptions: (IV2RowActionMenuOption | IV2RowActionMenuDivider)[];
+  type: V2ActionType.MENU;
+  menuOptions: (IV2ActionMenuOption | IV2ActionMenuDivider)[];
 
   // optional
   visible?: (data: any) => boolean;
@@ -79,9 +103,9 @@ interface IV2RowActionMenu {
 }
 
 /**
- * Row icon action Menu
+ * Icon action Menu
  */
-interface IV2RowActionMenuIcon extends IV2RowActionMenu {
+interface IV2ActionMenuIcon extends IV2ActionMenu {
   // required
   icon: string;
 
@@ -90,12 +114,12 @@ interface IV2RowActionMenuIcon extends IV2RowActionMenu {
 }
 
 /**
- * Row label action Menu
+ * Label action Menu
  */
-export interface IV2RowActionMenuLabel extends IV2RowActionMenu {
+export interface IV2ActionMenuLabel extends IV2ActionMenu {
   // required
   label: string;
-  menuOptions: (IV2RowActionMenuOption | IV2RowActionMenuDivider)[];
+  menuOptions: (IV2ActionMenuOption | IV2ActionMenuDivider)[];
 
   // optional
   visible?: (data: any) => boolean;
@@ -105,4 +129,4 @@ export interface IV2RowActionMenuLabel extends IV2RowActionMenu {
 /**
  * Action
  */
-export type V2RowAction = IV2RowActionIcon | IV2RowActionMenuIcon | IV2RowActionMenuLabel;
+export type V2Action = IV2ActionIcon | IV2ActionMenuIcon | IV2ActionMenuLabel;

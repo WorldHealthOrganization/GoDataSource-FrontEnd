@@ -45,9 +45,6 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
   teamsList$: Observable<TeamModel[]>;
   teamsListCount$: Observable<IBasicCount>;
 
-  // selected outbreak - needed to check assignment at delete team
-  selectedOutbreak: OutbreakModel;
-
   fixedTableColumns: string[] = [
     'name',
     'users',

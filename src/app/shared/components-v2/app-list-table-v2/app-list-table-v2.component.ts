@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, Renderer2, ViewChild } from '@angular/core';
 import { BaseModel } from '../../../core/models/base.model';
 import { Observable } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
@@ -15,7 +15,13 @@ import { IV2Column, IV2ColumnAction, IV2ColumnBasic, IV2ColumnBasicFormat, IV2Co
 import { AppListTableV2ActionsComponent } from './components/actions/app-list-table-v2-actions.component';
 import { IExtendedColDef } from './models/extended-column.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
-import { IV2RowActionMenuLabel } from './models/action.model';
+import { IV2ActionIconLabel, IV2ActionMenuLabel } from './models/action.model';
+import { IV2GroupedData } from './models/grouped-data.model';
+import { AgGridAngular } from '@ag-grid-community/angular';
+import { V2LoadingComponent } from './models/loading.component';
+import { V2NoRowsComponent } from './models/no-rows.component';
+import { IBasicCount } from '../../../core/models/basic-count.interface';
+import { PageEvent } from '@angular/material/paginator';
 
 /**
  * Component
@@ -61,6 +67,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     ClientSideRowModelModule
   ];
 
+  // loading in progress
+  loadingDataInProgress: boolean = false;
+
   // breadcrumbs
   @Input() breadcrumbs: IV2Breadcrumb[];
 
@@ -68,10 +77,51 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   @Input() pageTitle: string;
 
   // quick actions
-  @Input() quickActions: IV2RowActionMenuLabel;
+  @Input() quickActions: IV2ActionMenuLabel;
+
+  // add button
+  @Input() addAction: IV2ActionIconLabel;
+
+  // grouped data
+  groupedDataExpanded: boolean = false;
+  private _groupedData: IV2GroupedData;
+  @Input() set groupedData(groupedData: IV2GroupedData) {
+    // set data
+    this._groupedData = groupedData;
+
+    // already expanded, refresh ?
+    if (this.groupedDataExpanded) {
+      this.refreshGroupedData();
+    }
+  }
+  get groupedData(): IV2GroupedData {
+    return this._groupedData;
+  }
+
+  // page information
+  @Input() pageCount: IBasicCount;
+  @Input() pageSize: number;
+  @Input() pageIndex: number;
 
   // click listener
   private clickListener: () => void;
+
+  // refresh data
+  @Output() refreshData = new EventEmitter<void>();
+
+  // refresh data count
+  @Output() refreshDataCount = new EventEmitter<void>();
+
+  // change page
+  @Output() pageChange = new EventEmitter<PageEvent>();
+
+  // ag table handler
+  @ViewChild('agTable') agTable: AgGridAngular;
+
+  // constants
+  V2LoadingComponent = V2LoadingComponent;
+  V2NoRowsComponent = V2NoRowsComponent;
+  Constants = Constants;
 
   /**
    * Constructor
@@ -146,25 +196,40 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
    * Retrieve data
    */
   private retrieveData(): void {
+    // if first time we need to run one more time detect changes for spinner component to be loaded
+    if (!V2LoadingComponent.loadingHtmlElement) {
+      this.detectChanges();
+    }
+
     // nothing to do ?
     if (!this._records$) {
       // reset data
-      this.records = undefined;
+      this.records = [];
 
       // re-render page
-      this.changeDetectorRef.detectChanges();
+      this.detectChanges();
 
       // finished
       return;
     }
 
     // retrieve data
+    this.agTable.api.showLoadingOverlay();
+    this.loadingDataInProgress = true;
     this.recordsSubscription = this._records$.subscribe((data) => {
-      // set data
+      // finished
+      this.loadingDataInProgress = false;
+
+      // set data & hide loading overlay
       this.records = data;
 
+      // no records found ?
+      if (this.records.length < 1) {
+        this.agTable.api.showNoRowsOverlay();
+      }
+
       // re-render page
-      this.changeDetectorRef.detectChanges();
+      this.detectChanges();
     });
   }
 
@@ -219,7 +284,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     });
 
     // re-render page
-    this.changeDetectorRef.detectChanges();
+    this.detectChanges();
   }
 
   /**
@@ -457,5 +522,53 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
    */
   detectChanges(): void {
     this.changeDetectorRef.detectChanges();
+  }
+
+  /**
+   * Refresh grouped data
+   */
+  refreshGroupedData(): void {
+    // nothing to refresh ?
+    if (!this.groupedData) {
+      return;
+    }
+
+    // get grouped data
+    this.groupedData.data.get(
+      this.groupedData,
+      () => {
+        // refresh html
+        this.detectChanges();
+        this.resizeTable();
+      }
+    );
+
+    // display data
+    this.groupedDataExpanded = true;
+
+    // refresh html
+    this.detectChanges();
+    this.resizeTable();
+  }
+
+  /**
+   * Refresh Data
+   */
+  refreshDataHandler(): void {
+    this.refreshData.emit();
+  }
+
+  /**
+   * Refresh data count
+   */
+  refreshDataCountHandler(): void {
+    this.refreshDataCount.emit();
+  }
+
+  /**
+   * Change page
+   */
+  changePage(page: PageEvent): void {
+    this.pageChange.emit(page);
   }
 }

@@ -72,9 +72,6 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
   eventsListCount$: Observable<IBasicCount>;
   yesNoOptionsList$: Observable<any>;
 
-  // events outbreak
-  selectedOutbreak: OutbreakModel;
-
   // provide constants to template
   Constants = Constants;
   EntityType = EntityType;

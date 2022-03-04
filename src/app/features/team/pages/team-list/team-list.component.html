@@ -36,9 +36,9 @@
 -->
 
 <!--Total number of records from the list-->
-<app-total-number-of-records
-    [value]="teamsListCount$ | async">
-</app-total-number-of-records>
+<!--<app-total-number-of-records-->
+<!--    [value]="teamsListCount$ | async">-->
+<!--</app-total-number-of-records>-->
 
 <mat-card class="page-section page-content">
     <!-- Table top info -->
@@ -309,7 +309,7 @@
         [pageIndex]="pageIndex"
         [countData]="teamsListCount$ | async"
         [pageSize]="pageSize"
-        [pageSizeOptions]="pageSizeOptions"
+        [pageSizeOptions]="[]"
         (page)="changePage($event)">
     </app-mat-paginator-extended>
 </mat-card>

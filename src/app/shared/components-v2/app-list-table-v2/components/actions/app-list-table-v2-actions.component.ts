@@ -3,7 +3,7 @@ import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { IAfterGuiAttachedParams, ICellRendererParams } from '@ag-grid-community/core';
 import { IExtendedColDef } from '../../models/extended-column.model';
 import { IV2ColumnAction } from '../../models/column.model';
-import { V2RowAction, V2RowActionType } from '../../models/action.model';
+import { V2Action, V2ActionType } from '../../models/action.model';
 
 /**
  * Component
@@ -20,10 +20,10 @@ export class AppListTableV2ActionsComponent implements ICellRendererAngularComp 
   data: any;
 
   // actions
-  actions: V2RowAction[];
+  actions: V2Action[];
 
   // constants
-  V2RowActionType = V2RowActionType;
+  V2ActionType = V2ActionType;
 
   /**
    * Gets called whenever the cell refreshes

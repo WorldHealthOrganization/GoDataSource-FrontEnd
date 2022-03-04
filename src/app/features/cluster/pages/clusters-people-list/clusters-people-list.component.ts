@@ -3,7 +3,6 @@ import { ClusterDataService } from '../../../../core/services/data/cluster.data.
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ActivatedRoute } from '@angular/router';
 import { ClusterModel } from '../../../../core/models/cluster.model';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Observable } from 'rxjs';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -30,8 +29,6 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
   // breadcrumbs
   // breadcrumbs: BreadcrumbItemModel[] = [];
 
-  // selected Outbreak
-  selectedOutbreak: OutbreakModel;
   // present cluster
   cluster: ClusterModel;
   // cluster people list

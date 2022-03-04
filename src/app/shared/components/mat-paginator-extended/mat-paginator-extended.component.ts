@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Injectable, Input, OnDestroy, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Injectable, Input, OnDestroy, Output } from '@angular/core';
 import { IBasicCount } from '../../../core/models/basic-count.interface';
 import { PageEvent } from '@angular/material/paginator/paginator';
 import { MatPaginatorIntl } from '@angular/material/paginator';
@@ -107,6 +107,7 @@ class CustomMatPaginatorIntl
 @Component({
   selector: 'app-mat-paginator-extended',
   templateUrl: './mat-paginator-extended.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     DecimalPipe,
     {
@@ -126,6 +127,9 @@ export class MatPaginatorExtendedComponent {
   @Input() pageIndex: number;
   @Input() pageSize: number;
   @Input() pageSizeOptions: number[];
+
+  // disabled
+  @Input() loading: boolean;
 
   // events
   @Output() page: EventEmitter<PageEvent> = new EventEmitter<PageEvent>();

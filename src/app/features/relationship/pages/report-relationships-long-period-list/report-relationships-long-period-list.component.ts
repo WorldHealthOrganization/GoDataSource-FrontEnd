@@ -24,9 +24,6 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
   // breadcrumbs
   // breadcrumbs: BreadcrumbItemModel[] = [];
 
-  // selected Outbreak
-  selectedOutbreak: OutbreakModel;
-
   outbreakSubscriber: Subscription;
 
   // list of long periods in the dates of onset between cases in the chain of transmission i.e. indicate where an intermediate contact may have been missed

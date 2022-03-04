@@ -33,8 +33,6 @@ export class UserWorkloadComponent extends ListComponent implements OnInit, OnDe
   // breadcrumbs
   // breadcrumbs: BreadcrumbItemModel[] = [];
 
-  selectedOutbreak: OutbreakModel;
-
   dates: string[] = [];
   usersDataShow: IUserMap[] = [];
   usersData: IUserMap[];

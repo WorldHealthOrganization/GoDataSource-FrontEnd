@@ -34,9 +34,6 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent imple
   UserSettings = UserSettings;
   Constants = Constants;
 
-  // selected Outbreak
-  selectedOutbreak: OutbreakModel;
-
   // list of existing cot snapshots
   cotSnapshotsList$: Observable<CotSnapshotModel[]>;
   cotSnapshotsListCount$: Observable<IBasicCount>;

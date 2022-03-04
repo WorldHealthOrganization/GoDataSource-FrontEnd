@@ -62,9 +62,6 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
   fieldsGroupList: LabelValuePair[];
   fieldsGroupListRequired: IExportFieldsGroupRequired;
 
-  // selected Outbreak
-  selectedOutbreak: OutbreakModel;
-
   // list of existing case lab results
   labResultsList$: Observable<LabResultModel[]>;
   labResultsListCount$: Observable<IBasicCount>;

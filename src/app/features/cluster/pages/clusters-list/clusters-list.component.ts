@@ -33,8 +33,6 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
 
   outbreakSubscriber: Subscription;
 
-  // selected Outbreak
-  selectedOutbreak: OutbreakModel;
   // list of existing clusters
   clustersList$: Observable<ClusterModel[]>;
   clustersListCount$: Observable<IBasicCount>;

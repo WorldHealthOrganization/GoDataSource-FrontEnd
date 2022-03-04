@@ -21,11 +21,27 @@
 
     <!-- Buttons -->
     <div
-      fxFlex fxLayoutAlign="end"
+      fxFlex fxLayoutAlign="end" fxLayoutGap="1rem"
       class="gd-list-top-tile-buttons-buttons">
 
       <!-- Hide / show groups -->
-      <!-- TODO -->
+      <button
+        *ngIf="groupedData"
+        type="button"
+        mat-flat-button color="text"
+        class="gd-list-top-tile-buttons-button-grouped"
+        [class.gd-list-top-tile-buttons-button-grouped-expanded]="groupedDataExpanded"
+        (click)="groupedDataExpanded ? (groupedDataExpanded = false) : refreshGroupedData()">
+
+        <!-- Icon -->
+        <mat-icon>expand_more</mat-icon>
+
+        <!-- Label -->
+        <span>
+          {{groupedData.label | translate}}
+        </span>
+
+      </button>
 
       <!-- Quick actions -->
       <ng-container
@@ -38,7 +54,7 @@
           class="gd-list-top-tile-buttons-button-quick"
           [class.gd-list-top-tile-buttons-button-quick-expanded]="quickMenuTrigger.menuOpen"
           type="button"
-          mat-flat-button
+          mat-flat-button color="secondary"
           [disabled]="quickActions.disable && quickActions.disable(null)"
           [matMenuTriggerFor]="quickMenu"
           (menuClosed)="detectChanges()">
@@ -86,13 +102,68 @@
       </ng-container>
 
       <!-- Add -->
-      <!-- TODO -->
+      <button
+        *ngIf="addAction"
+        type="button"
+        mat-flat-button
+        [routerLink]="addAction.action.link && (!addAction.disable || !addAction.disable(null)) ? addAction.action.link(null) : undefined"
+        [queryParams]="addAction.action.linkQueryParams ? addAction.action.linkQueryParams(null) : undefined"
+        [disabled]="addAction.disable && addAction.disable(null)"
+        (click)="addAction.action.click ? addAction.action.click(null) : undefined">
+
+        <!-- Icon -->
+        <mat-icon>{{addAction.icon}}</mat-icon>
+
+        <!-- Label -->
+        <span>
+            {{ addAction.label | translate }}
+        </span>
+
+      </button>
+
     </div>
   </div>
 
-  <!-- @TODO: Grouped data -->
-  <div>
-    grouped data... gradient color from referenceData.color to a lighter one...
+  <!-- Grouped data -->
+  <div
+    *ngIf="groupedDataExpanded"
+    class="gd-list-top-grouped">
+
+    <!-- Loading data -->
+    <mat-progress-bar
+      *ngIf="groupedData.data.loading; else displayGroupedData"
+      mode="indeterminate"></mat-progress-bar>
+
+    <!-- Display data -->
+    <ng-template
+      #displayGroupedData>
+      <div
+        class="gd-list-top-grouped-data">
+
+        <!-- Group value -->
+        <div
+          *ngFor="let groupValue of groupedData.data.values"
+          class="gd-list-top-grouped-data-value"
+          fxLayout="row" fxLayoutGap="1rem"
+          [style.background-color]="groupValue.color">
+
+          <!-- Label -->
+          <div
+            fxFlex>
+            {{groupValue.label | translate}}
+          </div>
+
+          <!-- Count -->
+          <div
+            fxGrow="0">
+            {{groupValue.value}}
+          </div>
+
+        </div>
+
+      </div>
+    </ng-template>
+
   </div>
 </div>
 
@@ -109,7 +180,37 @@
     <div
       fxFlex
       class="gd-list-table-header-left">
-      more than enough...o sa fie text + un link cu text care o sa afiseze total count la on click (pb tb stilizat dupa ce implementam pt ca o sa sufere schimbari continutul html)
+
+      <!-- Loading -->
+      <div
+        *ngIf="!pageCount || pageCount.count === null; else pageInfo"
+        class="gd-list-table-header-left-loading">
+        <mat-progress-spinner
+          mode="indeterminate"
+          diameter="24">
+        </mat-progress-spinner>
+      </div>
+
+      <!-- Counted items -->
+      <ng-template
+        #pageInfo>
+
+        <!-- Text -->
+        <span
+          class="gd-list-table-header-left-text">
+          {{ (pageCount.hasMore ? ('LNG_COMMON_LABEL_PAGINATOR_COUNT_BEFORE_LENGTH' | translate) + ' ' : '') + (pageCount.count | number) + (' ' + ('LNG_COMMON_LABEL_PAGINATOR_COUNT_AFTER_LENGTH' | translate)) }}
+        </span>
+
+        <!-- Determine total -->
+        <ng-container
+          *ngIf="pageCount.hasMore">
+          (<button
+            class="gd-list-table-header-left-show-total"
+            type="button"
+            mat-flat-button color="text"
+            (click)="refreshDataCountHandler()">{{'LNG_COMMON_LABEL_PAGINATOR_SHOW_EXACT_COUNT' | translate}}</button>)
+        </ng-container>
+      </ng-template>
     </div>
 
     <!-- Right -->
@@ -138,7 +239,8 @@
       <button
         type="button"
         mat-icon-button
-        [matTooltip]="'LNG_COMMON_BUTTON_REFRESH_LIST' | translate">
+        [matTooltip]="'LNG_COMMON_BUTTON_REFRESH_LIST' | translate"
+        (click)="refreshDataHandler()">
         <mat-icon>refresh</mat-icon>
       </button>
 
@@ -164,6 +266,7 @@
 
   <!-- Table -->
   <ag-grid-angular
+    #agTable
     class="ag-theme-balham gd-list-table-data"
     [rowData]="records"
     [columnDefs]="columnDefs"
@@ -174,17 +277,37 @@
     suppressRowClickSelection="true"
     suppressPropertyNamesCheck="true"
     enableCellTextSelection="true"
+    [loadingOverlayComponent]="V2LoadingComponent"
+    [noRowsOverlayComponent]="V2NoRowsComponent"
     (firstDataRendered)="firstDataRendered($event)">
   </ag-grid-angular>
+
+  <!-- Loading -->
+  <div
+    *ngIf="!V2LoadingComponent.loadingHtmlElement"
+    class="gd-list-table-data-loading">
+    <mat-progress-spinner
+      mode="indeterminate"
+      diameter="64"></mat-progress-spinner>
+  </div>
+
+  <!-- No rows -->
+  <div
+    *ngIf="!V2NoRowsComponent.noRowsHtmlElement"
+    class="gd-list-table-data-no-rows">
+    {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+  </div>
 
   <!-- Table paginator -->
   <div
     class="gd-list-table-bottom">
     <app-mat-paginator-extended
-      [pageIndex]="0"
-      [countData]="{count: 10, hasMore: true}"
-      [pageSize]="500"
-      [pageSizeOptions]="[50, 100, 500, 1000]">
+      [pageIndex]="pageIndex"
+      [countData]="pageCount"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="Constants.PAGE_SIZE_OPTIONS"
+      (page)="changePage($event)"
+      [loading]="loadingDataInProgress || !pageCount">
     </app-mat-paginator-extended>
   </div>
 

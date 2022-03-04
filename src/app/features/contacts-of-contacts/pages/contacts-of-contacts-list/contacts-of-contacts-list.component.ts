@@ -82,9 +82,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
   fieldsGroupListRelationships: LabelValuePair[];
   fieldsGroupListRelationshipsRequired: IExportFieldsGroupRequired;
 
-  // contacts outbreak
-  selectedOutbreak: OutbreakModel;
-
   // gender list
   genderList$: Observable<any[]>;
 

@@ -77,10 +77,10 @@
 
 <div fxLayout fxLayoutAlign="space-between end">
     <!--Total number of records from the list-->
-    <app-total-number-of-records
-        [value]="followUpsListCount$ | async"
-        (showAll)="refreshListCount(false)">
-    </app-total-number-of-records>
+<!--    <app-total-number-of-records-->
+<!--        [value]="followUpsListCount$ | async"-->
+<!--        (showAll)="refreshListCount(false)">-->
+<!--    </app-total-number-of-records>-->
 </div>
 
 <!-- Side filters -->
@@ -777,7 +777,7 @@
         [pageIndex]="pageIndex"
         [countData]="followUpsListCount$ | async"
         [pageSize]="pageSize"
-        [pageSizeOptions]="pageSizeOptions"
+        [pageSizeOptions]="[]"
         (page)="changePage($event)">
     </app-mat-paginator-extended>
 </mat-card>

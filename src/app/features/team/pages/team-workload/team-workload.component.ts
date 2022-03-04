@@ -33,8 +33,6 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
   // breadcrumbs
   // breadcrumbs: BreadcrumbItemModel[] = [];
 
-  selectedOutbreak: OutbreakModel;
-
   dates: string[] = [];
   teamsDataShow: ITeamMap[] = [];
   teamsData: ITeamMap[];
