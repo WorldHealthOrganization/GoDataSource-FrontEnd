@@ -1,17 +1,32 @@
-:host {
-  .gd-list-table-actions {
-    .gd-list-table-actions-action {
-      button.mat-icon-button,
-      a.mat-icon-button {
-        font-size: 1.6rem;
-        height: 2.4rem;
-        min-width: 2.4rem;
-        padding: 0.4rem;
-        width: 2.4rem;
+@import 'font';
 
-        .mat-icon {
-          font-size: 1.6rem;
+.cdk-overlay-pane {
+  .mat-menu-panel {
+    .gd-list-table-actions-action-menu-button {
+      &.gd-list-table-actions-action-menu-warning {
+        color: var(--gd-danger);
+
+        &:hover {
+          background: rgba(var(--gd-danger-rgb), 0.1);
+          color: var(--gd-danger);
         }
+      }
+    }
+  }
+}
+
+.gd-list-table-actions {
+  .gd-list-table-actions-action {
+    button.mat-icon-button,
+    a.mat-icon-button {
+      font-size: 1.6rem;
+      height: 2.4rem;
+      min-width: 2.4rem;
+      padding: 0.4rem;
+      width: 2.4rem;
+
+      .mat-icon {
+        font-size: 1.6rem;
       }
     }
   }

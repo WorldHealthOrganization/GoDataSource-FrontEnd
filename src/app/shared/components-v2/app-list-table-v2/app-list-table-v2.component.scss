@@ -2,6 +2,71 @@
 @import 'font';
 
 :host {
+  .gd-list-top-tile-buttons {
+    padding-bottom: 2.4rem;
+
+    .gd-list-top-tile-buttons-title {
+      color: var(--gd-primary);
+      font-family: $gd-font-family;
+      font-size: 2.4rem;
+      font-weight: 500;
+      line-height: $gd-line-height;
+    }
+
+    .gd-list-top-tile-buttons-buttons {
+      .gd-list-top-tile-buttons-button-grouped {
+        .mat-icon {
+          @include transition(all 0.24s ease-in-out 0s);
+        }
+
+        &.gd-list-top-tile-buttons-button-grouped-expanded {
+          .mat-icon {
+            @include rotate(180deg);
+          }
+        }
+      }
+
+      .gd-list-top-tile-buttons-button-quick {
+        .mat-icon {
+          @include transition(all 0.24s ease-in-out 0s);
+        }
+
+        &.gd-list-top-tile-buttons-button-quick-expanded {
+          .mat-icon {
+            @include rotate(180deg);
+          }
+        }
+      }
+    }
+  }
+
+  .gd-list-top-grouped {
+    min-height: 8.4rem;
+
+    .gd-list-top-grouped-data {
+      padding-bottom: 2.4rem;
+
+      .gd-list-top-grouped-data-value {
+        @include border-radius(0.8rem);
+        @include box-shadow(0 2px 4px -1px rgb(0 0 0 / 20%), 0 4px 5px 0 rgb(0 0 0 / 14%), 0 1px 10px 0 rgb(0 0 0 / 12%));
+        font-family: $gd-font-family;
+        line-height: $gd-line-height;
+        padding: 1.2rem 1.6rem;
+        width: 100%;
+
+        .gd-list-top-grouped-data-value-label {
+          font-size: 1.8rem;
+          font-weight: 500;
+        }
+
+        .gd-list-top-grouped-data-value-count {
+          font-size: 2.4rem;
+          font-weight: 700;
+        }
+      }
+    }
+  }
+
   .gd-list-table {
     .gd-list-table-header {
       padding: 1.6rem;
@@ -10,5 +75,6 @@
 
   .gd-list-table-bottom {
     @include border-radius(0 0 0.4rem 0.4rem);
+    min-height: 4.8rem;
   }
 }

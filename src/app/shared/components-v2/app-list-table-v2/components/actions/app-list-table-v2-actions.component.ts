@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/core';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { IAfterGuiAttachedParams, ICellRendererParams } from '@ag-grid-community/core';
 import { IExtendedColDef } from '../../models/extended-column.model';
@@ -12,6 +12,7 @@ import { V2Action, V2ActionType } from '../../models/action.model';
   selector: 'app-list-table-v2-actions',
   templateUrl: './app-list-table-v2-actions.component.html',
   styleUrls: ['./app-list-table-v2-actions.component.scss'],
+  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppListTableV2ActionsComponent implements ICellRendererAngularComp {
