@@ -3,16 +3,17 @@
   &:not(.gd-cdk-overlay-pane-main-menu) {
     .mat-menu-panel {
       max-height: 50vh;
-  
+
       .mat-menu-content:not(:empty) {
         padding: 0;
       }
-  
+
       .mat-menu-item {
+        color: var(--gd-text);
         font-family: $gd-font-family;
         height: 4rem;
         line-height: 4rem;
-  
+
         &:hover {
           background: rgba(var(--gd-primary-rgb), 0.1);
           color: var(--gd-primary);

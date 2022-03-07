@@ -67,9 +67,6 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     ClientSideRowModelModule
   ];
 
-  // loading in progress
-  loadingDataInProgress: boolean = false;
-
   // breadcrumbs
   @Input() breadcrumbs: IV2Breadcrumb[];
 
@@ -215,11 +212,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // retrieve data
     this.agTable.api.showLoadingOverlay();
-    this.loadingDataInProgress = true;
     this.recordsSubscription = this._records$.subscribe((data) => {
-      // finished
-      this.loadingDataInProgress = false;
-
       // set data & hide loading overlay
       this.records = data;
 

@@ -1,21 +1,9 @@
-<!-- Loading -->
-<div
-  *ngIf="loading; else pageInfo"
-  class="gd-list-table-header-left-loading">
-  <mat-progress-spinner
-    mode="indeterminate"
-    diameter="24">
-  </mat-progress-spinner>
-</div>
-
-<!-- Counted items -->
-<ng-template
-  #pageInfo>
-  <mat-paginator
-    [pageIndex]="pageIndex"
-    [length]="countData?.count"
-    [pageSize]="pageSize"
-    [pageSizeOptions]="pageSizeOptions"
-    (page)="page.emit($event)">
-  </mat-paginator>
-</ng-template>
+<mat-paginator
+  [class.gd-list-table-bottom-disabled]="disabled"
+  [pageIndex]="pageIndex"
+  [length]="countData?.count"
+  [pageSize]="pageSize"
+  [pageSizeOptions]="pageSizeOptions"
+  (page)="page.emit($event)"
+  [disabled]="disabled">
+</mat-paginator>

@@ -129,7 +129,7 @@ export class MatPaginatorExtendedComponent {
   @Input() pageSizeOptions: number[];
 
   // disabled
-  @Input() loading: boolean;
+  @Input() disabled: boolean = false;
 
   // events
   @Output() page: EventEmitter<PageEvent> = new EventEmitter<PageEvent>();

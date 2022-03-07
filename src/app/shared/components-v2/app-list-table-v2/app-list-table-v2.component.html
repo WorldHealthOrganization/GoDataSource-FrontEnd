@@ -311,7 +311,7 @@
       [pageSize]="pageSize"
       [pageSizeOptions]="Constants.PAGE_SIZE_OPTIONS"
       (page)="changePage($event)"
-      [loading]="loadingDataInProgress || !pageCount">
+      [disabled]="!pageCount">
     </app-mat-paginator-extended>
   </div>
 
