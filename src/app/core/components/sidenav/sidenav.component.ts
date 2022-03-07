@@ -670,18 +670,42 @@ export class SidenavComponent implements OnInit, OnDestroy {
    */
   mainMenuOpened(menuId: string): void {
     // retrieve parent element
-    let classList: any = document.querySelector(`.gd-main-menu-option-float-menu.${menuId}`);
-    classList = classList ?
-      classList.closest('.cdk-overlay-pane').classList :
-      classList;
+    const menuClassList: any = document.querySelector(`.gd-main-menu-option-float-menu.${menuId}`);
+    const overlayClassList: any = menuClassList ?
+      menuClassList.closest('.cdk-overlay-pane').classList :
+      menuClassList;
 
     // attach custom class
     if (
-      classList &&
-      !classList.contains('gd-cdk-overlay-pane-main-menu')
+      overlayClassList &&
+      !overlayClassList.contains('gd-cdk-overlay-pane-main-menu')
     ) {
-      classList.add('gd-cdk-overlay-pane-main-menu');
+      overlayClassList.add('gd-cdk-overlay-pane-main-menu');
     }
+
+    // make position adjustments
+    setTimeout(() => {
+      if (
+        menuClassList &&
+        menuClassList.classList
+      ) {
+        if (menuClassList.classList.contains('mat-menu-above')) {
+          if (
+            overlayClassList &&
+            !overlayClassList.contains('gd-cdk-overlay-pane-main-menu-above')
+          ) {
+            overlayClassList.add('gd-cdk-overlay-pane-main-menu-above');
+          }
+        } else {
+          if (
+            overlayClassList &&
+            overlayClassList.contains('gd-cdk-overlay-pane-main-menu-above')
+          ) {
+            overlayClassList.remove('gd-cdk-overlay-pane-main-menu-above');
+          }
+        }
+      }
+    });
   }
 
   /**
