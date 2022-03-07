@@ -21,6 +21,11 @@ app-sidenav {
   &.gd-cdk-overlay-pane-main-menu {
     margin-top: -4.8rem;
     margin-left: 7rem;
+
+    &.gd-cdk-overlay-pane-main-menu-above {
+      position: relative !important;
+      top: 4.8rem;
+    }
   }
 
   .mat-menu-panel {
