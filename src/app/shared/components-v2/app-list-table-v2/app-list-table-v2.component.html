@@ -197,13 +197,14 @@
 
       <!-- Counted items -->
       <ng-template
+        fxFlex fxLayout="row" fxLayoutAlign="start center"
         #pageInfo>
 
         <!-- Text -->
-        <span
+        <div
           class="gd-list-table-header-left-text">
           {{ (pageCount.hasMore ? ('LNG_COMMON_LABEL_PAGINATOR_COUNT_BEFORE_LENGTH' | translate) + ' ' : '') + (pageCount.count | number) + (' ' + ('LNG_COMMON_LABEL_PAGINATOR_COUNT_AFTER_LENGTH' | translate)) }}
-        </span>
+        </div>
 
         <!-- Determine total -->
         <ng-container

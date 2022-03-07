@@ -73,4 +73,8 @@
       width: 2rem;
     }
   }
+
+  &.gd-list-table-bottom-disabled {
+    @include opacity(0.5);
+  }
 }
