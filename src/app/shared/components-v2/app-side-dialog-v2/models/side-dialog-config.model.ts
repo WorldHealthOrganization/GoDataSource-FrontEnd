@@ -74,6 +74,7 @@ export interface IV2SideDialogConfig {
 
   // optional
   dontCloseOnBackdrop?: boolean;
+  hideInputFilter?: boolean;
 }
 
 /**

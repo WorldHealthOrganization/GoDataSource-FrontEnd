@@ -16,24 +16,47 @@
 
       <!-- Top Bar -->
       <div
-        fxGrow="0" fxLayout="row"
+        fxGrow="0" fxLayout="column"
         class="gd-app-side-dialog-v2-content-top">
 
-        <!-- Title -->
+        <!-- Title & Close button -->
         <div
-          class="gd-app-side-dialog-v2-content-top-title"
-          fxFlex>
-          {{config?.title | translate}}
+          fxLayout="row"
+          class="gd-app-side-dialog-v2-content-tb">
+
+          <!-- Title -->
+          <div
+            class="gd-app-side-dialog-v2-content-top-title"
+            fxFlex>
+            {{config?.title | translate}}
+          </div>
+
+          <!-- Close button -->
+          <button
+            class="gd-app-side-dialog-v2-content-top-close"
+            type="button"
+            mat-icon-button
+            (click)="hide(true)">
+            <mat-icon>close</mat-icon>
+          </button>
+
         </div>
 
-        <!-- Close button -->
-        <button
-          class="gd-app-side-dialog-v2-content-top-close"
-          type="button"
-          mat-icon-button
-          (click)="hide(true)">
-          <mat-icon>close</mat-icon>
-        </button>
+        <!-- Filter -->
+        <div
+          *ngIf="!config?.hideInputFilter"
+          class="gd-app-side-dialog-v2-content-filter">
+
+          <!-- Search -->
+          <app-form-input-v2
+            placeholder="LNG_COMMON_LABEL_SEARCH"
+            [(ngModel)]="filterByValue"
+            neverFloatLabel="true"
+            (ngModelChange)="filterInputs()"
+            autocomplete="off">
+          </app-form-input-v2>
+
+        </div>
 
       </div>
 
@@ -42,7 +65,7 @@
         fxFlex
         class="gd-app-side-dialog-v2-content-middle">
         <div
-          *ngFor="let input of config?.inputs"
+          *ngFor="let input of visibleInputs"
           class="gd-app-side-dialog-v2-content-middle-item">
           <div
             [ngSwitch]="input.type">

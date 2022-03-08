@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild, ViewE
 import { MatSidenav } from '@angular/material/sidenav';
 import { IV2SideDialogConfig, IV2SideDialogConfigButton, IV2SideDialogConfigButtonType, IV2SideDialogResponse, V2SideDialogConfigInput, V2SideDialogConfigInputType } from './models/side-dialog-config.model';
 import { Observable, Subscriber } from 'rxjs';
+import { I18nService } from '../../../core/services/helper/i18n.service';
 
 /**
  * Component
@@ -23,6 +24,12 @@ export class AppSideDialogV2Component {
   // used to handle responses back to client
   observer$: Subscriber<IV2SideDialogResponse>;
 
+  // filter by value
+  filterByValue: string;
+
+  // visible inputs
+  visibleInputs: V2SideDialogConfigInput[];
+
   // constants
   V2SideDialogConfigInputType = V2SideDialogConfigInputType;
 
@@ -30,7 +37,8 @@ export class AppSideDialogV2Component {
    * Constructor
    */
   constructor(
-    protected changeDetectorRef: ChangeDetectorRef
+    protected changeDetectorRef: ChangeDetectorRef,
+    protected i18nService: I18nService
   ) {}
 
   /**
@@ -44,6 +52,10 @@ export class AppSideDialogV2Component {
 
       // set data
       this.config = config;
+
+      // show all
+      this.filterByValue = '';
+      this.filterInputs();
 
       // show side nav
       this.sideNav.open();
@@ -123,5 +135,33 @@ export class AppSideDialogV2Component {
       button.key,
       this.config?.inputs
     );
+  }
+
+  /**
+   * Filter inputs
+   */
+  filterInputs(): void {
+    // nothing to filter ?
+    if (
+      !this.config?.inputs ||
+      this.config.inputs.length < 1
+    ) {
+      // reset
+      this.visibleInputs = undefined;
+
+      // finished
+      return;
+    }
+
+    // filter - case insensitive
+    this.filterByValue = this.filterByValue ?
+      this.filterByValue.toLowerCase() :
+      this.filterByValue;
+    this.visibleInputs = !this.filterByValue ?
+      this.config.inputs :
+      this.config.inputs.filter((item) =>
+        !item.placeholder ||
+        this.i18nService.instant(item.placeholder).toLowerCase().indexOf(this.filterByValue) > -1
+      );
   }
 }
