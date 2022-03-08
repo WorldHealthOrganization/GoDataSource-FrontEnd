@@ -30,6 +30,7 @@ interface IV2SideDialogConfigInput {
   // optional
   data?: any;
   visible?: (data: IV2SideDialogData, handler: IV2SideDialogHandler) => boolean;
+  disabled?: (data: IV2SideDialogData, handler: IV2SideDialogHandler) => boolean;
 }
 
 /**

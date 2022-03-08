@@ -179,10 +179,10 @@ export class DialogV2Service {
         name: 'fieldsGroupList',
         values: [],
         options: config.export.allow.groups.fields,
-        visible: (data): boolean => {
-          return !(data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked;
+        disabled: (data): boolean => {
+          return (data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked;
         },
-        // ..required map - #TODO
+        // ..required map - #TODO - config.export.allow.groups.required
       });
     }
 
@@ -202,8 +202,8 @@ export class DialogV2Service {
           placeholder: 'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS_NO_TRANSLATED_VALUES',
           name: 'dontTranslateValues',
           checked: false,
-          visible: (data): boolean => {
-            return (data.map.useDbColumns as IV2SideDialogConfigInputCheckbox).checked;
+          disabled: (data): boolean => {
+            return !(data.map.useDbColumns as IV2SideDialogConfigInputCheckbox).checked;
           }
         });
       }
@@ -216,8 +216,8 @@ export class DialogV2Service {
         placeholder: 'LNG_COMMON_LABEL_EXPORT_JSON_REPLACE_UNDEFINED_WITH_NULL',
         name: 'jsonReplaceUndefinedWithNull',
         checked: false,
-        visible: (data): boolean => {
-          return (data.map.fileType as IV2SideDialogConfigInputSingleDropdown).value === ExportDataExtension.JSON;
+        disabled: (data): boolean => {
+          return (data.map.fileType as IV2SideDialogConfigInputSingleDropdown).value !== ExportDataExtension.JSON;
         }
       });
     }
@@ -229,8 +229,8 @@ export class DialogV2Service {
         placeholder: 'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE',
         name: 'useQuestionVariable',
         checked: false,
-        visible: (data): boolean => {
-          return !(data.map.useDbColumns as IV2SideDialogConfigInputCheckbox).checked;
+        disabled: (data): boolean => {
+          return (data.map.useDbColumns as IV2SideDialogConfigInputCheckbox).checked;
         }
       });
     }
