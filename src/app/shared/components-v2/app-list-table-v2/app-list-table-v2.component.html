@@ -304,7 +304,7 @@
     [loadingOverlayComponent]="V2LoadingComponent"
     [noRowsOverlayComponent]="V2NoRowsComponent"
     (firstDataRendered)="firstDataRendered($event)"
-    (dragStopped)="saveVisibleAndOrderOfColumns()">
+    (dragStopped)="saveVisibleAndOrderOfColumns($event)">
   </ag-grid-angular>
 
   <!-- Loading -->

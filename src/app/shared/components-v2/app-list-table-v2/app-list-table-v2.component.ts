@@ -843,9 +843,14 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   /**
    * Save visible and order of columns
    */
-  saveVisibleAndOrderOfColumns(): void {
+  saveVisibleAndOrderOfColumns(e?: {
+    target: any
+  }): void {
     // nothing to do ?
-    if (!this._pageSettingsKey) {
+    if (
+      !this._pageSettingsKey ||
+      e?.target?.classList?.contains('ag-header-cell-resize')
+    ) {
       return;
     }
 
