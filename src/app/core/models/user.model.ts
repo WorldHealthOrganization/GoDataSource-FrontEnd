@@ -299,6 +299,11 @@ implements
           [];
       }
     });
+
+    // if dashboard settings are missing then add them
+    if (!this.settings[UserSettings.DASHBOARD]) {
+      this.settings[UserSettings.DASHBOARD] = new UserSettingsDashboardModel({});
+    }
   }
 
   /**
