@@ -53,7 +53,8 @@
             [(ngModel)]="filterByValue"
             neverFloatLabel="true"
             (ngModelChange)="filterInputs()"
-            autocomplete="off">
+            autocomplete="off"
+            [suffixIconButtons]="filterByValue ? filterSuffixIconButtons : undefined">
           </app-form-input-v2>
 
         </div>

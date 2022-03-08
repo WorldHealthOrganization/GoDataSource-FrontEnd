@@ -3,6 +3,7 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { IV2SideDialogConfig, IV2SideDialogConfigButton, IV2SideDialogConfigButtonType, IV2SideDialogResponse, V2SideDialogConfigInput, V2SideDialogConfigInputType } from './models/side-dialog-config.model';
 import { Observable, Subscriber } from 'rxjs';
 import { I18nService } from '../../../core/services/helper/i18n.service';
+import { AppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v2';
 
 /**
  * Component
@@ -29,6 +30,20 @@ export class AppSideDialogV2Component {
 
   // visible inputs
   visibleInputs: V2SideDialogConfigInput[];
+
+  // filter suffix buttons
+  filterSuffixIconButtons: AppFormIconButtonV2[] = [
+    new AppFormIconButtonV2({
+      icon: 'clear',
+      clickAction: () => {
+        // clear
+        this.filterByValue = undefined;
+
+        // filter
+        this.filterInputs();
+      }
+    })
+  ];
 
   // constants
   V2SideDialogConfigInputType = V2SideDialogConfigInputType;
