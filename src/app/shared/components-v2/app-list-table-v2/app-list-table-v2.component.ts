@@ -642,7 +642,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         const visibleMap: {
           [field: string]: true
         } = {};
-        response.data.forEach((item: IV2SideDialogConfigInputCheckbox) => {
+        response.data.inputs.forEach((item: IV2SideDialogConfigInputCheckbox) => {
           // change option
           const itemData = item.data as IV2Column;
           itemData.notVisible = !item.checked;

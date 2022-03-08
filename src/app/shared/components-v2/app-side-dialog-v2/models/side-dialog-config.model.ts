@@ -29,6 +29,7 @@ interface IV2SideDialogConfigInput {
 
   // optional
   data?: any;
+  visible?: (data: IV2SideDialogData, handler: IV2SideDialogHandler) => boolean;
 }
 
 /**
@@ -79,6 +80,13 @@ export interface IV2SideDialogConfigInputMultiDropdown extends IV2SideDialogConf
 export type V2SideDialogConfigInput = IV2SideDialogConfigInputCheckbox | IV2SideDialogConfigInputText | IV2SideDialogConfigInputSingleDropdown | IV2SideDialogConfigInputMultiDropdown;
 
 /**
+ * Side dialog inputs map
+ */
+export interface IV2SideDialogConfigInputMap {
+  [name: string]: V2SideDialogConfigInput
+}
+
+/**
  * Side dialog button type
  */
 export enum IV2SideDialogConfigButtonType {
@@ -124,6 +132,24 @@ export interface IV2SideDialog {
 }
 
 /**
+ * Dialog handler
+ */
+export interface IV2SideDialogHandler {
+  // required
+  hide: () => void,
+  detectChanges: () => void
+}
+
+/**
+ * Dialog handler
+ */
+export interface IV2SideDialogData {
+  // required
+  inputs: V2SideDialogConfigInput[];
+  map: IV2SideDialogConfigInputMap;
+}
+
+/**
  * Side dialog response
  */
 export interface IV2SideDialogResponse {
@@ -132,10 +158,8 @@ export interface IV2SideDialogResponse {
     type: IV2SideDialogConfigButtonType,
     key?: string
   };
-  handler: {
-    hide: () => void
-  };
+  handler: IV2SideDialogHandler;
 
   // optional
-  data?: V2SideDialogConfigInput[];
+  data?: IV2SideDialogData;
 }

@@ -1,6 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject, Subscriber } from 'rxjs';
-import { IV2SideDialog, IV2SideDialogConfig, IV2SideDialogResponse, V2SideDialogConfigAction, V2SideDialogConfigInput, V2SideDialogConfigInputType } from '../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import {
+  IV2SideDialog,
+  IV2SideDialogConfig, IV2SideDialogConfigButtonType, IV2SideDialogConfigInputCheckbox, IV2SideDialogConfigInputSingleDropdown,
+  IV2SideDialogResponse,
+  V2SideDialogConfigAction,
+  V2SideDialogConfigInput,
+  V2SideDialogConfigInputType
+} from '../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ExportStatusStep } from '../../models/constants';
 import { Moment } from 'moment';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
@@ -64,16 +71,21 @@ export interface IV2ExportDataConfig {
           [groupValue: string]: string[]
         }
       },
-      questionnaire?: boolean,
-      dbFields?: boolean,
-      jsonReplaceUndefinedWithNull?: boolean
+      dbColumns?: boolean,
+      dbValues?: boolean,
+      jsonReplaceUndefinedWithNull?: boolean,
+      questionnaireVariables?: boolean
     },
 
     // optional
     progress?: (data: IV2ExportDataConfigProgressAnswer) => void,
     start?: () => void,
     end?: () => void,
-    queryBuilder?: RequestQueryBuilder
+    queryBuilder?: RequestQueryBuilder,
+    inputs?: {
+      prepend?: V2SideDialogConfigInput[],
+      append?: V2SideDialogConfigInput[]
+    }
   }
 }
 
@@ -109,6 +121,11 @@ export class DialogV2Service {
     // construct list of inputs specific to export dialog
     const inputs: V2SideDialogConfigInput[] = [];
 
+    // extra fields - prepend ?
+    if (config.export.inputs?.prepend) {
+      inputs.push(...config.export.inputs.prepend);
+    }
+
     // attach export allowed file types
     inputs.push({
       type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
@@ -131,20 +148,6 @@ export class DialogV2Service {
       });
     }
 
-    // groups
-    if (config.export.allow.groups) {
-      // all
-      inputs.push({
-        type: V2SideDialogConfigInputType.CHECKBOX,
-        placeholder: 'LNG_COMMON_LABEL_EXPORT_FIELDS_GROUPS_ALL',
-        name: 'fieldsGroupAll',
-        checked: true
-      });
-
-      // specific
-      // #TODO
-    }
-
     // attach anonymize
     if (
       config.export.allow.anonymize &&
@@ -159,6 +162,84 @@ export class DialogV2Service {
       });
     }
 
+    // groups
+    if (config.export.allow.groups) {
+      // all
+      inputs.push({
+        type: V2SideDialogConfigInputType.CHECKBOX,
+        placeholder: 'LNG_COMMON_LABEL_EXPORT_FIELDS_GROUPS_ALL',
+        name: 'fieldsGroupAll',
+        checked: true
+      });
+
+      // specific groups
+      inputs.push({
+        type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
+        placeholder: 'LNG_COMMON_LABEL_EXPORT_FIELDS_GROUPS',
+        name: 'fieldsGroupList',
+        values: [],
+        options: config.export.allow.groups.fields,
+        visible: (data): boolean => {
+          return !(data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked;
+        },
+        // ..required map - #TODO
+      });
+    }
+
+    // use db field names as column headers
+    if (config.export.allow.dbColumns) {
+      inputs.push({
+        type: V2SideDialogConfigInputType.CHECKBOX,
+        placeholder: 'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS',
+        name: 'useDbColumns',
+        checked: false
+      });
+
+      // use db values instead of formatting them like translating tokens etc...
+      if (config.export.allow.dbValues) {
+        inputs.push({
+          type: V2SideDialogConfigInputType.CHECKBOX,
+          placeholder: 'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS_NO_TRANSLATED_VALUES',
+          name: 'dontTranslateValues',
+          checked: false,
+          visible: (data): boolean => {
+            return (data.map.useDbColumns as IV2SideDialogConfigInputCheckbox).checked;
+          }
+        });
+      }
+    }
+
+    // when json type is selected allow user to replace undefined values with null, so he gets all data
+    if (config.export.allow.jsonReplaceUndefinedWithNull) {
+      inputs.push({
+        type: V2SideDialogConfigInputType.CHECKBOX,
+        placeholder: 'LNG_COMMON_LABEL_EXPORT_JSON_REPLACE_UNDEFINED_WITH_NULL',
+        name: 'jsonReplaceUndefinedWithNull',
+        checked: false,
+        visible: (data): boolean => {
+          return (data.map.fileType as IV2SideDialogConfigInputSingleDropdown).value === ExportDataExtension.JSON;
+        }
+      });
+    }
+
+    // use question variables instead of translating them
+    if (config.export.allow.questionnaireVariables) {
+      inputs.push({
+        type: V2SideDialogConfigInputType.CHECKBOX,
+        placeholder: 'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE',
+        name: 'useQuestionVariable',
+        checked: false,
+        visible: (data): boolean => {
+          return !(data.map.useDbColumns as IV2SideDialogConfigInputCheckbox).checked;
+        }
+      });
+    }
+
+    // extra fields - append ?
+    if (config.export.inputs?.append) {
+      inputs.push(...config.export.inputs.append);
+    }
+
     // display dialog
     this._sideDialogSubject$
       .next({
@@ -166,7 +247,16 @@ export class DialogV2Service {
         config: {
           title: config.title,
           inputs: inputs,
-          bottomButtons: []
+          bottomButtons: [{
+            type: IV2SideDialogConfigButtonType.OTHER,
+            label: 'LNG_COMMON_LABEL_EXPORT',
+            color: 'primary',
+            key: 'export'
+          }, {
+            type: IV2SideDialogConfigButtonType.CANCEL,
+            label: 'cancel',
+            color: 'text'
+          }]
         },
         responseSubscriber: new Subscriber<IV2SideDialogResponse>((response) => {
           console.log(response);

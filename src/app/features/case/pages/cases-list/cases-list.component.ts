@@ -40,6 +40,8 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import { IV2BreadcrumbAction } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 
 @Component({
   selector: 'app-cases-list',
@@ -48,6 +50,11 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 export class CasesListComponent extends ListComponent implements OnInit, OnDestroy {
   // list of existing cases
   casesList$: Observable<CaseModel[]>;
+
+  // field groups
+  casesFieldGroups: ILabelValuePairModel[];
+
+
 
   // address model needed for filters
   filterAddressModel: AddressModel = new AddressModel({
@@ -272,6 +279,12 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       .subscribe((fieldsGroupList) => {
         this.fieldsGroupList = fieldsGroupList.toLabelValuePair(this.i18nService);
         this.fieldsGroupListRequired = fieldsGroupList.toRequiredList();
+
+        // set groups
+        this.casesFieldGroups = fieldsGroupList.options.map((item) => ({
+          label: item.name,
+          value: item.name
+        }));
       });
 
     // retrieve the list of export fields groups for relationships
@@ -1258,7 +1271,25 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                           value: 'responsibleUserId'
                         }
                       ]
-                    }
+                    },
+                    groups: {
+                      fields: this.casesFieldGroups,
+                      // required: - #TODO
+                    },
+                    dbColumns: true,
+                    dbValues: true,
+                    jsonReplaceUndefinedWithNull: true,
+                    questionnaireVariables: true
+                  },
+                  inputs: {
+                    append: [
+                      {
+                        type: V2SideDialogConfigInputType.CHECKBOX,
+                        placeholder: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION',
+                        name: 'includeContactFields',
+                        checked: false
+                      }
+                    ]
                   }
                 }
               });

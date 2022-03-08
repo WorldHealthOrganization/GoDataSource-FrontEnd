@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
-import { IV2SideDialogConfig, IV2SideDialogConfigButton, IV2SideDialogConfigButtonType, IV2SideDialogResponse, V2SideDialogConfigInput, V2SideDialogConfigInputType } from './models/side-dialog-config.model';
+import { IV2SideDialogConfig, IV2SideDialogConfigButton, IV2SideDialogConfigButtonType, IV2SideDialogData, IV2SideDialogResponse, V2SideDialogConfigInput, V2SideDialogConfigInputType } from './models/side-dialog-config.model';
 import { Observable, Subscriber } from 'rxjs';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { AppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v2';
@@ -21,6 +21,7 @@ export class AppSideDialogV2Component {
 
   // dialog config
   config: IV2SideDialogConfig;
+  dialogData: IV2SideDialogData;
 
   // used to handle responses back to client
   observer$: Subscriber<IV2SideDialogResponse>;
@@ -68,6 +69,15 @@ export class AppSideDialogV2Component {
       // set data
       this.config = config;
 
+      // map inputs
+      this.dialogData = {
+        inputs: this.config.inputs,
+        map: {}
+      };
+      this.config.inputs.forEach((input) => {
+        this.dialogData.map[input.name] = input;
+      });
+
       // show all
       this.filterByValue = '';
       this.filterInputs();
@@ -92,6 +102,12 @@ export class AppSideDialogV2Component {
     // close side nav
     this.sideNav.close();
 
+    // reset data
+    this.config = undefined;
+    this.filterByValue = undefined;
+    this.visibleInputs = undefined;
+    this.dialogData = undefined;
+
     // trigger response
     if (triggerResponse) {
       this.sendResponse(
@@ -107,7 +123,7 @@ export class AppSideDialogV2Component {
   private sendResponse(
     type: IV2SideDialogConfigButtonType,
     key: string,
-    data?: V2SideDialogConfigInput[]
+    data?: IV2SideDialogData
   ): void {
     // nothing to do ?
     if (!this.observer$) {
@@ -124,9 +140,16 @@ export class AppSideDialogV2Component {
 
       // handler
       handler: {
+        // hide dialog
         hide: () => {
           // hide without triggering action since it will be triggered bellow with other options
           this.hide();
+        },
+
+        // detect changes
+        detectChanges: () => {
+          // update UI
+          this.changeDetectorRef.detectChanges();
         }
       },
 
@@ -163,7 +186,7 @@ export class AppSideDialogV2Component {
     this.sendResponse(
       button.type,
       button.key,
-      this.config?.inputs
+      this.dialogData
     );
   }
 

@@ -69,6 +69,7 @@
           *ngFor="let input of visibleInputs"
           class="gd-app-side-dialog-v2-content-middle-item">
           <div
+            *ngIf="!input.visible || input.visible(dialogData)"
             [ngSwitch]="input.type">
 
             <!-- Checkbox -->
