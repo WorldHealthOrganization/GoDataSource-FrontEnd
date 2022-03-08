@@ -1,8 +1,9 @@
+import { Subscriber } from 'rxjs';
+import { ILabelValuePairModel } from '../../../forms-v2/core/label-value-pair.model';
+
 /**
  * Side dialog config
  */
-import { Subscriber } from 'rxjs';
-
 export enum V2SideDialogConfigAction {
   OPEN,
   CLOSE
@@ -12,7 +13,10 @@ export enum V2SideDialogConfigAction {
  * Side dialog input type
  */
 export enum V2SideDialogConfigInputType {
-  CHECKBOX
+  CHECKBOX,
+  TEXT,
+  DROPDOWN_SINGLE,
+  DROPDOWN_MULTI
 }
 
 /**
@@ -30,17 +34,49 @@ interface IV2SideDialogConfigInput {
 /**
  * Side dialog input - checkbox
  */
-interface IV2SideDialogConfigInputCheckbox extends IV2SideDialogConfigInput {
+export interface IV2SideDialogConfigInputCheckbox extends IV2SideDialogConfigInput {
   // required
   type: V2SideDialogConfigInputType.CHECKBOX;
-  checked: boolean;
   placeholder: string;
+  checked: boolean;
+}
+
+/**
+ * Side dialog input - text
+ */
+export interface IV2SideDialogConfigInputText extends IV2SideDialogConfigInput {
+  // required
+  type: V2SideDialogConfigInputType.TEXT;
+  placeholder: string;
+  value: string;
+}
+
+/**
+ * Side dialog input - dropdown single
+ */
+export interface IV2SideDialogConfigInputSingleDropdown extends IV2SideDialogConfigInput {
+  // required
+  type: V2SideDialogConfigInputType.DROPDOWN_SINGLE;
+  placeholder: string;
+  options: ILabelValuePairModel[];
+  value: string;
+}
+
+/**
+ * Side dialog input - dropdown multiple
+ */
+export interface IV2SideDialogConfigInputMultiDropdown extends IV2SideDialogConfigInput {
+  // required
+  type: V2SideDialogConfigInputType.DROPDOWN_MULTI;
+  placeholder: string;
+  options: ILabelValuePairModel[];
+  values: string[];
 }
 
 /**
  * Side dialog inputs
  */
-export type V2SideDialogConfigInput = IV2SideDialogConfigInputCheckbox;
+export type V2SideDialogConfigInput = IV2SideDialogConfigInputCheckbox | IV2SideDialogConfigInputText | IV2SideDialogConfigInputSingleDropdown | IV2SideDialogConfigInputMultiDropdown;
 
 /**
  * Side dialog button type
@@ -95,6 +131,9 @@ export interface IV2SideDialogResponse {
   button: {
     type: IV2SideDialogConfigButtonType,
     key?: string
+  };
+  handler: {
+    hide: () => void
   };
 
   // optional

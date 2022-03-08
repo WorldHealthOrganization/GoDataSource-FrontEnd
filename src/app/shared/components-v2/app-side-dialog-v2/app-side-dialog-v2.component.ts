@@ -109,12 +109,25 @@ export class AppSideDialogV2Component {
     key: string,
     data?: V2SideDialogConfigInput[]
   ): void {
+    // nothing to do ?
+    if (!this.observer$) {
+      return;
+    }
+
     // send response
     this.observer$.next({
       // clicked button
       button: {
         type,
         key
+      },
+
+      // handler
+      handler: {
+        hide: () => {
+          // hide without triggering action since it will be triggered bellow with other options
+          this.hide();
+        }
       },
 
       // response
@@ -144,9 +157,6 @@ export class AppSideDialogV2Component {
       // finished
       return;
     }
-
-    // hide without triggering action since it will be triggered bellow with other options
-    this.hide();
 
     // other button
     // - include response data too

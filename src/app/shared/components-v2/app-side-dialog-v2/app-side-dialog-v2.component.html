@@ -78,6 +78,30 @@
               [(ngModel)]="input.checked"
               [placeholder]="input.placeholder"></app-form-checkbox-v2>
 
+            <!-- Text -->
+            <app-form-input-v2
+              *ngSwitchCase="V2SideDialogConfigInputType.TEXT"
+              class="gd-app-side-dialog-v2-content-middle-item-input"
+              [(ngModel)]="input.value"
+              [placeholder]="input.placeholder"></app-form-input-v2>
+
+            <!-- Dropdown - single -->
+            <app-form-select-v2
+              *ngSwitchCase="V2SideDialogConfigInputType.DROPDOWN_SINGLE"
+              class="gd-app-side-dialog-v2-content-middle-item-input"
+              [(ngModel)]="input.value"
+              [placeholder]="input.placeholder"
+              [options]="input.options"></app-form-select-v2>
+
+            <!-- Dropdown - multiple -->
+            <app-form-select-v2
+              *ngSwitchCase="V2SideDialogConfigInputType.DROPDOWN_MULTI"
+              class="gd-app-side-dialog-v2-content-middle-item-input"
+              [(ngModel)]="input.values"
+              [placeholder]="input.placeholder"
+              [options]="input.options"
+              [multiple]="true"></app-form-select-v2>
+
           </div>
         </div>
       </div>

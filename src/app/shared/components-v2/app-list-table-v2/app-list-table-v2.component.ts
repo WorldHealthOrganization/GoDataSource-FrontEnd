@@ -23,7 +23,7 @@ import { V2NoRowsComponent } from './models/no-rows.component';
 import { IBasicCount } from '../../../core/models/basic-count.interface';
 import { PageEvent } from '@angular/material/paginator';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
-import { IV2SideDialogConfigButtonType, V2SideDialogConfigInput, V2SideDialogConfigInputType } from '../app-side-dialog-v2/models/side-dialog-config.model';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputCheckbox, V2SideDialogConfigInput, V2SideDialogConfigInputType } from '../app-side-dialog-v2/models/side-dialog-config.model';
 import { UserModel, UserSettings } from '../../../core/models/user.model';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { catchError } from 'rxjs/operators';
@@ -635,11 +635,14 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           return;
         }
 
+        // close dialog
+        response.handler.hide();
+
         // set visible column on table to see the effects right away
         const visibleMap: {
           [field: string]: true
         } = {};
-        response.data.forEach((item) => {
+        response.data.forEach((item: IV2SideDialogConfigInputCheckbox) => {
           // change option
           const itemData = item.data as IV2Column;
           itemData.notVisible = !item.checked;

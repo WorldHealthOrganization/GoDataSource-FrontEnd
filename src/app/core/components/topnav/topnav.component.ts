@@ -4,12 +4,12 @@ import { UserModel } from '../../models/user.model';
 import { AuthDataService } from '../../services/data/auth.data.service';
 import { OutbreakDataService } from '../../services/data/outbreak.data.service';
 import { OutbreakModel } from '../../models/outbreak.model';
-import { LabelValuePairModel } from '../../../shared/forms-v2/core/label-value-pair.model';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { SnackbarService } from '../../services/helper/snackbar.service';
 import { DialogService } from '../../services/helper/dialog.service';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { ILabelValuePairModel } from '../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
   selector: 'app-topnav',
@@ -47,7 +47,7 @@ export class TopnavComponent implements OnInit, OnDestroy {
   getSelectedOutbreakSubject: Subscription;
 
   // outbreak list
-  outbreakListOptions: LabelValuePairModel[] = [];
+  outbreakListOptions: ILabelValuePairModel[] = [];
 
   /**
    * Constructor
@@ -116,12 +116,12 @@ export class TopnavComponent implements OnInit, OnDestroy {
           }
 
           // add to outbreak list of items
-          this.outbreakListOptions.push(new LabelValuePairModel({
+          this.outbreakListOptions.push({
             label: outbreak.name,
             value: outbreak.id,
             icon: icon,
             data: outbreak
-          }));
+          });
         });
       });
   }

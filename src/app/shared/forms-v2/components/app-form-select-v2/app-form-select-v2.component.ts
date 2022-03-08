@@ -10,8 +10,8 @@ import {
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
-import { LabelValuePairModel } from '../../core/label-value-pair.model';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+import { ILabelValuePairModel } from '../../core/label-value-pair.model';
 
 @Component({
   selector: 'app-form-select-v2',
@@ -38,14 +38,31 @@ export class AppFormSelectV2Component
   @Input() optionTooltipKey: string;
 
   // options
-  filteredOptions: LabelValuePairModel[];
+  filteredOptions: ILabelValuePairModel[];
   allOptionsMap: {
-    [value: string]: LabelValuePairModel
+    [value: string]: ILabelValuePairModel
   } = {};
-  private allOptions: LabelValuePairModel[];
-  @Input() set options(options: LabelValuePairModel[]) {
+  private allOptions: ILabelValuePairModel[];
+  @Input() set options(options: ILabelValuePairModel[]) {
     // set all options
     this.allOptions = options;
+
+    // translate options and sort
+    if (this.allOptions) {
+      // translate
+      this.allOptions
+        .forEach((item) => {
+          item.label = item.label ?
+            this.translateService.instant(item.label) :
+            item.label;
+        });
+
+      // sort
+      this.allOptions
+        .sort((item1, item2) => {
+          return item1.label.toLowerCase().localeCompare(item2.label.toLowerCase());
+        });
+    }
 
     // map for easy access
     this.allOptionsMap = {};
@@ -56,7 +73,7 @@ export class AppFormSelectV2Component
     // filter options
     this.filterOptions();
   }
-  get options(): LabelValuePairModel[] {
+  get options(): ILabelValuePairModel[] {
     return this.allOptions;
   }
 
@@ -113,7 +130,7 @@ export class AppFormSelectV2Component
     byValue = byValue.toLowerCase();
 
     // filter
-    this.filteredOptions = this.options.filter((item: LabelValuePairModel): boolean => {
+    this.filteredOptions = this.options.filter((item: ILabelValuePairModel): boolean => {
       return item.label.toLowerCase().indexOf(byValue) > -1;
     });
   }
