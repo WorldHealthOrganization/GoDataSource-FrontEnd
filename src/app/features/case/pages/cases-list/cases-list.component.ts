@@ -9,7 +9,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton, DialogField, DialogFieldType } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { Constants } from '../../../../core/models/constants';
+import { ApplyListFilter, Constants } from '../../../../core/models/constants';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
@@ -38,6 +38,7 @@ import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
+import { IV2BreadcrumbAction } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 
 @Component({
   selector: 'app-cases-list',
@@ -1485,6 +1486,22 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    * Initialize breadcrumbs
    */
   initializeBreadcrumbs(): void {
+    // determine if cases page should be linkable
+    let casesAction: IV2BreadcrumbAction = null;
+
+    // if we have an applied filter then we need to add breadcrumb
+    if (this.appliedListFilter === ApplyListFilter.CASES_WITHOUT_RELATIONSHIPS) {
+      // since we need to send user to the same page we need to do some hacks...
+      const redirect = this.redirectService.linkAndQueryParams(
+        ['/cases']
+      );
+      casesAction = {
+        link: redirect.link(),
+        linkQueryParams: redirect.linkQueryParams()
+      };
+    }
+
+    // set breadcrumbs
     this.breadcrumbs = [
       {
         label: 'LNG_COMMON_LABEL_HOME',
@@ -1495,9 +1512,17 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         }
       }, {
         label: 'LNG_PAGE_LIST_CASES_TITLE',
-        action: null
+        action: casesAction
       }
     ];
+
+    // if we have an applied filter then we need to add breadcrumb
+    if (this.appliedListFilter === ApplyListFilter.CASES_WITHOUT_RELATIONSHIPS) {
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_DASHBOARD_CASES_WITHOUT_RELATIONSHIPS',
+        action: null
+      });
+    }
   }
 
   /**
