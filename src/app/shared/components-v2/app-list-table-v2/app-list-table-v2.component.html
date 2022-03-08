@@ -78,16 +78,35 @@
               *ngIf="!menuOption.visible || menuOption.visible(null)">
 
               <!-- Child Menu link -->
-              <a
-                *ngIf="menuOption.label; else divider"
-                mat-menu-item
-                class="d-list-top-tile-buttons-button-quick-options-option {{menuOption.cssClasses}}"
-                [routerLink]="menuOption.action.link && (!menuOption.disable || !menuOption.disable(null)) ? menuOption.action.link(null) : undefined"
-                [queryParams]="menuOption.action.linkQueryParams ? menuOption.action.linkQueryParams(null) : undefined"
-                [disabled]="menuOption.disable && menuOption.disable(null)"
-                (click)="menuOption.action.click ? menuOption.action.click(null) : undefined">
-                {{menuOption.label | translate}}
-              </a>
+              <ng-container
+                *ngIf="menuOption.label; else divider">
+
+                <!-- Link -->
+                <a
+                  *ngIf="menuOption.action.link; else notLink"
+                  mat-menu-item
+                  class="d-list-top-tile-buttons-button-quick-options-option {{menuOption.cssClasses}}"
+                  [routerLink]="menuOption.action.link && (!menuOption.disable || !menuOption.disable(null)) ? menuOption.action.link(null) : undefined"
+                  [queryParams]="menuOption.action.linkQueryParams ? menuOption.action.linkQueryParams(null) : undefined"
+                  [disabled]="menuOption.disable && menuOption.disable(null)">
+                  {{menuOption.label | translate}}
+                </a>
+
+                <!-- Button -->
+                <ng-template
+                  #notLink>
+                  <button
+                    type="button"
+                    mat-menu-item
+                    class="d-list-top-tile-buttons-button-quick-options-option {{menuOption.cssClasses}}"
+                    [disabled]="menuOption.disable && menuOption.disable(null)"
+                    (click)="menuOption.action.click ? menuOption.action.click(null) : undefined">
+                    {{menuOption.label | translate}}
+                  </button>
+                </ng-template>
+
+              </ng-container>
+
 
               <!-- Divider -->
               <ng-template
