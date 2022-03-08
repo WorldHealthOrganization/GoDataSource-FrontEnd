@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { IV2SideDialogConfig, IV2SideDialogConfigButton, IV2SideDialogConfigButtonType, IV2SideDialogResponse, V2SideDialogConfigInput, V2SideDialogConfigInputType } from './models/side-dialog-config.model';
 import { Observable, Subscriber } from 'rxjs';
@@ -84,6 +84,11 @@ export class AppSideDialogV2Component {
    * Hide sidenav
    */
   hide(triggerResponse?: boolean): void {
+    // nothing to do ?
+    if (!this.sideNav.opened) {
+      return;
+    }
+
     // close side nav
     this.sideNav.close();
 
@@ -178,5 +183,23 @@ export class AppSideDialogV2Component {
         !item.placeholder ||
         this.i18nService.instant(item.placeholder).toLowerCase().indexOf(this.filterByValue) > -1
       );
+  }
+
+  /**
+   * Listen for keys
+   */
+  @HostListener('document:keydown', ['$event'])
+  onKeydownHandler(keysEvent: KeyboardEvent) {
+    // no need to do anything ?
+    if (this.config?.dontCloseOnBackdrop) {
+      return;
+    }
+
+    // close on escape
+    switch (keysEvent.code) {
+      case 'Escape':
+        this.hide(true);
+        break;
+    }
   }
 }
