@@ -20,7 +20,7 @@ import { moment, Moment } from './x-moment';
 import { ListHelperService } from '../services/helper/list-helper.service';
 import { SubscriptionLike } from 'rxjs/internal/types';
 import { StorageKey } from '../services/helper/storage.service';
-import { UserModel } from '../models/user.model';
+import { UserModel, UserSettings } from '../models/user.model';
 import { ValueAccessorBase } from '../../shared/xt-forms/core';
 import { SavedFilterData } from '../models/saved-filters.model';
 import * as LzString from 'lz-string';
@@ -115,6 +115,9 @@ export abstract class ListComponent implements OnDestroy {
   // page information
   pageCount: IBasicCount;
   pageIndex: number = 0;
+
+  // constants
+  UserSettings = UserSettings;
 
 
 

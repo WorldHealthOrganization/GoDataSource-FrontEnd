@@ -53,6 +53,7 @@ import { ListHelperService } from './helper/list-helper.service';
 import { ImportLogDataService } from './data/import-log.data.service';
 import { ImportResultDataService } from './data/import-result.data.service';
 import { ExportLogDataService } from './data/export-log.data.service';
+import { DialogV2Service } from './helper/dialog-v2.service';
 
 // export the list of services
 export const services: any[] = [
@@ -114,6 +115,7 @@ export const services: any[] = [
   I18nService,
   CacheService,
   DialogService,
+  DialogV2Service,
   DomService,
   RedirectService,
   EntityHelperService,

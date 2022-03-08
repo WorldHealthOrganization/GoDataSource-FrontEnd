@@ -492,10 +492,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
      * Persist user's settings for the dashboard
      */
   private persistUserDashboardSettings(): Observable<any> {
-    return this.authDataService.updateSettingsForCurrentUser(
-      UserSettings.DASHBOARD,
-      this.authUser.getSettings(UserSettings.DASHBOARD)
-    );
+    return this.authDataService.updateSettingsForCurrentUser({
+      [UserSettings.DASHBOARD]: this.authUser.getSettings(UserSettings.DASHBOARD)
+    });
   }
 
   /**

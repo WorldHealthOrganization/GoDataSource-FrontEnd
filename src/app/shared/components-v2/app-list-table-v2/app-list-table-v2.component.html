@@ -248,21 +248,21 @@
         <mat-icon>refresh</mat-icon>
       </button>
 
-      <!-- Pinned columns -->
-      <button
-        type="button"
-        mat-icon-button
-        [matTooltip]="'LNG_COMMON_BUTTON_PINNED_COLUMNS_LIST' | translate">
-        <mat-icon>push_pin</mat-icon>
-      </button>
-
       <!-- Visible columns -->
       <button
         type="button"
         mat-icon-button
         [matTooltip]="'LNG_SIDE_COLUMNS_SECTION_COLUMNS_TO_DISPLAY_TITLE' | translate"
-        (click)="setVisibleColumns()">
-        <mat-icon>view_column</mat-icon>
+        (click)="setVisibleColumns()"
+        [disabled]="savingColumns">
+        <mat-icon
+          *ngIf="!savingColumns; else savingColumnsProgress">view_column</mat-icon>
+        <ng-template
+          #savingColumnsProgress>
+          <mat-progress-spinner
+            mode="indeterminate"
+            diameter="16"></mat-progress-spinner>
+        </ng-template>
       </button>
 
     </div>
@@ -281,9 +281,11 @@
     suppressRowClickSelection="true"
     suppressPropertyNamesCheck="true"
     enableCellTextSelection="true"
+    suppressDragLeaveHidesColumns="true"
     [loadingOverlayComponent]="V2LoadingComponent"
     [noRowsOverlayComponent]="V2NoRowsComponent"
-    (firstDataRendered)="firstDataRendered($event)">
+    (firstDataRendered)="firstDataRendered($event)"
+    (dragStopped)="saveVisibleAndOrderOfColumns()">
   </ag-grid-angular>
 
   <!-- Loading -->

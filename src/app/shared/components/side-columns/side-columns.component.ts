@@ -236,10 +236,9 @@ export class SideColumnsComponent {
 
     // save visible columns
     this.loading = true;
-    this.authDataService.updateSettingsForCurrentUser(
-      this.tableColumnsUserSettingsKey,
-      this.visibleSaveTableColumns
-    ).subscribe(() => {
+    this.authDataService.updateSettingsForCurrentUser({
+      [this.tableColumnsUserSettingsKey]: this.visibleSaveTableColumns
+    }).subscribe(() => {
       this.loading = false;
     });
 

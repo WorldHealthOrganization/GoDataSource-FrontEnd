@@ -1,8 +1,12 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { UserModel } from '../../models/user.model';
 import { AuthDataService } from '../../services/data/auth.data.service';
 import { OutbreakModel } from '../../models/outbreak.model';
 import { OutbreakDataService } from '../../services/data/outbreak.data.service';
+import { AppSideDialogV2Component } from '../../../shared/components-v2/app-side-dialog-v2/app-side-dialog-v2.component';
+import { DialogV2Service } from '../../services/helper/dialog-v2.service';
+import { Subscription } from 'rxjs/internal/Subscription';
+import { V2SideDialogConfigAction } from '../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 // import { NavigationEnd, NavigationStart, RouteConfigLoadEnd, RouteConfigLoadStart, Router } from '@angular/router';
 // import { AuthDataService } from '../../services/data/auth.data.service';
 // import { UserModel } from '../../models/user.model';
@@ -34,6 +38,12 @@ import { OutbreakDataService } from '../../services/data/outbreak.data.service';
   styleUrls: ['./authenticated.component.scss']
 })
 export class AuthenticatedComponent implements OnInit, OnDestroy {
+  // Side Nav
+  @ViewChild('sideDialog', { static: true }) sideDialog: AppSideDialogV2Component;
+
+  // subscriptions
+  sideDialogSubjectSubscription: Subscription;
+
   // expand menu
   expandMenu: boolean = false;
 
@@ -113,7 +123,8 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
      */
   constructor(
     private authDataService: AuthDataService,
-    private outbreakDataService: OutbreakDataService
+    private outbreakDataService: OutbreakDataService,
+    private dialogV2Service: DialogV2Service
     // private router: Router,
     // private referenceDataDataService: ReferenceDataDataService,
     // private helpDataService: HelpDataService,
@@ -158,6 +169,28 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
 
     // // handle auth token expire popup
     // this.initializeTokenExpireHandler();
+
+    // used to handle side dialog requests
+    this.sideDialogSubjectSubscription = this.dialogV2Service.sideDialogSubject$
+      .subscribe((data) => {
+        // hide dialog
+        if (data.action === V2SideDialogConfigAction.CLOSE) {
+          // show dialog
+          this.sideDialog.hide();
+
+          // finished
+          return;
+        }
+
+        // show dialog
+        this.sideDialog
+          .show(data.config)
+          .subscribe((response) => {
+            data.responseSubscriber.next(response);
+            data.responseSubscriber.complete();
+            data.responseSubscriber = undefined;
+          });
+      });
 
     // determine the Selected Outbreak and display message if different than the active one.
     if (OutbreakModel.canView(this.authUser)) {
@@ -235,6 +268,12 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
    * Component destroyed
    */
   ngOnDestroy(): void {
+    // release side dialog subscription
+    if (this.sideDialogSubjectSubscription) {
+      this.sideDialogSubjectSubscription.unsubscribe();
+      this.sideDialogSubjectSubscription = undefined;
+    }
+
     /*
     // hide loading in case it is still visible
     this.hideLoading();

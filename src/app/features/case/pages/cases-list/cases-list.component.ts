@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription, throwError } from 'rxjs';
-import { UserModel, UserSettings } from '../../../../core/models/user.model';
+import { UserModel } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
@@ -92,7 +92,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   // provide constants to template
   Constants = Constants;
   EntityType = EntityType;
-  UserSettings = UserSettings;
   ReferenceDataCategory = ReferenceDataCategory;
   LabResultModel = LabResultModel;
   CaseModel = CaseModel;

@@ -1,0 +1,80 @@
+<mat-sidenav-container
+  class="gd-app-side-dialog-v2"
+  hasBackdrop="true"
+  (backdropClick)="config?.dontCloseOnBackdrop ? undefined : hide(true)">
+  <mat-sidenav
+    #sideNav
+    mode="over"
+    fixedInViewport
+    position="end"
+    [disableClose]="config?.dontCloseOnBackdrop">
+
+    <!-- Sidenav content -->
+    <div
+      class="gd-app-side-dialog-v2-content"
+      fxLayout="column">
+
+      <!-- Top Bar -->
+      <div
+        fxGrow="0" fxLayout="row"
+        class="gd-app-side-dialog-v2-content-top">
+
+        <!-- Title -->
+        <div
+          class="gd-app-side-dialog-v2-content-top-title"
+          fxFlex>
+          {{config?.title | translate}}
+        </div>
+
+        <!-- Close button -->
+        <button
+          class="gd-app-side-dialog-v2-content-top-close"
+          type="button"
+          mat-icon-button
+          (click)="hide(true)">
+          <mat-icon>close</mat-icon>
+        </button>
+
+      </div>
+
+      <!-- Inputs -->
+      <div
+        fxFlex
+        class="gd-app-side-dialog-v2-content-middle">
+        <div
+          *ngFor="let input of config?.inputs"
+          class="gd-app-side-dialog-v2-content-middle-item">
+          <div
+            [ngSwitch]="input.type">
+
+            <!-- Checkbox -->
+            <app-form-checkbox-v2
+              *ngSwitchCase="V2SideDialogConfigInputType.CHECKBOX"
+              class="gd-app-side-dialog-v2-content-middle-item-input"
+              [(ngModel)]="input.checked"
+              [placeholder]="input.placeholder"></app-form-checkbox-v2>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Bar -->
+      <div
+        fxGrow="0" fxLayout="row" fxLayoutAlign="end"
+        class="gd-app-side-dialog-v2-content-bottom">
+
+        <!-- Buttons -->
+        <button
+          *ngFor="let button of config?.bottomButtons"
+          type="button"
+          mat-flat-button [color]="button.color"
+          class="gd-app-side-dialog-v2-content-bottom-button"
+          (click)="clickedButton(button)">
+          {{button.label | translate}}
+        </button>
+
+      </div>
+    </div>
+
+  </mat-sidenav>
+</mat-sidenav-container>
