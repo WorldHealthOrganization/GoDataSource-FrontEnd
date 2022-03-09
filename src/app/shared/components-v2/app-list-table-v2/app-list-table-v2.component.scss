@@ -41,27 +41,50 @@
   }
 
   .gd-list-top-grouped {
-    min-height: 8.4rem;
+    min-height: 2.4rem;
 
     .gd-list-top-grouped-data {
       padding-bottom: 2.4rem;
 
       .gd-list-top-grouped-data-value {
         @include border-radius(0.8rem);
-        @include box-shadow(0 2px 4px -1px rgb(0 0 0 / 20%), 0 4px 5px 0 rgb(0 0 0 / 14%), 0 1px 10px 0 rgb(0 0 0 / 12%));
+        @include box-shadow(0 0.2rem 0.4rem -0.1rem rgba(0 0 0 / 20%),
+                            0 0.4rem 0.5rem 0 rgb(0 0 0 / 14%),
+                            0 0.1rem 1rem 0 rgb(0 0 0 / 12%));
         font-family: $gd-font-family;
         line-height: $gd-line-height;
         padding: 1.2rem 1.6rem;
+        position: relative;
         width: 100%;
+
+        &:after {
+          background: -moz-linear-gradient(left,  rgba(var(--gd-background-rgb), 0) 0%, rgba(var(--gd-background-rgb), 0.5) 100%);
+          background: -webkit-linear-gradient(left,  rgba(var(--gd-background-rgb), 0) 0%,rgba(var(--gd-background-rgb), 0.5) 100%);
+          background: linear-gradient(to right,  rgba(var(--gd-background-rgb), 0) 0%,rgba(var(--gd-background-rgb), 0.5) 100%);
+          filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00ffffff', endColorstr='#ffffff',GradientType=1 );
+          content: '';
+          @include border-radius(0.8rem);
+          display: block;
+          height: 100%;
+          left: 0;
+          position: absolute;
+          top: 0;
+          width: 100%;
+          z-index: 7;
+        }
 
         .gd-list-top-grouped-data-value-label {
           font-size: 1.8rem;
           font-weight: 500;
+          position: relative;
+          z-index: 10;
         }
 
         .gd-list-top-grouped-data-value-count {
           font-size: 2.4rem;
           font-weight: 700;
+          position: relative;
+          z-index: 10;
         }
       }
     }
@@ -70,6 +93,29 @@
   .gd-list-table {
     .gd-list-table-header {
       padding: 1.6rem;
+
+      .gd-list-table-header-left-text {
+        margin-right: 0.4rem;
+
+        &::first-letter {
+          text-transform: capitalize;
+        }
+      }
+
+      .gd-list-table-header-left-show-total {
+        line-height: $gd-line-height;
+        padding: 0 0.2rem;
+        @include transition(color 0.24s ease-in-out 0s);
+
+        &:hover,
+        &:focus {
+          color: var(--gd-primary-alt);
+        }
+
+        &:active {
+          color: var(--gd-primary);
+        }
+      }
     }
   }
 

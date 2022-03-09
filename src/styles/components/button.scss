@@ -37,7 +37,7 @@ a.mat-flat-button {
     color: var(--gd-background);
 
     &.mat-button-disabled {
-      background-color: rgba(var(--gd-primary-rgb), 0.15);
+      background-color: rgba(var(--gd-primary-rgb), 0.25);
       color: var(--gd-background);
     }
   }
@@ -47,7 +47,7 @@ a.mat-flat-button {
     color: var(--gd-text);
 
     &.mat-button-disabled {
-      background-color: rgba(var(--gd-secondary-rgb), 0.15);
+      background-color: rgba(var(--gd-secondary-rgb), 0.25);
       color: var(--gd-secondary);
     }
   }
@@ -57,7 +57,7 @@ a.mat-flat-button {
     color: var(--gd-background);
 
     &.mat-button-disabled {
-      background-color: rgba(var(--gd-success-rgb), 0.15);
+      background-color: rgba(var(--gd-success-rgb), 0.25);
       color: var(--gd-background);
     }
   }
@@ -67,7 +67,7 @@ a.mat-flat-button {
     color: var(--gd-background);
 
     &.mat-button-disabled {
-      background-color: rgba(var(--gd-danger-rgb), 0.15);
+      background-color: rgba(var(--gd-danger-rgb), 0.25);
       color: var(--gd-background);
     }
   }

@@ -218,21 +218,25 @@
       <ng-template
         #pageInfo>
 
-        <!-- Text -->
-        <span
-          class="gd-list-table-header-left-text">
-          {{ (pageCount.hasMore ? ('LNG_COMMON_LABEL_PAGINATOR_COUNT_BEFORE_LENGTH' | translate) + ' ' : '') + (pageCount.count | number) + (' ' + ('LNG_COMMON_LABEL_PAGINATOR_COUNT_AFTER_LENGTH' | translate)) }}
-        </span>
+        <div
+          fxFlex fxLayout="row" fxLayoutAlign="start center">
+          
+          <!-- Text -->
+          <div
+            class="gd-list-table-header-left-text">
+            {{ (pageCount.hasMore ? ('LNG_COMMON_LABEL_PAGINATOR_COUNT_BEFORE_LENGTH' | translate) + ' ' : '') + (pageCount.count | number) + (' ' + ('LNG_COMMON_LABEL_PAGINATOR_COUNT_AFTER_LENGTH' | translate)) }}
+          </div>
 
-        <!-- Determine total -->
-        <ng-container
-          *ngIf="pageCount.hasMore">
-          (<button
-            class="gd-list-table-header-left-show-total"
-            type="button"
-            mat-flat-button color="text"
-            (click)="refreshDataCountHandler()">{{'LNG_COMMON_LABEL_PAGINATOR_SHOW_EXACT_COUNT' | translate}}</button>)
-        </ng-container>
+          <!-- Determine total -->
+          <ng-container
+            *ngIf="pageCount.hasMore">
+            (<button
+              class="gd-list-table-header-left-show-total"
+              type="button"
+              mat-flat-button color="text"
+              (click)="refreshDataCountHandler()">{{'LNG_COMMON_LABEL_PAGINATOR_SHOW_EXACT_COUNT' | translate}}</button>)
+          </ng-container>
+        </div>
       </ng-template>
     </div>
 
