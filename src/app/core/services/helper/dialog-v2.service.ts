@@ -217,6 +217,7 @@ export class DialogV2Service {
       inputs.push({
         type: V2SideDialogConfigInputType.CHECKBOX,
         placeholder: 'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS',
+        tooltip: 'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS_DESCRIPTION',
         name: 'useDbColumns',
         checked: false
       });
@@ -226,6 +227,7 @@ export class DialogV2Service {
         inputs.push({
           type: V2SideDialogConfigInputType.CHECKBOX,
           placeholder: 'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS_NO_TRANSLATED_VALUES',
+          tooltip: 'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS_NO_TRANSLATED_VALUES_DESCRIPTION',
           name: 'dontTranslateValues',
           checked: false,
           disabled: (data): boolean => {
@@ -240,6 +242,7 @@ export class DialogV2Service {
       inputs.push({
         type: V2SideDialogConfigInputType.CHECKBOX,
         placeholder: 'LNG_COMMON_LABEL_EXPORT_JSON_REPLACE_UNDEFINED_WITH_NULL',
+        tooltip: 'LNG_COMMON_LABEL_EXPORT_JSON_REPLACE_UNDEFINED_WITH_NULL_DESCRIPTION',
         name: 'jsonReplaceUndefinedWithNull',
         checked: false,
         disabled: (data): boolean => {
@@ -253,6 +256,7 @@ export class DialogV2Service {
       inputs.push({
         type: V2SideDialogConfigInputType.CHECKBOX,
         placeholder: 'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE',
+        tooltip: 'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE_DESCRIPTION',
         name: 'useQuestionVariable',
         checked: false,
         disabled: (data): boolean => {

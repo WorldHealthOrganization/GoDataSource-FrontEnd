@@ -1,8 +1,10 @@
 <div
-  class="gd-form-checkbox-v2">
+  class="gd-form-checkbox-v2"
+  fxLayout="row" fxLayoutGap="1.6rem">
 
   <!-- Checkbox -->
   <mat-checkbox
+    fxFlex
     [(ngModel)]="value"
     [disabled]="disabled"
     (click)="onTouchItem()"
@@ -10,5 +12,11 @@
     color="primary">
     {{ placeholder | translate }}
   </mat-checkbox>
+
+  <!-- Tooltip -->
+  <mat-icon
+    *ngIf="tooltipButton"
+    matPrefix
+    [matTooltip]="tooltipButton.tooltip">{{tooltipButton.icon}}</mat-icon>
 
 </div>

@@ -29,6 +29,7 @@ interface IV2SideDialogConfigBase {
 
   // optional
   name?: string;
+  tooltip?: string;
   data?: any;
   visible?: (data: IV2SideDialogData, handler: IV2SideDialogHandler) => boolean;
   disabled?: (data: IV2SideDialogData, handler: IV2SideDialogHandler) => boolean;
