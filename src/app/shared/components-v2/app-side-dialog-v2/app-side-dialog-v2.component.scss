@@ -42,11 +42,17 @@
         }
 
         .gd-app-side-dialog-v2-content-filter {
-          background: rgba(var(--gd-secondary-rgb), 0.15);
           border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
 
           .gd-form-input-v2 {
             .mat-form-field {
+              background: rgba(var(--gd-secondary-rgb), 0.15);
+              @include transition(all 0.24s ease-in-out 0s);
+
+              &.mat-focused {
+                background: rgba(var(--gd-primary-rgb), 0.15);
+              }
+
               .mat-form-field-wrapper {
                 padding-bottom: 0;
           
