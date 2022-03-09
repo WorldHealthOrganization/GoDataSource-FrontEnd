@@ -53,8 +53,60 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   casesList$: Observable<CaseModel[]>;
 
   // field groups
-  casesFieldGroups: ILabelValuePairModel[];
-  casesFieldGroupsRequires: IV2ExportDataConfigGroupsRequired;
+  private casesFieldGroups: ILabelValuePairModel[];
+  private casesFieldGroupsRequires: IV2ExportDataConfigGroupsRequired;
+
+  // case anonymize fields
+  private caseAnonymizeFields: ILabelValuePairModel[] = [
+    { label: 'LNG_CASE_FIELD_LABEL_ID', value: 'id' },
+    { label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME', value: 'firstName' },
+    { label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME', value: 'middleName' },
+    { label: 'LNG_CASE_FIELD_LABEL_LAST_NAME', value: 'lastName' },
+    { label: 'LNG_CASE_FIELD_LABEL_GENDER', value: 'gender' },
+    { label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER', value: 'phoneNumber' },
+    { label: 'LNG_CASE_FIELD_LABEL_OCCUPATION', value: 'occupation' },
+    { label: 'LNG_CASE_FIELD_LABEL_DOB', value: 'dob' },
+    { label: 'LNG_CASE_FIELD_LABEL_AGE', value: 'age' },
+    { label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL', value: 'riskLevel' },
+    { label: 'LNG_CASE_FIELD_LABEL_RISK_REASON', value: 'riskReason' },
+    { label: 'LNG_CASE_FIELD_LABEL_DOCUMENTS', value: 'documents' },
+    { label: 'LNG_CASE_FIELD_LABEL_ADDRESSES', value: 'addresses' },
+    { label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION', value: 'classification' },
+    { label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION', value: 'dateOfInfection' },
+    { label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET', value: 'dateOfOnset' },
+    { label: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE', value: 'isDateOfOnsetApproximate' },
+    { label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME', value: 'dateOfOutcome' },
+    { label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE', value: 'dateBecomeCase' },
+    { label: 'LNG_CASE_FIELD_LABEL_DATE_RANGES', value: 'dateRanges' },
+    { label: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value: 'questionnaireAnswers' },
+    { label: 'LNG_CASE_FIELD_LABEL_TYPE', value: 'type' },
+    { label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING', value: 'dateOfReporting' },
+    { label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', value: 'isDateOfReportingApproximate' },
+    { label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED', value: 'transferRefused' },
+    { label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID', value: 'visualId' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' },
+    { label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT', value: 'wasContact' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE', value: 'wasCase' },
+    { label: 'LNG_CASE_FIELD_LABEL_OUTCOME_ID', value: 'outcomeId' },
+    { label: 'LNG_CASE_FIELD_LABEL_SAFE_BURIAL', value: 'safeBurial' },
+    { label: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL', value: 'dateOfBurial' },
+    { label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES', value: 'numberOfExposures' },
+    { label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS', value: 'numberOfContacts' },
+    { label: 'LNG_CASE_FIELD_LABEL_BURIAL_LOCATION_ID', value: 'burialLocationId' },
+    { label: 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME', value: 'burialPlaceName' },
+    { label: 'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED', value: 'vaccinesReceived' },
+    { label: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS', value: 'pregnancyStatus' },
+    { label: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUserId' }
+  ];
+
+
+
 
 
 
@@ -131,55 +183,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       description: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION_DESCRIPTION',
       fieldType: DialogFieldType.BOOLEAN
     })
-  ];
-
-  // anonymize fields
-  anonymizeFields: LabelValuePair[] = [
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_ID', 'id'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_FIRST_NAME', 'firstName'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_MIDDLE_NAME', 'middleName'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_LAST_NAME', 'lastName'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_GENDER', 'gender'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_PHONE_NUMBER', 'phoneNumber'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_OCCUPATION', 'occupation'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_DOB', 'dob'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_AGE', 'age'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_RISK_LEVEL', 'riskLevel'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_RISK_REASON', 'riskReason'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_DOCUMENTS', 'documents'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_ADDRESSES', 'addresses'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_CLASSIFICATION', 'classification'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION', 'dateOfInfection'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_ONSET', 'dateOfOnset'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE', 'isDateOfOnsetApproximate'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME', 'dateOfOutcome'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE', 'dateBecomeCase'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_RANGES', 'dateRanges'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_TYPE', 'type'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING', 'dateOfReporting'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', 'isDateOfReportingApproximate'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED', 'transferRefused'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_VISUAL_ID', 'visualId'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', 'createdAt'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', 'createdBy'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', 'updatedAt'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', 'updatedBy'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_DELETED', 'deleted'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', 'deletedAt'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', 'createdOn'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_WAS_CONTACT', 'wasContact'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_WAS_CASE', 'wasCase'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_OUTCOME_ID', 'outcomeId'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_SAFE_BURIAL', 'safeBurial'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL', 'dateOfBurial'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES', 'numberOfExposures'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS', 'numberOfContacts'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_BURIAL_LOCATION_ID', 'burialLocationId'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME', 'burialPlaceName'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED', 'vaccinesReceived'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS', 'pregnancyStatus'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID', 'responsibleUserId')
   ];
 
   // relationship anonymize fields
@@ -1065,188 +1068,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     ],
                     encrypt: true,
                     anonymize: {
-                      fields: [
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_ID',
-                          value: 'id'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
-                          value: 'firstName'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
-                          value: 'middleName'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
-                          value: 'lastName'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_GENDER',
-                          value: 'gender'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
-                          value: 'phoneNumber'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
-                          value: 'occupation'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_DOB',
-                          value: 'dob'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_AGE',
-                          value: 'age'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
-                          value: 'riskLevel'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_RISK_REASON',
-                          value: 'riskReason'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_DOCUMENTS',
-                          value: 'documents'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_ADDRESSES',
-                          value: 'addresses'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-                          value: 'classification'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
-                          value: 'dateOfInfection'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
-                          value: 'dateOfOnset'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
-                          value: 'isDateOfOnsetApproximate'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
-                          value: 'dateOfOutcome'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
-                          value: 'dateBecomeCase'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_DATE_RANGES',
-                          value: 'dateRanges'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-                          value: 'questionnaireAnswers'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_TYPE',
-                          value: 'type'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
-                          value: 'dateOfReporting'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
-                          value: 'isDateOfReportingApproximate'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
-                          value: 'transferRefused'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
-                          value: 'visualId'
-                        },
-                        {
-                          label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT',
-                          value: 'createdAt'
-                        },
-                        {
-                          label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY',
-                          value: 'createdBy'
-                        },
-                        {
-                          label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT',
-                          value: 'updatedAt'
-                        },
-                        {
-                          label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY',
-                          value: 'updatedBy'
-                        },
-                        {
-                          label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED',
-                          value: 'deleted'
-                        },
-                        {
-                          label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT',
-                          value: 'deletedAt'
-                        },
-                        {
-                          label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON',
-                          value: 'createdOn'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
-                          value: 'wasContact'
-                        },
-                        {
-                          label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE',
-                          value: 'wasCase'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_OUTCOME_ID',
-                          value: 'outcomeId'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_SAFE_BURIAL',
-                          value: 'safeBurial'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL',
-                          value: 'dateOfBurial'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES',
-                          value: 'numberOfExposures'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS',
-                          value: 'numberOfContacts'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_BURIAL_LOCATION_ID',
-                          value: 'burialLocationId'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME',
-                          value: 'burialPlaceName'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED',
-                          value: 'vaccinesReceived'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
-                          value: 'pregnancyStatus'
-                        },
-                        {
-                          label: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
-                          value: 'responsibleUserId'
-                        }
-                      ]
+                      fields: this.caseAnonymizeFields
                     },
                     groups: {
                       fields: this.casesFieldGroups,
@@ -2071,7 +1893,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       displayAnonymize: true,
       displayFieldsGroupList: true,
       displayUseQuestionVariable: true,
-      anonymizeFields: this.anonymizeFields,
+      // anonymizeFields: this.anonymizeFields,
       fieldsGroupList: this.fieldsGroupList,
       fieldsGroupListRequired: this.fieldsGroupListRequired,
       exportStart: () => { this.showLoadingDialog(); },
@@ -2222,9 +2044,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     // display export only if we have a selected outbreak
     if (this.selectedOutbreak) {
       // remove id from list
-      const anonymizeFields = _.filter(this.anonymizeFields, (value: LabelValuePair) => {
-        return value.value !== 'id';
-      });
+      // const anonymizeFields = _.filter(this.anonymizeFields, (value: LabelValuePair) => {
+      //   return value.value !== 'id';
+      // });
 
       // display export dialog
       this.dialogService.showExportDialog({
@@ -2233,7 +2055,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         fileName: '...', // this.casesDataExportFileName,
         fileType: ExportDataExtension.ZIP,
         displayAnonymize: true,
-        anonymizeFields: anonymizeFields,
+        // anonymizeFields: anonymizeFields,
         anonymizeFieldsKey: 'data',
         extraAPIData: {
           cases: selectedRecords
