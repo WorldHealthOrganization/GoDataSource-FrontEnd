@@ -1,0 +1,13 @@
+.gd-app-loading-dialog-v2 {
+
+  .gd-app-loading-dialog-v2-spinner {
+  }
+
+  .gd-app-loading-dialog-v2-message {
+    width: 100%;
+    height: 24px; // ca sa joace cand apare mesajul..pui tu cat tb aici
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+}
