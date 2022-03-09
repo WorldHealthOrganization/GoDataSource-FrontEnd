@@ -625,7 +625,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           key: 'apply'
         }, {
           type: IV2SideDialogConfigButtonType.CANCEL,
-          label: 'cancel',
+          label: 'LNG_COMMON_BUTTON_CANCEL',
           color: 'text'
         }]
       })
