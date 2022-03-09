@@ -346,7 +346,7 @@ export class DialogV2Service {
             }
           }, {
             type: IV2SideDialogConfigButtonType.CANCEL,
-            label: 'cancel',
+            label: 'LNG_COMMON_BUTTON_CANCEL',
             color: 'text'
           }]
         },
