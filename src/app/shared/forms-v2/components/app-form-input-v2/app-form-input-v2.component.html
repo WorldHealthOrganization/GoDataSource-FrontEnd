@@ -13,9 +13,9 @@
 
     <!-- Left - Icon buttons -->
     <mat-icon
-      *ngFor="let iconB of prefixIconButtons"
+      *ngIf="tooltipButton"
       matPrefix
-      (click)="iconButtonClick($event, iconB)">{{iconB.icon}}</mat-icon>
+      [matTooltip]="tooltipButton.tooltip">{{tooltipButton.icon}}</mat-icon>
 
     <!-- Input -->
     <input

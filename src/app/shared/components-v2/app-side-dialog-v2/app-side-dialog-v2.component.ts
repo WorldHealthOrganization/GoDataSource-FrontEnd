@@ -3,7 +3,7 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { IV2SideDialogConfig, IV2SideDialogConfigButton, IV2SideDialogConfigButtonType, IV2SideDialogData, IV2SideDialogResponse, V2SideDialogConfigInput, V2SideDialogConfigInputType } from './models/side-dialog-config.model';
 import { Observable, Subscriber } from 'rxjs';
 import { I18nService } from '../../../core/services/helper/i18n.service';
-import { AppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v2';
+import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v2';
 
 /**
  * Component
@@ -33,8 +33,8 @@ export class AppSideDialogV2Component {
   visibleInputs: V2SideDialogConfigInput[];
 
   // filter suffix buttons
-  filterSuffixIconButtons: AppFormIconButtonV2[] = [
-    new AppFormIconButtonV2({
+  filterSuffixIconButtons: IAppFormIconButtonV2[] = [
+    {
       icon: 'clear',
       clickAction: () => {
         // clear
@@ -43,7 +43,7 @@ export class AppSideDialogV2Component {
         // filter
         this.filterInputs();
       }
-    })
+    }
   ];
 
   // constants
