@@ -1024,6 +1024,15 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
         // Export cases
         {
+          label: 'OLD...dialog',
+          action: {
+            click: () => {
+              const a = this.dialogService.showLoadingDialog();
+              a.showMessage('bla bla progress bla bla');
+            }
+          }
+        },
+        {
           label: 'OLD',
           action: {
             click: () => {
