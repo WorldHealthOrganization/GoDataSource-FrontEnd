@@ -364,6 +364,29 @@ export class DialogV2Service {
           const formData = this.formHelperService.getFields(response.handler.form);
           const extension: string = (response.data.map.fileType as IV2SideDialogConfigInputSingleDropdown).value;
 
+          // do not send the checkbox all value to api
+          delete formData.fieldsGroupAll;
+
+          // clean form data
+          Object.keys(formData).forEach((name) => {
+            // must remove ?
+            if (
+              formData[name] === undefined || (
+                formData[name] && (
+                  (
+                    Array.isArray(formData[name]) &&
+                    formData[name].length < 1
+                  ) || (
+                    typeof formData[name] === 'object' &&
+                    Object.keys(formData[name]).length < 1
+                  )
+                )
+              )
+            ) {
+              delete formData[name];
+            }
+          });
+
           // construct query builder
           const qb: RequestQueryBuilder = new RequestQueryBuilder();
           if (
@@ -410,6 +433,7 @@ export class DialogV2Service {
 
                 // close dialog
                 loading.close();
+                response.handler.hide();
 
                 // send error down the road
                 return throwError(err);
@@ -426,6 +450,7 @@ export class DialogV2Service {
 
                 // close dialog
                 loading.close();
+                response.handler.hide();
 
                 // finished
                 return;
@@ -556,6 +581,7 @@ export class DialogV2Service {
 
                       // close dialog
                       loading.close();
+                      response.handler.hide();
 
                       // send error down the road
                       return throwError(err);
@@ -627,6 +653,7 @@ export class DialogV2Service {
 
                             // close dialog
                             loading.close();
+                            response.handler.hide();
 
                             // send error down the road
                             return throwError(err);
@@ -648,6 +675,7 @@ export class DialogV2Service {
 
                           // close dialog
                           loading.close();
+                          response.handler.hide();
                         });
                     }
 
@@ -658,6 +686,7 @@ export class DialogV2Service {
 
                       // close dialog
                       loading.close();
+                      response.handler.hide();
                     }
                   });
               };

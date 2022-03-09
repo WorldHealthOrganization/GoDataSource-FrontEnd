@@ -144,6 +144,9 @@ export class AppSideDialogV2Component {
         undefined
       );
     }
+
+    // update ui
+    this.changeDetectorRef.detectChanges();
   }
 
   /**

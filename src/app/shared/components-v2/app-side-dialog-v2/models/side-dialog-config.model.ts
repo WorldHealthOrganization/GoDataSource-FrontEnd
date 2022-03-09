@@ -182,8 +182,8 @@ export interface IV2SideDialog {
 export interface IV2SideDialogHandler {
   // required
   form: NgForm;
-  hide: () => void,
-  detectChanges: () => void
+  hide: () => void;
+  detectChanges: () => void;
 }
 
 /**
