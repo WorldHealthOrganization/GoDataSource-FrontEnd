@@ -58,6 +58,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
 
 
+
+
   // address model needed for filters
   filterAddressModel: AddressModel = new AddressModel({
     geoLocationAccurate: null

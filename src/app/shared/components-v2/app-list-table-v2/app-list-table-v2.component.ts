@@ -603,7 +603,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         type: V2SideDialogConfigInputType.CHECKBOX,
         checked: !column.notVisible,
         placeholder: column.label,
-        name: 'test',
+        name: column.field,
         data: column
       });
     });
