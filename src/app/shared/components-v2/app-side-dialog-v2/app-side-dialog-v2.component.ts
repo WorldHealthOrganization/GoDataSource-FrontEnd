@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
-import { IV2SideDialogConfig, IV2SideDialogConfigButton, IV2SideDialogConfigButtonType, IV2SideDialogData, IV2SideDialogResponse, V2SideDialogConfigInput, V2SideDialogConfigInputType } from './models/side-dialog-config.model';
+import { IV2SideDialogConfig, IV2SideDialogConfigButton, IV2SideDialogConfigButtonType, IV2SideDialogData, IV2SideDialogHandler, IV2SideDialogResponse, V2SideDialogConfigInput, V2SideDialogConfigInputType } from './models/side-dialog-config.model';
 import { Observable, Subscriber } from 'rxjs';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v2';
+import { NgForm } from '@angular/forms';
 
 /**
  * Component
@@ -19,9 +20,35 @@ export class AppSideDialogV2Component {
   // Side Nav
   @ViewChild('sideNav', { static: true }) sideNav: MatSidenav;
 
+  // Form
+  private _form: NgForm;
+  @ViewChild('form', { static: true }) set form(form: NgForm) {
+    // set data
+    this._form = form;
+
+    // update handler
+    this.dialogHandler.form = this._form;
+  }
+
   // dialog config
   config: IV2SideDialogConfig;
   dialogData: IV2SideDialogData;
+  dialogHandler: IV2SideDialogHandler = {
+    // form
+    form: null,
+
+    // hide dialog
+    hide: () => {
+      // hide without triggering action since it will be triggered bellow with other options
+      this.hide();
+    },
+
+    // detect changes
+    detectChanges: () => {
+      // update UI
+      this.changeDetectorRef.detectChanges();
+    }
+  };
 
   // used to handle responses back to client
   observer$: Subscriber<IV2SideDialogResponse>;
@@ -139,19 +166,7 @@ export class AppSideDialogV2Component {
       },
 
       // handler
-      handler: {
-        // hide dialog
-        hide: () => {
-          // hide without triggering action since it will be triggered bellow with other options
-          this.hide();
-        },
-
-        // detect changes
-        detectChanges: () => {
-          // update UI
-          this.changeDetectorRef.detectChanges();
-        }
-      },
+      handler: this.dialogHandler,
 
       // response
       data

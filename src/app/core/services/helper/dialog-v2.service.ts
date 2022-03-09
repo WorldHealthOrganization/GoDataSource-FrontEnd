@@ -282,7 +282,10 @@ export class DialogV2Service {
             type: IV2SideDialogConfigButtonType.OTHER,
             label: 'LNG_COMMON_LABEL_EXPORT',
             color: 'primary',
-            key: 'export'
+            key: 'export',
+            disabled: (_data, handler): boolean => {
+              return handler.form.invalid;
+            }
           }, {
             type: IV2SideDialogConfigButtonType.CANCEL,
             label: 'cancel',

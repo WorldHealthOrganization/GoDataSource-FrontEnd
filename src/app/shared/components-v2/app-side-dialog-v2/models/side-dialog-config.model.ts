@@ -1,5 +1,6 @@
 import { Subscriber } from 'rxjs';
 import { ILabelValuePairModel } from '../../../forms-v2/core/label-value-pair.model';
+import { NgForm } from '@angular/forms';
 
 /**
  * Side dialog config
@@ -127,6 +128,7 @@ export interface IV2SideDialogConfigButton {
   // optional
   color?: 'text' | 'secondary' | 'primary' | 'warn' | 'accent' | undefined;
   key?: string;
+  disabled?: (data: IV2SideDialogData, handler: IV2SideDialogHandler) => boolean;
 }
 
 /**
@@ -159,6 +161,7 @@ export interface IV2SideDialog {
  */
 export interface IV2SideDialogHandler {
   // required
+  form: NgForm;
   hide: () => void,
   detectChanges: () => void
 }

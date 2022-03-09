@@ -63,14 +63,15 @@
       </div>
 
       <!-- Inputs -->
-      <div
+      <form
+        #form="ngForm"
         fxFlex
         class="gd-app-side-dialog-v2-content-middle">
         <div
           *ngFor="let input of visibleInputs"
           class="gd-app-side-dialog-v2-content-middle-item">
           <div
-            *ngIf="!input.visible || input.visible(dialogData)"
+            *ngIf="!input.visible || input.visible(dialogData, dialogHandler)"
             [ngSwitch]="input.type">
 
             <!-- Divider -->
@@ -84,8 +85,9 @@
               *ngSwitchCase="V2SideDialogConfigInputType.CHECKBOX"
               class="gd-app-side-dialog-v2-content-middle-item-input"
               [(ngModel)]="input.checked"
+              [name]="input.name"
               [placeholder]="input.placeholder"
-              [disabled]="input.disabled && input.disabled(dialogData)"
+              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler)"
               [tooltip]="input.tooltip"></app-form-checkbox-v2>
 
             <!-- Text -->
@@ -93,31 +95,34 @@
               *ngSwitchCase="V2SideDialogConfigInputType.TEXT"
               class="gd-app-side-dialog-v2-content-middle-item-input"
               [(ngModel)]="input.value"
+              [name]="input.name"
               [placeholder]="input.placeholder"
-              [disabled]="input.disabled && input.disabled(dialogData)"></app-form-input-v2>
+              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler)"></app-form-input-v2>
 
             <!-- Dropdown - single -->
             <app-form-select-v2
               *ngSwitchCase="V2SideDialogConfigInputType.DROPDOWN_SINGLE"
               class="gd-app-side-dialog-v2-content-middle-item-input"
               [(ngModel)]="input.value"
+              [name]="input.name"
               [placeholder]="input.placeholder"
               [options]="input.options"
-              [disabled]="input.disabled && input.disabled(dialogData)"></app-form-select-v2>
+              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler)"></app-form-select-v2>
 
             <!-- Dropdown - multiple -->
             <app-form-select-v2
               *ngSwitchCase="V2SideDialogConfigInputType.DROPDOWN_MULTI"
               class="gd-app-side-dialog-v2-content-middle-item-input"
               [(ngModel)]="input.values"
+              [name]="input.name"
               [placeholder]="input.placeholder"
               [options]="input.options"
               [multiple]="true"
-              [disabled]="input.disabled && input.disabled(dialogData)"></app-form-select-v2>
+              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler)"></app-form-select-v2>
 
           </div>
         </div>
-      </div>
+      </form>
 
       <!-- Bottom Bar -->
       <div
@@ -130,6 +135,7 @@
           type="button"
           mat-flat-button [color]="button.color"
           class="gd-app-side-dialog-v2-content-bottom-button"
+          [disabled]="button.disabled && button.disabled(dialogData, dialogHandler)"
           (click)="clickedButton(button)">
           {{button.label | translate}}
         </button>
