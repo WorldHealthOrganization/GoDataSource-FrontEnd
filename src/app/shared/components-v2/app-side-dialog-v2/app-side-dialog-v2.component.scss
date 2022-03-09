@@ -1,22 +1,99 @@
+@import 'mixins';
+@import 'font';
+
 .gd-app-side-dialog-v2 {
+  &.mat-drawer-container {
+    background-color: var(--gd-background);
+    color: var(--gd-text);
+
+    .mat-drawer,
+    .mat-sidenav {
+      background-color: var(--gd-background);
+      color: var(--gd-text);
+    }
+  }
+
   .mat-drawer-backdrop {
+    background-color: rgba(0, 0, 0, 0.85);
     position: fixed;
   }
 
   .mat-sidenav {
     .gd-app-side-dialog-v2-content {
-      width: 300px;
       height: 100%;
+      min-width: 33rem;
 
       .gd-app-side-dialog-v2-content-top {
+        .gd-app-side-dialog-v2-content-tb {
+          border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+          padding: 1.6rem;
+
+          .gd-app-side-dialog-v2-content-top-title {
+            font-family: $gd-font-family;
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: $gd-line-height;
+          }
+
+          .gd-app-side-dialog-v2-content-top-close {
+            height: 3.7rem;
+            width: 3.7rem;
+          }
+        }
+
+        .gd-app-side-dialog-v2-content-filter {
+          background: rgba(var(--gd-secondary-rgb), 0.15);
+          border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+
+          .gd-form-input-v2 {
+            .mat-form-field {
+              .mat-form-field-wrapper {
+                padding-bottom: 0;
+          
+                .mat-form-field-flex {
+                  .mat-form-field-outline,
+                  .mat-form-field-outline-thick {
+                    color: transparent;
+
+                    .mat-form-field-outline-start,
+                    .mat-form-field-outline-gap,
+                    .mat-form-field-outline-end {
+                      border-width: 0;
+                      @include border-radius(0);
+                    }
+                  }
+                }
+              }
+
+              &.mat-form-field-disabled {
+                @include opacity(0.5);
+              }
+            }
+          }
+        }
       }
 
       .gd-app-side-dialog-v2-content-middle {
         overflow-x: hidden;
         overflow-y: overlay;
+        padding: 1.6rem;
+
+        .gd-app-side-dialog-v2-content-middle-item {
+          margin-bottom: 0.8rem;
+
+          .gd-form-checkbox-v2 {
+            margin-bottom: 1.6rem;
+          }
+        }
       }
 
       .gd-app-side-dialog-v2-content-bottom {
+        border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+        padding: 1.6rem;
+
+        .gd-app-side-dialog-v2-content-bottom-button {
+          text-transform: capitalize;
+        }
       }
     }
   }

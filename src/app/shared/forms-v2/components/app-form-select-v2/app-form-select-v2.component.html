@@ -27,9 +27,11 @@
         *ngIf="value">
 
         <!-- multiple select ? -->
-        <ng-container
-          *ngIf="multiple; else singleSelect">
-          <span
+        <div
+          *ngIf="multiple; else singleSelect"
+          fxLayout="row wrap"
+          class="gd-form-select-v2-panel-inner">
+          <div
             *ngFor="let selectedValue of value; let selectedIndex = index">
 
             <!-- separator -->
@@ -43,8 +45,8 @@
             <!-- Label -->
             {{allOptionsMap[selectedValue]?.label}}
 
-          </span>
-        </ng-container>
+          </div>
+        </div>
 
         <!-- Single select -->
         <ng-template
