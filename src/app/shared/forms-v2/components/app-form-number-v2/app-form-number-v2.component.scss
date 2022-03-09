@@ -1,0 +1,203 @@
+@import 'mixins';
+@import 'font';
+
+.gd-form-number-v2 {
+  width: 100%;
+
+  .mat-form-field {
+    width: 100%;
+    font-family: $gd-font-family;
+    font-size: $gd-font-size;
+    line-height: $gd-line-height;
+
+    .mat-form-field-wrapper {
+      margin: 0;
+      padding-bottom: 1.6rem;
+
+      .mat-form-field-flex {
+        margin-top: 0;
+        padding: 0 1.6rem;
+
+        .mat-form-field-outline {
+          color: var(--gd-secondary);
+          top: 0;
+
+          .mat-form-field-outline-start,
+          .mat-form-field-outline-gap,
+          .mat-form-field-outline-end {
+            border-width: 0.1rem;
+          }
+
+          .mat-form-field-outline-start {
+            @include border-radius(0.4rem 0 0 0.4rem);
+          }
+
+          .mat-form-field-outline-gap {
+            @include border-radius(0);
+          }
+
+          .mat-form-field-outline-end {
+            @include border-radius(0 0.4rem 0.4rem 0);
+          }
+        }
+
+        .mat-form-field-outline-thick {
+          color: var(--gd-primary);
+
+          .mat-form-field-outline-start,
+          .mat-form-field-outline-gap,
+          .mat-form-field-outline-end {
+            border-width: 0.1rem;
+          }
+
+          .mat-form-field-outline-start {
+            @include border-radius(0.4rem 0 0 0.4rem);
+          }
+
+          .mat-form-field-outline-gap {
+            @include border-radius(0);
+          }
+
+          .mat-form-field-outline-end {
+            @include border-radius(0 0.4rem 0.4rem 0);
+          }
+        }
+
+        .mat-form-field-prefix {
+          left: -0.4rem;
+          top: 0.5rem;
+
+          .mat-icon {
+            color: rgba(var(--gd-text-rgb), 0.75);
+            text-align: center;
+          }
+
+          .mat-icon-button {
+            font-size: 1.6rem;
+            height: 2.4rem;
+            width: 2.4rem;
+          }
+        }
+
+        .mat-form-field-infix {
+          border-top: 0 none;
+          @include flex(flex);
+          padding: 0.8rem 0;
+
+          input {
+            line-height: 2.4rem;
+            margin-top: 0;
+          }
+
+          .mat-form-field-label-wrapper {
+            .mat-form-field-label {
+              color: var(--gd-secondary);
+              line-height: 2.4rem;
+              margin-top: -0.7rem;
+            }
+          }
+        }
+
+        .mat-form-field-suffix {
+          top: 0.3rem;
+
+          .mat-icon {
+            color: rgba(var(--gd-text-rgb), 0.75);
+            font-size: 1.6rem;
+            height: 1.6rem;
+            line-height: 1;
+            text-align: center;
+          }
+
+          .mat-icon-button {
+            font-size: 1.6rem;
+            height: 2.4rem;
+            min-width: 0;
+            padding: 0;
+            width: 2.4rem;
+          }
+        }
+      }
+
+      .mat-form-field-subscript-wrapper {
+        font-size: 1.2rem;
+        margin-top: 0.4rem;
+        padding: 0 1.6rem;
+
+        .mat-form-field-hint-wrapper {
+          .mat-form-field-hint-spacer {}
+        }
+      }
+    }
+
+    &:focus,
+    &.mat-focused,
+    &.mat-form-field-should-float {
+      .mat-form-field-wrapper {
+        .mat-form-field-flex {
+          .mat-form-field-infix {
+            .mat-form-field-label-wrapper {
+              .mat-form-field-label {
+                color: var(--gd-primary);
+                transform: translateY(-1.6rem) scale(0.75);
+                width: 100%;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    &.mat-form-field-disabled {
+      .mat-form-field-wrapper {
+        .mat-form-field-flex {
+          background: rgba(var(--gd-secondary-rgb), 0.15);
+
+          .mat-form-field-outline {
+            color: rgba(var(--gd-secondary-rgb), 0.5);
+          }
+
+          .mat-form-field-prefix {
+            .mat-icon {
+              color: var(--gd-secondary);
+            }
+          }
+
+          .mat-form-field-infix {
+            .mat-form-field-label-wrapper {
+              .mat-form-field-label {
+                color: var(--gd-secondary);
+              }
+            }
+          }
+
+          .mat-form-field-suffix {
+            .mat-icon {
+              color: var(--gd-secondary);
+            }
+          }
+        }
+      }
+    }
+
+    &.mat-form-field-invalid {
+      .mat-form-field-wrapper {
+        .mat-form-field-flex {
+          background: rgba(var(--gd-danger-rgb), 0.15);
+
+          .mat-form-field-outline {
+            color: rgba(var(--gd-danger-rgb), 0.5);
+          }
+
+          .mat-form-field-infix {
+            .mat-form-field-label-wrapper {
+              .mat-form-field-label {
+                color: var(--gd-danger);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

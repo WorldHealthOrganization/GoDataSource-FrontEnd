@@ -103,6 +103,17 @@
               [required]="input.validators?.required && input.validators?.required(dialogData, dialogHandler)"
               (ngModelChange)="input.change ? input.change(dialogData, dialogHandler) : undefined"></app-form-input-v2>
 
+            <!-- Number -->
+            <app-form-number-v2
+              *ngSwitchCase="V2SideDialogConfigInputType.NUMBER"
+              class="gd-app-side-dialog-v2-content-middle-item-input"
+              [(ngModel)]="input.value"
+              [name]="input.name"
+              [placeholder]="input.placeholder"
+              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler)"
+              [required]="input.validators?.required && input.validators?.required(dialogData, dialogHandler)"
+              (ngModelChange)="input.change ? input.change(dialogData, dialogHandler) : undefined"></app-form-number-v2>
+
             <!-- Dropdown - single -->
             <app-form-select-v2
               *ngSwitchCase="V2SideDialogConfigInputType.DROPDOWN_SINGLE"

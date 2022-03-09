@@ -114,7 +114,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   notACaseFilter: boolean | string = false;
 
   exportCasesUrl: string;
-  casesDataExportFileName: string = moment().format('YYYY-MM-DD');
   allowedExportTypes: ExportDataExtension[] = [
     ExportDataExtension.CSV,
     ExportDataExtension.XLS,
@@ -237,11 +236,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    * Component initialized
    */
   ngOnInit() {
-    // add page title
-    this.casesDataExportFileName = this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE') +
-            ' - ' +
-            this.casesDataExportFileName;
-
     // retrieve users
     this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
@@ -969,7 +963,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         return CaseModel.canListPersonsWithoutRelationships(this.authUser) ||
           CaseModel.canListOnsetBeforePrimaryReport(this.authUser) ||
           CaseModel.canListLongPeriodBetweenOnsetDatesReport(this.authUser) ||
-          (this.exportCasesUrl && CaseModel.canExport(this.authUser)) ||
+          CaseModel.canExport(this.authUser) ||
           CaseModel.canImport(this.authUser) ||
           CaseModel.canExportInvestigationForm(this.authUser) ||
           CaseModel.canExportRelationships(this.authUser);
@@ -1030,7 +1024,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
         // Export cases
         {
-          label: 'NEW...dialog',
+          label: 'NEW loading dialog (remove me)',
           action: {
             click: () => {
               const d = this.dialogV2Service.showLoadingDialog();
@@ -1049,58 +1043,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           }
         },
         {
-          label: 'OLD',
-          action: {
-            click: () => {
-              // display export dialog
-              this.dialogService.showExportDialog({
-                // required
-                message: 'LNG_PAGE_LIST_CASES_EXPORT_TITLE',
-                url: this.exportCasesUrl,
-                fileName: this.casesDataExportFileName,
-
-                // configure
-                isAsyncExport: true,
-                displayUseDbColumns: true,
-                displayJsonReplaceUndefinedWithNull: true,
-                extraDialogFields: [
-                  new DialogField({
-                    name: 'includeContactFields',
-                    placeholder: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION',
-                    description: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION_DESCRIPTION',
-                    fieldType: DialogFieldType.BOOLEAN
-                  })
-                ],
-
-                // optional
-                allowedExportTypes: this.allowedExportTypes,
-                queryBuilder: this.queryBuilder,
-                displayEncrypt: true,
-                displayAnonymize: true,
-                displayFieldsGroupList: true,
-                displayUseQuestionVariable: true,
-                anonymizeFields: this.anonymizeFields,
-                fieldsGroupList: this.fieldsGroupList,
-                fieldsGroupListRequired: this.fieldsGroupListRequired,
-                exportStart: () => { this.showLoadingDialog(); },
-                exportFinished: () => { this.closeLoadingDialog(); },
-                // exportProgress: (data) => { this.showExportProgress(data); }
-              });
-            }
-          },
-          visible: (): boolean => {
-            return this.exportCasesUrl &&
-              CaseModel.canExport(this.authUser);
-          }
-        },
-        {
           label: 'LNG_PAGE_LIST_CASES_EXPORT_BUTTON',
           action: {
             click: () => {
               this.dialogV2Service.showExportData({
                 title: 'LNG_PAGE_LIST_CASES_EXPORT_TITLE',
                 export: {
-                  url: this.exportCasesUrl,
+                  url: `/outbreaks/${this.selectedOutbreak.id}/cases/export`,
                   async: true,
                   method: ExportDataMethod.GET,
                   fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
@@ -1324,8 +1273,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             }
           },
           visible: (): boolean => {
-            return this.exportCasesUrl &&
-              CaseModel.canExport(this.authUser);
+            return CaseModel.canExport(this.authUser);
           }
         },
 
@@ -1344,10 +1292,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         // Divider
         {
           visible: (): boolean => {
-            return (
-              this.exportCasesUrl &&
-              CaseModel.canExport(this.authUser)
-            ) || CaseModel.canImport(this.authUser);
+            return CaseModel.canExport(this.authUser) ||
+              CaseModel.canImport(this.authUser);
           }
         },
 
@@ -1356,7 +1302,33 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           label: 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS',
           action: {
             click: () => {
-              this.exportEmptyCaseInvestigationForms();
+              this.dialogV2Service.showExportData({
+                title: 'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS_TITLE',
+                export: {
+                  url: `outbreaks/${this.selectedOutbreak.id}/cases/export-investigation-template`,
+                  async: false,
+                  method: ExportDataMethod.GET,
+                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
+                  allow: {
+                    types: [
+                      ExportDataExtension.ZIP
+                    ]
+                  },
+                  inputs: {
+                    append: [
+                      {
+                        type: V2SideDialogConfigInputType.NUMBER,
+                        placeholder: 'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS_FIELD_COPIES',
+                        name: 'copies',
+                        value: 5,
+                        validators: {
+                          required: () => true
+                        }
+                      }
+                    ]
+                  }
+                }
+              });
             }
           },
           visible: (): boolean => {
@@ -2076,7 +2048,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       // required
       message: 'LNG_PAGE_LIST_CASES_EXPORT_TITLE',
       url: this.exportCasesUrl,
-      fileName: this.casesDataExportFileName,
+      fileName: '...', // this.casesDataExportFileName,
 
       // configure
       isAsyncExport: true,
@@ -2229,35 +2201,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       this.dialogService.showExportDialog({
         message: 'LNG_PAGE_LIST_CASES_EXPORT_CASE_INVESTIGATION_FORM_TITLE',
         url: `outbreaks/${this.selectedOutbreak.id}/cases/${caseModel.id}/export-empty-case-investigation`,
-        fileName: this.casesDataExportFileName,
+        fileName: '...', // this.casesDataExportFileName,
         fileType: ExportDataExtension.ZIP,
-        exportStart: () => { this.showLoadingDialog(); },
-        exportFinished: () => { this.closeLoadingDialog(); }
-      });
-    }
-  }
-
-  /**
-     * Export a bunch of empty case investigation forms for new Cases
-     */
-  exportEmptyCaseInvestigationForms() {
-    // display export only if we have a selected outbreak
-    if (this.selectedOutbreak) {
-      // display export dialog
-      this.dialogService.showExportDialog({
-        message: 'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS_TITLE',
-        url: `outbreaks/${this.selectedOutbreak.id}/cases/export-investigation-template`,
-        fileName: this.casesDataExportFileName,
-        fileType: ExportDataExtension.ZIP,
-        extraDialogFields: [
-          new DialogField({
-            name: 'copies',
-            type: 'number',
-            placeholder: 'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS_FIELD_COPIES',
-            value: 5,
-            required: true
-          })
-        ],
         exportStart: () => { this.showLoadingDialog(); },
         exportFinished: () => { this.closeLoadingDialog(); }
       });
@@ -2285,7 +2230,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       this.dialogService.showExportDialog({
         message: 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER_DIALOG_TITLE',
         url: `outbreaks/${this.selectedOutbreak.id}/cases/dossier`,
-        fileName: this.casesDataExportFileName,
+        fileName: '...', // this.casesDataExportFileName,
         fileType: ExportDataExtension.ZIP,
         displayAnonymize: true,
         anonymizeFields: anonymizeFields,

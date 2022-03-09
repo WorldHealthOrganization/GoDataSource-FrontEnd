@@ -17,6 +17,7 @@ export enum V2SideDialogConfigInputType {
   DIVIDER,
   CHECKBOX,
   TEXT,
+  NUMBER,
   DROPDOWN_SINGLE,
   DROPDOWN_MULTI
 }
@@ -38,7 +39,6 @@ interface IV2SideDialogConfigInputBase {
 
   // optional
   name?: string;
-  tooltip?: string;
   data?: any;
   visible?: (data: IV2SideDialogData, handler: IV2SideDialogHandler) => boolean;
   disabled?: (data: IV2SideDialogData, handler: IV2SideDialogHandler) => boolean;
@@ -74,6 +74,9 @@ export interface IV2SideDialogConfigInputCheckbox extends IV2SideDialogConfigInp
   type: V2SideDialogConfigInputType.CHECKBOX;
   placeholder: string;
   checked: boolean;
+
+  // optional
+  tooltip?: string;
 }
 
 /**
@@ -118,9 +121,23 @@ export interface IV2SideDialogConfigInputMultiDropdown extends IV2SideDialogConf
 }
 
 /**
+ * Side dialog input - number
+ */
+export interface IV2SideDialogConfigInputNumber extends IV2SideDialogConfigInput {
+  // required
+  type: V2SideDialogConfigInputType.NUMBER;
+  placeholder: string;
+  value: number;
+
+  // optional
+  validators?: IV2SideDialogConfigInputValidator;
+}
+
+/**
  * Side dialog inputs
  */
-export type V2SideDialogConfigInput = IV2SideDialogConfigInputDivider | IV2SideDialogConfigInputCheckbox | IV2SideDialogConfigInputText | IV2SideDialogConfigInputSingleDropdown | IV2SideDialogConfigInputMultiDropdown;
+export type V2SideDialogConfigInput = IV2SideDialogConfigInputDivider | IV2SideDialogConfigInputCheckbox | IV2SideDialogConfigInputText |
+IV2SideDialogConfigInputSingleDropdown | IV2SideDialogConfigInputMultiDropdown | IV2SideDialogConfigInputNumber;
 
 /**
  * Side dialog inputs map

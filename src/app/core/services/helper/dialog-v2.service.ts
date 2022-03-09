@@ -121,7 +121,9 @@ export class DialogV2Service {
       type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
       placeholder: 'LNG_COMMON_LABEL_EXPORT_TYPE',
       name: 'fileType',
-      value: undefined,
+      value: config.export.allow.types.length === 1 ?
+        config.export.allow.types[0] :
+        undefined,
       validators: {
         required: () => true
       },
@@ -129,10 +131,16 @@ export class DialogV2Service {
         label: type,
         value: type
       })),
+      disabled: (data): boolean => {
+        return (data.map.fileType as IV2SideDialogConfigInputSingleDropdown).options.length === 1;
+      },
       change: (data): void => {
         // not JSON ?
         if ((data.map.fileType as IV2SideDialogConfigInputSingleDropdown).value !== ExportDataExtension.JSON) {
-          (data.map.jsonReplaceUndefinedWithNull as IV2SideDialogConfigInputCheckbox).checked = false;
+          const checkbox = (data.map.jsonReplaceUndefinedWithNull as IV2SideDialogConfigInputCheckbox);
+          if (checkbox) {
+            checkbox.checked = false;
+          }
         }
       }
     });
