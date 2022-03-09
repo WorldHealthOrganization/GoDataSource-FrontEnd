@@ -276,6 +276,7 @@ export class DialogV2Service {
         action: V2SideDialogConfigAction.OPEN,
         config: {
           title: config.title,
+          width: '50rem',
           inputs: inputs,
           bottomButtons: [{
             type: IV2SideDialogConfigButtonType.OTHER,

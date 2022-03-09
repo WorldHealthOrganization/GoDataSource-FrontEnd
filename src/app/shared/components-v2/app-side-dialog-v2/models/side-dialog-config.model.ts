@@ -139,6 +139,7 @@ export interface IV2SideDialogConfig {
   bottomButtons: IV2SideDialogConfigButton[];
 
   // optional
+  width?: string;
   dontCloseOnBackdrop?: boolean;
   hideInputFilter?: boolean;
 }
