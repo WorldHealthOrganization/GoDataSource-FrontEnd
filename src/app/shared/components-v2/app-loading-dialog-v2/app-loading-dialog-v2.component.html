@@ -1,0 +1,18 @@
+<div
+  fxLayout="column" fxLayoutAlign="start center"
+  class="gd-app-loading-dialog-v2">
+  <!-- Spinner -->
+  <mat-progress-spinner
+    class="gd-app-loading-dialog-v2-spinner"
+    diameter="64"
+    mode="indeterminate"></mat-progress-spinner>
+
+  <!-- Message -->
+  <div
+    class="gd-app-loading-dialog-v2-message">
+    <span
+      *ngIf="data?.message">
+      {{data.message | translate:data.messageData}}
+    </span>
+  </div>
+</div>

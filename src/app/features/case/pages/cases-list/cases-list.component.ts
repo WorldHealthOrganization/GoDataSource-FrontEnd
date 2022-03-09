@@ -39,9 +39,10 @@ import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import { IV2BreadcrumbAction } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
-import { DialogV2Service, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/dialog-v2.service';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
 
 @Component({
   selector: 'app-cases-list',
@@ -1026,11 +1027,21 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
         // Export cases
         {
-          label: 'OLD...dialog',
+          label: 'NEW...dialog',
           action: {
             click: () => {
-              const a = this.dialogService.showLoadingDialog();
-              a.showMessage('bla bla progress bla bla');
+              const d = this.dialogV2Service.showLoadingDialog();
+              let m: string = '';
+              const b = () => {
+                setTimeout(() => {
+                  m += 'abc';
+                  d.message({
+                    message: m
+                  });
+                  b();
+                }, 500);
+              };
+              b();
             }
           }
         },

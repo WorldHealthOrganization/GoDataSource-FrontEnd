@@ -12,91 +12,10 @@ import {
   V2SideDialogConfigInput,
   V2SideDialogConfigInputType
 } from '../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { ExportStatusStep } from '../../models/constants';
-import { Moment } from 'moment';
-import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
-import { ILabelValuePairModel } from '../../../shared/forms-v2/core/label-value-pair.model';
-
-/**
- * Export data config progress answer
- */
-interface IV2ExportDataConfigProgressAnswer {
-  // required
-  readonly step: ExportStatusStep;
-  readonly processed: number;
-  readonly total: number;
-
-  // optional
-  readonly estimatedEndDate?: Moment;
-  readonly downloadedBytes?: string;
-  readonly totalBytes?: string
-}
-
-/**
- * Export accepted extensions
- */
-export enum ExportDataExtension {
-  CSV = 'csv',
-  XLS = 'xls',
-  XLSX = 'xlsx',
-  ODS = 'ods',
-  JSON = 'json',
-  PDF = 'pdf',
-  ZIP = 'zip',
-  QR = 'qr'
-}
-
-/**
- * Group required options
- */
-export interface IV2ExportDataConfigGroupsRequired {
-  [groupValue: string]: string[]
-}
-
-/**
- * Export data config
- */
-export interface IV2ExportDataConfig {
-  // required
-  title: string;
-  export: {
-    // required
-    url: string,
-    async: boolean,
-    fileName: string,
-    allow: {
-      // required
-      types: ExportDataExtension[],
-
-      // optional
-      encrypt?: boolean,
-      anonymize?: false | {
-        fields: ILabelValuePairModel[]
-      },
-      groups?: false | {
-        // required
-        fields: ILabelValuePairModel[],
-
-        // optional
-        required?: IV2ExportDataConfigGroupsRequired
-      },
-      dbColumns?: boolean,
-      dbValues?: boolean,
-      jsonReplaceUndefinedWithNull?: boolean,
-      questionnaireVariables?: boolean
-    },
-
-    // optional
-    progress?: (data: IV2ExportDataConfigProgressAnswer) => void,
-    start?: () => void,
-    end?: () => void,
-    queryBuilder?: RequestQueryBuilder,
-    inputs?: {
-      prepend?: V2SideDialogConfigInput[],
-      append?: V2SideDialogConfigInput[]
-    }
-  }
-}
+import { ExportDataExtension, IV2ExportDataConfig } from './models/dialog-v2.model';
+import { IV2LoadingDialogHandler } from '../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { AppLoadingDialogV2Component } from '../../../shared/components-v2/app-loading-dialog-v2/app-loading-dialog-v2.component';
 
 @Injectable()
 export class DialogV2Service {
@@ -108,6 +27,57 @@ export class DialogV2Service {
    */
   get sideDialogSubject$(): Subject<IV2SideDialog> {
     return this._sideDialogSubject$;
+  }
+
+  /**
+   * Constructor
+   */
+  constructor(
+    private matDialog: MatDialog
+    // private importExportDataService: ImportExportDataService,
+    // private exportLogDataService: ExportLogDataService
+  ) {}
+
+  /**
+   * Show loading dialog
+   */
+  showLoadingDialog(): IV2LoadingDialogHandler {
+    // create loading dialog handler
+    const handler: IV2LoadingDialogHandler = {
+      data: {
+        message: undefined
+      },
+      close: () => {
+        dialog.close();
+      },
+      message: (data) => {
+        // update message
+        handler.data.message = data.message;
+        handler.data.messageData = data.messageData;
+
+        // update ui
+        dialog.componentInstance.detectChanges();
+      }
+    };
+
+    // display dialog
+    const dialog: MatDialogRef<AppLoadingDialogV2Component> = this.matDialog.open(
+      AppLoadingDialogV2Component, {
+        autoFocus: false,
+        closeOnNavigation: false,
+        disableClose: true,
+        hasBackdrop: true,
+        panelClass: 'gd-app-loading-dialog-panel',
+        width: '35rem',
+        data: handler.data
+      }
+    );
+
+    // show dialog
+    dialog.afterClosed();
+
+    // finished creating dialog
+    return handler;
   }
 
   /**
@@ -355,6 +325,8 @@ export class DialogV2Service {
             // finished
             return;
           }
+
+          //
 
           console.log(response);
         })
