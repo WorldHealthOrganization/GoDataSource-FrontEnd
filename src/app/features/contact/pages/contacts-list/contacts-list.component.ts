@@ -1384,7 +1384,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
       isAsyncExport: true,
       displayUseDbColumns: true,
       displayJsonReplaceUndefinedWithNull: true,
-      exportProgress: (data) => { this.showExportProgress(data); },
+      // exportProgress: (data) => { this.showExportProgress(data); },
       extraDialogFields: [
         new DialogField({
           name: 'includeCaseFields',
@@ -1486,7 +1486,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
       isAsyncExport: true,
       displayUseDbColumns: true,
       displayJsonReplaceUndefinedWithNull: true,
-      exportProgress: (data) => { this.showExportProgress(data); },
+      // exportProgress: (data) => { this.showExportProgress(data); },
 
       // optional
       queryBuilder: qb,
@@ -1577,7 +1577,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
       isAsyncExport: true,
       displayUseDbColumns: true,
       displayJsonReplaceUndefinedWithNull: true,
-      exportProgress: (data) => { this.showExportProgress(data); },
+      // exportProgress: (data) => { this.showExportProgress(data); },
 
       // optional
       queryBuilder: qb,

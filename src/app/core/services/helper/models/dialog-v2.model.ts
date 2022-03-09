@@ -7,7 +7,7 @@ import { V2SideDialogConfigInput } from '../../../../shared/components-v2/app-si
 /**
  * Export data config progress answer
  */
-interface IV2ExportDataConfigProgressAnswer {
+export interface IV2ExportDataConfigProgressAnswer {
   // required
   readonly step: ExportStatusStep;
   readonly processed: number;
@@ -34,6 +34,14 @@ export enum ExportDataExtension {
 }
 
 /**
+ * Export method
+ */
+export enum ExportDataMethod {
+  POST,
+  GET
+}
+
+/**
  * Group required options
  */
 export interface IV2ExportDataConfigGroupsRequired {
@@ -50,6 +58,7 @@ export interface IV2ExportDataConfig {
     // required
     url: string,
     async: boolean,
+    method: ExportDataMethod,
     fileName: string,
     allow: {
       // required
@@ -74,7 +83,6 @@ export interface IV2ExportDataConfig {
     },
 
     // optional
-    progress?: (data: IV2ExportDataConfigProgressAnswer) => void,
     queryBuilder?: RequestQueryBuilder,
     inputs?: {
       prepend?: V2SideDialogConfigInput[],

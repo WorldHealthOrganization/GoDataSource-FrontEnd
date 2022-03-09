@@ -42,7 +42,7 @@ import { IV2BreadcrumbAction } from '../../../../shared/components-v2/app-breadc
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
+import { ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
 
 @Component({
   selector: 'app-cases-list',
@@ -964,14 +964,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       type: V2ActionType.MENU,
       label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
       visible: (): boolean => {
-        return !this.appliedListFilter && (
-          CaseModel.canListPersonsWithoutRelationships(this.authUser) ||
+        return CaseModel.canListPersonsWithoutRelationships(this.authUser) ||
           CaseModel.canListOnsetBeforePrimaryReport(this.authUser) ||
           CaseModel.canListLongPeriodBetweenOnsetDatesReport(this.authUser) ||
           (this.exportCasesUrl && CaseModel.canExport(this.authUser)) ||
           CaseModel.canImport(this.authUser) ||
           CaseModel.canExportInvestigationForm(this.authUser) ||
-          CaseModel.canExportRelationships(this.authUser));
+          CaseModel.canExportRelationships(this.authUser);
       },
       menuOptions: [
         // No relationships
@@ -984,14 +983,16 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             }
           ),
           visible: (): boolean => {
-            return CaseModel.canListPersonsWithoutRelationships(this.authUser);
+            return CaseModel.canListPersonsWithoutRelationships(this.authUser) &&
+              this.appliedListFilter !== Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS;
           }
         },
 
         // Divider
         {
           visible: (): boolean => {
-            return CaseModel.canListPersonsWithoutRelationships(this.authUser);
+            return CaseModel.canListPersonsWithoutRelationships(this.authUser) &&
+              this.appliedListFilter !== Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS;
           }
         },
 
@@ -1081,7 +1082,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 fieldsGroupListRequired: this.fieldsGroupListRequired,
                 exportStart: () => { this.showLoadingDialog(); },
                 exportFinished: () => { this.closeLoadingDialog(); },
-                exportProgress: (data) => { this.showExportProgress(data); }
+                // exportProgress: (data) => { this.showExportProgress(data); }
               });
             }
           },
@@ -1099,7 +1100,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 export: {
                   url: this.exportCasesUrl,
                   async: true,
-                  fileName: moment().format('YYYY-MM-DD'),
+                  method: ExportDataMethod.GET,
+                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
+                  queryBuilder: this.queryBuilder,
                   allow: {
                     types: [
                       ExportDataExtension.CSV,
@@ -2077,7 +2080,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       isAsyncExport: true,
       displayUseDbColumns: true,
       displayJsonReplaceUndefinedWithNull: true,
-      exportProgress: (data) => { this.showExportProgress(data); },
+      // exportProgress: (data) => { this.showExportProgress(data); },
       extraDialogFields: [
         new DialogField({
           name: 'includeContactFields',
@@ -2142,7 +2145,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       isAsyncExport: true,
       displayUseDbColumns: true,
       displayJsonReplaceUndefinedWithNull: true,
-      exportProgress: (data) => { this.showExportProgress(data); },
+      // exportProgress: (data) => { this.showExportProgress(data); },
 
       // optional
       queryBuilder: qb,
@@ -2198,7 +2201,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       isAsyncExport: true,
       displayUseDbColumns: true,
       displayJsonReplaceUndefinedWithNull: true,
-      exportProgress: (data) => { this.showExportProgress(data); },
+      // exportProgress: (data) => { this.showExportProgress(data); },
 
       // optional
       queryBuilder: qb,

@@ -398,7 +398,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
       isAsyncExport: true,
       displayUseDbColumns: true,
       displayJsonReplaceUndefinedWithNull: true,
-      exportProgress: (data) => { this.showExportProgress(data); },
+      // exportProgress: (data) => { this.showExportProgress(data); },
 
       // optional
       allowedExportTypes: this.allowedExportTypes,

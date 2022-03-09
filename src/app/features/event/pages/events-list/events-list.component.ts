@@ -685,7 +685,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
       isAsyncExport: true,
       displayUseDbColumns: true,
       displayJsonReplaceUndefinedWithNull: true,
-      exportProgress: (data) => { this.showExportProgress(data); },
+      // exportProgress: (data) => { this.showExportProgress(data); },
 
       // optional
       allowedExportTypes: this.allowedExportTypes,
@@ -736,7 +736,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
       isAsyncExport: true,
       displayUseDbColumns: true,
       displayJsonReplaceUndefinedWithNull: true,
-      exportProgress: (data) => { this.showExportProgress(data); },
+      // exportProgress: (data) => { this.showExportProgress(data); },
 
       // optional
       queryBuilder: qb,
@@ -792,7 +792,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
       isAsyncExport: true,
       displayUseDbColumns: true,
       displayJsonReplaceUndefinedWithNull: true,
-      exportProgress: (data) => { this.showExportProgress(data); },
+      // exportProgress: (data) => { this.showExportProgress(data); },
 
       // optional
       queryBuilder: qb,

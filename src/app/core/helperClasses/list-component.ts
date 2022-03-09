@@ -1,7 +1,7 @@
 import { ISerializedQueryBuilder, RequestFilter, RequestFilterOperator, RequestQueryBuilder, RequestSortDirection } from './request-query-builder';
 import * as _ from 'lodash';
 import { ReplaySubject, Subscriber, Subscription } from 'rxjs';
-import { ApplyListFilter, Constants, ExportStatusStep } from '../models/constants';
+import { ApplyListFilter, Constants } from '../models/constants';
 import { FormRangeModel } from '../../shared/components/form-range/form-range.model';
 import { Directive, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ResetInputOnSideFilterDirective, ResetLocationOnSideFilterDirective } from '../../shared/directives/reset-input-on-side-filter/reset-input-on-side-filter.directive';
@@ -25,7 +25,6 @@ import { ValueAccessorBase } from '../../shared/xt-forms/core';
 import { SavedFilterData } from '../models/saved-filters.model';
 import * as LzString from 'lz-string';
 import { LoadingDialogModel } from '../../shared/components';
-import { DialogExportProgressAnswer } from '../services/helper/dialog.service';
 import { IV2Column } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { IV2ActionIconLabel, IV2ActionMenuLabel } from '../../shared/components-v2/app-list-table-v2/models/action.model';
@@ -2804,73 +2803,6 @@ export abstract class ListComponent implements OnDestroy {
     if (this.loadingDialog) {
       this.loadingDialog.close();
       this.loadingDialog = null;
-    }
-  }
-
-  /**
-     * Show Export progress
-     */
-  showExportProgress(progress: DialogExportProgressAnswer): void {
-    // no visible loading dialog ?
-    if (!this.loadingDialog) {
-      return;
-    }
-
-    // display progress accordingly to status steps
-    switch (progress.step) {
-      case ExportStatusStep.LNG_STATUS_STEP_RETRIEVING_LANGUAGE_TOKENS:
-        this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_RETRIEVING_LANGUAGE_TOKENS');
-        break;
-      case ExportStatusStep.LNG_STATUS_STEP_PREPARING_PREFILTERS:
-        this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING_PREFILTERS');
-        break;
-      case ExportStatusStep.LNG_STATUS_STEP_PREPARING_RECORDS:
-        this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING');
-        break;
-      case ExportStatusStep.LNG_STATUS_STEP_PREPARING_LOCATIONS:
-        this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING_LOCATIONS');
-        break;
-      case ExportStatusStep.LNG_STATUS_STEP_CONFIGURE_HEADERS:
-        this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_CONFIGURE_HEADERS');
-        break;
-      case ExportStatusStep.LNG_STATUS_STEP_EXPORTING_RECORDS:
-        this.loadingDialog.showMessage(
-          'LNG_PAGE_EXPORT_DATA_EXPORT_PROCESSED', {
-            processed: progress.processed.toLocaleString('en'),
-            total: progress.total.toLocaleString('en'),
-            estimatedEnd: progress.estimatedEndDate ?
-              progress.estimatedEndDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) :
-              '-'
-          }
-        );
-        break;
-      case ExportStatusStep.LNG_STATUS_STEP_ENCRYPT:
-        this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_ENCRYPTING');
-        break;
-      case ExportStatusStep.LNG_STATUS_STEP_ARCHIVE:
-        this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_ARCHIVING');
-        break;
-      case ExportStatusStep.LNG_STATUS_STEP_EXPORT_FINISHED:
-        if (
-          progress.downloadedBytes === undefined ||
-                    progress.totalBytes === undefined
-        ) {
-          this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_FINISHING');
-        } else {
-          this.loadingDialog.showMessage(
-            'LNG_PAGE_EXPORT_DATA_EXPORT_DOWNLOADING', {
-              downloaded: progress.downloadedBytes ?
-                progress.downloadedBytes :
-                '',
-              total: progress.totalBytes ?
-                progress.totalBytes :
-                ''
-            }
-          );
-        }
-
-        // finished
-        break;
     }
   }
 }

@@ -44,7 +44,7 @@ export class ImportExportDataService {
       useQuestionVariable?: boolean,
       [otherData: string]: any
     },
-    queryBuilder?: RequestQueryBuilder,
+    queryBuilder: RequestQueryBuilder,
     responseType: 'blob' | 'json' = 'blob'
   ): Observable<Blob | IAsyncExportResponse>  {
     // clone data object
