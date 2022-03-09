@@ -4,7 +4,8 @@ import {
   IV2SideDialog,
   IV2SideDialogConfig,
   IV2SideDialogConfigButtonType,
-  IV2SideDialogConfigInputCheckbox, IV2SideDialogConfigInputMultiDropdown,
+  IV2SideDialogConfigInputCheckbox,
+  IV2SideDialogConfigInputMultiDropdown,
   IV2SideDialogConfigInputSingleDropdown,
   IV2SideDialogResponse,
   V2SideDialogConfigAction,
@@ -349,6 +350,12 @@ export class DialogV2Service {
           }]
         },
         responseSubscriber: new Subscriber<IV2SideDialogResponse>((response) => {
+          // cancelled ?
+          if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+            // finished
+            return;
+          }
+
           console.log(response);
         })
       });
