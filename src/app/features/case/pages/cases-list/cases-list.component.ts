@@ -39,7 +39,7 @@ import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import { IV2BreadcrumbAction } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { DialogV2Service, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/dialog-v2.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 
@@ -53,6 +53,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
   // field groups
   casesFieldGroups: ILabelValuePairModel[];
+  casesFieldGroupsRequires: IV2ExportDataConfigGroupsRequired;
 
 
 
@@ -285,6 +286,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           label: item.name,
           value: item.name
         }));
+        this.casesFieldGroupsRequires = fieldsGroupList.toRequiredList();
       });
 
     // retrieve the list of export fields groups for relationships
@@ -1283,7 +1285,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     },
                     groups: {
                       fields: this.casesFieldGroups,
-                      // required: - #TODO
+                      required: this.casesFieldGroupsRequires
                     },
                     dbColumns: true,
                     dbValues: true,
@@ -1295,6 +1297,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                       {
                         type: V2SideDialogConfigInputType.CHECKBOX,
                         placeholder: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION',
+                        tooltip: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION_DESCRIPTION',
                         name: 'includeContactFields',
                         checked: false
                       }

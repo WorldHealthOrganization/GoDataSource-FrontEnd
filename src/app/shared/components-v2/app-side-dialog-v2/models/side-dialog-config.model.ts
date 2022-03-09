@@ -1,5 +1,6 @@
 import { Subscriber } from 'rxjs';
 import { ILabelValuePairModel } from '../../../forms-v2/core/label-value-pair.model';
+import { NgForm } from '@angular/forms';
 
 /**
  * Side dialog config
@@ -13,6 +14,7 @@ export enum V2SideDialogConfigAction {
  * Side dialog input type
  */
 export enum V2SideDialogConfigInputType {
+  DIVIDER,
   CHECKBOX,
   TEXT,
   DROPDOWN_SINGLE,
@@ -20,17 +22,48 @@ export enum V2SideDialogConfigInputType {
 }
 
 /**
+ * Side dialog input validators
+ */
+interface IV2SideDialogConfigInputValidator {
+  // optional
+  required?: (data: IV2SideDialogData, handler: IV2SideDialogHandler) => boolean;
+}
+
+/**
  * Side dialog input
  */
-interface IV2SideDialogConfigInput {
+interface IV2SideDialogConfigInputBase {
   // required
   type: V2SideDialogConfigInputType;
-  name: string;
 
   // optional
+  name?: string;
+  tooltip?: string;
   data?: any;
   visible?: (data: IV2SideDialogData, handler: IV2SideDialogHandler) => boolean;
   disabled?: (data: IV2SideDialogData, handler: IV2SideDialogHandler) => boolean;
+}
+
+/**
+ * Side dialog input
+ */
+interface IV2SideDialogConfigInput extends IV2SideDialogConfigInputBase {
+  // required
+  name: string;
+
+  // optional
+  change?: (data: IV2SideDialogData, handler: IV2SideDialogHandler) => void;
+}
+
+/**
+ * Side dialog input - divider
+ */
+export interface IV2SideDialogConfigInputDivider extends IV2SideDialogConfigInputBase {
+  // required
+  type: V2SideDialogConfigInputType.DIVIDER;
+
+  // optional
+  placeholder?: string;
 }
 
 /**
@@ -51,6 +84,9 @@ export interface IV2SideDialogConfigInputText extends IV2SideDialogConfigInput {
   type: V2SideDialogConfigInputType.TEXT;
   placeholder: string;
   value: string;
+
+  // optional
+  validators?: IV2SideDialogConfigInputValidator;
 }
 
 /**
@@ -62,6 +98,9 @@ export interface IV2SideDialogConfigInputSingleDropdown extends IV2SideDialogCon
   placeholder: string;
   options: ILabelValuePairModel[];
   value: string;
+
+  // optional
+  validators?: IV2SideDialogConfigInputValidator;
 }
 
 /**
@@ -73,12 +112,15 @@ export interface IV2SideDialogConfigInputMultiDropdown extends IV2SideDialogConf
   placeholder: string;
   options: ILabelValuePairModel[];
   values: string[];
+
+  // optional
+  validators?: IV2SideDialogConfigInputValidator;
 }
 
 /**
  * Side dialog inputs
  */
-export type V2SideDialogConfigInput = IV2SideDialogConfigInputCheckbox | IV2SideDialogConfigInputText | IV2SideDialogConfigInputSingleDropdown | IV2SideDialogConfigInputMultiDropdown;
+export type V2SideDialogConfigInput = IV2SideDialogConfigInputDivider | IV2SideDialogConfigInputCheckbox | IV2SideDialogConfigInputText | IV2SideDialogConfigInputSingleDropdown | IV2SideDialogConfigInputMultiDropdown;
 
 /**
  * Side dialog inputs map
@@ -106,6 +148,7 @@ export interface IV2SideDialogConfigButton {
   // optional
   color?: 'text' | 'secondary' | 'primary' | 'warn' | 'accent' | undefined;
   key?: string;
+  disabled?: (data: IV2SideDialogData, handler: IV2SideDialogHandler) => boolean;
 }
 
 /**
@@ -118,6 +161,7 @@ export interface IV2SideDialogConfig {
   bottomButtons: IV2SideDialogConfigButton[];
 
   // optional
+  width?: string;
   dontCloseOnBackdrop?: boolean;
   hideInputFilter?: boolean;
 }
@@ -137,6 +181,7 @@ export interface IV2SideDialog {
  */
 export interface IV2SideDialogHandler {
   // required
+  form: NgForm;
   hide: () => void,
   detectChanges: () => void
 }

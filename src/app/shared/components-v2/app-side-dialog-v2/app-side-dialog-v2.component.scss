@@ -81,6 +81,37 @@
         .gd-app-side-dialog-v2-content-middle-item {
           margin-bottom: 0.8rem;
 
+          .gd-app-side-dialog-v2-content-middle-item-input-divider {
+            padding-bottom: 0.8rem;
+            position: relative;
+
+            &:before {
+              background: rgba(var(--gd-secondary-rgb), 0.25);
+              content: '';
+              display: block;
+              height: 0.1rem;
+              left: -1.6rem;
+              position: absolute;
+              top: 0;
+              width: calc(100% + 3.2rem);
+            }
+
+            &.gd-app-side-dialog-v2-content-middle-item-input-divider-has-title {
+              color: var(--gd-secondary);
+              font-size: 1.2rem;
+              height: 1.8rem;
+              letter-spacing: 0.2rem;
+              margin: 0 0 1.6rem;
+              padding-bottom: 0;
+              text-transform: uppercase;
+              white-space: nowrap;
+
+              &:before {
+                display: none;
+              }
+            }
+          }
+
           .gd-form-checkbox-v2 {
             margin-bottom: 1.6rem;
           }

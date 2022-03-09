@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { AppFormIconButtonV2 } from '../../../shared/forms-v2/core/app-form-icon-button-v2';
+import { IAppFormIconButtonV2 } from '../../../shared/forms-v2/core/app-form-icon-button-v2';
 import { UserModel } from '../../models/user.model';
 import { AuthDataService } from '../../services/data/auth.data.service';
 import { OutbreakDataService } from '../../services/data/outbreak.data.service';
@@ -20,18 +20,13 @@ import { ILabelValuePairModel } from '../../../shared/forms-v2/core/label-value-
 export class TopnavComponent implements OnInit, OnDestroy {
   // global search
   globalSearchValue: string;
-  globalSearchPrefixButtons: AppFormIconButtonV2[] = [
-    new AppFormIconButtonV2({
-      icon: 'help'
-    })
-  ];
-  globalSearchSuffixButtons: AppFormIconButtonV2[] = [
-    new AppFormIconButtonV2({
+  globalSearchSuffixButtons: IAppFormIconButtonV2[] = [
+    {
       icon: 'search',
       clickAction: () => {
         this.globalSearch();
       }
-    })
+    }
   ];
 
   // constants

@@ -2,7 +2,11 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject, Subscriber } from 'rxjs';
 import {
   IV2SideDialog,
-  IV2SideDialogConfig, IV2SideDialogConfigButtonType, IV2SideDialogConfigInputCheckbox, IV2SideDialogConfigInputSingleDropdown,
+  IV2SideDialogConfig,
+  IV2SideDialogConfigButtonType,
+  IV2SideDialogConfigInputCheckbox,
+  IV2SideDialogConfigInputMultiDropdown,
+  IV2SideDialogConfigInputSingleDropdown,
   IV2SideDialogResponse,
   V2SideDialogConfigAction,
   V2SideDialogConfigInput,
@@ -43,6 +47,13 @@ export enum ExportDataExtension {
 }
 
 /**
+ * Group required options
+ */
+export interface IV2ExportDataConfigGroupsRequired {
+  [groupValue: string]: string[]
+}
+
+/**
  * Export data config
  */
 export interface IV2ExportDataConfig {
@@ -67,9 +78,7 @@ export interface IV2ExportDataConfig {
         fields: ILabelValuePairModel[],
 
         // optional
-        required?: {
-          [groupValue: string]: string[]
-        }
+        required?: IV2ExportDataConfigGroupsRequired
       },
       dbColumns?: boolean,
       dbValues?: boolean,
@@ -132,6 +141,9 @@ export class DialogV2Service {
       placeholder: 'LNG_COMMON_LABEL_EXPORT_TYPE',
       name: 'fileType',
       value: undefined,
+      validators: {
+        required: () => true
+      },
       options: config.export.allow.types.map((type) => ({
         label: type,
         value: type
@@ -165,25 +177,96 @@ export class DialogV2Service {
     // groups
     if (config.export.allow.groups) {
       // all
-      inputs.push({
-        type: V2SideDialogConfigInputType.CHECKBOX,
-        placeholder: 'LNG_COMMON_LABEL_EXPORT_FIELDS_GROUPS_ALL',
-        name: 'fieldsGroupAll',
-        checked: true
-      });
+      inputs.push(
+        {
+          type: V2SideDialogConfigInputType.DIVIDER
+        }, {
+          type: V2SideDialogConfigInputType.CHECKBOX,
+          placeholder: 'LNG_COMMON_LABEL_EXPORT_FIELDS_GROUPS_ALL',
+          name: 'fieldsGroupAll',
+          checked: true
+        }
+      );
 
       // specific groups
-      inputs.push({
-        type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
-        placeholder: 'LNG_COMMON_LABEL_EXPORT_FIELDS_GROUPS',
-        name: 'fieldsGroupList',
-        values: [],
-        options: config.export.allow.groups.fields,
-        disabled: (data): boolean => {
-          return (data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked;
-        },
-        // ..required map - #TODO - config.export.allow.groups.required
-      });
+      inputs.push(
+        {
+          type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
+          placeholder: 'LNG_COMMON_LABEL_EXPORT_FIELDS_GROUPS',
+          name: 'fieldsGroupList',
+          values: [],
+          options: config.export.allow.groups.fields,
+          disabled: (data): boolean => {
+            return (data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked;
+          },
+          validators: {
+            required: (data): boolean => {
+              return !(data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked;
+            }
+          },
+          change: (data): void => {
+            // nothing to do ?
+            if (
+              !config.export.allow.groups ||
+              !config.export.allow.groups.required
+            ) {
+              // finished
+              return;
+            }
+
+            // do a map of selected values
+            const selected: {
+              [value: string]: true
+            } = {};
+            const selectedValues = (data.map.fieldsGroupList as IV2SideDialogConfigInputMultiDropdown).values;
+            selectedValues.forEach((value) => {
+              selected[value] = true;
+            });
+
+            // must auto-select required options ?
+            const required = config.export.allow.groups.required;
+            selectedValues.forEach((value) => {
+              // nothing required for this option ?
+              if (
+                !required[value] ||
+                required[value].length < 1
+              ) {
+                // finished
+                return;
+              }
+
+              // options required - check if they are already selected, if not, select them
+              required[value].forEach((requiredOption) => {
+                // already selected ?
+                if (selected[requiredOption]) {
+                  return;
+                }
+
+                // not selected - select option
+                selected[requiredOption] = true;
+                selectedValues.push(requiredOption);
+              });
+            });
+          }
+        }, {
+          type: V2SideDialogConfigInputType.DIVIDER
+        }
+      );
+    }
+
+    // add options title
+    if (
+      config.export.allow.dbColumns ||
+      config.export.allow.dbValues ||
+      config.export.allow.jsonReplaceUndefinedWithNull ||
+      config.export.allow.questionnaireVariables
+    ) {
+      inputs.push(
+        {
+          type: V2SideDialogConfigInputType.DIVIDER,
+          placeholder: 'LNG_COMMON_LABEL_EXPORT_OPTIONS'
+        }
+      );
     }
 
     // use db field names as column headers
@@ -191,6 +274,7 @@ export class DialogV2Service {
       inputs.push({
         type: V2SideDialogConfigInputType.CHECKBOX,
         placeholder: 'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS',
+        tooltip: 'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS_DESCRIPTION',
         name: 'useDbColumns',
         checked: false
       });
@@ -200,6 +284,7 @@ export class DialogV2Service {
         inputs.push({
           type: V2SideDialogConfigInputType.CHECKBOX,
           placeholder: 'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS_NO_TRANSLATED_VALUES',
+          tooltip: 'LNG_COMMON_LABEL_EXPORT_USE_DB_COLUMNS_NO_TRANSLATED_VALUES_DESCRIPTION',
           name: 'dontTranslateValues',
           checked: false,
           disabled: (data): boolean => {
@@ -214,6 +299,7 @@ export class DialogV2Service {
       inputs.push({
         type: V2SideDialogConfigInputType.CHECKBOX,
         placeholder: 'LNG_COMMON_LABEL_EXPORT_JSON_REPLACE_UNDEFINED_WITH_NULL',
+        tooltip: 'LNG_COMMON_LABEL_EXPORT_JSON_REPLACE_UNDEFINED_WITH_NULL_DESCRIPTION',
         name: 'jsonReplaceUndefinedWithNull',
         checked: false,
         disabled: (data): boolean => {
@@ -227,6 +313,7 @@ export class DialogV2Service {
       inputs.push({
         type: V2SideDialogConfigInputType.CHECKBOX,
         placeholder: 'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE',
+        tooltip: 'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE_DESCRIPTION',
         name: 'useQuestionVariable',
         checked: false,
         disabled: (data): boolean => {
@@ -246,12 +333,16 @@ export class DialogV2Service {
         action: V2SideDialogConfigAction.OPEN,
         config: {
           title: config.title,
+          width: '50rem',
           inputs: inputs,
           bottomButtons: [{
             type: IV2SideDialogConfigButtonType.OTHER,
             label: 'LNG_COMMON_LABEL_EXPORT',
             color: 'primary',
-            key: 'export'
+            key: 'export',
+            disabled: (_data, handler): boolean => {
+              return handler.form.invalid;
+            }
           }, {
             type: IV2SideDialogConfigButtonType.CANCEL,
             label: 'cancel',
@@ -259,6 +350,12 @@ export class DialogV2Service {
           }]
         },
         responseSubscriber: new Subscriber<IV2SideDialogResponse>((response) => {
+          // cancelled ?
+          if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+            // finished
+            return;
+          }
+
           console.log(response);
         })
       });

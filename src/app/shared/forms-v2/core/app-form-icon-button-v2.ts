@@ -1,18 +1,8 @@
-export class AppFormIconButtonV2 {
+export interface IAppFormIconButtonV2 {
+  // required
   icon: string;
-  clickAction: () => void;
 
-  /**
-   * Constructor
-   */
-  constructor(data: {
-    // required
-    icon: string,
-
-    // optional
-    clickAction?: () => void
-  }) {
-    this.icon = data.icon;
-    this.clickAction = data.clickAction;
-  }
+  // optional
+  clickAction?: () => void;
+  tooltip?: string;
 }

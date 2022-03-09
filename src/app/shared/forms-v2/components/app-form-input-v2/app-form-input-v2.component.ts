@@ -10,7 +10,7 @@ import {
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
-import { AppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
+import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
 
 @Component({
   selector: 'app-form-input-v2',
@@ -27,17 +27,38 @@ import { AppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
 export class AppFormInputV2Component
   extends AppFormBaseV2<string> implements OnDestroy {
 
-  // left - icon buttons
-  @Input() prefixIconButtons: AppFormIconButtonV2[];
-
   // right - icon buttons
-  @Input() suffixIconButtons: AppFormIconButtonV2[];
+  @Input() suffixIconButtons: IAppFormIconButtonV2[];
 
   // float label
   @Input() neverFloatLabel: boolean = false;
 
   // autocomplete
   @Input() autocomplete: string;
+
+  // tooltip
+  tooltipButton: IAppFormIconButtonV2;
+  private _tooltip: string;
+  tooltipTranslated: string;
+  @Input() set tooltip(tooltip: string) {
+    // set data
+    this._tooltip = tooltip;
+
+    // translate tooltip
+    this.tooltipTranslated = this._tooltip ?
+      this.translateService.instant(this._tooltip) :
+      this._tooltip;
+
+    // add / remove tooltip icon
+    this.tooltipButton = !this.tooltipTranslated ?
+      undefined : {
+        icon: 'help',
+        tooltip: this.tooltipTranslated
+      };
+  }
+  get tooltip(): string {
+    return this._tooltip;
+  }
 
   /**
    * Constructor
@@ -66,7 +87,7 @@ export class AppFormInputV2Component
    */
   iconButtonClick(
     event,
-    iconB: AppFormIconButtonV2
+    iconB: IAppFormIconButtonV2
   ): void {
     // prevent propagation
     event.stopPropagation();
