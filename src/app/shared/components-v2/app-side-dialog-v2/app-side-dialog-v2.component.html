@@ -88,7 +88,8 @@
               [name]="input.name"
               [placeholder]="input.placeholder"
               [disabled]="input.disabled && input.disabled(dialogData, dialogHandler)"
-              [tooltip]="input.tooltip"></app-form-checkbox-v2>
+              [tooltip]="input.tooltip"
+              (ngModelChange)="input.change ? input.change(dialogData, dialogHandler) : undefined"></app-form-checkbox-v2>
 
             <!-- Text -->
             <app-form-input-v2
@@ -97,7 +98,9 @@
               [(ngModel)]="input.value"
               [name]="input.name"
               [placeholder]="input.placeholder"
-              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler)"></app-form-input-v2>
+              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler)"
+              [required]="input.validators?.required && input.validators?.required(dialogData, dialogHandler)"
+              (ngModelChange)="input.change ? input.change(dialogData, dialogHandler) : undefined"></app-form-input-v2>
 
             <!-- Dropdown - single -->
             <app-form-select-v2
@@ -108,7 +111,8 @@
               [placeholder]="input.placeholder"
               [options]="input.options"
               [disabled]="input.disabled && input.disabled(dialogData, dialogHandler)"
-              [required]="input.validators?.required && input.validators?.required(dialogData, dialogHandler)"></app-form-select-v2>
+              [required]="input.validators?.required && input.validators?.required(dialogData, dialogHandler)"
+              (ngModelChange)="input.change ? input.change(dialogData, dialogHandler) : undefined"></app-form-select-v2>
 
             <!-- Dropdown - multiple -->
             <app-form-select-v2
@@ -120,7 +124,8 @@
               [options]="input.options"
               [multiple]="true"
               [disabled]="input.disabled && input.disabled(dialogData, dialogHandler)"
-              [required]="input.validators?.required && input.validators?.required(dialogData, dialogHandler)"></app-form-select-v2>
+              [required]="input.validators?.required && input.validators?.required(dialogData, dialogHandler)"
+              (ngModelChange)="input.change ? input.change(dialogData, dialogHandler) : undefined"></app-form-select-v2>
 
           </div>
         </div>

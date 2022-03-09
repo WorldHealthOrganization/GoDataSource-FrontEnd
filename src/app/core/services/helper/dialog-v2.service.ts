@@ -4,7 +4,7 @@ import {
   IV2SideDialog,
   IV2SideDialogConfig,
   IV2SideDialogConfigButtonType,
-  IV2SideDialogConfigInputCheckbox,
+  IV2SideDialogConfigInputCheckbox, IV2SideDialogConfigInputMultiDropdown,
   IV2SideDialogConfigInputSingleDropdown,
   IV2SideDialogResponse,
   V2SideDialogConfigAction,
@@ -46,6 +46,13 @@ export enum ExportDataExtension {
 }
 
 /**
+ * Group required options
+ */
+export interface IV2ExportDataConfigGroupsRequired {
+  [groupValue: string]: string[]
+}
+
+/**
  * Export data config
  */
 export interface IV2ExportDataConfig {
@@ -70,9 +77,7 @@ export interface IV2ExportDataConfig {
         fields: ILabelValuePairModel[],
 
         // optional
-        required?: {
-          [groupValue: string]: string[]
-        }
+        required?: IV2ExportDataConfigGroupsRequired
       },
       dbColumns?: boolean,
       dbValues?: boolean,
@@ -197,8 +202,51 @@ export class DialogV2Service {
             required: (data): boolean => {
               return !(data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked;
             }
+          },
+          change: (data): void => {
+            // nothing to do ?
+            if (
+              !config.export.allow.groups ||
+              !config.export.allow.groups.required
+            ) {
+              // finished
+              return;
+            }
+
+            // do a map of selected values
+            const selected: {
+              [value: string]: true
+            } = {};
+            const selectedValues = (data.map.fieldsGroupList as IV2SideDialogConfigInputMultiDropdown).values;
+            selectedValues.forEach((value) => {
+              selected[value] = true;
+            });
+
+            // must auto-select required options ?
+            const required = config.export.allow.groups.required;
+            selectedValues.forEach((value) => {
+              // nothing required for this option ?
+              if (
+                !required[value] ||
+                required[value].length < 1
+              ) {
+                // finished
+                return;
+              }
+
+              // options required - check if they are already selected, if not, select them
+              required[value].forEach((requiredOption) => {
+                // already selected ?
+                if (selected[requiredOption]) {
+                  return;
+                }
+
+                // not selected - select option
+                selected[requiredOption] = true;
+                selectedValues.push(requiredOption);
+              });
+            });
           }
-          // ..required map - #TODO - config.export.allow.groups.required
         }, {
           type: V2SideDialogConfigInputType.DIVIDER
         }

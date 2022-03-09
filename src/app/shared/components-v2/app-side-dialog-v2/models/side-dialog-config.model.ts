@@ -50,6 +50,9 @@ interface IV2SideDialogConfigInputBase {
 interface IV2SideDialogConfigInput extends IV2SideDialogConfigInputBase {
   // required
   name: string;
+
+  // optional
+  change?: (data: IV2SideDialogData, handler: IV2SideDialogHandler) => void;
 }
 
 /**
@@ -81,6 +84,9 @@ export interface IV2SideDialogConfigInputText extends IV2SideDialogConfigInput {
   type: V2SideDialogConfigInputType.TEXT;
   placeholder: string;
   value: string;
+
+  // optional
+  validators?: IV2SideDialogConfigInputValidator;
 }
 
 /**
