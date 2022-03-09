@@ -283,7 +283,10 @@ export class DialogV2Service {
           if (!(data.map.useDbColumns as IV2SideDialogConfigInputCheckbox).checked) {
             (data.map.dontTranslateValues as IV2SideDialogConfigInputCheckbox).checked = false;
           } else {
-            (data.map.useQuestionVariable as IV2SideDialogConfigInputCheckbox).checked = false;
+            const checkbox = (data.map.useQuestionVariable as IV2SideDialogConfigInputCheckbox);
+            if (checkbox) {
+              checkbox.checked = false;
+            }
           }
         }
       });

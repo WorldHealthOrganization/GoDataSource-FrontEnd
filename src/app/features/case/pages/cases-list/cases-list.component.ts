@@ -32,7 +32,7 @@ import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { AddressModel } from '../../../../core/models/address.model';
-import { ExportFieldsGroupModelNameEnum, IExportFieldsGroupRequired } from '../../../../core/models/export-fields-group.model';
+import { ExportFieldsGroupModelNameEnum } from '../../../../core/models/export-fields-group.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
@@ -53,8 +53,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   casesList$: Observable<CaseModel[]>;
 
   // field groups
-  private casesFieldGroups: ILabelValuePairModel[];
-  private casesFieldGroupsRequires: IV2ExportDataConfigGroupsRequired;
+  private caseFieldGroups: ILabelValuePairModel[];
+  private caseFieldGroupsRequires: IV2ExportDataConfigGroupsRequired;
+  private relationshipFieldGroups: ILabelValuePairModel[];
+  private relationshipFieldGroupsRequires: IV2ExportDataConfigGroupsRequired;
 
   // case anonymize fields
   private caseAnonymizeFields: ILabelValuePairModel[] = [
@@ -105,6 +107,30 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     { label: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUserId' }
   ];
 
+  // relationship anonymize fields
+  private relationshipAnonymizeFields: ILabelValuePairModel[] = [
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_ID', value: 'id' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_SOURCE', value: 'sourcePerson' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_TARGET', value: 'targetPerson' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT', value: 'dateOfFirstContact' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE', value: 'contactDate' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED', value: 'contactDateEstimated' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL', value: 'certaintyLevelId' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE', value: 'exposureTypeId' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY', value: 'exposureFrequencyId' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION', value: 'exposureDurationId' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION', value: 'socialRelationshipTypeId' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL', value: 'socialRelationshipDetail' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER', value: 'clusterId' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT', value: 'comment' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
+  ];
 
 
 
@@ -123,13 +149,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
   // user list
   userList$: Observable<UserModel[]>;
-
-  // list of export fields groups
-  fieldsGroupList: LabelValuePair[];
-  fieldsGroupListRequired: IExportFieldsGroupRequired;
-
-  fieldsGroupListRelationships: LabelValuePair[];
-  fieldsGroupListRelationshipsRequired: IExportFieldsGroupRequired;
 
   caseClassifications$: Observable<any>;
 
@@ -183,31 +202,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       description: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION_DESCRIPTION',
       fieldType: DialogFieldType.BOOLEAN
     })
-  ];
-
-  // relationship anonymize fields
-  relationshipAnonymizeFields: LabelValuePair[] = [
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_ID', 'id'),
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_SOURCE', 'sourcePerson'),
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_TARGET', 'targetPerson'),
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT', 'dateOfFirstContact'),
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE', 'contactDate'),
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED', 'contactDateEstimated'),
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL', 'certaintyLevelId'),
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE', 'exposureTypeId'),
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY', 'exposureFrequencyId'),
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION', 'exposureDurationId'),
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_RELATION', 'socialRelationshipTypeId'),
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL', 'socialRelationshipDetail'),
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER', 'clusterId'),
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_COMMENT', 'comment'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', 'createdAt'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', 'createdBy'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', 'updatedAt'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', 'updatedBy'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_DELETED', 'deleted'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', 'deletedAt'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', 'createdOn')
   ];
 
   // subscribers
@@ -278,22 +272,27 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     // retrieve the list of export fields groups for model
     this.outbreakDataService.getExportFieldsGroups(ExportFieldsGroupModelNameEnum.CASE)
       .subscribe((fieldsGroupList) => {
-        this.fieldsGroupList = fieldsGroupList.toLabelValuePair(this.i18nService);
-        this.fieldsGroupListRequired = fieldsGroupList.toRequiredList();
-
         // set groups
-        this.casesFieldGroups = fieldsGroupList.options.map((item) => ({
+        this.caseFieldGroups = fieldsGroupList.options.map((item) => ({
           label: item.name,
           value: item.name
         }));
-        this.casesFieldGroupsRequires = fieldsGroupList.toRequiredList();
+
+        // group restrictions
+        this.caseFieldGroupsRequires = fieldsGroupList.toRequiredList();
       });
 
     // retrieve the list of export fields groups for relationships
     this.outbreakDataService.getExportFieldsGroups(ExportFieldsGroupModelNameEnum.RELATIONSHIP)
       .subscribe((fieldsGroupList) => {
-        this.fieldsGroupListRelationships = fieldsGroupList.toLabelValuePair(this.i18nService);
-        this.fieldsGroupListRelationshipsRequired = fieldsGroupList.toRequiredList();
+        // set groups
+        this.relationshipFieldGroups = fieldsGroupList.options.map((item) => ({
+          label: item.name,
+          value: item.name
+        }));
+
+        // group restrictions
+        this.relationshipFieldGroupsRequires = fieldsGroupList.toRequiredList();
       });
 
     // initialize table Columns
@@ -353,11 +352,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   initializeTableColumns(): void {
     // default table columns
     this.tableColumns = [
-      // new VisibleColumnModel({
-      //   field: 'checkbox',
-      //   required: true,
-      //   excludeFromSave: true
-      // }),
       {
         field: 'lastName',
         label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
@@ -1071,8 +1065,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                       fields: this.caseAnonymizeFields
                     },
                     groups: {
-                      fields: this.casesFieldGroups,
-                      required: this.casesFieldGroupsRequires
+                      fields: this.caseFieldGroups,
+                      required: this.caseFieldGroupsRequires
                     },
                     dbColumns: true,
                     dbValues: true,
@@ -1163,7 +1157,63 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           label: 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_CASES_RELATIONSHIPS',
           action: {
             click: () => {
-              this.exportFilteredCasesRelationships();
+              // construct filter by case query builder
+              const qb = new RequestQueryBuilder();
+
+              // retrieve only relationships that have at least one persons as desired type
+              qb.filter.byEquality(
+                'persons.type',
+                EntityType.CASE
+              );
+
+              // merge out query builder
+              const personsQb = qb.addChildQueryBuilder('person');
+              personsQb.merge(this.queryBuilder);
+
+              // remove pagination
+              personsQb.paginator.clear();
+
+              // attach condition only if not empty
+              if (!personsQb.filter.isEmpty()) {
+                // filter only cases
+                personsQb.filter.byEquality(
+                  'type',
+                  EntityType.CASE
+                );
+              }
+
+              // export
+              this.dialogV2Service.showExportData({
+                title: 'LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIPS_TITLE',
+                export: {
+                  url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
+                  async: true,
+                  method: ExportDataMethod.GET,
+                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIP_FILE_NAME')} - ${moment().format('YYYY-MM-DD')}`,
+                  queryBuilder: qb,
+                  allow: {
+                    types: [
+                      ExportDataExtension.CSV,
+                      ExportDataExtension.XLS,
+                      ExportDataExtension.XLSX,
+                      ExportDataExtension.JSON,
+                      ExportDataExtension.ODS,
+                      ExportDataExtension.PDF
+                    ],
+                    encrypt: true,
+                    anonymize: {
+                      fields: this.relationshipAnonymizeFields
+                    },
+                    groups: {
+                      fields: this.relationshipFieldGroups,
+                      required: this.relationshipFieldGroupsRequires
+                    },
+                    dbColumns: true,
+                    dbValues: true,
+                    jsonReplaceUndefinedWithNull: true
+                  }
+                }
+              });
             }
           },
           visible: (): boolean => {
@@ -1887,15 +1937,15 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       ],
 
       // optional
-      allowedExportTypes: this.allowedExportTypes,
+      // allowedExportTypes: this.allowedExportTypes,
       queryBuilder: qb,
       displayEncrypt: true,
       displayAnonymize: true,
       displayFieldsGroupList: true,
       displayUseQuestionVariable: true,
       // anonymizeFields: this.anonymizeFields,
-      fieldsGroupList: this.fieldsGroupList,
-      fieldsGroupListRequired: this.fieldsGroupListRequired,
+      // fieldsGroupList: this.fieldsGroupList,
+      // fieldsGroupListRequired: this.fieldsGroupListRequired,
       exportStart: () => { this.showLoadingDialog(); },
       exportFinished: () => { this.closeLoadingDialog(); }
     });
@@ -1948,66 +1998,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       displayEncrypt: true,
       displayAnonymize: true,
       displayFieldsGroupList: true,
-      allowedExportTypes: this.allowedExportTypes,
-      anonymizeFields: this.relationshipAnonymizeFields,
-      fieldsGroupList: this.fieldsGroupListRelationships,
-      fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
-      exportStart: () => { this.showLoadingDialog(); },
-      exportFinished: () => { this.closeLoadingDialog(); }
-    });
-  }
-
-  /**
-     * Export Case Relationships
-     */
-  exportFilteredCasesRelationships() {
-    // construct filter by case query builder
-    const qb = new RequestQueryBuilder();
-
-    // retrieve only relationships that have at least one persons as desired type
-    qb.filter.byEquality(
-      'persons.type',
-      EntityType.CASE
-    );
-
-    // merge out query builder
-    const personsQb = qb.addChildQueryBuilder('person');
-    personsQb.merge(this.queryBuilder);
-
-    // remove pagination
-    personsQb.paginator.clear();
-
-    // attach condition only if not empty
-    if (!personsQb.filter.isEmpty()) {
-      // filter only cases
-      personsQb.filter.byEquality(
-        'type',
-        EntityType.CASE
-      );
-    }
-
-    // display export dialog
-    this.dialogService.showExportDialog({
-      // required
-      message: 'LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIPS_TITLE',
-      url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
-      fileName: this.i18nService.instant('LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIP_FILE_NAME'),
-
-      // configure
-      isAsyncExport: true,
-      displayUseDbColumns: true,
-      displayJsonReplaceUndefinedWithNull: true,
-      // exportProgress: (data) => { this.showExportProgress(data); },
-
-      // optional
-      queryBuilder: qb,
-      displayEncrypt: true,
-      displayAnonymize: true,
-      displayFieldsGroupList: true,
-      allowedExportTypes: this.allowedExportTypes,
-      anonymizeFields: this.relationshipAnonymizeFields,
-      fieldsGroupList: this.fieldsGroupListRelationships,
-      fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
+      // allowedExportTypes: this.allowedExportTypes,
+      // anonymizeFields: this.relationshipAnonymizeFields,
+      // fieldsGroupList: this.fieldsGroupListRelationships,
+      // fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
       exportStart: () => { this.showLoadingDialog(); },
       exportFinished: () => { this.closeLoadingDialog(); }
     });
