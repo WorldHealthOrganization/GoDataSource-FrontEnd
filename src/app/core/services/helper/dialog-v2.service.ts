@@ -135,6 +135,9 @@ export class DialogV2Service {
       placeholder: 'LNG_COMMON_LABEL_EXPORT_TYPE',
       name: 'fileType',
       value: undefined,
+      validators: {
+        required: () => true
+      },
       options: config.export.allow.types.map((type) => ({
         label: type,
         value: type
@@ -190,6 +193,11 @@ export class DialogV2Service {
           disabled: (data): boolean => {
             return (data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked;
           },
+          validators: {
+            required: (data): boolean => {
+              return !(data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked;
+            }
+          }
           // ..required map - #TODO - config.export.allow.groups.required
         }, {
           type: V2SideDialogConfigInputType.DIVIDER

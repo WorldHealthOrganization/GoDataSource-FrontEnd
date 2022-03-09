@@ -107,7 +107,8 @@
               [name]="input.name"
               [placeholder]="input.placeholder"
               [options]="input.options"
-              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler)"></app-form-select-v2>
+              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler)"
+              [required]="input.validators?.required && input.validators?.required(dialogData, dialogHandler)"></app-form-select-v2>
 
             <!-- Dropdown - multiple -->
             <app-form-select-v2
@@ -118,7 +119,8 @@
               [placeholder]="input.placeholder"
               [options]="input.options"
               [multiple]="true"
-              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler)"></app-form-select-v2>
+              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler)"
+              [required]="input.validators?.required && input.validators?.required(dialogData, dialogHandler)"></app-form-select-v2>
 
           </div>
         </div>

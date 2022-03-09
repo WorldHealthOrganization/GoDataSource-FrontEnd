@@ -22,9 +22,17 @@ export enum V2SideDialogConfigInputType {
 }
 
 /**
+ * Side dialog input validators
+ */
+interface IV2SideDialogConfigInputValidator {
+  // optional
+  required?: (data: IV2SideDialogData, handler: IV2SideDialogHandler) => boolean;
+}
+
+/**
  * Side dialog input
  */
-interface IV2SideDialogConfigBase {
+interface IV2SideDialogConfigInputBase {
   // required
   type: V2SideDialogConfigInputType;
 
@@ -39,7 +47,7 @@ interface IV2SideDialogConfigBase {
 /**
  * Side dialog input
  */
-interface IV2SideDialogConfigInput extends IV2SideDialogConfigBase {
+interface IV2SideDialogConfigInput extends IV2SideDialogConfigInputBase {
   // required
   name: string;
 }
@@ -47,7 +55,7 @@ interface IV2SideDialogConfigInput extends IV2SideDialogConfigBase {
 /**
  * Side dialog input - divider
  */
-export interface IV2SideDialogConfigInputDivider extends IV2SideDialogConfigBase {
+export interface IV2SideDialogConfigInputDivider extends IV2SideDialogConfigInputBase {
   // required
   type: V2SideDialogConfigInputType.DIVIDER;
 
@@ -84,6 +92,9 @@ export interface IV2SideDialogConfigInputSingleDropdown extends IV2SideDialogCon
   placeholder: string;
   options: ILabelValuePairModel[];
   value: string;
+
+  // optional
+  validators?: IV2SideDialogConfigInputValidator;
 }
 
 /**
@@ -95,6 +106,9 @@ export interface IV2SideDialogConfigInputMultiDropdown extends IV2SideDialogConf
   placeholder: string;
   options: ILabelValuePairModel[];
   values: string[];
+
+  // optional
+  validators?: IV2SideDialogConfigInputValidator;
 }
 
 /**
