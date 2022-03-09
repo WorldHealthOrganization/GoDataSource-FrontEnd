@@ -16,7 +16,8 @@ export const EnglishUsLang = {
     'LNG_LAYOUT_MENU_GENERAL_MENU_LABEL': 'GENERAL',
     'LNG_COMMON_LABEL_ACTIONS': 'Actions',
     'LNG_COMMON_LABEL_HOME': 'Home',
-    'LNG_COMMON_LABEL_EXPORT_OPTIONS': 'Options'
+    'LNG_COMMON_LABEL_EXPORT_OPTIONS': 'Options',
+    'LNG_COMMON_LABEL_NOTHING_FOUND': 'Nothing found'
 
 
 

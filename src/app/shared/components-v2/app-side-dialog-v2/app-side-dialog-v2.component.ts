@@ -228,7 +228,7 @@ export class AppSideDialogV2Component {
     this.visibleInputs = !this.filterByValue ?
       this.config.inputs :
       this.config.inputs.filter((item) =>
-        !item.placeholder ||
+        item.placeholder &&
         this.i18nService.instant(item.placeholder).toLowerCase().indexOf(this.filterByValue) > -1
       );
   }

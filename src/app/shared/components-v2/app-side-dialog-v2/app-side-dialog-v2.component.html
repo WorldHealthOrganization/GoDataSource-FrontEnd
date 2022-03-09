@@ -67,68 +67,80 @@
         #form="ngForm"
         fxFlex
         class="gd-app-side-dialog-v2-content-middle">
-        <div
-          *ngFor="let input of visibleInputs"
-          class="gd-app-side-dialog-v2-content-middle-item">
+        <ng-container
+          *ngIf="visibleInputs?.length > 0; else noMatches">
           <div
-            *ngIf="!input.visible || input.visible(dialogData, dialogHandler)"
-            [ngSwitch]="input.type">
-
-            <!-- Divider -->
+            *ngFor="let input of visibleInputs"
+            class="gd-app-side-dialog-v2-content-middle-item">
             <div
-              *ngSwitchCase="V2SideDialogConfigInputType.DIVIDER"
-              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-divider"
-              [class.gd-app-side-dialog-v2-content-middle-item-input-divider-has-title]="!!input.placeholder">{{input.placeholder | translate}}</div>
+              *ngIf="!input.visible || input.visible(dialogData, dialogHandler)"
+              [ngSwitch]="input.type">
 
-            <!-- Checkbox -->
-            <app-form-checkbox-v2
-              *ngSwitchCase="V2SideDialogConfigInputType.CHECKBOX"
-              class="gd-app-side-dialog-v2-content-middle-item-input"
-              [(ngModel)]="input.checked"
-              [name]="input.name"
-              [placeholder]="input.placeholder"
-              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler)"
-              [tooltip]="input.tooltip"
-              (ngModelChange)="input.change ? input.change(dialogData, dialogHandler) : undefined"></app-form-checkbox-v2>
+              <!-- Divider -->
+              <div
+                *ngSwitchCase="V2SideDialogConfigInputType.DIVIDER"
+                class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-divider"
+                [class.gd-app-side-dialog-v2-content-middle-item-input-divider-has-title]="!!input.placeholder">{{input.placeholder | translate}}</div>
 
-            <!-- Text -->
-            <app-form-input-v2
-              *ngSwitchCase="V2SideDialogConfigInputType.TEXT"
-              class="gd-app-side-dialog-v2-content-middle-item-input"
-              [(ngModel)]="input.value"
-              [name]="input.name"
-              [placeholder]="input.placeholder"
-              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler)"
-              [required]="input.validators?.required && input.validators?.required(dialogData, dialogHandler)"
-              (ngModelChange)="input.change ? input.change(dialogData, dialogHandler) : undefined"></app-form-input-v2>
+              <!-- Checkbox -->
+              <app-form-checkbox-v2
+                *ngSwitchCase="V2SideDialogConfigInputType.CHECKBOX"
+                class="gd-app-side-dialog-v2-content-middle-item-input"
+                [(ngModel)]="input.checked"
+                [name]="input.name"
+                [placeholder]="input.placeholder"
+                [disabled]="input.disabled && input.disabled(dialogData, dialogHandler)"
+                [tooltip]="input.tooltip"
+                (ngModelChange)="input.change ? input.change(dialogData, dialogHandler) : undefined"></app-form-checkbox-v2>
 
-            <!-- Dropdown - single -->
-            <app-form-select-v2
-              *ngSwitchCase="V2SideDialogConfigInputType.DROPDOWN_SINGLE"
-              class="gd-app-side-dialog-v2-content-middle-item-input"
-              [(ngModel)]="input.value"
-              [name]="input.name"
-              [placeholder]="input.placeholder"
-              [options]="input.options"
-              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler)"
-              [required]="input.validators?.required && input.validators?.required(dialogData, dialogHandler)"
-              (ngModelChange)="input.change ? input.change(dialogData, dialogHandler) : undefined"></app-form-select-v2>
+              <!-- Text -->
+              <app-form-input-v2
+                *ngSwitchCase="V2SideDialogConfigInputType.TEXT"
+                class="gd-app-side-dialog-v2-content-middle-item-input"
+                [(ngModel)]="input.value"
+                [name]="input.name"
+                [placeholder]="input.placeholder"
+                [disabled]="input.disabled && input.disabled(dialogData, dialogHandler)"
+                [required]="input.validators?.required && input.validators?.required(dialogData, dialogHandler)"
+                (ngModelChange)="input.change ? input.change(dialogData, dialogHandler) : undefined"></app-form-input-v2>
 
-            <!-- Dropdown - multiple -->
-            <app-form-select-v2
-              *ngSwitchCase="V2SideDialogConfigInputType.DROPDOWN_MULTI"
-              class="gd-app-side-dialog-v2-content-middle-item-input"
-              [(ngModel)]="input.values"
-              [name]="input.name"
-              [placeholder]="input.placeholder"
-              [options]="input.options"
-              [multiple]="true"
-              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler)"
-              [required]="input.validators?.required && input.validators?.required(dialogData, dialogHandler)"
-              (ngModelChange)="input.change ? input.change(dialogData, dialogHandler) : undefined"></app-form-select-v2>
+              <!-- Dropdown - single -->
+              <app-form-select-v2
+                *ngSwitchCase="V2SideDialogConfigInputType.DROPDOWN_SINGLE"
+                class="gd-app-side-dialog-v2-content-middle-item-input"
+                [(ngModel)]="input.value"
+                [name]="input.name"
+                [placeholder]="input.placeholder"
+                [options]="input.options"
+                [disabled]="input.disabled && input.disabled(dialogData, dialogHandler)"
+                [required]="input.validators?.required && input.validators?.required(dialogData, dialogHandler)"
+                (ngModelChange)="input.change ? input.change(dialogData, dialogHandler) : undefined"></app-form-select-v2>
 
+              <!-- Dropdown - multiple -->
+              <app-form-select-v2
+                *ngSwitchCase="V2SideDialogConfigInputType.DROPDOWN_MULTI"
+                class="gd-app-side-dialog-v2-content-middle-item-input"
+                [(ngModel)]="input.values"
+                [name]="input.name"
+                [placeholder]="input.placeholder"
+                [options]="input.options"
+                [multiple]="true"
+                [disabled]="input.disabled && input.disabled(dialogData, dialogHandler)"
+                [required]="input.validators?.required && input.validators?.required(dialogData, dialogHandler)"
+                (ngModelChange)="input.change ? input.change(dialogData, dialogHandler) : undefined"></app-form-select-v2>
+
+            </div>
           </div>
-        </div>
+        </ng-container>
+
+        <!-- No matches after search -->
+        <ng-template
+          #noMatches>
+          <div
+            class="gd-app-side-dialog-v2-content-middle-not-found">
+            {{'LNG_COMMON_LABEL_NOTHING_FOUND' | translate}}
+          </div>
+        </ng-template>
       </form>
 
       <!-- Bottom Bar -->
