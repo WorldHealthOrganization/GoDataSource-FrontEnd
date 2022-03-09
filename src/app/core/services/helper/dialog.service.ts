@@ -211,7 +211,6 @@ export class DialogService {
     useDbColumnsDontTranslateValueDescription?: string,
     yesLabel?: string,
     queryBuilder?: RequestQueryBuilder,
-    queryBuilderClearOthers?: string[],
     extraAPIData?: {
       [key: string]: any
     },
@@ -286,15 +285,6 @@ export class DialogService {
 
     if (!data.yesLabel) {
       data.yesLabel = 'LNG_COMMON_LABEL_EXPORT';
-    }
-    if (_.isEmpty(data.queryBuilderClearOthers)) {
-      data.queryBuilderClearOthers = [
-        'childrenQueryBuilders',
-        'includedRelations',
-        'filter',
-        'sort',
-        'deleted'
-      ];
     }
 
     // default extra api data
@@ -475,14 +465,16 @@ export class DialogService {
       data.queryBuilder &&
             !data.queryBuilder.isEmpty()
     ) {
-      if (_.isEmpty(data.queryBuilderClearOthers)) {
-        qb = _.cloneDeep(data.queryBuilder);
-      } else {
-        qb = new RequestQueryBuilder();
-        _.each(data.queryBuilderClearOthers, (property: string) => {
-          qb[property] = _.cloneDeep(data.queryBuilder[property]);
-        });
-      }
+      qb = new RequestQueryBuilder();
+      _.each([
+        'childrenQueryBuilders',
+        'includedRelations',
+        'filter',
+        'sort',
+        'deleted'
+      ], (property: string) => {
+        qb[property] = _.cloneDeep(data.queryBuilder[property]);
+      });
     }
 
     // display dialog

@@ -33,7 +33,6 @@ export class ExportButtonComponent {
   @Input() yesLabel: string;
   @Input() fileName: string;
   @Input() queryBuilder: RequestQueryBuilder;
-  @Input() queryBuilderClearOthers: string[];
   @Input() menuItem: boolean = false;
   @Input() isPOST: boolean = false;
   @Input() displayUseQuestionVariable: boolean = false;
@@ -102,7 +101,6 @@ export class ExportButtonComponent {
       yesLabel: this.yesLabel,
       fileName: this.fileName,
       queryBuilder: this.queryBuilder,
-      queryBuilderClearOthers: this.queryBuilderClearOthers,
       isPOST: this.isPOST,
       extraAPIData: this.extraAPIData,
       extraDialogFields: this.extraDialogFields,
