@@ -14,6 +14,19 @@
       .gd-app-side-dialog-v2-content-middle {
         overflow-x: hidden;
         overflow-y: overlay;
+
+        .gd-app-side-dialog-v2-content-middle-item {
+          .gd-app-side-dialog-v2-content-middle-item-input {
+
+            &.gd-app-side-dialog-v2-content-middle-item-input-divider {
+              border-bottom: 1px solid black;
+
+              &.gd-app-side-dialog-v2-content-middle-item-input-divider-has-title {
+                margin-top: 20px;
+              }
+            }
+          }
+        }
       }
 
       .gd-app-side-dialog-v2-content-bottom {

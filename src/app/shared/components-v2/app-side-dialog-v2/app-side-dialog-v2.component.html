@@ -72,6 +72,12 @@
             *ngIf="!input.visible || input.visible(dialogData)"
             [ngSwitch]="input.type">
 
+            <!-- Divider -->
+            <div
+              *ngSwitchCase="V2SideDialogConfigInputType.DIVIDER"
+              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-divider"
+              [class.gd-app-side-dialog-v2-content-middle-item-input-divider-has-title]="!!input.placeholder">{{input.placeholder | translate}}</div>
+
             <!-- Checkbox -->
             <app-form-checkbox-v2
               *ngSwitchCase="V2SideDialogConfigInputType.CHECKBOX"

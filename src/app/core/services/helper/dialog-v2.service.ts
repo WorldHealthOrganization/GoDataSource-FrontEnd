@@ -2,7 +2,10 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject, Subscriber } from 'rxjs';
 import {
   IV2SideDialog,
-  IV2SideDialogConfig, IV2SideDialogConfigButtonType, IV2SideDialogConfigInputCheckbox, IV2SideDialogConfigInputSingleDropdown,
+  IV2SideDialogConfig,
+  IV2SideDialogConfigButtonType,
+  IV2SideDialogConfigInputCheckbox,
+  IV2SideDialogConfigInputSingleDropdown,
   IV2SideDialogResponse,
   V2SideDialogConfigAction,
   V2SideDialogConfigInput,
@@ -165,25 +168,48 @@ export class DialogV2Service {
     // groups
     if (config.export.allow.groups) {
       // all
-      inputs.push({
-        type: V2SideDialogConfigInputType.CHECKBOX,
-        placeholder: 'LNG_COMMON_LABEL_EXPORT_FIELDS_GROUPS_ALL',
-        name: 'fieldsGroupAll',
-        checked: true
-      });
+      inputs.push(
+        {
+          type: V2SideDialogConfigInputType.DIVIDER
+        }, {
+          type: V2SideDialogConfigInputType.CHECKBOX,
+          placeholder: 'LNG_COMMON_LABEL_EXPORT_FIELDS_GROUPS_ALL',
+          name: 'fieldsGroupAll',
+          checked: true
+        }
+      );
 
       // specific groups
-      inputs.push({
-        type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
-        placeholder: 'LNG_COMMON_LABEL_EXPORT_FIELDS_GROUPS',
-        name: 'fieldsGroupList',
-        values: [],
-        options: config.export.allow.groups.fields,
-        disabled: (data): boolean => {
-          return (data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked;
-        },
-        // ..required map - #TODO - config.export.allow.groups.required
-      });
+      inputs.push(
+        {
+          type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
+          placeholder: 'LNG_COMMON_LABEL_EXPORT_FIELDS_GROUPS',
+          name: 'fieldsGroupList',
+          values: [],
+          options: config.export.allow.groups.fields,
+          disabled: (data): boolean => {
+            return (data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked;
+          },
+          // ..required map - #TODO - config.export.allow.groups.required
+        }, {
+          type: V2SideDialogConfigInputType.DIVIDER
+        }
+      );
+    }
+
+    // add options title
+    if (
+      config.export.allow.dbColumns ||
+      config.export.allow.dbValues ||
+      config.export.allow.jsonReplaceUndefinedWithNull ||
+      config.export.allow.questionnaireVariables
+    ) {
+      inputs.push(
+        {
+          type: V2SideDialogConfigInputType.DIVIDER,
+          placeholder: 'LNG_COMMON_LABEL_EXPORT_OPTIONS'
+        }
+      );
     }
 
     // use db field names as column headers
