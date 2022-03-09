@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
-import { IV2SideDialogConfig, IV2SideDialogConfigButton, IV2SideDialogConfigButtonType, IV2SideDialogData, IV2SideDialogHandler, IV2SideDialogResponse, V2SideDialogConfigInput, V2SideDialogConfigInputType } from './models/side-dialog-config.model';
+import { IV2SideDialogConfig, IV2SideDialogConfigButton, IV2SideDialogConfigButtonType, IV2SideDialogData, IV2SideDialogHandler, IV2SideDialogResponse, V2SideDialogConfigInputType } from './models/side-dialog-config.model';
 import { Observable, Subscriber } from 'rxjs';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v2';
@@ -57,7 +57,9 @@ export class AppSideDialogV2Component {
   filterByValue: string;
 
   // visible inputs
-  visibleInputs: V2SideDialogConfigInput[];
+  filteredInputs: {
+    [name: string]: true
+  } | false;
 
   // filter suffix buttons
   filterSuffixIconButtons: IAppFormIconButtonV2[] = [
@@ -132,7 +134,7 @@ export class AppSideDialogV2Component {
     // reset data
     this.config = undefined;
     this.filterByValue = undefined;
-    this.visibleInputs = undefined;
+    this.filteredInputs = undefined;
     this.dialogData = undefined;
 
     // trigger response
@@ -215,7 +217,7 @@ export class AppSideDialogV2Component {
       this.config.inputs.length < 1
     ) {
       // reset
-      this.visibleInputs = undefined;
+      this.filteredInputs = undefined;
 
       // finished
       return;
@@ -223,14 +225,36 @@ export class AppSideDialogV2Component {
 
     // filter - case insensitive
     this.filterByValue = this.filterByValue ?
-      this.filterByValue.toLowerCase() :
+      this.filterByValue.toLowerCase().trim() :
       this.filterByValue;
-    this.visibleInputs = !this.filterByValue ?
-      this.config.inputs :
-      this.config.inputs.filter((item) =>
+
+    // nothing to filter
+    if (!this.filterByValue) {
+      // reset
+      this.filteredInputs = undefined;
+
+      // finished
+      return;
+    }
+
+    // filter inputs
+    this.filteredInputs = {};
+    let foundMatch: boolean = false;
+    this.config.inputs.forEach((item) => {
+      if (
+        item.name &&
         item.placeholder &&
         this.i18nService.instant(item.placeholder).toLowerCase().indexOf(this.filterByValue) > -1
-      );
+      ) {
+        this.filteredInputs[item.name] = true;
+        foundMatch = true;
+      }
+    });
+
+    // nothing found ?
+    if (!foundMatch) {
+      this.filteredInputs = false;
+    }
   }
 
   /**
