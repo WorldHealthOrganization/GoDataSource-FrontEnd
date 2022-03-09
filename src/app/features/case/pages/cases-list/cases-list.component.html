@@ -1,5 +1,5 @@
 <app-list-table-v2
-  pageTitle="LNG_PAGE_LIST_CASES_TITLE"
+  [pageTitle]="appliedListFilter !== Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS ? 'LNG_PAGE_LIST_CASES_TITLE' : 'LNG_PAGE_DASHBOARD_CASES_WITHOUT_RELATIONSHIPS'"
   [records$]="casesList$"
   (refreshData)="needsRefreshList(true, false)"
   (refreshDataCount)="refreshListCount(false)"
@@ -11,6 +11,7 @@
   [pageCount]="pageCount"
   [pageSize]="pageSize"
   [pageIndex]="pageIndex"
+  [pageSettingsKey]="appliedListFilter !== Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS ? UserSettings.CASE_FIELDS : UserSettings.CASE_WITHOUT_RELATIONSHIPS_FIELDS"
   (pageChange)="changePage($event)"></app-list-table-v2>
 
 <!--

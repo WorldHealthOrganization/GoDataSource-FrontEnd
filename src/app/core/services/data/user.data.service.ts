@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { UserModel, UserSettings } from '../../models/user.model';
+import { UserModel } from '../../models/user.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { PasswordChangeModel } from '../../models/password-change.model';
 import { RequestQueryBuilder, RequestSortDirection } from '../../helperClasses/request-query-builder';
@@ -106,35 +106,28 @@ export class UserDataService {
   }
 
   /**
-     * Update user settings
-     * @param userId
-     * @param settingsKey
-     * @param data
-     * @returns {Observable<any>}
-     */
+   * Update user settings
+   */
   updateSettings(
     userId: string,
-    settingsKey: UserSettings,
-    data: any
+    settings: {
+      [settingsKey: string]: any
+    }
   ): Observable<any> {
     return this.getUser(userId)
       .pipe(
         mergeMap((userData) => {
-          // retrieve current user settings
-          const currentUserSettings = _.get(
-            userData,
-            'settings'
-          );
-
           // construct new settings
-          const userSettings = _.set(
-            currentUserSettings,
-            settingsKey,
-            data
-          );
+          _.each(settings, (data, settingsKey) => {
+            _.set(
+              userData.settings,
+              settingsKey,
+              data
+            );
+          });
 
           // save settings
-          return this.modifyUser(userId, {settings: userSettings});
+          return this.modifyUser(userId, {settings: userData.settings});
         })
       );
   }

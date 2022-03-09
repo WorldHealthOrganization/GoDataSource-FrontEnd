@@ -30,7 +30,11 @@
         <ng-container
           *ngIf="multiple; else singleSelect">
           <span
-            *ngFor="let selectedValue of value">
+            *ngFor="let selectedValue of value; let selectedIndex = index">
+
+            <!-- separator -->
+            <ng-container
+              *ngIf="selectedIndex > 0">, </ng-container>
 
             <!-- Icon -->
             <mat-icon

@@ -10,7 +10,7 @@ import {
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
-import { LabelValuePairModel } from '../../core/label-value-pair.model';
+import { ILabelValuePairModel } from '../../core/label-value-pair.model';
 
 @Component({
   selector: 'app-form-radio-button-v2',
@@ -27,7 +27,7 @@ import { LabelValuePairModel } from '../../core/label-value-pair.model';
 export class AppFormRadioButtonGroupV2Component
   extends AppFormBaseV2<string> implements OnDestroy {
   // options
-  @Input() options: LabelValuePairModel[];
+  @Input() options: ILabelValuePairModel[];
 
   /**
    * Constructor

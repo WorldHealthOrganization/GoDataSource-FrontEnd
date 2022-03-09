@@ -36,6 +36,9 @@ export class AppFormInputV2Component
   // float label
   @Input() neverFloatLabel: boolean = false;
 
+  // autocomplete
+  @Input() autocomplete: string;
+
   /**
    * Constructor
    */

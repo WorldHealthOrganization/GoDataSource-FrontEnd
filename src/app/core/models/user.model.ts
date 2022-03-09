@@ -41,46 +41,6 @@ export enum UserSettings {
   BACKUP_FIELDS = 'backupFields'
 }
 
-/**
- * Custom handlers
- */
-abstract class UserSettingsHandlers {
-  static AUDIT_LOG_FIELDS = [];
-  static DASHBOARD = UserSettingsDashboardModel;
-  static CASE_FIELDS = [];
-  static CASE_LAB_FIELDS = [];
-  static CASE_WITHOUT_RELATIONSHIPS_FIELDS = [];
-  static CONTACT_LAB_FIELDS = [];
-  static CONTACT_FIELDS = [];
-  static CONTACT_OF_CONTACT_FIELDS = [];
-  static EVENT_FIELDS = [];
-  static EVENT_WITHOUT_RELATIONSHIPS_FIELDS = [];
-  static LOCATION_FIELDS = [];
-  static LAB_RESULTS_FIELDS = [];
-  static RELATIONSHIP_FIELDS = [];
-  static OUTBREAK_FIELDS = [];
-  static OUTBREAK_MODIFY_QUESTIONNAIRE_FIELDS = [];
-  static OUTBREAK_TEMPLATE_FIELDS = [];
-  static OUTBREAK_TEMPLATE_MODIFY_QUESTIONNAIRE_FIELDS = [];
-  static CONTACT_DAILY_FOLLOW_UP_FIELDS = [];
-  static CASE_RELATED_DAILY_FOLLOW_UP_FIELDS = [];
-  static CONTACT_RELATED_DAILY_FOLLOW_UP_FIELDS = [];
-  static SYNC_UPSTREAM_SERVERS_FIELDS = [];
-  static SYNC_CLIENT_APPLICATIONS_FIELDS = [];
-  static SYNC_LOGS_FIELDS = [];
-  static REF_DATA_CAT_ENTRIES_FIELDS = [];
-  static SHARE_RELATIONSHIPS = [];
-  static USER_ROLE_FIELDS = [];
-  static ENTITY_NOT_DUPLICATES_FIELDS = [];
-  static USER_FIELDS = [];
-  static COT_SNAPSHOT_FIELDS = [];
-  static SEARCH_RESULTS_FIELDS = [];
-  static HELP_CATEGORIES_LIST = [];
-  static HELP_SEARCH = [];
-  static HELP_ITEMS_LIST = [];
-  static BACKUP_FIELDS = [];
-}
-
 export enum PhoneNumberType {
   PRIMARY_PHONE_NUMBER = 'LNG_USER_FIELD_LABEL_PRIMARY_TELEPHONE'
 }
@@ -328,8 +288,22 @@ implements
     this.disregardGeographicRestrictions = _.get(data, 'disregardGeographicRestrictions', false);
     this.dontCacheFilters = _.get(data, 'dontCacheFilters', false);
 
-    // initialize all settings
-    this.initializeSettings(data);
+    // initialize settings
+    _.each(data.settings, (settings, property) => {
+      // initialize settings
+      if (property === UserSettings.DASHBOARD) {
+        this.settings[property] = new UserSettingsDashboardModel(settings);
+      } else {
+        this.settings[property] = Array.isArray(settings) ?
+          settings :
+          [];
+      }
+    });
+
+    // if dashboard settings are missing then add them
+    if (!this.settings[UserSettings.DASHBOARD]) {
+      this.settings[UserSettings.DASHBOARD] = new UserSettingsDashboardModel({});
+    }
   }
 
   /**
@@ -403,31 +377,9 @@ implements
   }
 
   /**
-     * Initialize settings
-     */
-  private initializeSettings(data) {
-    _.each(UserSettings, (property: string, enumKey: string) => {
-      // retrieve settings
-      const settings = _.get(
-        data,
-        `settings.${property}`
-      );
-
-      // initialize settings
-      this.settings[property] = UserSettingsHandlers[enumKey] !== undefined ? (
-        _.isArray(UserSettingsHandlers[enumKey]) ?
-          (_.isEmpty(settings) ? [] : settings) :
-          new UserSettingsHandlers[enumKey](settings)
-      ) :
-        settings;
-    });
-  }
-
-  /**
-     * Retrieve settings
-     * @param key
-     */
-  getSettings(key: UserSettings) {
+   * Retrieve settings
+   */
+  getSettings(key: string) {
     return this.settings[key];
   }
 

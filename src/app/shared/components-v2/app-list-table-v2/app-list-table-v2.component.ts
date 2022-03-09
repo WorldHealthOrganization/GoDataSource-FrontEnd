@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, Renderer2, ViewChild } from '@angular/core';
 import { BaseModel } from '../../../core/models/base.model';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { ColumnApi, ValueFormatterParams } from '@ag-grid-community/core';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
@@ -22,6 +22,11 @@ import { V2LoadingComponent } from './models/loading.component';
 import { V2NoRowsComponent } from './models/no-rows.component';
 import { IBasicCount } from '../../../core/models/basic-count.interface';
 import { PageEvent } from '@angular/material/paginator';
+import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputCheckbox, V2SideDialogConfigInput, V2SideDialogConfigInputType } from '../app-side-dialog-v2/models/side-dialog-config.model';
+import { UserModel, UserSettings } from '../../../core/models/user.model';
+import { AuthDataService } from '../../../core/services/data/auth.data.service';
+import { catchError } from 'rxjs/operators';
 
 /**
  * Component
@@ -115,6 +120,23 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   // ag table handler
   @ViewChild('agTable') agTable: AgGridAngular;
 
+  // saving columns
+  savingColumns: boolean = false;
+
+  // page settings key
+  private _pageSettingsKey: UserSettings;
+  private _pageSettingsKeyLPinned: string;
+  private _pageSettingsKeyRPinned: string;
+  @Input() set pageSettingsKey(pageSettingsKey: UserSettings) {
+    // set data
+    this._pageSettingsKey = pageSettingsKey;
+    this._pageSettingsKeyLPinned = this._pageSettingsKey ? `${this._pageSettingsKey}LPinned` : this._pageSettingsKey;
+    this._pageSettingsKeyRPinned = this._pageSettingsKey ? `${this._pageSettingsKey}RPinned` : this._pageSettingsKey;
+
+    // update columns definitions
+    this.updateColumnDefinitions();
+  };
+
   // constants
   V2LoadingComponent = V2LoadingComponent;
   V2NoRowsComponent = V2NoRowsComponent;
@@ -130,7 +152,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     protected location: Location,
     protected renderer2: Renderer2,
     protected elementRef: ElementRef,
-    protected router: Router
+    protected router: Router,
+    protected dialogV2Service: DialogV2Service,
+    protected authDataService: AuthDataService
   ) {}
 
   /**
@@ -212,26 +236,41 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // retrieve data
     this.agTable.api.showLoadingOverlay();
-    this.recordsSubscription = this._records$.subscribe((data) => {
-      // set data & hide loading overlay
-      this.records = data;
+    this.recordsSubscription = this._records$
+      .pipe(
+        catchError((err) => {
+          // #TODO
+          // this.snackbarService.showApiError(err);
 
-      // no records found ?
-      if (this.records.length < 1) {
-        this.agTable.api.showNoRowsOverlay();
-      }
+          // send error down the road
+          return throwError(err);
+        })
+      )
+      .subscribe((data) => {
+        // set data & hide loading overlay
+        this.records = data;
 
-      // re-render page
-      this.detectChanges();
-    });
+        // no records found ?
+        if (this.records.length < 1) {
+          this.agTable.api.showNoRowsOverlay();
+        }
+
+        // re-render page
+        this.detectChanges();
+      });
   }
 
   /**
    * Update column definitions
    */
-  private updateColumnDefinitions(): void {
+  private updateColumnDefinitions(
+    overwriteVisibleColumns?: string[]
+  ): void {
     // nothing to do ?
-    if (!this._columns) {
+    if (
+      !this._columns ||
+      !this._pageSettingsKey
+    ) {
       // reset
       this.columnDefs = undefined;
 
@@ -239,24 +278,105 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       return;
     }
 
-    // determine columns
-    this.columnDefs = [{
-      pinned: IV2ColumnPinned.LEFT,
-      headerName: '',
-      field: this.keyField,
-      checkboxSelection: true,
-      headerCheckboxSelection: true,
-      cellClass: 'gd-cell-no-focus'
-    }];
-    this._columns.forEach((column) => {
+    // disable load visible columns
+    let visibleColumns: string[] = [];
+    const visibleColumnsMap: {
+      [field: string]: true
+    } = {};
+    let leftPinnedColumns: string[] = [];
+    const leftPinnedColumnsMap: {
+      [field: string]: true
+    } = {};
+    let rightPinnedColumns: string[] = [];
+    const rightPinnedColumnsMap: {
+      [field: string]: true
+    } = {};
+
+    // load column settings
+    const authUser: UserModel = this.authDataService.getAuthenticatedUser();
+
+    // visible columns
+    if (overwriteVisibleColumns) {
+      visibleColumns = overwriteVisibleColumns;
+    } else {
+      visibleColumns = authUser.getSettings(this._pageSettingsKey);
+      visibleColumns = visibleColumns ? visibleColumns : [];
+    }
+
+    // left pinned columns
+    leftPinnedColumns = authUser.getSettings(this._pageSettingsKeyLPinned);
+    leftPinnedColumns = leftPinnedColumns ? leftPinnedColumns : [];
+
+    // right pinned columns
+    rightPinnedColumns = authUser.getSettings(this._pageSettingsKeyRPinned);
+    rightPinnedColumns = rightPinnedColumns ? rightPinnedColumns : [];
+
+    // map visible columns
+    visibleColumns.forEach((field) => {
+      visibleColumnsMap[field] = true;
+    });
+
+    // map left pinned columns
+    leftPinnedColumns.forEach((field) => {
+      leftPinnedColumnsMap[field] = true;
+    });
+
+    // map right pinned columns
+    rightPinnedColumns.forEach((field) => {
+      rightPinnedColumnsMap[field] = true;
+    });
+
+    // process column
+    const processColumn = (
+      column: IV2Column,
+      determinePinned: boolean
+    ) => {
       // no need to take in account ?
       if (
-        column.notVisible || (
+        (
+          visibleColumns.length < 1 &&
+          column.notVisible
+        ) || (
+          column.format?.type !== V2ColumnFormat.ACTIONS &&
+          visibleColumns.length > 0 &&
+          !visibleColumnsMap[column.field]
+        ) || (
           column.exclude &&
           column.exclude(column)
         )
       ) {
         return;
+      }
+
+      // determine column pinned value
+      let pinned: IV2ColumnPinned | boolean;
+      if (determinePinned) {
+        if (
+          leftPinnedColumns.length > 0 &&
+          leftPinnedColumnsMap[column.field]
+        ) {
+          pinned = IV2ColumnPinned.LEFT;
+        } else if (
+          rightPinnedColumns.length > 0 &&
+          rightPinnedColumnsMap[column.field]
+        ) {
+          pinned = IV2ColumnPinned.RIGHT;
+        } else {
+          if (
+            column.pinned === true ||
+            column.pinned === IV2ColumnPinned.LEFT &&
+            leftPinnedColumns.length < 1
+          ) {
+            pinned = IV2ColumnPinned.LEFT;
+          } else if (
+            column.pinned === IV2ColumnPinned.RIGHT &&
+            rightPinnedColumns.length < 1
+          ) {
+            pinned = IV2ColumnPinned.RIGHT;
+          }
+        }
+      } else {
+        pinned = column.pinned;
       }
 
       // attach column to list of visible columns
@@ -265,16 +385,68 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           this.translateService.instant(column.label) :
           '',
         field: column.field,
-        pinned: column.pinned,
+        pinned,
         resizable: !column.notResizable,
         columnDefinition: column,
         cellClass: column.cssCellClasses,
         valueFormatter: (valueFormat): string => {
           return this.formatValue(valueFormat);
         },
-        cellRenderer: this.handleCellRenderer(column)
+        cellRenderer: this.handleCellRenderer(column),
+        suppressMovable: column.format && column.format.type === V2ColumnFormat.ACTIONS
       });
-    });
+    };
+
+    // determine columns
+    this.columnDefs = [{
+      pinned: IV2ColumnPinned.LEFT,
+      headerName: '',
+      field: this.keyField,
+      checkboxSelection: true,
+      headerCheckboxSelection: true,
+      cellClass: 'gd-cell-no-focus',
+      suppressMovable: true
+    }];
+    if (visibleColumns.length > 0) {
+      // map columns
+      const columnMap: {
+        [field: string]: IV2Column
+      } = {};
+      this._columns.forEach((column) => {
+        columnMap[column.field] = column;
+      });
+
+      // display columns in saved order
+      visibleColumns.forEach((field) => {
+        // column removed ?
+        if (!columnMap[field]) {
+          return;
+        }
+
+        // process
+        processColumn(
+          columnMap[field],
+          true
+        );
+      });
+
+      // process the remaining unprocessed items
+      this._columns.forEach((column) => {
+        if (column.format?.type === V2ColumnFormat.ACTIONS) {
+          processColumn(
+            column,
+            false
+          );
+        }
+      });
+    } else {
+      this._columns.forEach((column) => {
+        processColumn(
+          column,
+          column.format?.type !== V2ColumnFormat.ACTIONS
+        );
+      });
+    }
 
     // re-render page
     this.detectChanges();
@@ -417,9 +589,100 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
    * Visible Columns
    */
   setVisibleColumns(): void {
-    // #TODO
-    this._columns.forEach((col) => col.notVisible = false);
-    this.columns = this._columns;
+    // construct list of possible columns
+    const columns: IV2Column[] = this._columns
+      // filter out pinned columns since those are handled by a different button
+      .filter((item) => item.format?.type !== V2ColumnFormat.ACTIONS && (!item.exclude || !item.exclude(item)))
+      // sort columns by their label
+      .sort((v1, v2) => this.translateService.instant(v1.label).localeCompare(this.translateService.instant(v2.label)));
+
+    // construct list of checkboxes
+    const checkboxInputs: V2SideDialogConfigInput[] = [];
+    columns.forEach((column) => {
+      checkboxInputs.push({
+        type: V2SideDialogConfigInputType.CHECKBOX,
+        checked: !column.notVisible,
+        placeholder: column.label,
+        name: 'test',
+        data: column
+      });
+    });
+
+    // display popup
+    this.dialogV2Service
+      .showSideDialog({
+        // dialog
+        title: 'LNG_SIDE_COLUMNS_SECTION_COLUMNS_TO_DISPLAY_TITLE',
+
+        // inputs
+        inputs: checkboxInputs,
+
+        // buttons
+        bottomButtons: [{
+          type: IV2SideDialogConfigButtonType.OTHER,
+          label: 'LNG_SIDE_COLUMNS_APPLY_FILTERS_BUTTON',
+          color: 'primary',
+          key: 'apply'
+        }, {
+          type: IV2SideDialogConfigButtonType.CANCEL,
+          label: 'cancel',
+          color: 'text'
+        }]
+      })
+      .subscribe((response) => {
+        // nothing to do ?
+        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+          return;
+        }
+
+        // close dialog
+        response.handler.hide();
+
+        // set visible column on table to see the effects right away
+        const visibleMap: {
+          [field: string]: true
+        } = {};
+        response.data.inputs.forEach((item: IV2SideDialogConfigInputCheckbox) => {
+          // change option
+          const itemData = item.data as IV2Column;
+          itemData.notVisible = !item.checked;
+
+          // visible ?
+          if (item.checked) {
+            visibleMap[itemData.field] = true;
+          }
+        });
+
+        // construct visible columns keeping the previous order
+        const visibleColumns: string[] = [];
+        this.agTable.columnApi.getColumnState().forEach((columnState) => {
+          // retrieve column definition
+          const colDef: IExtendedColDef = this.agTable.columnApi.getColumn(columnState.colId)?.getColDef();
+          if (
+            !colDef ||
+            !colDef.columnDefinition ||
+            !visibleMap[colDef.columnDefinition.field] ||
+            colDef.columnDefinition.format?.type === V2ColumnFormat.ACTIONS
+          ) {
+            return;
+          }
+
+          // add to list
+          visibleColumns.push(colDef.columnDefinition.field);
+          delete visibleMap[colDef.columnDefinition.field];
+        });
+
+        // add at the end the columns that were made visible
+        Object.keys(visibleMap).forEach((field) => {
+          visibleColumns.push(field);
+        });
+
+        // hide table columns / show column accordingly
+        this.updateColumnDefinitions(visibleColumns);
+
+        // save the new settings
+        this.saveVisibleAndOrderOfColumns();
+      });
   }
 
   /**
@@ -575,5 +838,81 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
    */
   changePage(page: PageEvent): void {
     this.pageChange.emit(page);
+  }
+
+  /**
+   * Save visible and order of columns
+   */
+  saveVisibleAndOrderOfColumns(e?: {
+    target: any
+  }): void {
+    // nothing to do ?
+    if (
+      !this._pageSettingsKey ||
+      e?.target?.classList?.contains('ag-header-cell-resize')
+    ) {
+      return;
+    }
+
+    // display loading spinner while saving visible columns instead of visible columns button
+    this.savingColumns = true;
+
+    // update layout
+    this.detectChanges();
+
+    // determine order of columns and which are pinned and save data
+    const visibleColumns: string[] = [];
+    const leftPinnedColumns: string[] = [];
+    const rightPinnedColumns: string[] = [];
+    this.agTable.columnApi.getColumnState().forEach((columnState) => {
+      // retrieve column definition
+      const colDef: IExtendedColDef = this.agTable.columnApi.getColumn(columnState.colId)?.getColDef();
+
+      // nothing to do ?
+      if (
+        !colDef ||
+        !colDef.columnDefinition ||
+        colDef.columnDefinition.format?.type === V2ColumnFormat.ACTIONS
+      ) {
+        return;
+      }
+
+      // visible column ?
+      if (colDef.columnDefinition.field) {
+        // add to save
+        visibleColumns.push(colDef.columnDefinition.field);
+
+        // pinned ?
+        if (columnState.pinned === 'left') {
+          leftPinnedColumns.push(colDef.columnDefinition.field);
+        } else if (columnState.pinned === 'right') {
+          rightPinnedColumns.push(colDef.columnDefinition.field);
+        }
+      }
+    });
+
+    // update settings
+    this.authDataService
+      .updateSettingsForCurrentUser({
+        [this._pageSettingsKey]: visibleColumns,
+        [this._pageSettingsKeyLPinned]: leftPinnedColumns,
+        [this._pageSettingsKeyRPinned]: rightPinnedColumns
+      })
+      .pipe(
+        catchError((err) => {
+          // #TODO
+          // this.snackbarService.showApiError(err);
+
+          // send error down the road
+          return throwError(err);
+        })
+      )
+      .subscribe(() => {
+        // finished saving
+        this.savingColumns = false;
+
+        // update layout
+        this.detectChanges();
+      });
   }
 }

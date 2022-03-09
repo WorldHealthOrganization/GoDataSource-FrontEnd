@@ -2,7 +2,10 @@
 @import 'font';
 
 .gd-form-input-v2 {
+  width: 100%;
+
   .mat-form-field {
+    width: 100%;
     font-family: $gd-font-family;
     font-size: $gd-font-size;
     line-height: $gd-line-height;

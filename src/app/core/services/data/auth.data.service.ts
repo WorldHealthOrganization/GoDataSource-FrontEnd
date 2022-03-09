@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import { StorageKey, StorageService } from '../helper/storage.service';
 import { UserDataService } from './user.data.service';
 import { AuthModel, IAuthTwoFactor, ITokenInfo } from '../../models/auth.model';
-import { UserModel, UserSettings } from '../../models/user.model';
+import { UserModel } from '../../models/user.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { map, mergeMap, switchMap, tap } from 'rxjs/operators';
 import * as moment from 'moment';
@@ -134,21 +134,18 @@ export class AuthDataService {
 
   /**
      * Update settings for current user
-     * @param settingsKey
-     * @param data
-     * @returns {Observable<any>}
      */
   updateSettingsForCurrentUser(
-    settingsKey: UserSettings,
-    data: any
+    settings: {
+      [settingsKey: string]: any
+    }
   ): Observable<any> {
     // save user settings to database
     const authUser = this.getAuthenticatedUser();
     return this.userDataService
       .updateSettings(
         authUser.id,
-        settingsKey,
-        data
+        settings
       )
       .pipe(
         mergeMap(() => {

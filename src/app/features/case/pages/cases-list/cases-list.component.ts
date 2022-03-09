@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription, throwError } from 'rxjs';
-import { UserModel, UserSettings } from '../../../../core/models/user.model';
+import { UserModel } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
@@ -9,7 +9,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton, DialogField, DialogFieldType } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { Constants } from '../../../../core/models/constants';
+import { ApplyListFilter, Constants } from '../../../../core/models/constants';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
@@ -38,6 +38,10 @@ import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
+import { IV2BreadcrumbAction } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 
 @Component({
   selector: 'app-cases-list',
@@ -46,6 +50,11 @@ import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-
 export class CasesListComponent extends ListComponent implements OnInit, OnDestroy {
   // list of existing cases
   casesList$: Observable<CaseModel[]>;
+
+  // field groups
+  casesFieldGroups: ILabelValuePairModel[];
+
+
 
   // address model needed for filters
   filterAddressModel: AddressModel = new AddressModel({
@@ -92,7 +101,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   // provide constants to template
   Constants = Constants;
   EntityType = EntityType;
-  UserSettings = UserSettings;
   ReferenceDataCategory = ReferenceDataCategory;
   LabResultModel = LabResultModel;
   CaseModel = CaseModel;
@@ -210,6 +218,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     private outbreakDataService: OutbreakDataService,
     private referenceDataDataService: ReferenceDataDataService,
     private dialogService: DialogService,
+    private dialogV2Service: DialogV2Service,
     private i18nService: I18nService,
     private genericDataService: GenericDataService,
     private clusterDataService: ClusterDataService,
@@ -270,6 +279,12 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       .subscribe((fieldsGroupList) => {
         this.fieldsGroupList = fieldsGroupList.toLabelValuePair(this.i18nService);
         this.fieldsGroupListRequired = fieldsGroupList.toRequiredList();
+
+        // set groups
+        this.casesFieldGroups = fieldsGroupList.options.map((item) => ({
+          label: item.name,
+          value: item.name
+        }));
       });
 
     // retrieve the list of export fields groups for relationships
@@ -1009,7 +1024,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
         // Export cases
         {
-          label: 'LNG_PAGE_LIST_CASES_EXPORT_BUTTON',
+          label: 'OLD',
           action: {
             click: () => {
               // display export dialog
@@ -1045,6 +1060,238 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 exportStart: () => { this.showLoadingDialog(); },
                 exportFinished: () => { this.closeLoadingDialog(); },
                 exportProgress: (data) => { this.showExportProgress(data); }
+              });
+            }
+          },
+          visible: (): boolean => {
+            return this.exportCasesUrl &&
+              CaseModel.canExport(this.authUser);
+          }
+        },
+        {
+          label: 'LNG_PAGE_LIST_CASES_EXPORT_BUTTON',
+          action: {
+            click: () => {
+              this.dialogV2Service.showExportData({
+                title: 'LNG_PAGE_LIST_CASES_EXPORT_TITLE',
+                export: {
+                  url: this.exportCasesUrl,
+                  async: true,
+                  fileName: moment().format('YYYY-MM-DD'),
+                  allow: {
+                    types: [
+                      ExportDataExtension.CSV,
+                      ExportDataExtension.XLS,
+                      ExportDataExtension.XLSX,
+                      ExportDataExtension.JSON,
+                      ExportDataExtension.ODS,
+                      ExportDataExtension.PDF
+                    ],
+                    encrypt: true,
+                    anonymize: {
+                      fields: [
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_ID',
+                          value: 'id'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
+                          value: 'firstName'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
+                          value: 'middleName'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
+                          value: 'lastName'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_GENDER',
+                          value: 'gender'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
+                          value: 'phoneNumber'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
+                          value: 'occupation'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_DOB',
+                          value: 'dob'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_AGE',
+                          value: 'age'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
+                          value: 'riskLevel'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_RISK_REASON',
+                          value: 'riskReason'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_DOCUMENTS',
+                          value: 'documents'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_ADDRESSES',
+                          value: 'addresses'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+                          value: 'classification'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
+                          value: 'dateOfInfection'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
+                          value: 'dateOfOnset'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
+                          value: 'isDateOfOnsetApproximate'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
+                          value: 'dateOfOutcome'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
+                          value: 'dateBecomeCase'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_DATE_RANGES',
+                          value: 'dateRanges'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+                          value: 'questionnaireAnswers'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_TYPE',
+                          value: 'type'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
+                          value: 'dateOfReporting'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+                          value: 'isDateOfReportingApproximate'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
+                          value: 'transferRefused'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
+                          value: 'visualId'
+                        },
+                        {
+                          label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT',
+                          value: 'createdAt'
+                        },
+                        {
+                          label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY',
+                          value: 'createdBy'
+                        },
+                        {
+                          label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT',
+                          value: 'updatedAt'
+                        },
+                        {
+                          label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY',
+                          value: 'updatedBy'
+                        },
+                        {
+                          label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED',
+                          value: 'deleted'
+                        },
+                        {
+                          label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT',
+                          value: 'deletedAt'
+                        },
+                        {
+                          label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON',
+                          value: 'createdOn'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
+                          value: 'wasContact'
+                        },
+                        {
+                          label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE',
+                          value: 'wasCase'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_OUTCOME_ID',
+                          value: 'outcomeId'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_SAFE_BURIAL',
+                          value: 'safeBurial'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL',
+                          value: 'dateOfBurial'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+                          value: 'numberOfExposures'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS',
+                          value: 'numberOfContacts'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_BURIAL_LOCATION_ID',
+                          value: 'burialLocationId'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME',
+                          value: 'burialPlaceName'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED',
+                          value: 'vaccinesReceived'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
+                          value: 'pregnancyStatus'
+                        },
+                        {
+                          label: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
+                          value: 'responsibleUserId'
+                        }
+                      ]
+                    },
+                    groups: {
+                      fields: this.casesFieldGroups,
+                      // required: - #TODO
+                    },
+                    dbColumns: true,
+                    dbValues: true,
+                    jsonReplaceUndefinedWithNull: true,
+                    questionnaireVariables: true
+                  },
+                  inputs: {
+                    append: [
+                      {
+                        type: V2SideDialogConfigInputType.CHECKBOX,
+                        placeholder: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION',
+                        name: 'includeContactFields',
+                        checked: false
+                      }
+                    ]
+                  }
+                }
               });
             }
           },
@@ -1486,6 +1733,22 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    * Initialize breadcrumbs
    */
   initializeBreadcrumbs(): void {
+    // determine if cases page should be linkable
+    let casesAction: IV2BreadcrumbAction = null;
+
+    // if we have an applied filter then we need to add breadcrumb
+    if (this.appliedListFilter === ApplyListFilter.CASES_WITHOUT_RELATIONSHIPS) {
+      // since we need to send user to the same page we need to do some hacks...
+      const redirect = this.redirectService.linkAndQueryParams(
+        ['/cases']
+      );
+      casesAction = {
+        link: redirect.link(),
+        linkQueryParams: redirect.linkQueryParams()
+      };
+    }
+
+    // set breadcrumbs
     this.breadcrumbs = [
       {
         label: 'LNG_COMMON_LABEL_HOME',
@@ -1496,9 +1759,17 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         }
       }, {
         label: 'LNG_PAGE_LIST_CASES_TITLE',
-        action: null
+        action: casesAction
       }
     ];
+
+    // if we have an applied filter then we need to add breadcrumb
+    if (this.appliedListFilter === ApplyListFilter.CASES_WITHOUT_RELATIONSHIPS) {
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_DASHBOARD_CASES_WITHOUT_RELATIONSHIPS',
+        action: null
+      });
+    }
   }
 
   /**

@@ -1,0 +1,23 @@
+.gd-app-side-dialog-v2 {
+  .mat-drawer-backdrop {
+    position: fixed;
+  }
+
+  .mat-sidenav {
+    .gd-app-side-dialog-v2-content {
+      width: 300px;
+      height: 100%;
+
+      .gd-app-side-dialog-v2-content-top {
+      }
+
+      .gd-app-side-dialog-v2-content-middle {
+        overflow-x: hidden;
+        overflow-y: overlay;
+      }
+
+      .gd-app-side-dialog-v2-content-bottom {
+      }
+    }
+  }
+}
