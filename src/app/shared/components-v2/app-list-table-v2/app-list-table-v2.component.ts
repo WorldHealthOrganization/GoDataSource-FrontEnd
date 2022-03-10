@@ -683,14 +683,13 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           visibleColumns.push(field);
         });
 
-        // scroll to the end if we added columns at the end
-        if (remainingColumns.length) {
-          console.log(1);
-          // this.agTable.api.ensureColumnVisible();
-        }
-
         // hide table columns / show column accordingly
         this.updateColumnDefinitions(visibleColumns);
+
+        // scroll to the end if we added columns at the end
+        if (remainingColumns.length > 0) {
+          this.agTable.api.ensureColumnVisible(remainingColumns[0]);
+        }
 
         // save the new settings
         this.saveVisibleAndOrderOfColumns();
