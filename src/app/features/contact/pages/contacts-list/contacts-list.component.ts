@@ -29,7 +29,6 @@ import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
-import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -556,7 +555,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
     private dialogService: DialogService,
     private i18nService: I18nService,
     private userDataService: UserDataService,
-    private entityHelperService: EntityHelperService,
     private teamDataService: TeamDataService
   ) {
     super(listHelperService);
@@ -1727,10 +1725,10 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
     }
 
     // display dialog
-    this.entityHelperService.displayContacts(
-      this.selectedOutbreak.id,
-      entity
-    );
+    // this.entityHelperService.displayContacts(
+    //   this.selectedOutbreak.id,
+    //   entity
+    // );
   }
 
   /**
@@ -1743,10 +1741,10 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
     }
 
     // display dialog
-    this.entityHelperService.displayExposures(
-      this.selectedOutbreak.id,
-      entity
-    );
+    // this.entityHelperService.displayExposures(
+    //   this.selectedOutbreak.id,
+    //   entity
+    // );
   }
 
   /**

@@ -28,7 +28,6 @@ import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.model';
 import { RiskLevelModel } from '../../../../core/models/risk-level.model';
@@ -331,8 +330,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     private referenceDataDataService: ReferenceDataDataService,
     private dialogService: DialogService,
     private i18nService: I18nService,
-    private userDataService: UserDataService,
-    private entityHelperService: EntityHelperService
+    private userDataService: UserDataService
   ) {
     super(listHelperService);
   }
@@ -1071,10 +1069,10 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     }
 
     // display dialog
-    this.entityHelperService.displayExposures(
-      this.selectedOutbreak.id,
-      entity
-    );
+    // this.entityHelperService.displayExposures(
+    //   this.selectedOutbreak.id,
+    //   entity
+    // );
   }
 
   /**

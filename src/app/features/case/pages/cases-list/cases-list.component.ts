@@ -534,11 +534,45 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       this.tableColumns.push(
         {
           field: 'numberOfContacts',
-          label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS'
+          label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS',
+          format: {
+            type: V2ColumnFormat.BUTTON
+          },
+          buttonLabel: (item) => (item.numberOfContacts || '').toLocaleString('en'),
+          color: 'text',
+          click: (item) => {
+            // if we do not have contacts return
+            if (item.numberOfContacts < 1) {
+              return;
+            }
+
+            // display dialog
+            this.entityHelperService.contacts(
+              this.selectedOutbreak.id,
+              item
+            );
+          }
         },
         {
           field: 'numberOfExposures',
-          label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES'
+          label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+          format: {
+            type: V2ColumnFormat.BUTTON
+          },
+          buttonLabel: (item) => (item.numberOfExposures || '').toLocaleString('en'),
+          color: 'text',
+          click: (item) => {
+            // if we do not have exposures return
+            if (item.numberOfExposures < 1) {
+              return;
+            }
+
+            // display dialog
+            this.entityHelperService.exposures(
+              this.selectedOutbreak.id,
+              item
+            );
+          }
         }
       );
     }
@@ -2164,38 +2198,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         exportFinished: () => { this.closeLoadingDialog(); }
       });
     }
-  }
-
-  /**
-     * Display contacts popup
-     */
-  displayContacts(entity: CaseModel) {
-    // if we do not have contacts return
-    if (entity.numberOfContacts < 1) {
-      return;
-    }
-
-    // display dialog
-    this.entityHelperService.displayContacts(
-      this.selectedOutbreak.id,
-      entity
-    );
-  }
-
-  /**
-     * Display exposures popup
-     */
-  displayExposures(entity: CaseModel) {
-    // if we do not have any exposure return
-    if (entity.numberOfExposures < 1) {
-      return;
-    }
-
-    // display dialog
-    this.entityHelperService.displayExposures(
-      this.selectedOutbreak.id,
-      entity
-    );
   }
 
   /**

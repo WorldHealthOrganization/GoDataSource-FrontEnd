@@ -23,7 +23,6 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { Subscription } from 'rxjs/internal/Subscription';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
-import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
@@ -321,7 +320,6 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
     private genericDataService: GenericDataService,
     private i18nService: I18nService,
     private userDataService: UserDataService,
-    private entityHelperService: EntityHelperService,
     private redirectService: RedirectService
   ) {
     super(listHelperService);
@@ -818,10 +816,10 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
     }
 
     // display dialog
-    this.entityHelperService.displayContacts(
-      this.selectedOutbreak.id,
-      entity
-    );
+    // this.entityHelperService.displayContacts(
+    //   this.selectedOutbreak.id,
+    //   entity
+    // );
   }
 
   /**
@@ -834,10 +832,10 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
     }
 
     // display dialog
-    this.entityHelperService.displayExposures(
-      this.selectedOutbreak.id,
-      entity
-    );
+    // this.entityHelperService.displayExposures(
+    //   this.selectedOutbreak.id,
+    //   entity
+    // );
   }
 
   /**
