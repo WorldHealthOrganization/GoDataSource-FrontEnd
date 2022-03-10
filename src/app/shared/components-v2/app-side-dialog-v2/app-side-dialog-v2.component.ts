@@ -39,6 +39,23 @@ export class AppSideDialogV2Component implements OnDestroy {
     // form
     form: null,
 
+    // update
+    update: {
+      inputs: (inputs) => {
+        // already closed ?
+        if (!this.sideNav.opened) {
+          return;
+        }
+
+        // update inputs
+        this.config.inputs = inputs;
+        this.updateInputs();
+
+        // update UI
+        this.changeDetectorRef.detectChanges();
+      }
+    },
+
     // hide dialog
     hide: () => {
       // hide without triggering action since it will be triggered bellow with other options
@@ -187,14 +204,8 @@ export class AppSideDialogV2Component implements OnDestroy {
       // set data
       this.config = config;
 
-      // map inputs
-      this.dialogData = {
-        inputs: this.config.inputs,
-        map: {}
-      };
-      this.config.inputs.forEach((input) => {
-        this.dialogData.map[input.name] = input;
-      });
+      // update inputs
+      this.updateInputs();
 
       // show all
       this.filterByValue = '';
@@ -374,5 +385,19 @@ export class AppSideDialogV2Component implements OnDestroy {
         this.hide(true);
         break;
     }
+  }
+
+  /**
+   * Update inputs
+   */
+  updateInputs(): void {
+    // map inputs
+    this.dialogData = {
+      inputs: this.config.inputs,
+      map: {}
+    };
+    this.config.inputs.forEach((input) => {
+      this.dialogData.map[input.name] = input;
+    });
   }
 }
