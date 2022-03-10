@@ -1050,6 +1050,29 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           CaseModel.canExportRelationships(this.authUser);
       },
       menuOptions: [
+        // DELETE ME
+        {
+          label: 'DELETE ME',
+          action: {
+            click: () => {
+              this.dialogV2Service.showConfirmDialog({
+                config: {
+                  title: {
+                    get: () => 'some title'
+                  },
+                  message: {
+                    get: () => ''
+                  }
+                },
+                initialized: (handler) => {
+                  // display loading
+                  handler.loading.show();
+                }
+              }).subscribe(() => {});
+            }
+          }
+        },
+
         // No relationships
         {
           label: 'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON',
