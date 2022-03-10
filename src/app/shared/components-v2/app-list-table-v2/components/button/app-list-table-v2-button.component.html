@@ -1,0 +1,11 @@
+<!-- Button -->
+<div
+  class="gd-list-table-button">
+  <button
+    type="button"
+    mat-flat-button
+    [color]="buttonColDef.color"
+    (click)="buttonColDef.click(data)">
+    {{buttonColDef.buttonLabel(data)}}
+  </button>
+</div>

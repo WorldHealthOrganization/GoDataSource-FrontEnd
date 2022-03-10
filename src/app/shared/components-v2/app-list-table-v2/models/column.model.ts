@@ -47,6 +47,7 @@ export interface IV2ColumnBasic {
  * Format
  */
 export enum V2ColumnFormat {
+  BUTTON,
   AGE,
   DATE,
   DATETIME,
@@ -95,6 +96,28 @@ interface IV2ColumnBoolean extends Omit<IV2ColumnBasic, 'format'> {
 }
 
 /**
+ * Button column
+ */
+export interface IV2ColumnButton {
+  // required
+  format: Omit<IV2ColumnBasicFormat, 'type'> & {
+    type: V2ColumnFormat.BUTTON
+  };
+  field: string;
+  label: string;
+  buttonLabel: (data: any) => string;
+  color: 'text' | 'secondary' | 'primary' | 'warn' | 'accent' | undefined;
+  click: (data: any) => void;
+
+  // optional
+  notVisible?: boolean;
+  exclude?: (IV2Column) => boolean;
+  pinned?: IV2ColumnPinned | boolean;
+  notResizable?: boolean;
+  cssCellClasses?: string;
+}
+
+/**
  * Action column
  */
 export interface IV2ColumnAction {
@@ -117,4 +140,4 @@ export interface IV2ColumnAction {
 /**
  * Column
  */
-export type IV2Column = IV2ColumnBasic | IV2ColumnAge | IV2ColumnDate | IV2ColumnDatetime | IV2ColumnBoolean | IV2ColumnAction;
+export type IV2Column = IV2ColumnBasic | IV2ColumnButton | IV2ColumnAge | IV2ColumnDate | IV2ColumnDatetime | IV2ColumnBoolean | IV2ColumnAction;

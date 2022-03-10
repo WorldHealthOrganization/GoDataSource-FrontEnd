@@ -11,7 +11,7 @@ import { moment } from '../../../core/helperClasses/x-moment';
 import { Constants } from '../../../core/models/constants';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-import { IV2Column, IV2ColumnAction, IV2ColumnBasic, IV2ColumnBasicFormat, IV2ColumnPinned, V2ColumnFormat } from './models/column.model';
+import { IV2Column, IV2ColumnAction, IV2ColumnBasic, IV2ColumnBasicFormat, IV2ColumnButton, IV2ColumnPinned, V2ColumnFormat } from './models/column.model';
 import { AppListTableV2ActionsComponent } from './components/actions/app-list-table-v2-actions.component';
 import { IExtendedColDef } from './models/extended-column.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
@@ -27,6 +27,7 @@ import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputCheckbox, V2Side
 import { UserModel, UserSettings } from '../../../core/models/user.model';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { catchError } from 'rxjs/operators';
+import { AppListTableV2ButtonComponent } from './components/button/app-list-table-v2-button.component';
 
 /**
  * Component
@@ -526,7 +527,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
               this.i18nService.instant('LNG_COMMON_LABEL_YES') :
               this.i18nService.instant('LNG_COMMON_LABEL_NO');
 
-          // ACTIONS
+          // ACTIONS & BUTTONS
+          case V2ColumnFormat.BUTTON:
           case V2ColumnFormat.ACTIONS:
 
             // nothing to do here
@@ -565,15 +567,24 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           `<a class="gd-list-table-link" href="${this.location.prepareExternalUrl(url)}"><span is-link="${url}">${value}</span><a/>` :
           value;
       };
-    }
+    } else {
+      // actions ?
+      const actionColumn: IV2ColumnAction = column as IV2ColumnAction;
+      if (
+        actionColumn.format &&
+        actionColumn.format.type === V2ColumnFormat.ACTIONS
+      ) {
+        return AppListTableV2ActionsComponent;
+      }
 
-    // actions ?
-    const actionColumn: IV2ColumnAction = column as IV2ColumnAction;
-    if (
-      actionColumn.format &&
-      actionColumn.format.type === V2ColumnFormat.ACTIONS
-    ) {
-      return AppListTableV2ActionsComponent;
+      // buttons
+      const actionButton: IV2ColumnButton = column as IV2ColumnButton;
+      if (
+        actionButton.format &&
+        actionButton.format.type === V2ColumnFormat.BUTTON
+      ) {
+        return AppListTableV2ButtonComponent;
+      }
     }
 
     // nothing to do ?
