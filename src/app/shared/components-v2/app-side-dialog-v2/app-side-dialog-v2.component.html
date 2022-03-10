@@ -148,6 +148,7 @@
         <div
           *ngIf="filteredInputs === false"
           class="gd-app-side-dialog-v2-content-middle-not-found">
+          <mat-icon>search_off</mat-icon>
           {{'LNG_COMMON_LABEL_NOTHING_FOUND' | translate}}
         </div>
       </form>
@@ -175,13 +176,14 @@
       <div
         *ngIf="loading"
         class="gd-app-side-dialog-v2-content-loading"
-        fxLayout="column" fxLayoutAlign="center center">
+        [style.max-width]="config?.width"
+        fxLayout="column" fxLayoutAlign="start center">
 
         <!-- Spinner -->
         <mat-progress-spinner
           class="gd-app-side-dialog-v2-content-loading-spinner"
           mode="indeterminate"
-          diameter="64"></mat-progress-spinner>
+          diameter="32"></mat-progress-spinner>
 
         <!-- Message -->
         <div
