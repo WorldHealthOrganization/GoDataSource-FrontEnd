@@ -1,0 +1,20 @@
+/* Loading Dialog */
+.cdk-overlay-container {
+  .cdk-overlay-backdrop {
+    background: rgba(0, 0, 0, 0.85);
+    @include transition(opacity 0.24s ease-in-out 0s);
+    
+
+    &.cdk-overlay-dark-backdrop {
+      background: rgba(0, 0, 0, 0.85);
+    }
+  }
+
+  .mat-dialog-container {
+    background: transparent;
+    @include border-radius(0);
+    @include box-shadow(none);
+    color: var(--gd-background);
+    padding: 1.6rem;
+  }
+}
