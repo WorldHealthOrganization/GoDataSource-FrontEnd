@@ -1058,7 +1058,23 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 label: 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_CASE_INVESTIGATION_FORM',
                 action: {
                   click: (item: CaseModel) => {
-                    this.exportCaseInvestigationForm(item);
+                    // export
+                    this.dialogV2Service.showExportData({
+                      title: {
+                        get: () => 'LNG_PAGE_LIST_CASES_EXPORT_CASE_INVESTIGATION_FORM_TITLE'
+                      },
+                      export: {
+                        url: `outbreaks/${this.selectedOutbreak.id}/cases/${item.id}/export-empty-case-investigation`,
+                        async: false,
+                        method: ExportDataMethod.GET,
+                        fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
+                        allow: {
+                          types: [
+                            ExportDataExtension.ZIP
+                          ]
+                        }
+                      }
+                    });
                   }
                 },
                 visible: (item: CaseModel): boolean => {
@@ -2091,23 +2107,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     });
   }
 
-  /**
-     * Export case investigation form for a Case
-     */
-  exportCaseInvestigationForm(caseModel: CaseModel) {
-    // display export only if we have a selected outbreak
-    if (this.selectedOutbreak) {
-      // display export dialog
-      this.dialogService.showExportDialog({
-        message: 'LNG_PAGE_LIST_CASES_EXPORT_CASE_INVESTIGATION_FORM_TITLE',
-        url: `outbreaks/${this.selectedOutbreak.id}/cases/${caseModel.id}/export-empty-case-investigation`,
-        fileName: '...', // this.casesDataExportFileName,
-        fileType: ExportDataExtension.ZIP,
-        exportStart: () => { this.showLoadingDialog(); },
-        exportFinished: () => { this.closeLoadingDialog(); }
-      });
-    }
-  }
 
   /**
      * Export cases dossier
