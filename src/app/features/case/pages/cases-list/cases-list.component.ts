@@ -1040,6 +1040,32 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           }
         },
         {
+          label: 'NEW side loading dialog (remove me)',
+          action: {
+            click: () => {
+              let c;
+              this.dialogV2Service.showSideDialog({
+                title: 'Balaur...',
+                bottomButtons: [],
+                inputs: [],
+                initialized: (handler) => {
+                  handler.loading.show();
+                  c = handler;
+                }
+              }).subscribe(() => {});
+              let m: string = '';
+              const b = () => {
+                setTimeout(() => {
+                  m += 'abcefg';
+                  c.loading.message(m);
+                  b();
+                }, 500);
+              };
+              b();
+            }
+          }
+        },
+        {
           label: 'LNG_PAGE_LIST_CASES_EXPORT_BUTTON',
           action: {
             click: () => {
