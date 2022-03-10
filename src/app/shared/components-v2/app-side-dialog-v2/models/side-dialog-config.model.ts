@@ -220,7 +220,7 @@ export interface IV2SideDialogHandler {
 }
 
 /**
- * Dialog handler
+ * Dialog data
  */
 export interface IV2SideDialogData {
   // required
