@@ -53,7 +53,15 @@ export interface IV2ExportDataConfigGroupsRequired {
  */
 export interface IV2ExportDataConfig {
   // required
-  title: string;
+  title: {
+    // required
+    get: () => string,
+
+    // optional
+    data?: () => {
+      [key: string]: string
+    }
+  };
   export: {
     // required
     url: string,

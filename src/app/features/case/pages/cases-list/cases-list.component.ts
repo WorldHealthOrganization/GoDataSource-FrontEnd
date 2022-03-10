@@ -43,6 +43,7 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 
 @Component({
   selector: 'app-cases-list',
@@ -657,7 +658,90 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 cssClasses: 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: CaseModel): void => {
-                    this.deleteCase(item);
+                    // data
+                    const message: {
+                      get: string,
+                      data?: {
+                        name: string,
+                        numberOfContacts: string
+                      }
+                    } = {
+                      get: ''
+                    };
+
+                    // determine what we need to delete
+                    this.dialogV2Service.showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_DELETE',
+                          data: () => ({
+                            name: item.name
+                          })
+                        },
+                        message: {
+                          get: () => message.get,
+                          data: () => message.data
+                        }
+                      },
+                      initialized: (handler) => {
+                        // display loading
+                        handler.loading.show();
+
+                        // determine if case has exposed contacts
+                        this.caseDataService
+                          .getExposedContactsForCase(this.selectedOutbreak.id, item.id)
+                          .subscribe((exposedContacts: { count: number }) => {
+                            // set message data
+                            message.data = {
+                              name: item.name,
+                              numberOfContacts: exposedContacts?.count.toLocaleString('en')
+                            };
+
+                            // determine message label
+                            message.get = !exposedContacts?.count ?
+                              'LNG_DIALOG_CONFIRM_DELETE_CASE' :
+                              'LNG_DIALOG_CONFIRM_DELETE_CASE_WITH_EXPOSED_CONTACTS';
+
+                            // hide loading
+                            handler.loading.hide();
+                          });
+                      }
+                    }).subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading = this.dialogV2Service.showLoadingDialog();
+
+                      // delete case
+                      this.caseDataService
+                        .deleteCase(
+                          this.selectedOutbreak.id,
+                          item.id
+                        )
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            // this.snackbarService.showApiError(err);
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+                          // success
+                          // this.snackbarService.showSuccess('LNG_PAGE_LIST_CASES_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                          // hide loading
+                          loading.close();
+
+                          // reload data
+                          this.needsRefreshList(true);
+                        });
+                    });
                   },
                 },
                 visible: (item: CaseModel): boolean => {
@@ -1021,56 +1105,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
         // Export cases
         {
-          label: 'NEW loading dialog (remove me)',
-          action: {
-            click: () => {
-              const d = this.dialogV2Service.showLoadingDialog();
-              let m: string = '';
-              const b = () => {
-                setTimeout(() => {
-                  m += 'abc';
-                  d.message({
-                    message: m
-                  });
-                  b();
-                }, 500);
-              };
-              b();
-            }
-          }
-        },
-        {
-          label: 'NEW side loading dialog (remove me)',
-          action: {
-            click: () => {
-              let c;
-              this.dialogV2Service.showSideDialog({
-                title: 'Balaur...',
-                bottomButtons: [],
-                inputs: [],
-                initialized: (handler) => {
-                  handler.loading.show();
-                  c = handler;
-                }
-              }).subscribe(() => {});
-              let m: string = '';
-              const b = () => {
-                setTimeout(() => {
-                  m += 'abcefg';
-                  c.loading.message(m);
-                  b();
-                }, 500);
-              };
-              b();
-            }
-          }
-        },
-        {
           label: 'LNG_PAGE_LIST_CASES_EXPORT_BUTTON',
           action: {
             click: () => {
               this.dialogV2Service.showExportData({
-                title: 'LNG_PAGE_LIST_CASES_EXPORT_TITLE',
+                title: {
+                  get: () => 'LNG_PAGE_LIST_CASES_EXPORT_TITLE'
+                },
                 export: {
                   url: `/outbreaks/${this.selectedOutbreak.id}/cases/export`,
                   async: true,
@@ -1145,7 +1186,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           action: {
             click: () => {
               this.dialogV2Service.showExportData({
-                title: 'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS_TITLE',
+                title: {
+                  get: () => 'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS_TITLE'
+                },
                 export: {
                   url: `outbreaks/${this.selectedOutbreak.id}/cases/export-investigation-template`,
                   async: false,
@@ -1210,7 +1253,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
               // export
               this.dialogV2Service.showExportData({
-                title: 'LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIPS_TITLE',
+                title: {
+                  get: () => 'LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIPS_TITLE'
+                },
                 export: {
                   url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
                   async: true,
@@ -1812,45 +1857,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   getCaseClassificationColor(item: CaseModel) {
     const classificationData = _.get(this.caseClassificationsListMap, item.classification);
     return _.get(classificationData, 'colorCode', '');
-  }
-
-  /**
-     * Delete specific case from the selected outbreak
-     * @param {CaseModel} caseModel
-     */
-  deleteCase(caseModel: CaseModel) {
-    this.caseDataService
-      .getExposedContactsForCase(this.selectedOutbreak.id, caseModel.id)
-      .subscribe((exposedContacts: {count: number}) => {
-        if (exposedContacts) {
-          const translateData = {
-            name: caseModel.name,
-            numberOfContacts: exposedContacts.count
-          };
-          this.dialogService.showConfirm(
-            exposedContacts.count > 0 ?
-              'LNG_DIALOG_CONFIRM_DELETE_CASE_WITH_EXPOSED_CONTACTS' :
-              'LNG_DIALOG_CONFIRM_DELETE_CASE', translateData)
-            .subscribe((answer: DialogAnswer) => {
-              if (answer.button === DialogAnswerButton.Yes) {
-                // delete case
-                this.caseDataService
-                  .deleteCase(this.selectedOutbreak.id, caseModel.id)
-                  .pipe(
-                    catchError((err) => {
-                      this.snackbarService.showApiError(err);
-                      return throwError(err);
-                    })
-                  )
-                  .subscribe(() => {
-                    this.snackbarService.showSuccess('LNG_PAGE_LIST_CASES_ACTION_DELETE_SUCCESS_MESSAGE');
-
-                    // reload data
-                    this.needsRefreshList(true);
-                  });                            }
-            });
-        }
-      });
   }
 
   /**

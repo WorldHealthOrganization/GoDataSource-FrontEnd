@@ -173,7 +173,15 @@ export interface IV2SideDialogConfigButton {
  */
 export interface IV2SideDialogConfig {
   // required
-  title: string;
+  title: {
+    // required
+    get: () => string,
+
+    // optional
+    data?: () => {
+      [key: string]: string
+    }
+  };
   inputs: V2SideDialogConfigInput[];
   bottomButtons: IV2SideDialogConfigButton[];
 

@@ -1,10 +1,12 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { IV2SideDialogConfig, IV2SideDialogConfigButton, IV2SideDialogConfigButtonType, IV2SideDialogData, IV2SideDialogHandler, IV2SideDialogResponse, V2SideDialogConfigInputType } from './models/side-dialog-config.model';
 import { Observable, Subscriber } from 'rxjs';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v2';
 import { NgForm } from '@angular/forms';
+import { Location } from '@angular/common';
+import { SubscriptionLike } from 'rxjs/internal/types';
 
 /**
  * Component
@@ -16,7 +18,7 @@ import { NgForm } from '@angular/forms';
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None
 })
-export class AppSideDialogV2Component {
+export class AppSideDialogV2Component implements OnDestroy {
   // Side Nav
   @ViewChild('sideNav', { static: true }) sideNav: MatSidenav;
 
@@ -146,13 +148,32 @@ export class AppSideDialogV2Component {
   // constants
   V2SideDialogConfigInputType = V2SideDialogConfigInputType;
 
+  // subscriptions
+  locationSubscription: SubscriptionLike;
+
   /**
    * Constructor
    */
   constructor(
     protected changeDetectorRef: ChangeDetectorRef,
-    protected i18nService: I18nService
-  ) {}
+    protected i18nService: I18nService,
+    location: Location
+  ) {
+    this.locationSubscription = location.subscribe(() => {
+      this.hide(true);
+    });
+  }
+
+  /**
+   * Component destroyed
+   */
+  ngOnDestroy(): void {
+    // release location subscription
+    if (this.locationSubscription) {
+      this.locationSubscription.unsubscribe();
+      this.locationSubscription = undefined;
+    }
+  }
 
   /**
    * Open sidenav

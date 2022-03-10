@@ -29,7 +29,7 @@
           <div
             class="gd-app-side-dialog-v2-content-top-title"
             fxFlex>
-            {{config?.title | translate}}
+            {{config?.title.get() | translate:(config?.title.data ? config?.title.data() : undefined)}}
           </div>
 
           <!-- Close button -->

@@ -1,0 +1,90 @@
+<!-- Bottom dialog content -->
+<div
+  class="gd-app-bottom-dialog-v2"
+  fxLayout="column">
+
+  <!-- Top Bar -->
+  <div
+    fxGrow="0" fxLayout="column"
+    class="gd-app-bottom-dialog-v2-top">
+
+    <!-- Title & Close button -->
+    <div
+      fxLayout="row" fxLayoutAlign="space-between center"
+      class="gd-app-bottom-dialog-v2-tb">
+
+      <!-- Title -->
+      <div
+        class="gd-app-bottom-dialog-v2-top-title"
+        fxFlex>
+        {{config?.config.title.get() | translate:(config?.config.title.data ? config?.config.title.data() : undefined)}}
+      </div>
+
+      <!-- Close button -->
+      <button
+        class="gd-app-bottom-dialog-v2-top-close"
+        type="button"
+        mat-icon-button
+        (click)="hide()"
+        [disabled]="!!loading">
+        <mat-icon>close</mat-icon>
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- Content -->
+  <ng-container
+    *ngIf="!loading; else showLoading">
+
+    <!-- Message -->
+    <div
+      fxFlex
+      class="gd-app-bottom-dialog-v2-middle">
+      {{config?.config.message.get() | translate:(config?.config.message.data ? config?.config.message.data() : undefined)}}
+    </div>
+
+    <!-- Bottom Bar -->
+    <div
+      fxGrow="0" fxLayout="row" fxLayoutAlign="space-between" fxLayoutGap="1.6rem"
+      class="gd-app-bottom-dialog-v2-bottom">
+
+      <!-- Buttons -->
+      <button
+        *ngFor="let button of config?.bottomButtons"
+        type="button"
+        mat-flat-button [color]="button.color"
+        class="gd-app-bottom-dialog-v2-bottom-button"
+        (click)="clickedButton(button)">
+        {{button.label | translate}}
+      </button>
+
+    </div>
+
+  </ng-container>
+
+  <!-- Loading data -->
+  <ng-template
+    #showLoading>
+    <div
+      *ngIf="loading"
+      class="gd-app-side-dialog-v2-content-loading"
+      fxLayout="column" fxLayoutAlign="start center">
+
+      <!-- Spinner -->
+      <mat-progress-spinner
+        class="gd-app-side-dialog-v2-content-loading-spinner"
+        mode="indeterminate"
+        diameter="32"></mat-progress-spinner>
+
+      <!-- Message -->
+      <div
+        *ngIf="loading.message"
+        class="gd-app-side-dialog-v2-content-loading-message">
+        {{loading.message | translate:loading.messageData}}
+      </div>
+    </div>
+  </ng-template>
+
+</div>

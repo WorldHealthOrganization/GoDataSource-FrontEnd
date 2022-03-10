@@ -26,6 +26,9 @@ import * as moment from 'moment';
 import { Moment } from 'moment';
 import { Constants, ExportStatusStep } from '../../models/constants';
 import { ExportLogDataService } from '../data/export-log.data.service';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
+import { AppBottomDialogV2Component } from '../../../shared/components-v2/app-bottom-dialog-v2/app-bottom-dialog-v2.component';
+import { IV2BottomDialogConfig, IV2BottomDialogConfigButtonType, IV2BottomDialogConfigData, IV2BottomDialogHandler, IV2BottomDialogResponse } from '../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 
 @Injectable()
 export class DialogV2Service {
@@ -46,7 +49,8 @@ export class DialogV2Service {
     private matDialog: MatDialog,
     private formHelperService: FormHelperService,
     private importExportDataService: ImportExportDataService,
-    private exportLogDataService: ExportLogDataService
+    private exportLogDataService: ExportLogDataService,
+    private matBottomSheet: MatBottomSheet
   ) {}
 
   /**
@@ -79,6 +83,7 @@ export class DialogV2Service {
         disableClose: true,
         hasBackdrop: true,
         panelClass: 'gd-app-loading-dialog-panel',
+        backdropClass: 'gd-app-loading-dialog-backdrop',
         width: '35rem',
         data: handler.data
       }
@@ -683,5 +688,54 @@ export class DialogV2Service {
             });
         })
       });
+  }
+
+  /**
+   * Show bottom dialog
+   */
+  showBottomDialog(config: IV2BottomDialogConfig): Observable<IV2BottomDialogResponse> {
+    return this.matBottomSheet
+      .open(
+        AppBottomDialogV2Component, {
+          data: config,
+          hasBackdrop: true,
+          panelClass: 'gd-app-bottom-dialog-panel',
+          backdropClass: 'gd-app-bottom-dialog-backdrop',
+          disableClose: true,
+          closeOnNavigation: false
+        }
+      ).afterDismissed();
+  }
+
+  /**
+   * Confirm dialog
+   */
+  showConfirmDialog(data: {
+    // required
+    config: IV2BottomDialogConfigData,
+
+    // optional
+    initialized?: (handler: IV2BottomDialogHandler) => void,
+    yesLabel?: string,
+    cancelLabel?: string
+  }): Observable<IV2BottomDialogResponse> {
+    return this.showBottomDialog({
+      config: data.config,
+      initialized: data.initialized,
+      bottomButtons: [{
+        type: IV2BottomDialogConfigButtonType.OTHER,
+        label: data.yesLabel ?
+          data.yesLabel :
+          'LNG_DIALOG_CONFIRM_BUTTON_YES',
+        key: 'yes',
+        color: 'warn'
+      }, {
+        type: IV2BottomDialogConfigButtonType.CANCEL,
+        label: data.cancelLabel ?
+          data.cancelLabel :
+          'LNG_DIALOG_CONFIRM_BUTTON_CANCEL',
+        color: 'text'
+      }]
+    });
   }
 }

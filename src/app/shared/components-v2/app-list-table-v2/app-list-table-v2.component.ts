@@ -617,7 +617,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     this.dialogV2Service
       .showSideDialog({
         // dialog
-        title: 'LNG_SIDE_COLUMNS_SECTION_COLUMNS_TO_DISPLAY_TITLE',
+        title: {
+          get: () => 'LNG_SIDE_COLUMNS_SECTION_COLUMNS_TO_DISPLAY_TITLE'
+        },
 
         // inputs
         inputs: checkboxInputs,
