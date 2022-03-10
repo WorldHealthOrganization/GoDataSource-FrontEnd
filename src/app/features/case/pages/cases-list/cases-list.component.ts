@@ -7,7 +7,7 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton, DialogField, DialogFieldType } from '../../../../shared/components';
+import { DialogField, DialogFieldType } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ApplyListFilter, Constants } from '../../../../core/models/constants';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
@@ -15,7 +15,6 @@ import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryMo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Params, Router } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
-import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import * as _ from 'lodash';
@@ -1089,7 +1088,57 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 cssClasses: 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: CaseModel) => {
-                    this.restoreCase(item);
+                    // show confirm dialog to confirm the action
+                    this.dialogV2Service.showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_RESTORE',
+                          data: () => item as any
+                        },
+                        message: {
+                          get: () => 'LNG_DIALOG_CONFIRM_RESTORE_CASE',
+                          data: () => item as any
+                        }
+                      }
+                    }).subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading = this.dialogV2Service.showLoadingDialog();
+
+                      // convert
+                      this.caseDataService
+                        .restoreCase(
+                          this.selectedOutbreak.id,
+                          item.id
+                        )
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            // this.snackbarService.showApiError(err);
+
+                            // hide loading
+                            loading.close();
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+                          // success
+                          // this.snackbarService.showSuccess('LNG_PAGE_LIST_CASES_ACTION_RESTORE_SUCCESS_MESSAGE');
+
+                          // hide loading
+                          loading.close();
+
+                          // reload data
+                          this.needsRefreshList(true);
+                        });
+                    });
                   }
                 },
                 visible: (item: CaseModel): boolean => {
@@ -1952,33 +2001,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   getCaseClassificationColor(item: CaseModel) {
     const classificationData = _.get(this.caseClassificationsListMap, item.classification);
     return _.get(classificationData, 'colorCode', '');
-  }
-
-  /**
-     * Restore a case that was deleted
-     * @param {CaseModel} caseModel
-     */
-  restoreCase(caseModel: CaseModel) {
-    // show confirm dialog to confirm the action
-    this.dialogService
-      .showConfirm('LNG_DIALOG_CONFIRM_RESTORE_CASE', new CaseModel(caseModel))
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          this.caseDataService
-            .restoreCase(this.selectedOutbreak.id, caseModel.id)
-            .pipe(
-              catchError((err) => {
-                this.snackbarService.showApiError(err);
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_CASES_ACTION_RESTORE_SUCCESS_MESSAGE');
-              // reload data
-              this.needsRefreshList(true);
-            });
-        }
-      });
   }
 
   /**
