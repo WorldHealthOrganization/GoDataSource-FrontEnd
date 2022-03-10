@@ -54,7 +54,6 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   };
 
   // columns
-  columnDefs: IExtendedColDef[];
   private _columns: IV2Column[];
   @Input() set columns(columns: IV2Column[]) {
     // set data
@@ -272,7 +271,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       !this._pageSettingsKey
     ) {
       // reset
-      this.columnDefs = undefined;
+      if (this.agTable) {
+        this.agTable.api.setColumnDefs(undefined);
+      }
 
       // finished
       return;
@@ -380,7 +381,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       }
 
       // attach column to list of visible columns
-      this.columnDefs.push({
+      columnDefs.push({
         headerName: column.label ?
           this.translateService.instant(column.label) :
           '',
@@ -398,7 +399,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     };
 
     // determine columns
-    this.columnDefs = [{
+    const columnDefs: IExtendedColDef[] = [{
       pinned: IV2ColumnPinned.LEFT,
       headerName: '',
       field: this.keyField,
@@ -447,6 +448,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         );
       });
     }
+
+    // update column defs
+    this.agTable.api.setColumnDefs(columnDefs);
 
     // re-render page
     this.detectChanges();
@@ -673,9 +677,16 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         });
 
         // add at the end the columns that were made visible
-        Object.keys(visibleMap).forEach((field) => {
+        const remainingColumns = Object.keys(visibleMap);
+        remainingColumns.forEach((field) => {
           visibleColumns.push(field);
         });
+
+        // scroll to the end if we added columns at the end
+        if (remainingColumns.length) {
+          console.log(1);
+          // this.agTable.api.ensureColumnVisible();
+        }
 
         // hide table columns / show column accordingly
         this.updateColumnDefinitions(visibleColumns);
