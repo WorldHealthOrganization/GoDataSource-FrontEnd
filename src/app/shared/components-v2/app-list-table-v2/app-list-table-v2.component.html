@@ -85,7 +85,7 @@
                 <a
                   *ngIf="menuOption.action.link; else notLink"
                   mat-menu-item
-                  class="d-list-top-tile-buttons-button-quick-options-option {{menuOption.cssClasses}}"
+                  class="gd-list-top-tile-buttons-button-quick-options-option {{menuOption.cssClasses}}"
                   [routerLink]="menuOption.action.link && (!menuOption.disable || !menuOption.disable(null)) ? menuOption.action.link(null) : undefined"
                   [queryParams]="menuOption.action.linkQueryParams ? menuOption.action.linkQueryParams(null) : undefined"
                   [disabled]="menuOption.disable && menuOption.disable(null)">
@@ -98,7 +98,7 @@
                   <button
                     type="button"
                     mat-menu-item
-                    class="d-list-top-tile-buttons-button-quick-options-option {{menuOption.cssClasses}}"
+                    class="gd-list-top-tile-buttons-button-quick-options-option {{menuOption.cssClasses}}"
                     [disabled]="menuOption.disable && menuOption.disable(null)"
                     (click)="menuOption.action.click ? menuOption.action.click(null) : undefined">
                     {{menuOption.label | translate}}
