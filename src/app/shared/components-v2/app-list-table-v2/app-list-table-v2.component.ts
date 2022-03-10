@@ -39,7 +39,6 @@ import { catchError } from 'rxjs/operators';
 })
 export class AppListTableV2Component implements OnInit, OnDestroy {
   // records
-  records: BaseModel[];
   recordsSubscription: Subscription;
   private _records$: Observable<BaseModel[]>;
   @Input() set records$(records$: Observable<BaseModel[]>) {
@@ -54,7 +53,6 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   };
 
   // columns
-  columnDefs: IExtendedColDef[];
   private _columns: IV2Column[];
   @Input() set columns(columns: IV2Column[]) {
     // set data
@@ -225,7 +223,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // nothing to do ?
     if (!this._records$) {
       // reset data
-      this.records = [];
+      if (this.agTable) {
+        this.agTable.api.setRowData([]);
+      }
 
       // re-render page
       this.detectChanges();
@@ -248,10 +248,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       )
       .subscribe((data) => {
         // set data & hide loading overlay
-        this.records = data;
+        this.agTable.api.setRowData(data);
 
         // no records found ?
-        if (this.records.length < 1) {
+        if (data.length < 1) {
           this.agTable.api.showNoRowsOverlay();
         }
 
@@ -272,7 +272,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       !this._pageSettingsKey
     ) {
       // reset
-      this.columnDefs = undefined;
+      if (this.agTable) {
+        this.agTable.api.setColumnDefs(undefined);
+      }
 
       // finished
       return;
@@ -380,7 +382,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       }
 
       // attach column to list of visible columns
-      this.columnDefs.push({
+      columnDefs.push({
         headerName: column.label ?
           this.translateService.instant(column.label) :
           '',
@@ -398,7 +400,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     };
 
     // determine columns
-    this.columnDefs = [{
+    const columnDefs: IExtendedColDef[] = [{
       pinned: IV2ColumnPinned.LEFT,
       headerName: '',
       field: this.keyField,
@@ -447,6 +449,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         );
       });
     }
+
+    // update column defs
+    this.agTable.api.setColumnDefs(columnDefs);
 
     // re-render page
     this.detectChanges();
@@ -673,12 +678,18 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         });
 
         // add at the end the columns that were made visible
-        Object.keys(visibleMap).forEach((field) => {
+        const remainingColumns = Object.keys(visibleMap);
+        remainingColumns.forEach((field) => {
           visibleColumns.push(field);
         });
 
         // hide table columns / show column accordingly
         this.updateColumnDefinitions(visibleColumns);
+
+        // scroll to the end if we added columns at the end
+        if (remainingColumns.length > 0) {
+          this.agTable.api.ensureColumnVisible(remainingColumns[0]);
+        }
 
         // save the new settings
         this.saveVisibleAndOrderOfColumns();

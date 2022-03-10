@@ -153,6 +153,25 @@ export class AppFormSelectV2Component
       classList.add('gd-cdk-overlay-pane-dropdown');
     }
 
+    // attach custom class
+    if (this.multiple) {
+      // attach
+      if (
+        classList &&
+        !classList.contains('gd-cdk-overlay-pane-dropdown-multi')
+      ) {
+        classList.add('gd-cdk-overlay-pane-dropdown-multi');
+      }
+    } else {
+      // remove class
+      if (
+        classList &&
+        classList.contains('gd-cdk-overlay-pane-dropdown-multi')
+      ) {
+        classList.remove('gd-cdk-overlay-pane-dropdown-multi');
+      }
+    }
+
     // vscroll to first selected item
     this.vScrollToFirstSelectedOption();
   }
