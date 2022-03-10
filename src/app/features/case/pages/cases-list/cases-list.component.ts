@@ -727,6 +727,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                             // show error
                             // this.snackbarService.showApiError(err);
 
+                            // hide loading
+                            loading.close();
+
                             // send error down the road
                             return throwError(err);
                           })
@@ -767,7 +770,60 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 cssClasses: 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: CaseModel): void => {
-                    this.convertCaseToContact(item);
+                    // show confirm dialog to confirm the action
+                    this.dialogV2Service.showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_CONVERT',
+                          data: () => ({
+                            name: item.name,
+                            type: this.i18nService.instant(EntityType.CONTACT)
+                          })
+                        },
+                        message: {
+                          get: () => 'LNG_DIALOG_CONFIRM_CONVERT_CASE_TO_CONTACT',
+                          data: () => item as any
+                        }
+                      }
+                    }).subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading = this.dialogV2Service.showLoadingDialog();
+
+                      // convert
+                      this.caseDataService
+                        .convertToContact(
+                          this.selectedOutbreak.id,
+                          item.id
+                        )
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            // this.snackbarService.showApiError(err);
+
+                            // hide loading
+                            loading.close();
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+                          // success
+                          // this.snackbarService.showSuccess('LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT_SUCCESS_MESSAGE');
+
+                          // hide loading
+                          loading.close();
+
+                          // reload data
+                          this.needsRefreshList(true);
+                        });
+                    });
                   }
                 },
                 visible: (item: CaseModel): boolean => {
@@ -1902,33 +1958,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             )
             .subscribe(() => {
               this.snackbarService.showSuccess('LNG_PAGE_LIST_CASES_ACTION_RESTORE_SUCCESS_MESSAGE');
-              // reload data
-              this.needsRefreshList(true);
-            });
-        }
-      });
-  }
-
-  /**
-     * Convert a case to contact
-     * @param caseModel
-     */
-  convertCaseToContact(caseModel: CaseModel) {
-    // show confirm dialog to confirm the action
-    this.dialogService
-      .showConfirm('LNG_DIALOG_CONFIRM_CONVERT_CASE_TO_CONTACT', new CaseModel(caseModel))
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          this.caseDataService
-            .convertToContact(this.selectedOutbreak.id, caseModel.id)
-            .pipe(
-              catchError((err) => {
-                this.snackbarService.showApiError(err);
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT_SUCCESS_MESSAGE');
               // reload data
               this.needsRefreshList(true);
             });
