@@ -2,7 +2,7 @@
 .cdk-overlay-container {
   .cdk-overlay-backdrop {
     background: rgba(0, 0, 0, 0.85);
-    @include transition(opacity 0.24s ease-in-out 0s);
+    @include transition(none);
     
 
     &.cdk-overlay-dark-backdrop {
