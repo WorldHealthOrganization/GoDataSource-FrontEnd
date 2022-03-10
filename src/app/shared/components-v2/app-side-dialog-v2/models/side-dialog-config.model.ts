@@ -181,6 +181,7 @@ export interface IV2SideDialogConfig {
   width?: string;
   dontCloseOnBackdrop?: boolean;
   hideInputFilter?: boolean;
+  initialized?: (handler: IV2SideDialogHandler) => void;
 }
 
 /**
@@ -201,6 +202,21 @@ export interface IV2SideDialogHandler {
   form: NgForm;
   hide: () => void;
   detectChanges: () => void;
+  loading: {
+    show: (
+      message?: string,
+      messageData?: {
+        [key: string]: string
+      }
+    ) => void,
+    hide: () => void,
+    message: (
+      message: string,
+      messageData?: {
+        [key: string]: string
+      }
+    ) => void
+  }
 }
 
 /**

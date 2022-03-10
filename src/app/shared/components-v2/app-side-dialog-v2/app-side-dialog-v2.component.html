@@ -1,7 +1,7 @@
 <mat-sidenav-container
   class="gd-app-side-dialog-v2"
   hasBackdrop="true"
-  (backdropClick)="config?.dontCloseOnBackdrop ? undefined : hide(true)">
+  (backdropClick)="loading || config?.dontCloseOnBackdrop ? undefined : hide(true)">
   <mat-sidenav
     #sideNav
     mode="over"
@@ -37,7 +37,8 @@
             class="gd-app-side-dialog-v2-content-top-close"
             type="button"
             mat-icon-button
-            (click)="hide(true)">
+            (click)="hide(true)"
+            [disabled]="!!loading">
             <mat-icon>close</mat-icon>
           </button>
 
@@ -45,7 +46,7 @@
 
         <!-- Filter -->
         <div
-          *ngIf="!config?.hideInputFilter"
+          *ngIf="!loading && !config?.hideInputFilter"
           class="gd-app-side-dialog-v2-content-filter">
 
           <!-- Search -->
@@ -65,6 +66,7 @@
       <!-- Inputs -->
       <form
         #form="ngForm"
+        [hidden]="!!loading"
         fxFlex
         class="gd-app-side-dialog-v2-content-middle">
         <div
@@ -152,6 +154,7 @@
 
       <!-- Bottom Bar -->
       <div
+        [style.visibility]="loading ? 'hidden': 'visible'"
         fxGrow="0" fxLayout="row" fxLayoutAlign="space-between" fxLayoutGap="1.6rem"
         class="gd-app-side-dialog-v2-content-bottom">
 
@@ -166,6 +169,26 @@
           {{button.label | translate}}
         </button>
 
+      </div>
+
+      <!-- Loading data -->
+      <div
+        *ngIf="loading"
+        class="gd-app-side-dialog-v2-content-loading"
+        fxLayout="column" fxLayoutAlign="center center">
+
+        <!-- Spinner -->
+        <mat-progress-spinner
+          class="gd-app-side-dialog-v2-content-loading-spinner"
+          mode="indeterminate"
+          diameter="64"></mat-progress-spinner>
+
+        <!-- Message -->
+        <div
+          *ngIf="loading.message"
+          class="gd-app-side-dialog-v2-content-loading-message">
+          {{loading.message | translate:loading.messageData}}
+        </div>
       </div>
     </div>
 

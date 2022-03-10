@@ -353,7 +353,7 @@ export class DialogV2Service {
             color: 'primary',
             key: 'export',
             disabled: (_data, handler): boolean => {
-              return handler.form.invalid;
+              return !handler.form || handler.form.invalid;
             }
           }, {
             type: IV2SideDialogConfigButtonType.CANCEL,
@@ -367,9 +367,6 @@ export class DialogV2Service {
             // finished
             return;
           }
-
-          // show loading dialog
-          const loading = this.showLoadingDialog();
 
           // format data that is sent to export
           const formData = this.formHelperService.getFields(response.handler.form);
@@ -415,6 +412,9 @@ export class DialogV2Service {
             });
           }
 
+          // show loading dialog
+          response.handler.loading.show();
+
           // start export
           (
             config.export.method === ExportDataMethod.POST ?
@@ -443,7 +443,6 @@ export class DialogV2Service {
                 // this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
 
                 // close dialog
-                loading.close();
                 response.handler.hide();
 
                 // send error down the road
@@ -460,7 +459,6 @@ export class DialogV2Service {
                 );
 
                 // close dialog
-                loading.close();
                 response.handler.hide();
 
                 // finished
@@ -473,79 +471,64 @@ export class DialogV2Service {
                 switch (data.step) {
                   case ExportStatusStep.LNG_STATUS_STEP_RETRIEVING_LANGUAGE_TOKENS:
                     // change message
-                    loading.message({
-                      message: 'LNG_PAGE_EXPORT_DATA_EXPORT_RETRIEVING_LANGUAGE_TOKENS'
-                    });
+                    response.handler.loading.message('LNG_PAGE_EXPORT_DATA_EXPORT_RETRIEVING_LANGUAGE_TOKENS');
 
                     // finished
                     break;
 
                   case ExportStatusStep.LNG_STATUS_STEP_PREPARING_PREFILTERS:
                     // change message
-                    loading.message({
-                      message: 'LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING_PREFILTERS'
-                    });
+                    response.handler.loading.message('LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING_PREFILTERS');
 
                     // finished
                     break;
 
                   case ExportStatusStep.LNG_STATUS_STEP_PREPARING_RECORDS:
                     // change message
-                    loading.message({
-                      message: 'LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING'
-                    });
+                    response.handler.loading.message('LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING');
 
                     // finished
                     break;
 
                   case ExportStatusStep.LNG_STATUS_STEP_PREPARING_LOCATIONS:
                     // change message
-                    loading.message({
-                      message: 'LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING_LOCATIONS'
-                    });
+                    response.handler.loading.message('LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING_LOCATIONS');
 
                     // finished
                     break;
 
                   case ExportStatusStep.LNG_STATUS_STEP_CONFIGURE_HEADERS:
                     // change message
-                    loading.message({
-                      message: 'LNG_PAGE_EXPORT_DATA_EXPORT_CONFIGURE_HEADERS'
-                    });
+                    response.handler.loading.message('LNG_PAGE_EXPORT_DATA_EXPORT_CONFIGURE_HEADERS');
 
                     // finished
                     break;
 
                   case ExportStatusStep.LNG_STATUS_STEP_EXPORTING_RECORDS:
                     // change message
-                    loading.message({
-                      message: 'LNG_PAGE_EXPORT_DATA_EXPORT_PROCESSED',
-                      messageData: {
+                    response.handler.loading.message(
+                      'LNG_PAGE_EXPORT_DATA_EXPORT_PROCESSED', {
                         processed: data.processed.toLocaleString('en'),
                         total: data.total.toLocaleString('en'),
                         estimatedEnd: data.estimatedEndDate ?
                           data.estimatedEndDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) :
                           '-'
                       }
-                    });
+                    );
 
                     // finished
                     break;
 
                   case ExportStatusStep.LNG_STATUS_STEP_ENCRYPT:
                     // change message
-                    loading.message({
-                      message: 'LNG_PAGE_EXPORT_DATA_EXPORT_ENCRYPTING'
-                    });
+                    response.handler.loading.message('LNG_PAGE_EXPORT_DATA_EXPORT_ENCRYPTING');
 
                     // finished
                     break;
 
                   case ExportStatusStep.LNG_STATUS_STEP_ARCHIVE:
                     // change message
-                    loading.message({
-                      message: 'LNG_PAGE_EXPORT_DATA_EXPORT_ARCHIVING'
-                    });
+                    response.handler.loading.message('LNG_PAGE_EXPORT_DATA_EXPORT_ARCHIVING');
 
                     // finished
                     break;
@@ -556,14 +539,11 @@ export class DialogV2Service {
                       data.totalBytes === undefined
                     ) {
                       // change message
-                      loading.message({
-                        message: 'LNG_PAGE_EXPORT_DATA_EXPORT_FINISHING'
-                      });
+                      response.handler.loading.message('LNG_PAGE_EXPORT_DATA_EXPORT_FINISHING');
                     } else {
                       // change message
-                      loading.message({
-                        message: 'LNG_PAGE_EXPORT_DATA_EXPORT_DOWNLOADING',
-                        messageData: {
+                      response.handler.loading.message(
+                        'LNG_PAGE_EXPORT_DATA_EXPORT_DOWNLOADING', {
                           downloaded: data.downloadedBytes ?
                             data.downloadedBytes :
                             '',
@@ -571,7 +551,7 @@ export class DialogV2Service {
                             data.totalBytes :
                             ''
                         }
-                      });
+                      );
                     }
 
                     // finished
@@ -591,7 +571,6 @@ export class DialogV2Service {
                       // this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
 
                       // close dialog
-                      loading.close();
                       response.handler.hide();
 
                       // send error down the road
@@ -663,7 +642,6 @@ export class DialogV2Service {
                             // this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
 
                             // close dialog
-                            loading.close();
                             response.handler.hide();
 
                             // send error down the road
@@ -685,7 +663,6 @@ export class DialogV2Service {
                           );
 
                           // close dialog
-                          loading.close();
                           response.handler.hide();
                         });
                     }
@@ -696,7 +673,6 @@ export class DialogV2Service {
                       // this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
 
                       // close dialog
-                      loading.close();
                       response.handler.hide();
                     }
                   });

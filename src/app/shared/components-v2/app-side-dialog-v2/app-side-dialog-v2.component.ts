@@ -47,6 +47,65 @@ export class AppSideDialogV2Component {
     detectChanges: () => {
       // update UI
       this.changeDetectorRef.detectChanges();
+    },
+
+    // loading
+    loading: {
+      // show loading
+      show: (
+        message?: string,
+        messageData?: {
+          [key: string]: string
+        }
+      ) => {
+        // already showing ?
+        if (this.loading) {
+          return;
+        }
+
+        // show and update message
+        this.loading = {
+          message,
+          messageData
+        };
+
+        // update ui
+        this.changeDetectorRef.detectChanges();
+      },
+
+      // hide loading
+      hide: () => {
+        // already not visible ?
+        if (!this.loading) {
+          return;
+        }
+
+        // hide
+        this.loading = undefined;
+
+        // update ui
+        this.changeDetectorRef.detectChanges();
+      },
+
+      // change loading message
+      message: (
+        message: string,
+        messageData?: {
+          [key: string]: string
+        }
+      ) => {
+        // not visible, then don't update message
+        if (!this.loading) {
+          return;
+        }
+
+        // update message
+        this.loading.message = message;
+        this.loading.messageData = messageData;
+
+        // update ui
+        this.changeDetectorRef.detectChanges();
+      }
     }
   };
 
@@ -74,6 +133,15 @@ export class AppSideDialogV2Component {
       }
     }
   ];
+
+  // loading setup
+  loading: {
+    // optional
+    message?: string,
+    messageData?: {
+      [key: string]: string
+    }
+  } | undefined;
 
   // constants
   V2SideDialogConfigInputType = V2SideDialogConfigInputType;
@@ -111,6 +179,11 @@ export class AppSideDialogV2Component {
       this.filterByValue = '';
       this.filterInputs();
 
+      // initialized
+      if (config.initialized) {
+        config.initialized(this.dialogHandler);
+      }
+
       // show side nav
       this.sideNav.open();
 
@@ -136,6 +209,7 @@ export class AppSideDialogV2Component {
     this.filterByValue = undefined;
     this.filteredInputs = undefined;
     this.dialogData = undefined;
+    this.loading = undefined;
 
     // trigger response
     if (triggerResponse) {
@@ -266,7 +340,10 @@ export class AppSideDialogV2Component {
   @HostListener('document:keydown', ['$event'])
   onKeydownHandler(keysEvent: KeyboardEvent) {
     // no need to do anything ?
-    if (this.config?.dontCloseOnBackdrop) {
+    if (
+      this.config?.dontCloseOnBackdrop ||
+      this.loading
+    ) {
       return;
     }
 
