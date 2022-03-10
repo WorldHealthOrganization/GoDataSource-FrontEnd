@@ -15,13 +15,23 @@
 
   .mat-drawer-backdrop {
     background-color: rgba(0, 0, 0, 0.85);
+    display: block;
+    @include opacity(0);
     position: fixed;
+    @include transition(all 0.24s ease-in-out 0s);
+    visibility: hidden;
+
+    &.mat-drawer-shown {
+      @include opacity(1);
+      visibility: visible;
+    }
   }
 
   .mat-sidenav {
     .gd-app-side-dialog-v2-content {
       height: 100%;
       min-width: 33rem;
+      position: relative;
 
       .gd-app-side-dialog-v2-content-top {
         .gd-app-side-dialog-v2-content-tb {
@@ -122,6 +132,22 @@
             margin-bottom: 1.6rem;
           }
         }
+
+        .gd-app-side-dialog-v2-content-middle-not-found {
+          color: var(--gd-secondary);
+          font-size: 1.8rem;
+          font-style: italic;
+          text-align: center;
+
+          .mat-icon {
+            color: rgba(var(--gd-secondary-rgb), 0.15);
+            display: block;
+            font-size: 10rem;
+            height: 10rem;
+            margin: 1.6rem auto;
+            width: 10rem;
+          }
+        }
       }
 
       .gd-app-side-dialog-v2-content-bottom {
@@ -130,6 +156,25 @@
 
         .gd-app-side-dialog-v2-content-bottom-button {
           text-transform: capitalize;
+        }
+      }
+
+      .gd-app-side-dialog-v2-content-loading {
+        left: 50%;
+        min-height: 12.8rem;
+        padding: 1.6rem;
+        position: absolute;
+        text-align: center;
+        top: 50%;
+        @include translate(-50%, -50%);
+        width: 100%;
+
+        .gd-app-side-dialog-v2-content-loading-spinner {
+          margin-bottom: 1.6rem;
+        }
+
+        .gd-app-side-dialog-v2-content-loading-message {
+          height: 4.8rem;
         }
       }
     }
