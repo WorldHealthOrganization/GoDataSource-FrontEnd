@@ -39,7 +39,6 @@ import { catchError } from 'rxjs/operators';
 })
 export class AppListTableV2Component implements OnInit, OnDestroy {
   // records
-  records: BaseModel[];
   recordsSubscription: Subscription;
   private _records$: Observable<BaseModel[]>;
   @Input() set records$(records$: Observable<BaseModel[]>) {
@@ -224,7 +223,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // nothing to do ?
     if (!this._records$) {
       // reset data
-      this.records = [];
+      if (this.agTable) {
+        this.agTable.api.setRowData([]);
+      }
 
       // re-render page
       this.detectChanges();
@@ -247,10 +248,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       )
       .subscribe((data) => {
         // set data & hide loading overlay
-        this.records = data;
+        this.agTable.api.setRowData(data);
 
         // no records found ?
-        if (this.records.length < 1) {
+        if (data.length < 1) {
           this.agTable.api.showNoRowsOverlay();
         }
 
