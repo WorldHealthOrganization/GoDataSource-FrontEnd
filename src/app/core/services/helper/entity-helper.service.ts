@@ -54,7 +54,7 @@ export class EntityHelperService {
             'LNG_DIALOG_GENERAL_DIALOG_TITLE_GROUP_EXPOSURES_DIALOG_TITLE'
         },
         inputs: [],
-        width: '50rem',
+        width: '65rem',
         bottomButtons: [{
           type: IV2SideDialogConfigButtonType.CANCEL,
           label: 'LNG_COMMON_BUTTON_CANCEL',
