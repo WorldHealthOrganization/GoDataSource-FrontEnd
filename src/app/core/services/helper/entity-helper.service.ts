@@ -55,7 +55,11 @@ export class EntityHelperService {
         },
         inputs: [],
         width: '50rem',
-        bottomButtons: [],
+        bottomButtons: [{
+          type: IV2SideDialogConfigButtonType.CANCEL,
+          label: 'LNG_COMMON_BUTTON_CANCEL',
+          color: 'text'
+        }],
         initialized: (handler) => {
           // show loading
           handler.loading.show();
@@ -180,15 +184,7 @@ export class EntityHelperService {
             });
         }
       })
-      .subscribe((response) => {
-        // canceled ?
-        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
-          // finished
-          return;
-        }
-
-        console.log(response);
-      });
+      .subscribe();
   }
 
   /**
