@@ -164,7 +164,8 @@
             <a
               *ngSwitchCase="V2SideDialogConfigInputType.LINK"
               mat-flat-button
-              class="gd-app-side-dialog-v2-content-middle-item-input"
+              color="text"
+              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-link"
               [routerLink]="input.link(dialogData, dialogHandler, input)"
               [queryParams]="input.linkQueryParams ? input.linkQueryParams(dialogData, dialogHandler, input) : undefined"
               [disabled]="input.disabled && input.disabled(dialogData, dialogHandler, input)"
