@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } fro
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
-import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -43,14 +42,15 @@ export class PersonSummaryComponent implements OnInit {
      * Constructor
      */
   constructor(
-    private authDataService: AuthDataService,
-    private entityDataService: EntityDataService
+    private authDataService: AuthDataService
   ) {}
 
   ngOnInit() {
     this.authUser = this.authDataService.getAuthenticatedUser();
 
-    this.personData = this.entityDataService.getLightObjectDisplay(this.person);
+    // #TODO - new design
+    // this.personData = this.entityDataService.getLightObjectDisplay(this.person);
+
     this.personLink = this.getPersonLink();
     this.personChainLink = this.getPersonChainLink();
   }

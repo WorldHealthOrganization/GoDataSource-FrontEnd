@@ -548,7 +548,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
             // display dialog
             this.entityHelperService.contacts(
-              this.selectedOutbreak.id,
+              this.selectedOutbreak,
               item
             );
           }
@@ -569,7 +569,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
             // display dialog
             this.entityHelperService.exposures(
-              this.selectedOutbreak.id,
+              this.selectedOutbreak,
               item
             );
           }

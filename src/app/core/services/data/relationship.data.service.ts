@@ -9,8 +9,6 @@ import { MetricCasesWithContactsModel } from '../../models/metrics/metric-cases-
 import { MetricCasesTransmissionChainsModel } from '../../models/metrics/metric-cases-transmission-chains.model';
 import { MetricNewCasesWithContactsModel } from '../../models/metric-new-cases-contacts.model';
 import { ReportCasesWithOnsetModel } from '../../models/report-cases-with-onset.model';
-import { LabelValuePair } from '../../models/label-value-pair';
-import { Constants } from '../../models/constants';
 import * as _ from 'lodash';
 import { EntityModel, RelationshipModel, ReportDifferenceOnsetRelationshipModel } from '../../models/entity-and-relationship.model';
 import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache';
@@ -18,7 +16,6 @@ import { CaseModel } from '../../models/case.model';
 import { ContactModel } from '../../models/contact.model';
 import { EventModel } from '../../models/event.model';
 import { map } from 'rxjs/operators';
-import { moment } from '../../helperClasses/x-moment';
 import { IBasicCount } from '../../models/basic-count.interface';
 import { ContactOfContactModel } from '../../models/contact-of-contact.model';
 
@@ -384,70 +381,6 @@ export class RelationshipDataService {
       this.http.get(`outbreaks/${outbreakId}/relationships/long-periods-between-dates-of-onset-in-transmission-chains`),
       ReportDifferenceOnsetRelationshipModel
     );
-  }
-
-  /**
-     * Return label - value pair of Relationship objects
-     * @param {any} relationship
-     * @returns {LabelValuePair[]}
-     */
-  getLightObjectDisplay(
-    relationship: RelationshipModel
-  ): LabelValuePair[] {
-
-    const lightObject = [];
-
-    const sourcePerson = _.find(relationship.persons, person => person.source === true);
-    const sourcePeople = _.find(relationship.people, people => people.model.id === sourcePerson.id);
-    const destinationPeople = _.find(relationship.people, people => people.model.id !== sourcePerson.id);
-
-    lightObject.push(new LabelValuePair(
-      'LNG_RELATIONSHIP_FIELD_LABEL_SOURCE',
-      sourcePeople.model.name
-    ));
-
-    lightObject.push(new LabelValuePair(
-      'LNG_RELATIONSHIP_FIELD_LABEL_TARGET',
-      destinationPeople.model.name
-    ));
-
-    // dialog fields
-    lightObject.push(new LabelValuePair(
-      'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
-      relationship.contactDate ?
-        moment(relationship.contactDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
-        ''
-    ));
-    lightObject.push(new LabelValuePair(
-      'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
-      relationship.certaintyLevelId
-    ));
-    lightObject.push(new LabelValuePair(
-      'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
-      relationship.exposureTypeId
-    ));
-    lightObject.push(new LabelValuePair(
-      'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
-      relationship.exposureFrequencyId
-    ));
-    lightObject.push(new LabelValuePair(
-      'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
-      relationship.exposureDurationId
-    ));
-    lightObject.push(new LabelValuePair(
-      'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
-      relationship.socialRelationshipTypeId
-    ));
-    lightObject.push(new LabelValuePair(
-      'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP',
-      relationship.socialRelationshipDetail
-    ));
-    lightObject.push(new LabelValuePair(
-      'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT',
-      relationship.comment
-    ));
-
-    return lightObject;
   }
 
   /**

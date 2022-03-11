@@ -171,8 +171,9 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
       });
   }
 
-  updateRelationshipData(relationship: RelationshipModel) {
-    this.relationshipData = this.relationshipDataService.getLightObjectDisplay(relationship);
+  updateRelationshipData(_relationship: RelationshipModel) {
+    // #TODO - new design
+    // this.relationshipData = this.relationshipDataService.getLightObjectDisplay(relationship);
   }
 
   onRemove() {

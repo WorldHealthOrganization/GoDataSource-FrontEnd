@@ -69,12 +69,13 @@
         [hidden]="!!loading"
         fxFlex
         class="gd-app-side-dialog-v2-content-middle">
-        <div
-          *ngFor="let input of config?.inputs"
-          class="gd-app-side-dialog-v2-content-middle-item"
-          [hidden]="filteredInputs === false || (filteredInputs && !filteredInputs[input.name])">
+
+        <!-- Common -->
+        <ng-template
+          #commonPart
+          let-input="input">
           <div
-            *ngIf="!input.visible || input.visible(dialogData, dialogHandler)"
+            *ngIf="!input.visible || input.visible(dialogData, dialogHandler, input)"
             [ngSwitch]="input.type">
 
             <!-- Divider -->
@@ -90,9 +91,9 @@
               [(ngModel)]="input.checked"
               [name]="input.name"
               [placeholder]="input.placeholder"
-              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler)"
+              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler, input)"
               [tooltip]="input.tooltip"
-              (ngModelChange)="input.change ? input.change(dialogData, dialogHandler) : undefined"></app-form-checkbox-v2>
+              (ngModelChange)="input.change ? input.change(dialogData, dialogHandler, input) : undefined"></app-form-checkbox-v2>
 
             <!-- Text -->
             <app-form-input-v2
@@ -101,9 +102,9 @@
               [(ngModel)]="input.value"
               [name]="input.name"
               [placeholder]="input.placeholder"
-              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler)"
-              [required]="input.validators?.required && input.validators?.required(dialogData, dialogHandler)"
-              (ngModelChange)="input.change ? input.change(dialogData, dialogHandler) : undefined"></app-form-input-v2>
+              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler, input)"
+              [required]="input.validators?.required && input.validators?.required(dialogData, dialogHandler, input)"
+              (ngModelChange)="input.change ? input.change(dialogData, dialogHandler, input) : undefined"></app-form-input-v2>
 
             <!-- Number -->
             <app-form-number-v2
@@ -112,9 +113,9 @@
               [(ngModel)]="input.value"
               [name]="input.name"
               [placeholder]="input.placeholder"
-              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler)"
-              [required]="input.validators?.required && input.validators?.required(dialogData, dialogHandler)"
-              (ngModelChange)="input.change ? input.change(dialogData, dialogHandler) : undefined"></app-form-number-v2>
+              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler, input)"
+              [required]="input.validators?.required && input.validators?.required(dialogData, dialogHandler, input)"
+              (ngModelChange)="input.change ? input.change(dialogData, dialogHandler, input) : undefined"></app-form-number-v2>
 
             <!-- Dropdown - single -->
             <app-form-select-v2
@@ -124,9 +125,9 @@
               [name]="input.name"
               [placeholder]="input.placeholder"
               [options]="input.options"
-              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler)"
-              [required]="input.validators?.required && input.validators?.required(dialogData, dialogHandler)"
-              (ngModelChange)="input.change ? input.change(dialogData, dialogHandler) : undefined"></app-form-select-v2>
+              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler, input)"
+              [required]="input.validators?.required && input.validators?.required(dialogData, dialogHandler, input)"
+              (ngModelChange)="input.change ? input.change(dialogData, dialogHandler, input) : undefined"></app-form-select-v2>
 
             <!-- Dropdown - multiple -->
             <app-form-select-v2
@@ -137,11 +138,88 @@
               [placeholder]="input.placeholder"
               [options]="input.options"
               [multiple]="true"
-              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler)"
-              [required]="input.validators?.required && input.validators?.required(dialogData, dialogHandler)"
-              (ngModelChange)="input.change ? input.change(dialogData, dialogHandler) : undefined"></app-form-select-v2>
+              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler, input)"
+              [required]="input.validators?.required && input.validators?.required(dialogData, dialogHandler, input)"
+              (ngModelChange)="input.change ? input.change(dialogData, dialogHandler, input) : undefined"></app-form-select-v2>
+
+            <!-- Key-Value -->
+            <div
+              *ngSwitchCase="V2SideDialogConfigInputType.KEY_VALUE"
+              class="gd-app-side-dialog-v2-content-middle-item-input"
+              fxLayout="row" fxLayoutGap="1.6rem">
+
+              <!-- Key -->
+              <div
+                fxFlex
+                class="gd-app-side-dialog-v2-content-middle-item-input-key">{{input.placeholder | translate}}</div>
+
+              <!-- Value -->
+              <div
+                fxFlex
+                class="gd-app-side-dialog-v2-content-middle-item-input-value">{{input.value | translate}}</div>
+
+            </div>
+
+            <!-- Link -->
+            <a
+              *ngSwitchCase="V2SideDialogConfigInputType.LINK"
+              mat-flat-button
+              class="gd-app-side-dialog-v2-content-middle-item-input"
+              [routerLink]="input.link(dialogData, dialogHandler, input)"
+              [queryParams]="input.linkQueryParams ? input.linkQueryParams(dialogData, dialogHandler, input) : undefined"
+              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler, input)"
+              (click)="hide(true)">
+              {{input.placeholder | translate}}
+            </a>
+
+            <!-- Accordion -->
+            <div
+              *ngSwitchCase="V2SideDialogConfigInputType.ACCORDION"
+              fxLayout="column"
+              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-accordion">
+
+              <!-- Title -->
+              <div
+                class="gd-app-side-dialog-v2-content-middle-item-input-accordion-title">{{input.placeholder | translate}}</div>
+
+              <!-- Accordion -->
+              <mat-accordion>
+                <ng-container
+                  *ngFor="let panel of input.panels">
+                  <mat-expansion-panel
+                    *ngIf="!panel.visible || panel.visible(dialogData, dialogHandler, panel)"
+                    [disabled]="panel.disabled && panel.disabled(dialogData, dialogHandler, panel)">
+
+                    <!-- Panel header -->
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>{{panel.placeholder | translate}}</mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <!-- Inputs -->
+                    <div
+                      *ngFor="let panelInput of panel.inputs">
+                      <ng-template
+                        [ngTemplateOutlet]="commonPart"
+                        [ngTemplateOutletContext]="{ input: panelInput }"></ng-template>
+                    </div>
+
+                  </mat-expansion-panel>
+                </ng-container>
+              </mat-accordion>
+
+            </div>
 
           </div>
+        </ng-template>
+
+        <!-- Render root inputs -->
+        <div
+          *ngFor="let input of config?.inputs"
+          class="gd-app-side-dialog-v2-content-middle-item"
+          [hidden]="filteredInputs === false || (filteredInputs && !filteredInputs[input.name])">
+          <ng-template
+            [ngTemplateOutlet]="commonPart"
+            [ngTemplateOutletContext]="{ input }"></ng-template>
         </div>
 
         <!-- No matches after search -->
@@ -165,7 +243,7 @@
           type="button"
           mat-flat-button [color]="button.color"
           class="gd-app-side-dialog-v2-content-bottom-button"
-          [disabled]="button.disabled && button.disabled(dialogData, dialogHandler)"
+          [disabled]="button.disabled && button.disabled(dialogData, dialogHandler, button)"
           (click)="clickedButton(button)">
           {{button.label | translate}}
         </button>

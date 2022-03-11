@@ -1,6 +1,7 @@
 import { Subscriber } from 'rxjs';
 import { ILabelValuePairModel } from '../../../forms-v2/core/label-value-pair.model';
 import { NgForm } from '@angular/forms';
+import { Params } from '@angular/router';
 
 /**
  * Side dialog config
@@ -19,7 +20,11 @@ export enum V2SideDialogConfigInputType {
   TEXT,
   NUMBER,
   DROPDOWN_SINGLE,
-  DROPDOWN_MULTI
+  DROPDOWN_MULTI,
+  LINK,
+  ACCORDION,
+  ACCORDION_PANEL,
+  KEY_VALUE
 }
 
 /**
@@ -27,7 +32,7 @@ export enum V2SideDialogConfigInputType {
  */
 interface IV2SideDialogConfigInputValidator {
   // optional
-  required?: (data: IV2SideDialogData, handler: IV2SideDialogHandler) => boolean;
+  required?: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: V2SideDialogConfigInput) => boolean;
 }
 
 /**
@@ -40,8 +45,8 @@ interface IV2SideDialogConfigInputBase {
   // optional
   name?: string;
   data?: any;
-  visible?: (data: IV2SideDialogData, handler: IV2SideDialogHandler) => boolean;
-  disabled?: (data: IV2SideDialogData, handler: IV2SideDialogHandler) => boolean;
+  visible?: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: V2SideDialogConfigInput) => boolean;
+  disabled?: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: V2SideDialogConfigInput) => boolean;
 }
 
 /**
@@ -52,7 +57,7 @@ interface IV2SideDialogConfigInput extends IV2SideDialogConfigInputBase {
   name: string;
 
   // optional
-  change?: (data: IV2SideDialogData, handler: IV2SideDialogHandler) => void;
+  change?: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: V2SideDialogConfigInputFromInput) => void;
 }
 
 /**
@@ -64,6 +69,16 @@ export interface IV2SideDialogConfigInputDivider extends IV2SideDialogConfigInpu
 
   // optional
   placeholder?: string;
+}
+
+/**
+ * Side dialog input - key - value
+ */
+export interface IV2SideDialogConfigInputKeyValue extends IV2SideDialogConfigInputBase {
+  // required
+  type: V2SideDialogConfigInputType.KEY_VALUE;
+  placeholder: string;
+  value: string;
 }
 
 /**
@@ -134,10 +149,45 @@ export interface IV2SideDialogConfigInputNumber extends IV2SideDialogConfigInput
 }
 
 /**
+ * Side dialog input - link
+ */
+export interface IV2SideDialogConfigInputLink extends IV2SideDialogConfigInputBase {
+  // required
+  type: V2SideDialogConfigInputType.LINK;
+  placeholder: string;
+  link: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: IV2SideDialogConfigInputLink) => string[];
+
+  // optional
+  linkQueryParams?: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: IV2SideDialogConfigInputLink) => Params;
+}
+
+/**
+ * Side dialog input - accordion panel
+ */
+interface IV2SideDialogConfigInputAccordionPanel extends IV2SideDialogConfigInputBase {
+  // required
+  type: V2SideDialogConfigInputType.ACCORDION_PANEL;
+  placeholder: string;
+  inputs: V2SideDialogConfigInput[];
+}
+
+/**
+ * Side dialog input - accordion
+ */
+export interface IV2SideDialogConfigInputAccordion extends IV2SideDialogConfigInputBase {
+  // required
+  type: V2SideDialogConfigInputType.ACCORDION;
+  placeholder: string;
+  panels: IV2SideDialogConfigInputAccordionPanel[];
+}
+
+/**
  * Side dialog inputs
  */
-export type V2SideDialogConfigInput = IV2SideDialogConfigInputDivider | IV2SideDialogConfigInputCheckbox | IV2SideDialogConfigInputText |
-IV2SideDialogConfigInputSingleDropdown | IV2SideDialogConfigInputMultiDropdown | IV2SideDialogConfigInputNumber;
+export type V2SideDialogConfigInputFromInput = IV2SideDialogConfigInputCheckbox | IV2SideDialogConfigInputText | IV2SideDialogConfigInputSingleDropdown
+| IV2SideDialogConfigInputMultiDropdown | IV2SideDialogConfigInputNumber;
+export type V2SideDialogConfigInput = IV2SideDialogConfigInputDivider | IV2SideDialogConfigInputKeyValue | V2SideDialogConfigInputFromInput
+| IV2SideDialogConfigInputLink | IV2SideDialogConfigInputAccordion;
 
 /**
  * Side dialog inputs map
@@ -165,7 +215,7 @@ export interface IV2SideDialogConfigButton {
   // optional
   color?: 'text' | 'secondary' | 'primary' | 'warn' | 'accent' | undefined;
   key?: string;
-  disabled?: (data: IV2SideDialogData, handler: IV2SideDialogHandler) => boolean;
+  disabled?: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: IV2SideDialogConfigButton) => boolean;
 }
 
 /**
@@ -209,6 +259,9 @@ export interface IV2SideDialogHandler {
   // required
   form: NgForm;
   hide: () => void;
+  update: {
+    inputs: (inputs: V2SideDialogConfigInput[]) => void
+  },
   detectChanges: () => void;
   loading: {
     show: (

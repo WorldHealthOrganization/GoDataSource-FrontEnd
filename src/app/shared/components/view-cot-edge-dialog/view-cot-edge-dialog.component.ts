@@ -2,7 +2,6 @@ import { Component, Inject, OnDestroy, ViewChild, ViewEncapsulation } from '@ang
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
-import { RelationshipDataService } from '../../../core/services/data/relationship.data.service';
 import { RelationshipModel } from '../../../core/models/entity-and-relationship.model';
 import * as _ from 'lodash';
 
@@ -58,11 +57,11 @@ export class ViewCotEdgeDialogComponent implements OnDestroy {
      */
   constructor(
     public dialogRef: MatDialogRef<ViewCotEdgeDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: ViewCOTEdgeData,
-    private relationshipDataService: RelationshipDataService
+    @Inject(MAT_DIALOG_DATA) public data: ViewCOTEdgeData
   ) {
     this.relationship = this.data.relationship;
-    this.relationshipInfo = this.relationshipDataService.getLightObjectDisplay(this.relationship);
+    // #TODO - new design
+    // this.relationshipInfo = this.relationshipDataService.getLightObjectDisplay(this.relationship);
 
     // determine relationship link
     const sourcePerson = this.relationship.sourcePerson;
