@@ -43,10 +43,14 @@
             font-size: 1.8rem;
             font-weight: 700;
             line-height: $gd-line-height;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
           }
 
           .gd-app-side-dialog-v2-content-top-close {
             height: 3.7rem;
+            margin-left: 1.6rem;
             width: 3.7rem;
           }
         }

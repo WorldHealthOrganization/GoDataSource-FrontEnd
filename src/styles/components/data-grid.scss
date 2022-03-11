@@ -50,6 +50,10 @@
           background-color: var(--gd-background);
         }
 
+        &.ag-row-hover {
+          background-color: rgba(var(--gd-primary-rgb), 0.05);
+        }
+
         &.ag-row-selected {
           background-color: rgba(var(--gd-primary-rgb), 0.1);
         }
@@ -67,6 +71,20 @@
           &.ag-cell-first-right-pinned {
             &:not(.ag-cell-range-left):not(.ag-cell-range-single-cell) {
               border-left-color: rgba(var(--gd-secondary-rgb), 0.25);
+            }
+          }
+
+          .gd-list-table-button {
+            button.mat-flat-button,
+            a.mat-flat-button {
+              line-height: 2.4rem;
+              min-width: 5rem;
+              padding: 0;
+
+              .mat-button-focus-overlay,
+              .mat-ripple {
+                display: none;
+              }
             }
           }
         }
