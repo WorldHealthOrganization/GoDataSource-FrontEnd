@@ -146,16 +146,14 @@
             <div
               *ngSwitchCase="V2SideDialogConfigInputType.KEY_VALUE"
               class="gd-app-side-dialog-v2-content-middle-item-input"
-              fxLayout="row" fxLayoutGap="1.6rem">
+              fxLayout="row" fxLayoutAlign="start" fxLayoutGap="1.6rem">
 
               <!-- Key -->
               <div
-                fxFlex
                 class="gd-app-side-dialog-v2-content-middle-item-input-key">{{input.placeholder | translate}}</div>
 
               <!-- Value -->
               <div
-                fxFlex
                 class="gd-app-side-dialog-v2-content-middle-item-input-value">{{input.value | translate}}</div>
 
             </div>

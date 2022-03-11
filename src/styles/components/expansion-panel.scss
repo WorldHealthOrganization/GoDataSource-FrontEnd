@@ -1,0 +1,91 @@
+/* Expansion Panel */
+.mat-expansion-panel {
+  background: var(--gd-background);
+  border-color: rgba(var(--gd-secondary-rgb), 0.25);
+  border-style: solid solid none;
+  border-width: 0.1rem 0.1rem 0;
+  color: var(--gd-text);
+
+  &:not([class*=mat-elevation-z]) {
+    @include box-shadow(0px 3px 1px -2px rgb(0 0 0 / 20%), 0px 2px 2px 0px rgb(0 0 0 / 25%));
+  }
+
+  .mat-expansion-panel-header {
+    font-family: $gd-font-family;
+    font-size: $gd-font-size;
+    height: auto;
+    line-height: $gd-line-height;
+    padding: 0.8rem 1.6rem;
+
+    .mat-content {
+      .mat-expansion-panel-header-title {
+        color: var(--gd-text);
+        margin-right: 16px;
+      }
+    }
+
+    .mat-expansion-indicator {
+      position: relative;
+      top: -0.3rem;
+
+      &:after {
+        color: var(--gd-text);
+      }
+    }
+
+    &.mat-expanded {
+      border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+      @include border-radius(0.4rem 0.4rem 0 0);
+      height: auto;
+
+      .mat-expansion-panel-header-title {
+        font-weight: 700;
+      }
+
+      .mat-expansion-indicator {
+        top: 0.3rem;
+      }
+    }
+
+    &.cdk-program-focused,
+    &.cdk-keyboard-focused {
+      &:not([aria-disabled=true]) {
+        background: rgba(var(--gd-secondary-rgb), 0.1);
+      }
+    }
+
+    &[aria-disabled=true] {
+      background: rgba(var(--gd-secondary-rgb), 0.1);
+      color: var(--gd-secondary);
+
+      &:hover {
+        background: rgba(var(--gd-secondary-rgb), 0.1);
+      }
+
+      .mat-expansion-panel-header-title,
+      .mat-expansion-panel-header-description {
+        color: var(--gd-secondary);
+      }
+    }
+  }
+
+  .mat-expansion-panel-content {
+    font-family: $gd-font-family;
+    font-size: $gd-font-size;
+    line-height: $gd-line-height;
+
+    .mat-expansion-panel-body {
+      padding: 1.6rem;
+    }
+  }
+
+  &:not(.mat-expanded) {
+    .mat-expansion-panel-header {
+      &:not([aria-disabled=true]) {
+        &:hover {
+          background: rgba(var(--gd-secondary-rgb), 0.1);
+        }
+      }
+    }
+  }
+}
