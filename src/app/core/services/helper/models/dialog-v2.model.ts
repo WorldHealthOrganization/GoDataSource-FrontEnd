@@ -2,7 +2,7 @@ import { ExportStatusStep } from '../../../models/constants';
 import { Moment } from 'moment';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { RequestQueryBuilder } from '../../../helperClasses/request-query-builder';
-import { V2SideDialogConfigInput } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { IV2SideDialogHandler, V2SideDialogConfigInput } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 
 /**
  * Export data config progress answer
@@ -17,6 +17,13 @@ export interface IV2ExportDataConfigProgressAnswer {
   readonly estimatedEndDate?: Moment;
   readonly downloadedBytes?: string;
   readonly totalBytes?: string
+}
+
+/**
+ * Export button keys
+ */
+export enum ExportButtonKey {
+  EXPORT = 'export'
 }
 
 /**
@@ -96,5 +103,8 @@ export interface IV2ExportDataConfig {
       prepend?: V2SideDialogConfigInput[],
       append?: V2SideDialogConfigInput[]
     }
-  }
+  };
+
+  // optional
+  initialized?: (handler: IV2SideDialogHandler) => void;
 }

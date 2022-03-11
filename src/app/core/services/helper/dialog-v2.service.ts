@@ -12,7 +12,7 @@ import {
   V2SideDialogConfigInput,
   V2SideDialogConfigInputType
 } from '../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { ExportDataExtension, ExportDataMethod, IV2ExportDataConfig, IV2ExportDataConfigProgressAnswer } from './models/dialog-v2.model';
+import { ExportButtonKey, ExportDataExtension, ExportDataMethod, IV2ExportDataConfig, IV2ExportDataConfigProgressAnswer } from './models/dialog-v2.model';
 import { IV2LoadingDialogHandler } from '../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AppLoadingDialogV2Component } from '../../../shared/components-v2/app-loading-dialog-v2/app-loading-dialog-v2.component';
@@ -351,12 +351,13 @@ export class DialogV2Service {
         config: {
           title: config.title,
           width: '50rem',
+          initialized: config.initialized,
           inputs: inputs,
           bottomButtons: [{
             type: IV2SideDialogConfigButtonType.OTHER,
             label: 'LNG_COMMON_LABEL_EXPORT',
             color: 'primary',
-            key: 'export',
+            key: ExportButtonKey.EXPORT,
             disabled: (_data, handler): boolean => {
               return !handler.form || handler.form.invalid;
             }

@@ -56,6 +56,25 @@ export class AppSideDialogV2Component implements OnDestroy {
       }
     },
 
+    // buttons
+    buttons: {
+      click: (buttonKey) => {
+        // nothing to do ?
+        if (!this.config) {
+          return;
+        }
+
+        // find button
+        const button = this.config.bottomButtons.find((item) => item.key === buttonKey);
+        if (!button) {
+          return;
+        }
+
+        // click button
+        this.clickedButton(button);
+      }
+    },
+
     // hide dialog
     hide: () => {
       // hide without triggering action since it will be triggered bellow with other options
