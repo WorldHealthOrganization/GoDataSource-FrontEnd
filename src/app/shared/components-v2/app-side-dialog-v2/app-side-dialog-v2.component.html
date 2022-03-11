@@ -235,7 +235,7 @@
       <!-- Bottom Bar -->
       <div
         [style.visibility]="loading ? 'hidden': 'visible'"
-        fxGrow="0" fxLayout="row" fxLayoutAlign="space-between" fxLayoutGap="1.6rem"
+        fxGrow="0" fxLayout="row" [fxLayoutAlign]="config?.bottomButtons.length > 1 ? 'space-between' : 'end'" fxLayoutGap="1.6rem"
         class="gd-app-side-dialog-v2-content-bottom">
 
         <!-- Buttons -->
