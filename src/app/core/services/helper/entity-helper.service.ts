@@ -82,11 +82,13 @@ export class EntityHelperService {
               // construct list of inputs to display
               const entitiesList: IV2SideDialogConfigInputAccordion = {
                 type: V2SideDialogConfigInputType.ACCORDION,
+                name: 'entities-list',
                 placeholder: 'LNG_PAGE_LIST_CASES_DIALOG_ENTITY_SECTION_TITLE',
                 panels: []
               };
               const relationshipList: IV2SideDialogConfigInputAccordion = {
                 type: V2SideDialogConfigInputType.ACCORDION,
+                name: 'relationship-list',
                 placeholder: 'LNG_PAGE_LIST_CASES_DIALOG_ENTITY_RELATIONSHIPS_TITLE',
                 panels: []
               };
@@ -102,6 +104,7 @@ export class EntityHelperService {
                   .forEach((labelValue) => {
                     entityInputs.push({
                       type: V2SideDialogConfigInputType.KEY_VALUE,
+                      name: `entities-list-key-value-${relationshipData.model.id}-${labelValue.label}`,
                       placeholder: labelValue.label,
                       value: labelValue.value
                     });
@@ -110,6 +113,7 @@ export class EntityHelperService {
                 // View full resource link
                 entityInputs.push({
                   type: V2SideDialogConfigInputType.LINK,
+                  name: `entities-list-view-list-${relationshipData.model.id}`,
                   placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_FULL_RESOURCE',
                   link: () => [
                     EntityModel.getLinkForEntityType(relationshipData.model.type),
@@ -122,6 +126,7 @@ export class EntityHelperService {
                 // add entities to the list
                 entitiesList.panels.push({
                   type: V2SideDialogConfigInputType.ACCORDION_PANEL,
+                  name: `entities-list-panels-${relationshipData.model.id}`,
                   placeholder: relationshipData.model.name,
                   inputs: entityInputs
                 });
@@ -137,6 +142,7 @@ export class EntityHelperService {
                   .forEach((labelValue) => {
                     relationshipsInputs.push({
                       type: V2SideDialogConfigInputType.KEY_VALUE,
+                      name: `relationship-list-key-value-${relationshipData.relationship.id}-${labelValue.label}`,
                       placeholder: labelValue.label,
                       value: labelValue.value
                     });
@@ -146,6 +152,7 @@ export class EntityHelperService {
                 const sourcePerson = relationshipData.relationship.sourcePerson;
                 relationshipsInputs.push({
                   type: V2SideDialogConfigInputType.LINK,
+                  name: `relationship-list-view-list-${relationshipData.relationship.id}`,
                   placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_FULL_RESOURCE',
                   link: () => [
                     `/relationships/${sourcePerson.type}/${sourcePerson.id}/contacts/${relationshipData.relationship.id}/view`
@@ -155,6 +162,7 @@ export class EntityHelperService {
                 // add relationships to the list
                 relationshipList.panels.push({
                   type: V2SideDialogConfigInputType.ACCORDION_PANEL,
+                  name: `entities-list-panels-${relationshipData.relationship.id}`,
                   placeholder: from === SentFromColumn.CONTACTS ?
                     `${entity.name} - ${relationshipData.model.name}` :
                     `${entity.name} - ${relationshipData.model.name}`,
@@ -168,6 +176,7 @@ export class EntityHelperService {
               handler.update.inputs([
                 {
                   type: V2SideDialogConfigInputType.LINK,
+                  name: 'view-main-entity',
                   placeholder: from === SentFromColumn.CONTACTS ?
                     'LNG_DIALOG_GENERAL_DIALOG_LINK_FULL_LIST_CONTACTS' :
                     'LNG_DIALOG_GENERAL_DIALOG_LINK_FULL_LIST_EXPOSURES',
