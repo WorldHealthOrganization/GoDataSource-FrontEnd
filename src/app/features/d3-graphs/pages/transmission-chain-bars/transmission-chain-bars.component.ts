@@ -12,7 +12,6 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { Subscription } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { throwError } from 'rxjs';
@@ -28,6 +27,7 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-transmission-chain-bars',
@@ -105,7 +105,7 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
     private dialogService: DialogService,
     private importExportDataService: ImportExportDataService,
     private i18nService: I18nService,
-    protected snackbarService: SnackbarService,
+    protected toastV2Service: ToastV2Service,
     private systemSettingsDataService: SystemSettingsDataService,
     private referenceDataDataService: ReferenceDataDataService
   ) {}
@@ -261,7 +261,7 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
             .exportImageToPdf({image: dataBase64, responseType: 'blob', splitFactor: 1})
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 this.closeLoadingDialog();
                 return throwError(err);
               })

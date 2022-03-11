@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
@@ -14,6 +13,7 @@ import { SafeHtml } from '@angular/platform-browser';
 import { CaptchaDataFor, CaptchaDataService } from '../../../../core/services/data/captcha.data.service';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-forgot-password',
@@ -45,7 +45,7 @@ export class ForgotPasswordComponent implements OnInit {
     private router: Router,
     private authDataService: AuthDataService,
     private userDataService: UserDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     private dialogService: DialogService,
     private captchaDataService: CaptchaDataService,
@@ -106,12 +106,12 @@ export class ForgotPasswordComponent implements OnInit {
             loadingDialog.close();
 
             // show error
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             return throwError(err);
           })
         )
         .subscribe(() => {
-          this.snackbarService.showSuccess(
+          this.toastV2Service.success(
             'LNG_PAGE_FORGOT_PASSWORD_ACTION_SEND_EMAIL_SUCCESS_MESSAGE',
             {email: dirtyFields.email}
           );
@@ -134,7 +134,7 @@ export class ForgotPasswordComponent implements OnInit {
       .pipe(
         catchError((err) => {
           // show error
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         })
       );

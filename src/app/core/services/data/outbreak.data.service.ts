@@ -6,7 +6,6 @@ import { OutbreakModel } from '../../models/outbreak.model';
 import { StorageKey, StorageService } from '../helper/storage.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { AuthDataService } from './auth.data.service';
-import { SnackbarService } from '../helper/snackbar.service';
 import { EntityModel } from '../../models/entity-and-relationship.model';
 import { CaseModel } from '../../models/case.model';
 import { ContactModel } from '../../models/contact.model';
@@ -25,6 +24,7 @@ import {
   ExportFieldsGroupModel,
   ExportFieldsGroupModelNameEnum
 } from '../../models/export-fields-group.model';
+import { ToastV2Service } from '../helper/toast-v2.service';
 
 @Injectable()
 export class OutbreakDataService {
@@ -38,7 +38,7 @@ export class OutbreakDataService {
     private http: HttpClient,
     private modelHelper: ModelHelperService,
     private storageService: StorageService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private authDataService: AuthDataService
   ) {}
 
@@ -349,33 +349,31 @@ export class OutbreakDataService {
       .subscribe((selectedOutbreak) => {
         const authUser = this.authDataService.getAuthenticatedUser();
         if (!authUser.activeOutbreakId) {
-          this.snackbarService.showNotice(
+          this.toastV2Service.notice(
             'LNG_GENERIC_WARNING_NO_ACTIVE_OUTBREAK',
             undefined,
-            false,
             AppMessages.APP_MESSAGE_UNRESPONSIVE_NO_ACTIVE_OUTBREAK
           );
         } else {
           // hide message
-          this.snackbarService.hideMessage(AppMessages.APP_MESSAGE_UNRESPONSIVE_NO_ACTIVE_OUTBREAK);
+          this.toastV2Service.hide(AppMessages.APP_MESSAGE_UNRESPONSIVE_NO_ACTIVE_OUTBREAK);
 
           // outbreak not active ?
           if (authUser.activeOutbreakId !== selectedOutbreak.id) {
             this.getOutbreak(authUser.activeOutbreakId)
               .subscribe((outbreak) => {
-                this.snackbarService.showNotice(
+                this.toastV2Service.notice(
                   'LNG_GENERIC_WARNING_SELECTED_OUTBREAK_NOT_ACTIVE',
                   {
                     activeOutbreakName: outbreak.name,
                     selectedOutbreakName: selectedOutbreak.name
                   },
-                  false,
                   AppMessages.APP_MESSAGE_UNRESPONSIVE_SELECTED_OUTBREAK_NOT_ACTIVE
                 );
               });
           } else {
             // hide message
-            this.snackbarService.hideMessage(AppMessages.APP_MESSAGE_UNRESPONSIVE_SELECTED_OUTBREAK_NOT_ACTIVE);
+            this.toastV2Service.hide(AppMessages.APP_MESSAGE_UNRESPONSIVE_SELECTED_OUTBREAK_NOT_ACTIVE);
           }
         }
       });

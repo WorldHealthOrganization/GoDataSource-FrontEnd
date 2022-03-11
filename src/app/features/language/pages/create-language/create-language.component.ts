@@ -3,7 +3,6 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import * as _ from 'lodash';
 import { LanguageModel } from '../../../../core/models/language.model';
 import { LanguageDataService } from '../../../../core/services/data/language.data.service';
@@ -15,6 +14,7 @@ import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-co
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-create-language',
@@ -37,7 +37,7 @@ export class CreateLanguageComponent
   constructor(
     private router: Router,
     private languageDataService: LanguageDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     private cacheService: CacheService,
     private dialogService: DialogService,
@@ -90,13 +90,13 @@ export class CreateLanguageComponent
         .createLanguage(dirtyFields)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             loadingDialog.close();
             return throwError(err);
           })
         )
         .subscribe((newLanguage: LanguageModel) => {
-          this.snackbarService.showSuccess('LNG_PAGE_CREATE_LANGUAGE_ACTION_CREATE_LANGUAGE_SUCCESS_MESSAGE');
+          this.toastV2Service.success('LNG_PAGE_CREATE_LANGUAGE_ACTION_CREATE_LANGUAGE_SUCCESS_MESSAGE');
 
           // clear cache
           this.cacheService.remove(CacheKey.LANGUAGES);

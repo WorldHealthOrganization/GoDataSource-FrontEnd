@@ -21,6 +21,7 @@ import * as fromSharedPipes from './pipes';
 import * as formV2Components from './forms-v2/components';
 import * as v2Components from './components-v2';
 import { AgGridModule } from '@ag-grid-community/angular';
+import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
   imports: [
@@ -40,7 +41,17 @@ import { AgGridModule } from '@ag-grid-community/angular';
     NgxMatSelectSearchModule,
     HotTableModule.forRoot(),
     ScrollingModule,
-    ExperimentalScrollingModule
+    ExperimentalScrollingModule,
+    ToastrModule.forRoot({
+      extendedTimeOut: 5000,
+      enableHtml: true,
+      progressBar: true,
+      progressAnimation: 'decreasing',
+      positionClass: 'toast-top-center',
+      maxOpened: 5,
+      newestOnTop: false,
+      closeButton: false
+    })
   ],
   declarations: [
     ...fromSharedComponents.components,
@@ -64,6 +75,7 @@ import { AgGridModule } from '@ag-grid-community/angular';
     MglTimelineModule,
     ScrollingModule,
     ExperimentalScrollingModule,
+    ToastrModule,
     ...fromSharedDirectives.directives,
     ...fromSharedPipes.pipes,
     ...fromSharedComponents.components,

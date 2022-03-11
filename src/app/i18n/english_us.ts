@@ -20,7 +20,10 @@ export const EnglishUsLang = {
     'LNG_COMMON_LABEL_NOTHING_FOUND': 'Nothing found',
     'LNG_COMMON_LABEL_DELETE': 'Delete "{{name}}"',
     'LNG_COMMON_LABEL_CONVERT': 'Convert "{{name}}" to {{type}}',
-    'LNG_COMMON_LABEL_RESTORE': 'Restore "{{name}}"'
+    'LNG_COMMON_LABEL_RESTORE': 'Restore "{{name}}"',
+    'LNG_COMMON_LABEL_NOTIFICATION_HISTORY': 'There are {{length}} error(s). Click here to see details',
+    'LNG_COMMON_LABEL_HISTORY_TITLE': 'Errors',
+    'LNG_MULTIPLE_SNACKBAR_BUTTON_CLOSE_ALL': 'Clear all'
 
 
 

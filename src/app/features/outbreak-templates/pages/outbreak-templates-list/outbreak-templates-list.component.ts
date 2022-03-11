@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserSettings } from '../../../../core/models/user.model';
 import { Observable } from 'rxjs';
@@ -19,6 +18,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-outbreak-templates-list',
@@ -186,7 +186,7 @@ export class OutbreakTemplatesListComponent
   constructor(
     protected listHelperService: ListHelperService,
     private router: Router,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private authDataService: AuthDataService,
     private referenceDataDataService: ReferenceDataDataService,
     private dialogService: DialogService,
@@ -306,7 +306,7 @@ export class OutbreakTemplatesListComponent
       .getOutbreakTemplatesList(this.queryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           finishCallback([]);
           return throwError(err);
         }),
@@ -329,7 +329,7 @@ export class OutbreakTemplatesListComponent
       .getOutbreakTemplatesCount(countQueryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         }),
         share()
@@ -348,7 +348,7 @@ export class OutbreakTemplatesListComponent
             .deleteOutbreakTemplate(outbreakTemplate.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
@@ -359,7 +359,7 @@ export class OutbreakTemplatesListComponent
                 .subscribe((authenticatedUser) => {
                   this.authUser = authenticatedUser.user;
                 });
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_DELETE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_DELETE_SUCCESS_MESSAGE');
               this.needsRefreshList(true);
             });
         }
@@ -403,7 +403,7 @@ export class OutbreakTemplatesListComponent
                 .createOutbreakTemplate(outbreakTemplate, outbreakTemplate.id)
                 .pipe(
                   catchError((err) => {
-                    this.snackbarService.showApiError(err);
+                    this.toastV2Service.error(err);
                     loadingDialog.close();
                     return throwError(err);
                   }),
@@ -412,7 +412,7 @@ export class OutbreakTemplatesListComponent
                     return this.i18nService.loadUserLanguage()
                       .pipe(
                         catchError((err) => {
-                          this.snackbarService.showApiError(err);
+                          this.toastV2Service.error(err);
                           loadingDialog.close();
                           return throwError(err);
                         }),
@@ -421,7 +421,7 @@ export class OutbreakTemplatesListComponent
                   })
                 )
                 .subscribe((clonedOutbreakTemplate) => {
-                  this.snackbarService.showSuccess('LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_SUCCESS_MESSAGE');
+                  this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_SUCCESS_MESSAGE');
 
                   // hide dialog
                   loadingDialog.close();

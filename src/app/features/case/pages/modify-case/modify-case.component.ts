@@ -4,7 +4,6 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm, NgModel } from '@angular/forms';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -41,6 +40,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-modify-case',
@@ -200,7 +200,7 @@ export class ModifyCaseComponent
     private caseDataService: CaseDataService,
     private outbreakDataService: OutbreakDataService,
     private referenceDataDataService: ReferenceDataDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     private i18nService: I18nService,
     protected dialogService: DialogService,
@@ -488,7 +488,7 @@ export class ModifyCaseComponent
         .modifyCase(this.selectedOutbreak.id, this.caseId, dirtyFields)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
 
             // hide loading
             this.hideLoadingDialog();
@@ -507,7 +507,7 @@ export class ModifyCaseComponent
 
             // display message
             if (!finishCallBack) {
-              this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE');
 
               // update breadcrumb
               this.retrieveCaseData();
@@ -537,7 +537,7 @@ export class ModifyCaseComponent
               )
               .pipe(
                 catchError((err) => {
-                  this.snackbarService.showApiError(err);
+                  this.toastV2Service.error(err);
 
                   // hide loading
                   this.hideLoadingDialog();
@@ -581,7 +581,7 @@ export class ModifyCaseComponent
           )
           .pipe(
             catchError((err) => {
-              this.snackbarService.showApiError(err);
+              this.toastV2Service.error(err);
 
               // hide loading
               this.hideLoadingDialog();

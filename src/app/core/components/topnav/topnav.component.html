@@ -4,7 +4,7 @@
 
   <!-- Left -->
   <div
-    fxFlex
+    fxGrow="0"
     class="gd-top-left">
 
     <!-- Search -->
@@ -17,6 +17,28 @@
       (keyup.enter)="globalSearch()">
     </app-form-input-v2>
 
+  </div>
+
+  <!-- Middle -->
+  <div
+    fxFlex fxLayout="row" fxLayoutAlign="center"
+    class="gd-top-middle">
+    <!-- Toast history -->
+    <button
+      *ngIf="ToastV2Service.HISTORY.length > 0"
+      fxLayout="row" fxLayoutGap="1.6rem"
+      class="gd-top-middle-history"
+      mat-flat-button
+      color="text"
+      (click)="displayHistory()">
+
+      <!-- Icon -->
+      <mat-icon>error</mat-icon>
+
+      <!-- Message -->
+      <div>{{'LNG_COMMON_LABEL_NOTIFICATION_HISTORY' | translate:ToastV2Service.HISTORY}}</div>
+
+    </button>
   </div>
 
   <!-- Right -->

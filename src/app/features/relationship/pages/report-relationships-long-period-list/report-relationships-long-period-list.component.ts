@@ -5,7 +5,6 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { catchError, tap } from 'rxjs/operators';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { Router } from '@angular/router';
@@ -15,6 +14,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-report-relationships-long-period',
@@ -170,7 +170,7 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
   constructor(
     protected listHelperService: ListHelperService,
     private router: Router,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
     private relationshipDataService: RelationshipDataService
   ) {
@@ -252,7 +252,7 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
         .getLongPeriodBetweenDateOfOnset(this.selectedOutbreak.id)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             finishCallback([]);
             return throwError(err);
           }),

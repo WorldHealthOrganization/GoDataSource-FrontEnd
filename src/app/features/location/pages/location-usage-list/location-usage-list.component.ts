@@ -7,7 +7,6 @@ import { LocationModel } from '../../../../core/models/location.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import * as _ from 'lodash';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { Constants } from '../../../../core/models/constants';
 import { HoverRowAction } from '../../../../shared/components';
 import { EventModel } from '../../../../core/models/event.model';
@@ -18,6 +17,7 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-location-usage-list',
@@ -94,7 +94,7 @@ export class LocationUsageListComponent extends ListComponent implements OnInit,
      */
   constructor(
     protected listHelperService: ListHelperService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private locationDataService: LocationDataService,
     private outbreakDataService: OutbreakDataService,
     protected route: ActivatedRoute
@@ -196,7 +196,7 @@ export class LocationUsageListComponent extends ListComponent implements OnInit,
         .getOutbreaksListReduced()
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             finishCallback([]);
             return throwError(err);
           })
@@ -218,7 +218,7 @@ export class LocationUsageListComponent extends ListComponent implements OnInit,
             .getLocationUsage(this.locationId)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 finishCallback([]);
                 return throwError(err);
               })

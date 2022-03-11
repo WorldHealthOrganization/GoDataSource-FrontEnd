@@ -3,7 +3,6 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
 import * as _ from 'lodash';
@@ -20,6 +19,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-create-client-application',
@@ -45,7 +45,7 @@ export class CreateClientApplicationComponent extends ConfirmOnFormChanges imple
   constructor(
     private authDataService: AuthDataService,
     private router: Router,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     private systemSettingsDataService: SystemSettingsDataService,
     private outbreakDataService: OutbreakDataService,
@@ -105,7 +105,7 @@ export class CreateClientApplicationComponent extends ConfirmOnFormChanges imple
         .getSystemSettings()
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             loadingDialog.close();
             return throwError(err);
           })
@@ -121,14 +121,14 @@ export class CreateClientApplicationComponent extends ConfirmOnFormChanges imple
             })
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 loadingDialog.close();
                 return throwError(err);
               })
             )
             .subscribe(() => {
               // display success message
-              this.snackbarService.showSuccess('LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_ACTION_CREATE_CLIENT_APPLICATION_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_ACTION_CREATE_CLIENT_APPLICATION_SUCCESS_MESSAGE');
 
               // hide dialog
               loadingDialog.close();

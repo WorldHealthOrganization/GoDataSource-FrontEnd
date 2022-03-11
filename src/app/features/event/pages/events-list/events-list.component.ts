@@ -5,7 +5,6 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { EventDataService } from '../../../../core/services/data/event.data.service';
 import { EventModel } from '../../../../core/models/event.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -32,6 +31,7 @@ import {
   ExportFieldsGroupModelNameEnum
 } from '../../../../core/models/export-fields-group.model';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-events-list',
@@ -315,7 +315,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
     private router: Router,
     private eventDataService: EventDataService,
     private outbreakDataService: OutbreakDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private dialogService: DialogService,
     private genericDataService: GenericDataService,
     private i18nService: I18nService,
@@ -549,7 +549,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
         .getEventsList(this.selectedOutbreak.id, this.queryBuilder)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             finishCallback([]);
             return throwError(err);
           }),
@@ -591,7 +591,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
         .getEventsCount(this.selectedOutbreak.id, countQueryBuilder)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             return throwError(err);
           }),
           share()
@@ -613,12 +613,12 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             .deleteEvent(this.selectedOutbreak.id, event.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_EVENTS_ACTION_DELETE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_EVENTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
               // reload data
               this.needsRefreshList(true);
@@ -640,12 +640,12 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             .restoreEvent(this.selectedOutbreak.id, eventModel.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_SUCCESS_MESSAGE');
               // reload data
               this.needsRefreshList(true);
             });

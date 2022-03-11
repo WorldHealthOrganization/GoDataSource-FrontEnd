@@ -3,7 +3,6 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
@@ -15,6 +14,7 @@ import * as _ from 'lodash';
 import { EntityType } from '../../../../core/models/entity-type';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-event-merge-duplicate-records',
@@ -74,7 +74,7 @@ export class EventMergeDuplicateRecordsComponent extends ConfirmOnFormChanges im
     private route: ActivatedRoute,
     private router: Router,
     private outbreakDataService: OutbreakDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService
   ) {
     super();
@@ -202,19 +202,19 @@ export class EventMergeDuplicateRecordsComponent extends ConfirmOnFormChanges im
           .pipe(
             catchError((err) => {
               this.displayLoading = false;
-              this.snackbarService.showApiError(err);
+              this.toastV2Service.error(err);
               return throwError(err);
             })
           )
           .subscribe(() => {
-            this.snackbarService.showSuccess('LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_MERGE_EVENTS_SUCCESS_MESSAGE');
+            this.toastV2Service.success('LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_MERGE_EVENTS_SUCCESS_MESSAGE');
 
             // navigate to listing page
             this.disableDirtyConfirm();
             this.router.navigate(['/duplicated-records']);
           });
       } else {
-        this.snackbarService.showError('LNG_FORM_ERROR_FORM_INVALID');
+        this.toastV2Service.error('LNG_FORM_ERROR_FORM_INVALID');
       }
     }
   }

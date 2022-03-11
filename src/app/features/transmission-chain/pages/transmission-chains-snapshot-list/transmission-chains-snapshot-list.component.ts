@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Observable, Subscription, throwError } from 'rxjs';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { UserSettings } from '../../../../core/models/user.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
@@ -16,6 +15,7 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { Constants } from '../../../../core/models/constants';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-transmission-chains-snapshot-list',
@@ -75,7 +75,7 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent imple
      */
   constructor(
     protected listHelperService: ListHelperService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
     private transmissionChainDataService: TransmissionChainDataService,
     private genericDataService: GenericDataService,
@@ -204,7 +204,7 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent imple
       )
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           finishCallback([]);
           return throwError(err);
         }),
@@ -238,7 +238,7 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent imple
       )
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         }),
         share()
@@ -261,13 +261,13 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent imple
             )
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
               // show message
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_ASYNC_COT_ACTION_DELETE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_ASYNC_COT_ACTION_DELETE_SUCCESS_MESSAGE');
 
               // reload data
               this.needsRefreshList(true);

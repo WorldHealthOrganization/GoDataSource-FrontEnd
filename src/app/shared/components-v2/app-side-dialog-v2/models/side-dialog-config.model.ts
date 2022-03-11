@@ -24,7 +24,8 @@ export enum V2SideDialogConfigInputType {
   LINK,
   ACCORDION,
   ACCORDION_PANEL,
-  KEY_VALUE
+  KEY_VALUE,
+  HTML
 }
 
 /**
@@ -80,6 +81,16 @@ export interface IV2SideDialogConfigInputKeyValue extends IV2SideDialogConfigInp
   name: string;
   placeholder: string;
   value: string;
+}
+
+/**
+ * Side dialog input - long text
+ */
+export interface IV2SideDialogConfigInputHTML extends IV2SideDialogConfigInputBase {
+  // required
+  type: V2SideDialogConfigInputType.HTML;
+  name: string;
+  placeholder: string;
 }
 
 /**
@@ -172,6 +183,9 @@ export interface IV2SideDialogConfigInputAccordionPanel extends IV2SideDialogCon
   name: string;
   placeholder: string;
   inputs: V2SideDialogConfigInput[];
+
+  // optional
+  iconButton?: IV2SideDialogConfigIconButton;
 }
 
 /**
@@ -190,8 +204,8 @@ export interface IV2SideDialogConfigInputAccordion extends IV2SideDialogConfigIn
  */
 export type V2SideDialogConfigInputFromInput = IV2SideDialogConfigInputCheckbox | IV2SideDialogConfigInputText | IV2SideDialogConfigInputSingleDropdown
 | IV2SideDialogConfigInputMultiDropdown | IV2SideDialogConfigInputNumber;
-export type V2SideDialogConfigInput = IV2SideDialogConfigInputDivider | IV2SideDialogConfigInputKeyValue | V2SideDialogConfigInputFromInput
-| IV2SideDialogConfigInputLink | IV2SideDialogConfigInputAccordion;
+export type V2SideDialogConfigInput = IV2SideDialogConfigInputDivider | IV2SideDialogConfigInputKeyValue | IV2SideDialogConfigInputHTML
+| V2SideDialogConfigInputFromInput | IV2SideDialogConfigInputLink | IV2SideDialogConfigInputAccordion;
 
 /**
  * Side dialog inputs map
@@ -206,6 +220,20 @@ export interface IV2SideDialogConfigInputMap {
 export enum IV2SideDialogConfigButtonType {
   CANCEL,
   OTHER
+}
+
+/**
+ * Side dialog icon button
+ */
+export interface IV2SideDialogConfigIconButton {
+  // required
+  icon: string;
+  click: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: IV2SideDialogConfigIconButton) => void;
+
+  // optional
+  data?: any;
+  color?: 'text' | 'secondary' | 'primary' | 'warn' | 'accent' | undefined;
+  disabled?: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: IV2SideDialogConfigIconButton) => boolean;
 }
 
 /**

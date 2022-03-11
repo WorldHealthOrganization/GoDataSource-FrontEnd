@@ -5,7 +5,6 @@ import { LocationDataService } from '../../../core/services/data/location.data.s
 import { HierarchicalLocationModel } from '../../../core/models/hierarchical-location.model';
 import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
-import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import { Subject ,  Subscription } from 'rxjs';
 import { ErrorMessage } from '../../xt-forms/core/error-message';
 import { I18nService } from '../../../core/services/helper/i18n.service';
@@ -18,6 +17,7 @@ import * as moment from 'moment';
 import { Observable } from 'rxjs/internal/Observable';
 import { of } from 'rxjs/internal/observable/of';
 import { Subscriber } from 'rxjs/internal-compatibility';
+import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 
 export class LocationAutoItem {
   constructor(
@@ -159,7 +159,7 @@ export class FormLocationDropdownComponent
     queryBuilder: RequestQueryBuilder,
     outbreakId: string,
     service: LocationDataService | OutbreakDataService,
-    snackbarService: SnackbarService
+    toastV2Service: ToastV2Service
   ): Observable<HierarchicalLocationModel[]> {
     // remove older cached items
     _.each(
@@ -219,7 +219,7 @@ export class FormLocationDropdownComponent
                   catchError((err) => {
                     observer.error(err);
                     observer.complete();
-                    snackbarService.showApiError(err);
+                    toastV2Service.error(err);
                     return throwError(err);
                   })
                 )
@@ -251,7 +251,7 @@ export class FormLocationDropdownComponent
     @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
     @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
     private locationDataService: LocationDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private i18nService: I18nService,
     private outbreakDataService: OutbreakDataService
   ) {
@@ -450,14 +450,14 @@ export class FormLocationDropdownComponent
         this.queryBuilder,
         this.outbreakId,
         this.outbreakDataService,
-        this.snackbarService
+        this.toastV2Service
       ) :
       FormLocationDropdownComponent.doRequestOrGetFromCache(
         'getLocationsHierarchicalList',
         this.queryBuilder,
         undefined,
         this.locationDataService,
-        this.snackbarService
+        this.toastV2Service
       );
 
     // retrieve hierarchic location list

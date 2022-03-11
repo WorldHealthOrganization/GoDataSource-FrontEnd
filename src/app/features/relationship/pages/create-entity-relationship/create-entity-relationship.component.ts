@@ -4,7 +4,6 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm, NgModel } from '@angular/forms';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import * as _ from 'lodash';
@@ -28,6 +27,7 @@ import { catchError, share } from 'rxjs/operators';
 import { throwError, forkJoin } from 'rxjs';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-create-entity-relationship',
@@ -86,7 +86,7 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
     private route: ActivatedRoute,
     private entityDataService: EntityDataService,
     private outbreakDataService: OutbreakDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     private relationshipDataService: RelationshipDataService,
     private dialogService: DialogService,
@@ -108,7 +108,7 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
     this.route.queryParams
       .subscribe((queryParams: { selectedEntityIds }) => {
         if (_.isEmpty(queryParams.selectedEntityIds)) {
-          this.snackbarService.showError('LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES');
+          this.toastV2Service.error('LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES');
 
           // No entities selected; navigate back to Available Entities list
           this.disableDirtyConfirm();
@@ -162,7 +162,7 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
         .getEntity(this.entityType, this.selectedOutbreak.id, this.entityId)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
 
             // Entity not found; navigate back to Entities list
             this.router.navigate([this.entityMap[this.entityType].link]);
@@ -291,17 +291,17 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
     return forkJoin(createRelationships$)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         })
       )
       .subscribe(() => {
         if (createRelationships$.length > 1) {
           // multiple relationships
-          this.snackbarService.showSuccess('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_MULTIPLE_RELATIONSHIP_SUCCESS_MESSAGE');
+          this.toastV2Service.success('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_MULTIPLE_RELATIONSHIP_SUCCESS_MESSAGE');
         } else {
           // single relationship
-          this.snackbarService.showSuccess('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE');
+          this.toastV2Service.success('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE');
         }
 
         // navigate to listing page

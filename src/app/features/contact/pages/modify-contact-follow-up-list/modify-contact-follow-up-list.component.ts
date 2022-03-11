@@ -3,7 +3,6 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -25,6 +24,7 @@ import { Constants } from '../../../../core/models/constants';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-modify-contact-follow-ups-list',
@@ -78,7 +78,7 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     private route: ActivatedRoute,
     private followUpsDataService: FollowUpsDataService,
     private outbreakDataService: OutbreakDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private dialogService: DialogService,
     private formHelper: FormHelperService,
     private referenceDataDataService: ReferenceDataDataService,
@@ -105,7 +105,7 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     this.route.queryParams
       .subscribe((queryParams: { followUpsIds }) => {
         if (_.isEmpty(queryParams.followUpsIds)) {
-          this.snackbarService.showError('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ERROR_NO_FOLLOW_UPS_SELECTED');
+          this.toastV2Service.error('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ERROR_NO_FOLLOW_UPS_SELECTED');
 
           // No entities selected
           this.disableDirtyConfirm();
@@ -257,7 +257,7 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     const dirtyFields: any = this.getFormDirtyFields(stepForms);
 
     if (_.isEmpty(dirtyFields)) {
-      this.snackbarService.showSuccess('LNG_FORM_WARNING_NO_CHANGES');
+      this.toastV2Service.success('LNG_FORM_WARNING_NO_CHANGES');
       return;
     }
 
@@ -289,14 +289,14 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
         catchError((err) => {
           loadingDialog.close();
 
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         })
       )
       .subscribe(() => {
         loadingDialog.close();
 
-        this.snackbarService.showSuccess('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE');
 
         // navigate to listing page
         this.disableDirtyConfirm();

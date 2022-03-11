@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { Observable } from 'rxjs';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -24,6 +23,7 @@ import { throwError } from 'rxjs';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-outbreak-list',
@@ -245,7 +245,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
     private authDataService: AuthDataService,
     private genericDataService: GenericDataService,
     private referenceDataDataService: ReferenceDataDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private dialogService: DialogService,
     private i18nService: I18nService,
     private router: Router
@@ -431,7 +431,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
       .getOutbreaksList(this.queryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           finishCallback([]);
           return throwError(err);
         }),
@@ -459,7 +459,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
       .getOutbreaksCount(countQueryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         }),
         share()
@@ -478,7 +478,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
             .deleteOutbreak(outbreak.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
@@ -489,7 +489,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
                 .subscribe((authenticatedUser) => {
                   this.authUser = authenticatedUser.user;
                 });
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_SUCCESS_MESSAGE');
               this.needsRefreshList(true);
             });
         }
@@ -510,12 +510,12 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
             .restoreOutbreak(outbreak.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_OUTBREAKS_RESTORE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAKS_RESTORE_SUCCESS_MESSAGE');
 
               // reload data
               this.needsRefreshList(true);
@@ -534,7 +534,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
             .modifyUser(userId, userData)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
@@ -544,7 +544,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
                 .reloadAndPersistAuthUser()
                 .subscribe((authenticatedUser) => {
                   this.authUser = authenticatedUser.user;
-                  this.snackbarService.showSuccess('LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE_SUCCESS_MESSAGE');
+                  this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE_SUCCESS_MESSAGE');
                   this.outbreakDataService.checkActiveSelectedOutbreak();
                   this.needsRefreshList(true);
 
@@ -675,7 +675,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
                 .createOutbreak(outbreak)
                 .pipe(
                   catchError((err) => {
-                    this.snackbarService.showApiError(err);
+                    this.toastV2Service.error(err);
                     loadingDialog.close();
                     return throwError(err);
                   }),
@@ -684,7 +684,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
                     return this.i18nService.loadUserLanguage()
                       .pipe(
                         catchError((err) => {
-                          this.snackbarService.showApiError(err);
+                          this.toastV2Service.error(err);
                           loadingDialog.close();
                           return throwError(err);
                         }),
@@ -693,7 +693,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
                   })
                 )
                 .subscribe((clonedOutbreak) => {
-                  this.snackbarService.showSuccess('LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_SUCCESS_MESSAGE');
+                  this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_SUCCESS_MESSAGE');
 
                   // hide dialog
                   loadingDialog.close();

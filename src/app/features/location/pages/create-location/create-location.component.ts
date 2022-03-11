@@ -4,7 +4,6 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
@@ -17,6 +16,7 @@ import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-co
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-create-location',
@@ -45,7 +45,7 @@ export class CreateLocationComponent
   constructor(
     private router: Router,
     private locationDataService: LocationDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private route: ActivatedRoute,
     private formHelper: FormHelperService,
     private referenceDataDataService: ReferenceDataDataService,
@@ -142,13 +142,13 @@ export class CreateLocationComponent
         .createLocation(dirtyFields)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             loadingDialog.close();
             return throwError(err);
           })
         )
         .subscribe((newLocation: LocationModel) => {
-          this.snackbarService.showSuccess('LNG_PAGE_CREATE_LOCATION_ACTION_CREATE_LOCATION_SUCCESS_MESSAGE');
+          this.toastV2Service.success('LNG_PAGE_CREATE_LOCATION_ACTION_CREATE_LOCATION_SUCCESS_MESSAGE');
 
           // hide dialog
           loadingDialog.close();

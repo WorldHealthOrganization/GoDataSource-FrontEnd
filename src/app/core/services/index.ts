@@ -28,7 +28,6 @@ import { TeamDataService } from './data/team.data.service';
 import { AttachmentDataService } from './data/attachment.data.service';
 import { StorageService } from './helper/storage.service';
 import { LoggerService } from './helper/logger.service';
-import { SnackbarService } from './helper/snackbar.service';
 import { ModelHelperService } from './helper/model-helper.service';
 import { FormHelperService } from './helper/form-helper.service';
 import { I18nService } from './helper/i18n.service';
@@ -54,6 +53,7 @@ import { ImportLogDataService } from './data/import-log.data.service';
 import { ImportResultDataService } from './data/import-result.data.service';
 import { ExportLogDataService } from './data/export-log.data.service';
 import { DialogV2Service } from './helper/dialog-v2.service';
+import { ToastV2Service } from './helper/toast-v2.service';
 
 // export the list of services
 export const services: any[] = [
@@ -109,7 +109,6 @@ export const services: any[] = [
   // helper services
   StorageService,
   LoggerService,
-  SnackbarService,
   ModelHelperService,
   FormHelperService,
   I18nService,
@@ -119,5 +118,6 @@ export const services: any[] = [
   DomService,
   RedirectService,
   EntityHelperService,
-  ListHelperService
+  ListHelperService,
+  ToastV2Service
 ];

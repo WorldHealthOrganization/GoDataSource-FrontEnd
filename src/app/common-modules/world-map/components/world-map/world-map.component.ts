@@ -34,9 +34,9 @@ import { v4 as uuid } from 'uuid';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components';
 import { MatDialogRef } from '@angular/material/dialog';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { applyStyle } from 'ol-mapbox-style';
 import RenderFeature from 'ol/render/Feature';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 /**
  * Point used for rendering purposes
@@ -404,7 +404,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
   constructor(
     private outbreakDataService: OutbreakDataService,
     private dialogService: DialogService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service
   ) {}
 
   /**
@@ -494,7 +494,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                       this.initializeMap();
                     }).catch(() => {
                       // display an error
-                      this.snackbarService.showError('LNG_PAGE_WORLD_MAP_OUTBREAK_MAP_SERVER_STYLE_INVALID_URL');
+                      this.toastV2Service.error('LNG_PAGE_WORLD_MAP_OUTBREAK_MAP_SERVER_STYLE_INVALID_URL');
                     });
                   });
               }

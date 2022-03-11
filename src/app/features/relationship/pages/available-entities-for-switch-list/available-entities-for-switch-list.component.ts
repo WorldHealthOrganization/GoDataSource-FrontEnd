@@ -3,7 +3,6 @@ import { RelationshipsListComponent } from '../../helper-classes/relationships-l
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { Observable, throwError } from 'rxjs/index';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
@@ -24,6 +23,7 @@ import { AddressType } from '../../../../core/models/address.model';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-available-entities-for-switch-list',
@@ -70,7 +70,7 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
     protected route: ActivatedRoute,
     protected outbreakDataService: OutbreakDataService,
     protected entityDataService: EntityDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private relationshipDataService: RelationshipDataService,
     private referenceDataDataService: ReferenceDataDataService,
     private dialogService: DialogService,
@@ -148,7 +148,7 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
   getQueryParams() {
     // read route query params
     if (_.isEmpty(this.route.snapshot.queryParams.selectedTargetIds)) {
-      this.snackbarService.showError('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_NO_CONTACTS_SELECTED');
+      this.toastV2Service.error('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_NO_CONTACTS_SELECTED');
       this.router.navigate(['/contacts/follow-ups']);
     } else {
       this.selectedRecordsIds = JSON.parse(this.route.snapshot.queryParams.selectedTargetIds);
@@ -250,7 +250,7 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
         )
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             finishCallback([]);
             return throwError(err);
           }),
@@ -309,7 +309,7 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
         )
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             return throwError(err);
           }),
           share()
@@ -397,7 +397,7 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
                 // hide dialog
                 loadingDialog.close();
 
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
@@ -406,7 +406,7 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
               loadingDialog.close();
 
               // saved
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_ACTION_SET_SOURCE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_ACTION_SET_SOURCE_SUCCESS_MESSAGE');
 
               // redirect
               this.router.navigate(['/relationships', this.entityType, selectedRecordId, 'contacts']);

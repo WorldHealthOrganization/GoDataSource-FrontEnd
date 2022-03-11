@@ -7,7 +7,6 @@ import { Constants } from '../../../../core/models/constants';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogAnswerButton, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogConfiguration } from '../../../../shared/components/dialog/dialog.component';
@@ -34,6 +33,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { AddressModel } from '../../../../core/models/address.model';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-daily-follow-ups-list',
@@ -248,7 +248,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     protected teamDataService: TeamDataService,
     protected outbreakDataService: OutbreakDataService,
     protected userDataService: UserDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private authDataService: AuthDataService,
     private genericDataService: GenericDataService,
     private referenceDataDataService: ReferenceDataDataService,
@@ -1110,7 +1110,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             finishCallback([]);
             return throwError(err);
           }),
@@ -1167,7 +1167,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         .getFollowUpsCount(this.selectedOutbreak.id, countQueryBuilder)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             return throwError(err);
           }),
           share()
@@ -1268,7 +1268,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                     this.closeLoadingDialog();
 
                     // error
-                    this.snackbarService.showApiError(err);
+                    this.toastV2Service.error(err);
                     return throwError(err);
                   })
                 )
@@ -1277,7 +1277,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                   this.closeLoadingDialog();
 
                   // finished
-                  this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
+                  this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
 
                   // reload data
                   this.needsRefreshList(true);

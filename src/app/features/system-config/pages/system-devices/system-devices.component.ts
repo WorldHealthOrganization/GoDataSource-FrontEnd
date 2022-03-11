@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { UserSettings } from '../../../../core/models/user.model';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -14,6 +13,7 @@ import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-system-devices-list',
@@ -117,7 +117,7 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
     protected listHelperService: ListHelperService,
     private router: Router,
     private deviceDataService: DeviceDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private dialogService: DialogService
   ) {
     super(listHelperService);
@@ -207,7 +207,7 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
       .getDevices(this.queryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           finishCallback([]);
           return throwError(err);
         }),
@@ -229,7 +229,7 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
       .getDevicesCount(countQueryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         }),
         share()
@@ -249,13 +249,13 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
             .deleteDevice(device.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 this.closeLoadingDialog();
                 return throwError(err);
               })
             )
             .subscribe( () => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE_SUCCESS_MESSAGE');
 
               this.needsRefreshList();
               this.closeLoadingDialog();
@@ -278,7 +278,7 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
             .wipeDevice(device.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 this.closeLoadingDialog();
                 return throwError(err);
               })

@@ -3,7 +3,6 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { NgForm } from '@angular/forms';
 import * as _ from 'lodash';
 import { FormHelperService } from '../../../core/services/helper/form-helper.service';
-import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import { GlobalEntitySearchDataService } from '../../../core/services/data/global-entity-search.data.service';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { Subscription } from 'rxjs';
@@ -17,6 +16,7 @@ import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { RedirectService } from '../../../core/services/helper/redirect.service';
 import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
+import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-global-entity-search',
@@ -42,7 +42,7 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
      */
   constructor(
     private formHelper: FormHelperService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private globalEntitySearchDataService: GlobalEntitySearchDataService,
     private outbreakDataService: OutbreakDataService,
     private dialogService: DialogService,
@@ -105,7 +105,7 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
           .pipe(
             catchError((err) => {
               this.closeLoadingDialog();
-              this.snackbarService.showApiError(err);
+              this.toastV2Service.error(err);
 
               return throwError(err);
             })
@@ -151,7 +151,7 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
               // empty search field
               this.globalSearchValue = '';
             } else {
-              this.snackbarService.showError('LNG_GLOBAL_ENTITY_SEARCH_NO_ENTITIES_MESSAGE');
+              this.toastV2Service.error('LNG_GLOBAL_ENTITY_SEARCH_NO_ENTITIES_MESSAGE');
 
               // hide loading
               this.closeLoadingDialog();

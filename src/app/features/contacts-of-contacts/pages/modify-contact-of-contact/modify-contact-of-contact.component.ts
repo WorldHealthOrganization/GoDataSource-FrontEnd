@@ -15,7 +15,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
@@ -37,6 +36,7 @@ import { TimerCache } from '../../../../core/helperClasses/timer-cache';
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-modify-contact-of-contact',
@@ -93,7 +93,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
     private outbreakDataService: OutbreakDataService,
     private contactsOfContactsDataService: ContactsOfContactsDataService,
     private formHelper: FormHelperService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private relationshipDataService: RelationshipDataService,
     private router: Router,
     protected dialogService: DialogService,
@@ -263,7 +263,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
         )
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             this.hideLoadingDialog();
             return throwError(err);
           })
@@ -279,7 +279,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
 
             // display message
             if (!finishCallBack) {
-              this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_MODIFY_CONTACT_OF_CONTACT_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_MODIFY_CONTACT_OF_CONTACT_SUCCESS_MESSAGE');
 
               // update breadcrumb
               this.createBreadcrumbs();
@@ -309,7 +309,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
               )
               .pipe(
                 catchError((err) => {
-                  this.snackbarService.showApiError(err);
+                  this.toastV2Service.error(err);
 
                   // hide loading
                   this.hideLoadingDialog();
@@ -354,7 +354,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
           )
           .pipe(
             catchError((err) => {
-              this.snackbarService.showApiError(err);
+              this.toastV2Service.error(err);
 
               // hide dialog
               this.hideLoadingDialog();

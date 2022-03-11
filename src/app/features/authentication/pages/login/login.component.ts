@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { AuthModel, IAuthTwoFactor } from '../../../../core/models/auth.model';
@@ -16,6 +15,7 @@ import { Observable } from 'rxjs/internal/Observable';
 import { SafeHtml } from '@angular/platform-browser';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-login',
@@ -43,7 +43,7 @@ export class LoginComponent implements OnInit {
   constructor(
     private router: Router,
     private authDataService: AuthDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private i18nService: I18nService,
     protected dialogService: DialogService,
     private captchaDataService: CaptchaDataService,
@@ -110,7 +110,7 @@ export class LoginComponent implements OnInit {
             }
 
             // show error
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             return throwError(err);
           })
         )
@@ -118,7 +118,7 @@ export class LoginComponent implements OnInit {
           // two factor authentication
           if ((auth as IAuthTwoFactor).twoFA) {
             // display message that 2FA is active
-            this.snackbarService.showSuccess(
+            this.toastV2Service.success(
               'LNG_PAGE_LOGIN_ACTION_LOGIN_2FA_CODE_REQUIRED',
               {
                 email: dirtyFields.email
@@ -148,13 +148,13 @@ export class LoginComponent implements OnInit {
                 loadingDialog.close();
 
                 // show api error
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
               // show success message
-              this.snackbarService.showSuccess(
+              this.toastV2Service.success(
                 'LNG_PAGE_LOGIN_ACTION_LOGIN_SUCCESS_MESSAGE',
                 {
                   name: `${authModel.user.firstName} ${authModel.user.lastName}`
@@ -189,7 +189,7 @@ export class LoginComponent implements OnInit {
       .pipe(
         catchError((err) => {
           // show error
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         })
       );

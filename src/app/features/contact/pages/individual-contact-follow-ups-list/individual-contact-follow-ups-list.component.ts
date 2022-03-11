@@ -7,7 +7,6 @@ import { Constants } from '../../../../core/models/constants';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
@@ -31,6 +30,7 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { AddressModel } from '../../../../core/models/address.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-individual-contact-follow-ups-list',
@@ -215,7 +215,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
     protected teamDataService: TeamDataService,
     protected outbreakDataService: OutbreakDataService,
     protected userDataService: UserDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private authDataService: AuthDataService,
     private genericDataService: GenericDataService,
     private referenceDataDataService: ReferenceDataDataService,
@@ -644,7 +644,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
         .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             finishCallback([]);
             return throwError(err);
           }),
@@ -705,7 +705,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
         .getFollowUpsCount(this.selectedOutbreak.id, countQueryBuilder)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             return throwError(err);
           }),
           share()

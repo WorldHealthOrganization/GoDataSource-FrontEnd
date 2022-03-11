@@ -9,7 +9,6 @@ import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import * as _ from 'lodash';
 import { ErrorCodes } from '../../../../core/enums/error-codes.enum';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -23,6 +22,7 @@ import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-locations-list',
@@ -148,7 +148,7 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
     private genericDataService: GenericDataService,
     private route: ActivatedRoute,
     private dialogService: DialogService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private router: Router,
     private i18nService: I18nService,
     private referenceDataDataService: ReferenceDataDataService,
@@ -287,7 +287,7 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
       )
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           finishCallback([]);
           return throwError(err);
         }),
@@ -310,7 +310,7 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
       .getLocationsCountByParent(this.parentId, countQueryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         }),
         share()
@@ -349,14 +349,14 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
                       }
                     });
                 } else {
-                  this.snackbarService.showApiError(err);
+                  this.toastV2Service.error(err);
                 }
 
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_SUCCESS_MESSAGE');
 
               // reset location cache after deleting a location
               FormLocationDropdownComponent.CACHE = {};

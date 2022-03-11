@@ -6,13 +6,13 @@ import { DialogAnswer, DialogAnswerButton, DialogAnswerInputValue } from '../dia
 import { FollowUpsDataService } from '../../../core/services/data/follow-ups.data.service';
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../core/services/helper/form-helper.service';
-import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
 import { Observable } from 'rxjs';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 
 export class ModifyContactFollowUpQuestionnaireData {
   constructor(
@@ -50,7 +50,7 @@ export class ModifyContactFollowUpQuestionnaireDialogComponent implements OnInit
     @Inject(MAT_DIALOG_DATA) public data: ModifyContactFollowUpQuestionnaireData,
     private followUpsDataService: FollowUpsDataService,
     private formHelper: FormHelperService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private referenceDataDataService: ReferenceDataDataService
   ) {
   }
@@ -94,12 +94,12 @@ export class ModifyContactFollowUpQuestionnaireDialogComponent implements OnInit
       .pipe(
         catchError((err) => {
           this.loading = false;
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         })
       )
       .subscribe(() => {
-        this.snackbarService.showSuccess('LNG_DIALOG_MODIFY_FOLLOW_UP_QUESTIONNAIRE_BUTTON_SAVE_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_DIALOG_MODIFY_FOLLOW_UP_QUESTIONNAIRE_BUTTON_SAVE_SUCCESS_MESSAGE');
 
         // close popup
         this.dialogRef.close(new DialogAnswer(

@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -20,6 +19,7 @@ import { EventModel } from '../../../../core/models/event.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-duplicate-records-list',
@@ -64,7 +64,7 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
   constructor(
     protected listHelperService: ListHelperService,
     private router: Router,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService
   ) {
     super(listHelperService);
@@ -125,7 +125,7 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
         .getPeoplePossibleDuplicates(this.selectedOutbreak.id, this.queryBuilder)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             finishCallback([]);
             return throwError(err);
           }),
@@ -157,7 +157,7 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
         .getPeoplePossibleDuplicatesCount(this.selectedOutbreak.id, countQueryBuilder)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             return throwError(err);
           }),
           share()
@@ -251,13 +251,13 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
 
     // we shouldn't be able to merge two types...
     if (types.length > 1) {
-      this.snackbarService.showError('LNG_PAGE_LIST_DUPLICATE_RECORDS_MERGE_NOT_SUPPORTED');
+      this.toastV2Service.error('LNG_PAGE_LIST_DUPLICATE_RECORDS_MERGE_NOT_SUPPORTED');
       return;
     }
 
     // check if we have write access to any of the present types
     if (types.length < 1) {
-      this.snackbarService.showError('LNG_PAGE_LIST_DUPLICATE_RECORDS_NO_WRITE_ACCESS');
+      this.toastV2Service.error('LNG_PAGE_LIST_DUPLICATE_RECORDS_NO_WRITE_ACCESS');
       return;
     }
 

@@ -17,6 +17,7 @@ import { moment } from '../../helperClasses/x-moment';
 import { Constants } from '../../models/constants';
 import { ILabelValuePairModel } from '../../../shared/forms-v2/core/label-value-pair.model';
 import { I18nService } from './i18n.service';
+import { ToastV2Service } from './toast-v2.service';
 
 /**
  * From ?
@@ -34,7 +35,8 @@ export class EntityHelperService {
   constructor(
     private dialogV2Service: DialogV2Service,
     private relationshipDataService: RelationshipDataService,
-    private i18nService: I18nService
+    private i18nService: I18nService,
+    private toastV2Service: ToastV2Service
   ) {}
 
   /**
@@ -69,7 +71,7 @@ export class EntityHelperService {
             .pipe(
               catchError((err) => {
                 // show error
-                // this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
 
                 // hide
                 handler.hide();

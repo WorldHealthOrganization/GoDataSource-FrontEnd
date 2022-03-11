@@ -5,9 +5,9 @@ import * as _ from 'lodash';
 import { HierarchicalLocationModel } from '../../../core/models/hierarchical-location.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LocationModel } from '../../../core/models/location.model';
-import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-location-breadcrumbs',
@@ -29,7 +29,7 @@ export class LocationBreadcrumbsComponent implements OnInit {
     private locationDataService: LocationDataService,
     private route: ActivatedRoute,
     private router: Router,
-    private snackbarService: SnackbarService
+    private toastV2Service: ToastV2Service
   ) {}
 
   ngOnInit() {
@@ -62,7 +62,7 @@ export class LocationBreadcrumbsComponent implements OnInit {
           .getLocation(this.locationId)
           .pipe(
             catchError((err) => {
-              this.snackbarService.showApiError(err);
+              this.toastV2Service.error(err);
               this.router.navigate(['/locations']);
               return throwError(err);
             })

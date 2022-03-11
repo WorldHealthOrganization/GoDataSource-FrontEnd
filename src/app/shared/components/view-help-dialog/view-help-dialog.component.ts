@@ -3,7 +3,6 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
 import { HelpItemModel } from '../../../core/models/help-item.model';
 import { ListComponent } from '../../../core/helperClasses/list-component';
-import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import { catchError, tap } from 'rxjs/operators';
 import { HelpDataService } from '../../../core/services/data/help.data.service';
 import * as _ from 'lodash';
@@ -14,6 +13,7 @@ import { ViewHelpDetailsData, ViewHelpDetailsDialogComponent } from '../view-hel
 import { HoverRowAction } from '../hover-row-actions/hover-row-actions.component';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { ListHelperService } from '../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 
 export class ViewHelpData {
   helpItemsIds: string[];
@@ -77,7 +77,7 @@ export class ViewHelpDialogComponent extends ListComponent implements OnDestroy 
     protected listHelperService: ListHelperService,
     public dialogRef: MatDialogRef<ViewHelpDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: ViewHelpData,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private helpDataService: HelpDataService,
     private dialogService: DialogService
   ) {
@@ -145,7 +145,7 @@ export class ViewHelpDialogComponent extends ListComponent implements OnDestroy 
     this.helpItemsList$ = this.helpItemsList$
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           finishCallback([]);
           return throwError(err);
         }),

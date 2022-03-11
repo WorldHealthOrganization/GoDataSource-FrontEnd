@@ -3,7 +3,6 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { ActivatedRoute } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { throwError } from 'rxjs';
@@ -14,6 +13,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { ContactModel } from '../../../../core/models/contact.model';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-modify-questionnaire-contact',
@@ -42,7 +42,7 @@ export class ModifyQuestionnaireContactComponent extends ViewModifyComponent imp
     private authDataService: AuthDataService,
     private contactDataService: ContactDataService,
     private outbreakDataService: OutbreakDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     protected dialogService: DialogService
   ) {
@@ -177,7 +177,7 @@ export class ModifyQuestionnaireContactComponent extends ViewModifyComponent imp
       )
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
 
           // hide loading
           this.hideLoadingDialog();
@@ -193,7 +193,7 @@ export class ModifyQuestionnaireContactComponent extends ViewModifyComponent imp
         form.form.markAsPristine();
 
         // display message
-        this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE');
 
         // loading will be closed by retrieveContactData() method
         // NOTHING TO DO

@@ -10,8 +10,8 @@ import { FileItem, FileLikeObject, FileUploader } from 'ng2-file-upload';
 import { environment } from '../../../../../environments/environment';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { UserModel } from '../../../../core/models/user.model';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 export enum IconExtension {
   PNG = '.png',
@@ -91,7 +91,7 @@ export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements 
     private referenceDataDataService: ReferenceDataDataService,
     private authDataService: AuthDataService,
     private formHelper: FormHelperService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private router: Router
   ) {
     super();
@@ -215,7 +215,7 @@ export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements 
     hideLoading: boolean = false
   ) {
     // display toast
-    this.snackbarService.showError(
+    this.toastV2Service.error(
       messageToken,
       this.translationData
     );
@@ -323,7 +323,7 @@ export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements 
       !this.uploader ||
             this.uploader.queue.length < 1
     ) {
-      this.snackbarService.showError('LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_WARNING_IMG_REQUIRED');
+      this.toastV2Service.error('LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_WARNING_IMG_REQUIRED');
       return;
     }
 

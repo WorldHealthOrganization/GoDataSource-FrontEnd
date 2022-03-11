@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { UserSettings } from '../../../../core/models/user.model';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { SystemSyncLogDataService } from '../../../../core/services/data/system-sync-log.data.service';
@@ -23,6 +22,7 @@ import { moment } from '../../../../core/helperClasses/x-moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-system-sync-logs-list',
@@ -103,7 +103,7 @@ export class SystemSyncLogsComponent
      */
   constructor(
     protected listHelperService: ListHelperService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private dialogService: DialogService,
     private systemSyncLogDataService: SystemSyncLogDataService,
     private genericDataService: GenericDataService,
@@ -247,7 +247,7 @@ export class SystemSyncLogsComponent
       .getSyncLogList(this.queryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           finishCallback([]);
           return throwError(err);
         }),
@@ -288,7 +288,7 @@ export class SystemSyncLogsComponent
       .getSyncLogsCount(countQueryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         }),
         share()
@@ -325,7 +325,7 @@ export class SystemSyncLogsComponent
               })
               .pipe(
                 catchError((err) => {
-                  this.snackbarService.showApiError(err);
+                  this.toastV2Service.error(err);
                   return throwError(err);
                 })
               )
@@ -333,7 +333,7 @@ export class SystemSyncLogsComponent
                 this.settings = new SystemSettingsModel(settings);
 
                 // display success message
-                this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_SYNC_SETTINGS_DIALOG_SUCCESS_MESSAGE');
+                this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_SYNC_SETTINGS_DIALOG_SUCCESS_MESSAGE');
 
                 // refresh settings
                 this.needsRefreshList(true);
@@ -355,13 +355,13 @@ export class SystemSyncLogsComponent
             .deleteSyncLog(systemSyncLogModel.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
               // display success message
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_DELETE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_DELETE_SUCCESS_MESSAGE');
 
               // refresh
               this.needsRefreshList(true);
@@ -455,14 +455,14 @@ export class SystemSyncLogsComponent
             .deleteSyncLogs(qb)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 this.closeLoadingDialog();
                 return throwError(err);
               })
             )
             .subscribe(() => {
               // display success message
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_DELETE_SERVER_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_DELETE_SERVER_SUCCESS_MESSAGE');
 
               // refresh
               this.needsRefreshList(true);

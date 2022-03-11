@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { IAppFormIconButtonV2 } from '../../../shared/forms-v2/core/app-form-icon-button-v2';
 import { UserModel } from '../../models/user.model';
 import { AuthDataService } from '../../services/data/auth.data.service';
@@ -6,16 +6,19 @@ import { OutbreakDataService } from '../../services/data/outbreak.data.service';
 import { OutbreakModel } from '../../models/outbreak.model';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import { SnackbarService } from '../../services/helper/snackbar.service';
-import { DialogService } from '../../services/helper/dialog.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { ILabelValuePairModel } from '../../../shared/forms-v2/core/label-value-pair.model';
+import { ToastV2Service } from '../../services/helper/toast-v2.service';
+import { DialogV2Service } from '../../services/helper/dialog-v2.service';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputAccordion, V2SideDialogConfigInputType } from '../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { v4 as uuid } from 'uuid';
 
 @Component({
   selector: 'app-topnav',
   templateUrl: './topnav.component.html',
   styleUrls: ['./topnav.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TopnavComponent implements OnInit, OnDestroy {
   // global search
@@ -31,6 +34,7 @@ export class TopnavComponent implements OnInit, OnDestroy {
 
   // constants
   OutbreakModel = OutbreakModel;
+  ToastV2Service = ToastV2Service;
 
   // authenticated user
   authUser: UserModel;
@@ -38,8 +42,9 @@ export class TopnavComponent implements OnInit, OnDestroy {
   // selected Outbreak
   selectedOutbreak: OutbreakModel = new OutbreakModel();
 
-  // subscription
+  // subscriptions
   getSelectedOutbreakSubject: Subscription;
+  historyChangedSubscription: Subscription;
 
   // outbreak list
   outbreakListOptions: ILabelValuePairModel[] = [];
@@ -50,8 +55,9 @@ export class TopnavComponent implements OnInit, OnDestroy {
   constructor(
     private outbreakDataService: OutbreakDataService,
     private authDataService: AuthDataService,
-    private snackbarService: SnackbarService,
-    private dialogService: DialogService
+    private toastV2Service: ToastV2Service,
+    private dialogV2Service: DialogV2Service,
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
 
   /**
@@ -72,7 +78,17 @@ export class TopnavComponent implements OnInit, OnDestroy {
         if (outbreak) {
           // update the selected outbreak
           this.selectedOutbreak = outbreak;
+
+          // update ui
+          this.changeDetectorRef.detectChanges();
         }
+      });
+
+    // subscribe to history changes
+    this.historyChangedSubscription = this.toastV2Service.historyChanged
+      .subscribe(() => {
+        // update ui
+        this.changeDetectorRef.detectChanges();
       });
   }
 
@@ -80,9 +96,16 @@ export class TopnavComponent implements OnInit, OnDestroy {
    * Component destroyed
    */
   ngOnDestroy(): void {
+    // release subscription
     if (this.getSelectedOutbreakSubject) {
       this.getSelectedOutbreakSubject.unsubscribe();
       this.getSelectedOutbreakSubject = null;
+    }
+
+    // release subscription
+    if (this.historyChangedSubscription) {
+      this.historyChangedSubscription.unsubscribe();
+      this.historyChangedSubscription = null;
     }
   }
 
@@ -99,6 +122,7 @@ export class TopnavComponent implements OnInit, OnDestroy {
     this.outbreakDataService
       .getOutbreaksListReduced()
       .subscribe((outbreaksList) => {
+        // prepare outbreaks
         this.outbreakListOptions = [];
         outbreaksList.forEach((outbreak: OutbreakModel) => {
           // add outbreak details
@@ -118,6 +142,9 @@ export class TopnavComponent implements OnInit, OnDestroy {
             data: outbreak
           });
         });
+
+        // update ui
+        this.changeDetectorRef.detectChanges();
       });
   }
 
@@ -125,14 +152,18 @@ export class TopnavComponent implements OnInit, OnDestroy {
    * Change the selected Outbreak across the application
    */
   selectOutbreak(outbreakId: string) {
+    // show loading
+    const loadingDialog = this.dialogV2Service.showLoadingDialog();
+
+    // update ui
+    this.changeDetectorRef.detectChanges();
+
     // retrieve outbreak data since we have only truncated data here
-    // #TODO
-    const loadingDialog = this.dialogService.showLoadingDialog();
     this.outbreakDataService
       .getOutbreak(outbreakId)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           loadingDialog.close();
           return throwError(err);
         })
@@ -146,6 +177,9 @@ export class TopnavComponent implements OnInit, OnDestroy {
 
         // cache the selected Outbreak
         this.outbreakDataService.setSelectedOutbreak(this.selectedOutbreak);
+
+        // update ui
+        this.changeDetectorRef.detectChanges();
       });
   }
 
@@ -154,5 +188,88 @@ export class TopnavComponent implements OnInit, OnDestroy {
    */
   globalSearch(): void {
     console.log('global search by ', this.globalSearchValue);
+  }
+
+  /**
+   * Display history
+   */
+  displayHistory(): void {
+    // construct list of history items
+    const parent: IV2SideDialogConfigInputAccordion = {
+      type: V2SideDialogConfigInputType.ACCORDION,
+      placeholder: '',
+      name: 'errors',
+      panels: []
+    };
+    ToastV2Service.HISTORY.data.forEach((item) => {
+      // attach accordion
+      parent.panels.push({
+        type: V2SideDialogConfigInputType.ACCORDION_PANEL,
+        name: `errors-${uuid()}`,
+        placeholder: item.title,
+        iconButton: {
+          icon: 'close',
+          color: 'warn',
+          data: item,
+          click: (_dialogData, handler, iconButton) => {
+            // remove history item
+            this.toastV2Service.removeHistory(iconButton.data.id);
+
+            // remove input item
+            const panelIndex = parent.panels.findIndex((panel) => panel.iconButton === iconButton);
+            parent.panels.splice(panelIndex, 1);
+
+            // nothing to see anymore ?
+            if (parent.panels.length < 1) {
+              // hide
+              handler.hide();
+
+              // finished
+              return;
+            }
+
+            // update ui
+            handler.detectChanges();
+          }
+        },
+        inputs: [{
+          type: V2SideDialogConfigInputType.HTML,
+          name: `errors-long-${uuid()}`,
+          placeholder: item.details
+        }]
+      });
+    });
+
+    // display dialog
+    this.dialogV2Service
+      .showSideDialog({
+        title: {
+          get: () => 'LNG_COMMON_LABEL_HISTORY_TITLE'
+        },
+        width: '60rem',
+        bottomButtons: [{
+          type: IV2SideDialogConfigButtonType.OTHER,
+          label: 'LNG_MULTIPLE_SNACKBAR_BUTTON_CLOSE_ALL',
+          color: 'primary'
+        }, {
+          type: IV2SideDialogConfigButtonType.CANCEL,
+          label: 'LNG_COMMON_BUTTON_CANCEL',
+          color: 'text'
+        }],
+        inputs: [parent]
+      })
+      .subscribe((response) => {
+        // cancelled ?
+        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+          // finished
+          return;
+        }
+
+        // clear all
+        this.toastV2Service.clearHistory();
+
+        // close popup
+        response.handler.hide();
+      });
   }
 }

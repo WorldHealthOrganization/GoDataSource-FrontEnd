@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Observable } from 'rxjs';
 import { UserSettings } from '../../../../core/models/user.model';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -17,6 +16,7 @@ import * as _ from 'lodash';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-help-categories-list',
@@ -106,7 +106,7 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
     protected listHelperService: ListHelperService,
     private router: Router,
     private helpDataService: HelpDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private dialogService: DialogService,
     private i18nService: I18nService
   ) {
@@ -178,7 +178,7 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
       .getHelpCategoryList(this.queryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           finishCallback([]);
           return throwError(err);
         }),
@@ -201,7 +201,7 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
       .getHelpCategoryCount(countQueryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         }),
         share()
@@ -222,12 +222,12 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
             .deleteHelpCategory(category.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_DELETE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_DELETE_SUCCESS_MESSAGE');
 
               // reload data
               this.needsRefreshList(true);

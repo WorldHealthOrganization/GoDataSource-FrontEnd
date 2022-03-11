@@ -2287,8 +2287,8 @@ export abstract class ListComponent implements OnDestroy {
     // validate
     if (selectedRecords.length < 1) {
       // display message
-      if (this.listHelperService.snackbarService) {
-        this.listHelperService.snackbarService.showError('LNG_COMMON_LABEL_NO_RECORDS_SELECTED');
+      if (this.listHelperService.toastV2Service) {
+        this.listHelperService.toastV2Service.error('LNG_COMMON_LABEL_NO_RECORDS_SELECTED');
       }
 
       // not valid
@@ -2419,7 +2419,7 @@ export abstract class ListComponent implements OnDestroy {
           // display only if we're loading data, for save it doesn't matter since we will overwrite it
           if (forLoadingFilters) {
             setTimeout(() => {
-              this.listHelperService.snackbarService.showError('LNG_COMMON_LABEL_INVALID_URL_FILTERS');
+              this.listHelperService.toastV2Service.error('LNG_COMMON_LABEL_INVALID_URL_FILTERS');
             });
           }
         } else {

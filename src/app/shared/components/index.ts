@@ -48,13 +48,11 @@ import { FormVaccinesListComponent } from './form-vaccines-list/form-vaccines-li
 import { HotTableWrapperComponent } from './hot-table-wrapper/hot-table-wrapper.component';
 import { LocationDialogComponent } from './location-dialog/location-dialog.component';
 import { FormContactOfContactQuickComponent } from './form-contact-of-contact-quick/form-contact-of-contact-quick.component';
-import { MultipleSnackbarComponent } from './multiple-snackbar/multiple-snackbar.component';
 import { FancyTooltipComponent } from './fancy-tooltip/fancy-tooltip.component';
 import { PieDonutChartComponent } from './pie-donut-graph/pie-donut-chart.component';
 import { MatPaginatorExtendedComponent } from './mat-paginator-extended/mat-paginator-extended.component';
 
 // export necessary components individually
-export * from './multiple-snackbar/multiple-snackbar.component';
 export * from './dialog/dialog.component';
 export * from './modify-contact-follow-up-questionnaire-dialog/modify-contact-follow-up-questionnaire-dialog.component';
 export * from './loading-dialog/loading-dialog.component';
@@ -69,9 +67,6 @@ export * from './location-dialog/location-dialog.component';
 
 // export the list of all components
 export const components: any[] = [
-  // popups
-  MultipleSnackbarComponent,
-
   // main layout
   BreadcrumbsComponent,
   SideFiltersComponent,

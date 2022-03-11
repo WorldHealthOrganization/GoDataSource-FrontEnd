@@ -19,7 +19,6 @@ import { LoadingDialogModel } from '../../../../shared/components';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { Constants } from '../../../../core/models/constants';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { catchError, map, share } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
@@ -30,6 +29,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { MatExpansionPanel } from '@angular/material/expansion';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 interface IKpiGroup {
   id: DashboardKpiGroup;
@@ -314,7 +314,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private i18nService: I18nService,
     private genericDataService: GenericDataService,
     private dialogService: DialogService,
-    protected snackbarService: SnackbarService,
+    protected toastV2Service: ToastV2Service,
     private systemSettingsDataService: SystemSettingsDataService,
     private referenceDataDataService: ReferenceDataDataService
   ) {
@@ -573,7 +573,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .subscribe((pngBase64) => {
         // object not found ?
         if (!pngBase64) {
-          this.snackbarService.showError('LNG_PAGE_DASHBOARD_EPI_ELEMENT_NOT_VISIBLE_ERROR_MSG');
+          this.toastV2Service.error('LNG_PAGE_DASHBOARD_EPI_ELEMENT_NOT_VISIBLE_ERROR_MSG');
           this.closeLoadingDialog();
           return;
         }
@@ -583,7 +583,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           .exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
           .pipe(
             catchError((err) => {
-              this.snackbarService.showApiError(err);
+              this.toastV2Service.error(err);
               this.closeLoadingDialog();
               return throwError(err);
             })
@@ -606,7 +606,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
     });
     if (!atLeastOneIsExpanded) {
-      this.snackbarService.showError('LNG_PAGE_DASHBOARD_KPIS_ELEMENTS_NOT_VISIBLE_ERROR_MSG');
+      this.toastV2Service.error('LNG_PAGE_DASHBOARD_KPIS_ELEMENTS_NOT_VISIBLE_ERROR_MSG');
       return;
     }
 
@@ -623,7 +623,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             .exportImageToPdf({image: dataBase64, responseType: 'blob', splitFactor: 1})
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 this.closeLoadingDialog();
                 return throwError(err);
               })

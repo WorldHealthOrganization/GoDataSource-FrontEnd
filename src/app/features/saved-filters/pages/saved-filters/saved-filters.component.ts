@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { SavedFiltersService } from '../../../../core/services/data/saved-filters.data.service';
 import * as _ from 'lodash';
 import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
@@ -17,6 +16,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-saved-filters',
@@ -79,7 +79,7 @@ export class SavedFiltersComponent extends ListComponent implements OnInit, OnDe
   constructor(
     protected listHelperService: ListHelperService,
     private savedFiltersService: SavedFiltersService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private genericDataService: GenericDataService,
     private dialogService: DialogService,
     private userDataService: UserDataService
@@ -136,7 +136,7 @@ export class SavedFiltersComponent extends ListComponent implements OnInit, OnDe
       .getSavedFiltersList(this.queryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           finishCallback([]);
           return throwError(err);
         }),
@@ -158,7 +158,7 @@ export class SavedFiltersComponent extends ListComponent implements OnInit, OnDe
       .getSavedFiltersListCount(countQueryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         }),
         share()
@@ -174,12 +174,12 @@ export class SavedFiltersComponent extends ListComponent implements OnInit, OnDe
     this.savedFiltersService.modifyFilter(savedFilterId, {isPublic : isPublic})
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         })
       )
       .subscribe(() => {
-        this.snackbarService.showSuccess('LNG_PAGE_LIST_SAVED_FILTERS_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_LIST_SAVED_FILTERS_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE');
       });
   }
 
@@ -194,12 +194,12 @@ export class SavedFiltersComponent extends ListComponent implements OnInit, OnDe
           this.savedFiltersService.deleteFilter(filterId)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_SAVED_FILTERS_ACTION_DELETE_FILTER_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_SAVED_FILTERS_ACTION_DELETE_FILTER_SUCCESS_MESSAGE');
 
               // reload data
               this.needsRefreshList(true);

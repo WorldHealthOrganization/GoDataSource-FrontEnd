@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SavedImportMappingService } from '../../../../core/services/data/saved-import-mapping.data.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { Observable } from 'rxjs';
 import { SavedImportMappingModel } from '../../../../core/models/saved-import-mapping.model';
 import { catchError, share, tap } from 'rxjs/operators';
@@ -17,6 +16,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-saved-import-mapping',
@@ -78,7 +78,7 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
      */
   constructor(
     protected listHelperService: ListHelperService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private savedImportMappingService: SavedImportMappingService,
     private dialogService: DialogService,
     private genericDataService: GenericDataService,
@@ -136,7 +136,7 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
       .getImportMappingsList(this.queryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           finishCallback([]);
           return throwError(err);
         }),
@@ -158,7 +158,7 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
       .getImportMappingsListCount(countQueryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         }),
         share()
@@ -177,12 +177,12 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
           this.savedImportMappingService.deleteImportMapping(savedImportId)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_DELETE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_DELETE_SUCCESS_MESSAGE');
 
               // reload data
               this.needsRefreshList(true);
@@ -200,12 +200,12 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
     this.savedImportMappingService.modifyImportMapping(savedImportMappingId, {isPublic : isPublic})
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         })
       )
       .subscribe(() => {
-        this.snackbarService.showSuccess('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE');
       });
   }
 

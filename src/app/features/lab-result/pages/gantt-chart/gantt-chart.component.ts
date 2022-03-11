@@ -10,7 +10,6 @@ import * as FileSaver from 'file-saver';
 import { LoadingDialogModel } from '../../../../shared/components/index';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { GanttChartDelayOnsetDashletComponent } from '../../components/gantt-chart-delay-onset-dashlet/gantt-chart-delay-onset-dashlet.component';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { Observable } from 'rxjs';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { Constants } from '../../../../core/models/constants';
@@ -23,6 +22,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { GanttChartModel } from '../../../../core/models/gantt-chart.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-gantt-chart',
@@ -68,7 +68,7 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
     private i18nService: I18nService,
     private dialogService: DialogService,
     private genericDataService: GenericDataService,
-    protected snackbarService: SnackbarService,
+    protected toastV2Service: ToastV2Service,
     private systemSettingsDataService: SystemSettingsDataService,
     private authDataService: AuthDataService
   ) {
@@ -190,7 +190,7 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
       !this.ganttChart ||
             !this.ganttChart.hasData()
     ) {
-      this.snackbarService.showError('LNG_PAGE_DASHLET_GANTT_CHART_NO_DATA_LABEL');
+      this.toastV2Service.error('LNG_PAGE_DASHLET_GANTT_CHART_NO_DATA_LABEL');
     } else {
       this.showLoadingDialog();
       let ganttChartName = 'app-gantt-chart-delay-onset-dashlet svg';
@@ -206,7 +206,7 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
             .exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 this.closeLoadingDialog();
                 return throwError(err);
               })

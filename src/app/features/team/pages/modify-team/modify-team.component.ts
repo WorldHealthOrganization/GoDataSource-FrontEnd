@@ -2,7 +2,6 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { UserModel } from '../../../../core/models/user.model';
@@ -19,6 +18,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { FormLocationDropdownComponent } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-modify-team',
@@ -45,7 +45,7 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
   constructor(
     private teamDataService: TeamDataService,
     private router: Router,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     protected route: ActivatedRoute,
     private authDataService: AuthDataService,
@@ -82,7 +82,7 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
             .getTeam(this.teamId)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 this.router.navigate(['/teams']);
                 return throwError(err);
               })
@@ -146,7 +146,7 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
     this.checkTeamsInSameLocations()
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           // hide loading
           this.hideLoadingDialog();
           return throwError(err);
@@ -158,7 +158,7 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
             .modifyTeam(this.teamId, dirtyFields)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 // hide loading
                 this.hideLoadingDialog();
                 return throwError(err);
@@ -172,7 +172,7 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
               form.form.markAsPristine();
 
               // display message
-              this.snackbarService.showSuccess('LNG_PAGE_MODIFY_TEAM_ACTION_MODIFY_TEAM_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_MODIFY_TEAM_ACTION_MODIFY_TEAM_SUCCESS_MESSAGE');
 
               // hide loading
               this.hideLoadingDialog();

@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
@@ -17,6 +16,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { throwError } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-modify-reference-data-entry',
@@ -51,7 +51,7 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
   constructor(
     protected route: ActivatedRoute,
     private referenceDataDataService: ReferenceDataDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     private authDataService: AuthDataService,
     private iconDataService: IconDataService,
@@ -190,7 +190,7 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
       )
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           // hide loading
           this.hideLoadingDialog();
           return throwError(err);
@@ -200,7 +200,7 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
           return this.i18nService.loadUserLanguage()
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 // hide loading
                 this.hideLoadingDialog();
                 return throwError(err);
@@ -219,7 +219,7 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
         form.form.markAsPristine();
 
         // display message
-        this.snackbarService.showSuccess('LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_ACTION_MODIFY_ENTRY_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_ACTION_MODIFY_ENTRY_SUCCESS_MESSAGE');
 
         // update breadcrumbs
         this.initializeBreadcrumbs();

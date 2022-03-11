@@ -4,7 +4,6 @@ import { EntityType } from '../../../../core/models/entity-type';
 import * as _ from 'lodash';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
@@ -42,6 +41,7 @@ import { TimerCache } from '../../../../core/helperClasses/timer-cache';
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-create-contact-of-contact',
@@ -92,7 +92,7 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
     private entityDataService: EntityDataService,
     private outbreakDataService: OutbreakDataService,
     private authDataService: AuthDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     private relationshipDataService: RelationshipDataService,
     private referenceDataDataService: ReferenceDataDataService,
@@ -135,7 +135,7 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
 
         // check if we have proper value ( case or event ID )
         if (!this.entityId) {
-          this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_WARNING_CASE_OR_EVENT_REQUIRED');
+          this.toastV2Service.success('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_WARNING_CASE_OR_EVENT_REQUIRED');
 
           this.disableDirtyConfirm();
           // navigate to Contacts page
@@ -150,7 +150,7 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
           .pipe(
             catchError((err) => {
               // show error message
-              this.snackbarService.showError(err.message);
+              this.toastV2Service.error(err.message);
 
               // redirect to contacts
               this.disableDirtyConfirm();
@@ -196,7 +196,7 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
               .pipe(
                 catchError((err) => {
                   // show error message
-                  this.snackbarService.showError(err.message);
+                  this.toastV2Service.error(err.message);
 
                   // navigate to contacts listing page
                   this.disableDirtyConfirm();
@@ -295,7 +295,7 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
         )
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
 
             // hide dialog
             loadingDialog.close();
@@ -314,7 +314,7 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
             .pipe(
               catchError((err) => {
                 // display error message
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
 
                 // remove contact of contact
                 this.contactsOfContactsDataService
@@ -331,7 +331,7 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
             .subscribe(() => {
               // called when we finished creating contact of contact
               const finishedCreatingContactOfContact = () => {
-                this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
+                this.toastV2Service.success('LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
 
                 // hide dialog
                 loadingDialog.close();
@@ -378,7 +378,7 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
                   )
                   .pipe(
                     catchError((err) => {
-                      this.snackbarService.showApiError(err);
+                      this.toastV2Service.error(err);
 
                       // hide dialog
                       loadingDialog.close();
@@ -416,7 +416,7 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
           )
           .pipe(
             catchError((err) => {
-              this.snackbarService.showApiError(err);
+              this.toastV2Service.error(err);
 
               // hide dialog
               loadingDialog.close();

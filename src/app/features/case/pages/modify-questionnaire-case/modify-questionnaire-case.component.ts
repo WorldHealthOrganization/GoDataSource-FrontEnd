@@ -4,7 +4,6 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -14,6 +13,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel } from '../../../../core/models/user.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-modify-questionnaire-case',
@@ -42,7 +42,7 @@ export class ModifyQuestionnaireCaseComponent extends ViewModifyComponent implem
     private authDataService: AuthDataService,
     private caseDataService: CaseDataService,
     private outbreakDataService: OutbreakDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     protected dialogService: DialogService
   ) {
@@ -173,7 +173,7 @@ export class ModifyQuestionnaireCaseComponent extends ViewModifyComponent implem
       )
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
 
           // hide loading
           this.hideLoadingDialog();
@@ -189,7 +189,7 @@ export class ModifyQuestionnaireCaseComponent extends ViewModifyComponent implem
         form.form.markAsPristine();
 
         // display message
-        this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE');
 
         // loading will be closed by retrieveCaseData() method
         // NOTHING TO DO

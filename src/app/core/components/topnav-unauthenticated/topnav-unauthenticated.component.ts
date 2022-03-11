@@ -3,9 +3,9 @@ import { Observable } from 'rxjs';
 import { LanguageDataService } from '../../../core/services/data/language.data.service';
 import { LanguageModel } from '../../../core/models/language.model';
 import { I18nService } from '../../../core/services/helper/i18n.service';
-import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import { DialogService } from '../../../core/services/helper/dialog.service';
 import { map } from 'rxjs/operators';
+import { ToastV2Service } from '../../services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-topnav-unauthenticated',
@@ -26,7 +26,7 @@ export class TopnavUnauthenticatedComponent implements OnInit {
   constructor(
     private languageDataService: LanguageDataService,
     private i18nService: I18nService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private dialogService: DialogService
   ) {}
 
@@ -69,7 +69,7 @@ export class TopnavUnauthenticatedComponent implements OnInit {
         loadingDialog.close();
 
         // finished
-        this.snackbarService.showSuccess('LNG_LAYOUT_ACTION_CHANGE_LANGUAGE_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_LAYOUT_ACTION_CHANGE_LANGUAGE_SUCCESS_MESSAGE');
       });
   }
 }

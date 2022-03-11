@@ -7,7 +7,6 @@ import { Observable } from 'rxjs';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { EntityType } from '../../../../core/models/entity-type';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import * as _ from 'lodash';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Constants } from '../../../../core/models/constants';
@@ -20,6 +19,7 @@ import { throwError } from 'rxjs/internal/observable/throwError';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-clusters-people-list',
@@ -94,7 +94,7 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
     private route: ActivatedRoute,
     private outbreakDataService: OutbreakDataService,
     private clusterDataService: ClusterDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private referenceDataDataService: ReferenceDataDataService
   ) {
     super(listHelperService);
@@ -205,7 +205,7 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
         .getClusterPeople(this.selectedOutbreak.id, this.cluster.id, this.queryBuilder)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             finishCallback([]);
             return throwError(err);
           }),
@@ -231,7 +231,7 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
       .getClusterPeopleCount(this.selectedOutbreak.id, this.cluster.id, countQueryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         }),
         share()

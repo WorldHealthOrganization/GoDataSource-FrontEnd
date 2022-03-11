@@ -3,7 +3,6 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { LanguageModel } from '../../../../core/models/language.model';
 import { LanguageDataService } from '../../../../core/services/data/language.data.service';
@@ -13,6 +12,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-modify-language',
@@ -38,7 +38,7 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
     protected route: ActivatedRoute,
     private languageDataService: LanguageDataService,
     private formHelper: FormHelperService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private cacheService: CacheService,
     private authDataService: AuthDataService,
     protected dialogService: DialogService
@@ -124,7 +124,7 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
       .modifyLanguage(this.languageId, dirtyFields)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           // hide loading
           this.hideLoadingDialog();
           return throwError(err);
@@ -137,7 +137,7 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
           return this.languageDataService.getLanguagesList()
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 // hide loading
                 this.hideLoadingDialog();
                 return throwError(err);
@@ -154,7 +154,7 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
         form.form.markAsPristine();
 
         // display message
-        this.snackbarService.showSuccess('LNG_PAGE_MODIFY_LANGUAGE_ACTION_MODIFY_LANGUAGE_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_MODIFY_LANGUAGE_ACTION_MODIFY_LANGUAGE_SUCCESS_MESSAGE');
 
         // update breadcrumbs
         this.initializeBreadcrumbs();

@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Observable } from 'rxjs';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import * as _ from 'lodash';
 import { AuditLogDataService } from '../../../../core/services/data/audit-log.data.service';
@@ -15,6 +14,7 @@ import { moment } from '../../../../core/helperClasses/x-moment';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-audit-logs-list',
@@ -58,7 +58,7 @@ export class AuditLogsListComponent
   constructor(
     protected listHelperService: ListHelperService,
     private auditLogDataService: AuditLogDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private genericDataService: GenericDataService,
     private userDataService: UserDataService
   ) {
@@ -186,7 +186,7 @@ export class AuditLogsListComponent
       .getAuditLogsList(this.queryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           finishCallback([]);
           return throwError(err);
         }),
@@ -209,7 +209,7 @@ export class AuditLogsListComponent
       .getAuditLogsCount(countQueryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         }),
         share()

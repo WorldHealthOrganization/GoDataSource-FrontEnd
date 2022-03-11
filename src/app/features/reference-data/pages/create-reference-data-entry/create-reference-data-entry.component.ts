@@ -2,7 +2,6 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
@@ -17,6 +16,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-create-reference-data-entry',
@@ -53,7 +53,7 @@ export class CreateReferenceDataEntryComponent
     private router: Router,
     private route: ActivatedRoute,
     private referenceDataDataService: ReferenceDataDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     private iconDataService: IconDataService,
     private i18nService: I18nService,
@@ -184,7 +184,7 @@ export class CreateReferenceDataEntryComponent
           }
 
           // display error
-          this.snackbarService.showApiError(
+          this.toastV2Service.error(
             err, {
               name: this.entry.value
             }
@@ -200,7 +200,7 @@ export class CreateReferenceDataEntryComponent
         })
       )
       .subscribe((newReferenceDataEntry) => {
-        this.snackbarService.showSuccess('LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_ACTION_CREATE_ENTRY_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_ACTION_CREATE_ENTRY_SUCCESS_MESSAGE');
 
         // navigate to proper page
         // method handles disableDirtyConfirm too...

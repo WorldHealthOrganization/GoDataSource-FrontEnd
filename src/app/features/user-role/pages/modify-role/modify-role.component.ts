@@ -3,7 +3,6 @@ import { NgForm } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { Observable } from 'rxjs';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
@@ -17,6 +16,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { IGroupEventData, IGroupOptionEventData, ISelectGroupMap, ISelectGroupOptionFormatResponse, ISelectGroupOptionMap } from '../../../../shared/xt-forms/components/form-select-groups/form-select-groups.component';
 import { DomSanitizer } from '@angular/platform-browser';
 import { UserRoleHelper } from '../../../../core/helperClasses/user-role.helper';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-modify-role',
@@ -41,7 +41,7 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
   constructor(
     protected route: ActivatedRoute,
     private userRoleDataService: UserRoleDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     private authDataService: AuthDataService,
     protected dialogService: DialogService,
@@ -132,7 +132,7 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
       .modifyRole(this.userRoleId, dirtyFields)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           // hide loading
           this.hideLoadingDialog();
           return throwError(err);
@@ -146,7 +146,7 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
         form.form.markAsPristine();
 
         // display message
-        this.snackbarService.showSuccess('LNG_PAGE_MODIFY_USER_ROLES_ACTION_MODIFY_USER_ROLES_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_MODIFY_USER_ROLES_ACTION_MODIFY_USER_ROLES_SUCCESS_MESSAGE');
 
         // hide loading
         this.hideLoadingDialog();

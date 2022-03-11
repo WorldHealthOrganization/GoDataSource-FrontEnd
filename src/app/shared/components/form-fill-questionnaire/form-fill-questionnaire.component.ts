@@ -9,7 +9,6 @@ import { environment } from '../../../../environments/environment';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
-import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import { AttachmentDataService } from '../../../core/services/data/attachment.data.service';
 import { AttachmentModel } from '../../../core/models/attachment.model';
 import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
@@ -17,6 +16,7 @@ import { DialogService } from '../../../core/services/helper/dialog.service';
 import * as FileSaver from 'file-saver';
 import * as momentOriginal from 'moment';
 import { moment, Moment } from '../../../core/helperClasses/x-moment';
+import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 
 interface UploaderData {
   uploader: FileUploader;
@@ -207,7 +207,7 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
     @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
     private authDataService: AuthDataService,
     private outbreakDataService: OutbreakDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private attachmentDataService: AttachmentDataService,
     private dialogService: DialogService
   ) {
@@ -436,7 +436,7 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
           // handle server errors
           uploaderData.uploader.onErrorItem = () => {
             // display error
-            this.snackbarService.showError('LNG_QUESTIONNAIRE_ERROR_UPLOADING_FILE');
+            this.toastV2Service.error('LNG_QUESTIONNAIRE_ERROR_UPLOADING_FILE');
 
             // reset uploading flag
             uploaderData.uploading = false;
@@ -445,7 +445,7 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
           // handle errors when trying to upload files
           uploaderData.uploader.onWhenAddingFileFailed = () => {
             // display error
-            this.snackbarService.showError('LNG_QUESTIONNAIRE_ERROR_UPLOADING_FILE');
+            this.toastV2Service.error('LNG_QUESTIONNAIRE_ERROR_UPLOADING_FILE');
           };
 
           // progress handle
@@ -477,7 +477,7 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
               !response ||
                             !jsonResponse
             ) {
-              this.snackbarService.showError('LNG_QUESTIONNAIRE_ERROR_UPLOADING_FILE');
+              this.toastV2Service.error('LNG_QUESTIONNAIRE_ERROR_UPLOADING_FILE');
               return;
             }
 

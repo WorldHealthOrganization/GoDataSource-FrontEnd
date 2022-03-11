@@ -9,7 +9,6 @@ import { Observable, Subscriber } from 'rxjs';
 import * as _ from 'lodash';
 import { LabelValuePair } from '../../models/label-value-pair';
 import { ImportExportDataService } from '../data/import-export.data.service';
-import { SnackbarService } from './snackbar.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import * as FileSaver from 'file-saver';
 import { LoadingDialogComponent, LoadingDialogDataModel, LoadingDialogModel } from '../../../shared/components/loading-dialog/loading-dialog.component';
@@ -21,6 +20,7 @@ import { Constants, ExportStatusStep } from '../../models/constants';
 import { Moment } from 'moment';
 import * as moment from 'moment';
 import { I18nService } from './i18n.service';
+import { ToastV2Service } from './toast-v2.service';
 
 /**
  * Export accepted extensions
@@ -65,7 +65,7 @@ export class DialogService {
   constructor(
     private dialog: MatDialog,
     private importExportDataService: ImportExportDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private exportLogDataService: ExportLogDataService,
     private i18nService: I18nService
   ) {}
@@ -525,7 +525,7 @@ export class DialogService {
           )
             .pipe(
               catchError((err) => {
-                this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
+                this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
 
                 // call dialog closed
                 if (data.exportFinished) {
@@ -557,7 +557,7 @@ export class DialogService {
                     .getExportLog((blobOrJson as IAsyncExportResponse).exportLogId)
                     .pipe(
                       catchError((err) => {
-                        this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
+                        this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
 
                         // call dialog closed
                         if (data.exportFinished) {
@@ -633,7 +633,7 @@ export class DialogService {
                           )
                           .pipe(
                             catchError((err) => {
-                              this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
+                              this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
 
                               // call dialog closed
                               if (data.exportFinished) {
@@ -670,7 +670,7 @@ export class DialogService {
                       // process errors
                       if (exportLogModel.status === Constants.SYSTEM_SYNC_LOG_STATUS.FAILED.value) {
                         // error exporting data
-                        this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
+                        this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
 
                         // call dialog closed
                         if (data.exportFinished) {

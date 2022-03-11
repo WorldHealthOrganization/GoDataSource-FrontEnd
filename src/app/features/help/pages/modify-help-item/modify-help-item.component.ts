@@ -3,7 +3,6 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -16,6 +15,7 @@ import { CacheKey, CacheService } from '../../../../core/services/helper/cache.s
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-modify-help-item',
@@ -45,7 +45,7 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
     protected route: ActivatedRoute,
     private helpDataService: HelpDataService,
     private formHelper: FormHelperService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private router: Router,
     private authDataService: AuthDataService,
     private i18nService: I18nService,
@@ -186,7 +186,7 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
       .modifyHelpItem(this.categoryId, this.itemId, dirtyFields)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           // hide loading
           this.hideLoadingDialog();
           return throwError(err);
@@ -196,7 +196,7 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
           return this.i18nService.loadUserLanguage()
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 // hide loading
                 this.hideLoadingDialog();
                 return throwError(err);
@@ -213,7 +213,7 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
         form.form.markAsPristine();
 
         // display message
-        this.snackbarService.showSuccess('LNG_PAGE_MODIFY_HELP_ITEM_ACTION_MODIFY_HELP_ITEM_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_MODIFY_HELP_ITEM_ACTION_MODIFY_HELP_ITEM_SUCCESS_MESSAGE');
 
         // remove help items from cache
         this.cacheService.remove(CacheKey.HELP_ITEMS);

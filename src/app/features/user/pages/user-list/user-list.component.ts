@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { UserModel, UserRoleModel, PhoneNumberType, UserSettings } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -21,6 +20,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-user-list',
@@ -103,7 +103,7 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
   constructor(
     protected listHelperService: ListHelperService,
     private userDataService: UserDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private dialogService: DialogService,
     private outbreakDataService: OutbreakDataService,
     private userRoleDataService: UserRoleDataService,
@@ -228,7 +228,7 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
       .getUsersList(this.queryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           finishCallback([]);
           return throwError(err);
         }),
@@ -251,7 +251,7 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
       .getUsersCount(countQueryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         }),
         share()
@@ -268,12 +268,12 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
             .deleteUser(user.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_USERS_ACTION_DELETE_USER_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_USERS_ACTION_DELETE_USER_SUCCESS_MESSAGE');
 
               // reload data
               this.needsRefreshList(true);

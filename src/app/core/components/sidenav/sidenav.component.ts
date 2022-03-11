@@ -13,12 +13,12 @@ import { PERMISSION } from '../../models/permission.model';
 import { ChildNavItem, NavItem } from './nav-item.class';
 import { OutbreakDataService } from '../../services/data/outbreak.data.service';
 import { OutbreakModel } from '../../models/outbreak.model';
-import { SnackbarService } from '../../services/helper/snackbar.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { DashboardModel } from '../../models/dashboard.model';
 import { SystemSettingsDataService } from '../../services/data/system-settings.data.service';
 import { SystemSettingsVersionModel } from '../../models/system-settings-version.model';
 import { IsActiveMatchOptions } from '@angular/router';
+import { ToastV2Service } from '../../services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-sidenav',
@@ -521,7 +521,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
   constructor(
     private authDataService: AuthDataService,
     private outbreakDataService: OutbreakDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private systemSettingsDataService: SystemSettingsDataService,
     private changeDetectorRef: ChangeDetectorRef
   ) {
@@ -540,7 +540,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
         .subscribe((outbreaksCount) => {
           // no outbreak ?
           if (!outbreaksCount.count) {
-            this.snackbarService.showNotice('LNG_GENERIC_WARNING_NO_OUTBREAKS');
+            this.toastV2Service.notice('LNG_GENERIC_WARNING_NO_OUTBREAKS');
           }
         });
     }

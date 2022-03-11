@@ -6,7 +6,6 @@ import { IConvertChainToGraphElements, TransmissionChainDataService } from '../.
 import { GraphNodeModel } from '../../../../core/models/graph-node.model';
 import { Constants } from '../../../../core/models/constants';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { forkJoin, Observable, Subscription } from 'rxjs';
@@ -43,6 +42,7 @@ import { ContactOfContactModel } from '../../../../core/models/contact-of-contac
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { CotSnapshotModel } from '../../../../core/models/cot-snapshot.model';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-transmission-chains-dashlet',
@@ -483,7 +483,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     private outbreakDataService: OutbreakDataService,
     private transmissionChainDataService: TransmissionChainDataService,
     private entityDataService: EntityDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private dialogService: DialogService,
     private referenceDataDataService: ReferenceDataDataService,
     private genericDataService: GenericDataService,
@@ -604,7 +604,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     this.initializeReferenceData()
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         })
       )
@@ -910,7 +910,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           .pipe(
             catchError((err) => {
               // display error message
-              this.snackbarService.showApiError(err);
+              this.toastV2Service.error(err);
 
               // finished
               loadingDialog.close();
@@ -919,7 +919,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           )
           .subscribe((data) => {
             // display message
-            this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_GENERATE_SNAPSHOT_IN_PROGRESS');
+            this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_GENERATE_SNAPSHOT_IN_PROGRESS');
 
             // select snapshot
             this.selectedSnapshot = data.transmissionChainId;
@@ -1663,15 +1663,14 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
     // show a descriptive message to user when editing CoT about fixed data
     if (this.editMode) {
-      this.snackbarService.showNotice(
+      this.toastV2Service.notice(
         'LNG_GENERIC_WARNING_EDIT_COT',
         {},
-        false,
         AppMessages.APP_MESSAGE_UNRESPONSIVE_EDIT_COT
       );
     } else {
       // hide message
-      this.snackbarService.hideMessage(AppMessages.APP_MESSAGE_UNRESPONSIVE_EDIT_COT);
+      this.toastV2Service.hide(AppMessages.APP_MESSAGE_UNRESPONSIVE_EDIT_COT);
     }
 
   }
@@ -1935,7 +1934,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
               .getEntity(localEntity.type, this.selectedOutbreak.id, localEntity.model.id)
               .pipe(
                 catchError((err) => {
-                  this.snackbarService.showApiError(err);
+                  this.toastV2Service.error(err);
                   loadingDialog.close();
                   return throwError(err);
                 })
@@ -2074,7 +2073,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 )
                 .pipe(
                   catchError((err) => {
-                    this.snackbarService.showApiError(err);
+                    this.toastV2Service.error(err);
                     loadingDialog.close();
                     return throwError(err);
                   })
@@ -2212,7 +2211,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       )
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
 
           // finished
           finishedCallback();
@@ -2542,7 +2541,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       )
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
 
           // finished
           loadingDialog.close();
@@ -2614,7 +2613,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             .pipe(
               catchError((err) => {
                 // display error message
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
 
                 // finished
                 loadingDialog.close();

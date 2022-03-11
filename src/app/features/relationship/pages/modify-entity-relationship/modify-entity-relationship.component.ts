@@ -4,7 +4,6 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import * as _ from 'lodash';
@@ -23,6 +22,7 @@ import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-modify-entity-relationship',
@@ -144,7 +144,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
     private router: Router,
     private entityDataService: EntityDataService,
     private outbreakDataService: OutbreakDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     private relationshipDataService: RelationshipDataService,
     private authDataService: AuthDataService,
@@ -206,7 +206,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
         .getEntity(this.entityType, this.selectedOutbreak.id, this.entityId)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
 
             // Entity not found; navigate back to Entities list
             this.router.navigate([this.entityMap[this.entityType].link]);
@@ -237,7 +237,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
         .getEntityRelationship(this.selectedOutbreak.id, this.entityType, this.entityId, this.relationshipId)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
 
             // Relationship not found; navigate back to Entity Relationships list
             this.disableDirtyConfirm();
@@ -336,7 +336,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
       )
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           // hide loading
           this.hideLoadingDialog();
           return throwError(err);
@@ -350,7 +350,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
         form.form.markAsPristine();
 
         // display message
-        this.snackbarService.showSuccess('LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE');
 
         // hide loading
         this.hideLoadingDialog();

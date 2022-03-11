@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
@@ -39,6 +38,7 @@ import {
   IExportFieldsGroupRequired,
   ExportFieldsGroupModelNameEnum
 } from '../../../../core/models/export-fields-group.model';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-contacts-of-contacts-list',
@@ -324,7 +324,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     protected listHelperService: ListHelperService,
     private router: Router,
     private contactsOfContactsDataService: ContactsOfContactsDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
     private genericDataService: GenericDataService,
     private referenceDataDataService: ReferenceDataDataService,
@@ -777,12 +777,12 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             .deleteContactOfContact(this.selectedOutbreak.id, contactOfContact.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showError(err.message);
+                this.toastV2Service.error(err.message);
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
               // reload data
               this.needsRefreshList(true);
@@ -804,12 +804,12 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             .restoreContactOfContact(this.selectedOutbreak.id, contactOfContact.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showError(err.message);
+                this.toastV2Service.error(err.message);
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_RESTORE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_RESTORE_SUCCESS_MESSAGE');
               // reload data
               this.needsRefreshList(true);
             });

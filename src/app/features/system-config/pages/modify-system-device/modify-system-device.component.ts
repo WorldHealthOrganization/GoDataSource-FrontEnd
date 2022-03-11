@@ -3,7 +3,6 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { ActivatedRoute } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DeviceModel } from '../../../../core/models/device.model';
@@ -12,6 +11,7 @@ import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-modify-system-device',
@@ -34,7 +34,7 @@ export class ModifySystemDeviceComponent extends ViewModifyComponent implements 
      */
   constructor(
     protected route: ActivatedRoute,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     protected dialogService: DialogService,
     private deviceDataService: DeviceDataService,
@@ -131,7 +131,7 @@ export class ModifySystemDeviceComponent extends ViewModifyComponent implements 
       .modifyDevice(this.deviceId, dirtyFields)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           // hide loading
           this.hideLoadingDialog();
           return throwError(err);
@@ -145,7 +145,7 @@ export class ModifySystemDeviceComponent extends ViewModifyComponent implements 
         form.form.markAsPristine();
 
         // display message
-        this.snackbarService.showSuccess('LNG_PAGE_MODIFY_SYSTEM_DEVICE_ACTION_MODIFY_SYSTEM_DEVICE_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_MODIFY_SYSTEM_DEVICE_ACTION_MODIFY_SYSTEM_DEVICE_SUCCESS_MESSAGE');
 
         // hide loading
         this.hideLoadingDialog();

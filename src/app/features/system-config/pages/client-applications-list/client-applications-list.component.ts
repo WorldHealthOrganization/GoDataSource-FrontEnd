@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { UserSettings } from '../../../../core/models/user.model';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
@@ -19,6 +18,7 @@ import { HoverRowActionsDirective } from '../../../../shared/directives/hover-ro
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-client-applications-list',
@@ -122,7 +122,7 @@ export class ClientApplicationsListComponent
   constructor(
     protected listHelperService: ListHelperService,
     private systemSettingsDataService: SystemSettingsDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private dialogService: DialogService,
     private outbreakDataService: OutbreakDataService,
     private i18nService: I18nService
@@ -214,7 +214,7 @@ export class ClientApplicationsListComponent
     ])
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           finishCallback([]);
           return throwError(err);
         })
@@ -288,7 +288,7 @@ export class ClientApplicationsListComponent
             .getSystemSettings()
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
@@ -305,13 +305,13 @@ export class ClientApplicationsListComponent
                 })
                 .pipe(
                   catchError((err) => {
-                    this.snackbarService.showApiError(err);
+                    this.toastV2Service.error(err);
                     return throwError(err);
                   })
                 )
                 .subscribe(() => {
                   // display success message
-                  this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DELETE_SUCCESS_MESSAGE');
+                  this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                   // refresh
                   this.needsRefreshList(true);
@@ -334,7 +334,7 @@ export class ClientApplicationsListComponent
       .getSystemSettings()
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         })
       )
@@ -354,13 +354,13 @@ export class ClientApplicationsListComponent
             })
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
               // display success message
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_TOGGLE_ENABLED_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_TOGGLE_ENABLED_SUCCESS_MESSAGE');
 
               // finished
               clientApplication.active = newValue;

@@ -3,7 +3,6 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { Subscription, Subscriber, throwError } from 'rxjs';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { catchError } from 'rxjs/operators';
@@ -15,6 +14,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel } from '../../../../core/models/user.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { PieDonutChartData } from '../../../../shared/components/pie-donut-graph/pie-donut-chart.component';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-cases-hospitalized-pie-chart-dashlet',
@@ -83,7 +83,7 @@ implements OnInit, OnDestroy {
   constructor(
     private outbreakDataService: OutbreakDataService,
     private caseDataService: CaseDataService,
-    protected snackbarService: SnackbarService,
+    protected toastV2Service: ToastV2Service,
     private router: Router,
     private authDataService: AuthDataService
   ) {}
@@ -236,7 +236,7 @@ implements OnInit, OnDestroy {
         )
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             return throwError(err);
           })
         )

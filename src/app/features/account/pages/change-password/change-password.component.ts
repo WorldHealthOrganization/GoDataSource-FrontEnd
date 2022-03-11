@@ -1,6 +1,5 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { PasswordChangeModel } from '../../../../core/models/password-change.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
@@ -10,6 +9,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { Router } from '@angular/router';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-change-password',
@@ -32,7 +32,7 @@ export class ChangePasswordComponent {
   constructor(
     private router: Router,
     private userDataService: UserDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private modelHelperService: ModelHelperService,
     private authDataService: AuthDataService
   ) {
@@ -50,7 +50,7 @@ export class ChangePasswordComponent {
         .changePassword(data)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             return throwError(err);
           })
         )
@@ -66,7 +66,7 @@ export class ChangePasswordComponent {
                 this.authUser = authenticatedUser.user;
 
                 // display message
-                this.snackbarService.showSuccess('LNG_PAGE_CHANGE_PASSWORD_ACTION_CHANGE_PASSWORD_SUCCESS_MESSAGE');
+                this.toastV2Service.success('LNG_PAGE_CHANGE_PASSWORD_ACTION_CHANGE_PASSWORD_SUCCESS_MESSAGE');
 
                 // refresh page
                 if (redirect) {

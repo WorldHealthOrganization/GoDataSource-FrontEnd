@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { UserSettings } from '../../../../core/models/user.model';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
@@ -18,6 +17,7 @@ import { catchError } from 'rxjs/operators';
 import { HoverRowActionsDirective } from '../../../../shared/directives/hover-row-actions/hover-row-actions.directive';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-upstream-servers-list',
@@ -115,7 +115,7 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
   constructor(
     protected listHelperService: ListHelperService,
     private systemSettingsDataService: SystemSettingsDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private dialogService: DialogService,
     private systemSyncDataService: SystemSyncDataService,
     private systemSyncLogDataService: SystemSyncLogDataService
@@ -210,7 +210,7 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
       .getSystemSettings()
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           finishCallback([]);
           return throwError(err);
         })
@@ -262,7 +262,7 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
             .getSystemSettings()
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
@@ -280,13 +280,13 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
                   })
                   .pipe(
                     catchError((err) => {
-                      this.snackbarService.showApiError(err);
+                      this.toastV2Service.error(err);
                       return throwError(err);
                     })
                   )
                   .subscribe(() => {
                     // display success message
-                    this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_DELETE_SUCCESS_MESSAGE');
+                    this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                     // refresh
                     this.needsRefreshList(true);
@@ -314,7 +314,7 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
       .getSystemSettings()
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         })
       )
@@ -332,13 +332,13 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
             })
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
               // display success message
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_TOGGLE_SYNC_ENABLED_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_TOGGLE_SYNC_ENABLED_SUCCESS_MESSAGE');
             });
         } else {
           // not found ?
@@ -363,7 +363,7 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
             .pipe(
               catchError((err) => {
                 this.loading = false;
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
@@ -373,13 +373,13 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
                 case Constants.SYSTEM_SYNC_LOG_STATUS.SUCCESS.value:
                 case Constants.SYSTEM_SYNC_LOG_STATUS.SUCCESS_WITH_WARNINGS.value:
                   // display success message
-                  this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_SYNC_SUCCESS_MESSAGE');
+                  this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_SYNC_SUCCESS_MESSAGE');
                   this.loading = false;
                   break;
 
                   // sync error ?
                 case Constants.SYSTEM_SYNC_LOG_STATUS.FAILED.value:
-                  this.snackbarService.showError('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_SYNC_FAILED_MESSAGE');
+                  this.toastV2Service.error('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_SYNC_FAILED_MESSAGE');
                   this.loading = false;
                   break;
 
@@ -407,7 +407,7 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
             .pipe(
               catchError((err) => {
                 this.loading = false;
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )

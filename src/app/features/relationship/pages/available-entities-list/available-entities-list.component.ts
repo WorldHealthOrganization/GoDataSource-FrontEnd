@@ -5,7 +5,6 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { Observable } from 'rxjs';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
@@ -22,6 +21,7 @@ import { AddressType } from '../../../../core/models/address.model';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-available-entities-list',
@@ -73,7 +73,7 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
     protected route: ActivatedRoute,
     protected outbreakDataService: OutbreakDataService,
     protected entityDataService: EntityDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private genericDataService: GenericDataService,
     private referenceDataDataService: ReferenceDataDataService,
     private relationshipDataService: RelationshipDataService
@@ -224,7 +224,7 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
         )
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             finishCallback([]);
             return throwError(err);
           }),
@@ -275,7 +275,7 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
         )
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             return throwError(err);
           }),
           share()

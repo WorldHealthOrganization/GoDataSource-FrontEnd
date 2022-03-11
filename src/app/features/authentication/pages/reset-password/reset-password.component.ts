@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
@@ -8,6 +7,7 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 import * as _ from 'lodash';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-reset-password',
@@ -32,7 +32,7 @@ export class ResetPasswordComponent implements OnInit {
     private route: ActivatedRoute,
     private authDataService: AuthDataService,
     private userDataService: UserDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService
   ) {
     // get the route params
@@ -75,13 +75,13 @@ export class ResetPasswordComponent implements OnInit {
         .resetPassword(dirtyFields, this.passwordResetToken)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             return throwError(err);
           })
         )
         .subscribe(() => {
           // success message
-          this.snackbarService.showSuccess('LNG_PAGE_CHANGE_PASSWORD_ACTION_CHANGE_PASSWORD_SUCCESS_MESSAGE');
+          this.toastV2Service.success('LNG_PAGE_CHANGE_PASSWORD_ACTION_CHANGE_PASSWORD_SUCCESS_MESSAGE');
 
           // redirect to login page
           this.router.navigate(['/auth/login']);

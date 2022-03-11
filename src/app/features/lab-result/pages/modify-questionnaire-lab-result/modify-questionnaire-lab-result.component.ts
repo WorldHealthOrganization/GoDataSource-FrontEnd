@@ -3,7 +3,6 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { ActivatedRoute } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { throwError } from 'rxjs';
@@ -17,6 +16,7 @@ import { EntityModel } from '../../../../core/models/entity-and-relationship.mod
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { Constants } from '../../../../core/models/constants';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-modify-questionnaire-lab-result',
@@ -48,7 +48,7 @@ export class ModifyQuestionnaireLabResultComponent extends ViewModifyComponent i
     private authDataService: AuthDataService,
     private labResultDataService: LabResultDataService,
     private outbreakDataService: OutbreakDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     protected dialogService: DialogService
   ) {
@@ -188,7 +188,7 @@ export class ModifyQuestionnaireLabResultComponent extends ViewModifyComponent i
       )
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
 
           // hide loading
           this.hideLoadingDialog();
@@ -204,7 +204,7 @@ export class ModifyQuestionnaireLabResultComponent extends ViewModifyComponent i
         form.form.markAsPristine();
 
         // display message
-        this.snackbarService.showSuccess('LNG_PAGE_MODIFY_LAB_RESULT_ACTION_MODIFY_LAB_RESULT_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_MODIFY_LAB_RESULT_ACTION_MODIFY_LAB_RESULT_SUCCESS_MESSAGE');
 
         // loading will be closed by retrieveLabResultData() method
         // NOTHING TO DO

@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { LanguageDataService } from '../../../../core/services/data/language.data.service';
@@ -13,6 +12,7 @@ import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-languages-list',
@@ -121,7 +121,7 @@ export class LanguagesListComponent
     protected listHelperService: ListHelperService,
     private router: Router,
     private languageDataService: LanguageDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private dialogService: DialogService,
     private cacheService: CacheService
   ) {
@@ -178,7 +178,7 @@ export class LanguagesListComponent
       .getLanguagesList(this.queryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           finishCallback([]);
           return throwError(err);
         }),
@@ -201,7 +201,7 @@ export class LanguagesListComponent
       .getLanguagesCount(countQueryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         }),
         share()
@@ -224,14 +224,14 @@ export class LanguagesListComponent
             .pipe(
               catchError((err) => {
                 this.closeLoadingDialog();
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
               this.closeLoadingDialog();
 
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_LANGUAGES_ACTION_DELETE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_LANGUAGES_ACTION_DELETE_SUCCESS_MESSAGE');
 
               // clear cache
               this.cacheService.remove(CacheKey.LANGUAGES);

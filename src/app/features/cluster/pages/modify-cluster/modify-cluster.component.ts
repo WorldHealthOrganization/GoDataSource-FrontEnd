@@ -3,7 +3,6 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { ActivatedRoute } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
@@ -14,6 +13,7 @@ import { ClusterDataService } from '../../../../core/services/data/cluster.data.
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-modify-cluster',
@@ -44,7 +44,7 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
     private authDataService: AuthDataService,
     private clusterDataService: ClusterDataService,
     private outbreakDataService: OutbreakDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     protected dialogService: DialogService
   ) {
@@ -135,7 +135,7 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
       .modifyCluster(this.selectedOutbreak.id, this.clusterId, dirtyFields)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           // hide loading
           this.hideLoadingDialog();
           return throwError(err);
@@ -149,7 +149,7 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
         form.form.markAsPristine();
 
         // display message
-        this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CLUSTER_ACTION_MODIFY_CLUSTER_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_MODIFY_CLUSTER_ACTION_MODIFY_CLUSTER_SUCCESS_MESSAGE');
 
         // update breadcrumbs
         this.initializeBreadcrumbs();

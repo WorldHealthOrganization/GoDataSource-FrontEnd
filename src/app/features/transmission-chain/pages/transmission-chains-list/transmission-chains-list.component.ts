@@ -7,7 +7,6 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ApplyListFilter, Constants } from '../../../../core/models/constants';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { EntityType } from '../../../../core/models/entity-type';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { catchError } from 'rxjs/operators';
@@ -16,6 +15,7 @@ import * as _ from 'lodash';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-transmission-chains-list',
@@ -60,7 +60,7 @@ export class TransmissionChainsListComponent extends ListComponent implements On
     private outbreakDataService: OutbreakDataService,
     private transmissionChainDataService: TransmissionChainDataService,
     private route: ActivatedRoute,
-    private snackbarService: SnackbarService
+    private toastV2Service: ToastV2Service
   ) {
     super(listHelperService);
   }
@@ -292,7 +292,7 @@ export class TransmissionChainsListComponent extends ListComponent implements On
       transmissionChains$
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             finishCallback([]);
             return throwError(err);
           })

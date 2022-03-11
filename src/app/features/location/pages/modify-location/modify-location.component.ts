@@ -4,7 +4,6 @@ import { NgForm, NgModel } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { UserModel } from '../../../../core/models/user.model';
@@ -18,6 +17,7 @@ import { LocationBreadcrumbsComponent } from '../../../../shared/components/loca
 import { DialogAnswer, DialogAnswerButton, DialogConfiguration } from '../../../../shared/components/dialog/dialog.component';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-modify-location',
@@ -53,7 +53,7 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
   constructor(
     private locationDataService: LocationDataService,
     private router: Router,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     protected route: ActivatedRoute,
     private authDataService: AuthDataService,
@@ -91,7 +91,7 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
           .getLocation(this.locationId, true)
           .pipe(
             catchError((err) => {
-              this.snackbarService.showApiError(err);
+              this.toastV2Service.error(err);
               this.disableDirtyConfirm();
               this.router.navigate(['/locations']);
 
@@ -188,7 +188,7 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
       )
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           // hide loading
           this.hideLoadingDialog();
           return throwError(err);
@@ -203,7 +203,7 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
         form.form.markAsPristine();
 
         // display message
-        this.snackbarService.showSuccess('LNG_PAGE_MODIFY_LOCATION_ACTION_MODIFY_LOCATION_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_MODIFY_LOCATION_ACTION_MODIFY_LOCATION_SUCCESS_MESSAGE');
 
         // update breadcrumbs
         this.initializeBreadcrumbs();
@@ -218,7 +218,7 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
             .getLocationUsageCount(modifiedLocation.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 // hide loading
                 this.hideLoadingDialog();
                 return throwError(err);
@@ -238,7 +238,7 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
                         .propagateGeoLocation(modifiedLocation.id)
                         .pipe(
                           catchError((err) => {
-                            this.snackbarService.showApiError(err);
+                            this.toastV2Service.error(err);
                             // hide loading
                             this.hideLoadingDialog();
                             return throwError(err);
@@ -249,7 +249,7 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
                           this.hideLoadingDialog();
 
                           // success msg
-                          this.snackbarService.showSuccess('LNG_PAGE_MODIFY_LOCATION_ACTION_PROPAGATE_LOCATION_GEO_LOCATION_SUCCESS_MESSAGE');
+                          this.toastV2Service.success('LNG_PAGE_MODIFY_LOCATION_ACTION_PROPAGATE_LOCATION_GEO_LOCATION_SUCCESS_MESSAGE');
                         });
                     } else {
                       // hide loading

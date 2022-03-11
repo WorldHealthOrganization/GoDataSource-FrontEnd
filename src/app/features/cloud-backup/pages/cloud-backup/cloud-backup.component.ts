@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-cloud-backup',
@@ -26,7 +26,7 @@ export class CloudBackupComponent implements OnInit {
      */
   constructor(
     private systemSettingsDataService: SystemSettingsDataService,
-    private snackbarService: SnackbarService
+    private toastV2Service: ToastV2Service
   ) {}
 
   /**
@@ -55,6 +55,6 @@ export class CloudBackupComponent implements OnInit {
     textBox.select();
     document.execCommand('copy');
     document.body.removeChild(textBox);
-    this.snackbarService.showSuccess('LNG_PAGE_CLOUD_BACKUP_ACTION_COPY_PATH_SUCCESS_MESSAGE');
+    this.toastV2Service.success('LNG_PAGE_CLOUD_BACKUP_ACTION_COPY_PATH_SUCCESS_MESSAGE');
   }
 }

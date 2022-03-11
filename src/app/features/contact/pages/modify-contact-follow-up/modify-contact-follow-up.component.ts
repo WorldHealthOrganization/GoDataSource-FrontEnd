@@ -2,7 +2,6 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -29,6 +28,7 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-modify-follow-up',
@@ -76,7 +76,7 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
     protected route: ActivatedRoute,
     private caseDataService: CaseDataService,
     private outbreakDataService: OutbreakDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     private followUpsDataService: FollowUpsDataService,
     private authDataService: AuthDataService,
@@ -152,7 +152,7 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
         .pipe(
           catchError((err) => {
             // show error message
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
 
             // redirect
             this.disableDirtyConfirm();
@@ -188,7 +188,7 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
         .pipe(
           catchError((err) => {
             // show error message
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
 
             // redirect
             this.disableDirtyConfirm();
@@ -379,7 +379,7 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
       )
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           // hide loading
           this.hideLoadingDialog();
           return throwError(err);
@@ -395,7 +395,7 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
         form.form.markAsPristine();
 
         // display message
-        this.snackbarService.showSuccess('LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE');
 
         // update breadcrumb
         this.initializeBreadcrumbs();

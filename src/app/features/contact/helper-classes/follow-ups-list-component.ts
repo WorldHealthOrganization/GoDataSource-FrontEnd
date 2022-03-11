@@ -206,12 +206,12 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
             .deleteFollowUp(this.selectedOutbreak.id, followUp.personId, followUp.id)
             .pipe(
               catchError((err) => {
-                this.listHelperService.snackbarService.showApiError(err);
+                this.listHelperService.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.listHelperService.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SUCCESS_MESSAGE');
+              this.listHelperService.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SUCCESS_MESSAGE');
 
               // reload data
               this.needsRefreshList(true);
@@ -254,7 +254,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
                 // hide dialog
                 this.closeLoadingDialog();
 
-                this.listHelperService.snackbarService.showApiError(err);
+                this.listHelperService.toastV2Service.error(err);
                 return throwError(err);
               })
             )
@@ -262,7 +262,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
               // hide dialog
               this.closeLoadingDialog();
 
-              this.listHelperService.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
+              this.listHelperService.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
 
               this.needsRefreshList(true);
             });
@@ -303,7 +303,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
                 // hide dialog
                 this.closeLoadingDialog();
 
-                this.listHelperService.snackbarService.showApiError(err);
+                this.listHelperService.toastV2Service.error(err);
                 return throwError(err);
               })
             )
@@ -311,7 +311,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
               // hide dialog
               this.closeLoadingDialog();
 
-              this.listHelperService.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
+              this.listHelperService.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
 
               this.needsRefreshList(true);
             });
@@ -333,12 +333,12 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
             .restoreFollowUp(this.selectedOutbreak.id, followUp.personId, followUp.id)
             .pipe(
               catchError((err) => {
-                this.listHelperService.snackbarService.showApiError(err);
+                this.listHelperService.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.listHelperService.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SUCCESS_MESSAGE');
+              this.listHelperService.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SUCCESS_MESSAGE');
 
               // reload data
               this.needsRefreshList(true);
@@ -467,7 +467,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
       )
       .pipe(
         catchError((err) => {
-          this.listHelperService.snackbarService.showApiError(err);
+          this.listHelperService.toastV2Service.error(err);
           return throwError(err);
         })
       )
@@ -480,7 +480,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
 
         // show success ?
         // this might not be the best idea...maybe we can replace / remove it
-        this.listHelperService.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_CHANGE_FOLLOW_UP_TEAM_SUCCESS_MESSAGE');
+        this.listHelperService.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_CHANGE_FOLLOW_UP_TEAM_SUCCESS_MESSAGE');
       });
   }
 
@@ -494,12 +494,12 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
       .modifyFollowUp(this.selectedOutbreak.id, followUp.personId, followUp.id, {targeted: targeted})
       .pipe(
         catchError((err) => {
-          this.listHelperService.snackbarService.showApiError(err);
+          this.listHelperService.toastV2Service.error(err);
           return throwError(err);
         })
       )
       .subscribe(() => {
-        this.listHelperService.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_CHANGE_TARGETED_STATUS_SUCCESS_MESSAGE');
+        this.listHelperService.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_CHANGE_TARGETED_STATUS_SUCCESS_MESSAGE');
       });
   }
 

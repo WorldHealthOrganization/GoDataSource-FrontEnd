@@ -241,7 +241,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       .pipe(
         catchError((err) => {
           // #TODO
-          // this.snackbarService.showApiError(err);
+          // this.toastV2Service.error(err);
 
           // send error down the road
           return throwError(err);
@@ -925,7 +925,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       .pipe(
         catchError((err) => {
           // #TODO
-          // this.snackbarService.showApiError(err);
+          // this.toastV2Service.error(err);
 
           // send error down the road
           return throwError(err);

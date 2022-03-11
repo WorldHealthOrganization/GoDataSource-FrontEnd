@@ -6,8 +6,8 @@ import { UserModel, UserSettings } from '../../../core/models/user.model';
 import * as _ from 'lodash';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { FormHelperService } from '../../../core/services/helper/form-helper.service';
-import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import { I18nService } from '../../../core/services/helper/i18n.service';
+import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-side-columns',
@@ -76,7 +76,7 @@ export class SideColumnsComponent {
   constructor(
     private authDataService: AuthDataService,
     private formHelper: FormHelperService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private i18nService: I18nService
   ) {}
 
@@ -194,7 +194,7 @@ export class SideColumnsComponent {
 
     // no visible columns ?
     if (_.isEmpty(_.filter(columns, (value) => value))) {
-      this.snackbarService.showError('LNG_SIDE_COLUMNS_ERROR_NO_COLUMN_SELECTED');
+      this.toastV2Service.error('LNG_SIDE_COLUMNS_ERROR_NO_COLUMN_SELECTED');
       return;
     }
 

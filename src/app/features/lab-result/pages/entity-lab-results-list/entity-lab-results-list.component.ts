@@ -10,7 +10,6 @@ import { Observable, throwError } from 'rxjs';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
@@ -35,6 +34,7 @@ import {
   ExportFieldsGroupModelNameEnum
 } from '../../../../core/models/export-fields-group.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-entity-lab-results-list',
@@ -278,7 +278,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
     private caseDataService: CaseDataService,
     private contactDataService: ContactDataService,
     private labResultDataService: LabResultDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private dialogService: DialogService,
     private referenceDataDataService: ReferenceDataDataService,
     private genericDataService: GenericDataService,
@@ -682,7 +682,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
         .getEntityLabResults(this.selectedOutbreak.id, EntityModel.getLinkForEntityType(this.personType), this.entityData.id, this.queryBuilder)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             finishCallback([]);
             return throwError(err);
           }),
@@ -728,7 +728,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
         .getEntityLabResultsCount(this.selectedOutbreak.id, EntityModel.getLinkForEntityType(this.personType), this.entityData.id, countQueryBuilder)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             return throwError(err);
           }),
           share()
@@ -750,12 +750,12 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
             .deleteLabResult(this.selectedOutbreak.id, labResult.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
               // reload data
               this.needsRefreshList(true);
@@ -784,12 +784,12 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
             )
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT_SUCCESS_MESSAGE');
 
               // reload data
               this.needsRefreshList(true);
@@ -819,14 +819,14 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
             .modifyCase(this.selectedOutbreak.id, this.entityData.id, {classification: classificationOption.value})
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe((caseData: CaseModel) => {
               // update the initial case classification
               this.initialCaseClassification = caseData.classification;
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_LAB_RESULTS_ACTION_CHANGE_CASE_EPI_CLASSIFICATION_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_LAB_RESULTS_ACTION_CHANGE_CASE_EPI_CLASSIFICATION_SUCCESS_MESSAGE');
             });
         } else {
           if (answer.button === DialogAnswerButton.Cancel) {

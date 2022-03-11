@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -19,6 +18,7 @@ import { catchError, share, tap } from 'rxjs/operators';
 import { HoverRowAction } from '../../../../shared/components';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-inconsistencies-list',
@@ -83,7 +83,7 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
      */
   constructor(
     protected listHelperService: ListHelperService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
     private i18nService: I18nService,
     private route: ActivatedRoute,
@@ -160,7 +160,7 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
         .getPeopleInconsistencies(this.outbreak.id, this.queryBuilder)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             finishCallback([]);
             return throwError(err);
           }),

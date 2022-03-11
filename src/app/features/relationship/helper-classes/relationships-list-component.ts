@@ -226,7 +226,7 @@ export abstract class RelationshipsListComponent extends ListComponent implement
       .getEntity(this.entityType, this.selectedOutbreak.id, this.entityId)
       .pipe(
         catchError((err) => {
-          this.listHelperService.snackbarService.showApiError(err);
+          this.listHelperService.toastV2Service.error(err);
 
           // Entity not found; navigate back to Entities list
           this.router.navigate([this.entityMap[this.entityType].link]);

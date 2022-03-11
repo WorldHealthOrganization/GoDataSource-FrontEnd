@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { NgForm } from '@angular/forms';
@@ -23,6 +22,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-create-outbreak',
@@ -59,7 +59,7 @@ export class CreateOutbreakComponent
   constructor(
     private outbreakDataService: OutbreakDataService,
     private router: Router,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private referenceDataDataService: ReferenceDataDataService,
     private formHelper: FormHelperService,
     private route: ActivatedRoute,
@@ -177,7 +177,7 @@ export class CreateOutbreakComponent
         .createOutbreak(outbreakData, this.creatingOutbreakFromTemplate ? this.outbreakTemplateId : '')
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             loadingDialog.close();
             return throwError(err);
           }),
@@ -188,7 +188,7 @@ export class CreateOutbreakComponent
             return this.i18nService.loadUserLanguage()
               .pipe(
                 catchError((err) => {
-                  this.snackbarService.showApiError(err);
+                  this.toastV2Service.error(err);
                   loadingDialog.close();
                   return throwError(err);
                 }),
@@ -197,7 +197,7 @@ export class CreateOutbreakComponent
           })
         )
         .subscribe((newOutbreak) => {
-          this.snackbarService.showSuccess('LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON');
+          this.toastV2Service.success('LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON');
 
           // hide dialog
           loadingDialog.close();

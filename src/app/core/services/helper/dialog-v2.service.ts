@@ -29,6 +29,7 @@ import { ExportLogDataService } from '../data/export-log.data.service';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { AppBottomDialogV2Component } from '../../../shared/components-v2/app-bottom-dialog-v2/app-bottom-dialog-v2.component';
 import { IV2BottomDialogConfig, IV2BottomDialogConfigButtonType, IV2BottomDialogConfigData, IV2BottomDialogHandler, IV2BottomDialogResponse } from '../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { ToastV2Service } from './toast-v2.service';
 
 @Injectable()
 export class DialogV2Service {
@@ -50,7 +51,8 @@ export class DialogV2Service {
     private formHelperService: FormHelperService,
     private importExportDataService: ImportExportDataService,
     private exportLogDataService: ExportLogDataService,
-    private matBottomSheet: MatBottomSheet
+    private matBottomSheet: MatBottomSheet,
+    private toastV2Service: ToastV2Service
   ) {}
 
   /**
@@ -446,7 +448,7 @@ export class DialogV2Service {
             .pipe(
               catchError((err) => {
                 // show error
-                // this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
+                this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
 
                 // close dialog
                 response.handler.hide();
@@ -574,7 +576,7 @@ export class DialogV2Service {
                   .pipe(
                     catchError((err) => {
                       // show error
-                      // this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
+                      this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
 
                       // close dialog
                       response.handler.hide();
@@ -645,7 +647,7 @@ export class DialogV2Service {
                         .pipe(
                           catchError((err) => {
                             // show error
-                            // this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
+                            this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
 
                             // close dialog
                             response.handler.hide();
@@ -676,7 +678,7 @@ export class DialogV2Service {
                     // process errors
                     if (exportLogModel.status === Constants.SYSTEM_SYNC_LOG_STATUS.FAILED.value) {
                       // show error
-                      // this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
+                      this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
 
                       // close dialog
                       response.handler.hide();

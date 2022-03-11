@@ -5,7 +5,6 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
@@ -22,6 +21,7 @@ import { throwError } from 'rxjs';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { VaccineModel } from '../../../../core/models/vaccine.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-contact-merge-duplicate-records',
@@ -126,7 +126,7 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
     private router: Router,
     private route: ActivatedRoute,
     private outbreakDataService: OutbreakDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     private i18nService: I18nService,
     private teamDataService: TeamDataService
@@ -212,7 +212,7 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
         .getTeamsList(qb)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             return throwError(err);
           })
         )
@@ -512,19 +512,19 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
           .pipe(
             catchError((err) => {
               this.displayLoading = false;
-              this.snackbarService.showApiError(err);
+              this.toastV2Service.error(err);
               return throwError(err);
             })
           )
           .subscribe(() => {
-            this.snackbarService.showSuccess('LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_CONTACTS_SUCCESS_MESSAGE');
+            this.toastV2Service.success('LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_CONTACTS_SUCCESS_MESSAGE');
 
             // navigate to listing page
             this.disableDirtyConfirm();
             this.router.navigate(['/duplicated-records']);
           });
       } else {
-        this.snackbarService.showError('LNG_FORM_ERROR_FORM_INVALID');
+        this.toastV2Service.error('LNG_FORM_ERROR_FORM_INVALID');
       }
     }
   }

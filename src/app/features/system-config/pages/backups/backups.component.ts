@@ -5,7 +5,6 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Observable, throwError } from 'rxjs';
 import { BackupModel } from '../../../../core/models/backup.model';
@@ -20,6 +19,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-backups',
@@ -111,7 +111,7 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
     private dialogService: DialogService,
     private systemSettingsDataService: SystemSettingsDataService,
     private systemBackupDataService: SystemBackupDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private genericDataService: GenericDataService,
     private userDataService: UserDataService,
     private i18nService: I18nService
@@ -234,7 +234,7 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
       .getBackupList(this.queryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           finishCallback([]);
           return throwError(err);
         }),
@@ -256,7 +256,7 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
       .getBackupListCount(countQueryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         }),
         share()
@@ -324,13 +324,13 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
           .createBackup(answer.inputValue.value)
           .pipe(
             catchError((err) => {
-              this.snackbarService.showApiError(err);
+              this.toastV2Service.error(err);
               return throwError(err);
             })
           )
           .subscribe(() => {
             // display success message
-            this.snackbarService.showSuccess('LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_SUCCESS_MESSAGE');
+            this.toastV2Service.success('LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_SUCCESS_MESSAGE');
 
             // refresh page
             this.needsRefreshList(true);
@@ -357,13 +357,13 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
             .deleteBackup(item.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
               // display success message
-              this.snackbarService.showSuccess('LNG_PAGE_SYSTEM_BACKUPS_ACTION_DELETE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_SYSTEM_BACKUPS_ACTION_DELETE_SUCCESS_MESSAGE');
 
               // refresh page
               this.needsRefreshList(true);
@@ -384,13 +384,13 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
         .restoreBackup(backupItemData.id)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             return throwError(err);
           })
         )
         .subscribe(() => {
           // display success message
-          this.snackbarService.showSuccess('LNG_PAGE_SYSTEM_BACKUPS_BACKUP_RESTORE_SUCCESS_MESSAGE');
+          this.toastV2Service.success('LNG_PAGE_SYSTEM_BACKUPS_BACKUP_RESTORE_SUCCESS_MESSAGE');
 
           // refresh page
           this.loading = false;
@@ -407,7 +407,7 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
             .getBackup(this.waitForBackupIdToBeReady)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
 
                 // can't continue with the restore
                 this.waitForBackupIdToBeReady = undefined;
@@ -426,7 +426,7 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
 
                   // backup error ?
                 case Constants.SYSTEM_BACKUP_STATUS.FAILED.value:
-                  this.snackbarService.showError('LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_FAILED_MESSAGE');
+                  this.toastV2Service.error('LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_FAILED_MESSAGE');
                   this.waitForBackupIdToBeReady = undefined;
                   this.needsRefreshList(true);
                   break;
@@ -469,13 +469,13 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
               .createBackup(answerBackup.inputValue.value)
               .pipe(
                 catchError((err) => {
-                  this.snackbarService.showApiError(err);
+                  this.toastV2Service.error(err);
                   return throwError(err);
                 })
               )
               .subscribe((newBackup: BackupModel) => {
                 // display success message
-                this.snackbarService.showSuccess('LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_SUCCESS_MESSAGE');
+                this.toastV2Service.success('LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_SUCCESS_MESSAGE');
 
                 // refresh page
                 this.needsRefreshList(true);
@@ -667,14 +667,14 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
               .pipe(
                 catchError((err) => {
                   this.closeLoadingDialog();
-                  this.snackbarService.showApiError(err);
+                  this.toastV2Service.error(err);
                   return throwError(err);
                 })
               )
               .subscribe(() => {
                 // display success message
                 this.closeLoadingDialog();
-                this.snackbarService.showSuccess('LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SUCCESS_MESSAGE');
+                this.toastV2Service.success('LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SUCCESS_MESSAGE');
 
                 // refresh settings
                 this.refreshSystemSettings();

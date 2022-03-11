@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { Observable } from 'rxjs';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -16,6 +15,7 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-clusters-list',
@@ -125,7 +125,7 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
     protected listHelperService: ListHelperService,
     private router: Router,
     private clusterDataService: ClusterDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
     private dialogService: DialogService
   ) {
@@ -185,7 +185,7 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
         .getClusterList(this.selectedOutbreak.id, this.queryBuilder)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             finishCallback([]);
             return throwError(err);
           }),
@@ -212,7 +212,7 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
         .getClustersCount(this.selectedOutbreak.id, countQueryBuilder)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             return throwError(err);
           }),
           share()
@@ -233,12 +233,12 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
             .deleteCluster(this.selectedOutbreak.id, clusterModel.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_CLUSTERS_ACTION_DELETE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_CLUSTERS_ACTION_DELETE_SUCCESS_MESSAGE');
 
               // reload data
               this.needsRefreshList(true);

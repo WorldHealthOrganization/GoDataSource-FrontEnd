@@ -1,6 +1,5 @@
 import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FileItem, FileLikeObject, FileUploader } from 'ng2-file-upload';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { environment } from '../../../../../environments/environment';
 import { IAsyncImportResponse, IMappedOption, IModelArrayProperties, ImportableFileModel, ImportableFilePropertiesModel, ImportableFilePropertyValuesModel, ImportableLabelValuePair, ImportableMapField, ImportDataExtension } from './model';
@@ -34,6 +33,7 @@ import { ImportResultDataService } from '../../../../core/services/data/import-r
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ImportResultModel } from '../../../../core/models/import-result.model';
 import { HoverRowAction, LoadingDialogModel } from '../../../../shared/components';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 export enum ImportServerModelNames {
   CASE_LAB_RESULTS = 'labResult',
@@ -391,7 +391,7 @@ export class ImportDataComponent
                     this.usedSourceFieldsForValidation.fields[item.sourceFieldWithSelectedIndexes] > 1
         ) {
           // display toast
-          this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_MUST_FIX_DUPLICATE_BEFORE_ADD');
+          this.toastV2Service.error('LNG_PAGE_IMPORT_DATA_ERROR_MUST_FIX_DUPLICATE_BEFORE_ADD');
         } else {
           // add option
           this.addNewOptionMap(
@@ -622,7 +622,7 @@ export class ImportDataComponent
      */
   constructor(
     protected listHelperService: ListHelperService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private authDataService: AuthDataService,
     private dialogService: DialogService,
     private i18nService: I18nService,
@@ -726,7 +726,7 @@ export class ImportDataComponent
       try {
         err = _.isObject(err) ? err : JSON.parse(err);
         err = err.error ? err.error : err;
-        this.snackbarService.showApiError(err);
+        this.toastV2Service.error(err);
 
         // hide loading
         this._displayLoading = false;
@@ -771,7 +771,7 @@ export class ImportDataComponent
       // we finished with one steppers
       if (this.isOneStep) {
         // display success
-        this.snackbarService.showSuccess(
+        this.toastV2Service.success(
           this.importSuccessMessage,
           this.translationData
         );
@@ -1504,7 +1504,7 @@ export class ImportDataComponent
               .pipe(
                 catchError((err) => {
                   // display error
-                  this.snackbarService.showApiError(err);
+                  this.toastV2Service.error(err);
 
                   // hide loading
                   loadingDialog.close();
@@ -1527,7 +1527,7 @@ export class ImportDataComponent
                   loadingDialog.close();
 
                   // display success message
-                  this.snackbarService.showSuccess('LNG_PAGE_IMPORT_DATA_LOAD_SAVED_IMPORT_MAPPING_SUCCESS_MESSAGE');
+                  this.toastV2Service.success('LNG_PAGE_IMPORT_DATA_LOAD_SAVED_IMPORT_MAPPING_SUCCESS_MESSAGE');
                 });
               });
           }
@@ -1573,7 +1573,7 @@ export class ImportDataComponent
               .pipe(
                 catchError((err) => {
                   // display error
-                  this.snackbarService.showApiError(err);
+                  this.toastV2Service.error(err);
 
                   // hide loading
                   loadingDialog.close();
@@ -1596,7 +1596,7 @@ export class ImportDataComponent
                   loadingDialog.close();
 
                   // display message
-                  this.snackbarService.showSuccess('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE');
+                  this.toastV2Service.success('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE');
                 });
               });
           } else if (answer.button === DialogAnswerButton.Extra_1) {
@@ -1676,7 +1676,7 @@ export class ImportDataComponent
               loadingDialog.close();
 
               // show error
-              this.snackbarService.showApiError(err);
+              this.toastV2Service.error(err);
               return throwError(err);
             })
           )
@@ -1767,7 +1767,7 @@ export class ImportDataComponent
     hideLoading: boolean = false
   ) {
     // display toast
-    this.snackbarService.showError(
+    this.toastV2Service.error(
       messageToken,
       this.translationData
     );
@@ -1870,7 +1870,7 @@ export class ImportDataComponent
         loadingDialog.close();
 
         // display error message
-        this.snackbarService.showError(
+        this.toastV2Service.error(
           'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_ROWS', {
             rows: invalidFieldRows.join(', ')
           }
@@ -1948,9 +1948,9 @@ export class ImportDataComponent
                   this.errMsgDetails = err;
 
                   // display error
-                  this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
+                  this.toastV2Service.error('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
                 } else {
-                  this.snackbarService.showApiError(err);
+                  this.toastV2Service.error(err);
                 }
 
                 // hide loading
@@ -1973,7 +1973,7 @@ export class ImportDataComponent
                     .pipe(
                       catchError((err) => {
                         // display error message
-                        this.snackbarService.showApiError(err);
+                        this.toastV2Service.error(err);
 
                         // hide loading
                         loadingDialog.close();
@@ -2008,7 +2008,7 @@ export class ImportDataComponent
                       // finished everything with success ?
                       if (importLogModel.status === Constants.SYSTEM_SYNC_LOG_STATUS.SUCCESS.value) {
                         // display success
-                        this.snackbarService.showSuccess(
+                        this.toastV2Service.success(
                           this.importSuccessMessage,
                           this.translationData
                         );
@@ -2044,7 +2044,7 @@ export class ImportDataComponent
                       };
 
                       // display error message
-                      this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
+                      this.toastV2Service.error('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
 
                       // trigger error list refresh
                       if (
@@ -2063,7 +2063,7 @@ export class ImportDataComponent
                 checkStatusPeriodically();
               } else {
                 // display success
-                this.snackbarService.showSuccess(
+                this.toastV2Service.success(
                   this.importSuccessMessage,
                   this.translationData
                 );
@@ -2705,7 +2705,7 @@ export class ImportDataComponent
           loadingDialog.close();
 
           // show error
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         })
       )
@@ -2880,7 +2880,7 @@ export class ImportDataComponent
                     loadingDialog.close();
 
                     // show error
-                    this.snackbarService.showApiError(err);
+                    this.toastV2Service.error(err);
                     return throwError(err);
                   })
                 );
@@ -3083,10 +3083,10 @@ export class ImportDataComponent
                     loadingDialog.close();
 
                     // display success
-                    this.snackbarService.showSuccess(
+                    this.toastV2Service.success(
                       'LNG_PAGE_IMPORT_DATA_MAPPING_FINISHED',
                       {},
-                      SnackbarService.DURATION_INFINITE
+                      true
                     );
                   });
                 });
@@ -3381,7 +3381,7 @@ export class ImportDataComponent
       .getImportResultsList(this.queryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           finishCallback([]);
           return throwError(err);
         }),
@@ -3422,7 +3422,7 @@ export class ImportDataComponent
       .getImportResultsCount(countQueryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         }),
         share()

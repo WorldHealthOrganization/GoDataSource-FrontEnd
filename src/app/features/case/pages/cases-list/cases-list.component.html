@@ -1,3 +1,10 @@
+<button mat-flat-button (click)="b1()">1</button>
+<button mat-flat-button (click)="b2()">2</button>
+<button mat-flat-button (click)="b3()">3</button>
+<button mat-flat-button (click)="b4()">4</button>
+<button mat-flat-button (click)="b5()">5</button>
+<button mat-flat-button (click)="b6()">6</button>
+
 <app-list-table-v2
   [pageTitle]="appliedListFilter !== Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS ? 'LNG_PAGE_LIST_CASES_TITLE' : 'LNG_PAGE_DASHBOARD_CASES_WITHOUT_RELATIONSHIPS'"
   [records$]="casesList$"

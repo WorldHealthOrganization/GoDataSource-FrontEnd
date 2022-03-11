@@ -5,7 +5,6 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ActivatedRoute } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { EventModel } from '../../../../core/models/event.model';
 import { EventDataService } from '../../../../core/services/data/event.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -23,6 +22,7 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Observable } from 'rxjs/index';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-modify-event',
@@ -61,7 +61,7 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
     private outbreakDataService: OutbreakDataService,
     private eventDataService: EventDataService,
     private formHelper: FormHelperService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private authDataService: AuthDataService,
     protected dialogService: DialogService,
     private userDataService: UserDataService
@@ -136,7 +136,7 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
       )
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           // hide loading
           this.hideLoadingDialog();
           return throwError(err);
@@ -150,7 +150,7 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
         form.form.markAsPristine();
 
         // display message
-        this.snackbarService.showSuccess('LNG_PAGE_MODIFY_EVENT_ACTION_MODIFY_EVENT_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_MODIFY_EVENT_ACTION_MODIFY_EVENT_SUCCESS_MESSAGE');
 
         // update breadcrumb
         this.initializeBreadcrumbs();

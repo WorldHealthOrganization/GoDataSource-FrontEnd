@@ -3,7 +3,6 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { EventModel } from '../../../../core/models/event.model';
@@ -23,6 +22,7 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
 import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Observable } from 'rxjs/index';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-create-event',
@@ -58,7 +58,7 @@ export class CreateEventComponent
     private router: Router,
     private eventDataService: EventDataService,
     private outbreakDataService: OutbreakDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     private dialogService: DialogService,
     private authDataService: AuthDataService,
@@ -128,13 +128,13 @@ export class CreateEventComponent
         .createEvent(this.outbreakId, dirtyFields)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             loadingDialog.close();
             return throwError(err);
           })
         )
         .subscribe((newEvent: EventModel) => {
-          this.snackbarService.showSuccess('LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_SUCCESS_MESSAGE');
+          this.toastV2Service.success('LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_SUCCESS_MESSAGE');
 
           // hide dialog
           loadingDialog.close();

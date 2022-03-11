@@ -4,7 +4,6 @@ import { Observable } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { PhoneNumberType, UserModel, UserRoleModel } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
@@ -21,6 +20,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-create-user',
@@ -52,7 +52,7 @@ export class CreateUserComponent
     private router: Router,
     private userDataService: UserDataService,
     private userRoleDataService: UserRoleDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private authDataService: AuthDataService,
     private outbreakDataService: OutbreakDataService,
     private formHelper: FormHelperService,
@@ -119,13 +119,13 @@ export class CreateUserComponent
         .createUser(dirtyFields)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             loadingDialog.close();
             return throwError(err);
           })
         )
         .subscribe((newUser: UserModel) => {
-          this.snackbarService.showSuccess('LNG_PAGE_CREATE_USER_ACTION_CREATE_USER_SUCCESS_MESSAGE');
+          this.toastV2Service.success('LNG_PAGE_CREATE_USER_ACTION_CREATE_USER_SUCCESS_MESSAGE');
 
           // hide dialog
           loadingDialog.close();

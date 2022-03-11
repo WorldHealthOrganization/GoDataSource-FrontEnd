@@ -11,7 +11,6 @@ import { UserModel } from '../../../../core/models/user.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -25,6 +24,7 @@ import { SheetCellType } from '../../../../core/models/sheet/sheet-cell-type';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { Constants } from '../../../../core/models/constants';
 import * as Handsontable from 'handsontable';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-bulk-modify-contacts-of-contacts',
@@ -84,7 +84,7 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
     private route: ActivatedRoute,
     private contactsOfContactsDataService: ContactsOfContactsDataService,
     private outbreakDataService: OutbreakDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private referenceDataDataService: ReferenceDataDataService,
     private i18nService: I18nService,
     private dialogService: DialogService,
@@ -120,7 +120,7 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
       .pipe(
         catchError((err) => {
           // show error message
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         })
       )
@@ -222,7 +222,7 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
       .getContactsOfContactsList(this.selectedOutbreak.id, qb)
       .pipe(catchError((err) => {
         loadingDialog.close();
-        this.snackbarService.showApiError(err);
+        this.toastV2Service.error(err);
         return throwError(err);
       }))
       .subscribe((contactOfContactModels) => {
@@ -423,7 +423,7 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
 
           // show error
           loadingDialog.close();
-          this.snackbarService.showError('LNG_PAGE_BULK_MODIFY_CONTACTS_OF_CONTACTS_WARNING_INVALID_FIELDS');
+          this.toastV2Service.error('LNG_PAGE_BULK_MODIFY_CONTACTS_OF_CONTACTS_WARNING_INVALID_FIELDS');
         } else {
           // collect data from table
           this.hotTableWrapper.getData()
@@ -510,12 +510,12 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
                 .pipe(
                   catchError((err) => {
                     loadingDialog.close();
-                    this.snackbarService.showApiError(err);
+                    this.toastV2Service.error(err);
                     return throwError(err);
                   })
                 )
                 .subscribe(() => {
-                  this.snackbarService.showSuccess('LNG_PAGE_BULK_MODIFY_CONTACTS_OF_CONTACTS_ACTION_MODIFY_CONTACTS_SUCCESS_MESSAGE');
+                  this.toastV2Service.success('LNG_PAGE_BULK_MODIFY_CONTACTS_OF_CONTACTS_ACTION_MODIFY_CONTACTS_SUCCESS_MESSAGE');
 
                   // navigate to listing page
                   this.disableDirtyConfirm();

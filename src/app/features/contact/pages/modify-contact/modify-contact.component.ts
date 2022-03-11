@@ -8,7 +8,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -45,6 +44,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-modify-contact',
@@ -203,7 +203,7 @@ export class ModifyContactComponent
     private outbreakDataService: OutbreakDataService,
     private contactDataService: ContactDataService,
     private formHelper: FormHelperService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private router: Router,
     protected dialogService: DialogService,
     private i18nService: I18nService,
@@ -428,7 +428,7 @@ export class ModifyContactComponent
         )
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             // hide loading
             this.hideLoadingDialog();
             return throwError(err);
@@ -445,7 +445,7 @@ export class ModifyContactComponent
 
             // display message
             if (!finishCallBack) {
-              this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE');
 
               // update breadcrumb
               this.initializeBreadcrumbs();
@@ -475,7 +475,7 @@ export class ModifyContactComponent
               )
               .pipe(
                 catchError((err) => {
-                  this.snackbarService.showApiError(err);
+                  this.toastV2Service.error(err);
 
                   // hide loading
                   this.hideLoadingDialog();
@@ -519,7 +519,7 @@ export class ModifyContactComponent
           )
           .pipe(
             catchError((err) => {
-              this.snackbarService.showApiError(err);
+              this.toastV2Service.error(err);
 
               // hide loading
               this.hideLoadingDialog();

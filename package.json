@@ -52,6 +52,7 @@
     "ngx-mat-select-search": "4.0.2",
     "ngx-material-timepicker": "5.5.3",
     "ngx-popperjs": "13.0.0",
+    "ngx-toastr": "14.2.2",
     "ngx-wig": "13.0.3",
     "ol": "6.12.0",
     "rxjs": "6.6.7",

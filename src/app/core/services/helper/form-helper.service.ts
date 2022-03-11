@@ -2,14 +2,14 @@ import { Injectable } from '@angular/core';
 
 import { AbstractControl, FormControl, NgForm } from '@angular/forms';
 import * as _ from 'lodash';
-import { SnackbarService } from './snackbar.service';
 import { I18nService } from './i18n.service';
+import { ToastV2Service } from './toast-v2.service';
 
 @Injectable()
 export class FormHelperService {
 
   constructor(
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private i18nService: I18nService
   ) {
   }
@@ -248,12 +248,11 @@ export class FormHelperService {
       checkControlsForInvalidStatus(form);
 
       // display error message
-      this.snackbarService.showError(
+      this.toastV2Service.error(
         _.isEmpty(fields) ? 'LNG_FORM_ERROR_FORM_INVALID' : 'LNG_FORM_ERROR_FORM_INVALID_WITH_FIELDS',
         {
           fields: fields
-        },
-        true
+        }
       );
 
       // finished
@@ -267,7 +266,7 @@ export class FormHelperService {
 
       // if there are no changes, display an error
       if (_.isEmpty(dirtyFields)) {
-        this.snackbarService.showSuccess('LNG_FORM_WARNING_NO_CHANGES');
+        this.toastV2Service.success('LNG_FORM_WARNING_NO_CHANGES');
         return false;
       }
     }

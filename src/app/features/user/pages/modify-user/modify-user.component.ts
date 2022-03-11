@@ -4,7 +4,6 @@ import { Observable } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { PhoneNumberType, UserModel, UserRoleModel } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -22,6 +21,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-modify-user',
@@ -57,7 +57,7 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
     private userDataService: UserDataService,
     private userRoleDataService: UserRoleDataService,
     private authDataService: AuthDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
     private formHelper: FormHelperService,
     protected dialogService: DialogService,
@@ -168,7 +168,7 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
         .modifyUser(this.userId, dirtyFields)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             // hide loading
             this.hideLoadingDialog();
             return throwError(err);
@@ -187,7 +187,7 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
             .reloadAndPersistAuthUser()
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 // hide loading
                 this.hideLoadingDialog();
                 return throwError(err);
@@ -198,7 +198,7 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
               form.form.markAsPristine();
 
               // display message
-              this.snackbarService.showSuccess('LNG_PAGE_MODIFY_USER_ACTION_MODIFY_USER_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_MODIFY_USER_ACTION_MODIFY_USER_SUCCESS_MESSAGE');
 
               // update breadcrumbs
               this.initializeBreadcrumbs();

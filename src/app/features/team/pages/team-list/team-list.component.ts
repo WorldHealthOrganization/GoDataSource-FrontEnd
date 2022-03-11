@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Observable } from 'rxjs';
 import { UserModel } from '../../../../core/models/user.model';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import * as _ from 'lodash';
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
@@ -19,6 +18,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-team-list',
@@ -108,7 +108,7 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
     private dialogService: DialogService,
     private outbreakDataService: OutbreakDataService,
     private followUpsDataService: FollowUpsDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private userDataService: UserDataService
   ) {
     super(listHelperService);
@@ -170,7 +170,7 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
       .getTeamsList(this.queryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           finishCallback([]);
           return throwError(err);
         }),
@@ -193,7 +193,7 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
       .getTeamsCount(countQueryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         }),
         share()
@@ -230,19 +230,19 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
             )
             .subscribe((followUpsCount) => {
               if (followUpsCount.count > 0) {
-                this.snackbarService.showError('LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_IN_USE_MESSAGE');
+                this.toastV2Service.error('LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_IN_USE_MESSAGE');
               } else {
                 // delete the team
                 this.teamDataService
                   .deleteTeam(team.id)
                   .pipe(
                     catchError((err) => {
-                      this.snackbarService.showApiError(err);
+                      this.toastV2Service.error(err);
                       return throwError(err);
                     })
                   )
                   .subscribe(() => {
-                    this.snackbarService.showSuccess('LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_SUCCESS_MESSAGE');
+                    this.toastV2Service.success('LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_SUCCESS_MESSAGE');
                     // reload data
                     this.needsRefreshList(true);
                   });

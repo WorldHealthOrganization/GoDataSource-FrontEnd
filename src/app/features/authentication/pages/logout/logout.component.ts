@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Router } from '@angular/router';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs/internal/observable/throwError';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-logout',
@@ -18,7 +18,7 @@ export class LogoutComponent implements OnInit {
   constructor(
     private router: Router,
     private authDataService: AuthDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private i18nService: I18nService,
     protected dialogService: DialogService
   ) {}
@@ -46,7 +46,7 @@ export class LogoutComponent implements OnInit {
             this.router.navigate(['/auth/login']);
 
             // show error
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             return throwError(err);
           })
         )
@@ -61,7 +61,7 @@ export class LogoutComponent implements OnInit {
                 loadingDialog.close();
 
                 // show api error
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )

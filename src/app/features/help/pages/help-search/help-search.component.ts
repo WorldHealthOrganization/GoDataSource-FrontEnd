@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { Router } from '@angular/router';
@@ -13,6 +12,7 @@ import { UserSettings } from '../../../../core/models/user.model';
 import { HoverRowAction } from '../../../../shared/components';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-help-search',
@@ -52,7 +52,7 @@ export class HelpSearchComponent extends ListComponent implements OnInit, OnDest
     protected listHelperService: ListHelperService,
     private router: Router,
     private helpDataService: HelpDataService,
-    private snackbarService: SnackbarService
+    private toastV2Service: ToastV2Service
   ) {
     super(
       listHelperService,
@@ -126,7 +126,7 @@ export class HelpSearchComponent extends ListComponent implements OnInit, OnDest
     this.helpItemsList$ = this.helpItemsList$
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           finishCallback([]);
           return throwError(err);
         }),

@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { UserSettings } from '../../../../core/models/user.model';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -18,6 +17,7 @@ import { throwError } from 'rxjs';
 import * as _ from 'lodash';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-help-items-list',
@@ -103,7 +103,7 @@ export class HelpItemsListComponent extends ListComponent implements OnInit, OnD
   constructor(
     protected listHelperService: ListHelperService,
     private helpDataService: HelpDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private dialogService: DialogService,
     private route: ActivatedRoute,
     private i18nService: I18nService,
@@ -239,7 +239,7 @@ export class HelpItemsListComponent extends ListComponent implements OnInit, OnD
       .getHelpItemsCategoryList(this.categoryId, this.queryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           finishCallback([]);
           return throwError(err);
         }),
@@ -265,7 +265,7 @@ export class HelpItemsListComponent extends ListComponent implements OnInit, OnD
       )
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         }),
         share()
@@ -286,13 +286,13 @@ export class HelpItemsListComponent extends ListComponent implements OnInit, OnD
             .deleteHelpItem(item.categoryId, item.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
               // display success message
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_HELP_ITEMS_ACTION_DELETE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_HELP_ITEMS_ACTION_DELETE_SUCCESS_MESSAGE');
 
               // remove help items from cache
               this.cacheService.remove(CacheKey.HELP_ITEMS);
@@ -318,13 +318,13 @@ export class HelpItemsListComponent extends ListComponent implements OnInit, OnD
             .approveHelpItem(item.categoryId, item.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
               // display success message
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_HELP_ITEMS_ACTION_APPROVE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_HELP_ITEMS_ACTION_APPROVE_SUCCESS_MESSAGE');
 
               // remove help items from cache
               this.cacheService.remove(CacheKey.HELP_ITEMS);

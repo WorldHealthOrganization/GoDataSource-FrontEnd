@@ -6,7 +6,6 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
@@ -18,6 +17,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-create-outbreak-template',
@@ -46,7 +46,7 @@ export class CreateOutbreakTemplateComponent
     private referenceDataDataService: ReferenceDataDataService,
     private formHelper: FormHelperService,
     private outbreakTemplateDataService: OutbreakTemplateDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private router: Router,
     private dialogService: DialogService,
     private authDataService: AuthDataService,
@@ -111,13 +111,13 @@ export class CreateOutbreakTemplateComponent
         .createOutbreakTemplate(outbreakTemplateData)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showError((err.message));
+            this.toastV2Service.error((err.message));
             loadingDialog.close();
             return throwError(err);
           })
         )
         .subscribe((newOutbreakTemplate) => {
-          this.snackbarService.showSuccess('LNG_PAGE_CREATE_OUTBREAK_TEMPLATES_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON');
+          this.toastV2Service.success('LNG_PAGE_CREATE_OUTBREAK_TEMPLATES_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON');
 
           // hide dialog
           loadingDialog.close();

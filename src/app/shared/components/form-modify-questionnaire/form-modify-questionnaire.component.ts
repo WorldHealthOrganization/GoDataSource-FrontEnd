@@ -22,11 +22,11 @@ import { Constants } from '../../../core/models/constants';
 import { DomService } from '../../../core/services/helper/dom.service';
 import { v4 as uuid } from 'uuid';
 import { FormInputComponent } from '../../xt-forms/components/form-input/form-input.component';
-import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import { HoverRowAction, HoverRowActionType } from '../hover-row-actions/hover-row-actions.component';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 
 /**
  * Used to initialize breadcrumbs
@@ -204,7 +204,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     private genericDataService: GenericDataService,
     private formHelper: FormHelperService,
     private domService: DomService,
-    private snackbarService: SnackbarService
+    private toastV2Service: ToastV2Service
   ) {
     super();
   }
@@ -427,7 +427,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         this.i18nService.loadUserLanguage()
           .pipe(
             catchError((err) => {
-              this.snackbarService.showApiError(err);
+              this.toastV2Service.error(err);
               return throwError(err);
             })
           )
@@ -836,7 +836,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
           // success saving questionnaire ?
           if (!success) {
             // we can't rollback..so..what now ? try again, or disable questionnaire ?
-            this.snackbarService.showError('LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_ERROR_SAVING_QUESTIONNAIRE');
+            this.toastV2Service.error('LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_ERROR_SAVING_QUESTIONNAIRE');
           }
 
           // finished saving data

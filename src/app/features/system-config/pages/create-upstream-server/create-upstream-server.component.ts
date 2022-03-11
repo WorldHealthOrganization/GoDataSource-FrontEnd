@@ -3,7 +3,6 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { AbstractControl, NgForm } from '@angular/forms';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { SystemUpstreamServerModel } from '../../../../core/models/system-upstream-server.model';
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
 import * as _ from 'lodash';
@@ -15,6 +14,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel } from '../../../../core/models/user.model';
 import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-create-upstream-server',
@@ -39,7 +39,7 @@ export class CreateUpstreamServerComponent
      */
   constructor(
     private router: Router,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     private systemSettingsDataService: SystemSettingsDataService,
     private dialogService: DialogService,
@@ -104,7 +104,7 @@ export class CreateUpstreamServerComponent
         .getSystemSettings()
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             loadingDialog.close();
             return throwError(err);
           })
@@ -120,14 +120,14 @@ export class CreateUpstreamServerComponent
             })
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 loadingDialog.close();
                 return throwError(err);
               })
             )
             .subscribe(() => {
               // display success message
-              this.snackbarService.showSuccess('LNG_PAGE_CREATE_SYSTEM_UPSTREAM_SERVER_ACTION_CREATE_UPSTREAM_SERVER_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_CREATE_SYSTEM_UPSTREAM_SERVER_ACTION_CREATE_UPSTREAM_SERVER_SUCCESS_MESSAGE');
 
               // hide dialog
               loadingDialog.close();

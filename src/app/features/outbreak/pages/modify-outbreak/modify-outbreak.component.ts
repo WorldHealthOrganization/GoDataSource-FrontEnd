@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ActivatedRoute } from '@angular/router';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
 import * as _ from 'lodash';
@@ -19,6 +18,7 @@ import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/vali
 import { catchError, map } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-modify-outbreak',
@@ -57,7 +57,7 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
     private outbreakDataService: OutbreakDataService,
     protected route: ActivatedRoute,
     private referenceDataDataService: ReferenceDataDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     private authDataService: AuthDataService,
     protected dialogService: DialogService
@@ -166,7 +166,7 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
       )
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           // hide loading
           this.hideLoadingDialog();
           return throwError(err);
@@ -180,7 +180,7 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
         form.form.markAsPristine();
 
         // display message
-        this.snackbarService.showSuccess('LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE');
 
         // update breadcrumbs
         this.initializeBreadcrumbs();

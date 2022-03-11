@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Constants } from '../../../../core/models/constants';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ActivatedRoute } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -37,6 +36,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 enum NodeAction {
   MODIFY_PERSON = 'modify-person',
@@ -107,7 +107,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
      */
   constructor(
     private authDataService: AuthDataService,
-    protected snackbarService: SnackbarService,
+    protected toastV2Service: ToastV2Service,
     protected route: ActivatedRoute,
     private importExportDataService: ImportExportDataService,
     private i18nService: I18nService,
@@ -247,7 +247,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
           // check that png was generated
           if (!pngBase64) {
             // display error
-            this.snackbarService.showNotice('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT_NOTHING_TO_EXPORT');
+            this.toastV2Service.notice('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT_NOTHING_TO_EXPORT');
             loadingDialog.close();
             return;
           }
@@ -259,7 +259,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
           this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: Number(splitFactor)})
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 loadingDialog.close();
                 return throwError(err);
               })
@@ -293,7 +293,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
           loadingDialog.close();
         });
     } else {
-      this.snackbarService.showNotice('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT_NOTHING_TO_EXPORT');
+      this.toastV2Service.notice('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT_NOTHING_TO_EXPORT');
     }
   }
 
@@ -328,7 +328,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
       .getEntity(entity.type, this.selectedOutbreak.id, entity.id)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           loadingDialog.close();
           return throwError(err);
         })
@@ -343,7 +343,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             )
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 loadingDialog.close();
                 return throwError(err);
               })
@@ -434,7 +434,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
       .getEntityRelationship(this.selectedOutbreak.id, relationship.sourceType, relationship.source, relationship.id)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           loadingDialog.close();
           return throwError(err);
         })
@@ -537,13 +537,13 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             .deleteEntity(person.type, this.selectedOutbreak.id, person.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
 
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_DELETE_PERSON_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_DELETE_PERSON_SUCCESS_MESSAGE');
 
               // reset form
               this.resetFormModels();
@@ -594,12 +594,12 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
       )
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         })
       )
       .subscribe(() => {
-        this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE');
 
         // reset form
         this.resetFormModels();
@@ -652,7 +652,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             .pipe(
               catchError((err) => {
                 // display error message
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
 
                 // rollback - remove contact
                 this.contactDataService
@@ -665,12 +665,12 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             );
         }),
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         })
       )
       .subscribe(() => {
-        this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
 
         // reset form
         this.resetFormModels();
@@ -718,7 +718,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             .pipe(
               catchError((err) => {
                 // display error message
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
 
                 // rollback - remove contact
                 this.contactsOfContactsDataService
@@ -731,12 +731,12 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             );
         }),
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         })
       )
       .subscribe(() => {
-        this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_OF_CONTACT_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_OF_CONTACT_SUCCESS_MESSAGE');
 
         // reset form
         this.resetFormModels();
@@ -769,12 +769,12 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
       .modifyEntity(person.type, this.selectedOutbreak.id, person.id, dirtyFields)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         })
       )
       .subscribe(() => {
-        this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_SUCCESS_MESSAGE');
 
         // reset form
         this.resetFormModels();
@@ -810,13 +810,13 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
       )
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
 
           return throwError(err);
         })
       )
       .subscribe(() => {
-        this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE');
 
         // reset selected relationship
         this.selectedRelationship = undefined;
@@ -845,12 +845,12 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             .deleteRelationship(this.selectedOutbreak.id, sourcePerson.type, sourcePerson.id, this.selectedRelationship.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
 
               // reset selected relationship
               this.selectedRelationship = undefined;

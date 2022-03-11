@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { UserSettings } from '../../../../core/models/user.model';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -25,6 +24,7 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-cases-list',
@@ -121,7 +121,7 @@ export class MarkedNotDuplicatesListComponent
      */
   constructor(
     protected listHelperService: ListHelperService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
     private referenceDataDataService: ReferenceDataDataService,
     private route: ActivatedRoute,
@@ -397,7 +397,7 @@ export class MarkedNotDuplicatesListComponent
         )
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             finishCallback([]);
             return throwError(err);
           }),
@@ -429,7 +429,7 @@ export class MarkedNotDuplicatesListComponent
         )
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             return throwError(err);
           }),
           share()
@@ -457,7 +457,7 @@ export class MarkedNotDuplicatesListComponent
               )
               .pipe(
                 catchError((err) => {
-                  this.snackbarService.showApiError(err);
+                  this.toastV2Service.error(err);
                   loadingDialog.close();
                   return throwError(err);
                 })

@@ -4,7 +4,6 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import * as _ from 'lodash';
@@ -18,6 +17,7 @@ import { RelationshipType } from '../../../../core/enums/relationship-type.enum'
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-create-entity-relationship-bulk',
@@ -66,7 +66,7 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
     private route: ActivatedRoute,
     private entityDataService: EntityDataService,
     private outbreakDataService: OutbreakDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     private relationshipDataService: RelationshipDataService
   ) {
@@ -78,7 +78,7 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
     this.route.queryParams
       .subscribe((queryParams: { selectedSourceIds, selectedTargetIds }) => {
         if (_.isEmpty(queryParams.selectedSourceIds) || _.isEmpty(queryParams.selectedTargetIds)) {
-          this.snackbarService.showError('LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES');
+          this.toastV2Service.error('LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES');
 
           // No source or target entities selected; navigate back to exposures list
           this.disableDirtyConfirm();
@@ -126,7 +126,7 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
         .getEntity(this.entityType, this.selectedOutbreak.id, this.entityId)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
 
             // Entity not found; navigate back to Entities list
             this.router.navigate([this.entityMap[this.entityType].link]);
@@ -211,12 +211,12 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
       .createBulkRelationships(this.selectedOutbreak.id, relationshipsBulkData)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         })
       )
       .subscribe(() => {
-        this.snackbarService.showSuccess('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_SUCCESS_MESSAGE');
 
         // navigate back to root person's relationships list
         this.disableDirtyConfirm();

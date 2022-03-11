@@ -4,7 +4,6 @@ import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import * as _ from 'lodash';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { Constants } from '../../../../core/models/constants';
@@ -30,6 +29,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { EntityType } from '../../../../core/models/entity-type';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-contact-range-follow-ups-list',
@@ -130,7 +130,7 @@ export class ContactRangeFollowUpsListComponent
     protected listHelperService: ListHelperService,
     private outbreakDataService: OutbreakDataService,
     private followUpsDataService: FollowUpsDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private referenceDataDataService: ReferenceDataDataService,
     private i18nService: I18nService,
     private genericDataService: GenericDataService,
@@ -306,7 +306,7 @@ export class ContactRangeFollowUpsListComponent
         )
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             finishCallback([]);
             return throwError(err);
           })
@@ -390,7 +390,7 @@ export class ContactRangeFollowUpsListComponent
         .getRangeFollowUpsListCount(this.selectedOutbreak.id, countQueryBuilder)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             return throwError(err);
           }),
           share()

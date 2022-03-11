@@ -4,7 +4,6 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
@@ -23,6 +22,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-create-follow-up',
@@ -59,7 +59,7 @@ export class CreateContactFollowUpComponent
     private route: ActivatedRoute,
     private contactDataService: ContactDataService,
     private outbreakDataService: OutbreakDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     private followUpsDataService: FollowUpsDataService,
     private referenceDataDataService: ReferenceDataDataService,
@@ -111,7 +111,7 @@ export class CreateContactFollowUpComponent
         .getContact(this.selectedOutbreak.id, this.contactId)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
 
             this.disableDirtyConfirm();
             this.router.navigate(['/contacts']);
@@ -188,13 +188,13 @@ export class CreateContactFollowUpComponent
         .createFollowUp(this.selectedOutbreak.id, this.contactData.id, dirtyFields)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             loadingDialog.close();
             return throwError(err);
           })
         )
         .subscribe((newContactFollowup: FollowUpModel) => {
-          this.snackbarService.showSuccess('LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_SUCCESS_MESSAGE');
+          this.toastV2Service.success('LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_SUCCESS_MESSAGE');
 
           // hide dialog
           loadingDialog.close();

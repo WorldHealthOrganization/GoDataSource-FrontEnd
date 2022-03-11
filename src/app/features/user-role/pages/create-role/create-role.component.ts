@@ -3,7 +3,6 @@ import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { Observable } from 'rxjs';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { throwError } from 'rxjs';
@@ -18,6 +17,7 @@ import { UserModel, UserRoleModel } from '../../../../core/models/user.model';
 import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-create-role',
@@ -47,7 +47,7 @@ export class CreateRoleComponent
   constructor(
     private router: Router,
     private userRoleDataService: UserRoleDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     private dialogService: DialogService,
     private sanitized: DomSanitizer,
@@ -83,7 +83,7 @@ export class CreateRoleComponent
             this.userRoleDataService
               .getRole(queryParams.cloneId)
               .pipe(catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
 
                 // hide loading
                 loadingDialog.close();
@@ -148,13 +148,13 @@ export class CreateRoleComponent
       .createRole(dirtyFields)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           loadingDialog.close();
           return throwError(err);
         })
       )
       .subscribe((newRole: UserRoleModel) => {
-        this.snackbarService.showSuccess('LNG_PAGE_CREATE_USER_ROLE_ACTION_CREATE_USER_ROLE_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_CREATE_USER_ROLE_ACTION_CREATE_USER_ROLE_SUCCESS_MESSAGE');
 
         // hide dialog
         loadingDialog.close();

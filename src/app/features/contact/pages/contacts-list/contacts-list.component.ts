@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -42,6 +41,7 @@ import {
   IExportFieldsGroupRequired,
   ExportFieldsGroupModelNameEnum
 } from '../../../../core/models/export-fields-group.model';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-contacts-list',
@@ -548,7 +548,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
     protected listHelperService: ListHelperService,
     private router: Router,
     private contactDataService: ContactDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
     private genericDataService: GenericDataService,
     private referenceDataDataService: ReferenceDataDataService,
@@ -1166,7 +1166,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         .getContactsList(this.selectedOutbreak.id, this.queryBuilder)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             finishCallback([]);
             return throwError(err);
           }),
@@ -1208,7 +1208,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         .getContactsCount(this.selectedOutbreak.id, countQueryBuilder)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             return throwError(err);
           }),
           share()
@@ -1288,12 +1288,12 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             .deleteContact(this.selectedOutbreak.id, contact.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
               // reload data
               this.needsRefreshList(true);
@@ -1314,12 +1314,12 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             .restoreContact(this.selectedOutbreak.id, contact.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_SUCCESS_MESSAGE');
               // reload data
               this.needsRefreshList(true);
             });
@@ -1339,12 +1339,12 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             .convertContactToCase(this.selectedOutbreak.id, contactModel.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_TO_CASE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_TO_CASE_SUCCESS_MESSAGE');
               // reload data
               this.needsRefreshList(true);
             });
@@ -1692,15 +1692,15 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
               .pipe(
                 catchError((err) => {
                   this.closeLoadingDialog();
-                  this.snackbarService.showApiError(err);
+                  this.toastV2Service.error(err);
                   return throwError(err);
                 })
               )
               .subscribe(() => {
                 // success message
-                this.snackbarService.showSuccess(
+                this.toastV2Service.success(
                   'LNG_PAGE_BULK_MODIFY_CONTACTS_ACTION_MODIFY_CONTACTS_SUCCESS_MESSAGE', {
-                    count: records.length
+                    count: records.length.toLocaleString('en')
                   }
                 );
 

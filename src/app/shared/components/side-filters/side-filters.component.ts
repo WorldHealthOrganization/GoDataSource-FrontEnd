@@ -13,7 +13,6 @@ import { SavedFiltersService } from '../../../core/services/data/saved-filters.d
 import { DialogService } from '../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldType } from '../dialog/dialog.component';
 import { SavedFilterData, SavedFilterDataAppliedFilter, SavedFilterDataAppliedSort, SavedFilterModel } from '../../../core/models/saved-filters.model';
-import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { moment } from '../../../core/helperClasses/x-moment';
@@ -22,6 +21,7 @@ import { DateRangeModel } from '../../../core/models/date-range.model';
 import { of } from 'rxjs/internal/observable/of';
 import { UserModel } from '../../../core/models/user.model';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
+import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-side-filters',
@@ -163,7 +163,7 @@ export class SideFiltersComponent {
     private i18nService: I18nService,
     private savedFiltersService: SavedFiltersService,
     private dialogService: DialogService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     authDataService: AuthDataService
   ) {
     // initialize data
@@ -221,7 +221,7 @@ export class SideFiltersComponent {
     // nothing to save ?
     const filterData: SavedFilterData = this.toSaveData();
     if (_.isEmpty(filterData)) {
-      this.snackbarService.showNotice('LNG_SIDE_FILTERS_NOTICE_NOTHING_TO_SAVE');
+      this.toastV2Service.notice('LNG_SIDE_FILTERS_NOTICE_NOTHING_TO_SAVE');
       return;
     }
 
@@ -262,7 +262,7 @@ export class SideFiltersComponent {
               )
               .pipe(
                 catchError((err) => {
-                  this.snackbarService.showApiError(err);
+                  this.toastV2Service.error(err);
                   return throwError(err);
                 })
               )
@@ -274,7 +274,7 @@ export class SideFiltersComponent {
                 this.getAvailableSavedFilters();
 
                 // display message
-                this.snackbarService.showSuccess('LNG_SIDE_FILTERS_SAVE_FILTER_SUCCESS_MESSAGE');
+                this.toastV2Service.success('LNG_SIDE_FILTERS_SAVE_FILTER_SUCCESS_MESSAGE');
               });
           }
         });
@@ -315,7 +315,7 @@ export class SideFiltersComponent {
             )
               .pipe(
                 catchError((err) => {
-                  this.snackbarService.showApiError(err);
+                  this.toastV2Service.error(err);
                   return throwError(err);
                 })
               )
@@ -327,7 +327,7 @@ export class SideFiltersComponent {
                 this.getAvailableSavedFilters();
 
                 // display message
-                this.snackbarService.showSuccess('LNG_SIDE_FILTERS_MODIFY_FILTER_SUCCESS_MESSAGE');
+                this.toastV2Service.success('LNG_SIDE_FILTERS_MODIFY_FILTER_SUCCESS_MESSAGE');
               });
           } else if (answer.button === DialogAnswerButton.Extra_1) {
             createFilter();

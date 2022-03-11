@@ -4,7 +4,6 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -41,6 +40,7 @@ import { ContactDataService } from '../../../../core/services/data/contact.data.
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-create-case',
@@ -184,7 +184,7 @@ export class CreateCaseComponent
     private caseDataService: CaseDataService,
     private outbreakDataService: OutbreakDataService,
     private referenceDataDataService: ReferenceDataDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     private dialogService: DialogService,
     private i18nService: I18nService,
@@ -349,7 +349,7 @@ export class CreateCaseComponent
         )
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
 
             // hide dialog
             loadingDialog.close();
@@ -360,7 +360,7 @@ export class CreateCaseComponent
         .subscribe((newCase: CaseModel) => {
           // called when we finished creating case
           const finishedCreatingCase = () => {
-            this.snackbarService.showSuccess('LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE');
+            this.toastV2Service.success('LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE');
 
             // hide dialog
             loadingDialog.close();
@@ -394,7 +394,7 @@ export class CreateCaseComponent
               )
               .pipe(
                 catchError((err) => {
-                  this.snackbarService.showApiError(err);
+                  this.toastV2Service.error(err);
 
                   // hide dialog
                   loadingDialog.close();
@@ -432,9 +432,9 @@ export class CreateCaseComponent
           .pipe(
             catchError((err) => {
               if (_.includes(_.get(err, 'details.codes.id'), 'uniqueness')) {
-                this.snackbarService.showError('LNG_PAGE_CREATE_CASE_ERROR_UNIQUE_ID');
+                this.toastV2Service.error('LNG_PAGE_CREATE_CASE_ERROR_UNIQUE_ID');
               } else {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
               }
 
               // hide dialog

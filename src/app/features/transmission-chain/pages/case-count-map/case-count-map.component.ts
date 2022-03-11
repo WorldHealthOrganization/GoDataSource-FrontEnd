@@ -15,7 +15,7 @@ import { TransmissionChainModel } from '../../../../core/models/transmission-cha
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { catchError } from 'rxjs/operators';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-case-count-map',
@@ -62,7 +62,7 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
     private dialogService: DialogService,
     private i18nService: I18nService,
     private authDataService: AuthDataService,
-    private snackbarService: SnackbarService
+    private toastV2Service: ToastV2Service
   ) {}
 
   /**
@@ -143,7 +143,7 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
         .pipe(
           catchError((err) => {
             // show error
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
 
             // hide loading
             this.displayLoading = false;

@@ -3,7 +3,6 @@ import { ActivatedRoute } from '@angular/router';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { UserSettings } from '../../../../core/models/user.model';
@@ -15,6 +14,7 @@ import { throwError } from 'rxjs';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { IconModel } from '../../../../core/models/icon.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-reference-data-category-entries-list',
@@ -92,7 +92,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
     protected listHelperService: ListHelperService,
     private route: ActivatedRoute,
     private referenceDataDataService: ReferenceDataDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private dialogService: DialogService,
     private i18nService: I18nService
   ) {
@@ -253,7 +253,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
         .getReferenceDataByCategory(this.categoryId)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             finishCallback([]);
             return throwError(err);
           }),
@@ -310,7 +310,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
             .deleteEntry(entry.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err, {entryValue: entry.value});
+                this.toastV2Service.error(err, {entryValue: entry.value});
                 return throwError(err);
               }),
               switchMap(() => {
@@ -319,7 +319,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
               })
             )
             .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_DELETE_ENTRY_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_DELETE_ENTRY_SUCCESS_MESSAGE');
 
               // reload data
               this.needsRefreshList(true);
@@ -347,7 +347,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
       )
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         })
       )
@@ -357,7 +357,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
 
         // show success ?
         // this might not be the best idea...maybe we can replace / remove it
-        this.snackbarService.showSuccess('LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_CHANGE_ORDER_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_CHANGE_ORDER_SUCCESS_MESSAGE');
       });
   }
 }

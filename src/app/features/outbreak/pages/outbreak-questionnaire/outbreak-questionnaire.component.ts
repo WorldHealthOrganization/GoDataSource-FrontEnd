@@ -6,13 +6,13 @@ import { FormModifyQuestionnaireBreadcrumbsData, FormModifyQuestionnaireComponen
 import { OutbreakQestionnaireTypeEnum } from '../../../../core/enums/outbreak-qestionnaire-type.enum';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { throwError } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-outbreak-questionnaire',
@@ -87,7 +87,7 @@ export class OutbreakQuestionnaireComponent extends ConfirmOnFormChanges impleme
   constructor(
     protected route: ActivatedRoute,
     private outbreakDataService: OutbreakDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private i18nService: I18nService,
     private authDataService: AuthDataService
   ) {
@@ -183,7 +183,7 @@ export class OutbreakQuestionnaireComponent extends ConfirmOnFormChanges impleme
       })
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
 
           // finished
           questionnaireData.finishSubscriber.next(false);
@@ -196,7 +196,7 @@ export class OutbreakQuestionnaireComponent extends ConfirmOnFormChanges impleme
           return this.i18nService.loadUserLanguage()
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
 
                 // finished
                 questionnaireData.finishSubscriber.next(false);
@@ -211,7 +211,7 @@ export class OutbreakQuestionnaireComponent extends ConfirmOnFormChanges impleme
       .subscribe(() => {
         // display message - this might flood the user, so for now we won't display anything
         // #TODO
-        // this.snackbarService.showSuccess('LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE');
+        // this.toastV2Service.success('LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE');
 
         // finished
         questionnaireData.finishSubscriber.next(true);

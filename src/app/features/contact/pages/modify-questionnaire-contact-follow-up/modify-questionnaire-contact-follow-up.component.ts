@@ -3,7 +3,6 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { ActivatedRoute } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { throwError } from 'rxjs';
@@ -17,6 +16,7 @@ import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { Constants } from '../../../../core/models/constants';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-modify-questionnaire-contact-follow-up',
@@ -50,7 +50,7 @@ export class ModifyQuestionnaireContactFollowUpComponent extends ViewModifyCompo
     private authDataService: AuthDataService,
     private followUpsDataService: FollowUpsDataService,
     private outbreakDataService: OutbreakDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     protected dialogService: DialogService
   ) {
@@ -174,7 +174,7 @@ export class ModifyQuestionnaireContactFollowUpComponent extends ViewModifyCompo
         .pipe(
           catchError((err) => {
             // show error message
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
 
             // redirect
             this.disableDirtyConfirm();
@@ -221,7 +221,7 @@ export class ModifyQuestionnaireContactFollowUpComponent extends ViewModifyCompo
       )
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
 
           // hide loading
           this.hideLoadingDialog();
@@ -237,7 +237,7 @@ export class ModifyQuestionnaireContactFollowUpComponent extends ViewModifyCompo
         form.form.markAsPristine();
 
         // display message
-        this.snackbarService.showSuccess('LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE');
 
         // loading will be closed by retrieveFollowUpData() method
         // NOTHING TO DO

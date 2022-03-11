@@ -3,7 +3,6 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
@@ -22,6 +21,7 @@ import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { VaccineModel } from '../../../../core/models/vaccine.model';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-case-merge-duplicate-records',
@@ -163,7 +163,7 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
     private router: Router,
     private route: ActivatedRoute,
     private outbreakDataService: OutbreakDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     private i18nService: I18nService
   ) {
@@ -558,19 +558,19 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
           .pipe(
             catchError((err) => {
               this.displayLoading = false;
-              this.snackbarService.showApiError(err);
+              this.toastV2Service.error(err);
               return throwError(err);
             })
           )
           .subscribe(() => {
-            this.snackbarService.showSuccess('LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_MERGE_CASES_SUCCESS_MESSAGE');
+            this.toastV2Service.success('LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_MERGE_CASES_SUCCESS_MESSAGE');
 
             // navigate to listing page
             this.disableDirtyConfirm();
             this.router.navigate(['/duplicated-records']);
           });
       } else {
-        this.snackbarService.showError('LNG_FORM_ERROR_FORM_INVALID');
+        this.toastV2Service.error('LNG_FORM_ERROR_FORM_INVALID');
       }
     }
   }

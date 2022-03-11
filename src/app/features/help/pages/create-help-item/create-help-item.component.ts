@@ -3,7 +3,6 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -17,6 +16,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-create-help-item',
@@ -41,7 +41,7 @@ export class CreateHelpItemComponent
   constructor(
     private router: Router,
     private helpDataService: HelpDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     private i18nService: I18nService,
     private route: ActivatedRoute,
@@ -138,7 +138,7 @@ export class CreateHelpItemComponent
         .createHelpItem(this.categoryId, dirtyFields)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             loadingDialog.close();
             return throwError(err);
           }),
@@ -147,7 +147,7 @@ export class CreateHelpItemComponent
             return this.i18nService.loadUserLanguage()
               .pipe(
                 catchError((err) => {
-                  this.snackbarService.showApiError(err);
+                  this.toastV2Service.error(err);
                   loadingDialog.close();
                   return throwError(err);
                 }),
@@ -156,7 +156,7 @@ export class CreateHelpItemComponent
           })
         )
         .subscribe((newHelpItem) => {
-          this.snackbarService.showSuccess('LNG_PAGE_CREATE_HELP_ITEM_ACTION_CREATE_HELP_ITEM_SUCCESS_MESSAGE');
+          this.toastV2Service.success('LNG_PAGE_CREATE_HELP_ITEM_ACTION_CREATE_HELP_ITEM_SUCCESS_MESSAGE');
 
           // remove help items from cache
           // this isn't really necessary since we retrieve & cache only approve items, and since default approve value is false..this won't be retrieved

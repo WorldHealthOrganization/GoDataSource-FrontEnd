@@ -15,11 +15,11 @@ import { LocationModel } from '../../../core/models/location.model';
 import { LocationDataService } from '../../../core/services/data/location.data.service';
 import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
 import { throwError } from 'rxjs/internal/observable/throwError';
-import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { DialogService } from '../../../core/services/helper/dialog.service';
 import { LocationDialogComponent } from '../location-dialog/location-dialog.component';
 import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
+import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 
 /**
  * Error message
@@ -287,7 +287,7 @@ implements OnInit, OnDestroy {
   constructor(
     private i18nService: I18nService,
     private locationDataService: LocationDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     public dialogService: DialogService
   ) {}
 
@@ -715,7 +715,7 @@ implements OnInit, OnDestroy {
       .pipe(
         catchError((err) => {
           // display error message
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
 
           // location not loading anymore
           this.loadingLocations = false;

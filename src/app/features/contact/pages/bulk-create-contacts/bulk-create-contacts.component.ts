@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Observable } from 'rxjs';
@@ -31,6 +30,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel } from '../../../../core/models/user.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { TeamModel } from '../../../../core/models/team.model';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-bulk-create-contacts',
@@ -102,7 +102,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     private contactDataService: ContactDataService,
     private entityDataService: EntityDataService,
     private outbreakDataService: OutbreakDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private referenceDataDataService: ReferenceDataDataService,
     private i18nService: I18nService,
     private dialogService: DialogService,
@@ -161,7 +161,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
       .pipe(
         catchError((err) => {
           // show error message
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
 
           // navigate to Cases/Events listing page
           this.redirectToRelatedEntityList();
@@ -446,7 +446,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         .pipe(
           catchError((err) => {
             // show error message
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
 
             // navigate to Cases/Events listing page
             this.redirectToRelatedEntityList();
@@ -476,7 +476,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     }
 
     // related person data is wrong or missing
-    this.snackbarService.showSuccess('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_CASE_OR_EVENT_REQUIRED');
+    this.toastV2Service.success('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_CASE_OR_EVENT_REQUIRED');
 
     // navigate to Cases/Events listing page
     this.redirectToRelatedEntityList();
@@ -533,7 +533,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
 
           // show error
           loadingDialog.close();
-          this.snackbarService.showError('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_INVALID_FIELDS');
+          this.toastV2Service.error('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_INVALID_FIELDS');
         } else {
           // collect data from table
           this.hotTableWrapper
@@ -546,7 +546,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
               if (_.isEmpty(dataResponse.data)) {
                 // show error
                 loadingDialog.close();
-                this.snackbarService.showError('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_NO_DATA');
+                this.toastV2Service.error('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_NO_DATA');
               } else {
                 // create contacts
                 this.contactDataService
@@ -614,7 +614,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                       });
 
                       // try to parse into more clear errors
-                      this.snackbarService.translateApiErrors(errors)
+                      this.toastV2Service.translateErrors(errors)
                         .subscribe((translatedErrors) => {
                           // transform errors
                           (translatedErrors || []).forEach((translatedError) => {
@@ -636,12 +636,12 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                         });
 
                       // display error
-                      this.snackbarService.showApiError(err);
+                      this.toastV2Service.error(err);
                       return throwError(err);
                     })
                   )
                   .subscribe(() => {
-                    this.snackbarService.showSuccess('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
+                    this.toastV2Service.success('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
 
                     // navigate to listing page
                     this.disableDirtyConfirm();

@@ -4,9 +4,9 @@ import { AuthDataService } from '../data/auth.data.service';
 import { Observable } from 'rxjs/internal/Observable';
 import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
-import { SnackbarService } from '../helper/snackbar.service';
 import { TranslateService } from '@ngx-translate/core';
 import { I18nService } from '../helper/i18n.service';
+import { ToastV2Service } from '../helper/toast-v2.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -16,7 +16,7 @@ export class AuthGuard implements CanActivate {
   constructor(
     private authDataService: AuthDataService,
     private router: Router,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private translateService: TranslateService,
     private i18nService: I18nService
   ) {}
@@ -64,13 +64,13 @@ export class AuthGuard implements CanActivate {
 
     // display not authorized error
     if (this.translateService.currentLang) {
-      this.snackbarService.showError('LNG_ROLE_AVAILABLE_PERMISSIONS_NOT_AUTHORIZED_MESSAGE');
+      this.toastV2Service.error('LNG_ROLE_AVAILABLE_PERMISSIONS_NOT_AUTHORIZED_MESSAGE');
     } else {
       // load language
       const languageSubscriber = this.i18nService
         .waitForLanguageInitialization()
         .subscribe(() => {
-          this.snackbarService.showError('LNG_ROLE_AVAILABLE_PERMISSIONS_NOT_AUTHORIZED_MESSAGE');
+          this.toastV2Service.error('LNG_ROLE_AVAILABLE_PERMISSIONS_NOT_AUTHORIZED_MESSAGE');
           if (
             languageSubscriber &&
                         !languageSubscriber.closed

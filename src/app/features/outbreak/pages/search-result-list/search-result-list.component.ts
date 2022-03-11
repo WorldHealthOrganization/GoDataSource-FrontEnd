@@ -15,7 +15,6 @@ import {
 import { HoverRowAction } from '../../../../shared/components';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { GlobalEntitySearchDataService } from '../../../../core/services/data/global-entity-search.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
@@ -37,6 +36,7 @@ import {
   throwError
 } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-search-result-list',
@@ -105,7 +105,7 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
     protected listHelperService: ListHelperService,
     private globalEntitySearchDataService: GlobalEntitySearchDataService,
     private outbreakDataService: OutbreakDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private referenceDataDataService: ReferenceDataDataService,
     private route: ActivatedRoute
   ) {
@@ -214,7 +214,7 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
         )
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             finishCallback([]);
             return throwError(err);
           }),
@@ -263,7 +263,7 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
         )
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             return throwError(err);
           }),
           share()

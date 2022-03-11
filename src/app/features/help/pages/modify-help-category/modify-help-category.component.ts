@@ -3,7 +3,6 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -14,6 +13,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { throwError } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-modify-help-category',
@@ -40,7 +40,7 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
     protected route: ActivatedRoute,
     private helpDataService: HelpDataService,
     private formHelper: FormHelperService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private authDataService: AuthDataService,
     private i18nService: I18nService,
     protected dialogService: DialogService
@@ -123,7 +123,7 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
       .modifyHelpCategory(this.categoryId, dirtyFields)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           // hide loading
           this.hideLoadingDialog();
           return throwError(err);
@@ -133,7 +133,7 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
           return this.i18nService.loadUserLanguage()
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 // hide loading
                 this.hideLoadingDialog();
                 return throwError(err);
@@ -150,7 +150,7 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
         form.form.markAsPristine();
 
         // display message
-        this.snackbarService.showSuccess('LNG_PAGE_MODIFY_HELP_CATEGORY_ACTION_MODIFY_HELP_CATEGORY_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_MODIFY_HELP_CATEGORY_ACTION_MODIFY_HELP_CATEGORY_SUCCESS_MESSAGE');
 
         // update breadcrumbs
         this.initializeBreadcrumbs();

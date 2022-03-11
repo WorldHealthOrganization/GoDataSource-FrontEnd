@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { UserModel, UserRoleModel, UserSettings } from '../../../../core/models/user.model';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { PermissionModel } from '../../../../core/models/permission.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
@@ -15,6 +14,7 @@ import * as _ from 'lodash';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-roles-list',
@@ -114,7 +114,7 @@ export class RolesListComponent extends ListComponent implements OnInit, OnDestr
     protected listHelperService: ListHelperService,
     private router: Router,
     private userRoleDataService: UserRoleDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private dialogService: DialogService,
     private userDataService: UserDataService
   ) {
@@ -199,7 +199,7 @@ export class RolesListComponent extends ListComponent implements OnInit, OnDestr
       .getRolesList(this.queryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           finishCallback([]);
           return throwError(err);
         }),
@@ -222,7 +222,7 @@ export class RolesListComponent extends ListComponent implements OnInit, OnDestr
       .getRolesCount(countQueryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         }),
         share()
@@ -242,12 +242,12 @@ export class RolesListComponent extends ListComponent implements OnInit, OnDestr
             .deleteRole(userRole.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err, {userRoleName : userRole.name});
+                this.toastV2Service.error(err, {userRoleName : userRole.name});
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_USER_ROLES_ACTION_DELETE_USER_ROLE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_USER_ROLES_ACTION_DELETE_USER_ROLE_SUCCESS_MESSAGE');
 
               // reload data
               this.needsRefreshList(true);

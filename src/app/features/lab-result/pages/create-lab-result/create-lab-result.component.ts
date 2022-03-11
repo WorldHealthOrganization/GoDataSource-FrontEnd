@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -27,6 +26,7 @@ import { ContactDataService } from '../../../../core/services/data/contact.data.
 import { EntityType } from '../../../../core/models/entity-type';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { Constants } from '../../../../core/models/constants';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-create-lab-result',
@@ -86,7 +86,7 @@ export class CreateLabResultComponent
     private outbreakDataService: OutbreakDataService,
     private caseDataService: CaseDataService,
     private contactDataService: ContactDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private router: Router,
     private referenceDataDataService: ReferenceDataDataService,
     private genericDataService: GenericDataService,
@@ -138,7 +138,7 @@ export class CreateLabResultComponent
               entitySubscriber
                 .pipe(
                   catchError((err) => {
-                    this.snackbarService.showApiError(err);
+                    this.toastV2Service.error(err);
 
                     // Case / Contact not found
                     this.disableDirtyConfirm();
@@ -255,7 +255,7 @@ export class CreateLabResultComponent
         )
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
 
             // hide dialog
             loadingDialog.close();
@@ -264,7 +264,7 @@ export class CreateLabResultComponent
           })
         )
         .subscribe((newLabResult: LabResultModel) => {
-          this.snackbarService.showSuccess('LNG_PAGE_CREATE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_SUCCESS_MESSAGE');
+          this.toastV2Service.success('LNG_PAGE_CREATE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_SUCCESS_MESSAGE');
 
           // hide dialog
           loadingDialog.close();

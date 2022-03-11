@@ -5,12 +5,12 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { HoverRowAction } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { catchError, tap } from 'rxjs/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { IconModel } from '../../../../core/models/icon.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-reference-data-categories-list',
@@ -62,7 +62,7 @@ export class ReferenceDataCategoriesListComponent
     protected listHelperService: ListHelperService,
     private referenceDataDataService: ReferenceDataDataService,
     private i18nService: I18nService,
-    private snackbarService: SnackbarService
+    private toastV2Service: ToastV2Service
   ) {
     super(
       listHelperService,
@@ -112,7 +112,7 @@ export class ReferenceDataCategoriesListComponent
       .getReferenceData()
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           finishCallback([]);
           return throwError(err);
         }),

@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { SnackbarService } from './snackbar.service';
 import { ListFilterDataService } from '../data/list-filter.data.service';
 import { ActivatedRoute, PRIMARY_OUTLET, Router } from '@angular/router';
 import { RedirectService } from './redirect.service';
@@ -8,6 +7,7 @@ import { StorageService } from './storage.service';
 import { AuthDataService } from '../data/auth.data.service';
 import { OutbreakDataService } from '../data/outbreak.data.service';
 import { DialogService } from './dialog.service';
+import { ToastV2Service } from './toast-v2.service';
 
 @Injectable()
 export class ListHelperService {
@@ -16,7 +16,7 @@ export class ListHelperService {
      * Used to easily inject services to list-component that is used to extend all list page compoenents
      */
   constructor(
-    public snackbarService: SnackbarService,
+    public toastV2Service: ToastV2Service,
     public listFilterDataService: ListFilterDataService,
     public route: ActivatedRoute,
     public redirectService: RedirectService,

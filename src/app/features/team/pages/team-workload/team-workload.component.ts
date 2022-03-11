@@ -3,7 +3,6 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { TeamFollowupsPerDayModel } from '../../../../core/models/team-followups-per-day.model';
 import { Constants } from '../../../../core/models/constants';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -16,6 +15,7 @@ import { TeamModel } from '../../../../core/models/team.model';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 interface ITeamMap {
   id: string;
@@ -63,7 +63,7 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
     protected listHelperService: ListHelperService,
     private outbreakDataService: OutbreakDataService,
     private followUpsDataService: FollowUpsDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private i18nService: I18nService,
     private teamDataService: TeamDataService
   ) {
@@ -205,7 +205,7 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
               // hide loading
               this.displayLoading = false;
 
-              this.snackbarService.showApiError(err);
+              this.toastV2Service.error(err);
               finishCallback([]);
               return throwError(err);
             })

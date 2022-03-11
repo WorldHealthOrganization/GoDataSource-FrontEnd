@@ -4,7 +4,6 @@ import { Observable, throwError } from 'rxjs';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import * as _ from 'lodash';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
@@ -34,6 +33,7 @@ import {
   ExportFieldsGroupModelNameEnum
 } from '../../../../core/models/export-fields-group.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-lab-results',
@@ -283,7 +283,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
   constructor(
     protected listHelperService: ListHelperService,
     private router: Router,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
     private labResultDataService: LabResultDataService,
     private dialogService: DialogService,
@@ -669,7 +669,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
         .getOutbreakLabResults(this.selectedOutbreak.id, this.queryBuilder)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             finishCallback([]);
             return throwError(err);
           }),
@@ -721,7 +721,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
         .getOutbreakLabResultsCount(this.selectedOutbreak.id, countQueryBuilder)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             return throwError(err);
           }),
           share()
@@ -744,12 +744,12 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
             .deleteLabResult(this.selectedOutbreak.id, labResult.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
               // reload data
               this.needsRefreshList(true);
@@ -778,12 +778,12 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
             )
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT_SUCCESS_MESSAGE');
 
               // reload data
               this.needsRefreshList(true);

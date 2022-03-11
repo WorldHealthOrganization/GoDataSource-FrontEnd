@@ -5,7 +5,6 @@ import { Observable } from 'rxjs';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
@@ -28,6 +27,7 @@ import { RelationshipPersonModel } from '../../../../core/models/relationship-pe
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ClusterModel } from '../../../../core/models/cluster.model';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-entity-relationships-list',
@@ -129,7 +129,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     protected route: ActivatedRoute,
     protected outbreakDataService: OutbreakDataService,
     protected entityDataService: EntityDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private relationshipDataService: RelationshipDataService,
     private referenceDataDataService: ReferenceDataDataService,
     private dialogService: DialogService,
@@ -361,7 +361,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
           )
           .pipe(
             catchError((err) => {
-              this.snackbarService.showApiError(err);
+              this.toastV2Service.error(err);
               finishCallback([]);
               return throwError(err);
             }),
@@ -430,7 +430,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
           )
           .pipe(
             catchError((err) => {
-              this.snackbarService.showApiError(err);
+              this.toastV2Service.error(err);
               return throwError(err);
             }),
             share()
@@ -446,7 +446,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
           )
           .pipe(
             catchError((err) => {
-              this.snackbarService.showApiError(err);
+              this.toastV2Service.error(err);
               return throwError(err);
             }),
             share()
@@ -482,12 +482,12 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
             .deleteRelationship(this.selectedOutbreak.id, this.entityType, this.entityId, relatedEntity.relationship.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
 
               // reload data
               this.needsRefreshList(true);
@@ -520,12 +520,12 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
             .deleteBulkRelationships(this.selectedOutbreak.id, qb)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS_SUCCESS_MESSAGE');
 
               this.needsRefreshList(true);
             });

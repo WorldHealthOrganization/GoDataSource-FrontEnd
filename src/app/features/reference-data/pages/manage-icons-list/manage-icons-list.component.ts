@@ -8,12 +8,12 @@ import { Observable } from 'rxjs';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DialogAnswer, DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import * as _ from 'lodash';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-manage-icons-list',
@@ -68,7 +68,7 @@ export class ManageIconsListComponent extends ListComponent implements OnInit, O
     private referenceDataDataService: ReferenceDataDataService,
     private iconDataService: IconDataService,
     private dialogService: DialogService,
-    private snackbarService: SnackbarService
+    private toastV2Service: ToastV2Service
   ) {
     super(listHelperService);
   }
@@ -178,7 +178,7 @@ export class ManageIconsListComponent extends ListComponent implements OnInit, O
       .getIconsList(this.queryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           finishCallback([]);
           return throwError(err);
         }),
@@ -201,7 +201,7 @@ export class ManageIconsListComponent extends ListComponent implements OnInit, O
       .getIconsCount(countQueryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         }),
         share()
@@ -221,12 +221,12 @@ export class ManageIconsListComponent extends ListComponent implements OnInit, O
             .deleteIcon(icon.id)
             .pipe(
               catchError((err) => {
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_LIST_ACTION_DELETE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_LIST_ACTION_DELETE_SUCCESS_MESSAGE');
 
               // reload data
               this.needsRefreshList(true);

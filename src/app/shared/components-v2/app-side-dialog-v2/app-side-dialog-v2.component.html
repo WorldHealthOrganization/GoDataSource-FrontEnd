@@ -160,6 +160,14 @@
 
             </div>
 
+            <!-- Long Text -->
+            <div
+              *ngSwitchCase="V2SideDialogConfigInputType.HTML"
+              class="gd-app-side-dialog-v2-content-middle-item-input"
+              fxLayout="row" fxLayoutGap="1.6rem"
+              [innerHTML]="input.placeholder ? (input.placeholder | translate | safeHtml) : undefined">
+            </div>
+
             <!-- Link -->
             <a
               *ngSwitchCase="V2SideDialogConfigInputType.LINK"
@@ -189,12 +197,22 @@
                   *ngFor="let panel of input.panels">
                   <mat-expansion-panel
                     *ngIf="!panel.visible || panel.visible(dialogData, dialogHandler, panel)"
-                    [style.height]="filteredInputs === false || (filteredInputs && !filteredInputs[input.name] && !filteredInputs[panel.name] && !filteredForceParent[panel.name]) ? 0 : 'auto'"
+                    [style.height]="filteredInputs === false || (filteredInputs && !filteredInputs[input.name] && !filteredInputs[panel.name] && !filteredForceParent[panel.name]) ? 0 : undefined"
                     [disabled]="panel.disabled && panel.disabled(dialogData, dialogHandler, panel)">
 
                     <!-- Panel header -->
                     <mat-expansion-panel-header>
                       <mat-panel-title>{{panel.placeholder | translate}}</mat-panel-title>
+                      <mat-panel-description
+                        *ngIf="panel.iconButton"
+                        fxLayoutAlign="end">
+                        <button
+                          type="button"
+                          mat-icon-button
+                          [color]="panel.iconButton.color"
+                          [disabled]="panel.iconButton.disabled && panel.iconButton.disabled(dialogData, dialogHandler, panel.iconButton)"
+                          (click)="$event.stopPropagation(); panel.iconButton.click(dialogData, dialogHandler, panel.iconButton);"><mat-icon>{{panel.iconButton.icon}}</mat-icon></button>
+                      </mat-panel-description>
                     </mat-expansion-panel-header>
 
                     <!-- Inputs -->

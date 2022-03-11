@@ -7,7 +7,6 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { ReportCasesWithOnsetModel } from '../../../../core/models/report-cases-with-onset.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { EntityType } from '../../../../core/models/entity-type';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { catchError, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
@@ -17,6 +16,7 @@ import { throwError } from 'rxjs/internal/observable/throwError';
 import { CaseModel } from '../../../../core/models/case.model';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-report-cases-date-onset-list',
@@ -177,7 +177,7 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
   constructor(
     protected listHelperService: ListHelperService,
     private router: Router,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
     private relationshipDataService: RelationshipDataService
   ) {
@@ -259,7 +259,7 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
         .getCasesWithDateOnsetBeforePrimaryCase(this.selectedOutbreak.id)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             finishCallback([]);
             return throwError(err);
           }),

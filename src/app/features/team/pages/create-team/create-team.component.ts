@@ -4,7 +4,6 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { UserModel } from '../../../../core/models/user.model';
@@ -18,6 +17,7 @@ import { catchError } from 'rxjs/operators';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-create-team',
@@ -46,7 +46,7 @@ export class CreateTeamComponent
     private router: Router,
     private teamDataService: TeamDataService,
     private userDataService: UserDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     private dialogService: DialogService,
     private authDataService: AuthDataService,
@@ -104,12 +104,12 @@ export class CreateTeamComponent
               .createTeam(dirtyFields)
               .pipe(
                 catchError((err) => {
-                  this.snackbarService.showApiError(err);
+                  this.toastV2Service.error(err);
                   return throwError(err);
                 })
               )
               .subscribe((newTeam: TeamModel) => {
-                this.snackbarService.showSuccess('LNG_PAGE_CREATE_TEAM_ACTION_CREATE_TEAM_SUCCESS_MESSAGE');
+                this.toastV2Service.success('LNG_PAGE_CREATE_TEAM_ACTION_CREATE_TEAM_SUCCESS_MESSAGE');
 
                 // navigate to proper page
                 // method handles disableDirtyConfirm too...

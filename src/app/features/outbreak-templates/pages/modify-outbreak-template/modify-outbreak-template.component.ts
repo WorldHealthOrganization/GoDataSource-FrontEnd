@@ -9,13 +9,13 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-modify-outbreak-template',
@@ -48,7 +48,7 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
     private referenceDataDataService: ReferenceDataDataService,
     private outbreakTemplateDataService: OutbreakTemplateDataService,
     private formHelper: FormHelperService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private authDataService: AuthDataService,
     protected dialogService: DialogService
   ) {
@@ -142,7 +142,7 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
       .modifyOutbreakTemplate(this.outbreakTemplateId, dirtyFields)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           // hide loading
           this.hideLoadingDialog();
           return throwError(err);
@@ -156,7 +156,7 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
         form.form.markAsPristine();
 
         // display message
-        this.snackbarService.showSuccess('LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE');
 
         // update breadcrumbs
         this.initializeBreadcrumbs();

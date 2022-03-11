@@ -5,7 +5,6 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
@@ -44,6 +43,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-create-contact',
@@ -189,7 +189,7 @@ export class CreateContactComponent
     private contactDataService: ContactDataService,
     private entityDataService: EntityDataService,
     private outbreakDataService: OutbreakDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
     private relationshipDataService: RelationshipDataService,
     private referenceDataDataService: ReferenceDataDataService,
@@ -244,7 +244,7 @@ export class CreateContactComponent
           !this.entityType ||
                     !this.entityId
         ) {
-          this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_WARNING_CASE_OR_EVENT_REQUIRED');
+          this.toastV2Service.success('LNG_PAGE_CREATE_CONTACT_WARNING_CASE_OR_EVENT_REQUIRED');
 
           // navigate to Cases/Events listing page
           this.disableDirtyConfirm();
@@ -263,7 +263,7 @@ export class CreateContactComponent
           .pipe(
             catchError((err) => {
               // show error message
-              this.snackbarService.showApiError(err);
+              this.toastV2Service.error(err);
 
               // redirect to cases
               this.disableDirtyConfirm();
@@ -309,7 +309,7 @@ export class CreateContactComponent
               .pipe(
                 catchError((err) => {
                   // show error message
-                  this.snackbarService.showApiError(err);
+                  this.toastV2Service.error(err);
 
                   // navigate to Cases/Events listing page
                   this.disableDirtyConfirm();
@@ -446,7 +446,7 @@ export class CreateContactComponent
         )
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
 
             // hide dialog
             loadingDialog.close();
@@ -465,7 +465,7 @@ export class CreateContactComponent
             .pipe(
               catchError((err) => {
                 // display error message
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
 
                 // remove contact
                 this.contactDataService
@@ -482,7 +482,7 @@ export class CreateContactComponent
             .subscribe(() => {
               // called when we finished creating contact
               const finishedCreatingContact = () => {
-                this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
+                this.toastV2Service.success('LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
 
                 // hide dialog
                 loadingDialog.close();
@@ -531,7 +531,7 @@ export class CreateContactComponent
                   )
                   .pipe(
                     catchError((err) => {
-                      this.snackbarService.showApiError(err);
+                      this.toastV2Service.error(err);
 
                       // hide dialog
                       loadingDialog.close();
@@ -569,7 +569,7 @@ export class CreateContactComponent
           )
           .pipe(
             catchError((err) => {
-              this.snackbarService.showApiError(err);
+              this.toastV2Service.error(err);
 
               // hide dialog
               loadingDialog.close();
