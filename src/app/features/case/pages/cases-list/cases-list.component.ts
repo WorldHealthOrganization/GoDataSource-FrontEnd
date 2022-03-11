@@ -551,7 +551,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
               this.selectedOutbreak,
               item
             );
-          }
+          },
+          disabled: (data) => !RelationshipModel.canList(this.authUser) || !data.canListRelationshipContacts(this.authUser)
         },
         {
           field: 'numberOfExposures',
@@ -572,7 +573,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
               this.selectedOutbreak,
               item
             );
-          }
+          },
+          disabled: (data) => !RelationshipModel.canList(this.authUser) || !data.canListRelationshipExposures(this.authUser)
         }
       );
     }
