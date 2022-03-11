@@ -5,6 +5,9 @@
 @import "~@ag-grid-community/core/dist/styles/ag-grid.css";
 @import "~@ag-grid-community/core/dist/styles/ag-theme-balham.css";
 
+/* Toastr */
+@import '~ngx-toastr/toastr';
+
 /* Global Components */
 @import './components/overlay';
 @import './components/button';
