@@ -1,6 +1,16 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
-import { IV2SideDialogConfig, IV2SideDialogConfigButton, IV2SideDialogConfigButtonType, IV2SideDialogData, IV2SideDialogHandler, IV2SideDialogResponse, V2SideDialogConfigInputType } from './models/side-dialog-config.model';
+import {
+  IV2SideDialogConfig,
+  IV2SideDialogConfigButton,
+  IV2SideDialogConfigButtonType,
+  IV2SideDialogConfigInputAccordionPanel,
+  IV2SideDialogData,
+  IV2SideDialogHandler,
+  IV2SideDialogResponse,
+  V2SideDialogConfigInput,
+  V2SideDialogConfigInputType
+} from './models/side-dialog-config.model';
 import { Observable, Subscriber } from 'rxjs';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v2';
@@ -53,6 +63,25 @@ export class AppSideDialogV2Component implements OnDestroy {
 
         // update UI
         this.changeDetectorRef.detectChanges();
+      }
+    },
+
+    // buttons
+    buttons: {
+      click: (buttonKey) => {
+        // nothing to do ?
+        if (!this.config) {
+          return;
+        }
+
+        // find button
+        const button = this.config.bottomButtons.find((item) => item.key === buttonKey);
+        if (!button) {
+          return;
+        }
+
+        // click button
+        this.clickedButton(button);
       }
     },
 
@@ -136,6 +165,9 @@ export class AppSideDialogV2Component implements OnDestroy {
 
   // visible inputs
   filteredInputs: {
+    [name: string]: true
+  } | false;
+  filteredForceParent: {
     [name: string]: true
   } | false;
 
@@ -240,6 +272,7 @@ export class AppSideDialogV2Component implements OnDestroy {
     this.config = undefined;
     this.filterByValue = undefined;
     this.filteredInputs = undefined;
+    this.filteredForceParent = undefined;
     this.dialogData = undefined;
     this.loading = undefined;
 
@@ -327,6 +360,7 @@ export class AppSideDialogV2Component implements OnDestroy {
     ) {
       // reset
       this.filteredInputs = undefined;
+      this.filteredForceParent = undefined;
 
       // finished
       return;
@@ -341,28 +375,60 @@ export class AppSideDialogV2Component implements OnDestroy {
     if (!this.filterByValue) {
       // reset
       this.filteredInputs = undefined;
+      this.filteredForceParent = undefined;
 
       // finished
       return;
     }
 
-    // filter inputs
+    // search recursively
     this.filteredInputs = {};
-    let foundMatch: boolean = false;
-    this.config.inputs.forEach((item) => {
-      if (
-        item.name &&
-        item.placeholder &&
-        this.i18nService.instant(item.placeholder).toLowerCase().indexOf(this.filterByValue) > -1
-      ) {
-        this.filteredInputs[item.name] = true;
-        foundMatch = true;
-      }
-    });
+    this.filteredForceParent = {};
+    const deepSearch = (inputs: (V2SideDialogConfigInput | IV2SideDialogConfigInputAccordionPanel)[]): boolean => {
+      // determine if at least one child is visible
+      let childVisible: boolean = false;
+
+      // go through children
+      inputs.forEach((input) => {
+        // determine if parent should be visible
+        if (
+          input.name &&
+          input.placeholder &&
+          this.i18nService.instant(input.placeholder).toLowerCase().indexOf(this.filterByValue) > -1
+        ) {
+          this.filteredInputs[input.name] = true;
+          childVisible = true;
+        }
+
+        // if parent should be visible, no need to filter children, show all of them
+        if (this.filteredInputs[input.name]) {
+          return;
+        }
+
+        // filter if input has children ?
+        if (input.type === V2SideDialogConfigInputType.ACCORDION) {
+          if (deepSearch(input.panels)) {
+            // at least one child is visible, so we should make parent visible too
+            this.filteredForceParent[input.name] = true;
+            childVisible = true;
+          }
+        } else if (input.type === V2SideDialogConfigInputType.ACCORDION_PANEL) {
+          if (deepSearch(input.inputs)) {
+            // at least one child is visible, so we should make parent visible too
+            this.filteredForceParent[input.name] = true;
+            childVisible = true;
+          }
+        }
+      });
+
+      // finished
+      return childVisible;
+    };
 
     // nothing found ?
-    if (!foundMatch) {
+    if (!deepSearch(this.config.inputs)) {
       this.filteredInputs = false;
+      this.filteredForceParent = undefined;
     }
   }
 

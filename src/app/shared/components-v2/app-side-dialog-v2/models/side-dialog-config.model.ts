@@ -77,6 +77,7 @@ export interface IV2SideDialogConfigInputDivider extends IV2SideDialogConfigInpu
 export interface IV2SideDialogConfigInputKeyValue extends IV2SideDialogConfigInputBase {
   // required
   type: V2SideDialogConfigInputType.KEY_VALUE;
+  name: string;
   placeholder: string;
   value: string;
 }
@@ -154,6 +155,7 @@ export interface IV2SideDialogConfigInputNumber extends IV2SideDialogConfigInput
 export interface IV2SideDialogConfigInputLink extends IV2SideDialogConfigInputBase {
   // required
   type: V2SideDialogConfigInputType.LINK;
+  name: string;
   placeholder: string;
   link: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: IV2SideDialogConfigInputLink) => string[];
 
@@ -164,9 +166,10 @@ export interface IV2SideDialogConfigInputLink extends IV2SideDialogConfigInputBa
 /**
  * Side dialog input - accordion panel
  */
-interface IV2SideDialogConfigInputAccordionPanel extends IV2SideDialogConfigInputBase {
+export interface IV2SideDialogConfigInputAccordionPanel extends IV2SideDialogConfigInputBase {
   // required
   type: V2SideDialogConfigInputType.ACCORDION_PANEL;
+  name: string;
   placeholder: string;
   inputs: V2SideDialogConfigInput[];
 }
@@ -177,6 +180,7 @@ interface IV2SideDialogConfigInputAccordionPanel extends IV2SideDialogConfigInpu
 export interface IV2SideDialogConfigInputAccordion extends IV2SideDialogConfigInputBase {
   // required
   type: V2SideDialogConfigInputType.ACCORDION;
+  name: string;
   placeholder: string;
   panels: IV2SideDialogConfigInputAccordionPanel[];
 }
@@ -261,6 +265,9 @@ export interface IV2SideDialogHandler {
   hide: () => void;
   update: {
     inputs: (inputs: V2SideDialogConfigInput[]) => void
+  },
+  buttons: {
+    click: (buttonKey: string) => void
   },
   detectChanges: () => void;
   loading: {

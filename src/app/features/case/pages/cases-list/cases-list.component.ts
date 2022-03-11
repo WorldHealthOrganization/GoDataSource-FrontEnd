@@ -41,7 +41,7 @@ import { IV2BreadcrumbAction } from '../../../../shared/components-v2/app-breadc
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
+import { ExportButtonKey, ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 
 @Component({
@@ -551,7 +551,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
               this.selectedOutbreak,
               item
             );
-          }
+          },
+          disabled: (data) => !RelationshipModel.canList(this.authUser) || !data.canListRelationshipContacts(this.authUser)
         },
         {
           field: 'numberOfExposures',
@@ -572,7 +573,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
               this.selectedOutbreak,
               item
             );
-          }
+          },
+          disabled: (data) => !RelationshipModel.canList(this.authUser) || !data.canListRelationshipExposures(this.authUser)
         }
       );
     }
@@ -1095,6 +1097,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     this.dialogV2Service.showExportData({
                       title: {
                         get: () => 'LNG_PAGE_LIST_CASES_EXPORT_CASE_INVESTIGATION_FORM_TITLE'
+                      },
+                      initialized: (handler) => {
+                        handler.buttons.click(ExportButtonKey.EXPORT);
                       },
                       export: {
                         url: `outbreaks/${this.selectedOutbreak.id}/cases/${item.id}/export-empty-case-investigation`,

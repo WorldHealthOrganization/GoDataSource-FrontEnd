@@ -82,11 +82,13 @@ export class EntityHelperService {
               // construct list of inputs to display
               const entitiesList: IV2SideDialogConfigInputAccordion = {
                 type: V2SideDialogConfigInputType.ACCORDION,
+                name: 'entities-list',
                 placeholder: 'LNG_PAGE_LIST_CASES_DIALOG_ENTITY_SECTION_TITLE',
                 panels: []
               };
               const relationshipList: IV2SideDialogConfigInputAccordion = {
                 type: V2SideDialogConfigInputType.ACCORDION,
+                name: 'relationship-list',
                 placeholder: 'LNG_PAGE_LIST_CASES_DIALOG_ENTITY_RELATIONSHIPS_TITLE',
                 panels: []
               };
@@ -102,6 +104,7 @@ export class EntityHelperService {
                   .forEach((labelValue) => {
                     entityInputs.push({
                       type: V2SideDialogConfigInputType.KEY_VALUE,
+                      name: `entities-list-key-value-${relationshipData.model.id}-${labelValue.label}`,
                       placeholder: labelValue.label,
                       value: labelValue.value
                     });
@@ -110,6 +113,7 @@ export class EntityHelperService {
                 // View full resource link
                 entityInputs.push({
                   type: V2SideDialogConfigInputType.LINK,
+                  name: `entities-list-view-list-${relationshipData.model.id}`,
                   placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_FULL_RESOURCE',
                   link: () => [
                     EntityModel.getLinkForEntityType(relationshipData.model.type),
@@ -122,6 +126,7 @@ export class EntityHelperService {
                 // add entities to the list
                 entitiesList.panels.push({
                   type: V2SideDialogConfigInputType.ACCORDION_PANEL,
+                  name: `entities-list-panels-${relationshipData.model.id}`,
                   placeholder: relationshipData.model.name,
                   inputs: entityInputs
                 });
@@ -137,6 +142,7 @@ export class EntityHelperService {
                   .forEach((labelValue) => {
                     relationshipsInputs.push({
                       type: V2SideDialogConfigInputType.KEY_VALUE,
+                      name: `relationship-list-key-value-${relationshipData.relationship.id}-${labelValue.label}`,
                       placeholder: labelValue.label,
                       value: labelValue.value
                     });
@@ -146,6 +152,7 @@ export class EntityHelperService {
                 const sourcePerson = relationshipData.relationship.sourcePerson;
                 relationshipsInputs.push({
                   type: V2SideDialogConfigInputType.LINK,
+                  name: `relationship-list-view-list-${relationshipData.relationship.id}`,
                   placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_FULL_RESOURCE',
                   link: () => [
                     `/relationships/${sourcePerson.type}/${sourcePerson.id}/contacts/${relationshipData.relationship.id}/view`
@@ -155,6 +162,7 @@ export class EntityHelperService {
                 // add relationships to the list
                 relationshipList.panels.push({
                   type: V2SideDialogConfigInputType.ACCORDION_PANEL,
+                  name: `entities-list-panels-${relationshipData.relationship.id}`,
                   placeholder: from === SentFromColumn.CONTACTS ?
                     `${entity.name} - ${relationshipData.model.name}` :
                     `${entity.name} - ${relationshipData.model.name}`,
@@ -168,6 +176,7 @@ export class EntityHelperService {
               handler.update.inputs([
                 {
                   type: V2SideDialogConfigInputType.LINK,
+                  name: 'view-main-entity',
                   placeholder: from === SentFromColumn.CONTACTS ?
                     'LNG_DIALOG_GENERAL_DIALOG_LINK_FULL_LIST_CONTACTS' :
                     'LNG_DIALOG_GENERAL_DIALOG_LINK_FULL_LIST_EXPOSURES',
@@ -406,158 +415,4 @@ export class EntityHelperService {
       entity
     );
   }
-
-
-
-
-
-
-
-  // /**
-  //  * Display dialog with entities and related relationships
-  //  */
-  // displayEntitiesAndRelationships(
-  //   from: SentFromColumn,
-  //   entity: CaseModel | ContactModel | EventModel | ContactOfContactModel,
-  //   relationshipsData: EntityModel[]
-  // ) {
-  //   if (!_.isEmpty(relationshipsData)) {
-  //     // split relationships data into entities and relationships
-  //     // entities collection
-  //     const entities: DialogField[] = [];
-  //
-  //     // add links to list relationship page only if we're allowed to view that page
-  //     const authUser: UserModel = this.authDataService.getAuthenticatedUser();
-  //     if (
-  //       RelationshipModel.canList(authUser) && (
-  //         from === SentFromColumn.CONTACTS ?
-  //           entity.canListRelationshipContacts(authUser) :
-  //           entity.canListRelationshipExposures(authUser)
-  //       )
-  //     ) {
-  //       entities.push(
-  //         // add link to full resource
-  //         new DialogField({
-  //           name: 'link',
-  //           fieldType: DialogFieldType.LINK,
-  //           routerLink: [
-  //             from === SentFromColumn.CONTACTS ?
-  //               `/relationships/${entity.type}/${entity.id}/contacts` :
-  //               `/relationships/${entity.type}/${entity.id}/exposures`
-  //           ],
-  //           placeholder: from === SentFromColumn.CONTACTS ?
-  //             'LNG_DIALOG_GENERAL_DIALOG_LINK_FULL_LIST_CONTACTS' :
-  //             'LNG_DIALOG_GENERAL_DIALOG_LINK_FULL_LIST_EXPOSURES',
-  //           linkTarget: '_blank'
-  //         }),
-  //
-  //         // add section title for entities
-  //         new DialogField({
-  //           name: '_',
-  //           fieldType: DialogFieldType.SECTION_TITLE,
-  //           placeholder: 'LNG_PAGE_LIST_CASES_DIALOG_ENTITY_SECTION_TITLE'
-  //         })
-  //       );
-  //     }
-  //
-  //     // relationships collection
-  //     const relationships: DialogField[] = [
-  //       // add section title for relationships
-  //       new DialogField({
-  //         name: '_',
-  //         fieldType: DialogFieldType.SECTION_TITLE,
-  //         placeholder: 'LNG_PAGE_LIST_CASES_DIALOG_ENTITY_RELATIONSHIPS_TITLE'
-  //       })
-  //     ];
-  //
-  //     // add entities and relationships
-  //     relationshipsData.forEach((relationshipData) => {
-  //       // add entities to the list
-  //       entities.push(new DialogField({
-  //         name: '_',
-  //         fieldType: DialogFieldType.ACTION,
-  //         placeholder: relationshipData.model.name,
-  //         actionData: relationshipData.model,
-  //         actionCallback: relationshipData.model.canView(authUser) ? ((item) => {
-  //           // show entity information
-  //           this.dialogService.showCustomDialog(
-  //             ViewCotNodeDialogComponent,
-  //             {
-  //               ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
-  //               ...{
-  //                 data: {
-  //                   entity: item
-  //                 }
-  //               }
-  //             }
-  //           );
-  //         }) : null
-  //       }));
-  //
-  //       // construct relationship label for dialog
-  //       let relationshipLabel: string = '';
-  //       switch (from) {
-  //         case SentFromColumn.CONTACTS:
-  //           relationshipLabel = `${entity.name} - ${relationshipData.model.name}`;
-  //           break;
-  //         case SentFromColumn.EXPOSURES:
-  //           relationshipLabel = `${entity.name} - ${relationshipData.model.name}`;
-  //           break;
-  //       }
-  //
-  //       // add related entities into relationship people to display relationship dialog
-  //       relationshipData.relationship.people = [
-  //         new EntityModel(entity),
-  //         new EntityModel(relationshipData.model)
-  //       ];
-  //
-  //       // add relationships to the list
-  //       relationships.push(new DialogField({
-  //         name: '_',
-  //         fieldType: DialogFieldType.ACTION,
-  //         placeholder: relationshipLabel,
-  //         actionData: relationshipData.relationship,
-  //         actionCallback: relationshipData.relationship.canView(authUser) ? ((item) => {
-  //           // show entity information
-  //           this.dialogService.showCustomDialog(
-  //             ViewCotEdgeDialogComponent,
-  //             {
-  //               ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
-  //               ...{
-  //                 data: {
-  //                   relationship: item,
-  //                   showResourceViewPageLink:
-  //                     from === SentFromColumn.EXPOSURES ?
-  //                       relationshipData.model.canViewRelationshipExposures(authUser) :
-  //                       relationshipData.model.canViewRelationshipContacts(authUser)
-  //                 }
-  //               }
-  //             }
-  //           );
-  //         }) : null
-  //       }));
-  //     });
-  //
-  //     // display dialog to choose item from list
-  //     this.dialogService
-  //       .showInput(new DialogConfiguration({
-  //         message: from === 'fromContacts' ?
-  //           'LNG_DIALOG_GENERAL_DIALOG_TITLE_GROUP_CONTACTS_DIALOG_TITLE' :
-  //           'LNG_DIALOG_GENERAL_DIALOG_TITLE_GROUP_EXPOSURES_DIALOG_TITLE',
-  //         buttons: [
-  //           new DialogButton({
-  //             label: 'LNG_COMMON_BUTTON_CLOSE',
-  //             clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
-  //               dialogHandler.close();
-  //             }
-  //           })
-  //         ],
-  //         fieldsList: [
-  //           ...entities,
-  //           ...relationships
-  //         ]
-  //       }))
-  //       .subscribe();
-  //   }
-  // }
 }

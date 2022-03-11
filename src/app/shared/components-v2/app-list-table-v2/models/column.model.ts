@@ -110,6 +110,7 @@ export interface IV2ColumnButton {
   click: (data: any) => void;
 
   // optional
+  disabled?: (data: any) => boolean;
   notVisible?: boolean;
   exclude?: (IV2Column) => boolean;
   pinned?: IV2ColumnPinned | boolean;

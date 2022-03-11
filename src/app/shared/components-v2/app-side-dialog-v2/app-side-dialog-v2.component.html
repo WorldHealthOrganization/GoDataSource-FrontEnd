@@ -189,6 +189,7 @@
                   *ngFor="let panel of input.panels">
                   <mat-expansion-panel
                     *ngIf="!panel.visible || panel.visible(dialogData, dialogHandler, panel)"
+                    [style.height]="filteredInputs === false || (filteredInputs && !filteredInputs[input.name] && !filteredInputs[panel.name] && !filteredForceParent[panel.name]) ? 0 : 'auto'"
                     [disabled]="panel.disabled && panel.disabled(dialogData, dialogHandler, panel)">
 
                     <!-- Panel header -->
@@ -198,7 +199,8 @@
 
                     <!-- Inputs -->
                     <div
-                      *ngFor="let panelInput of panel.inputs">
+                      *ngFor="let panelInput of panel.inputs"
+                      [hidden]="filteredInputs === false || (filteredInputs && !filteredInputs[input.name] && !filteredInputs[panel.name] && !filteredInputs[panelInput.name])">
                       <ng-template
                         [ngTemplateOutlet]="commonPart"
                         [ngTemplateOutletContext]="{ input: panelInput }"></ng-template>
@@ -217,7 +219,7 @@
         <div
           *ngFor="let input of config?.inputs"
           class="gd-app-side-dialog-v2-content-middle-item"
-          [hidden]="filteredInputs === false || (filteredInputs && !filteredInputs[input.name])">
+          [hidden]="filteredInputs === false || (filteredInputs && !filteredInputs[input.name] && !filteredForceParent[input.name])">
           <ng-template
             [ngTemplateOutlet]="commonPart"
             [ngTemplateOutletContext]="{ input }"></ng-template>
@@ -235,7 +237,7 @@
       <!-- Bottom Bar -->
       <div
         [style.visibility]="loading ? 'hidden': 'visible'"
-        fxGrow="0" fxLayout="row" fxLayoutAlign="space-between" fxLayoutGap="1.6rem"
+        fxGrow="0" fxLayout="row" [fxLayoutAlign]="config?.bottomButtons.length > 1 ? 'space-between' : 'end'" fxLayoutGap="1.6rem"
         class="gd-app-side-dialog-v2-content-bottom">
 
         <!-- Buttons -->
