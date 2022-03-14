@@ -169,17 +169,12 @@ export class TopnavComponent implements OnInit, OnDestroy {
         })
       )
       .subscribe((outbreakData) => {
-        // set selected outbreak
-        this.selectedOutbreak = outbreakData;
-
         // hide loading dialog
         loadingDialog.close();
 
         // cache the selected Outbreak
-        this.outbreakDataService.setSelectedOutbreak(this.selectedOutbreak);
-
-        // update ui
-        this.changeDetectorRef.detectChanges();
+        // - no need to change our local variables here, they will be updated by the getSelectedOutbreakSubject listener
+        this.outbreakDataService.setSelectedOutbreak(outbreakData);
       });
   }
 
@@ -207,6 +202,7 @@ export class TopnavComponent implements OnInit, OnDestroy {
         type: V2SideDialogConfigInputType.ACCORDION_PANEL,
         name: `errors-${uuid()}`,
         placeholder: item.title,
+        cssClasses: 'gd-type-error',
         iconButton: {
           icon: 'close',
           color: 'warn',

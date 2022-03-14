@@ -48,6 +48,7 @@ interface IV2SideDialogConfigInputBase {
   data?: any;
   visible?: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: V2SideDialogConfigInput) => boolean;
   disabled?: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: V2SideDialogConfigInput) => boolean;
+  cssClasses?: string;
 }
 
 /**
