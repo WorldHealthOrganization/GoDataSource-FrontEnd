@@ -80,16 +80,22 @@
             }
           }
 
-          .gd-list-table-button {
-            button.mat-flat-button,
-            a.mat-flat-button {
-              line-height: 2.4rem;
-              min-width: 5rem;
-              padding: 0;
+          &.gd-cell-button {
+            .ag-cell-value {
+              width: 100%;
+            }
 
-              .mat-button-focus-overlay,
-              .mat-ripple {
-                display: none;
+            .gd-list-table-button {
+              button.mat-flat-button,
+              a.mat-flat-button {
+                line-height: 2.4rem;
+                padding: 0;
+                width: 100%;
+  
+                .mat-button-focus-overlay,
+                .mat-ripple {
+                  display: none;
+                }
               }
             }
           }
