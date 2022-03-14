@@ -161,7 +161,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
     visible: boolean,
     options: NavItem[]
   }[] = [{
-      label: 'LNG_LAYOUT_MENU_MAIN_MENU_LABEL',
+      label: 'LNG_LAYOUT_MENU_DATA_LABEL',
       visible: false,
       options: [
         new NavItem(
@@ -208,43 +208,6 @@ export class SidenavComponent implements OnInit, OnDestroy {
           () => this.hasOutbreak.apply(this) // provide context to keep this functionality
         ),
         new NavItem(
-          'lab-results-group',
-          'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL',
-          'science',
-          [],
-          [
-            new ChildNavItem(
-              'lab-results',
-              'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL',
-              new PermissionExpression({
-                and: [
-                  PERMISSION.LAB_RESULT_LIST,
-                  new PermissionExpression({
-                    or: [
-                      PERMISSION.CASE_LIST_LAB_RESULT,
-                      PERMISSION.CONTACT_LIST_LAB_RESULT
-                    ]
-                  })
-                ]
-              }),
-              '/lab-results',
-              () => this.hasOutbreak.apply(this) // provide context to keep this functionality
-            ),
-            new ChildNavItem(
-              'gantt-chart',
-              'LNG_LAYOUT_MENU_ITEM_GANTT_CHART',
-              new PermissionExpression({
-                or: [
-                  PERMISSION.GANTT_CHART_VIEW_DELAY_ONSET_LAB_TESTING,
-                  PERMISSION.GANTT_CHART_VIEW_DELAY_ONSET_HOSPITALIZATION
-                ]
-              }),
-              '/lab-results/gantt-chart',
-              () => this.hasOutbreak.apply(this) // provide context to keep this functionality
-            )
-          ]
-        ),
-        new NavItem(
           'contacts-group',
           'LNG_LAYOUT_MENU_ITEM_CONTACTS_LABEL',
           'people',
@@ -289,6 +252,43 @@ export class SidenavComponent implements OnInit, OnDestroy {
           ]
         ),
         new NavItem(
+          'lab-results-group',
+          'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL',
+          'science',
+          [],
+          [
+            new ChildNavItem(
+              'lab-results',
+              'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL',
+              new PermissionExpression({
+                and: [
+                  PERMISSION.LAB_RESULT_LIST,
+                  new PermissionExpression({
+                    or: [
+                      PERMISSION.CASE_LIST_LAB_RESULT,
+                      PERMISSION.CONTACT_LIST_LAB_RESULT
+                    ]
+                  })
+                ]
+              }),
+              '/lab-results',
+              () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+            ),
+            new ChildNavItem(
+              'gantt-chart',
+              'LNG_LAYOUT_MENU_ITEM_GANTT_CHART',
+              new PermissionExpression({
+                or: [
+                  PERMISSION.GANTT_CHART_VIEW_DELAY_ONSET_LAB_TESTING,
+                  PERMISSION.GANTT_CHART_VIEW_DELAY_ONSET_HOSPITALIZATION
+                ]
+              }),
+              '/lab-results/gantt-chart',
+              () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+            )
+          ]
+        ),
+        new NavItem(
           'events',
           'LNG_LAYOUT_MENU_ITEM_EVENTS_LABEL',
           'event_note',
@@ -301,17 +301,6 @@ export class SidenavComponent implements OnInit, OnDestroy {
           () => this.hasOutbreak.apply(this) // provide context to keep this functionality
         ),
         new NavItem(
-          'duplicated-records',
-          'LNG_LAYOUT_MENU_ITEM_DUPLICATED_RECORDS_LABEL',
-          'repeat',
-          [
-            PERMISSION.DUPLICATE_LIST
-          ],
-          [],
-          '/duplicated-records',
-          () => this.hasOutbreak.apply(this) // provide context to keep this functionality
-        ),
-        new NavItem(
           'clusters',
           'LNG_LAYOUT_MENU_ITEM_CLUSTERS_LABEL',
           'group_work',
@@ -320,6 +309,17 @@ export class SidenavComponent implements OnInit, OnDestroy {
           ],
           [],
           '/clusters',
+          () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+        ),
+        new NavItem(
+          'duplicated-records',
+          'LNG_LAYOUT_MENU_ITEM_DUPLICATED_RECORDS_LABEL',
+          'repeat',
+          [
+            PERMISSION.DUPLICATE_LIST
+          ],
+          [],
+          '/duplicated-records',
           () => this.hasOutbreak.apply(this) // provide context to keep this functionality
         ),
         new NavItem(
@@ -375,19 +375,9 @@ export class SidenavComponent implements OnInit, OnDestroy {
         )
       ]
     }, {
-      label: 'LNG_LAYOUT_MENU_GENERAL_MENU_LABEL',
+      label: 'LNG_LAYOUT_MENU_SYSTEM_ADMINISTRATION_LABEL',
       visible: false,
       options: [
-        new NavItem(
-          'help',
-          'LNG_LAYOUT_MENU_ITEM_HELP',
-          'help',
-          [
-            // NO permissions required, only to be authenticated
-          ],
-          [],
-          '/help'
-        ),
         new NavItem(
           'reference-data',
           'LNG_LAYOUT_MENU_ITEM_REFERENCE_DATA_LABEL',
@@ -511,6 +501,16 @@ export class SidenavComponent implements OnInit, OnDestroy {
               '/system-config/backups'
             )
           ]
+        ),
+        new NavItem(
+          'help',
+          'LNG_LAYOUT_MENU_ITEM_HELP',
+          'help',
+          [
+            // NO permissions required, only to be authenticated
+          ],
+          [],
+          '/help'
         )
       ]
     }];
