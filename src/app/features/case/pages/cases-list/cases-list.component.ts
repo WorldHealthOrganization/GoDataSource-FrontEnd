@@ -538,6 +538,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           format: {
             type: V2ColumnFormat.BUTTON
           },
+          cssCellClass: 'gd-cell-button',
           buttonLabel: (item) => (item.numberOfContacts || '').toLocaleString('en'),
           color: 'text',
           click: (item) => {
@@ -560,6 +561,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           format: {
             type: V2ColumnFormat.BUTTON
           },
+          cssCellClass: 'gd-cell-button',
           buttonLabel: (item) => (item.numberOfExposures || '').toLocaleString('en'),
           color: 'text',
           click: (item) => {
@@ -644,7 +646,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         label: 'LNG_COMMON_LABEL_ACTIONS',
         pinned: IV2ColumnPinned.RIGHT,
         notResizable: true,
-        cssCellClasses: 'gd-cell-no-focus',
+        cssCellClass: 'gd-cell-no-focus',
         format: {
           type: V2ColumnFormat.ACTIONS
         },

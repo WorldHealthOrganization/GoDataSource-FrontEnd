@@ -40,7 +40,7 @@ export interface IV2ColumnBasic {
   pinned?: IV2ColumnPinned | boolean;
   notResizable?: boolean;
   link?: (any) => string;
-  cssCellClasses?: string;
+  cssCellClass?: string;
 }
 
 /**
@@ -115,7 +115,7 @@ export interface IV2ColumnButton {
   exclude?: (IV2Column) => boolean;
   pinned?: IV2ColumnPinned | boolean;
   notResizable?: boolean;
-  cssCellClasses?: string;
+  cssCellClass?: string;
 }
 
 /**
@@ -135,7 +135,7 @@ export interface IV2ColumnAction {
   exclude?: (IV2Column) => boolean;
   pinned?: IV2ColumnPinned | boolean;
   notResizable?: boolean;
-  cssCellClasses?: string;
+  cssCellClass?: string;
 }
 
 /**
