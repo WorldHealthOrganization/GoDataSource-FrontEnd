@@ -1,9 +1,11 @@
 @import 'font';
 
+/* Radio button */
 .gd-form-radio-button-group-v2 {
   .mat-radio-button {
     font-family: $gd-font-family;
 
+    /* Radio button label */
     .mat-radio-label {
       .mat-radio-container {
         .mat-radio-outer-circle {
@@ -20,6 +22,7 @@
       }
     }
 
+    /* Radio button types */
     &.mat-primary {
       .mat-radio-label {
         .mat-radio-container {
@@ -80,6 +83,7 @@
       }
     }
 
+    /* Radio button disabled */
     &.mat-radio-disabled {
       .mat-radio-label {
         .mat-radio-container {

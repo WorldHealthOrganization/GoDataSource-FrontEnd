@@ -1,5 +1,6 @@
 @import 'font';
 
+/* Checkbox */
 .gd-form-checkbox-v2 {
   .mat-checkbox {
     font-family: $gd-font-family;
@@ -40,6 +41,7 @@
       }
     }
 
+    /* Checkbox types */
     &.mat-checkbox-indeterminate,
     &.mat-checkbox-checked {
       &.mat-primary {
@@ -60,6 +62,7 @@
         }
       }
 
+      /* Checkbox checked and disabled */
       &.mat-checkbox-disabled {
         .mat-checkbox-frame {
           border-color: var(--gd-secondary);
@@ -71,6 +74,7 @@
       }
     }
 
+    /* Checkbox not checked and disabled */
     &:not(.mat-checkbox-checked) {
       &.mat-checkbox-disabled {
         .mat-checkbox-frame {

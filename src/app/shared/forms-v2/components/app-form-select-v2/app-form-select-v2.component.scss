@@ -1,6 +1,7 @@
 @import 'mixins';
 @import 'font';
 
+/* Select dropdown */
  .cdk-overlay-pane {
    &.gd-cdk-overlay-pane-dropdown {
      margin-top: 5rem;
@@ -18,6 +19,7 @@
    }
  }
 
+/* Select */
 .gd-form-select-v2 {
   width: 100%;
 
@@ -35,6 +37,7 @@
         margin-top: 0;
         padding: 0 1.6rem;
 
+        /* Select borders */
         .mat-form-field-outline {
           color: var(--gd-secondary);
           top: 0;
@@ -58,6 +61,7 @@
           }
         }
 
+        /* Select borders on focus */
         .mat-form-field-outline-thick {
           color: var(--gd-primary);
 
@@ -80,6 +84,7 @@
           }
         }
 
+        /* Select prefix */
         .mat-form-field-prefix {
           left: -0.4rem;
           top: 0.3rem;
@@ -96,6 +101,7 @@
           }
         }
 
+        /* Select middle */
         .mat-form-field-infix {
           border-top: 0 none;
           @include flex(flex);
@@ -108,6 +114,7 @@
             line-height: 2.4rem;
             margin-top: 0;
 
+            /* Select arrow trigger */
             .mat-select-trigger {
               height: 2.4rem;
 
@@ -142,6 +149,7 @@
               }
             }
 
+            /* Select multiple */
             &.mat-select-multiple {
               height: auto;
 
@@ -193,6 +201,7 @@
           }
         }
 
+        /* Select suffix */
         .mat-form-field-suffix {
           top: 0.3rem;
 
@@ -216,6 +225,7 @@
       }
     }
 
+    /* Select focused */
     &:focus,
     &.mat-focused {
       .mat-form-field-wrapper {
@@ -234,6 +244,7 @@
       }
     }
 
+    /* Select disabled */
     &.mat-form-field-disabled {
       .mat-form-field-wrapper {
         .mat-form-field-flex {
@@ -286,6 +297,7 @@
       }
     }
 
+    /* Select invalid */
     &.mat-form-field-invalid {
       .mat-form-field-wrapper {
         .mat-form-field-flex {

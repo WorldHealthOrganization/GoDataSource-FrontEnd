@@ -11,6 +11,7 @@
       border-color: rgba(var(--gd-secondary-rgb), 0.25);
     }
 
+    /* AgGrid header */
     .ag-header {
       background-color: rgba(var(--gd-secondary-rgb), 0.1);
       border-bottom-color: rgba(var(--gd-secondary-rgb), 0.25);
@@ -23,11 +24,13 @@
         border-left-color: rgba(var(--gd-secondary-rgb), 0.25);
       }
   
+      /* AgGrid header row */
       .ag-header-row {
         color: var(--gd-text);
         font-weight: 700;
       }
   
+      /* AgGrid header cell */
       .ag-header-cell,
       .ag-header-group-cell {
         padding: 0.8rem;
@@ -40,7 +43,9 @@
       }
     }
 
+    /* AgGrid content */
     .ag-body-viewport {
+      /* AgGrid content row */
       .ag-row {
         background-color: var(--gd-background);
         border-color: rgba(var(--gd-secondary-rgb), 0.25);
@@ -58,6 +63,7 @@
           background-color: rgba(var(--gd-primary-rgb), 0.1);
         }
 
+        /* AgGrid content cell */
         .ag-cell {
           line-height: 2.4rem;
           padding: 0.8rem;
@@ -90,6 +96,7 @@
         }
       }
 
+      /* AgGrid row focused */
       &.ag-has-focus {
         .ag-cell-focus:not(.ag-cell-range-selected) {
           border-color: var(--gd-primary);
@@ -129,6 +136,7 @@
       }
     }
 
+    /* AgGrid checkboxes */
     .ag-checkbox {
       &.ag-header-select-all {
         margin-right: 0;

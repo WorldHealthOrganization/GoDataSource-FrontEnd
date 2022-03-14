@@ -2,9 +2,11 @@
 @import 'font';
 
 :host {
+  /* Page top section */
   .gd-list-top-tile-buttons {
     padding-bottom: 2.4rem;
 
+    /* Page title */
     .gd-list-top-tile-buttons-title {
       color: var(--gd-primary);
       font-family: $gd-font-family;
@@ -13,6 +15,7 @@
       line-height: $gd-line-height;
     }
 
+    /* Page top buttons */
     .gd-list-top-tile-buttons-buttons {
       .gd-list-top-tile-buttons-button-grouped {
         .mat-icon {
@@ -40,6 +43,7 @@
     }
   }
 
+  /* Summary boxes */
   .gd-list-top-grouped {
     min-height: 2.4rem;
 
@@ -90,6 +94,7 @@
     }
   }
 
+  /* List table */
   .gd-list-table {
     .gd-list-table-header {
       padding: 1.6rem;
@@ -119,6 +124,7 @@
     }
   }
 
+  /* List table pagination area */
   .gd-list-table-bottom {
     @include border-radius(0 0 0.4rem 0.4rem);
     min-height: 4.8rem;

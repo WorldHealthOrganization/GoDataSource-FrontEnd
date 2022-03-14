@@ -11,6 +11,7 @@
       @include box-shadow(0px 3px 1px -2px rgb(0 0 0 / 20%), 0px 2px 2px 0px rgb(0 0 0 / 25%));
     }
 
+    /* Expansion panel header */
     .mat-expansion-panel-header {
       font-family: $gd-font-family;
       font-size: $gd-font-size;
@@ -34,6 +35,7 @@
         }
       }
 
+      /* Expansion panel header expanded */
       &.mat-expanded {
         border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
         @include border-radius(0.4rem 0.4rem 0 0);
@@ -70,6 +72,7 @@
       }
     }
 
+    /* Expansion panel content */
     .mat-expansion-panel-content {
       font-family: $gd-font-family;
       font-size: $gd-font-size;
@@ -82,6 +85,7 @@
       }
     }
 
+    /* Expansion panel expanded */
     &:not(.mat-expanded) {
       .mat-expansion-panel-header {
         &:not([aria-disabled=true]) {
@@ -92,6 +96,7 @@
       }
     }
 
+    /* Expansion panel type error */
     &.gd-type-error {
       border: 0 none;
       color: var(--gd-background);
@@ -159,6 +164,7 @@
       }
     }
 
+    /* Expansion panel not expandable */
     &.gd-app-side-dialog-v2-content-middle-item-input-panel-not-expandable {
       pointer-events: none;
 

@@ -1,6 +1,7 @@
 @import 'mixins';
 @import 'font';
 
+/* Slide-in panel */
 .gd-app-side-dialog-v2 {
   &.mat-drawer-container {
     background-color: var(--gd-background);
@@ -13,6 +14,7 @@
     }
   }
 
+  /* Overlay */
   .mat-drawer-backdrop {
     background-color: rgba(0, 0, 0, 0.85);
     display: block;
@@ -33,11 +35,13 @@
       min-width: 33rem;
       position: relative;
 
+      /* Slide-in panel header */
       .gd-app-side-dialog-v2-content-top {
         .gd-app-side-dialog-v2-content-tb {
           border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
           padding: 1.6rem;
 
+          /* Slide-in panel title */
           .gd-app-side-dialog-v2-content-top-title {
             font-family: $gd-font-family;
             font-size: 1.8rem;
@@ -48,6 +52,7 @@
             white-space: nowrap;
           }
 
+          /* Slide-in panel close button */
           .gd-app-side-dialog-v2-content-top-close {
             height: 3.7rem;
             margin-left: 1.6rem;
@@ -55,6 +60,7 @@
           }
         }
 
+        /* Slide-in panel search */
         .gd-app-side-dialog-v2-content-filter {
           border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
 
@@ -93,14 +99,17 @@
         }
       }
 
+      /* Slide-in panel content */
       .gd-app-side-dialog-v2-content-middle {
         overflow-x: hidden;
         overflow-y: overlay;
         padding: 1.6rem;
 
+        /* Slide-in panel content item */
         .gd-app-side-dialog-v2-content-middle-item {
           margin-bottom: 0.8rem;
 
+          /* Slide-in panel divider */
           .gd-app-side-dialog-v2-content-middle-item-input-divider {
             padding-bottom: 0.8rem;
             position: relative;
@@ -116,6 +125,7 @@
               width: calc(100% + 3.2rem);
             }
 
+            /* Slide-in panel divider with title */
             &.gd-app-side-dialog-v2-content-middle-item-input-divider-has-title {
               color: var(--gd-secondary);
               font-size: 1.2rem;
@@ -132,10 +142,12 @@
             }
           }
 
+          /* Slide-in panel checkboxes */
           .gd-form-checkbox-v2 {
             margin-bottom: 1.6rem;
           }
 
+          /* Slide-in panel links */
           .gd-app-side-dialog-v2-content-middle-item-input-link {
             line-height: 2.4rem;
             margin-bottom: 1.6rem;
@@ -147,6 +159,7 @@
             }
           }
 
+          /* Slide-in panel accordions */
           .gd-app-side-dialog-v2-content-middle-item-input-accordion-title {
             color: var(--gd-secondary);
             font-size: 1.2rem;
@@ -223,6 +236,7 @@
           }
         }
 
+        /* Slide-in panel not found */
         .gd-app-side-dialog-v2-content-middle-not-found {
           color: var(--gd-secondary);
           font-size: 1.8rem;
@@ -240,6 +254,7 @@
         }
       }
 
+      /* Slide-in panel footer */
       .gd-app-side-dialog-v2-content-bottom {
         border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
         padding: 1.6rem;
@@ -249,6 +264,7 @@
         }
       }
 
+      /* Slide-in panel loading spinner */
       .gd-app-side-dialog-v2-content-loading {
         left: 50%;
         min-height: 12.8rem;
@@ -265,6 +281,17 @@
 
         .gd-app-side-dialog-v2-content-loading-message {
           height: 4.8rem;
+        }
+      }
+    }
+
+    &.ng-animating {
+      .mat-expansion-panel {
+        &:not(.gd-main-menu-option) {
+          .mat-expansion-panel-content {
+            height: 0;
+            visibility: hidden;
+          }
         }
       }
     }

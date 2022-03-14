@@ -11,6 +11,7 @@
     padding: 0.8rem;
   }
 
+  /* Pagination select */
   .mat-paginator-page-size {
     @include flex_align_items(center);
     margin-right: 0;
@@ -54,6 +55,7 @@
     margin: 0 2.4rem;
   }
 
+  /* Pagination nav buttons */
   .mat-paginator-navigation-next {
     margin-left: 0.8rem;
   }
