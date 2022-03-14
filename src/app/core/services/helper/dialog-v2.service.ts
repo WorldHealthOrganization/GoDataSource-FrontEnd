@@ -80,7 +80,9 @@ export class DialogV2Service {
     // display dialog
     const dialog: MatDialogRef<AppLoadingDialogV2Component> = this.matDialog.open(
       AppLoadingDialogV2Component, {
+        restoreFocus: false,
         autoFocus: false,
+        delayFocusTrap: false,
         closeOnNavigation: false,
         disableClose: true,
         hasBackdrop: true,

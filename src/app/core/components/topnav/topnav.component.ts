@@ -12,6 +12,7 @@ import { ToastV2Service } from '../../services/helper/toast-v2.service';
 import { DialogV2Service } from '../../services/helper/dialog-v2.service';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputAccordion, V2SideDialogConfigInputType } from '../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { v4 as uuid } from 'uuid';
+import { IV2LoadingDialogHandler } from '../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
 
 @Component({
   selector: 'app-topnav',
@@ -48,6 +49,9 @@ export class TopnavComponent implements OnInit, OnDestroy {
 
   // outbreak list
   outbreakListOptions: ILabelValuePairModel[] = [];
+
+  // loading handler
+  private loadingHandler: IV2LoadingDialogHandler;
 
   /**
    * Constructor
@@ -107,6 +111,9 @@ export class TopnavComponent implements OnInit, OnDestroy {
       this.historyChangedSubscription.unsubscribe();
       this.historyChangedSubscription = null;
     }
+
+    // close loading handler
+    this.hideLoading();
   }
 
   /**
@@ -149,11 +156,35 @@ export class TopnavComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Show loading
+   */
+  showLoading(): void {
+    // already visible ?
+    if (this.loadingHandler) {
+      return;
+    }
+
+    // show
+    this.loadingHandler = this.dialogV2Service.showLoadingDialog();
+  }
+
+  /**
+   * Hide loading
+   */
+  hideLoading(): void {
+    // close loading handler
+    if (this.loadingHandler) {
+      this.loadingHandler.close();
+      this.loadingHandler = undefined;
+    }
+  }
+
+  /**
    * Change the selected Outbreak across the application
    */
   selectOutbreak(outbreakId: string) {
     // show loading
-    const loadingDialog = this.dialogV2Service.showLoadingDialog();
+    this.showLoading();
 
     // update ui
     this.changeDetectorRef.detectChanges();
@@ -163,18 +194,23 @@ export class TopnavComponent implements OnInit, OnDestroy {
       .getOutbreak(outbreakId)
       .pipe(
         catchError((err) => {
+          // error
           this.toastV2Service.error(err);
-          loadingDialog.close();
+
+          // hide loading
+          this.hideLoading();
+
+          // send it further
           return throwError(err);
         })
       )
       .subscribe((outbreakData) => {
-        // hide loading dialog
-        loadingDialog.close();
-
         // cache the selected Outbreak
         // - no need to change our local variables here, they will be updated by the getSelectedOutbreakSubject listener
         this.outbreakDataService.setSelectedOutbreak(outbreakData);
+
+        // hide loading
+        this.hideLoading();
       });
   }
 
@@ -228,7 +264,7 @@ export class TopnavComponent implements OnInit, OnDestroy {
             handler.detectChanges();
           }
         },
-        inputs: [{
+        inputs: !item.details || !item.details.trim() ? [] : [{
           type: V2SideDialogConfigInputType.HTML,
           name: `errors-long-${uuid()}`,
           placeholder: item.details
