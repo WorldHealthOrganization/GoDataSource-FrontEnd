@@ -156,6 +156,10 @@
             padding-bottom: 0;
             text-transform: uppercase;
             white-space: nowrap;
+
+            &:empty {
+              display: none;
+            }
           }
 
           .gd-app-side-dialog-v2-content-middle-item-input-accordion {

@@ -9,8 +9,7 @@
 
     .gd-form-input-v2 {
       .mat-form-field {
-        max-width: 38rem;
-        width: 100%;
+        min-width: 38rem;
 
         .mat-form-field-wrapper {
           background: rgba(var(--gd-secondary-rgb), 0.15);
@@ -39,6 +38,15 @@
             }
           }
         }
+      }
+    }
+  }
+
+  .gd-top-middle {
+    .gd-top-middle-history {
+      &.mat-warn {
+        background-color: rgba(var(--gd-danger-rgb), 0.15);
+        color: var(--gd-danger);
       }
     }
   }

@@ -250,7 +250,7 @@ export class TopnavComponent implements OnInit, OnDestroy {
         bottomButtons: [{
           type: IV2SideDialogConfigButtonType.OTHER,
           label: 'LNG_MULTIPLE_SNACKBAR_BUTTON_CLOSE_ALL',
-          color: 'primary'
+          color: 'warn'
         }, {
           type: IV2SideDialogConfigButtonType.CANCEL,
           label: 'LNG_COMMON_BUTTON_CANCEL',

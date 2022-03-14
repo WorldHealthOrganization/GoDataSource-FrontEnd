@@ -75,6 +75,8 @@
     line-height: $gd-line-height;
 
     .mat-expansion-panel-body {
+      max-height: 25rem;
+      overflow-y: overlay;
       padding: 1.6rem;
     }
   }

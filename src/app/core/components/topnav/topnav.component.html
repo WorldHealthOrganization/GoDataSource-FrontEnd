@@ -26,14 +26,14 @@
     <!-- Toast history -->
     <button
       *ngIf="ToastV2Service.HISTORY.length > 0"
-      fxLayout="row" fxLayoutGap="1.6rem"
+      fxLayout="row"
       class="gd-top-middle-history"
       mat-flat-button
-      color="text"
+      color="warn"
       (click)="displayHistory()">
 
       <!-- Icon -->
-      <mat-icon>error</mat-icon>
+      <mat-icon>warning</mat-icon>
 
       <!-- Message -->
       <div>{{'LNG_COMMON_LABEL_NOTIFICATION_HISTORY' | translate:ToastV2Service.HISTORY}}</div>
