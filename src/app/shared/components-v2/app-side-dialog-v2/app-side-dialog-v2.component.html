@@ -198,7 +198,8 @@
                     class="gd-app-side-dialog-v2-content-middle-item-input-panel {{panel.cssClasses}}"
                     [class.gd-app-side-dialog-v2-content-middle-item-input-panel-not-expandable]="!panel.inputs || panel.inputs.length < 1"
                     [style.height]="filteredInputs === false || (filteredInputs && !filteredInputs[input.name] && !filteredInputs[panel.name] && !filteredForceParent[panel.name]) ? 0 : undefined"
-                    [disabled]="panel.disabled && panel.disabled(dialogData, dialogHandler, panel)">
+                    [disabled]="panel.disabled && panel.disabled(dialogData, dialogHandler, panel)"
+                    togglePosition="before">
 
                     <!-- Panel header -->
                     <mat-expansion-panel-header>
