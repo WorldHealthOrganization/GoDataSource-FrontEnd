@@ -211,12 +211,14 @@
 }
 
 @mixin breakpoint($point) {
+  /* Phone */
   @if $point=='xs' {
     @media only screen and (max-width: 767px) {
       @content;
     }
   }
 
+  /* Tablet */
   @else if $point=='gt-xs' {
     @media only screen and (min-width: 768px) {
       @content;
@@ -253,6 +255,7 @@
     }
   }
 
+  /* Laptop */
   @else if $point=='gt-md' {
     @media only screen and (min-width: 1200px) {
       @content;
@@ -271,6 +274,7 @@
     }
   }
 
+  /* Desktop */
   @else if $point=='gt-lg' {
     @media only screen and (min-width: 1600px) {
       @content;
