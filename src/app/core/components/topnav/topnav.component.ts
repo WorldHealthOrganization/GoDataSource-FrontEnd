@@ -264,7 +264,7 @@ export class TopnavComponent implements OnInit, OnDestroy {
             handler.detectChanges();
           }
         },
-        inputs: [{
+        inputs: !item.details || !item.details.trim() ? [] : [{
           type: V2SideDialogConfigInputType.HTML,
           name: `errors-long-${uuid()}`,
           placeholder: item.details
