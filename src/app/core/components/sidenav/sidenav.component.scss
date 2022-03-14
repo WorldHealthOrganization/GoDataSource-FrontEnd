@@ -2,7 +2,7 @@
 @import 'font';
 
 app-sidenav {
-  // variables
+  /* Variables */
   --gd-version-height: 4.2rem;
 }
 
@@ -20,7 +20,7 @@ app-sidenav {
 .cdk-overlay-pane {
   &.gd-cdk-overlay-pane-main-menu {
     margin-top: -4.8rem;
-    margin-left: 7rem;
+    margin-left: 6.2rem;
 
     &.gd-cdk-overlay-pane-main-menu-above {
       position: relative !important;
@@ -66,7 +66,7 @@ app-sidenav {
 
 /* Main Menu */
 .gd-main-menu {
-  // variables
+  /* Variables */
   --gd-menu-option-active-border-width: 0.7rem;
   --gd-menu-option-height: 4.8rem;
 
@@ -76,7 +76,7 @@ app-sidenav {
   overflow-y: overlay;
   width: 100%;
 
-  // Hide menu scrollbar and show it on hover
+  /* Hide menu scrollbar and show it on hover */
   &::-webkit-scrollbar,
   &::-webkit-scrollbar-thumb {
     @include transition(all 0.24s ease-in-out 0s);
@@ -92,6 +92,7 @@ app-sidenav {
     }
   }
 
+  /* Menu section title */
   .gd-main-menu-group-label {
     color: var(--gd-secondary);
     font-size: 1.2rem;
@@ -107,6 +108,7 @@ app-sidenav {
     }
   }
 
+  /* Menu when sidebar is collapsed */
   &.gd-version-not-visible {
     height: calc(100% - 4.3rem);
     margin-top: 4.3rem;
@@ -125,6 +127,7 @@ app-sidenav {
     }
   }
 
+  /* Menu item */
   .gd-main-menu-option {
     cursor: pointer;
 
@@ -148,11 +151,13 @@ app-sidenav {
         padding: 1.2rem 2.4rem 1.2rem 0;
         width: 100%;
 
+        /* Menu item icon */
         .gd-main-menu-option-label-icon {
           font-size: 2.4rem;
           margin: 0 2.4rem 0 1.7rem;
         }
 
+        /* Menu item text */
         .gd-main-menu-option-label-text {
           overflow: hidden;
           text-overflow: ellipsis;
@@ -161,6 +166,7 @@ app-sidenav {
       }
     }
 
+    /* Menu item hover */
     &:hover {
       > .gd-main-menu-option-header {
         > .gd-main-menu-option-label {
@@ -169,6 +175,7 @@ app-sidenav {
       }
     }
 
+    /* Menu item active */
     &.gd-main-menu-option-active {
       .gd-main-menu-option-header {
         .gd-main-menu-option-label {
@@ -187,6 +194,7 @@ app-sidenav {
       }
     }
 
+    /* Menu parent item */
     &.mat-expansion-panel {
       @include border-radius(0);
       @include box-shadow(none);

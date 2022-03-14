@@ -14,6 +14,7 @@ a.mat-flat-button {
     background: var(--gd-background);
   }
 
+  /* Button disabled */
   &.mat-button-disabled,
   &.mat-button-disabled.mat-button-disabled {
     background-color: rgba(var(--gd-primary-rgb), 0.25);
@@ -26,12 +27,14 @@ a.mat-flat-button {
     }
   }
 
+  /* Button hover */
   &:hover {
     .mat-button-focus-overlay {
       @include opacity(0.1);
     }
   }
 
+  /* Primary button */
   &.mat-primary {
     background-color: var(--gd-primary);
     color: var(--gd-background);
@@ -42,6 +45,7 @@ a.mat-flat-button {
     }
   }
 
+  /* Secondary button */
   &.mat-secondary {
     background-color: rgba(var(--gd-secondary-rgb), 0.35);
     color: var(--gd-text);
@@ -52,6 +56,7 @@ a.mat-flat-button {
     }
   }
 
+  /* Accent button */
   &.mat-accent {
     background-color: var(--gd-success);
     color: var(--gd-background);
@@ -62,6 +67,7 @@ a.mat-flat-button {
     }
   }
 
+  /* Warn button */
   &.mat-warn {
     background-color: var(--gd-danger);
     color: var(--gd-background);
@@ -72,6 +78,7 @@ a.mat-flat-button {
     }
   }
 
+  /* Text button */
   &.mat-text {
     background-color: transparent;
     color: var(--gd-primary);

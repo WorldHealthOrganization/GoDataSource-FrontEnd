@@ -1,6 +1,7 @@
 @import 'mixins';
 @import 'font';
 
+/* Input number */
 .gd-form-number-v2 {
   width: 100%;
 
@@ -18,6 +19,7 @@
         margin-top: 0;
         padding: 0 1.6rem;
 
+        /* Input number borders */
         .mat-form-field-outline {
           color: var(--gd-secondary);
           top: 0;
@@ -41,6 +43,7 @@
           }
         }
 
+        /* Input number borders on focus */
         .mat-form-field-outline-thick {
           color: var(--gd-primary);
 
@@ -63,6 +66,7 @@
           }
         }
 
+        /* Input number middle */
         .mat-form-field-infix {
           border-top: 0 none;
           @include flex(flex);
@@ -90,6 +94,7 @@
       }
     }
 
+    /* Input number focused */
     &:focus,
     &.mat-focused,
     &.mat-form-field-should-float {
@@ -108,6 +113,7 @@
       }
     }
 
+    /* Input number disabled */
     &.mat-form-field-disabled {
       .mat-form-field-wrapper {
         .mat-form-field-flex {
@@ -128,6 +134,7 @@
       }
     }
 
+    /* Input number invalid */
     &.mat-form-field-invalid {
       .mat-form-field-wrapper {
         .mat-form-field-flex {

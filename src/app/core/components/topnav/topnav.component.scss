@@ -1,12 +1,15 @@
 @import 'mixins';
 @import 'font';
 
+/* Header */
 .gd-top {
   height: 100%;
 
+  /* Header left */
   .gd-top-left {
     padding-left: 4rem;
 
+    /* Search */
     .gd-form-input-v2 {
       .mat-form-field {
         min-width: 38rem;
@@ -42,6 +45,7 @@
     }
   }
 
+  /* Header middle */
   .gd-top-middle {
     .gd-top-middle-history {
       &.mat-warn {
@@ -51,9 +55,11 @@
     }
   }
 
+  /* Header right */
   .gd-top-right {
     padding-right: 4rem;
 
+    /* Selected outbreak */
     .gd-form-select-v2 {
       .mat-form-field {
         min-width: 38rem;
@@ -64,6 +70,7 @@
       }
     }
 
+    /* Header buttons */
     button.mat-icon-button {
       background: transparent;
       @include border-radius(0);
@@ -75,6 +82,7 @@
         font-size: 2.4rem;
       }
 
+      /* User button */
       &.gd-top-right-user {
         background: var(--gd-primary);
         @include border-radius(50%);

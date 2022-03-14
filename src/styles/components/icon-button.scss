@@ -1,5 +1,4 @@
-/* Icon Button */
-/* Buttons */
+/* Icon button */
 button.mat-icon-button,
 a.mat-icon-button {
   background: rgba(var(--gd-secondary-rgb), 0.35);
@@ -18,6 +17,7 @@ a.mat-icon-button {
     background: var(--gd-background);
   }
 
+  /* Icon button disabled */
   &.mat-button-disabled,
   &.mat-button-disabled.mat-button-disabled {
     background-color: rgba(var(--gd-secondary-rgb), 0.15);
@@ -30,12 +30,14 @@ a.mat-icon-button {
     }
   }
 
+  /* Icon button hover */
   &:hover {
     .mat-button-focus-overlay {
       @include opacity(0.25);
     }
   }
 
+  /* Icon button types */
   &.mat-primary {
     background-color: var(--gd-primary);
     color: var(--gd-background);

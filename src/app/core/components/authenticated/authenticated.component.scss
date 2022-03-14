@@ -1,12 +1,12 @@
 @import 'mixins';
 
 mat-sidenav-container {
-  // Variables
+  /* Variables */
   --gd-menu-width-expanded: 33rem;
   --gd-menu-width-collapsed: 7rem;
   --gd-top-bar-height: 7rem;
 
-  // Authenticated body layout
+  /* Authenticated body layout */
   &.gd-body-content {
     background-color: transparent;
     color: var(--gd-text);
@@ -16,7 +16,7 @@ mat-sidenav-container {
     padding: 0;
     width: 100vw;
 
-    // Left side
+    /* Left side */
     .gd-body-content-left {
       border-right: 0 none;
       @include box-shadow(0.2rem 7rem 0.2rem rgba(var(--gd-text-rgb), 0.1));
@@ -25,12 +25,12 @@ mat-sidenav-container {
       @include transition(all 0.24s ease-in-out 0s);
       width: var(--gd-menu-width-collapsed);
 
-      // Left content
+      /* Left content */
       .gd-body-content-left-content {
         height: 100%;
         overflow: hidden;
 
-        // Logo
+        /* Logo */
         .gd-body-content-left-content-logo {
           cursor: pointer;
           display: block;
@@ -47,12 +47,12 @@ mat-sidenav-container {
           }
         }
 
-        // Menu
+        /* Menu */
         .gd-body-content-left-content-menu {
           height: calc(100% - var(--gd-top-bar-height));
           position: relative;
 
-          // Top gradient which appears only when collapsed menu has scrollbar
+          /* Top gradient which appears only when collapsed menu has scrollbar */
           &:before {
             background: -moz-linear-gradient(top, var(--gd-background) 0%, transparent 100%);
             background: -webkit-linear-gradient(top, var(--gd-background) 0%, transparent 100%);
@@ -73,7 +73,7 @@ mat-sidenav-container {
         }
       }
 
-      // Left side expanded
+      /* Left side expanded */
       &.gd-body-content-left-expanded {
         width: var(--gd-menu-width-expanded);
 
@@ -91,7 +91,7 @@ mat-sidenav-container {
         }
       }
 
-      // Expand / collapse button
+      /* Expand / collapse button */
       .gd-expand-collapse-button {
         background: var(--gd-background);
         border: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.5);
@@ -120,7 +120,7 @@ mat-sidenav-container {
       }
     }
 
-    // Right side
+    /* Right side */
     .gd-body-content-right {
       margin: 0 0 0 var(--gd-menu-width-collapsed);
       @include transition(all 0.24s ease-in-out 0s);
@@ -131,7 +131,7 @@ mat-sidenav-container {
         width: calc(100% - var(--gd-menu-width-expanded));
       }
 
-      // Top bar
+      /* Top bar */
       .gd-body-content-right-top {
         background: var(--gd-background);
         @include box-shadow(0.2rem 0.2rem 0.2rem rgba(var(--gd-text-rgb), 0.1));
@@ -141,7 +141,7 @@ mat-sidenav-container {
         z-index: 1000;
       }
 
-      // Page content
+      /* Page content */
       .gd-body-content-right-bottom {
         background: rgba(var(--gd-secondary-rgb), 0.1);
         color: var(--gd-text);
