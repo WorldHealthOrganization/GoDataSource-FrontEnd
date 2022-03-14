@@ -28,13 +28,6 @@ export class AppComponent implements OnInit {
     // load the default language
     this.i18nService.loadUserLanguage().subscribe();
 
-    // used by OpenLayers
-    // The script below is only needed for old environments like Internet Explorer and Android 4.x
-    const script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = 'https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL';
-    document.head.appendChild(script);
-
     // determine if this is a demo or production instance
     this.systemSettingsDataService
       .getAPIVersion()

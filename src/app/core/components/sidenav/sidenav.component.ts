@@ -199,7 +199,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
         new NavItem(
           'cases',
           'LNG_LAYOUT_MENU_ITEM_CASES_LABEL',
-          'add',
+          'person',
           [
             PERMISSION.CASE_LIST
           ],
@@ -291,7 +291,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
         new NavItem(
           'events',
           'LNG_LAYOUT_MENU_ITEM_EVENTS_LABEL',
-          'event',
+          'event_note',
           [
             PERMISSION.OUTBREAK_VIEW,
             PERMISSION.EVENT_LIST
@@ -303,7 +303,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
         new NavItem(
           'duplicated-records',
           'LNG_LAYOUT_MENU_ITEM_DUPLICATED_RECORDS_LABEL',
-          'file_copy',
+          'repeat',
           [
             PERMISSION.DUPLICATE_LIST
           ],
@@ -325,7 +325,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
         new NavItem(
           'data-visualisation',
           'LNG_LAYOUT_MENU_ITEM_DATA_VISUALISATION',
-          'assignment',
+          'insert_chart_outlined',
           [],
           [
             new ChildNavItem(
@@ -391,7 +391,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
         new NavItem(
           'reference-data',
           'LNG_LAYOUT_MENU_ITEM_REFERENCE_DATA_LABEL',
-          'public',
+          'format_list_bulleted',
           [
             PERMISSION.REFERENCE_DATA_LIST
           ],
