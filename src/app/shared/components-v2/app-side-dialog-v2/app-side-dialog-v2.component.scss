@@ -156,6 +156,10 @@
             padding-bottom: 0;
             text-transform: uppercase;
             white-space: nowrap;
+
+            &:empty {
+              display: none;
+            }
           }
 
           .gd-app-side-dialog-v2-content-middle-item-input-accordion {
@@ -192,6 +196,16 @@
 
                 &:before {
                   display: none;
+                }
+              }
+            }
+
+            .gd-type-error {
+              .mat-expansion-panel-body {
+                .gd-app-side-dialog-v2-content-middle-item-input {
+                  &:before {
+                    display: none;
+                  }
                 }
               }
             }

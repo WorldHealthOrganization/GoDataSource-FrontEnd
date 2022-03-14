@@ -75,6 +75,8 @@
     line-height: $gd-line-height;
 
     .mat-expansion-panel-body {
+      max-height: 25rem;
+      overflow-y: overlay;
       padding: 1.6rem;
     }
   }
@@ -85,6 +87,91 @@
         &:hover {
           background: rgba(var(--gd-secondary-rgb), 0.1);
         }
+      }
+    }
+  }
+
+  &.gd-type-error {
+    border: 0 none;
+    color: var(--gd-background);
+
+    &:not([class*=mat-elevation-z]) {
+      @include box-shadow(none);
+    }
+
+    .mat-expansion-panel-header {
+      background: var(--gd-danger);
+      border-bottom: 0.1rem solid var(--gd-background);
+
+      .mat-content {
+        .mat-expansion-panel-header-title {
+          color: var(--gd-background);
+        }
+
+        .mat-expansion-panel-header-description {
+          button.mat-icon-button {
+            &:hover {
+              .mat-button-focus-overlay {
+                @include opacity(0.5);
+              }
+            }
+          }
+        }
+      }
+
+      .mat-expansion-indicator {
+        &:after {
+          color: var(--gd-background);
+        }
+      }
+
+      &.mat-expanded {
+        background: var(--gd-danger);
+        border-bottom-color: rgba(var(--gd-danger-rgb), 0.15);
+
+        &:hover {
+          background: rgba(var(--gd-danger-rgb), 0.85);
+        }
+      }
+
+      &.cdk-program-focused,
+      &.cdk-keyboard-focused {
+        &:not([aria-disabled=true]) {
+          background: rgba(var(--gd-danger-rgb), 0.85);
+        }
+      }
+    }
+
+    .mat-expansion-panel-content {
+      background: rgba(var(--gd-danger-rgb), 0.15);
+      color: var(--gd-text);
+    }
+
+    &:not(.mat-expanded) {
+      .mat-expansion-panel-header {
+        &:not([aria-disabled=true]) {
+          &:hover {
+            background: rgba(var(--gd-danger-rgb), 0.85);
+          }
+        }
+      }
+    }
+  }
+
+  &.gd-app-side-dialog-v2-content-middle-item-input-panel-not-expandable {
+    pointer-events: none;
+
+    .mat-expansion-panel-header {
+      .mat-expansion-panel-header-description {
+        margin-right: 0;
+
+        button.mat-icon-button {
+          pointer-events: all;
+        }
+      }
+
+      .mat-expansion-indicator {
+        display: none;
       }
     }
   }

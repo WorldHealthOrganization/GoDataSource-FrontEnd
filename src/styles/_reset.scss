@@ -328,3 +328,12 @@ svg:not(:root) {
   /* Support for IE. */
   font-feature-settings: 'liga';
 }
+
+.mat-tooltip-panel {
+  .mat-tooltip {
+    background: var(--gd-text);
+    font-family: $gd-font-family;
+    margin: 0.4rem;
+    padding: 0.4rem 0.8rem;
+  }
+}
