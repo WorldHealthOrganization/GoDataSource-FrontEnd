@@ -199,6 +199,16 @@
                 }
               }
             }
+
+            .gd-type-error {
+              .mat-expansion-panel-body {
+                .gd-app-side-dialog-v2-content-middle-item-input {
+                  &:before {
+                    display: none;
+                  }
+                }
+              }
+            }
           }
 
           .gd-app-side-dialog-v2-content-middle-item-input {
