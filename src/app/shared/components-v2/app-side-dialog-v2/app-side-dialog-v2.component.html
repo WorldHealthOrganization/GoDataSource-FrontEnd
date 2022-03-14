@@ -81,13 +81,13 @@
             <!-- Divider -->
             <div
               *ngSwitchCase="V2SideDialogConfigInputType.DIVIDER"
-              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-divider"
+              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-divider {{input.cssClasses}}"
               [class.gd-app-side-dialog-v2-content-middle-item-input-divider-has-title]="!!input.placeholder">{{input.placeholder | translate}}</div>
 
             <!-- Checkbox -->
             <app-form-checkbox-v2
               *ngSwitchCase="V2SideDialogConfigInputType.CHECKBOX"
-              class="gd-app-side-dialog-v2-content-middle-item-input"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
               [(ngModel)]="input.checked"
               [name]="input.name"
               [placeholder]="input.placeholder"
@@ -98,7 +98,7 @@
             <!-- Text -->
             <app-form-input-v2
               *ngSwitchCase="V2SideDialogConfigInputType.TEXT"
-              class="gd-app-side-dialog-v2-content-middle-item-input"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
               [(ngModel)]="input.value"
               [name]="input.name"
               [placeholder]="input.placeholder"
@@ -109,7 +109,7 @@
             <!-- Number -->
             <app-form-number-v2
               *ngSwitchCase="V2SideDialogConfigInputType.NUMBER"
-              class="gd-app-side-dialog-v2-content-middle-item-input"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
               [(ngModel)]="input.value"
               [name]="input.name"
               [placeholder]="input.placeholder"
@@ -120,7 +120,7 @@
             <!-- Dropdown - single -->
             <app-form-select-v2
               *ngSwitchCase="V2SideDialogConfigInputType.DROPDOWN_SINGLE"
-              class="gd-app-side-dialog-v2-content-middle-item-input"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
               [(ngModel)]="input.value"
               [name]="input.name"
               [placeholder]="input.placeholder"
@@ -132,7 +132,7 @@
             <!-- Dropdown - multiple -->
             <app-form-select-v2
               *ngSwitchCase="V2SideDialogConfigInputType.DROPDOWN_MULTI"
-              class="gd-app-side-dialog-v2-content-middle-item-input"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
               [(ngModel)]="input.values"
               [name]="input.name"
               [placeholder]="input.placeholder"
@@ -145,7 +145,7 @@
             <!-- Key-Value -->
             <div
               *ngSwitchCase="V2SideDialogConfigInputType.KEY_VALUE"
-              class="gd-app-side-dialog-v2-content-middle-item-input"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
               fxLayout="row" fxLayoutAlign="start" fxLayoutGap="1.6rem">
 
               <!-- Key -->
@@ -158,10 +158,10 @@
 
             </div>
 
-            <!-- Long Text -->
+            <!-- HTML -->
             <div
               *ngSwitchCase="V2SideDialogConfigInputType.HTML"
-              class="gd-app-side-dialog-v2-content-middle-item-input"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
               fxLayout="row" fxLayoutGap="1.6rem"
               [innerHTML]="input.placeholder ? (input.placeholder | translate | safeHtml) : undefined">
             </div>
@@ -171,7 +171,7 @@
               *ngSwitchCase="V2SideDialogConfigInputType.LINK"
               mat-flat-button
               color="text"
-              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-link"
+              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-link {{input.cssClasses}}"
               [routerLink]="input.link(dialogData, dialogHandler, input)"
               [queryParams]="input.linkQueryParams ? input.linkQueryParams(dialogData, dialogHandler, input) : undefined"
               [disabled]="input.disabled && input.disabled(dialogData, dialogHandler, input)"
@@ -183,7 +183,7 @@
             <div
               *ngSwitchCase="V2SideDialogConfigInputType.ACCORDION"
               fxLayout="column"
-              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-accordion">
+              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-accordion {{input.cssClasses}}">
 
               <!-- Title -->
               <div
@@ -195,6 +195,7 @@
                   *ngFor="let panel of input.panels">
                   <mat-expansion-panel
                     *ngIf="!panel.visible || panel.visible(dialogData, dialogHandler, panel)"
+                    class="{{panel.cssClasses}}"
                     [style.height]="filteredInputs === false || (filteredInputs && !filteredInputs[input.name] && !filteredInputs[panel.name] && !filteredForceParent[panel.name]) ? 0 : undefined"
                     [disabled]="panel.disabled && panel.disabled(dialogData, dialogHandler, panel)">
 
