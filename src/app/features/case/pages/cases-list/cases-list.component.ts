@@ -360,6 +360,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           type: V2ColumnFormat.STATUS
         },
         notResizable: true,
+        pinned: true,
         legends: [
           // classification
           {
