@@ -90,12 +90,17 @@ interface IV2ActionMenuDivider {
 }
 
 /**
+ * Menu item
+ */
+export type V2ActionMenuItem = IV2ActionMenuOption | IV2ActionMenuDivider;
+
+/**
  * Action Menu
  */
 interface IV2ActionMenu {
   // type
   type: V2ActionType.MENU;
-  menuOptions: (IV2ActionMenuOption | IV2ActionMenuDivider)[];
+  menuOptions: V2ActionMenuItem[];
 
   // optional
   visible?: (data: any) => boolean;
@@ -119,11 +124,6 @@ interface IV2ActionMenuIcon extends IV2ActionMenu {
 export interface IV2ActionMenuLabel extends IV2ActionMenu {
   // required
   label: string;
-  menuOptions: (IV2ActionMenuOption | IV2ActionMenuDivider)[];
-
-  // optional
-  visible?: (data: any) => boolean;
-  disable?: (item: any) => boolean;
 }
 
 /**

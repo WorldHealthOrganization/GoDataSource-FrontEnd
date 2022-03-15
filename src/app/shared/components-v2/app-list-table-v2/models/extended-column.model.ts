@@ -6,5 +6,5 @@ import { IV2Column } from './column.model';
  */
 export interface IExtendedColDef extends ColDef {
   // column definition
-  columnDefinition?: IV2Column;
+  columnDefinition: IV2Column;
 }
