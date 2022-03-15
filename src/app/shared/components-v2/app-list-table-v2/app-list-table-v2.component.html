@@ -305,7 +305,7 @@
     suppressDragLeaveHidesColumns="true"
     [loadingOverlayComponent]="V2LoadingComponent"
     [noRowsOverlayComponent]="V2NoRowsComponent"
-    (firstDataRendered)="firstDataRendered($event)"
+    (firstDataRendered)="firstDataRendered()"
     (dragStopped)="saveVisibleAndOrderOfColumns($event)">
   </ag-grid-angular>
 
@@ -327,15 +327,36 @@
 
   <!-- Table paginator -->
   <div
+    fxLayout="row"
     class="gd-list-table-bottom">
-    <app-mat-paginator-extended
-      [pageIndex]="pageIndex"
-      [countData]="pageCount"
-      [pageSize]="pageSize"
-      [pageSizeOptions]="Constants.PAGE_SIZE_OPTIONS"
-      (page)="changePage($event)"
-      [disabled]="!pageCount">
-    </app-mat-paginator-extended>
+
+    <!-- Left -->
+    <div
+      fxFlex
+      class="gd-list-table-bottom-left">
+
+      <!-- Legends & Messages -->
+      <div
+        *ngFor="let legend of legends"
+        class="gd-list-table-bottom-left-legend"
+        [innerHTML]="legend.html | safeHtml"></div>
+
+    </div>
+
+    <!-- Right -->
+    <div
+      fxGrow="0"
+      class="gd-list-table-bottom-right">
+      <app-mat-paginator-extended
+        [pageIndex]="pageIndex"
+        [countData]="pageCount"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="Constants.PAGE_SIZE_OPTIONS"
+        (page)="changePage($event)"
+        [disabled]="!pageCount">
+      </app-mat-paginator-extended>
+    </div>
+
   </div>
 
 </mat-card>

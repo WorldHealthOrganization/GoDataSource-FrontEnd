@@ -10,9 +10,9 @@ import { DialogField, DialogFieldType } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ApplyListFilter, Constants } from '../../../../core/models/constants';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
-import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategory, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { Params, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
@@ -31,7 +31,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { AddressModel } from '../../../../core/models/address.model';
 import { ExportFieldsGroupModelNameEnum } from '../../../../core/models/export-fields-group.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2ColumnPinned, V2ColumnStatusForm, IV2ColumnStatusFormType, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -43,6 +43,7 @@ import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/ap
 import { ExportButtonKey, ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 
 @Component({
   selector: 'app-cases-list',
@@ -150,10 +151,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   // user list
   userList$: Observable<UserModel[]>;
 
-  caseClassifications$: Observable<any>;
-
   caseClassificationsList$: Observable<any[]>;
-  caseClassificationsListMap: { [id: string]: ReferenceDataEntryModel };
   genderList$: Observable<any[]>;
   yesNoOptionsList$: Observable<any[]>;
   occupationsList$: Observable<any[]>;
@@ -212,6 +210,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    */
   constructor(
     protected listHelperService: ListHelperService,
+    private activatedRoute: ActivatedRoute,
     private router: Router,
     private caseDataService: CaseDataService,
     private toastV2Service: ToastV2Service,
@@ -238,25 +237,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
     // reference data
     this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
-    this.caseClassifications$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION).pipe(share());
-    this.caseClassificationsList$ = this.caseClassifications$
-      .pipe(
-        map((data: ReferenceDataCategoryModel) => {
-          return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
-            new LabelValuePair(entry.value, entry.id, null, null, entry.iconUrl)
-          );
-        })
-      );
-    this.caseClassifications$.subscribe((caseClassificationCategory: ReferenceDataCategoryModel) => {
-      this.caseClassificationsListMap = _.transform(
-        caseClassificationCategory.entries,
-        (result, entry: ReferenceDataEntryModel) => {
-          // groupBy won't work here since groupBy will put an array instead of one value
-          result[entry.id] = entry;
-        },
-        {}
-      );
-    });
     this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
     this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
     this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
@@ -372,6 +352,74 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         field: 'visualId',
         label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
         pinned: IV2ColumnPinned.LEFT
+      },
+      {
+        field: 'statuses',
+        label: 'LNG_COMMON_LABEL_STATUSES',
+        format: {
+          type: V2ColumnFormat.STATUS
+        },
+        notResizable: true,
+        legends: [
+          // classification
+          {
+            title: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+            items: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).list.map((item) => {
+              return {
+                form: {
+                  type: IV2ColumnStatusFormType.CIRCLE,
+                  color: item.getColorCode()
+                },
+                label: item.id
+              };
+            })
+          },
+
+          // risk
+          {
+            title: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
+            items: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).list.map((item) => {
+              return {
+                form: {
+                  type: IV2ColumnStatusFormType.TRIANGLE,
+                  color: item.getColorCode()
+                },
+                label: item.id
+              };
+            })
+          }
+        ],
+        forms: (_column, data: CaseModel): V2ColumnStatusForm[] => {
+          // construct list of forms that we need to display
+          const forms: V2ColumnStatusForm[] = [];
+
+          // classification
+          const classification = this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>;
+          if (
+            data.classification &&
+            classification.map[data.classification]
+          ) {
+            forms.push({
+              type: IV2ColumnStatusFormType.CIRCLE,
+              color: classification.map[data.classification].getColorCode()
+            });
+          }
+
+          // risk
+          const risk = this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>;
+          if (
+            data.riskLevel &&
+            risk.map[data.riskLevel]
+          ) {
+            forms.push({
+              type: IV2ColumnStatusFormType.TRIANGLE,
+              color: risk.map[data.riskLevel].getColorCode()
+            });
+          }
+
+          // finished
+          return forms;
+        }
       },
       {
         field: 'classification',
@@ -1521,71 +1569,57 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
               takeUntil(this.destroyed$)
             )
             .subscribe((countResponse) => {
-              this.caseClassifications$
-                .pipe(
-                  // should be the last pipe
-                  takeUntil(this.destroyed$)
-                )
-                .subscribe((refClassificationData: ReferenceDataCategoryModel) => {
-                  // map reference data
-                  const refDataMap: {
-                    [entryId: string]: ReferenceDataEntryModel
-                  } = {};
-                  refClassificationData.entries.forEach((entry) => {
-                    refDataMap[entry.id] = entry;
-                  });
-
-                  // group data
-                  let values: {
-                    label: string,
-                    value: number,
-                    color?: string,
-                    order?: any
-                  }[] = [];
-                  Object.keys(countResponse.classification || {}).forEach((classificationId) => {
-                    values.push({
-                      label: classificationId,
-                      value: countResponse.classification[classificationId].count,
-                      color: refDataMap[classificationId] ? refDataMap[classificationId].getColorCode() : Constants.DEFAULT_COLOR_REF_DATA,
-                      order: refDataMap[classificationId].order !== undefined ?
-                        refDataMap[classificationId].order :
-                        Number.MAX_SAFE_INTEGER
-                    });
-                  });
-
-                  // sort values either by order or label natural order
-                  values = values.sort((item1, item2) => {
-                    // if same order, compare labels
-                    if (item1.order === item2.order) {
-                      return this.i18nService.instant(item1.label).localeCompare(this.i18nService.instant(item2.label));
-                    }
-
-                    // format order
-                    let order1: number = Number.MAX_SAFE_INTEGER;
-                    try { order1 = parseInt(item1.order, 10); } catch (e) {}
-                    let order2: number = Number.MAX_SAFE_INTEGER;
-                    try { order2 = parseInt(item2.order, 10); } catch (e) {}
-
-                    // compare order
-                    return order1 - order2;
-                  });
-
-                  // set data
-                  gData.data.values = values.map((item) => {
-                    return {
-                      label: item.label,
-                      bgColor: item.color,
-                      textColor: Constants.hexColorToTextColor(item.color),
-                      value: item.value.toLocaleString('en')
-                    };
-                  });
-
-                  // finished loading data
-                  gData.data.loading = false;
-
-                  // refresh ui
-                  refreshUI();
+              // group data
+              const classification = this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>;
+              let values: {
+                label: string,
+                value: number,
+                color?: string,
+                order?: any
+              }[] = [];
+              Object.keys(countResponse.classification || {}).forEach((classificationId) => {
+                values.push({
+                  label: classificationId,
+                  value: countResponse.classification[classificationId].count,
+                  color: classification.map[classificationId] ? classification.map[classificationId].getColorCode() : Constants.DEFAULT_COLOR_REF_DATA,
+                  order: classification.map[classificationId].order !== undefined ?
+                    classification.map[classificationId].order :
+                    Number.MAX_SAFE_INTEGER
                 });
+              });
+
+              // sort values either by order or label natural order
+              values = values.sort((item1, item2) => {
+                // if same order, compare labels
+                if (item1.order === item2.order) {
+                  return this.i18nService.instant(item1.label).localeCompare(this.i18nService.instant(item2.label));
+                }
+
+                // format order
+                let order1: number = Number.MAX_SAFE_INTEGER;
+                try { order1 = parseInt(item1.order, 10); } catch (e) {}
+                let order2: number = Number.MAX_SAFE_INTEGER;
+                try { order2 = parseInt(item2.order, 10); } catch (e) {}
+
+                // compare order
+                return order1 - order2;
+              });
+
+              // set data
+              gData.data.values = values.map((item) => {
+                return {
+                  label: item.label,
+                  bgColor: item.color,
+                  textColor: Constants.hexColorToTextColor(item.color),
+                  value: item.value.toLocaleString('en')
+                };
+              });
+
+              // finished loading data
+              gData.data.loading = false;
+
+              // refresh ui
+              refreshUI();
             });
         }
       }
@@ -1888,6 +1922,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       'middleName',
       'visualId',
       'classification',
+      'riskLevel',
       'outcomeId',
       'dateOfOutcome',
       'age',
@@ -2010,15 +2045,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       .subscribe((response) => {
         this.pageCount = response;
       });
-  }
-
-  /**
-     * Retrieve Case classification color accordingly to Case's Classification value
-     * @param item
-     */
-  getCaseClassificationColor(item: CaseModel) {
-    const classificationData = _.get(this.caseClassificationsListMap, item.classification);
-    return _.get(classificationData, 'colorCode', '');
   }
 
   /**

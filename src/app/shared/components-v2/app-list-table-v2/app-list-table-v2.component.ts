@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Even
 import { BaseModel } from '../../../core/models/base.model';
 import { Observable, throwError } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { ColumnApi, ValueFormatterParams } from '@ag-grid-community/core';
+import { ValueFormatterParams } from '@ag-grid-community/core';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { TranslateService } from '@ngx-translate/core';
 import * as _ from 'lodash';
@@ -11,7 +11,7 @@ import { moment } from '../../../core/helperClasses/x-moment';
 import { Constants } from '../../../core/models/constants';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-import { IV2Column, IV2ColumnAction, IV2ColumnBasic, IV2ColumnBasicFormat, IV2ColumnButton, IV2ColumnPinned, V2ColumnFormat } from './models/column.model';
+import { IV2Column, IV2ColumnAction, IV2ColumnBasic, IV2ColumnBasicFormat, IV2ColumnButton, IV2ColumnPinned, IV2ColumnStatus, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from './models/column.model';
 import { AppListTableV2ActionsComponent } from './components/actions/app-list-table-v2-actions.component';
 import { IExtendedColDef } from './models/extended-column.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
@@ -28,6 +28,7 @@ import { UserModel, UserSettings } from '../../../core/models/user.model';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { catchError } from 'rxjs/operators';
 import { AppListTableV2ButtonComponent } from './components/button/app-list-table-v2-button.component';
+import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 
 /**
  * Component
@@ -39,6 +40,11 @@ import { AppListTableV2ButtonComponent } from './components/button/app-list-tabl
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppListTableV2Component implements OnInit, OnDestroy {
+  // static
+  private static readonly STANDARD_SHAPE_SIZE: number = 12;
+  private static readonly STANDARD_SHAPE_GAP: number = 5;
+  private static readonly STANDARD_SHAPE_PADDING: number = 12;
+
   // records
   recordsSubscription: Subscription;
   private _records$: Observable<BaseModel[]>;
@@ -136,6 +142,12 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     this.updateColumnDefinitions();
   };
 
+  // legends
+  legends: {
+    // required
+    html: string;
+  }[];
+
   // constants
   V2LoadingComponent = V2LoadingComponent;
   V2NoRowsComponent = V2NoRowsComponent;
@@ -153,7 +165,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     protected elementRef: ElementRef,
     protected router: Router,
     protected dialogV2Service: DialogV2Service,
-    protected authDataService: AuthDataService
+    protected authDataService: AuthDataService,
+    protected toastV2Service: ToastV2Service
   ) {}
 
   /**
@@ -240,8 +253,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     this.recordsSubscription = this._records$
       .pipe(
         catchError((err) => {
-          // #TODO
-          // this.toastV2Service.error(err);
+          // show error
+          this.toastV2Service.error(err);
 
           // send error down the road
           return throwError(err);
@@ -256,6 +269,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           this.agTable.api.showNoRowsOverlay();
         }
 
+        // some type of columns should have a fixed width
+        this.adjustFixedSizeColumns();
+
         // re-render page
         this.detectChanges();
       });
@@ -267,6 +283,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   private updateColumnDefinitions(
     overwriteVisibleColumns?: string[]
   ): void {
+    // reset data
+    this.legends = [];
+
     // nothing to do ?
     if (
       !this._columns ||
@@ -384,7 +403,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
       // attach column to list of visible columns
       columnDefs.push({
-        headerName: column.label ?
+        headerName: column.label && column.format?.type !== V2ColumnFormat.STATUS ?
           this.translateService.instant(column.label) :
           '',
         field: column.field,
@@ -398,6 +417,30 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         cellRenderer: this.handleCellRenderer(column),
         suppressMovable: column.format && column.format.type === V2ColumnFormat.ACTIONS
       });
+
+      // update legends
+      if (column.format?.type === V2ColumnFormat.STATUS) {
+        // get column def
+        const statusColumn = column as IV2ColumnStatus;
+
+        // go through legends
+        statusColumn.legends.forEach((legend) => {
+          // render legends
+          let html: string = `<span class="gd-list-table-bottom-left-legend-title">${this.translateService.instant(legend.title)}</span> `;
+
+          // render legend
+          legend.items.forEach((legendItem) => {
+            html += `<span class="gd-list-table-bottom-left-legend-item">
+              ${this.renderStatusForm(legendItem.form, false)} ${this.translateService.instant(legendItem.label)}
+            </span>`;
+          });
+
+          // add to legends to render
+          this.legends.push({
+            html
+          });
+        });
+      }
     };
 
     // determine columns
@@ -527,7 +570,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
               this.i18nService.instant('LNG_COMMON_LABEL_YES') :
               this.i18nService.instant('LNG_COMMON_LABEL_NO');
 
-          // ACTIONS & BUTTONS
+          // nothing to do
+          case V2ColumnFormat.STATUS:
           case V2ColumnFormat.BUTTON:
           case V2ColumnFormat.ACTIONS:
 
@@ -546,6 +590,50 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     return valueFormat.value && typeof valueFormat.value === 'string' ?
       this.translateService.instant(valueFormat.value) :
       valueFormat.value;
+  }
+
+  /**
+   * Render status form
+   */
+  private renderStatusForm(
+    form: V2ColumnStatusForm,
+    addGap: boolean
+  ): string {
+    let statusHtml: string = '';
+    switch (form.type) {
+      case IV2ColumnStatusFormType.CIRCLE:
+        statusHtml += `
+          <svg width="${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" viewBox="0 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}" xmlns="http://www.w3.org/2000/svg">
+            <circle fill="${form.color}" cx="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}" cy="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}" r="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}" />
+          </svg>
+        `;
+
+        // finished
+        break;
+
+      case IV2ColumnStatusFormType.SQUARE:
+        statusHtml += `
+          <svg width="${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" viewBox="0 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}" xmlns="http://www.w3.org/2000/svg">
+            <rect fill="${form.color}" width="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" />
+          </svg>
+        `;
+
+        // finished
+        break;
+
+      case IV2ColumnStatusFormType.TRIANGLE:
+        statusHtml += `
+          <svg width="${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" viewBox="0 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}" xmlns="http://www.w3.org/2000/svg">
+            <polygon fill="${form.color}" points="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2} 0, 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE}, ${AppListTableV2Component.STANDARD_SHAPE_SIZE} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}"/>
+          </svg>
+        `;
+
+        // finished
+        break;
+    }
+
+    // finished
+    return statusHtml;
   }
 
   /**
@@ -578,12 +666,39 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       }
 
       // buttons
-      const actionButton: IV2ColumnButton = column as IV2ColumnButton;
+      const buttonColumn: IV2ColumnButton = column as IV2ColumnButton;
       if (
-        actionButton.format &&
-        actionButton.format.type === V2ColumnFormat.BUTTON
+        buttonColumn.format &&
+        buttonColumn.format.type === V2ColumnFormat.BUTTON
       ) {
         return AppListTableV2ButtonComponent;
+      }
+
+      // status
+      const statusColumn: IV2ColumnStatus = column as IV2ColumnStatus;
+      if (
+        statusColumn.format &&
+        statusColumn.format.type === V2ColumnFormat.STATUS
+      ) {
+        return (params: ValueFormatterParams) => {
+          // determine forms
+          const forms: V2ColumnStatusForm[] = statusColumn.forms(
+            statusColumn,
+            params.data
+          );
+
+          // construct status html
+          let statusHtml: string = '';
+          forms.forEach((form, formIndex) => {
+            statusHtml += this.renderStatusForm(
+              form,
+              formIndex < forms.length - 1
+            );
+          });
+
+          // finished
+          return statusHtml;
+        };
       }
     }
 
@@ -594,11 +709,46 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   /**
    * Grid ready
    */
-  firstDataRendered(event: {
-    columnApi: ColumnApi
-  }): void {
+  firstDataRendered(): void {
     // resize all columns
-    event.columnApi.autoSizeAllColumns();
+    this.agTable.columnApi.autoSizeAllColumns();
+
+    // some type of columns should have a fixed width
+    this.adjustFixedSizeColumns();
+  }
+
+  /**
+   * Some type of columns should have a fixed width
+   */
+  private adjustFixedSizeColumns(): void {
+    // some type of columns should have a fixed width
+    this.agTable.columnApi.getColumnState().forEach((columnState) => {
+      // retrieve column definition
+      const column = this.agTable.columnApi.getColumn(columnState.colId);
+      const colDef: IExtendedColDef = column?.getColDef();
+      if (colDef.columnDefinition?.format?.type === V2ColumnFormat.STATUS) {
+        // determine maximum number of items
+        const statusColumn: IV2ColumnStatus = colDef.columnDefinition as IV2ColumnStatus;
+        let maxForms: number = 1;
+        this.agTable.api.forEachNode((node) => {
+          const formsNo: number = statusColumn.forms(
+            statusColumn,
+            node.data
+          ).length;
+          maxForms = maxForms < formsNo ?
+            formsNo :
+            maxForms;
+        });
+
+        // set column width
+        this.agTable.columnApi.setColumnWidth(
+          column,
+          (maxForms - 1) * (AppListTableV2Component.STANDARD_SHAPE_SIZE + AppListTableV2Component.STANDARD_SHAPE_GAP) +
+          AppListTableV2Component.STANDARD_SHAPE_SIZE +
+          AppListTableV2Component.STANDARD_SHAPE_PADDING * 2
+        );
+      }
+    });
   }
 
   /**
@@ -703,6 +853,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         if (remainingColumns.length > 0) {
           this.agTable.api.ensureColumnVisible(remainingColumns[0]);
         }
+
+        // some type of columns should have a fixed width
+        this.adjustFixedSizeColumns();
 
         // save the new settings
         this.saveVisibleAndOrderOfColumns();
@@ -924,8 +1077,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       })
       .pipe(
         catchError((err) => {
-          // #TODO
-          // this.toastV2Service.error(err);
+          // error
+          this.toastV2Service.error(err);
 
           // send error down the road
           return throwError(err);
