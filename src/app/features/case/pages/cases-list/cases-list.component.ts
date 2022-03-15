@@ -31,7 +31,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { AddressModel } from '../../../../core/models/address.model';
 import { ExportFieldsGroupModelNameEnum } from '../../../../core/models/export-fields-group.model';
-import { IV2ColumnPinned, V2ColumnStatusForm, IV2ColumnStatusFormType, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -281,6 +281,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     // initialize quick actions
     this.initializeQuickActions();
 
+    // initialize group actions
+    this.initializeGroupActions();
+
     // initialize add action
     this.initializeAddAction();
 
@@ -329,7 +332,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   /**
    * Initialize Side Table Columns
    */
-  initializeTableColumns(): void {
+  private initializeTableColumns(): void {
     // default table columns
     this.tableColumns = [
       {
@@ -1247,7 +1250,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   /**
    * Initialize quick actions
    */
-  initializeQuickActions(): void {
+  private initializeQuickActions(): void {
     this.quickActions = {
       type: V2ActionType.MENU,
       label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
@@ -1518,6 +1521,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         }
       ]
     };
+  }
+
+  /**
+   * Initialize group actions
+   */
+  private initializeGroupActions(): void {
+    this.groupActions = [];
   }
 
   /**
