@@ -110,7 +110,7 @@ interface IV2ActionMenu {
 /**
  * Icon action Menu
  */
-interface IV2ActionMenuIcon extends IV2ActionMenu {
+export interface IV2ActionMenuIcon extends IV2ActionMenu {
   // required
   icon: string;
 
