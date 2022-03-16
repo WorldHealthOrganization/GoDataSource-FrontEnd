@@ -82,7 +82,11 @@ export interface IV2ExportDataConfig {
       // optional
       encrypt?: boolean,
       anonymize?: false | {
-        fields: ILabelValuePairModel[]
+        // required
+        fields: ILabelValuePairModel[],
+
+        // optional
+        key?: string
       },
       groups?: false | {
         // required
@@ -102,6 +106,11 @@ export interface IV2ExportDataConfig {
     inputs?: {
       prepend?: V2SideDialogConfigInput[],
       append?: V2SideDialogConfigInput[]
+    },
+    extraFormData?: {
+      append: {
+        [key: string]: any
+      }
     }
   };
 

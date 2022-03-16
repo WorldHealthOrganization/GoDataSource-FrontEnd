@@ -238,7 +238,6 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
           finishCallback([]);
           return throwError(err);
         }),
-        tap(this.checkEmptyList.bind(this)),
         tap((data: any[]) => {
           finishCallback(data);
         })

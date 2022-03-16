@@ -27,7 +27,7 @@ import * as LzString from 'lz-string';
 import { LoadingDialogModel } from '../../shared/components';
 import { IV2Column } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
-import { IV2ActionIconLabel, IV2ActionMenuLabel } from '../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2ActionIconLabel, IV2ActionMenuLabel, V2ActionMenuItem } from '../../shared/components-v2/app-list-table-v2/models/action.model';
 import { OutbreakModel } from '../models/outbreak.model';
 import { IV2GroupedData } from '../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import { IBasicCount } from '../models/basic-count.interface';
@@ -92,6 +92,9 @@ export abstract class ListComponent implements OnDestroy {
 
   // quick actions
   quickActions: IV2ActionMenuLabel;
+
+  // group actions
+  groupActions: V2ActionMenuItem[];
 
   // add action
   addAction: IV2ActionIconLabel;
@@ -216,9 +219,6 @@ export abstract class ListComponent implements OnDestroy {
   // pagination
   public pageSize: number = Constants.DEFAULT_PAGE_SIZE;
   private paginatorInitialized = false;
-
-  // flag set to true if the list is empty
-  public isEmptyList: boolean;
 
   // Models for the checkbox functionality
   private checkboxModels: {
@@ -613,13 +613,6 @@ export abstract class ListComponent implements OnDestroy {
     if (this.triggerListRefresh) {
       this.triggerListRefresh.call(instant);
     }
-  }
-
-  /**
-     * Checks if list is empty
-     */
-  checkEmptyList(list: any[]) {
-    this.isEmptyList = _.isEmpty(list);
   }
 
   /**

@@ -263,7 +263,6 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
             finishCallback([]);
             return throwError(err);
           }),
-          tap(this.checkEmptyList.bind(this)),
           tap((data: any[]) => {
             finishCallback(data);
           })

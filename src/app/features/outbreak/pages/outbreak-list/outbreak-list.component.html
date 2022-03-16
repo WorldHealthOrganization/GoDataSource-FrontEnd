@@ -556,22 +556,22 @@
         <mat-spinner></mat-spinner>
     </div>
 
-    <!-- No data -->
-    <div
-        *ngIf="!refreshingList && isEmptyList"
-        class="empty-table-text">
-        {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
-    </div>
+<!--    &lt;!&ndash; No data &ndash;&gt;-->
+<!--    <div-->
+<!--        *ngIf="!refreshingList && isEmptyList"-->
+<!--        class="empty-table-text">-->
+<!--        {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}-->
+<!--    </div>-->
 
-    <!-- Pages (need to be hidden and not ngIf, otherwise it makes a new duplicate request) -->
-    <app-mat-paginator-extended
-        [hidden]="refreshingList || isEmptyList"
-        [pageIndex]="pageIndex"
-        [countData]="outbreaksListCount$ | async"
-        [pageSize]="pageSize"
-        [pageSizeOptions]="[]"
-        (page)="changePage($event)">
-    </app-mat-paginator-extended>
+<!--    &lt;!&ndash; Pages (need to be hidden and not ngIf, otherwise it makes a new duplicate request) &ndash;&gt;-->
+<!--    <app-mat-paginator-extended-->
+<!--        [hidden]="refreshingList || isEmptyList"-->
+<!--        [pageIndex]="pageIndex"-->
+<!--        [countData]="outbreaksListCount$ | async"-->
+<!--        [pageSize]="pageSize"-->
+<!--        [pageSizeOptions]="[]"-->
+<!--        (page)="changePage($event)">-->
+<!--    </app-mat-paginator-extended>-->
 </mat-card>
 
 

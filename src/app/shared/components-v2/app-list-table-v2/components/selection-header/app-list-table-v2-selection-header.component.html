@@ -1,0 +1,40 @@
+<div
+  class="gd-list-table-selection-header">
+  <!-- Menu -->
+  <button
+    type="button"
+    mat-icon-button
+    [disabled]="action.disable && action.disable(component.selectedRows)"
+    [matMenuTriggerFor]="menu">
+    <mat-icon>{{action.icon}}</mat-icon>
+  </button>
+
+  <!-- Floating menu -->
+  <mat-menu
+    #menu="matMenu"
+    class="gd-list-table-selection-header-menu">
+    <ng-container
+      *ngFor="let menuOption of action.menuOptions">
+      <ng-container
+        *ngIf="!menuOption.visible || menuOption.visible(component.selectedRows)">
+
+        <!-- Child Menu link -->
+        <button
+          *ngIf="menuOption.label; else divider"
+          mat-menu-item
+          class="gd-list-table-selection-header-button {{menuOption.cssClasses}}"
+          [disabled]="menuOption.disable && menuOption.disable(component.selectedRows)"
+          (click)="menuOption.action.click(component.selectedRows)">
+          {{menuOption.label | translate}}
+        </button>
+
+        <!-- Divider -->
+        <ng-template
+          #divider>
+          <mat-divider></mat-divider>
+        </ng-template>
+
+      </ng-container>
+    </ng-container>
+  </mat-menu>
+</div>

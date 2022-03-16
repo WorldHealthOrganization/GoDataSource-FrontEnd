@@ -172,7 +172,9 @@ export class DialogV2Service {
       inputs.push({
         type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
         placeholder: 'LNG_COMMON_LABEL_EXPORT_ANONYMIZE_FIELDS',
-        name: 'anonymizeFields',
+        name: config.export.allow.anonymize.key ?
+          config.export.allow.anonymize.key :
+          'anonymizeFields',
         values: [],
         options: config.export.allow.anonymize.fields
       });
@@ -404,6 +406,14 @@ export class DialogV2Service {
               delete formData[name];
             }
           });
+
+          // append extra data ?
+          if (config.export.extraFormData?.append) {
+            Object.assign(
+              formData,
+              config.export.extraFormData?.append
+            );
+          }
 
           // construct query builder
           const qb: RequestQueryBuilder = new RequestQueryBuilder();

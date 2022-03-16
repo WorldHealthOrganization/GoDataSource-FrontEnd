@@ -276,9 +276,6 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
           // refresh the total count
           this.refreshListCount();
 
-          // flag if list is empty
-          this.checkEmptyList(this.categoryEntries);
-
           // finished
           finishCallback(entries);
         });

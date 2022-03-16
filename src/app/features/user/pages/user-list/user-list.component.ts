@@ -232,7 +232,6 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
           finishCallback([]);
           return throwError(err);
         }),
-        tap(this.checkEmptyList.bind(this)),
         tap((data: any[]) => {
           finishCallback(data);
         })

@@ -5,6 +5,7 @@ import { AppSideDialogV2Component } from './app-side-dialog-v2/app-side-dialog-v
 import { AppLoadingDialogV2Component } from './app-loading-dialog-v2/app-loading-dialog-v2.component';
 import { AppBottomDialogV2Component } from './app-bottom-dialog-v2/app-bottom-dialog-v2.component';
 import { AppListTableV2ButtonComponent } from './app-list-table-v2/components/button/app-list-table-v2-button.component';
+import { AppListTableV2SelectionHeaderComponent } from './app-list-table-v2/components/selection-header/app-list-table-v2-selection-header.component';
 
 export const components: any[] = [
   AppBottomDialogV2Component,
@@ -12,6 +13,7 @@ export const components: any[] = [
   AppListTableV2ActionsComponent,
   AppListTableV2ButtonComponent,
   AppListTableV2Component,
+  AppListTableV2SelectionHeaderComponent,
   AppLoadingDialogV2Component,
   AppSideDialogV2Component
 ];

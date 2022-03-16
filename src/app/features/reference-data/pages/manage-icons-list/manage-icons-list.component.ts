@@ -182,7 +182,6 @@ export class ManageIconsListComponent extends ListComponent implements OnInit, O
           finishCallback([]);
           return throwError(err);
         }),
-        tap(this.checkEmptyList.bind(this)),
         tap((data: any[]) => {
           finishCallback(data);
         })

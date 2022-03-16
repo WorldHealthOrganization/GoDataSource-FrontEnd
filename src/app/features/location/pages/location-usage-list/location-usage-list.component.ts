@@ -255,9 +255,6 @@ export class LocationUsageListComponent extends ListComponent implements OnInit,
               } : null;
               this.usageDetailsList = usageData.items.slice(0, Constants.DEFAULT_USAGE_MAX_RECORDS_DISPLAYED);
 
-              // flag if list is empty
-              this.checkEmptyList(this.usageDetailsList);
-
               // finished
               finishCallback(this.usageDetailsList);
             });

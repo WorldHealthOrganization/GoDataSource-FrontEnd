@@ -1120,7 +1120,6 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
               followUps
             );
           }),
-          tap(this.checkEmptyList.bind(this)),
           tap((data: any[]) => {
             finishCallback(data);
           })

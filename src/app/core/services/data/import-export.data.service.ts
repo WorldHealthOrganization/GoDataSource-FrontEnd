@@ -169,7 +169,7 @@ export class ImportExportDataService {
     // filter ?
     if (
       queryBuilder &&
-            !queryBuilder.isEmpty()
+      !queryBuilder.isEmpty()
     ) {
       const filterData = queryBuilder.buildQuery(false);
       if (_.isEmpty(data)) {

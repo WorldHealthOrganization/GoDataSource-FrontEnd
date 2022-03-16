@@ -243,7 +243,6 @@ export class HelpItemsListComponent extends ListComponent implements OnInit, OnD
           finishCallback([]);
           return throwError(err);
         }),
-        tap(this.checkEmptyList.bind(this)),
         tap((data: any[]) => {
           finishCallback(data);
         })
