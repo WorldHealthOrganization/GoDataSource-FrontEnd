@@ -54,11 +54,15 @@ import { ImportResultDataService } from './data/import-result.data.service';
 import { ExportLogDataService } from './data/export-log.data.service';
 import { DialogV2Service } from './helper/dialog-v2.service';
 import { ToastV2Service } from './helper/toast-v2.service';
+import { ClassificationDataResolver } from './resolvers/data/classification.resolver';
+import { RiskDataResolver } from './resolvers/data/risk.resolver';
 
 // export the list of services
 export const services: any[] = [
   // resolver services
+  ClassificationDataResolver,
   LanguageResolver,
+  RiskDataResolver,
 
   // data services
   AuthDataService,
