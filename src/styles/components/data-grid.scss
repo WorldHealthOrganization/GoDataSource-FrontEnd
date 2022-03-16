@@ -40,6 +40,17 @@
           height: 100%;
           top: 0;
         }
+
+        .gd-list-table-selection-header {
+          @include flex(flex);
+
+          button.mat-icon-button {
+            height: 2.4rem;
+            min-width: 2.4rem;
+            padding: 0;
+            width: 2.4rem;
+          }
+        }
       }
     }
 
