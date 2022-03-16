@@ -501,6 +501,15 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
                   this.agTable.api.getSelectedNodes().length > 0;
               }
             },
+            {
+              // divider
+              visible: (): boolean => {
+                return this.agTable.api.getDisplayedRowCount() > 0 && (
+                  this.agTable.api.getSelectedNodes().length < this.agTable.api.getDisplayedRowCount() ||
+                  this.agTable.api.getSelectedNodes().length > 0
+                );
+              }
+            },
             ...(this.groupActions ? this.groupActions : [])
           ]
         }]
