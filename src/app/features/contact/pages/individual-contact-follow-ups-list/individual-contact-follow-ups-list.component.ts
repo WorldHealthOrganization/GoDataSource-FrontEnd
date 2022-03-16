@@ -654,7 +654,6 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
               followUps
             );
           }),
-          tap(this.checkEmptyList.bind(this)),
           tap((data: any[]) => {
             finishCallback(data);
           })

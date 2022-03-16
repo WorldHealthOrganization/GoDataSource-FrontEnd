@@ -15,7 +15,7 @@ import { IV2Column, IV2ColumnAction, IV2ColumnBasic, IV2ColumnBasicFormat, IV2Co
 import { AppListTableV2ActionsComponent } from './components/actions/app-list-table-v2-actions.component';
 import { IExtendedColDef } from './models/extended-column.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
-import { IV2ActionIconLabel, IV2ActionMenuLabel } from './models/action.model';
+import { IV2ActionIconLabel, IV2ActionMenuLabel, V2ActionMenuItem, V2ActionType } from './models/action.model';
 import { IV2GroupedData } from './models/grouped-data.model';
 import { AgGridAngular } from '@ag-grid-community/angular';
 import { V2LoadingComponent } from './models/loading.component';
@@ -29,6 +29,7 @@ import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { catchError } from 'rxjs/operators';
 import { AppListTableV2ButtonComponent } from './components/button/app-list-table-v2-button.component';
 import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
+import { AppListTableV2SelectionHeaderComponent } from './components/selection-header/app-list-table-v2-selection-header.component';
 
 /**
  * Component
@@ -70,7 +71,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   };
 
   // key field used to handle each row (checkbox selection, etc)
-  @Input() keyField: string = '_id';
+  @Input() keyField: string = 'id';
 
   // ag-grid modules
   modules = [
@@ -85,6 +86,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
   // quick actions
   @Input() quickActions: IV2ActionMenuLabel;
+
+  // group actions
+  @Input() groupActions: V2ActionMenuItem[];
 
   // add button
   @Input() addAction: IV2ActionIconLabel;
@@ -147,6 +151,12 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // required
     html: string;
   }[];
+
+  // selected ids
+  private _selected: string[] = [];
+  get selectedRows(): string[] {
+    return this._selected;
+  }
 
   // constants
   V2LoadingComponent = V2LoadingComponent;
@@ -271,6 +281,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
         // some type of columns should have a fixed width
         this.adjustFixedSizeColumns();
+
+        // unselect everything
+        this.agTable.api.deselectAll();
 
         // re-render page
         this.detectChanges();
@@ -449,9 +462,49 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       headerName: '',
       field: this.keyField,
       checkboxSelection: true,
-      headerCheckboxSelection: true,
       cellClass: 'gd-cell-no-focus',
-      suppressMovable: true
+      suppressMovable: true,
+      headerComponent: AppListTableV2SelectionHeaderComponent,
+      valueFormatter: () => '',
+      columnDefinitionData: this,
+      columnDefinition: {
+        format: {
+          type: V2ColumnFormat.ACTIONS
+        },
+        field: this.keyField,
+        label: '',
+        actions: [{
+          type: V2ActionType.MENU,
+          icon: 'expand_more',
+          menuOptions: [
+            {
+              label: 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL',
+              action: {
+                click: () => {
+                  this.agTable.api.selectAll();
+                }
+              },
+              visible: (): boolean => {
+                return this.agTable.api.getDisplayedRowCount() > 0 &&
+                  this.agTable.api.getSelectedNodes().length < this.agTable.api.getDisplayedRowCount();
+              }
+            },
+            {
+              label: 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL',
+              action: {
+                click: () => {
+                  this.agTable.api.deselectAll();
+                }
+              },
+              visible: (): boolean => {
+                return this.agTable.api.getDisplayedRowCount() > 0 &&
+                  this.agTable.api.getSelectedNodes().length > 0;
+              }
+            },
+            ...(this.groupActions ? this.groupActions : [])
+          ]
+        }]
+      }
     }];
     if (visibleColumns.length > 0) {
       // map columns
@@ -725,7 +778,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     this.agTable.columnApi.getColumnState().forEach((columnState) => {
       // retrieve column definition
       const column = this.agTable.columnApi.getColumn(columnState.colId);
-      const colDef: IExtendedColDef = column?.getColDef();
+      const colDef: IExtendedColDef = column?.getColDef() as IExtendedColDef;
       if (colDef.columnDefinition?.format?.type === V2ColumnFormat.STATUS) {
         // determine maximum number of items
         const statusColumn: IV2ColumnStatus = colDef.columnDefinition as IV2ColumnStatus;
@@ -825,7 +878,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         const visibleColumns: string[] = [];
         this.agTable.columnApi.getColumnState().forEach((columnState) => {
           // retrieve column definition
-          const colDef: IExtendedColDef = this.agTable.columnApi.getColumn(columnState.colId)?.getColDef();
+          const colDef: IExtendedColDef = this.agTable.columnApi.getColumn(columnState.colId)?.getColDef() as IExtendedColDef;
           if (
             !colDef ||
             !colDef.columnDefinition ||
@@ -1043,7 +1096,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     const rightPinnedColumns: string[] = [];
     this.agTable.columnApi.getColumnState().forEach((columnState) => {
       // retrieve column definition
-      const colDef: IExtendedColDef = this.agTable.columnApi.getColumn(columnState.colId)?.getColDef();
+      const colDef: IExtendedColDef = this.agTable.columnApi.getColumn(columnState.colId)?.getColDef() as IExtendedColDef;
 
       // nothing to do ?
       if (
@@ -1091,5 +1144,13 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         // update layout
         this.detectChanges();
       });
+  }
+
+  /**
+   * Selection changed
+   */
+  selectionChanged(): void {
+    // update selected
+    this._selected = this.agTable.api.getSelectedNodes().map((item) => item.data[this.keyField]);
   }
 }

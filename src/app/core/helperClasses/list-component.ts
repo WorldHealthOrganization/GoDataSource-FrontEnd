@@ -220,9 +220,6 @@ export abstract class ListComponent implements OnDestroy {
   public pageSize: number = Constants.DEFAULT_PAGE_SIZE;
   private paginatorInitialized = false;
 
-  // flag set to true if the list is empty
-  public isEmptyList: boolean;
-
   // Models for the checkbox functionality
   private checkboxModels: {
     multiCheck: boolean,
@@ -616,13 +613,6 @@ export abstract class ListComponent implements OnDestroy {
     if (this.triggerListRefresh) {
       this.triggerListRefresh.call(instant);
     }
-  }
-
-  /**
-     * Checks if list is empty
-     */
-  checkEmptyList(list: any[]) {
-    this.isEmptyList = _.isEmpty(list);
   }
 
   /**

@@ -680,7 +680,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
       this.contactsOfContactsList$ = this.contactsOfContactsDataService
         .getContactsOfContactsList(this.selectedOutbreak.id, this.queryBuilder)
         .pipe(
-          tap(this.checkEmptyList.bind(this)),
           tap((data: any[]) => {
             finishCallback(data);
           })

@@ -203,7 +203,6 @@ export class RolesListComponent extends ListComponent implements OnInit, OnDestr
           finishCallback([]);
           return throwError(err);
         }),
-        tap(this.checkEmptyList.bind(this)),
         tap((data: any[]) => {
           finishCallback(data);
         })

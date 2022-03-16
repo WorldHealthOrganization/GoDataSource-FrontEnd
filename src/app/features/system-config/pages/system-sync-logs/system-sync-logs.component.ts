@@ -269,7 +269,6 @@ export class SystemSyncLogsComponent
             return log;
           });
         }),
-        tap(this.checkEmptyList.bind(this)),
         tap((data: any[]) => {
           finishCallback(data);
         })

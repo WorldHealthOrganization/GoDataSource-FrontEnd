@@ -365,7 +365,6 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
               finishCallback([]);
               return throwError(err);
             }),
-            tap(this.checkEmptyList.bind(this)),
             tap((entities: EntityModel[]) => {
               // map models
               this.relationshipsListRecordsMap = {};
@@ -386,7 +385,6 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
           this.queryBuilder
         )
           .pipe(
-            tap(this.checkEmptyList.bind(this)),
             tap((entities: EntityModel[]) => {
               // map models
               this.relationshipsListRecordsMap = {};

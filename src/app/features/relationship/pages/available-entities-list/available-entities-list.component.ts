@@ -228,7 +228,6 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
             finishCallback([]);
             return throwError(err);
           }),
-          tap(this.checkEmptyList.bind(this)),
           tap((data: any[]) => {
             finishCallback(data);
           })

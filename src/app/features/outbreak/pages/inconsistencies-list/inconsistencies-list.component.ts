@@ -164,7 +164,6 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
             finishCallback([]);
             return throwError(err);
           }),
-          tap(this.checkEmptyList.bind(this)),
           tap((data: any[]) => {
             finishCallback(data);
           })
