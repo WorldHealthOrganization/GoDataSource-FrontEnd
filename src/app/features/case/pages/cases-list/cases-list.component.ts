@@ -1510,6 +1510,49 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         disable: (selected: string[]): boolean => {
           return selected.length < 1;
         }
+      }, {
+        label: 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER',
+        action: {
+          click: (selected: string[]) => {
+            // remove id from list
+            const anonymizeFields = this.caseAnonymizeFields.filter((item) => {
+              return item.value !== 'id';
+            });
+
+            // export dossier
+            this.dialogV2Service.showExportData({
+              title: {
+                get: () => 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER_DIALOG_TITLE'
+              },
+              export: {
+                url: `outbreaks/${this.selectedOutbreak.id}/cases/dossier`,
+                async: false,
+                method: ExportDataMethod.POST,
+                fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
+                extraFormData: {
+                  append: {
+                    cases: selected
+                  }
+                },
+                allow: {
+                  types: [
+                    ExportDataExtension.ZIP
+                  ],
+                  anonymize: {
+                    fields: anonymizeFields,
+                    key: 'data'
+                  }
+                }
+              }
+            });
+          }
+        },
+        visible: (): boolean => {
+          return CaseModel.canExportDossier(this.authUser);
+        },
+        disable: (selected: string[]): boolean => {
+          return selected.length < 1;
+        }
       }
     ];
   }
@@ -2228,43 +2271,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       exportStart: () => { this.showLoadingDialog(); },
       exportFinished: () => { this.closeLoadingDialog(); }
     });
-  }
-
-
-  /**
-     * Export cases dossier
-     */
-  exportSelectedCasesDossier() {
-    // get list of selected ids
-    const selectedRecords: false | string[] = this.validateCheckedRecords();
-    if (!selectedRecords) {
-      return;
-    }
-
-    // display export only if we have a selected outbreak
-    if (this.selectedOutbreak) {
-      // remove id from list
-      // const anonymizeFields = _.filter(this.anonymizeFields, (value: LabelValuePair) => {
-      //   return value.value !== 'id';
-      // });
-
-      // display export dialog
-      this.dialogService.showExportDialog({
-        message: 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER_DIALOG_TITLE',
-        url: `outbreaks/${this.selectedOutbreak.id}/cases/dossier`,
-        fileName: '...', // this.casesDataExportFileName,
-        fileType: ExportDataExtension.ZIP,
-        displayAnonymize: true,
-        // anonymizeFields: anonymizeFields,
-        anonymizeFieldsKey: 'data',
-        extraAPIData: {
-          cases: selectedRecords
-        },
-        isPOST: true,
-        exportStart: () => { this.showLoadingDialog(); },
-        exportFinished: () => { this.closeLoadingDialog(); }
-      });
-    }
   }
 
   /**
