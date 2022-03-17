@@ -2069,7 +2069,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       'age',
       'gender',
       'addresses',
-      'locations',
       'dateOfOnset',
       'dateOfReporting',
       'wasContact',
