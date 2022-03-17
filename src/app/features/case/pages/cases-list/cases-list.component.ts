@@ -139,9 +139,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   });
   filterAddressParentLocationIds: string[] = [];
 
-  // don't display pills by default
-  showCountPills: boolean = false;
-
   // user list
   userList$: Observable<UserModel[]>;
 
@@ -167,12 +164,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
   // provide constants to template
   Constants = Constants;
-  EntityType = EntityType;
-  ReferenceDataCategory = ReferenceDataCategory;
-  LabResultModel = LabResultModel;
-  CaseModel = CaseModel;
-  OutbreakModel = OutbreakModel;
-  UserModel = UserModel;
 
   notACaseFilter: boolean | string = false;
 
