@@ -117,3 +117,20 @@ export interface IV2ExportDataConfig {
   // optional
   initialized?: (handler: IV2SideDialogHandler) => void;
 }
+
+/**
+ * Load config and Export data
+ */
+export interface IV2ExportDataConfigLoaderConfig {
+  // required
+  title: {
+    // required
+    get: () => string,
+
+    // optional
+    data?: () => {
+      [key: string]: string
+    }
+  };
+  load: (finished: (config: IV2ExportDataConfig) => void) => void;
+}

@@ -5,7 +5,6 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { DialogField, DialogFieldType } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ApplyListFilter, Constants } from '../../../../core/models/constants';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
@@ -53,12 +52,6 @@ import { LocationModel } from '../../../../core/models/location.model';
 export class CasesListComponent extends ListComponent implements OnInit, OnDestroy {
   // list of existing cases
   casesList$: Observable<CaseModel[]>;
-
-  // field groups
-  private caseFieldGroups: ILabelValuePairModel[];
-  private caseFieldGroupsRequires: IV2ExportDataConfigGroupsRequired;
-  private relationshipFieldGroups: ILabelValuePairModel[];
-  private relationshipFieldGroupsRequires: IV2ExportDataConfigGroupsRequired;
 
   // case anonymize fields
   private caseAnonymizeFields: ILabelValuePairModel[] = [
@@ -183,26 +176,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
   notACaseFilter: boolean | string = false;
 
-  exportCasesUrl: string;
-  allowedExportTypes: ExportDataExtension[] = [
-    ExportDataExtension.CSV,
-    ExportDataExtension.XLS,
-    ExportDataExtension.XLSX,
-    ExportDataExtension.JSON,
-    ExportDataExtension.ODS,
-    ExportDataExtension.PDF
-  ];
-
-  // include contact data in case export ?
-  caseExtraDialogFields: DialogField[] = [
-    new DialogField({
-      name: 'includeContactFields',
-      placeholder: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION',
-      description: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION_DESCRIPTION',
-      fieldType: DialogFieldType.BOOLEAN
-    })
-  ];
-
   // subscribers
   outbreakSubscriber: Subscription;
 
@@ -250,32 +223,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     this.yesNoOptionsWithoutAllList$ = this.genericDataService.getFilterYesNoOptions(true);
     this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
 
-    // retrieve the list of export fields groups for model
-    this.outbreakDataService.getExportFieldsGroups(ExportFieldsGroupModelNameEnum.CASE)
-      .subscribe((fieldsGroupList) => {
-        // set groups
-        this.caseFieldGroups = fieldsGroupList.options.map((item) => ({
-          label: item.name,
-          value: item.name
-        }));
-
-        // group restrictions
-        this.caseFieldGroupsRequires = fieldsGroupList.toRequiredList();
-      });
-
-    // retrieve the list of export fields groups for relationships
-    this.outbreakDataService.getExportFieldsGroups(ExportFieldsGroupModelNameEnum.RELATIONSHIP)
-      .subscribe((fieldsGroupList) => {
-        // set groups
-        this.relationshipFieldGroups = fieldsGroupList.options.map((item) => ({
-          label: item.name,
-          value: item.name
-        }));
-
-        // group restrictions
-        this.relationshipFieldGroupsRequires = fieldsGroupList.toRequiredList();
-      });
-
     // initialize table Columns
     this.initializeTableColumns();
 
@@ -311,13 +258,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    */
   selectedOutbreakChanged(): void {
     // export cases url
-    this.exportCasesUrl = null;
     if (
       this.selectedOutbreak &&
       this.selectedOutbreak.id
     ) {
-      this.exportCasesUrl = `/outbreaks/${this.selectedOutbreak.id}/cases/export`;
-
       this.clustersListAsLabelValuePair$ = this.clusterDataService.getClusterListAsLabelValue(this.selectedOutbreak.id);
 
       // initialize side filters
@@ -1672,91 +1616,162 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    * Export case data
    */
   private exportCases(qb: RequestQueryBuilder): void {
-    this.dialogV2Service.showExportData({
-      title: {
-        get: () => 'LNG_PAGE_LIST_CASES_EXPORT_TITLE'
-      },
-      export: {
-        url: `/outbreaks/${this.selectedOutbreak.id}/cases/export`,
-        async: true,
-        method: ExportDataMethod.POST,
-        fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
-        queryBuilder: qb,
-        allow: {
-          types: [
-            ExportDataExtension.CSV,
-            ExportDataExtension.XLS,
-            ExportDataExtension.XLSX,
-            ExportDataExtension.JSON,
-            ExportDataExtension.ODS,
-            ExportDataExtension.PDF
-          ],
-          encrypt: true,
-          anonymize: {
-            fields: this.caseAnonymizeFields
-          },
-          groups: {
-            fields: this.caseFieldGroups,
-            required: this.caseFieldGroupsRequires
-          },
-          dbColumns: true,
-          dbValues: true,
-          jsonReplaceUndefinedWithNull: true,
-          questionnaireVariables: true
+    this.dialogV2Service
+      .showExportDataAfterLoadingData({
+        title: {
+          get: () => 'LNG_PAGE_LIST_CASES_EXPORT_TITLE'
         },
-        inputs: {
-          append: [
-            {
-              type: V2SideDialogConfigInputType.CHECKBOX,
-              placeholder: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION',
-              tooltip: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION_DESCRIPTION',
-              name: 'includeContactFields',
-              checked: false
-            }
-          ]
+        load: (finished) => {
+          // retrieve the list of export fields groups for model
+          this.outbreakDataService
+            .getExportFieldsGroups(ExportFieldsGroupModelNameEnum.CASE)
+            .pipe(
+              // handle errors
+              catchError((err) => {
+                // show error
+                this.toastV2Service.error(err);
+
+                // send error further
+                return throwError(err);
+              }),
+
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            )
+            .subscribe((fieldsGroupList) => {
+              // set groups
+              const caseFieldGroups: ILabelValuePairModel[] = fieldsGroupList.options.map((item) => ({
+                label: item.name,
+                value: item.name
+              }));
+
+              // group restrictions
+              const caseFieldGroupsRequires: IV2ExportDataConfigGroupsRequired = fieldsGroupList.toRequiredList();
+
+              // show export
+              finished({
+                title: {
+                  get: () => 'LNG_PAGE_LIST_CASES_EXPORT_TITLE'
+                },
+                export: {
+                  url: `/outbreaks/${this.selectedOutbreak.id}/cases/export`,
+                  async: true,
+                  method: ExportDataMethod.POST,
+                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
+                  queryBuilder: qb,
+                  allow: {
+                    types: [
+                      ExportDataExtension.CSV,
+                      ExportDataExtension.XLS,
+                      ExportDataExtension.XLSX,
+                      ExportDataExtension.JSON,
+                      ExportDataExtension.ODS,
+                      ExportDataExtension.PDF
+                    ],
+                    encrypt: true,
+                    anonymize: {
+                      fields: this.caseAnonymizeFields
+                    },
+                    groups: {
+                      fields: caseFieldGroups,
+                      required: caseFieldGroupsRequires
+                    },
+                    dbColumns: true,
+                    dbValues: true,
+                    jsonReplaceUndefinedWithNull: true,
+                    questionnaireVariables: true
+                  },
+                  inputs: {
+                    append: [
+                      {
+                        type: V2SideDialogConfigInputType.CHECKBOX,
+                        placeholder: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION',
+                        tooltip: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION_DESCRIPTION',
+                        name: 'includeContactFields',
+                        checked: false
+                      }
+                    ]
+                  }
+                }
+              });
+            });
         }
-      }
-    });
+      });
   }
 
   /**
    * Export case relationships
    */
   private exportCaseRelationships(qb: RequestQueryBuilder): void {
-    // export
-    this.dialogV2Service.showExportData({
-      title: {
-        get: () => 'LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIPS_TITLE'
-      },
-      export: {
-        url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
-        async: true,
-        method: ExportDataMethod.POST,
-        fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIP_FILE_NAME')} - ${moment().format('YYYY-MM-DD')}`,
-        queryBuilder: qb,
-        allow: {
-          types: [
-            ExportDataExtension.CSV,
-            ExportDataExtension.XLS,
-            ExportDataExtension.XLSX,
-            ExportDataExtension.JSON,
-            ExportDataExtension.ODS,
-            ExportDataExtension.PDF
-          ],
-          encrypt: true,
-          anonymize: {
-            fields: this.relationshipAnonymizeFields
-          },
-          groups: {
-            fields: this.relationshipFieldGroups,
-            required: this.relationshipFieldGroupsRequires
-          },
-          dbColumns: true,
-          dbValues: true,
-          jsonReplaceUndefinedWithNull: true
+    this.dialogV2Service
+      .showExportDataAfterLoadingData({
+        title: {
+          get: () => 'LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIPS_TITLE'
+        },
+        load: (finished) => {
+          // retrieve the list of export fields groups for model
+          this.outbreakDataService
+            .getExportFieldsGroups(ExportFieldsGroupModelNameEnum.RELATIONSHIP)
+            .pipe(
+              // handle errors
+              catchError((err) => {
+                // show error
+                this.toastV2Service.error(err);
+
+                // send error further
+                return throwError(err);
+              }),
+
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            )
+            .subscribe((fieldsGroupList) => {
+              // set groups
+              const relationshipFieldGroups: ILabelValuePairModel[] = fieldsGroupList.options.map((item) => ({
+                label: item.name,
+                value: item.name
+              }));
+
+              // group restrictions
+              const relationshipFieldGroupsRequires: IV2ExportDataConfigGroupsRequired = fieldsGroupList.toRequiredList();
+
+              // show export
+              finished({
+                title: {
+                  get: () => 'LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIPS_TITLE'
+                },
+                export: {
+                  url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
+                  async: true,
+                  method: ExportDataMethod.POST,
+                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIP_FILE_NAME')} - ${moment().format('YYYY-MM-DD')}`,
+                  queryBuilder: qb,
+                  allow: {
+                    types: [
+                      ExportDataExtension.CSV,
+                      ExportDataExtension.XLS,
+                      ExportDataExtension.XLSX,
+                      ExportDataExtension.JSON,
+                      ExportDataExtension.ODS,
+                      ExportDataExtension.PDF
+                    ],
+                    encrypt: true,
+                    anonymize: {
+                      fields: this.relationshipAnonymizeFields
+                    },
+                    groups: {
+                      fields: relationshipFieldGroups,
+                      required: relationshipFieldGroupsRequires
+                    },
+                    dbColumns: true,
+                    dbValues: true,
+                    jsonReplaceUndefinedWithNull: true
+                  }
+                }
+              });
+            });
         }
-      }
-    });
+      });
   }
 
 
