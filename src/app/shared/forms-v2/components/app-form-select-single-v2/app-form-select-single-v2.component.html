@@ -1,5 +1,5 @@
 <div
-  class="gd-form-select-v2">
+  class="gd-form-select-single-v2">
 
   <!-- Input data -->
   <mat-form-field
@@ -17,49 +17,19 @@
       [errorStateMatcher]="errMatcher"
       [disabled]="disabled"
       [required]="required"
-      [multiple]="multiple"
-      panelClass="gd-form-select-v2-panel"
-      (click)="dropdownOpened()"
-      (opened)="dropdownOpened()">
+      panelClass="gd-form-select-single-v2-panel"
+      (opened)="vScrollToFirstSelectedOption()">
 
       <!-- Selected value -->
       <mat-select-trigger
         *ngIf="value">
 
-        <!-- multiple select ? -->
-        <div
-          *ngIf="multiple; else singleSelect"
-          fxLayout="row wrap"
-          class="gd-form-select-v2-panel-inner">
-          <div
-            *ngFor="let selectedValue of value; let selectedIndex = index">
+        <!-- Icon -->
+        <mat-icon
+          *ngIf="allOptionsMap[value]?.icon">{{allOptionsMap[value].icon}}</mat-icon>
 
-            <!-- separator -->
-            <ng-container
-              *ngIf="selectedIndex > 0">, </ng-container>
-
-            <!-- Icon -->
-            <mat-icon
-              *ngIf="allOptionsMap[selectedValue]?.icon">{{allOptionsMap[selectedValue].icon}}</mat-icon>
-
-            <!-- Label -->
-            {{allOptionsMap[selectedValue]?.label}}
-
-          </div>
-        </div>
-
-        <!-- Single select -->
-        <ng-template
-          #singleSelect>
-
-          <!-- Icon -->
-          <mat-icon
-            *ngIf="allOptionsMap[valueAsString]?.icon">{{allOptionsMap[valueAsString].icon}}</mat-icon>
-
-          <!-- Label -->
-          {{allOptionsMap[valueAsString]?.label}}
-
-        </ng-template>
+        <!-- Label -->
+        {{allOptionsMap[value]?.label}}
 
       </mat-select-trigger>
 
@@ -115,41 +85,18 @@
       <ng-container
         *ngIf="value">
 
-        <!-- multiple select ? -->
-        <ng-container
-          *ngIf="multiple; else singleSelect">
-          <mat-option
-            *ngFor="let selectedValue of value"
-            style="height: 0; display: none;"
-            [value]="selectedValue">
+        <!-- Option -->
+        <mat-option
+          style="height: 0; display: none;"
+          [value]="value">
 
-            <!-- Icon -->
-            <mat-icon
-              *ngIf="allOptionsMap[selectedValue]?.icon">{{allOptionsMap[selectedValue].icon}}</mat-icon>
+          <!-- Icon -->
+          <mat-icon
+            *ngIf="allOptionsMap[value]?.icon">{{allOptionsMap[value].icon}}</mat-icon>
 
-            <!-- Label -->
-            {{allOptionsMap[selectedValue]?.label}}
-
-          </mat-option>
-        </ng-container>
-
-        <!-- Single select -->
-        <ng-template
-          #singleSelect>
-
-          <!-- Option -->
-          <mat-option
-            style="height: 0; display: none;"
-            [value]="valueAsString">
-
-            <!-- Icon -->
-            <mat-icon
-              *ngIf="allOptionsMap[valueAsString]?.icon">{{allOptionsMap[valueAsString].icon}}</mat-icon>
-
-            <!-- Label -->
-            {{allOptionsMap[valueAsString]?.label}}
-          </mat-option>
-        </ng-template>
+          <!-- Label -->
+          {{allOptionsMap[value]?.label}}
+        </mat-option>
 
       </ng-container>
 

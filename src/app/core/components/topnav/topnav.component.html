@@ -47,14 +47,14 @@
     class="gd-top-right">
 
     <!-- Outbreaks -->
-    <app-form-select-v2
+    <app-form-select-single-v2
       *ngIf="OutbreakModel.canView(authUser)"
       placeholder="LNG_LAYOUT_SELECTED_OUTBREAK_LABEL"
       [ngModel]="selectedOutbreak.id"
       (ngModelChange)="selectOutbreak($event)"
       [options]="outbreakListOptions"
       optionTooltipKey="details">
-    </app-form-select-v2>
+    </app-form-select-single-v2>
 
     <!-- Help -->
     <button

@@ -5,22 +5,11 @@
  .cdk-overlay-pane {
    &.gd-cdk-overlay-pane-dropdown {
      margin-top: 5rem;
-
-     &.gd-cdk-overlay-pane-dropdown-multi {
-      margin-top: 3.5rem;
-      transform: translateX(-1.6rem) !important;
-
-      .mat-select-panel-wrap {
-        .mat-select-panel {
-          min-width: calc(100% + 2.2rem) !important;
-        }
-      }
-     }
    }
  }
 
 /* Select */
-.gd-form-select-v2 {
+.gd-form-select-single-v2 {
   width: 100%;
 
   .mat-form-field {
@@ -149,34 +138,6 @@
               }
             }
 
-            /* Select multiple */
-            &.mat-select-multiple {
-              height: auto;
-
-              .mat-select-trigger {
-                width: calc(100% + 1rem);
-
-                .mat-select-value {
-                  .mat-select-value-text {
-                    .gd-form-select-v2-panel-inner {
-                      height: auto;
-                      max-height: 7.2rem;
-                      overflow-y: auto;
-                      padding-right: 3rem;
-                    }
-                  }
-                }
-  
-                .mat-select-arrow-wrapper {
-                  @include flex(flex);
-                  @include flex_align_items(center);
-                  height: 100%;
-                  position: absolute;
-                  right: 1.6rem;
-                }
-              }
-            }
-
             &[aria-expanded="true"] {
               .mat-select-trigger {
                 .mat-select-arrow-wrapper {
@@ -259,20 +220,20 @@
               color: var(--gd-secondary);
             }
           }
-  
+
           .mat-form-field-infix {
             .mat-select {
               .mat-select-trigger {
                 .mat-select-value {
                   color: var(--gd-secondary);
-  
+
                   .mat-select-value-text {
                     .mat-icon {
                       color: var(--gd-secondary);
                     }
                   }
                 }
-  
+
                 .mat-select-arrow-wrapper {
                   .mat-select-arrow {
                     color: var(--gd-secondary);
@@ -280,14 +241,14 @@
                 }
               }
             }
-  
+
             .mat-form-field-label-wrapper {
               .mat-form-field-label {
                 color: var(--gd-secondary);
               }
             }
           }
-  
+
           .mat-form-field-suffix {
             .mat-icon {
               color: var(--gd-secondary);
@@ -313,7 +274,7 @@
                 .mat-select-value {
                   color: var(--gd-danger);
                 }
-  
+
                 .mat-select-arrow-wrapper {
                   .mat-select-arrow {
                     color: var(--gd-danger);
@@ -321,7 +282,7 @@
                 }
               }
             }
-  
+
             .mat-form-field-label-wrapper {
               .mat-form-field-label {
                 color: var(--gd-danger);

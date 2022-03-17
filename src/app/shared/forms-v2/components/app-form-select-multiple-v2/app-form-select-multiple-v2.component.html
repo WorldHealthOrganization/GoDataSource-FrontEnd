@@ -1,0 +1,129 @@
+<div
+  class="gd-form-select-multiple-v2">
+
+  <!-- Input data -->
+  <mat-form-field
+    appearance="outline">
+
+    <!-- Place holder -->
+    <mat-label>
+      {{ placeholder | translate }}
+    </mat-label>
+
+    <!-- Select -->
+    <mat-select
+      [(ngModel)]="value"
+      (closed)="onTouchItem()"
+      [errorStateMatcher]="errMatcher"
+      [disabled]="disabled"
+      [required]="required"
+      multiple="true"
+      panelClass="gd-form-select-multiple-v2-panel"
+      (opened)="vScrollToFirstSelectedOption()">
+
+      <!-- Selected value -->
+      <mat-select-trigger
+        *ngIf="value">
+
+        <!-- multiple select ? -->
+        <div
+          fxLayout="row wrap"
+          class="gd-form-select-multiple-v2-panel-inner">
+          <div
+            *ngFor="let selectedValue of value; let selectedIndex = index">
+
+            <!-- separator -->
+            <ng-container
+              *ngIf="selectedIndex > 0">, </ng-container>
+
+            <!-- Icon -->
+            <mat-icon
+              *ngIf="allOptionsMap[selectedValue]?.icon">{{allOptionsMap[selectedValue].icon}}</mat-icon>
+
+            <!-- Label -->
+            {{allOptionsMap[selectedValue]?.label}}
+
+          </div>
+        </div>
+
+      </mat-select-trigger>
+
+      <!-- Search filter -->
+      <mat-option>
+        <ngx-mat-select-search
+          ngModel
+          [placeholderLabel]="'LNG_COMMON_LABEL_SEARCH' | translate"
+          [noEntriesFoundLabel]="null"
+          [clearSearchInput]="true"
+          [disableScrollToActiveOnOptionsChanged]="true"
+          [preventHomeEndKeyPropagation]="true"
+          (ngModelChange)="filterOptions($event)">
+        </ngx-mat-select-search>
+      </mat-option>
+
+      <!-- vscroll -->
+      <cdk-virtual-scroll-viewport
+        #cdkVirtualScrollViewport
+        [itemSize]="40"
+        [minBufferPx]="240"
+        [maxBufferPx]="480"
+        style="height: 20rem; overflow-x: hidden;">
+
+        <!-- Empty option used to select nothing -->
+        <mat-option
+          *ngIf="clearable"
+          [value]="null">
+          {{ 'LNG_COMMON_LABEL_NONE' | translate }}
+        </mat-option>
+
+        <!-- Options -->
+        <mat-option
+          *cdkVirtualFor="let option of filteredOptions; templateCacheSize: 0"
+          [value]="option.value"
+          [disabled]="option.disabled">
+          <div
+            [matTooltip]="optionTooltipKey ? option.data[optionTooltipKey] : undefined">
+
+            <!-- Icon -->
+            <mat-icon
+              *ngIf="option.icon">{{option.icon}}</mat-icon>
+
+            <!-- Label -->
+            {{option.label}}
+
+          </div>
+        </mat-option>
+
+      </cdk-virtual-scroll-viewport>
+
+      <!-- Selected option(s) hack to handle not visible in virtual scroll options -->
+      <ng-container
+        *ngIf="value">
+
+        <!-- Options -->
+        <mat-option
+          *ngFor="let selectedValue of value"
+          style="height: 0; display: none;"
+          [value]="selectedValue">
+
+          <!-- Icon -->
+          <mat-icon
+            *ngIf="allOptionsMap[selectedValue]?.icon">{{allOptionsMap[selectedValue].icon}}</mat-icon>
+
+          <!-- Label -->
+          {{allOptionsMap[selectedValue]?.label}}
+
+        </mat-option>
+
+      </ng-container>
+
+    </mat-select>
+
+    <!-- Errors -->
+    <mat-error
+      *ngIf="control?.invalid && control?.touched">
+      {{ getErrorMessages() }}
+    </mat-error>
+
+  </mat-form-field>
+</div>
