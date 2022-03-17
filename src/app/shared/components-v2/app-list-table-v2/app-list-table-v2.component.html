@@ -121,9 +121,8 @@
       </ng-container>
 
       <!-- Add -->
-      <button
+      <a
         *ngIf="addAction"
-        type="button"
         mat-flat-button
         [routerLink]="addAction.action.link && (!addAction.disable || !addAction.disable(null)) ? addAction.action.link(null) : undefined"
         [queryParams]="addAction.action.linkQueryParams ? addAction.action.linkQueryParams(null) : undefined"
@@ -134,11 +133,9 @@
         <mat-icon>{{addAction.icon}}</mat-icon>
 
         <!-- Label -->
-        <span>
-            {{ addAction.label | translate }}
-        </span>
+        <span>{{ addAction.label | translate }}</span>
 
-      </button>
+      </a>
 
     </div>
   </div>
