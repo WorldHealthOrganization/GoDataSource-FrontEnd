@@ -19,11 +19,18 @@ import { SystemSettingsDataService } from '../../services/data/system-settings.d
 import { SystemSettingsVersionModel } from '../../models/system-settings-version.model';
 import { IsActiveMatchOptions } from '@angular/router';
 import { ToastV2Service } from '../../services/helper/toast-v2.service';
+import { MAT_MENU_DEFAULT_OPTIONS } from '@angular/material/menu';
 
 @Component({
   selector: 'app-sidenav',
   templateUrl: './sidenav.component.html',
   styleUrls: ['./sidenav.component.scss'],
+  providers: [{
+    provide: MAT_MENU_DEFAULT_OPTIONS,
+    useValue: {
+      overlayPanelClass: 'gd-cdk-overlay-pane-main-menu'
+    }
+  }],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -674,14 +681,6 @@ export class SidenavComponent implements OnInit, OnDestroy {
     const overlayClassList: any = menuClassList ?
       menuClassList.closest('.cdk-overlay-pane').classList :
       menuClassList;
-
-    // attach custom class
-    if (
-      overlayClassList &&
-      !overlayClassList.contains('gd-cdk-overlay-pane-main-menu')
-    ) {
-      overlayClassList.add('gd-cdk-overlay-pane-main-menu');
-    }
 
     // make position adjustments
     setTimeout(() => {
