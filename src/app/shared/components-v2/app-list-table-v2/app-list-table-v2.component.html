@@ -322,23 +322,28 @@
   <!-- No rows -->
   <div
     *ngIf="!V2NoRowsComponent.noRowsHtmlElement"
+    fxLayout="column" fxLayoutAlign="center center"
     class="gd-list-table-data-no-rows">
-    {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+    <div
+      class="image"></div>
+    <div
+      class="text">{{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}</div>
   </div>
 
   <!-- Table paginator -->
   <div
-    fxLayout="row"
+    fxLayout="row" fxLayoutAlign="space-between center"
     class="gd-list-table-bottom">
 
     <!-- Left -->
     <div
-      fxFlex
+      fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="0.4rem"
       class="gd-list-table-bottom-left">
 
       <!-- Legends & Messages -->
       <div
         *ngFor="let legend of legends"
+        fxLayout="row wrap" fxLayoutAlign="start center"
         class="gd-list-table-bottom-left-legend"
         [innerHTML]="legend.html | safeHtml"></div>
 

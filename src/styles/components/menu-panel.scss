@@ -18,6 +18,12 @@
           background: rgba(var(--gd-primary-rgb), 0.1);
           color: var(--gd-primary);
         }
+
+        &[disabled],
+        &:disabled {
+          background: rgba(var(--gd-secondary-rgb), 0.15);
+          color: var(--gd-secondary);
+        }
       }
     }
   }
