@@ -68,29 +68,9 @@
 
 <!--
 #TODO - old html code - must remove once not needed anymore
-<div class="authenticated app-theme" fxLayout="column" *ngIf="authUser">
-    <mat-sidenav-container class="sidenav-container">
-
-        <mat-sidenav #snav mode="over" fixedInViewport>
-            <app-sidenav></app-sidenav>
-        </mat-sidenav>
-
-        <mat-sidenav-content>
-
-            <button class="sidenav-toggle" mat-raised-button color="accent" (click)="snav.toggle()">
-                {{ 'LNG_LAYOUT_MENU_BUTTON_LABEL' | translate }}
-            </button>
-
             <div *ngIf="contextSearchHelpItems"
                 class="context-help-trigger"
                 (click)="displayHelpDialog()">
                 <span class="xt-icon">help</span>
             </div>
-
-            <router-outlet></router-outlet>
-
-        </mat-sidenav-content>
-    </mat-sidenav-container>
-
-</div>
 -->

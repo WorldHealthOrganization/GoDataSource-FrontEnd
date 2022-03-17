@@ -31,6 +31,7 @@ import { IV2ActionIconLabel, IV2ActionMenuLabel, V2ActionMenuItem } from '../../
 import { OutbreakModel } from '../models/outbreak.model';
 import { IV2GroupedData } from '../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import { IBasicCount } from '../models/basic-count.interface';
+import { AuthenticatedComponent } from '../components/authenticated/authenticated.component';
 
 /**
  * Used by caching filter
@@ -2514,15 +2515,24 @@ export abstract class ListComponent implements OnDestroy {
   private mergeQueryParamsToUrl(queryParams: {
     [queryParamKey: string]: any
   }): void {
-    this.listHelperService.router.navigate(
-      [],
-      {
-        relativeTo: this.listHelperService.route,
-        replaceUrl: true,
-        queryParamsHandling: 'merge',
-        queryParams
-      }
-    );
+    // disable show page loading
+    AuthenticatedComponent.DISABLE_PAGE_LOADING = true;
+
+    // add params to page
+    this.listHelperService.router
+      .navigate(
+        [],
+        {
+          relativeTo: this.listHelperService.route,
+          replaceUrl: true,
+          queryParamsHandling: 'merge',
+          queryParams
+        }
+      )
+      .then(() => {
+        // enable page loading
+        AuthenticatedComponent.DISABLE_PAGE_LOADING = false;
+      });
   }
 
   /**
