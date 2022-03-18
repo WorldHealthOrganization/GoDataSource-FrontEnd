@@ -301,32 +301,13 @@
     enableCellTextSelection="true"
     suppressDragLeaveHidesColumns="true"
     suppressCellSelection="true"
-    [loadingOverlayComponent]="V2LoadingComponent"
-    [noRowsOverlayComponent]="V2NoRowsComponent"
+    columnHoverHighlight="true"
+    [loadingOverlayComponent]="AppListTableV2LoadingComponent"
+    [noRowsOverlayComponent]="AppListTableV2NoDataComponent"
     (firstDataRendered)="firstDataRendered()"
     (dragStopped)="saveVisibleAndOrderOfColumns($event)"
     (selectionChanged)="selectionChanged()">
   </ag-grid-angular>
-
-  <!-- Loading -->
-  <div
-    *ngIf="!V2LoadingComponent.loadingHtmlElement"
-    class="gd-list-table-data-loading">
-    <mat-progress-spinner
-      mode="indeterminate"
-      diameter="32"></mat-progress-spinner>
-  </div>
-
-  <!-- No rows -->
-  <div
-    *ngIf="!V2NoRowsComponent.noRowsHtmlElement"
-    fxLayout="column" fxLayoutAlign="center center"
-    class="gd-list-table-data-no-rows">
-    <div
-      class="image"></div>
-    <div
-      class="text">{{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}</div>
-  </div>
 
   <!-- Table paginator -->
   <div

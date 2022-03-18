@@ -1,0 +1,25 @@
+@import 'mixins';
+
+:host {
+  width: 100%;
+
+  .gd-list-table-column-header {
+
+    &.gd-list-table-column-header-sortable {
+      cursor: pointer;
+
+      &:hover {
+        color: red;
+      }
+
+      .gd-list-table-column-header-title {
+      }
+
+      .gd-list-table-column-header-sort {
+        &.gd-list-table-column-header-sort-desc {
+          @include rotate(180deg);
+        }
+      }
+    }
+  }
+}

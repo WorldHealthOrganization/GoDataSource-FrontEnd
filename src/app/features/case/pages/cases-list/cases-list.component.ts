@@ -274,23 +274,27 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       {
         field: 'lastName',
         label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
-        pinned: IV2ColumnPinned.LEFT
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true
       },
       {
         field: 'firstName',
         label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
-        pinned: IV2ColumnPinned.LEFT
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true
       },
       {
         field: 'middleName',
         label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
         notVisible: true,
-        pinned: IV2ColumnPinned.LEFT
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true
       },
       {
         field: 'visualId',
         label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
-        pinned: IV2ColumnPinned.LEFT
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true
       },
       {
         field: 'statuses',
@@ -363,11 +367,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       },
       {
         field: 'classification',
-        label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION'
+        label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+        sortable: true
       },
       {
         field: 'outcomeId',
-        label: 'LNG_CASE_FIELD_LABEL_OUTCOME'
+        label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+        sortable: true
       },
       {
         field: 'dateOfOutcome',
@@ -375,25 +381,29 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: V2ColumnFormat.DATE
         },
-        notVisible: true
+        notVisible: true,
+        sortable: true
       },
       {
         field: 'age',
         label: 'LNG_CASE_FIELD_LABEL_AGE',
         format: {
           type: V2ColumnFormat.AGE
-        }
+        },
+        sortable: true
       },
       {
         field: 'gender',
-        label: 'LNG_CASE_FIELD_LABEL_GENDER'
+        label: 'LNG_CASE_FIELD_LABEL_GENDER',
+        sortable: true
       },
       {
         field: 'phoneNumber',
         label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
         format: {
           type: 'mainAddress.phoneNumber'
-        }
+        },
+        sortable: true
       },
       {
         field: 'location',
@@ -413,7 +423,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'mainAddress.emailAddress'
-        }
+        },
+        sortable: true
       },
       {
         field: 'addresses.addressLine1',
@@ -421,7 +432,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'mainAddress.addressLine1'
-        }
+        },
+        sortable: true
       },
       {
         field: 'addresses.city',
@@ -429,7 +441,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'mainAddress.city'
-        }
+        },
+        sortable: true
       },
       {
         field: 'addresses.geoLocation.lat',
@@ -437,7 +450,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lat'
-        }
+        },
+        sortable: true
       },
       {
         field: 'addresses.geoLocation.lng',
@@ -445,7 +459,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lng'
-        }
+        },
+        sortable: true
       },
       {
         field: 'addresses.postalCode',
@@ -453,7 +468,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'mainAddress.postalCode'
-        }
+        },
+        sortable: true
       },
       {
         field: 'addresses.geoLocationAccurate',
@@ -462,14 +478,16 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: V2ColumnFormat.BOOLEAN,
           field: 'mainAddress.geoLocationAccurate'
-        }
+        },
+        sortable: true
       },
       {
         field: 'dateOfOnset',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
         format: {
           type: V2ColumnFormat.DATE
-        }
+        },
+        sortable: true
       },
       {
         field: 'dateOfReporting',
@@ -477,7 +495,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATE
-        }
+        },
+        sortable: true
       },
       {
         field: 'notACase',
@@ -488,7 +507,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           value: (data) => {
             return data.classification === Constants.CASE_CLASSIFICATION.NOT_A_CASE;
           }
-        }
+        },
+        sortable: true
       },
       {
         field: 'wasContact',
@@ -496,7 +516,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
-        }
+        },
+        sortable: true
       },
       {
         field: 'responsibleUserId',
@@ -526,6 +547,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           format: {
             type: V2ColumnFormat.BUTTON
           },
+          sortable: true,
           cssCellClass: 'gd-cell-button',
           buttonLabel: (item) => (item.numberOfContacts || '').toLocaleString('en'),
           color: 'text',
@@ -549,6 +571,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           format: {
             type: V2ColumnFormat.BUTTON
           },
+          sortable: true,
           cssCellClass: 'gd-cell-button',
           buttonLabel: (item) => (item.numberOfExposures || '').toLocaleString('en'),
           color: 'text',
@@ -577,7 +600,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
-        }
+        },
+        sortable: true
       },
       {
         field: 'createdBy',
@@ -601,7 +625,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME
-        }
+        },
+        sortable: true
       },
       {
         field: 'updatedBy',
@@ -625,7 +650,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME
-        }
+        },
+        sortable: true
       },
 
       // actions

@@ -18,8 +18,6 @@ import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
 import { IV2ActionIconLabel, IV2ActionMenuLabel, V2ActionMenuItem, V2ActionType } from './models/action.model';
 import { IV2GroupedData } from './models/grouped-data.model';
 import { AgGridAngular } from '@ag-grid-community/angular';
-import { V2LoadingComponent } from './models/loading.component';
-import { V2NoRowsComponent } from './models/no-rows.component';
 import { IBasicCount } from '../../../core/models/basic-count.interface';
 import { PageEvent } from '@angular/material/paginator';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
@@ -30,6 +28,10 @@ import { catchError } from 'rxjs/operators';
 import { AppListTableV2ButtonComponent } from './components/button/app-list-table-v2-button.component';
 import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 import { AppListTableV2SelectionHeaderComponent } from './components/selection-header/app-list-table-v2-selection-header.component';
+import { AppListTableV2ColumnHeaderComponent } from './components/column-header/app-list-table-v2-column-header.component';
+import { RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
+import { AppListTableV2LoadingComponent } from './components/loading/app-list-table-v2-loading.component';
+import { AppListTableV2NoDataComponent } from './components/no-data/app-list-table-v2-no-data.component';
 
 /**
  * Component
@@ -42,6 +44,7 @@ import { AppListTableV2SelectionHeaderComponent } from './components/selection-h
 })
 export class AppListTableV2Component implements OnInit, OnDestroy {
   // static
+  private static readonly STANDARD_SELECT_COLUMN_WIDTH: number = 42;
   private static readonly STANDARD_SHAPE_SIZE: number = 12;
   private static readonly STANDARD_SHAPE_GAP: number = 6;
   private static readonly STANDARD_SHAPE_PADDING: number = 12;
@@ -126,6 +129,12 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   // change page
   @Output() pageChange = new EventEmitter<PageEvent>();
 
+  // change page
+  @Output() sortBy = new EventEmitter<{
+    field: string,
+    direction: RequestSortDirection
+  }>();
+
   // ag table handler
   @ViewChild('agTable') agTable: AgGridAngular;
 
@@ -158,9 +167,22 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     return this._selected;
   }
 
+  // sort by
+  private _sortBy: {
+    component: AppListTableV2ColumnHeaderComponent,
+    column: IExtendedColDef,
+    direction: RequestSortDirection | null
+  } = { component: null, column: null, direction: null };
+  get sortByColumn(): IExtendedColDef {
+    return this._sortBy?.column;
+  }
+  get sortByDirection(): RequestSortDirection | null {
+    return this._sortBy?.direction;
+  }
+
   // constants
-  V2LoadingComponent = V2LoadingComponent;
-  V2NoRowsComponent = V2NoRowsComponent;
+  AppListTableV2LoadingComponent = AppListTableV2LoadingComponent;
+  AppListTableV2NoDataComponent = AppListTableV2NoDataComponent;
   Constants = Constants;
 
   /**
@@ -239,11 +261,6 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
    * Retrieve data
    */
   private retrieveData(): void {
-    // if first time we need to run one more time detect changes for spinner component to be loaded
-    if (!V2LoadingComponent.loadingHtmlElement) {
-      this.detectChanges();
-    }
-
     // nothing to do ?
     if (!this._records$) {
       // reset data
@@ -423,12 +440,14 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         pinned,
         resizable: !column.notResizable,
         columnDefinition: column,
+        columnDefinitionData: this,
         cellClass: column.cssCellClass,
         valueFormatter: (valueFormat): string => {
           return this.formatValue(valueFormat);
         },
         cellRenderer: this.handleCellRenderer(column),
-        suppressMovable: column.format && column.format.type === V2ColumnFormat.ACTIONS
+        suppressMovable: column.format && column.format.type === V2ColumnFormat.ACTIONS,
+        headerComponent: AppListTableV2ColumnHeaderComponent
       });
 
       // update legends
@@ -465,6 +484,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       cellClass: 'gd-cell-no-focus',
       suppressMovable: true,
       headerComponent: AppListTableV2SelectionHeaderComponent,
+      width: AppListTableV2Component.STANDARD_SELECT_COLUMN_WIDTH,
       valueFormatter: () => '',
       columnDefinitionData: this,
       columnDefinition: {
@@ -808,6 +828,11 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           (maxForms - 1) * (AppListTableV2Component.STANDARD_SHAPE_SIZE + AppListTableV2Component.STANDARD_SHAPE_GAP) +
           AppListTableV2Component.STANDARD_SHAPE_SIZE +
           AppListTableV2Component.STANDARD_SHAPE_PADDING * 2
+        );
+      } else if (colDef.headerComponent === AppListTableV2SelectionHeaderComponent) {
+        this.agTable.columnApi.setColumnWidth(
+          column,
+          AppListTableV2Component.STANDARD_SELECT_COLUMN_WIDTH
         );
       }
     });
@@ -1161,5 +1186,37 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   selectionChanged(): void {
     // update selected
     this._selected = this.agTable.api.getSelectedNodes().map((item) => item.data[this.keyField]);
+  }
+
+  /**
+   * Sort by - used in AppListTableV2ColumnHeaderComponent
+   */
+  columnSortBy(
+    component: AppListTableV2ColumnHeaderComponent,
+    column: IExtendedColDef,
+    direction: RequestSortDirection | null
+  ): void {
+    // keep old data
+    const oldColumn = this._sortBy.column;
+    const oldComponent = this._sortBy.component;
+
+    // set data
+    this._sortBy.component = component;
+    this._sortBy.column = column;
+    this._sortBy.direction = direction;
+
+    // redraw the old one ?
+    if (
+      oldColumn &&
+      oldColumn !== column
+    ) {
+      oldComponent.changeDetectorRef.detectChanges();
+    }
+
+    // sort
+    this.sortBy.emit({
+      field: this._sortBy.column?.columnDefinition.field,
+      direction: this._sortBy.direction
+    });
   }
 }

@@ -131,7 +131,6 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
       if (event instanceof RouteConfigLoadStart || event instanceof NavigationStart) {
         this.showLoading();
       } else if (event instanceof NavigationEnd) {
-        // console.log(1);
         this.hideLoading();
       }
     });

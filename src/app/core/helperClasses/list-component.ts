@@ -617,12 +617,15 @@ export abstract class ListComponent implements OnDestroy {
   }
 
   /**
-     * Sort asc / desc by specific fields
-     * @param data
-     * @param objectDetailsSort
-     */
+   * Sort asc / desc by specific fields
+   * @param data
+   * @param objectDetailsSort
+   */
   public sortBy(
-    data: any,
+    data: {
+      field: string,
+      direction: RequestSortDirection
+    },
     objectDetailsSort?: {
       [property: string]: string[]
     }
@@ -633,8 +636,8 @@ export abstract class ListComponent implements OnDestroy {
     }
 
     // sort information
-    const property = _.get(data, 'active');
-    const direction = _.get(data, 'direction');
+    const property = data?.field;
+    const direction = data?.direction;
 
     // remove previous sort columns, we can sort only by one column at a time
     this.queryBuilder.sort.clear();
@@ -643,7 +646,7 @@ export abstract class ListComponent implements OnDestroy {
     let queryBuilder;
     if (
       this.sideFilter &&
-            (queryBuilder = this.sideFilter.getQueryBuilder())
+      (queryBuilder = this.sideFilter.getQueryBuilder())
     ) {
       this.queryBuilder.sort.merge(queryBuilder.sort);
     }
@@ -651,12 +654,12 @@ export abstract class ListComponent implements OnDestroy {
     // sort
     if (
       property &&
-            direction
+      direction
     ) {
       // add sorting criteria
       if (
         objectDetailsSort &&
-                objectDetailsSort[property]
+        objectDetailsSort[property]
       ) {
         _.each(objectDetailsSort[property], (childProperty: string) => {
           this.queryBuilder.sort.by(
