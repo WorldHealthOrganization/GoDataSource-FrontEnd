@@ -10,7 +10,7 @@ import { AddressModel } from '../../../../core/models/address.model';
 import { FormControl, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
-import { catchError, share, tap } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
@@ -128,9 +128,6 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
             this.toastV2Service.error(err);
             finishCallback([]);
             return throwError(err);
-          }),
-          tap((duplicatesList) => {
-            this.checkEmptyList(duplicatesList.groups);
           })
         )
         .subscribe((duplicatesList) => {

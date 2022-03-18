@@ -41,6 +41,7 @@ export interface IV2ColumnBasic {
   notResizable?: boolean;
   link?: (any) => string;
   cssCellClass?: string;
+  sortable?: boolean;
 }
 
 /**
@@ -52,7 +53,8 @@ export enum V2ColumnFormat {
   DATE,
   DATETIME,
   BOOLEAN,
-  ACTIONS
+  ACTIONS,
+  STATUS
 }
 
 /**
@@ -116,6 +118,7 @@ export interface IV2ColumnButton {
   pinned?: IV2ColumnPinned | boolean;
   notResizable?: boolean;
   cssCellClass?: string;
+  sortable?: boolean;
 }
 
 /**
@@ -136,9 +139,73 @@ export interface IV2ColumnAction {
   pinned?: IV2ColumnPinned | boolean;
   notResizable?: boolean;
   cssCellClass?: string;
+  sortable?: never;
+}
+
+/**
+ * Status column form type
+ */
+export enum IV2ColumnStatusFormType {
+  CIRCLE,
+  SQUARE,
+  TRIANGLE
+}
+
+/**
+ * Status column form - shape
+ */
+interface IV2ColumnStatusFormShape {
+  // required
+  type: IV2ColumnStatusFormType.CIRCLE | IV2ColumnStatusFormType.SQUARE | IV2ColumnStatusFormType.TRIANGLE;
+  color: string;
+}
+
+/**
+ * Status column form
+ */
+export type V2ColumnStatusForm = IV2ColumnStatusFormShape;
+
+/**
+ * Status column - legend
+ */
+interface IV2ColumnLegendStatusItem {
+  // required
+  form: V2ColumnStatusForm;
+  label: string;
+}
+
+/**
+ * Status column - legend
+ */
+interface IV2ColumnLegend<T> {
+  // required
+  title: string;
+  items: T[];
+}
+
+/**
+ * Status column
+ */
+export interface IV2ColumnStatus {
+  // required
+  format: Omit<IV2ColumnBasicFormatType, 'type'> & {
+    type: V2ColumnFormat.STATUS
+  };
+  notResizable: true;
+  field: string;
+  label: string;
+  forms: (IV2ColumnStatus, data: any) => V2ColumnStatusForm[];
+  legends: IV2ColumnLegend<IV2ColumnLegendStatusItem>[];
+
+  // optional
+  notVisible?: boolean;
+  exclude?: (IV2Column) => boolean;
+  pinned?: IV2ColumnPinned | boolean;
+  cssCellClass?: string;
+  sortable?: never;
 }
 
 /**
  * Column
  */
-export type IV2Column = IV2ColumnBasic | IV2ColumnButton | IV2ColumnAge | IV2ColumnDate | IV2ColumnDatetime | IV2ColumnBoolean | IV2ColumnAction;
+export type IV2Column = IV2ColumnBasic | IV2ColumnButton | IV2ColumnAge | IV2ColumnDate | IV2ColumnDatetime | IV2ColumnBoolean | IV2ColumnAction | IV2ColumnStatus;

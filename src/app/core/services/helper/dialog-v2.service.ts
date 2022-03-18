@@ -12,7 +12,7 @@ import {
   V2SideDialogConfigInput,
   V2SideDialogConfigInputType
 } from '../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { ExportButtonKey, ExportDataExtension, ExportDataMethod, IV2ExportDataConfig, IV2ExportDataConfigProgressAnswer } from './models/dialog-v2.model';
+import { ExportButtonKey, ExportDataExtension, ExportDataMethod, IV2ExportDataConfig, IV2ExportDataConfigLoaderConfig, IV2ExportDataConfigProgressAnswer } from './models/dialog-v2.model';
 import { IV2LoadingDialogHandler } from '../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AppLoadingDialogV2Component } from '../../../shared/components-v2/app-loading-dialog-v2/app-loading-dialog-v2.component';
@@ -33,6 +33,9 @@ import { ToastV2Service } from './toast-v2.service';
 
 @Injectable()
 export class DialogV2Service {
+  // export dialog width
+  private static readonly EXPORT_DIALOG_WIDTH: string = '50rem';
+
   // used to show and update side dialog
   private _sideDialogSubject$: Subject<IV2SideDialog> = new Subject<IV2SideDialog>();
 
@@ -172,7 +175,9 @@ export class DialogV2Service {
       inputs.push({
         type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
         placeholder: 'LNG_COMMON_LABEL_EXPORT_ANONYMIZE_FIELDS',
-        name: 'anonymizeFields',
+        name: config.export.allow.anonymize.key ?
+          config.export.allow.anonymize.key :
+          'anonymizeFields',
         values: [],
         options: config.export.allow.anonymize.fields
       });
@@ -354,7 +359,7 @@ export class DialogV2Service {
         action: V2SideDialogConfigAction.OPEN,
         config: {
           title: config.title,
-          width: '50rem',
+          width: DialogV2Service.EXPORT_DIALOG_WIDTH,
           initialized: config.initialized,
           inputs: inputs,
           bottomButtons: [{
@@ -404,6 +409,14 @@ export class DialogV2Service {
               delete formData[name];
             }
           });
+
+          // append extra data ?
+          if (config.export.extraFormData?.append) {
+            Object.assign(
+              formData,
+              config.export.extraFormData?.append
+            );
+          }
 
           // construct query builder
           const qb: RequestQueryBuilder = new RequestQueryBuilder();
@@ -693,6 +706,31 @@ export class DialogV2Service {
             });
         })
       });
+  }
+
+  /**
+   * Show export data
+   */
+  showExportDataAfterLoadingData(config: IV2ExportDataConfigLoaderConfig): void {
+    this.showSideDialog({
+      title: config.title,
+      width: DialogV2Service.EXPORT_DIALOG_WIDTH,
+      inputs: [],
+      bottomButtons: [],
+      initialized: (handler) => {
+        // show loading
+        handler.loading.show();
+
+        // wait for data to be loaded
+        config.load((exportConfig) => {
+          // hide previous dialog
+          handler.hide();
+
+          // show export
+          this.showExportData(exportConfig);
+        });
+      }
+    }).subscribe();
   }
 
   /**

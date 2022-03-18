@@ -27,10 +27,11 @@ import * as LzString from 'lz-string';
 import { LoadingDialogModel } from '../../shared/components';
 import { IV2Column } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
-import { IV2ActionIconLabel, IV2ActionMenuLabel } from '../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2ActionIconLabel, IV2ActionMenuLabel, V2ActionMenuItem } from '../../shared/components-v2/app-list-table-v2/models/action.model';
 import { OutbreakModel } from '../models/outbreak.model';
 import { IV2GroupedData } from '../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import { IBasicCount } from '../models/basic-count.interface';
+import { AuthenticatedComponent } from '../components/authenticated/authenticated.component';
 
 /**
  * Used by caching filter
@@ -92,6 +93,9 @@ export abstract class ListComponent implements OnDestroy {
 
   // quick actions
   quickActions: IV2ActionMenuLabel;
+
+  // group actions
+  groupActions: V2ActionMenuItem[];
 
   // add action
   addAction: IV2ActionIconLabel;
@@ -216,9 +220,6 @@ export abstract class ListComponent implements OnDestroy {
   // pagination
   public pageSize: number = Constants.DEFAULT_PAGE_SIZE;
   private paginatorInitialized = false;
-
-  // flag set to true if the list is empty
-  public isEmptyList: boolean;
 
   // Models for the checkbox functionality
   private checkboxModels: {
@@ -616,19 +617,15 @@ export abstract class ListComponent implements OnDestroy {
   }
 
   /**
-     * Checks if list is empty
-     */
-  checkEmptyList(list: any[]) {
-    this.isEmptyList = _.isEmpty(list);
-  }
-
-  /**
-     * Sort asc / desc by specific fields
-     * @param data
-     * @param objectDetailsSort
-     */
+   * Sort asc / desc by specific fields
+   * @param data
+   * @param objectDetailsSort
+   */
   public sortBy(
-    data: any,
+    data: {
+      field: string,
+      direction: RequestSortDirection
+    },
     objectDetailsSort?: {
       [property: string]: string[]
     }
@@ -639,8 +636,8 @@ export abstract class ListComponent implements OnDestroy {
     }
 
     // sort information
-    const property = _.get(data, 'active');
-    const direction = _.get(data, 'direction');
+    const property = data?.field;
+    const direction = data?.direction;
 
     // remove previous sort columns, we can sort only by one column at a time
     this.queryBuilder.sort.clear();
@@ -649,7 +646,7 @@ export abstract class ListComponent implements OnDestroy {
     let queryBuilder;
     if (
       this.sideFilter &&
-            (queryBuilder = this.sideFilter.getQueryBuilder())
+      (queryBuilder = this.sideFilter.getQueryBuilder())
     ) {
       this.queryBuilder.sort.merge(queryBuilder.sort);
     }
@@ -657,12 +654,12 @@ export abstract class ListComponent implements OnDestroy {
     // sort
     if (
       property &&
-            direction
+      direction
     ) {
       // add sorting criteria
       if (
         objectDetailsSort &&
-                objectDetailsSort[property]
+        objectDetailsSort[property]
       ) {
         _.each(objectDetailsSort[property], (childProperty: string) => {
           this.queryBuilder.sort.by(
@@ -2521,15 +2518,24 @@ export abstract class ListComponent implements OnDestroy {
   private mergeQueryParamsToUrl(queryParams: {
     [queryParamKey: string]: any
   }): void {
-    this.listHelperService.router.navigate(
-      [],
-      {
-        relativeTo: this.listHelperService.route,
-        replaceUrl: true,
-        queryParamsHandling: 'merge',
-        queryParams
-      }
-    );
+    // disable show page loading
+    AuthenticatedComponent.DISABLE_PAGE_LOADING = true;
+
+    // add params to page
+    this.listHelperService.router
+      .navigate(
+        [],
+        {
+          relativeTo: this.listHelperService.route,
+          replaceUrl: true,
+          queryParamsHandling: 'merge',
+          queryParams
+        }
+      )
+      .then(() => {
+        // enable page loading
+        AuthenticatedComponent.DISABLE_PAGE_LOADING = false;
+      });
   }
 
   /**

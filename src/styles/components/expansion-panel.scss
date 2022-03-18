@@ -115,6 +115,8 @@
           }
 
           .mat-expansion-panel-header-description {
+            margin-right: 0;
+
             button.mat-icon-button {
               &:hover {
                 .mat-button-focus-overlay {
@@ -169,9 +171,9 @@
       pointer-events: none;
 
       .mat-expansion-panel-header {
-        .mat-expansion-panel-header-description {
-          margin-right: 0;
+        padding-left: 4rem;
 
+        .mat-expansion-panel-header-description {
           button.mat-icon-button {
             pointer-events: all;
           }

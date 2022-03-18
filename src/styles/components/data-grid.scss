@@ -40,6 +40,17 @@
           height: 100%;
           top: 0;
         }
+
+        .gd-list-table-selection-header {
+          @include flex(flex);
+
+          button.mat-icon-button {
+            height: 2.4rem;
+            min-width: 2.4rem;
+            padding: 0;
+            width: 2.4rem;
+          }
+        }
       }
     }
 
@@ -80,16 +91,22 @@
             }
           }
 
-          .gd-list-table-button {
-            button.mat-flat-button,
-            a.mat-flat-button {
-              line-height: 2.4rem;
-              min-width: 5rem;
-              padding: 0;
+          &.gd-cell-button {
+            .ag-cell-value {
+              width: 100%;
+            }
 
-              .mat-button-focus-overlay,
-              .mat-ripple {
-                display: none;
+            .gd-list-table-button {
+              button.mat-flat-button,
+              a.mat-flat-button {
+                line-height: 2.4rem;
+                padding: 0;
+                width: 100%;
+  
+                .mat-button-focus-overlay,
+                .mat-ripple {
+                  display: none;
+                }
               }
             }
           }
@@ -175,6 +192,47 @@
           @include box-shadow(none);
         }
       }
+    }
+
+    /* AgGrid no rows */
+    .gd-list-table-data-no-rows {
+      .image {
+        background-image: url(../../assets/images/nothing-found.svg);
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+        height: 25rem;
+        width: 25rem;
+      }
+
+      .text {
+        color: var(--gd-secondary);
+        font-size: 1.6rem;
+        margin-top: 2rem;
+      }
+    }
+  }
+}
+
+/* List table legend */
+.gd-list-table-bottom-left-legend {
+  .gd-list-table-bottom-left-legend-title {
+    color: var(--gd-secondary);
+    font-size: 1.2rem;
+    margin-left: 0.8rem;
+    min-width: 9.5rem;
+    text-transform: uppercase;
+  }
+
+  .gd-list-table-bottom-left-legend-item {
+    @include flex_align_items(center);
+    @include flex(flex);
+    @include flex_direction(row);
+    font-size: 1.2rem;
+    margin-left: 0.8rem;
+
+    svg {
+      margin-right: 0.4rem;
     }
   }
 }

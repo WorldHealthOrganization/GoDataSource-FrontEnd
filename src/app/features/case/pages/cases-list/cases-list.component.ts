@@ -1,18 +1,16 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subscription, throwError } from 'rxjs';
+import { Observable, of, Subscription, throwError } from 'rxjs';
 import { UserModel } from '../../../../core/models/user.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { DialogField, DialogFieldType } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ApplyListFilter, Constants } from '../../../../core/models/constants';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
-import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategory, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { Params, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
@@ -21,7 +19,7 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
-import { catchError, map, share, takeUntil, tap } from 'rxjs/operators';
+import { catchError, map, share, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
@@ -31,7 +29,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { AddressModel } from '../../../../core/models/address.model';
 import { ExportFieldsGroupModelNameEnum } from '../../../../core/models/export-fields-group.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -40,9 +38,12 @@ import { IV2BreadcrumbAction } from '../../../../shared/components-v2/app-breadc
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { ExportButtonKey, ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
+import { ExportButtonKey, ExportDataExtension, ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { LocationDataService } from '../../../../core/services/data/location.data.service';
+import { LocationModel } from '../../../../core/models/location.model';
 
 @Component({
   selector: 'app-cases-list',
@@ -51,12 +52,6 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 export class CasesListComponent extends ListComponent implements OnInit, OnDestroy {
   // list of existing cases
   casesList$: Observable<CaseModel[]>;
-
-  // field groups
-  private caseFieldGroups: ILabelValuePairModel[];
-  private caseFieldGroupsRequires: IV2ExportDataConfigGroupsRequired;
-  private relationshipFieldGroups: ILabelValuePairModel[];
-  private relationshipFieldGroupsRequires: IV2ExportDataConfigGroupsRequired;
 
   // case anonymize fields
   private caseAnonymizeFields: ILabelValuePairModel[] = [
@@ -144,16 +139,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   });
   filterAddressParentLocationIds: string[] = [];
 
-  // don't display pills by default
-  showCountPills: boolean = false;
-
   // user list
   userList$: Observable<UserModel[]>;
 
-  caseClassifications$: Observable<any>;
-
   caseClassificationsList$: Observable<any[]>;
-  caseClassificationsListMap: { [id: string]: ReferenceDataEntryModel };
   genderList$: Observable<any[]>;
   yesNoOptionsList$: Observable<any[]>;
   occupationsList$: Observable<any[]>;
@@ -175,34 +164,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
   // provide constants to template
   Constants = Constants;
-  EntityType = EntityType;
-  ReferenceDataCategory = ReferenceDataCategory;
-  LabResultModel = LabResultModel;
-  CaseModel = CaseModel;
-  OutbreakModel = OutbreakModel;
-  UserModel = UserModel;
 
   notACaseFilter: boolean | string = false;
-
-  exportCasesUrl: string;
-  allowedExportTypes: ExportDataExtension[] = [
-    ExportDataExtension.CSV,
-    ExportDataExtension.XLS,
-    ExportDataExtension.XLSX,
-    ExportDataExtension.JSON,
-    ExportDataExtension.ODS,
-    ExportDataExtension.PDF
-  ];
-
-  // include contact data in case export ?
-  caseExtraDialogFields: DialogField[] = [
-    new DialogField({
-      name: 'includeContactFields',
-      placeholder: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION',
-      description: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION_DESCRIPTION',
-      fieldType: DialogFieldType.BOOLEAN
-    })
-  ];
 
   // subscribers
   outbreakSubscriber: Subscription;
@@ -212,12 +175,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    */
   constructor(
     protected listHelperService: ListHelperService,
+    private activatedRoute: ActivatedRoute,
     private router: Router,
     private caseDataService: CaseDataService,
+    private locationDataService: LocationDataService,
     private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
     private referenceDataDataService: ReferenceDataDataService,
-    private dialogService: DialogService,
     private dialogV2Service: DialogV2Service,
     private i18nService: I18nService,
     private genericDataService: GenericDataService,
@@ -238,25 +202,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
     // reference data
     this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
-    this.caseClassifications$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION).pipe(share());
-    this.caseClassificationsList$ = this.caseClassifications$
-      .pipe(
-        map((data: ReferenceDataCategoryModel) => {
-          return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
-            new LabelValuePair(entry.value, entry.id, null, null, entry.iconUrl)
-          );
-        })
-      );
-    this.caseClassifications$.subscribe((caseClassificationCategory: ReferenceDataCategoryModel) => {
-      this.caseClassificationsListMap = _.transform(
-        caseClassificationCategory.entries,
-        (result, entry: ReferenceDataEntryModel) => {
-          // groupBy won't work here since groupBy will put an array instead of one value
-          result[entry.id] = entry;
-        },
-        {}
-      );
-    });
     this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
     this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
     this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
@@ -269,37 +214,14 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     this.yesNoOptionsWithoutAllList$ = this.genericDataService.getFilterYesNoOptions(true);
     this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
 
-    // retrieve the list of export fields groups for model
-    this.outbreakDataService.getExportFieldsGroups(ExportFieldsGroupModelNameEnum.CASE)
-      .subscribe((fieldsGroupList) => {
-        // set groups
-        this.caseFieldGroups = fieldsGroupList.options.map((item) => ({
-          label: item.name,
-          value: item.name
-        }));
-
-        // group restrictions
-        this.caseFieldGroupsRequires = fieldsGroupList.toRequiredList();
-      });
-
-    // retrieve the list of export fields groups for relationships
-    this.outbreakDataService.getExportFieldsGroups(ExportFieldsGroupModelNameEnum.RELATIONSHIP)
-      .subscribe((fieldsGroupList) => {
-        // set groups
-        this.relationshipFieldGroups = fieldsGroupList.options.map((item) => ({
-          label: item.name,
-          value: item.name
-        }));
-
-        // group restrictions
-        this.relationshipFieldGroupsRequires = fieldsGroupList.toRequiredList();
-      });
-
     // initialize table Columns
     this.initializeTableColumns();
 
     // initialize quick actions
     this.initializeQuickActions();
+
+    // initialize group actions
+    this.initializeGroupActions();
 
     // initialize add action
     this.initializeAddAction();
@@ -327,13 +249,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    */
   selectedOutbreakChanged(): void {
     // export cases url
-    this.exportCasesUrl = null;
     if (
       this.selectedOutbreak &&
       this.selectedOutbreak.id
     ) {
-      this.exportCasesUrl = `/outbreaks/${this.selectedOutbreak.id}/cases/export`;
-
       this.clustersListAsLabelValuePair$ = this.clusterDataService.getClusterListAsLabelValue(this.selectedOutbreak.id);
 
       // initialize side filters
@@ -349,37 +268,112 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   /**
    * Initialize Side Table Columns
    */
-  initializeTableColumns(): void {
+  private initializeTableColumns(): void {
     // default table columns
     this.tableColumns = [
       {
         field: 'lastName',
         label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
-        pinned: IV2ColumnPinned.LEFT
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true
       },
       {
         field: 'firstName',
         label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
-        pinned: IV2ColumnPinned.LEFT
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true
       },
       {
         field: 'middleName',
         label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
         notVisible: true,
-        pinned: IV2ColumnPinned.LEFT
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true
       },
       {
         field: 'visualId',
         label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
-        pinned: IV2ColumnPinned.LEFT
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true
+      },
+      {
+        field: 'statuses',
+        label: 'LNG_COMMON_LABEL_STATUSES',
+        format: {
+          type: V2ColumnFormat.STATUS
+        },
+        notResizable: true,
+        pinned: true,
+        legends: [
+          // classification
+          {
+            title: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+            items: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).list.map((item) => {
+              return {
+                form: {
+                  type: IV2ColumnStatusFormType.CIRCLE,
+                  color: item.getColorCode()
+                },
+                label: item.id
+              };
+            })
+          },
+
+          // risk
+          {
+            title: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
+            items: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).list.map((item) => {
+              return {
+                form: {
+                  type: IV2ColumnStatusFormType.TRIANGLE,
+                  color: item.getColorCode()
+                },
+                label: item.id
+              };
+            })
+          }
+        ],
+        forms: (_column, data: CaseModel): V2ColumnStatusForm[] => {
+          // construct list of forms that we need to display
+          const forms: V2ColumnStatusForm[] = [];
+
+          // classification
+          const classification = this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>;
+          if (
+            data.classification &&
+            classification.map[data.classification]
+          ) {
+            forms.push({
+              type: IV2ColumnStatusFormType.CIRCLE,
+              color: classification.map[data.classification].getColorCode()
+            });
+          }
+
+          // risk
+          const risk = this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>;
+          if (
+            data.riskLevel &&
+            risk.map[data.riskLevel]
+          ) {
+            forms.push({
+              type: IV2ColumnStatusFormType.TRIANGLE,
+              color: risk.map[data.riskLevel].getColorCode()
+            });
+          }
+
+          // finished
+          return forms;
+        }
       },
       {
         field: 'classification',
-        label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION'
+        label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+        sortable: true
       },
       {
         field: 'outcomeId',
-        label: 'LNG_CASE_FIELD_LABEL_OUTCOME'
+        label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+        sortable: true
       },
       {
         field: 'dateOfOutcome',
@@ -387,25 +381,29 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: V2ColumnFormat.DATE
         },
-        notVisible: true
+        notVisible: true,
+        sortable: true
       },
       {
         field: 'age',
         label: 'LNG_CASE_FIELD_LABEL_AGE',
         format: {
           type: V2ColumnFormat.AGE
-        }
+        },
+        sortable: true
       },
       {
         field: 'gender',
-        label: 'LNG_CASE_FIELD_LABEL_GENDER'
+        label: 'LNG_CASE_FIELD_LABEL_GENDER',
+        sortable: true
       },
       {
         field: 'phoneNumber',
         label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
         format: {
           type: 'mainAddress.phoneNumber'
-        }
+        },
+        sortable: true
       },
       {
         field: 'location',
@@ -425,7 +423,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'mainAddress.emailAddress'
-        }
+        },
+        sortable: true
       },
       {
         field: 'addresses.addressLine1',
@@ -433,7 +432,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'mainAddress.addressLine1'
-        }
+        },
+        sortable: true
       },
       {
         field: 'addresses.city',
@@ -441,7 +441,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'mainAddress.city'
-        }
+        },
+        sortable: true
       },
       {
         field: 'addresses.geoLocation.lat',
@@ -449,7 +450,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lat'
-        }
+        },
+        sortable: true
       },
       {
         field: 'addresses.geoLocation.lng',
@@ -457,7 +459,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lng'
-        }
+        },
+        sortable: true
       },
       {
         field: 'addresses.postalCode',
@@ -465,7 +468,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'mainAddress.postalCode'
-        }
+        },
+        sortable: true
       },
       {
         field: 'addresses.geoLocationAccurate',
@@ -474,14 +478,16 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: V2ColumnFormat.BOOLEAN,
           field: 'mainAddress.geoLocationAccurate'
-        }
+        },
+        sortable: true
       },
       {
         field: 'dateOfOnset',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
         format: {
           type: V2ColumnFormat.DATE
-        }
+        },
+        sortable: true
       },
       {
         field: 'dateOfReporting',
@@ -489,7 +495,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATE
-        }
+        },
+        sortable: true
       },
       {
         field: 'notACase',
@@ -500,7 +507,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           value: (data) => {
             return data.classification === Constants.CASE_CLASSIFICATION.NOT_A_CASE;
           }
-        }
+        },
+        sortable: true
       },
       {
         field: 'wasContact',
@@ -508,7 +516,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
-        }
+        },
+        sortable: true
       },
       {
         field: 'responsibleUserId',
@@ -538,6 +547,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           format: {
             type: V2ColumnFormat.BUTTON
           },
+          sortable: true,
           cssCellClass: 'gd-cell-button',
           buttonLabel: (item) => (item.numberOfContacts || '').toLocaleString('en'),
           color: 'text',
@@ -561,6 +571,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           format: {
             type: V2ColumnFormat.BUTTON
           },
+          sortable: true,
           cssCellClass: 'gd-cell-button',
           buttonLabel: (item) => (item.numberOfExposures || '').toLocaleString('en'),
           color: 'text',
@@ -589,7 +600,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
-        }
+        },
+        sortable: true
       },
       {
         field: 'createdBy',
@@ -613,7 +625,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME
-        }
+        },
+        sortable: true
       },
       {
         field: 'updatedBy',
@@ -637,7 +650,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME
-        }
+        },
+        sortable: true
       },
 
       // actions
@@ -1198,7 +1212,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   /**
    * Initialize quick actions
    */
-  initializeQuickActions(): void {
+  private initializeQuickActions(): void {
     this.quickActions = {
       type: V2ActionType.MENU,
       label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
@@ -1270,51 +1284,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           label: 'LNG_PAGE_LIST_CASES_EXPORT_BUTTON',
           action: {
             click: () => {
-              this.dialogV2Service.showExportData({
-                title: {
-                  get: () => 'LNG_PAGE_LIST_CASES_EXPORT_TITLE'
-                },
-                export: {
-                  url: `/outbreaks/${this.selectedOutbreak.id}/cases/export`,
-                  async: true,
-                  method: ExportDataMethod.GET,
-                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
-                  queryBuilder: this.queryBuilder,
-                  allow: {
-                    types: [
-                      ExportDataExtension.CSV,
-                      ExportDataExtension.XLS,
-                      ExportDataExtension.XLSX,
-                      ExportDataExtension.JSON,
-                      ExportDataExtension.ODS,
-                      ExportDataExtension.PDF
-                    ],
-                    encrypt: true,
-                    anonymize: {
-                      fields: this.caseAnonymizeFields
-                    },
-                    groups: {
-                      fields: this.caseFieldGroups,
-                      required: this.caseFieldGroupsRequires
-                    },
-                    dbColumns: true,
-                    dbValues: true,
-                    jsonReplaceUndefinedWithNull: true,
-                    questionnaireVariables: true
-                  },
-                  inputs: {
-                    append: [
-                      {
-                        type: V2SideDialogConfigInputType.CHECKBOX,
-                        placeholder: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION',
-                        tooltip: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION_DESCRIPTION',
-                        name: 'includeContactFields',
-                        checked: false
-                      }
-                    ]
-                  }
-                }
-              });
+              this.exportCases(this.queryBuilder);
             }
           },
           visible: (): boolean => {
@@ -1413,40 +1383,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 );
               }
 
-              // export
-              this.dialogV2Service.showExportData({
-                title: {
-                  get: () => 'LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIPS_TITLE'
-                },
-                export: {
-                  url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
-                  async: true,
-                  method: ExportDataMethod.GET,
-                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIP_FILE_NAME')} - ${moment().format('YYYY-MM-DD')}`,
-                  queryBuilder: qb,
-                  allow: {
-                    types: [
-                      ExportDataExtension.CSV,
-                      ExportDataExtension.XLS,
-                      ExportDataExtension.XLSX,
-                      ExportDataExtension.JSON,
-                      ExportDataExtension.ODS,
-                      ExportDataExtension.PDF
-                    ],
-                    encrypt: true,
-                    anonymize: {
-                      fields: this.relationshipAnonymizeFields
-                    },
-                    groups: {
-                      fields: this.relationshipFieldGroups,
-                      required: this.relationshipFieldGroupsRequires
-                    },
-                    dbColumns: true,
-                    dbValues: true,
-                    jsonReplaceUndefinedWithNull: true
-                  }
-                }
-              });
+              // export case relationships
+              this.exportCaseRelationships(qb);
             }
           },
           visible: (): boolean => {
@@ -1472,9 +1410,122 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   }
 
   /**
+   * Initialize group actions
+   */
+  private initializeGroupActions(): void {
+    this.groupActions = [
+      {
+        label: 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES',
+        action: {
+          click: (selected: string[]) => {
+            // construct query builder
+            const qb = new RequestQueryBuilder();
+            qb.filter.bySelect(
+              'id',
+              selected,
+              true,
+              null
+            );
+
+            // export
+            this.exportCases(qb);
+          }
+        },
+        visible: (): boolean => {
+          return CaseModel.canExport(this.authUser);
+        },
+        disable: (selected: string[]): boolean => {
+          return selected.length < 1;
+        }
+      }, {
+        label: 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER',
+        action: {
+          click: (selected: string[]) => {
+            // remove id from list
+            const anonymizeFields = this.caseAnonymizeFields.filter((item) => {
+              return item.value !== 'id';
+            });
+
+            // export dossier
+            this.dialogV2Service.showExportData({
+              title: {
+                get: () => 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER_DIALOG_TITLE'
+              },
+              export: {
+                url: `outbreaks/${this.selectedOutbreak.id}/cases/dossier`,
+                async: false,
+                method: ExportDataMethod.POST,
+                fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
+                extraFormData: {
+                  append: {
+                    cases: selected
+                  }
+                },
+                allow: {
+                  types: [
+                    ExportDataExtension.ZIP
+                  ],
+                  anonymize: {
+                    fields: anonymizeFields,
+                    key: 'data'
+                  }
+                }
+              }
+            });
+          }
+        },
+        visible: (): boolean => {
+          return CaseModel.canExportDossier(this.authUser);
+        },
+        disable: (selected: string[]): boolean => {
+          return selected.length < 1;
+        }
+      }, {
+        label: 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_RELATIONSHIPS',
+        action: {
+          click: (selected: string[]) => {
+            // construct query builder
+            const qb = new RequestQueryBuilder();
+            const personsQb = qb.addChildQueryBuilder('person');
+
+            // retrieve only relationships that have at least one persons as desired type
+            qb.filter.byEquality(
+              'persons.type',
+              EntityType.CASE
+            );
+
+            // id
+            personsQb.filter.bySelect(
+              'id',
+              selected,
+              true,
+              null
+            );
+
+            // type
+            personsQb.filter.byEquality(
+              'type',
+              EntityType.CASE
+            );
+
+            // export case relationships
+            this.exportCaseRelationships(qb);
+          }
+        },
+        visible: (): boolean => {
+          return CaseModel.canExportRelationships(this.authUser);
+        },
+        disable: (selected: string[]): boolean => {
+          return selected.length < 1;
+        }
+      }
+    ];
+  }
+
+  /**
    * Initialize add action
    */
-  initializeAddAction(): void {
+  private initializeAddAction(): void {
     this.addAction = {
       type: V2ActionType.ICON_LABEL,
       label: 'LNG_COMMON_BUTTON_ADD',
@@ -1491,7 +1542,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   /**
    * Initialize grouped data
    */
-  initializeGroupedData(): void {
+  private initializeGroupedData(): void {
     this.groupedData = {
       label: 'LNG_PAGE_LIST_CASES_ACTION_SHOW_GROUP_BY_CLASSIFICATION_PILLS',
       data: {
@@ -1521,76 +1572,226 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
               takeUntil(this.destroyed$)
             )
             .subscribe((countResponse) => {
-              this.caseClassifications$
-                .pipe(
-                  // should be the last pipe
-                  takeUntil(this.destroyed$)
-                )
-                .subscribe((refClassificationData: ReferenceDataCategoryModel) => {
-                  // map reference data
-                  const refDataMap: {
-                    [entryId: string]: ReferenceDataEntryModel
-                  } = {};
-                  refClassificationData.entries.forEach((entry) => {
-                    refDataMap[entry.id] = entry;
-                  });
-
-                  // group data
-                  let values: {
-                    label: string,
-                    value: number,
-                    color?: string,
-                    order?: any
-                  }[] = [];
-                  Object.keys(countResponse.classification || {}).forEach((classificationId) => {
-                    values.push({
-                      label: classificationId,
-                      value: countResponse.classification[classificationId].count,
-                      color: refDataMap[classificationId] ? refDataMap[classificationId].getColorCode() : Constants.DEFAULT_COLOR_REF_DATA,
-                      order: refDataMap[classificationId].order !== undefined ?
-                        refDataMap[classificationId].order :
-                        Number.MAX_SAFE_INTEGER
-                    });
-                  });
-
-                  // sort values either by order or label natural order
-                  values = values.sort((item1, item2) => {
-                    // if same order, compare labels
-                    if (item1.order === item2.order) {
-                      return this.i18nService.instant(item1.label).localeCompare(this.i18nService.instant(item2.label));
-                    }
-
-                    // format order
-                    let order1: number = Number.MAX_SAFE_INTEGER;
-                    try { order1 = parseInt(item1.order, 10); } catch (e) {}
-                    let order2: number = Number.MAX_SAFE_INTEGER;
-                    try { order2 = parseInt(item2.order, 10); } catch (e) {}
-
-                    // compare order
-                    return order1 - order2;
-                  });
-
-                  // set data
-                  gData.data.values = values.map((item) => {
-                    return {
-                      label: item.label,
-                      bgColor: item.color,
-                      textColor: Constants.hexColorToTextColor(item.color),
-                      value: item.value.toLocaleString('en')
-                    };
-                  });
-
-                  // finished loading data
-                  gData.data.loading = false;
-
-                  // refresh ui
-                  refreshUI();
+              // group data
+              const classification = this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>;
+              let values: {
+                label: string,
+                value: number,
+                color?: string,
+                order?: any
+              }[] = [];
+              Object.keys(countResponse.classification || {}).forEach((classificationId) => {
+                values.push({
+                  label: classificationId,
+                  value: countResponse.classification[classificationId].count,
+                  color: classification.map[classificationId] ? classification.map[classificationId].getColorCode() : Constants.DEFAULT_COLOR_REF_DATA,
+                  order: classification.map[classificationId].order !== undefined ?
+                    classification.map[classificationId].order :
+                    Number.MAX_SAFE_INTEGER
                 });
+              });
+
+              // sort values either by order or label natural order
+              values = values.sort((item1, item2) => {
+                // if same order, compare labels
+                if (item1.order === item2.order) {
+                  return this.i18nService.instant(item1.label).localeCompare(this.i18nService.instant(item2.label));
+                }
+
+                // format order
+                let order1: number = Number.MAX_SAFE_INTEGER;
+                try { order1 = parseInt(item1.order, 10); } catch (e) {}
+                let order2: number = Number.MAX_SAFE_INTEGER;
+                try { order2 = parseInt(item2.order, 10); } catch (e) {}
+
+                // compare order
+                return order1 - order2;
+              });
+
+              // set data
+              gData.data.values = values.map((item) => {
+                return {
+                  label: item.label,
+                  bgColor: item.color,
+                  textColor: Constants.hexColorToTextColor(item.color),
+                  value: item.value.toLocaleString('en')
+                };
+              });
+
+              // finished loading data
+              gData.data.loading = false;
+
+              // refresh ui
+              refreshUI();
             });
         }
       }
     };
   }
+
+  /**
+   * Export case data
+   */
+  private exportCases(qb: RequestQueryBuilder): void {
+    this.dialogV2Service
+      .showExportDataAfterLoadingData({
+        title: {
+          get: () => 'LNG_PAGE_LIST_CASES_EXPORT_TITLE'
+        },
+        load: (finished) => {
+          // retrieve the list of export fields groups for model
+          this.outbreakDataService
+            .getExportFieldsGroups(ExportFieldsGroupModelNameEnum.CASE)
+            .pipe(
+              // handle errors
+              catchError((err) => {
+                // show error
+                this.toastV2Service.error(err);
+
+                // send error further
+                return throwError(err);
+              }),
+
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            )
+            .subscribe((fieldsGroupList) => {
+              // set groups
+              const caseFieldGroups: ILabelValuePairModel[] = fieldsGroupList.options.map((item) => ({
+                label: item.name,
+                value: item.name
+              }));
+
+              // group restrictions
+              const caseFieldGroupsRequires: IV2ExportDataConfigGroupsRequired = fieldsGroupList.toRequiredList();
+
+              // show export
+              finished({
+                title: {
+                  get: () => 'LNG_PAGE_LIST_CASES_EXPORT_TITLE'
+                },
+                export: {
+                  url: `/outbreaks/${this.selectedOutbreak.id}/cases/export`,
+                  async: true,
+                  method: ExportDataMethod.POST,
+                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
+                  queryBuilder: qb,
+                  allow: {
+                    types: [
+                      ExportDataExtension.CSV,
+                      ExportDataExtension.XLS,
+                      ExportDataExtension.XLSX,
+                      ExportDataExtension.JSON,
+                      ExportDataExtension.ODS,
+                      ExportDataExtension.PDF
+                    ],
+                    encrypt: true,
+                    anonymize: {
+                      fields: this.caseAnonymizeFields
+                    },
+                    groups: {
+                      fields: caseFieldGroups,
+                      required: caseFieldGroupsRequires
+                    },
+                    dbColumns: true,
+                    dbValues: true,
+                    jsonReplaceUndefinedWithNull: true,
+                    questionnaireVariables: true
+                  },
+                  inputs: {
+                    append: [
+                      {
+                        type: V2SideDialogConfigInputType.CHECKBOX,
+                        placeholder: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION',
+                        tooltip: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION_DESCRIPTION',
+                        name: 'includeContactFields',
+                        checked: false
+                      }
+                    ]
+                  }
+                }
+              });
+            });
+        }
+      });
+  }
+
+  /**
+   * Export case relationships
+   */
+  private exportCaseRelationships(qb: RequestQueryBuilder): void {
+    this.dialogV2Service
+      .showExportDataAfterLoadingData({
+        title: {
+          get: () => 'LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIPS_TITLE'
+        },
+        load: (finished) => {
+          // retrieve the list of export fields groups for model
+          this.outbreakDataService
+            .getExportFieldsGroups(ExportFieldsGroupModelNameEnum.RELATIONSHIP)
+            .pipe(
+              // handle errors
+              catchError((err) => {
+                // show error
+                this.toastV2Service.error(err);
+
+                // send error further
+                return throwError(err);
+              }),
+
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            )
+            .subscribe((fieldsGroupList) => {
+              // set groups
+              const relationshipFieldGroups: ILabelValuePairModel[] = fieldsGroupList.options.map((item) => ({
+                label: item.name,
+                value: item.name
+              }));
+
+              // group restrictions
+              const relationshipFieldGroupsRequires: IV2ExportDataConfigGroupsRequired = fieldsGroupList.toRequiredList();
+
+              // show export
+              finished({
+                title: {
+                  get: () => 'LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIPS_TITLE'
+                },
+                export: {
+                  url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
+                  async: true,
+                  method: ExportDataMethod.POST,
+                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIP_FILE_NAME')} - ${moment().format('YYYY-MM-DD')}`,
+                  queryBuilder: qb,
+                  allow: {
+                    types: [
+                      ExportDataExtension.CSV,
+                      ExportDataExtension.XLS,
+                      ExportDataExtension.XLSX,
+                      ExportDataExtension.JSON,
+                      ExportDataExtension.ODS,
+                      ExportDataExtension.PDF
+                    ],
+                    encrypt: true,
+                    anonymize: {
+                      fields: this.relationshipAnonymizeFields
+                    },
+                    groups: {
+                      fields: relationshipFieldGroups,
+                      required: relationshipFieldGroupsRequires
+                    },
+                    dbColumns: true,
+                    dbValues: true,
+                    jsonReplaceUndefinedWithNull: true
+                  }
+                }
+              });
+            });
+        }
+      });
+  }
+
+
 
   /**
      * Initialize Side Filters
@@ -1888,12 +2089,12 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       'middleName',
       'visualId',
       'classification',
+      'riskLevel',
       'outcomeId',
       'dateOfOutcome',
       'age',
       'gender',
       'addresses',
-      'locations',
       'dateOfOnset',
       'dateOfReporting',
       'wasContact',
@@ -1926,9 +2127,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       // retrieve responsible user information
       this.queryBuilder.include('responsibleUser', true);
 
-      // retrieve location list
-      this.queryBuilder.include('locations', true);
-
       // refresh badges list with applied filter
       if (!triggeredByPageChange) {
         this.initializeGroupedData();
@@ -1938,20 +2136,87 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       this.casesList$ = this.caseDataService
         .getCasesList(this.selectedOutbreak.id, this.queryBuilder)
         .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            finishCallback([]);
-            return throwError(err);
-          }),
+          switchMap((data) => {
+            // determine locations that we need to retrieve
+            const locationsIdsMap: {
+              [locationId: string]: true
+            } = {};
+            data.forEach((item) => {
+              (item.addresses || []).forEach((address) => {
+                // nothing to add ?
+                if (!address?.locationId) {
+                  return;
+                }
+
+                // add location to list
+                locationsIdsMap[address.locationId] = true;
+              });
+            });
+
+            // determine ids
+            const locationIds: string[] = Object.keys(locationsIdsMap);
+
+            // nothing to retrieve ?
+            if (locationIds.length < 1) {
+              return of(data);
+            }
+
+            // construct location query builder
+            const qb = new RequestQueryBuilder();
+            qb.filter.bySelect(
+              'id',
+              locationIds,
+              false,
+              null
+            );
+
+            // retrieve locations
+            return this.locationDataService
+              .getLocationsList(qb)
+              .pipe(
+                map((locations) => {
+                  // map locations
+                  const locationsMap: {
+                    [locationId: string]: LocationModel
+                  } = {};
+                  locations.forEach((location) => {
+                    locationsMap[location.id] = location;
+                  });
+
+                  // set locations
+                  data.forEach((item) => {
+                    (item.addresses || []).forEach((address) => {
+                      address.location = address.locationId && locationsMap[address.locationId] ?
+                        locationsMap[address.locationId] :
+                        address.location;
+                    });
+                  });
+
+                  // finished
+                  return data;
+                })
+              );
+          })
+        )
+        .pipe(
+          // process data
           map((cases: CaseModel[]) => {
             return EntityModel.determineAlertness(
               this.selectedOutbreak.caseInvestigationTemplate,
               cases
             );
           }),
-          tap(this.checkEmptyList.bind(this)),
+
+          // finished
           tap((data: any[]) => {
             finishCallback(data);
+          }),
+
+          // handle errors
+          catchError((err) => {
+            this.toastV2Service.error(err);
+            finishCallback([]);
+            return throwError(err);
           }),
 
           // should be the last pipe
@@ -2013,15 +2278,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   }
 
   /**
-     * Retrieve Case classification color accordingly to Case's Classification value
-     * @param item
-     */
-  getCaseClassificationColor(item: CaseModel) {
-    const classificationData = _.get(this.caseClassificationsListMap, item.classification);
-    return _.get(classificationData, 'colorCode', '');
-  }
-
-  /**
      * Filter by Classification field
      * @param values
      */
@@ -2034,154 +2290,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
     // add new filter
     this.filterBySelectField('classification', values, 'value', false);
-  }
-
-  /**
-     * Export selected records
-     */
-  exportSelectedCases() {
-    // get list of selected ids
-    const selectedRecords: false | string[] = this.validateCheckedRecords();
-    if (!selectedRecords) {
-      return;
-    }
-
-    // construct query builder
-    const qb = new RequestQueryBuilder();
-    qb.filter.bySelect(
-      'id',
-      selectedRecords,
-      true,
-      null
-    );
-
-    // display export dialog
-    this.dialogService.showExportDialog({
-      // required
-      message: 'LNG_PAGE_LIST_CASES_EXPORT_TITLE',
-      url: this.exportCasesUrl,
-      fileName: '...', // this.casesDataExportFileName,
-
-      // configure
-      isAsyncExport: true,
-      displayUseDbColumns: true,
-      displayJsonReplaceUndefinedWithNull: true,
-      // exportProgress: (data) => { this.showExportProgress(data); },
-      extraDialogFields: [
-        new DialogField({
-          name: 'includeContactFields',
-          placeholder: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION',
-          description: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION_DESCRIPTION',
-          fieldType: DialogFieldType.BOOLEAN
-        })
-      ],
-
-      // optional
-      // allowedExportTypes: this.allowedExportTypes,
-      queryBuilder: qb,
-      displayEncrypt: true,
-      displayAnonymize: true,
-      displayFieldsGroupList: true,
-      displayUseQuestionVariable: true,
-      // anonymizeFields: this.anonymizeFields,
-      // fieldsGroupList: this.fieldsGroupList,
-      // fieldsGroupListRequired: this.fieldsGroupListRequired,
-      exportStart: () => { this.showLoadingDialog(); },
-      exportFinished: () => { this.closeLoadingDialog(); }
-    });
-  }
-
-  /**
-     * Export relationship for selected cases
-     */
-  exportSelectedCasesRelationships() {
-    // get list of selected ids
-    const selectedRecords: false | string[] = this.validateCheckedRecords();
-    if (!selectedRecords) {
-      return;
-    }
-
-    // construct query builder
-    const qb = new RequestQueryBuilder();
-    const personsQb = qb.addChildQueryBuilder('person');
-
-    // retrieve only relationships that have at least one persons as desired type
-    qb.filter.byEquality(
-      'persons.type',
-      EntityType.CASE
-    );
-
-    // id
-    personsQb.filter.bySelect('id', selectedRecords, true, null);
-
-    // type
-    personsQb.filter.byEquality(
-      'type',
-      EntityType.CASE
-    );
-
-    // display export dialog
-    this.dialogService.showExportDialog({
-      // required
-      message: 'LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIPS_TITLE',
-      url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
-      fileName: this.i18nService.instant('LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIP_FILE_NAME'),
-
-      // configure
-      isAsyncExport: true,
-      displayUseDbColumns: true,
-      displayJsonReplaceUndefinedWithNull: true,
-      // exportProgress: (data) => { this.showExportProgress(data); },
-
-      // optional
-      queryBuilder: qb,
-      displayEncrypt: true,
-      displayAnonymize: true,
-      displayFieldsGroupList: true,
-      // allowedExportTypes: this.allowedExportTypes,
-      // anonymizeFields: this.relationshipAnonymizeFields,
-      // fieldsGroupList: this.fieldsGroupListRelationships,
-      // fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
-      exportStart: () => { this.showLoadingDialog(); },
-      exportFinished: () => { this.closeLoadingDialog(); }
-    });
-  }
-
-
-  /**
-     * Export cases dossier
-     */
-  exportSelectedCasesDossier() {
-    // get list of selected ids
-    const selectedRecords: false | string[] = this.validateCheckedRecords();
-    if (!selectedRecords) {
-      return;
-    }
-
-    // display export only if we have a selected outbreak
-    if (this.selectedOutbreak) {
-      // remove id from list
-      // const anonymizeFields = _.filter(this.anonymizeFields, (value: LabelValuePair) => {
-      //   return value.value !== 'id';
-      // });
-
-      // display export dialog
-      this.dialogService.showExportDialog({
-        message: 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER_DIALOG_TITLE',
-        url: `outbreaks/${this.selectedOutbreak.id}/cases/dossier`,
-        fileName: '...', // this.casesDataExportFileName,
-        fileType: ExportDataExtension.ZIP,
-        displayAnonymize: true,
-        // anonymizeFields: anonymizeFields,
-        anonymizeFieldsKey: 'data',
-        extraAPIData: {
-          cases: selectedRecords
-        },
-        isPOST: true,
-        exportStart: () => { this.showLoadingDialog(); },
-        exportFinished: () => { this.closeLoadingDialog(); }
-      });
-    }
   }
 
   /**

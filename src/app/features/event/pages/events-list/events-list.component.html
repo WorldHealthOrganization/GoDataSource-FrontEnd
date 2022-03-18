@@ -175,9 +175,7 @@
                             [disableRipple]="true"
                             [matMenuTriggerFor]="actionsMenuMultipleRecords"
                             color="accent"
-                            [matTooltip]="'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_TOOLTIP' | translate"
-                            [disabled]="isEmptyList"
-                        >
+                            [matTooltip]="'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_TOOLTIP' | translate">
                             <span class="xt-icon">arrowDropdownCircle</span>
                         </button>
 
@@ -754,5 +752,21 @@
         [pageSizeOptions]="[]"
         (page)="changePage($event)">
     </app-mat-paginator-extended> -->
+<!--    &lt;!&ndash; No data &ndash;&gt;-->
+<!--    <div-->
+<!--        *ngIf="!refreshingList && isEmptyList"-->
+<!--        class="empty-table-text">-->
+<!--        {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; Pages (need to be hidden and not ngIf, otherwise it makes a new duplicate request) &ndash;&gt;-->
+<!--    <app-mat-paginator-extended-->
+<!--        [hidden]="refreshingList || isEmptyList"-->
+<!--        [pageIndex]="pageIndex"-->
+<!--        [countData]="eventsListCount$ | async"-->
+<!--        [pageSize]="pageSize"-->
+<!--        [pageSizeOptions]="[]"-->
+<!--        (page)="changePage($event)">-->
+<!--    </app-mat-paginator-extended>-->
 
 <!-- </mat-card> -->

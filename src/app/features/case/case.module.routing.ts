@@ -5,6 +5,8 @@ import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
+import { ClassificationDataResolver } from '../../core/services/resolvers/data/classification.resolver';
+import { RiskDataResolver } from '../../core/services/resolvers/data/risk.resolver';
 
 const routes: Routes = [
   // Cases list
@@ -16,6 +18,10 @@ const routes: Routes = [
       permissions: [
         PERMISSION.CASE_LIST
       ]
+    },
+    resolve: {
+      classification: ClassificationDataResolver,
+      risk: RiskDataResolver
     }
   },
   // Create Case

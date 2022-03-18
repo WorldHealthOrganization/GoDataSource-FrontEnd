@@ -305,7 +305,6 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
             finishCallback([]);
             return throwError(err);
           }),
-          tap(this.checkEmptyList.bind(this)),
           tap((data: any[]) => {
             finishCallback(data);
           })

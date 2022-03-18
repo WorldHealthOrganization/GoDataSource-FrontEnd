@@ -231,9 +231,6 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
         // refresh the total count
         this.refreshListCount();
 
-        // flag if list is empty
-        this.checkEmptyList(this.upstreamServerList);
-
         // finished
         finishCallback(this.upstreamServerList);
       });

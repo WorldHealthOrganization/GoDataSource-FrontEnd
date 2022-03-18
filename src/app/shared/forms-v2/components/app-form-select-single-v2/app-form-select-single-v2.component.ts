@@ -12,24 +12,27 @@ import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { ILabelValuePairModel } from '../../core/label-value-pair.model';
+import { MAT_SELECT_CONFIG } from '@angular/material/select';
 
 @Component({
-  selector: 'app-form-select-v2',
-  templateUrl: './app-form-select-v2.component.html',
-  styleUrls: ['./app-form-select-v2.component.scss'],
+  selector: 'app-form-select-single-v2',
+  templateUrl: './app-form-select-single-v2.component.html',
+  styleUrls: ['./app-form-select-single-v2.component.scss'],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
-    useExisting: forwardRef(() => AppFormSelectV2Component),
+    useExisting: forwardRef(() => AppFormSelectSingleV2Component),
     multi: true
+  }, {
+    provide: MAT_SELECT_CONFIG,
+    useValue: {
+      overlayPanelClass: 'gd-cdk-overlay-pane-dropdown'
+    }
   }],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppFormSelectV2Component
-  extends AppFormBaseV2<string | string[]> implements OnDestroy {
-
-  // multiple ?
-  @Input() multiple: boolean = false;
+export class AppFormSelectSingleV2Component
+  extends AppFormBaseV2<string> implements OnDestroy {
 
   // clearable ?
   @Input() clearable: boolean = false;
@@ -75,11 +78,6 @@ export class AppFormSelectV2Component
   }
   get options(): ILabelValuePairModel[] {
     return this.allOptions;
-  }
-
-  // value as string
-  get valueAsString(): string {
-    return this.value as string;
   }
 
   // vscroll handler
@@ -136,67 +134,18 @@ export class AppFormSelectV2Component
   }
 
   /**
-   * Dropdown opened
-   */
-  dropdownOpened(): void {
-    // retrieve parent element
-    let classList: any = document.querySelector('.gd-form-select-v2-panel');
-    classList = classList ?
-      classList.closest('.cdk-overlay-pane').classList :
-      classList;
-
-    // attach custom class
-    if (
-      classList &&
-      !classList.contains('gd-cdk-overlay-pane-dropdown')
-    ) {
-      classList.add('gd-cdk-overlay-pane-dropdown');
-    }
-
-    // attach custom class
-    if (this.multiple) {
-      // attach
-      if (
-        classList &&
-        !classList.contains('gd-cdk-overlay-pane-dropdown-multi')
-      ) {
-        classList.add('gd-cdk-overlay-pane-dropdown-multi');
-      }
-    } else {
-      // remove class
-      if (
-        classList &&
-        classList.contains('gd-cdk-overlay-pane-dropdown-multi')
-      ) {
-        classList.remove('gd-cdk-overlay-pane-dropdown-multi');
-      }
-    }
-
-    // vscroll to first selected item
-    this.vScrollToFirstSelectedOption();
-  }
-
-  /**
    * vScroll to see the first selected item
    */
-  private vScrollToFirstSelectedOption(): void {
+  vScrollToFirstSelectedOption(): void {
     // scroll to item ?
     if (
       this.value &&
       this.cdkVirtualScrollViewport
     ) {
       // hack to force re-render, otherwise we see an empty scroll
-      if (
-        this.value && (
-          !this.multiple ||
-          this.value.length > 0
-        )
-      ) {
+      if (this.value) {
         // determine value to search
-        const valueToSearch: string = this.multiple ?
-          this.value[0] :
-          (this.value as string);
-        const index: number = this.filteredOptions.findIndex((option) => option.value === valueToSearch);
+        const index: number = this.filteredOptions.findIndex((option) => option.value === this.value);
         if (index > -1) {
           this.cdkVirtualScrollViewport.scrollToIndex(index);
         }

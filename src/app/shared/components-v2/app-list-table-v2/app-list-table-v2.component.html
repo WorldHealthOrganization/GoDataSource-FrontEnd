@@ -121,9 +121,8 @@
       </ng-container>
 
       <!-- Add -->
-      <button
+      <a
         *ngIf="addAction"
-        type="button"
         mat-flat-button
         [routerLink]="addAction.action.link && (!addAction.disable || !addAction.disable(null)) ? addAction.action.link(null) : undefined"
         [queryParams]="addAction.action.linkQueryParams ? addAction.action.linkQueryParams(null) : undefined"
@@ -134,11 +133,9 @@
         <mat-icon>{{addAction.icon}}</mat-icon>
 
         <!-- Label -->
-        <span>
-            {{ addAction.label | translate }}
-        </span>
+        <span>{{ addAction.label | translate }}</span>
 
-      </button>
+      </a>
 
     </div>
   </div>
@@ -303,39 +300,48 @@
     suppressPropertyNamesCheck="true"
     enableCellTextSelection="true"
     suppressDragLeaveHidesColumns="true"
-    [loadingOverlayComponent]="V2LoadingComponent"
-    [noRowsOverlayComponent]="V2NoRowsComponent"
-    (firstDataRendered)="firstDataRendered($event)"
-    (dragStopped)="saveVisibleAndOrderOfColumns($event)">
+    suppressCellSelection="true"
+    columnHoverHighlight="true"
+    [loadingOverlayComponent]="AppListTableV2LoadingComponent"
+    [noRowsOverlayComponent]="AppListTableV2NoDataComponent"
+    (firstDataRendered)="firstDataRendered()"
+    (dragStopped)="saveVisibleAndOrderOfColumns($event)"
+    (selectionChanged)="selectionChanged()">
   </ag-grid-angular>
-
-  <!-- Loading -->
-  <div
-    *ngIf="!V2LoadingComponent.loadingHtmlElement"
-    class="gd-list-table-data-loading">
-    <mat-progress-spinner
-      mode="indeterminate"
-      diameter="32"></mat-progress-spinner>
-  </div>
-
-  <!-- No rows -->
-  <div
-    *ngIf="!V2NoRowsComponent.noRowsHtmlElement"
-    class="gd-list-table-data-no-rows">
-    {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
-  </div>
 
   <!-- Table paginator -->
   <div
+    fxLayout="row" fxLayoutAlign="space-between center"
     class="gd-list-table-bottom">
-    <app-mat-paginator-extended
-      [pageIndex]="pageIndex"
-      [countData]="pageCount"
-      [pageSize]="pageSize"
-      [pageSizeOptions]="Constants.PAGE_SIZE_OPTIONS"
-      (page)="changePage($event)"
-      [disabled]="!pageCount">
-    </app-mat-paginator-extended>
+
+    <!-- Left -->
+    <div
+      fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="0.4rem"
+      class="gd-list-table-bottom-left">
+
+      <!-- Legends & Messages -->
+      <div
+        *ngFor="let legend of legends"
+        fxLayout="row wrap" fxLayoutAlign="start center"
+        class="gd-list-table-bottom-left-legend"
+        [innerHTML]="legend.html | safeHtml"></div>
+
+    </div>
+
+    <!-- Right -->
+    <div
+      fxGrow="0"
+      class="gd-list-table-bottom-right">
+      <app-mat-paginator-extended
+        [pageIndex]="pageIndex"
+        [countData]="pageCount"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="Constants.PAGE_SIZE_OPTIONS"
+        (page)="changePage($event)"
+        [disabled]="!pageCount">
+      </app-mat-paginator-extended>
+    </div>
+
   </div>
 
 </mat-card>

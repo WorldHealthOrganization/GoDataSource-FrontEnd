@@ -312,9 +312,6 @@ export class TransmissionChainsListComponent extends ListComponent implements On
           // refresh the total count
           this.refreshListCount();
 
-          // flag if list is empty
-          this.checkEmptyList(this.transmissionChains);
-
           // finished
           finishCallback(this.transmissionChains);
         });

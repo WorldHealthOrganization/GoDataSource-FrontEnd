@@ -673,7 +673,6 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
             finishCallback([]);
             return throwError(err);
           }),
-          tap(this.checkEmptyList.bind(this)),
           tap((data: any[]) => {
             finishCallback(data);
           })

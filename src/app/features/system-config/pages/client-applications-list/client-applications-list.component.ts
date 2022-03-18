@@ -257,9 +257,6 @@ export class ClientApplicationsListComponent
         // refresh the total count
         this.refreshListCount();
 
-        // flag if list is empty
-        this.checkEmptyList(this.clientApplicationsServerList);
-
         // finished
         finishCallback(this.clientApplicationsServerList);
       });

@@ -189,7 +189,6 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
             finishCallback([]);
             return throwError(err);
           }),
-          tap(this.checkEmptyList.bind(this)),
           tap((data: any[]) => {
             finishCallback(data);
           })
