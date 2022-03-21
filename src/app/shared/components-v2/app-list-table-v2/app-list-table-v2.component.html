@@ -315,7 +315,8 @@
     [noRowsOverlayComponent]="AppListTableV2NoDataComponent"
     (firstDataRendered)="firstDataRendered()"
     (dragStopped)="saveVisibleAndOrderOfColumns($event)"
-    (selectionChanged)="selectionChanged()">
+    (selectionChanged)="selectionChanged()"
+    (gridReady)="gridReady($event)">
   </ag-grid-angular>
 
   <!-- Table paginator -->
