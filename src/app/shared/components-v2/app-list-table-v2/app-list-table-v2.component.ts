@@ -332,9 +332,6 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // disable load visible columns
     let visibleColumns: string[] = [];
-    const visibleColumnsMap: {
-      [field: string]: true
-    } = {};
     let leftPinnedColumns: string[] = [];
     const leftPinnedColumnsMap: {
       [field: string]: true
@@ -363,10 +360,22 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     rightPinnedColumns = authUser.getSettings(this._pageSettingsKeyRPinned);
     rightPinnedColumns = rightPinnedColumns ? rightPinnedColumns : [];
 
-    // map visible columns
-    visibleColumns.forEach((field) => {
-      visibleColumnsMap[field] = true;
-    });
+    // mark visible columns if we have any
+    if (visibleColumns.length > 0) {
+      // map visible columns
+      const visibleColumnsMap: {
+        [field: string]: true
+      } = {};
+      visibleColumns.forEach((field) => {
+        visibleColumnsMap[field] = true;
+      });
+
+      // make columns visible
+      this._columns.forEach((column) => {
+        column.notVisible = !visibleColumnsMap[column.field] &&
+          column.format?.type !== V2ColumnFormat.ACTIONS;
+      });
+    }
 
     // map left pinned columns
     leftPinnedColumns.forEach((field) => {
@@ -378,20 +387,73 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       rightPinnedColumnsMap[field] = true;
     });
 
-    // process column
-    const processColumn = (
-      column: IV2Column,
-      determinePinned: boolean
-    ) => {
+    // determine columns
+    const columnDefs: IExtendedColDef[] = [{
+      pinned: IV2ColumnPinned.LEFT,
+      headerName: '',
+      field: this.keyField,
+      checkboxSelection: true,
+      cellClass: 'gd-cell-no-focus',
+      suppressMovable: true,
+      headerComponent: AppListTableV2SelectionHeaderComponent,
+      width: AppListTableV2Component.STANDARD_SELECT_COLUMN_WIDTH,
+      valueFormatter: () => '',
+      columnDefinitionData: this,
+      columnDefinition: {
+        format: {
+          type: V2ColumnFormat.ACTIONS
+        },
+        field: this.keyField,
+        label: '',
+        actions: [{
+          type: V2ActionType.MENU,
+          icon: 'expand_more',
+          menuOptions: [
+            {
+              label: 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL',
+              action: {
+                click: () => {
+                  this.agTable.api.selectAll();
+                }
+              },
+              visible: (): boolean => {
+                return this.agTable.api.getDisplayedRowCount() > 0 &&
+                  this.agTable.api.getSelectedNodes().length < this.agTable.api.getDisplayedRowCount();
+              }
+            },
+            {
+              label: 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL',
+              action: {
+                click: () => {
+                  this.agTable.api.deselectAll();
+                }
+              },
+              visible: (): boolean => {
+                return this.agTable.api.getDisplayedRowCount() > 0 &&
+                  this.agTable.api.getSelectedNodes().length > 0;
+              }
+            },
+            {
+              // divider
+              visible: (): boolean => {
+                return this.agTable.api.getDisplayedRowCount() > 0 && (
+                  this.agTable.api.getSelectedNodes().length < this.agTable.api.getDisplayedRowCount() ||
+                  this.agTable.api.getSelectedNodes().length > 0
+                );
+              }
+            },
+            ...(this.groupActions ? this.groupActions : [])
+          ]
+        }]
+      }
+    }];
+
+    // process columns
+    this._columns.forEach((column) => {
       // no need to take in account ?
       if (
         (
-          visibleColumns.length < 1 &&
           column.notVisible
-        ) || (
-          column.format?.type !== V2ColumnFormat.ACTIONS &&
-          visibleColumns.length > 0 &&
-          !visibleColumnsMap[column.field]
         ) || (
           column.exclude &&
           column.exclude(column)
@@ -402,7 +464,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
       // determine column pinned value
       let pinned: IV2ColumnPinned | boolean;
-      if (determinePinned) {
+      if (column.format?.type !== V2ColumnFormat.ACTIONS) {
         if (
           leftPinnedColumns.length > 0 &&
           leftPinnedColumnsMap[column.field]
@@ -473,108 +535,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           });
         });
       }
-    };
-
-    // determine columns
-    const columnDefs: IExtendedColDef[] = [{
-      pinned: IV2ColumnPinned.LEFT,
-      headerName: '',
-      field: this.keyField,
-      checkboxSelection: true,
-      cellClass: 'gd-cell-no-focus',
-      suppressMovable: true,
-      headerComponent: AppListTableV2SelectionHeaderComponent,
-      width: AppListTableV2Component.STANDARD_SELECT_COLUMN_WIDTH,
-      valueFormatter: () => '',
-      columnDefinitionData: this,
-      columnDefinition: {
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        field: this.keyField,
-        label: '',
-        actions: [{
-          type: V2ActionType.MENU,
-          icon: 'expand_more',
-          menuOptions: [
-            {
-              label: 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL',
-              action: {
-                click: () => {
-                  this.agTable.api.selectAll();
-                }
-              },
-              visible: (): boolean => {
-                return this.agTable.api.getDisplayedRowCount() > 0 &&
-                  this.agTable.api.getSelectedNodes().length < this.agTable.api.getDisplayedRowCount();
-              }
-            },
-            {
-              label: 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL',
-              action: {
-                click: () => {
-                  this.agTable.api.deselectAll();
-                }
-              },
-              visible: (): boolean => {
-                return this.agTable.api.getDisplayedRowCount() > 0 &&
-                  this.agTable.api.getSelectedNodes().length > 0;
-              }
-            },
-            {
-              // divider
-              visible: (): boolean => {
-                return this.agTable.api.getDisplayedRowCount() > 0 && (
-                  this.agTable.api.getSelectedNodes().length < this.agTable.api.getDisplayedRowCount() ||
-                  this.agTable.api.getSelectedNodes().length > 0
-                );
-              }
-            },
-            ...(this.groupActions ? this.groupActions : [])
-          ]
-        }]
-      }
-    }];
-    if (visibleColumns.length > 0) {
-      // map columns
-      const columnMap: {
-        [field: string]: IV2Column
-      } = {};
-      this._columns.forEach((column) => {
-        columnMap[column.field] = column;
-      });
-
-      // display columns in saved order
-      visibleColumns.forEach((field) => {
-        // column removed ?
-        if (!columnMap[field]) {
-          return;
-        }
-
-        // process
-        processColumn(
-          columnMap[field],
-          true
-        );
-      });
-
-      // process the remaining unprocessed items
-      this._columns.forEach((column) => {
-        if (column.format?.type === V2ColumnFormat.ACTIONS) {
-          processColumn(
-            column,
-            false
-          );
-        }
-      });
-    } else {
-      this._columns.forEach((column) => {
-        processColumn(
-          column,
-          column.format?.type !== V2ColumnFormat.ACTIONS
-        );
-      });
-    }
+    });
 
     // update column defs
     this.agTable.api.setColumnDefs(columnDefs);
@@ -877,7 +838,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           type: IV2SideDialogConfigButtonType.OTHER,
           label: 'LNG_SIDE_COLUMNS_APPLY_FILTERS_BUTTON',
           color: 'primary',
-          key: 'apply'
+          key: 'apply',
+          disabled: (data): boolean => {
+            return !data.inputs.find((item: IV2SideDialogConfigInputCheckbox) => item.checked);
+          }
         }, {
           type: IV2SideDialogConfigButtonType.CANCEL,
           label: 'LNG_COMMON_BUTTON_CANCEL',

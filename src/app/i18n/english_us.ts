@@ -32,5 +32,6 @@ export const EnglishUsLang = {
      * REMOVE the tokens from below
      */
     // LNG_LAYOUT_ACTIVE_OUTBREAK_LABEL
+    // LNG_SIDE_COLUMNS_ERROR_NO_COLUMN_SELECTED
   }
 };
