@@ -52,11 +52,11 @@
 </app-topnav>
 -->
 
-<app-side-columns
-    [tableColumnsUserSettingsKey]="UserSettings.LOCATION_FIELDS"
-    [tableColumns]="tableColumns"
-    (visibleColumnsChanged)="applySideColumnsChanged($event)">
-</app-side-columns>
+<!--<app-side-columns-->
+<!--    [tableColumnsUserSettingsKey]="UserSettings.LOCATION_FIELDS"-->
+<!--    [tableColumns]="tableColumns"-->
+<!--    (visibleColumnsChanged)="applySideColumnsChanged($event)">-->
+<!--</app-side-columns>-->
 
 <div fxLayout="row" fxLayoutAlign="space-between center">
     <!--Total number of records from the list-->
@@ -377,9 +377,9 @@
                     </mat-cell>
                 </ng-container>
 
-                <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
+                <mat-header-row *matHeaderRowDef="[]"></mat-header-row>
                 <mat-row
-                    *matRowDef="let item; columns: visibleTableColumns"
+                    *matRowDef="let item; columns: []"
                     app-hover-row-actions
                     [hoverRowActionsComponent]="hoverRow"
                     [hoverRowActions]="recordActions"

@@ -803,13 +803,13 @@ export class ImportDataComponent
     // initialize pagination
     this.initPaginator();
 
-    // init visible columns
-    this.visibleTableColumns = [
-      'recordNo',
-      'error.message',
-      'error.details',
-      'data'
-    ];
+    // // init visible columns
+    // this.visibleTableColumns = [
+    //   'recordNo',
+    //   'error.message',
+    //   'error.details',
+    //   'data'
+    // ];
   }
 
   /**

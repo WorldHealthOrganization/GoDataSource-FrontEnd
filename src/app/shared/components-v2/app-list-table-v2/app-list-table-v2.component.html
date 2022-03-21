@@ -19,6 +19,15 @@
       {{pageTitle | translate}}
     </div>
 
+    <button
+      type="button"
+      mat-flat-button color="text"
+      (click)="agTable.api.showLoadingOverlay()">1</button>
+    <button
+      type="button"
+      mat-flat-button color="text"
+      (click)="this.agTable.api.setRowData([]); agTable.api.showNoRowsOverlay()">2</button>
+
     <!-- Buttons -->
     <div
       fxFlex fxLayoutAlign="end" fxLayoutGap="0.8rem"
@@ -300,13 +309,14 @@
     suppressPropertyNamesCheck="true"
     enableCellTextSelection="true"
     suppressDragLeaveHidesColumns="true"
-    suppressCellSelection="true"
+    suppressCellFocus="true"
     columnHoverHighlight="true"
     [loadingOverlayComponent]="AppListTableV2LoadingComponent"
     [noRowsOverlayComponent]="AppListTableV2NoDataComponent"
     (firstDataRendered)="firstDataRendered()"
     (dragStopped)="saveVisibleAndOrderOfColumns($event)"
-    (selectionChanged)="selectionChanged()">
+    (selectionChanged)="selectionChanged()"
+    (gridReady)="gridReady($event)">
   </ag-grid-angular>
 
   <!-- Table paginator -->

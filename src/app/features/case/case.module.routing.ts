@@ -6,7 +6,7 @@ import { PERMISSION } from '../../core/models/permission.model';
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 import { ClassificationDataResolver } from '../../core/services/resolvers/data/classification.resolver';
-import { RiskDataResolver } from '../../core/services/resolvers/data/risk.resolver';
+import { OutcomeDataResolver } from '../../core/services/resolvers/data/outcome.resolver';
 
 const routes: Routes = [
   // Cases list
@@ -21,7 +21,7 @@ const routes: Routes = [
     },
     resolve: {
       classification: ClassificationDataResolver,
-      risk: RiskDataResolver
+      outcome: OutcomeDataResolver
     }
   },
   // Create Case
