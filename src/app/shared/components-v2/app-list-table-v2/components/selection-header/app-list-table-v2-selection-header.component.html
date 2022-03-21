@@ -2,6 +2,9 @@
   class="gd-list-table-selection-header">
   <!-- Menu -->
   <button
+    #menuTrigger="matMenuTrigger"
+    class="gd-list-table-selection-header-button"
+    [class.gd-list-table-selection-header-button-expanded]="menuTrigger.menuOpen"
     type="button"
     mat-icon-button
     [disabled]="action.disable && action.disable(component.selectedRows)"
