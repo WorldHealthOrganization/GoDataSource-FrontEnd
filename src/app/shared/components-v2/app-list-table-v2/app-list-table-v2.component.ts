@@ -307,6 +307,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     if (!this._records$) {
       // reset data
       this._agTable.api.setRowData([]);
+      this._agTable.api.hideOverlay();
 
       // re-render page
       this.detectChanges();
