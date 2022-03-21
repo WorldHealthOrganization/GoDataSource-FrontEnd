@@ -8,7 +8,8 @@
     type="button"
     mat-icon-button
     [disabled]="action.disable && action.disable(component.selectedRows)"
-    [matMenuTriggerFor]="menu">
+    [matMenuTriggerFor]="menu"
+    (menuClosed)="changeDetectorRef.detectChanges()">
     <mat-icon>{{action.icon}}</mat-icon>
   </button>
 
