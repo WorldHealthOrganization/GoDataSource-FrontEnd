@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import { IHeaderAngularComp } from '@ag-grid-community/angular';
 import { IAfterGuiAttachedParams, IHeaderParams } from '@ag-grid-community/core';
 import { IV2ColumnAction } from '../../models/column.model';
@@ -21,6 +21,13 @@ export class AppListTableV2SelectionHeaderComponent implements IHeaderAngularCom
   component: {
     selectedRows: number
   };
+
+  /**
+   * Constructor
+   */
+  constructor(
+    public changeDetectorRef: ChangeDetectorRef
+  ) {}
 
   /**
    * Gets called whenever the cell refreshes
