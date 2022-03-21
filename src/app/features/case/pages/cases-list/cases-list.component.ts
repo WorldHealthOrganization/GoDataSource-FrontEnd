@@ -319,10 +319,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             })
           },
 
-          // risk
+          // outcome
           {
-            title: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
-            items: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).list.map((item) => {
+            title: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+            items: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).list.map((item) => {
               return {
                 form: {
                   type: IV2ColumnStatusFormType.TRIANGLE,
@@ -349,15 +349,15 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             });
           }
 
-          // risk
-          const risk = this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>;
+          // outcome
+          const outcome = this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>;
           if (
-            data.riskLevel &&
-            risk.map[data.riskLevel]
+            data.outcomeId &&
+            outcome.map[data.outcomeId]
           ) {
             forms.push({
               type: IV2ColumnStatusFormType.TRIANGLE,
-              color: risk.map[data.riskLevel].getColorCode()
+              color: outcome.map[data.outcomeId].getColorCode()
             });
           }
 
