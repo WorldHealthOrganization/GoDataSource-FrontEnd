@@ -157,11 +157,6 @@ export abstract class ListComponent implements OnDestroy {
   tableColumns: IV2Column[] = [];
 
   /**
-     * List table visible columns
-     */
-  visibleTableColumns: string[] = [];
-
-  /**
      * List of cells to be expanded for row/column
      *  Example:
      *      {
@@ -2302,33 +2297,6 @@ export abstract class ListComponent implements OnDestroy {
 
   public uncheckAllRecords() {
     this.checkedAllRecords = false;
-  }
-
-  /**
-     * Visible columns
-     * @param visibleColumns
-     */
-  applySideColumnsChanged(visibleColumns: string[]) {
-    // apply side columns
-    this.visibleTableColumns = visibleColumns;
-
-    // disabled saved filters for current user ?
-    const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
-    if (
-      authUser.dontCacheFilters ||
-            this._disableFilterCaching
-    ) {
-      return;
-    }
-
-    // reload data into columns from cached filters
-    // load saved filters
-    const currentUserCache: ICachedFilter = this.getCachedFilters(true);
-    const currentUserCacheForCurrentPath: ICachedFilterItems = currentUserCache[this.getCachedFilterPageKey()];
-    if (currentUserCacheForCurrentPath) {
-      // load saved input values
-      this.loadCachedInputValues(currentUserCacheForCurrentPath);
-    }
   }
 
   /**

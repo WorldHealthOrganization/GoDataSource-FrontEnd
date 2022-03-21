@@ -15,12 +15,12 @@
 </app-topnav>
 -->
 
-<!-- Side columns -->
-<app-side-columns
-    [tableColumnsUserSettingsKey]="UserSettings.OUTBREAK_FIELDS"
-    [tableColumns]="tableColumns"
-    (visibleColumnsChanged)="applySideColumnsChanged($event)">
-</app-side-columns>
+<!--&lt;!&ndash; Side columns &ndash;&gt;-->
+<!--<app-side-columns-->
+<!--    [tableColumnsUserSettingsKey]="UserSettings.OUTBREAK_FIELDS"-->
+<!--    [tableColumns]="tableColumns"-->
+<!--    (visibleColumnsChanged)="applySideColumnsChanged($event)">-->
+<!--</app-side-columns>-->
 
 <!-- Total number of records from the list -->
 <!--<app-total-number-of-records-->
@@ -540,9 +540,9 @@
             </mat-cell>
         </ng-container>
 
-        <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
+        <mat-header-row *matHeaderRowDef="[]"></mat-header-row>
         <mat-row
-            *matRowDef="let item; columns: visibleTableColumns"
+            *matRowDef="let item; columns: []"
             app-hover-row-actions
             [hoverRowActionsComponent]="hoverRow"
             [hoverRowActions]="recordActions"

@@ -8,12 +8,12 @@
 </app-topnav>
 -->
 
-<!-- Side columns -->
-<app-side-columns
-    [tableColumnsUserSettingsKey]="UserSettings.AUDIT_LOG_FIELDS"
-    [tableColumns]="tableColumns"
-    (visibleColumnsChanged)="applySideColumnsChanged($event)">
-</app-side-columns>
+<!--&lt;!&ndash; Side columns &ndash;&gt;-->
+<!--<app-side-columns-->
+<!--    [tableColumnsUserSettingsKey]="UserSettings.AUDIT_LOG_FIELDS"-->
+<!--    [tableColumns]="tableColumns"-->
+<!--    (visibleColumnsChanged)="applySideColumnsChanged($event)">-->
+<!--</app-side-columns>-->
 
 <!--Total number of records from the list-->
 <!--<app-total-number-of-records-->
@@ -242,8 +242,8 @@
             </mat-cell>
         </ng-container>
 
-        <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
-        <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
+        <mat-header-row *matHeaderRowDef="[]"></mat-header-row>
+        <mat-row *matRowDef="let item; columns: []"></mat-row>
     </mat-table>
 
     <div
