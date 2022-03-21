@@ -45,11 +45,21 @@
         .gd-list-table-selection-header {
           @include flex(flex);
 
-          button.mat-icon-button {
+          .gd-list-table-selection-header-button {
             height: 2.4rem;
             min-width: 2.4rem;
             padding: 0;
             width: 2.4rem;
+
+            .mat-icon {
+              @include transition(all 0.24s ease-in-out 0s);
+            }
+
+            &.gd-list-table-selection-header-button-expanded {
+              .mat-icon {
+                @include rotate(180deg);
+              }
+            }
           }
         }
 
@@ -287,8 +297,15 @@
     }
 
     .ag-overlay {
-      height: calc(100% - 8.9rem);
-      top: 8.9rem;
+      height: calc(100% - 4.1rem);
+      top: 4.1rem;
+    }
+
+    &.gd-list-table-data-88 {
+      .ag-overlay {
+        height: calc(100% - 8.9rem);
+        top: 8.9rem;
+      }
     }
   }
 }

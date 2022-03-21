@@ -22,11 +22,15 @@
     <button
       type="button"
       mat-flat-button color="text"
-      (click)="agTable.api.showLoadingOverlay()">1</button>
+      (click)="_agTable?.api.showLoadingOverlay()">1</button>
     <button
       type="button"
       mat-flat-button color="text"
-      (click)="this.agTable.api.setRowData([]); agTable.api.showNoRowsOverlay()">2</button>
+      (click)="_agTable?.api.setRowData([]); _agTable?.api.showNoRowsOverlay()">2</button>
+    <button
+      type="button"
+      mat-flat-button color="text"
+      (click)="showHeaderFilters = !showHeaderFilters">3 ({{showHeaderFilters ? 'true' : 'false'}})</button>
 
     <!-- Buttons -->
     <div
@@ -299,10 +303,9 @@
 
   <!-- Table -->
   <ag-grid-angular
-    #agTable
     class="ag-theme-balham gd-list-table-data"
+    [class.gd-list-table-data-88]="showHeaderFilters"
     [modules]="modules"
-    headerHeight="88"
     rowHeight="40"
     rowSelection="multiple"
     suppressRowClickSelection="true"
@@ -315,7 +318,8 @@
     [noRowsOverlayComponent]="AppListTableV2NoDataComponent"
     (firstDataRendered)="firstDataRendered()"
     (dragStopped)="saveVisibleAndOrderOfColumns($event)"
-    (selectionChanged)="selectionChanged()">
+    (selectionChanged)="selectionChanged()"
+    (gridReady)="gridReady($event)">
   </ag-grid-angular>
 
   <!-- Table paginator -->

@@ -25,7 +25,8 @@ export class AppListTableV2ColumnHeaderComponent implements IHeaderAngularComp {
       direction: RequestSortDirection | null
     ) => void,
     sortByColumn: IExtendedColDef,
-    sortByDirection: RequestSortDirection | null
+    sortByDirection: RequestSortDirection | null,
+    showHeaderFilters: boolean
   };
 
   // constants
@@ -42,7 +43,10 @@ export class AppListTableV2ColumnHeaderComponent implements IHeaderAngularComp {
    * Gets called whenever the cell refreshes
    */
   refresh(_params: IHeaderParams): boolean {
-    // ignore for now
+    // re-render
+    this.changeDetectorRef.detectChanges();
+
+    // finished
     return true;
   }
 
