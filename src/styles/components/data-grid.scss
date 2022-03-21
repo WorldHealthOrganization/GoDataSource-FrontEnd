@@ -79,6 +79,10 @@
                       border-color: rgba(var(--gd-secondary-rgb), 0.25);
                     }
                   }
+
+                  .mat-form-field-infix {
+                    width: 0;
+                  }
                 }
               }
 
