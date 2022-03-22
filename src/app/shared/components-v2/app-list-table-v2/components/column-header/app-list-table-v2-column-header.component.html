@@ -18,12 +18,12 @@
     </div>
 
     <!-- Label -->
-    <mat-icon
-      *ngIf="extendedColDef.columnDefinition.sortable && component.sortByColumn === extendedColDef"
-      fxGrow="0"
-      class="gd-list-table-column-header-sort"
-      [class.gd-list-table-column-header-sort-asc]="component.sortByDirection === RequestSortDirection.ASC"
-      [class.gd-list-table-column-header-sort-desc]="component.sortByDirection === RequestSortDirection.DESC">south</mat-icon>
+    <div
+      class="gd-list-table-column-header-sort">
+      <mat-icon
+        *ngIf="extendedColDef.columnDefinition.sortable && component.sortByColumn === extendedColDef"
+        [class.gd-list-table-column-header-sort-desc]="component.sortByDirection === RequestSortDirection.DESC">south</mat-icon>
+    </div>
 
   </div>
 

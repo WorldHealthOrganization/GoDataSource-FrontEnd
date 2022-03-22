@@ -21,7 +21,7 @@
           @include flex_align_items(center);
           @include flex_justify(center);
 
-          &.gd-list-table-column-header-sort-desc {
+          .gd-list-table-column-header-sort-desc {
             @include rotate(180deg);
           }
         }
