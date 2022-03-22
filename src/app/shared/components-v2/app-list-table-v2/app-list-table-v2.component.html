@@ -19,19 +19,6 @@
       {{pageTitle | translate}}
     </div>
 
-    <button
-      type="button"
-      mat-flat-button color="text"
-      (click)="_agTable?.api.showLoadingOverlay()">1</button>
-    <button
-      type="button"
-      mat-flat-button color="text"
-      (click)="_agTable?.api.setRowData([]); _agTable?.api.showNoRowsOverlay()">2</button>
-    <button
-      type="button"
-      mat-flat-button color="text"
-      (click)="showHeaderFilters = !showHeaderFilters">3 ({{showHeaderFilters ? 'true' : 'false'}})</button>
-
     <!-- Buttons -->
     <div
       fxFlex fxLayoutAlign="end" fxLayoutGap="0.8rem"
@@ -279,6 +266,24 @@
         [matTooltip]="'LNG_COMMON_BUTTON_REFRESH_LIST' | translate"
         (click)="refreshDataHandler()">
         <mat-icon>refresh</mat-icon>
+      </button>
+
+      <!-- Show / Hide header filters -->
+      <button
+        [class.gd-list-table-header-right-header-filters-active]="showHeaderFilters"
+        type="button"
+        mat-icon-button
+        [matTooltip]="(showHeaderFilters ? 'LNG_COMMON_LABEL_HEADER_FILTER_HIDE' : 'LNG_COMMON_LABEL_HEADER_FILTER_SHOW') | translate"
+        (click)="showHeaderFilters = !showHeaderFilters"
+        [disabled]="savingHeaderFilterVisibility">
+        <mat-icon
+          *ngIf="!savingHeaderFilterVisibility; else savingHeaderFilterVisibilityProgress">filter_alt</mat-icon>
+        <ng-template
+          #savingHeaderFilterVisibilityProgress>
+          <mat-progress-spinner
+            mode="indeterminate"
+            diameter="16"></mat-progress-spinner>
+        </ng-template>
       </button>
 
       <!-- Visible columns -->

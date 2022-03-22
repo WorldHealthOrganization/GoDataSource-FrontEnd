@@ -294,9 +294,7 @@ implements
       if (property === UserSettings.DASHBOARD) {
         this.settings[property] = new UserSettingsDashboardModel(settings);
       } else {
-        this.settings[property] = Array.isArray(settings) ?
-          settings :
-          [];
+        this.settings[property] = settings;
       }
     });
 
