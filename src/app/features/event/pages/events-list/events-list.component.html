@@ -12,7 +12,8 @@
     [pageSize]="pageSize"
     [pageIndex]="pageIndex"
     [pageSettingsKey]="appliedListFilter !== Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS ? UserSettings.EVENT_FIELDS : UserSettings.EVENT_WITHOUT_RELATIONSHIPS_FIELDS"
-    (pageChange)="changePage($event)"></app-list-table-v2>
+    (pageChange)="changePage($event)"
+    (sortBy)="sortBy($event, { age: [ 'years', 'months' ] })"></app-list-table-v2>
 
 
 <!--

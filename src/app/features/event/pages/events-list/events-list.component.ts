@@ -601,6 +601,7 @@ export class EventsListComponent
         field: 'name',
         label: 'LNG_EVENT_FIELD_LABEL_NAME',
         pinned: IV2ColumnPinned.LEFT,
+        sortable: true
       },
       {
         field: 'date',
@@ -612,6 +613,7 @@ export class EventsListComponent
       {
         field: 'description',
         label: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION',
+        sortable: true
       },
       {
         field: 'phoneNumber',
@@ -622,6 +624,7 @@ export class EventsListComponent
         field: 'address.emailAddress',
         label: 'LNG_EVENT_FIELD_LABEL_EMAIL',
         notVisible: true,
+        sortable: true
       },
       {
         field: 'responsibleUserId',
@@ -698,10 +701,12 @@ export class EventsListComponent
       {
         field: 'deleted',
         label: 'LNG_EVENT_FIELD_LABEL_DELETED',
+        sortable: true
       },
       {
         field: 'createdBy',
         label: 'LNG_EVENT_FIELD_LABEL_CREATED_BY',
+        sortable: true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN,
@@ -710,6 +715,7 @@ export class EventsListComponent
       {
         field: 'createdAt',
         label: 'LNG_EVENT_FIELD_LABEL_CREATED_AT',
+        sortable: true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME,
@@ -718,6 +724,7 @@ export class EventsListComponent
       {
         field: 'updatedBy',
         label: 'LNG_EVENT_FIELD_LABEL_UPDATED_BY',
+        sortable: true,
         notVisible: true,
         format: {
           type: 'updatedByUser.name',
@@ -729,6 +736,7 @@ export class EventsListComponent
       {
         field: 'updatedAt',
         label: 'LNG_EVENT_FIELD_LABEL_UPDATED_AT',
+        sortable: true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME,
@@ -737,6 +745,7 @@ export class EventsListComponent
       {
         field: 'location',
         label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
+        sortable: true,
         notVisible: true,
         format: {
           type: 'mainAddress.location.name',
@@ -750,6 +759,7 @@ export class EventsListComponent
       {
         field: 'address.addressLine1',
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
+        sortable: true,
         notVisible: true,
         format: {
           type: 'mainAddress.addressLine1',
@@ -758,6 +768,7 @@ export class EventsListComponent
       {
         field: 'address.city',
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+        sortable: true,
         notVisible: true,
         format: {
           type: 'mainAddress.city',
@@ -766,6 +777,7 @@ export class EventsListComponent
       {
         field: 'addresses.geoLocation.lat',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
+        sortable: true,
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lat',
@@ -774,6 +786,7 @@ export class EventsListComponent
       {
         field: 'addresses.geoLocation.lng',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
+        sortable: true,
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lng',
@@ -782,6 +795,7 @@ export class EventsListComponent
       {
         field: 'addresses.postalCode',
         label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
+        sortable: true,
         notVisible: true,
         format: {
           type: 'mainAddress.postalCode',
@@ -790,6 +804,7 @@ export class EventsListComponent
       {
         field: 'addresses.geoLocationAccurate',
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
+        sortable: true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN,
