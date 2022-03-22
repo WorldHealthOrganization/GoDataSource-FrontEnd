@@ -5,21 +5,30 @@
 
   .gd-list-table-column {
     .gd-list-table-column-header {
-      height: 40px;
-
       &.gd-list-table-column-header-sortable {
         cursor: pointer;
+        @include transition(all 0.24s ease-in-out 0s);
 
         &:hover {
-          color: red;
-        }
-
-        .gd-list-table-column-header-title {
+          .gd-list-table-column-header-title {
+            color: var(--gd-primary);
+          }
         }
 
         .gd-list-table-column-header-sort {
+          color: var(--gd-primary);
+          @include flex(flex);
+          @include flex_align_items(center);
+          @include flex_justify(center);
+
           &.gd-list-table-column-header-sort-desc {
             @include rotate(180deg);
+          }
+        }
+
+        &.gd-list-table-column-header-sortable-active {
+          .gd-list-table-column-header-title {
+            color: var(--gd-primary);
           }
         }
       }

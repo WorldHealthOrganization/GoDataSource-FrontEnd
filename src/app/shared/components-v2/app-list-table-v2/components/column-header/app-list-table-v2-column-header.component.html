@@ -7,6 +7,7 @@
     fxLayout="row" fxLayoutGap="1.6rem"
     class="gd-list-table-column-header"
     [class.gd-list-table-column-header-sortable]="extendedColDef.columnDefinition.sortable"
+    [class.gd-list-table-column-header-sortable-active]="component.sortByColumn === extendedColDef"
     (click)="extendedColDef.columnDefinition.sortable ? sort() : undefined">
 
     <!-- Label -->
@@ -28,6 +29,7 @@
 
   <!-- Filter -->
   <div
+    *ngIf="component.showHeaderFilters"
     class="gd-list-table-column-filter">
     <!-- TODO - input, select, ... 1 row, no wrap so we have fixed height to determine loading & no data overlay height and position... -->
     <app-form-input-v2

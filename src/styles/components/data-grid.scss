@@ -33,6 +33,7 @@
       /* AgGrid header cell */
       .ag-header-cell,
       .ag-header-group-cell {
+        @include flex_align_items(flex-start);
         padding: 0.8rem;
   
         &:after {
@@ -44,11 +45,90 @@
         .gd-list-table-selection-header {
           @include flex(flex);
 
-          button.mat-icon-button {
+          .gd-list-table-selection-header-button {
             height: 2.4rem;
             min-width: 2.4rem;
             padding: 0;
             width: 2.4rem;
+
+            .mat-icon {
+              @include transition(all 0.24s ease-in-out 0s);
+            }
+
+            &.gd-list-table-selection-header-button-expanded {
+              .mat-icon {
+                @include rotate(180deg);
+              }
+            }
+          }
+        }
+
+        &.ag-column-hover {
+          background-color: rgba(var(--gd-primary-rgb), 0.05);
+        }
+
+        .gd-list-table-column-filter {
+          margin-top: 0.8rem;
+
+          .gd-form-input-v2 {
+            .mat-form-field {
+              .mat-form-field-wrapper {
+                padding-bottom: 0;
+
+                .mat-form-field-flex {
+                  background: var(--gd-background);
+                  padding: 0 0.8rem;
+
+                  .mat-form-field-outline,
+                  .mat-form-field-outline-thick {
+                    color: var(--gd-text);
+
+                    .mat-form-field-outline-start,
+                    .mat-form-field-outline-gap,
+                    .mat-form-field-outline-end {
+                      border-color: rgba(var(--gd-secondary-rgb), 0.25);
+                    }
+                  }
+
+                  .mat-form-field-infix {
+                    width: 0;
+                  }
+                }
+              }
+
+              &:focus,
+              &.mat-focused {
+                .mat-form-field-wrapper {
+                  .mat-form-field-flex {
+                    .mat-form-field-outline,
+                    .mat-form-field-outline-thick {
+                      .mat-form-field-outline-start,
+                      .mat-form-field-outline-gap,
+                      .mat-form-field-outline-end {
+                        border-color: rgba(var(--gd-primary-rgb), 0.5);
+                      }
+                    }
+                  }
+                }
+              }
+
+              &.mat-form-field-invalid {
+                .mat-form-field-wrapper {
+                  .mat-form-field-flex {
+                    background: rgba(var(--gd-danger-rgb), 0.15);
+          
+                    .mat-form-field-outline,
+                    .mat-form-field-outline-thick {
+                      .mat-form-field-outline-start,
+                      .mat-form-field-outline-gap,
+                      .mat-form-field-outline-end {
+                        border-color: rgba(var(--gd-danger-rgb), 0.25);
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -109,6 +189,10 @@
                 }
               }
             }
+          }
+
+          &.ag-column-hover {
+            background-color: transparent;
           }
         }
       }
@@ -196,7 +280,7 @@
 
     /* AgGrid no rows */
     .gd-list-table-data-no-rows {
-      .image {
+      .gd-list-table-data-no-rows-image {
         background-image: url(../../assets/images/nothing-found.svg);
         background-size: contain;
         background-position: center;
@@ -205,10 +289,22 @@
         width: 25rem;
       }
 
-      .text {
+      .gd-list-table-data-no-rows-text {
         color: var(--gd-secondary);
         font-size: 1.6rem;
         margin-top: 2rem;
+      }
+    }
+
+    .ag-overlay {
+      height: calc(100% - 4.1rem);
+      top: 4.1rem;
+    }
+
+    &.gd-list-table-data-88 {
+      .ag-overlay {
+        height: calc(100% - 8.9rem);
+        top: 8.9rem;
       }
     }
   }

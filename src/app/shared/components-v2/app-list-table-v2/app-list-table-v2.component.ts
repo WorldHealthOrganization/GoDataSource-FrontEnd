@@ -77,7 +77,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   /**
    * Ag table api handlers
    */
-  private _agTable: {
+  // #TODO
+  // private _agTable: {
+  _agTable: {
     api: GridApi,
     columnApi: ColumnApi
   } = null;
@@ -110,6 +112,22 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
   // add button
   @Input() addAction: IV2ActionIconLabel;
+
+  // show header filters ?
+  private _showHeaderFilters: boolean = false;
+  set showHeaderFilters(showHeaderFilters: boolean) {
+    // set data
+    this._showHeaderFilters = showHeaderFilters;
+
+    // update header height
+    this._agTable?.api.setHeaderHeight(showHeaderFilters ? 88 : 40);
+
+    // re-render header columns
+    this.updateColumnDefinitions();
+  }
+  get showHeaderFilters(): boolean {
+    return this._showHeaderFilters;
+  }
 
   // grouped data
   groupedDataExpanded: boolean = false;
@@ -289,6 +307,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     if (!this._records$) {
       // reset data
       this._agTable.api.setRowData([]);
+      this._agTable.api.hideOverlay();
 
       // re-render page
       this.detectChanges();
@@ -1239,5 +1258,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       // call
       this.retrieveData();
     }
+
+    // set header height
+    // @TODO
+    this._agTable?.api.setHeaderHeight(this.showHeaderFilters ? 88 : 40);
   }
 }
