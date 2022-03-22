@@ -144,8 +144,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   // user list
   userList$: Observable<UserModel[]>;
 
-  caseClassificationsList$: Observable<any[]>;
-  genderList$: Observable<any[]>;
   yesNoOptionsList$: Observable<any[]>;
   occupationsList$: Observable<any[]>;
   outcomeList$: Observable<any[]>;
@@ -203,7 +201,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
     // reference data
-    this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
     this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
     this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
     this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
@@ -428,7 +425,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           type: V2ColumnFormat.DATE
         },
         notVisible: true,
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
       },
       {
         field: 'age',
@@ -436,12 +436,19 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: V2ColumnFormat.AGE
         },
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.AGE_RANGE
+        }
       },
       {
         field: 'gender',
         label: 'LNG_CASE_FIELD_LABEL_GENDER',
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        }
       },
       {
         field: 'phoneNumber',
@@ -1876,7 +1883,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         fieldName: 'gender',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_GENDER',
         type: FilterType.MULTISELECT,
-        options$: this.genderList$,
+        // options$: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         sortable: true
       }),
       new FilterModel({
@@ -1932,7 +1939,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         fieldName: 'classification',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
         type: FilterType.MULTISELECT,
-        options$: this.caseClassificationsList$
+        // options$: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
       }),
       new FilterModel({
         fieldName: 'dateOfInfection',

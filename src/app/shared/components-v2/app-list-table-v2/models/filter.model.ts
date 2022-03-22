@@ -8,11 +8,12 @@ import { IExtendedColDef } from './extended-column.model';
 export enum V2FilterType {
   TEXT,
   MULTIPLE_SELECT,
+  DATE_RANGE,
+  AGE_RANGE,
 
   // #TODO
-  NUMBER,
-  DATE,
-  DATETIME
+  NUMBER_RANGE,
+  DATETIME_RANGE
 }
 
 /**
@@ -58,15 +59,43 @@ export interface V2FilterMultipleSelect extends Omit<V2FilterBasic, 'options'> {
   value?: string[];
 }
 
+/**
+ * Date range
+ */
+export interface V2FilterDate extends V2FilterBasic {
+  // required
+  type: V2FilterType.DATE_RANGE
+
+  // optional
+  // #TODO
+  value?: any;
+  min?: Moment;
+  max?: Moment;
+}
+
+/**
+ * Age range
+ */
+export interface V2FilterAge extends V2FilterBasic {
+  // required
+  type: V2FilterType.AGE_RANGE
+
+  // optional
+  // #TODO
+  value?: any;
+  // min?: Moment;
+  // max?: Moment;
+}
+
 
 
 // #TODO
 /**
- * Number
+ * Number range
  */
 export interface V2FilterNumber extends V2FilterBasic {
   // required
-  type: V2FilterType.NUMBER
+  type: V2FilterType.NUMBER_RANGE
   min: number;
   max: number;
 
@@ -75,32 +104,19 @@ export interface V2FilterNumber extends V2FilterBasic {
 }
 
 /**
- * Date
- */
-export interface V2FilterDate extends V2FilterBasic {
-  // required
-  type: V2FilterType.DATE
-  min: Moment;
-  max: Moment;
-
-  // optional
-  value?: Moment;
-}
-
-/**
- * Datetime
+ * Datetime range
  */
 export interface V2FilterDateTime extends V2FilterBasic {
   // required
-  type: V2FilterType.DATETIME
-  min: Moment;
-  max: Moment;
+  type: V2FilterType.DATETIME_RANGE
 
   // optional
   value?: Moment;
+  min?: Moment;
+  max?: Moment;
 }
 
 /**
  * Filter
  */
-export type V2Filter = V2FilterText | V2FilterMultipleSelect | V2FilterNumber | V2FilterDate | V2FilterDateTime;
+export type V2Filter = V2FilterText | V2FilterMultipleSelect | V2FilterDate | V2FilterAge | V2FilterNumber | V2FilterDateTime;
