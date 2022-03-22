@@ -3,6 +3,7 @@ import { IHeaderAngularComp } from '@ag-grid-community/angular';
 import { IAfterGuiAttachedParams, IHeaderParams } from '@ag-grid-community/core';
 import { IExtendedColDef } from '../../models/extended-column.model';
 import { RequestSortDirection } from '../../../../../core/helperClasses/request-query-builder';
+import { V2FilterType } from '../../models/filter.model';
 
 /**
  * Component
@@ -26,11 +27,13 @@ export class AppListTableV2ColumnHeaderComponent implements IHeaderAngularComp {
     ) => void,
     sortByColumn: IExtendedColDef,
     sortByDirection: RequestSortDirection | null,
-    showHeaderFilters: boolean
+    showHeaderFilters: boolean,
+    columnFilterBy: (column: IExtendedColDef) => void
   };
 
   // constants
   RequestSortDirection = RequestSortDirection;
+  V2FilterType = V2FilterType;
 
   /**
    * Constructor

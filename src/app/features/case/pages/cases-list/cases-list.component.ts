@@ -44,6 +44,8 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { LocationModel } from '../../../../core/models/location.model';
+import { V2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { IExtendedColDef } from '../../../../shared/components-v2/app-list-table-v2/models/extended-column.model';
 
 @Component({
   selector: 'app-cases-list',
@@ -275,26 +277,42 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         field: 'lastName',
         label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
         pinned: IV2ColumnPinned.LEFT,
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
       },
       {
         field: 'firstName',
         label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
         pinned: IV2ColumnPinned.LEFT,
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
       },
       {
         field: 'middleName',
         label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
         notVisible: true,
         pinned: IV2ColumnPinned.LEFT,
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
       },
       {
         field: 'visualId',
         label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
         pinned: IV2ColumnPinned.LEFT,
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
       },
       {
         field: 'statuses',
@@ -368,12 +386,40 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       {
         field: 'classification',
         label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          search: (column: IExtendedColDef) => {
+            // create condition
+            const values: string[] = (column.columnDefinition.filter as V2FilterMultipleSelect).value;
+            const condition = {
+              classification: {
+                inq: values
+              }
+            };
+
+            // remove existing filter
+            this.queryBuilder.filter.removeExactCondition(condition);
+
+            // add new filter
+            this.filterBySelectField(
+              'classification',
+              values,
+              null,
+              false
+            );
+          }
+        }
       },
       {
         field: 'outcomeId',
         label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        }
       },
       {
         field: 'dateOfOutcome',
@@ -2275,21 +2321,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       .subscribe((response) => {
         this.pageCount = response;
       });
-  }
-
-  /**
-     * Filter by Classification field
-     * @param values
-     */
-  filterByClassificationField(values) {
-    // create condition
-    const condition = {classification: {inq: values}};
-
-    // remove existing filter
-    this.queryBuilder.filter.removeExactCondition(condition);
-
-    // add new filter
-    this.filterBySelectField('classification', values, 'value', false);
   }
 
   /**

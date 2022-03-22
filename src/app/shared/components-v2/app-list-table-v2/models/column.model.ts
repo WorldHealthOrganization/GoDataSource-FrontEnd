@@ -1,4 +1,5 @@
 import { V2Action } from './action.model';
+import { V2Filter, V2FilterDate, V2FilterDateTime } from './filter.model';
 
 /**
  * Column pinned
@@ -42,6 +43,7 @@ export interface IV2ColumnBasic {
   link?: (any) => string;
   cssCellClass?: string;
   sortable?: boolean;
+  filter?: V2Filter;
 }
 
 /**
@@ -75,6 +77,9 @@ interface IV2ColumnDate extends Omit<IV2ColumnBasic, 'format'> {
   format: Omit<IV2ColumnBasicFormat, 'type'> & {
     type: V2ColumnFormat.DATE
   };
+
+  // optional
+  filter?: V2FilterDate;
 }
 
 /**
@@ -85,6 +90,9 @@ interface IV2ColumnDatetime extends Omit<IV2ColumnBasic, 'format'> {
   format: Omit<IV2ColumnBasicFormat, 'type'> & {
     type: V2ColumnFormat.DATETIME
   };
+
+  // optional
+  filter?: V2FilterDateTime;
 }
 
 /**
@@ -119,6 +127,7 @@ export interface IV2ColumnButton {
   notResizable?: boolean;
   cssCellClass?: string;
   sortable?: boolean;
+  filter?: never;
 }
 
 /**
@@ -140,6 +149,7 @@ export interface IV2ColumnAction {
   notResizable?: boolean;
   cssCellClass?: string;
   sortable?: never;
+  filter?: never;
 }
 
 /**
@@ -203,6 +213,7 @@ export interface IV2ColumnStatus {
   pinned?: IV2ColumnPinned | boolean;
   cssCellClass?: string;
   sortable?: never;
+  filter?: never;
 }
 
 /**
