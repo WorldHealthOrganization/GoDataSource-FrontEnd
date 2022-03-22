@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Params, Router } from '@angular/router';
 import * as _ from 'lodash';
-import { Observable, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { catchError, share, takeUntil, tap } from 'rxjs/operators';
+import { catchError, map, share, switchMap, takeUntil, tap } from 'rxjs/operators';
 
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
@@ -20,10 +20,12 @@ import {
   IExportFieldsGroupRequired,
 } from '../../../../core/models/export-fields-group.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { LocationModel } from '../../../../core/models/location.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { EventDataService } from '../../../../core/services/data/event.data.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
@@ -505,7 +507,8 @@ export class EventsListComponent
     private userDataService: UserDataService,
     private redirectService: RedirectService,
     private entityHelperService: EntityHelperService,
-    private dialogV2Service: DialogV2Service
+    private dialogV2Service: DialogV2Service,
+    private locationDataService: LocationDataService,
   ) {
     super(listHelperService);
   }
@@ -1639,12 +1642,68 @@ export class EventsListComponent
       // retrieve responsible user information
       this.queryBuilder.include('responsibleUser', true);
 
-      // retrieve location list
-      this.queryBuilder.include('location', true);
-
       // retrieve the list of Events
       this.eventsList$ = this.eventDataService
         .getEventsList(this.selectedOutbreak.id, this.queryBuilder)
+        .pipe(
+          switchMap((data) => {
+            // determine locations that we need to retrieve
+            const locationsIdsMap: {
+              [locationId: string]: true
+            } = {};
+            data.forEach((item) => {
+              // nothing to add ?
+              if (!item.address?.locationId) {
+                return;
+              }
+
+              // add location to list
+              locationsIdsMap[item.address.locationId] = true;
+            });
+
+            // determine ids
+            const locationIds: string[] = Object.keys(locationsIdsMap);
+
+            // nothing to retrieve ?
+            if (locationIds.length < 1) {
+              return of(data);
+            }
+
+            // construct location query builder
+            const qb = new RequestQueryBuilder();
+            qb.filter.bySelect(
+              'id',
+              locationIds,
+              false,
+              null
+            );
+
+            // retrieve locations
+            return this.locationDataService
+              .getLocationsList(qb)
+              .pipe(
+                map((locations) => {
+                  // map locations
+                  const locationsMap: {
+                    [locationId: string]: LocationModel
+                  } = {};
+                  locations.forEach((location) => {
+                    locationsMap[location.id] = location;
+                  });
+
+                  // set locations
+                  data.forEach((item) => {
+                    item.address.location = item.address.locationId && locationsMap[item.address.locationId]
+                      ? locationsMap[item.address.locationId]
+                      : item.address.location;
+                  });
+
+                  // finished
+                  return data;
+                })
+              );
+          })
+        )
         .pipe(
           catchError((err) => {
             this.toastV2Service.error(err);
