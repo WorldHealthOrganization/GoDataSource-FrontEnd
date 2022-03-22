@@ -822,6 +822,14 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // some type of columns should have a fixed width
     this.adjustFixedSizeColumns();
+
+    // set min width to column depending on the current content
+    // - it would've been better if we could've set it to header width, and not cel content too
+    this._agTable.columnApi.getAllColumns().forEach((column) => {
+      const colDef = column.getColDef();
+      colDef.minWidth = column.getActualWidth();
+      column.setColDef(colDef, colDef);
+    });
   }
 
   /**
@@ -1217,7 +1225,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   }
 
   /**
-   * Sort by - used in AppListTableV2ColumnHeaderComponent
+   * Sort by - used in AppListTableV2ColumnHeaderComponent even if it is marked as not used...
    */
   columnSortBy(
     component: AppListTableV2ColumnHeaderComponent,
