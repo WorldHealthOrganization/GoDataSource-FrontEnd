@@ -2,6 +2,7 @@ import { ILabelValuePairModel } from '../../../forms-v2/core/label-value-pair.mo
 import { IExtendedColDef } from './extended-column.model';
 import { IV2DateRange } from '../../../forms-v2/components/app-form-date-range-v2/models/date.model';
 import { IV2NumberRange } from '../../../forms-v2/components/app-form-number-range-v2/models/number.model';
+import { AddressModel } from '../../../../core/models/address.model';
 
 /**
  * Filter Type
@@ -10,7 +11,8 @@ export enum V2FilterType {
   TEXT,
   MULTIPLE_SELECT,
   DATE_RANGE,
-  AGE_RANGE
+  AGE_RANGE,
+  PHONE_NUMBER
 }
 
 /**
@@ -34,14 +36,16 @@ interface V2FilterBasic {
   options?: never;
   min?: never;
   max?: never;
+  address?: never;
+  value?: never;
 }
 
 /**
  * Text
  */
-export interface V2FilterText extends V2FilterBasic {
+export interface V2FilterText extends Omit<V2FilterBasic, 'value'> {
   // required
-  type: V2FilterType.TEXT
+  type: V2FilterType.TEXT;
   textType: V2FilterTextType;
 
   // optional
@@ -51,9 +55,9 @@ export interface V2FilterText extends V2FilterBasic {
 /**
  * Multiple select
  */
-export interface V2FilterMultipleSelect extends Omit<V2FilterBasic, 'options'> {
+export interface V2FilterMultipleSelect extends Omit<V2FilterBasic, 'options' | 'value'> {
   // required
-  type: V2FilterType.MULTIPLE_SELECT
+  type: V2FilterType.MULTIPLE_SELECT;
   options: ILabelValuePairModel[];
 
   // optional
@@ -63,9 +67,9 @@ export interface V2FilterMultipleSelect extends Omit<V2FilterBasic, 'options'> {
 /**
  * Date range
  */
-export interface V2FilterDate extends V2FilterBasic {
+export interface V2FilterDate extends Omit<V2FilterBasic, 'value'> {
   // required
-  type: V2FilterType.DATE_RANGE
+  type: V2FilterType.DATE_RANGE;
 
   // optional
   value?: IV2DateRange;
@@ -74,9 +78,9 @@ export interface V2FilterDate extends V2FilterBasic {
 /**
  * Age range
  */
-export interface V2FilterAge extends Omit<V2FilterBasic, 'min' | 'max'> {
+export interface V2FilterAge extends Omit<V2FilterBasic, 'min' | 'max' | 'value'> {
   // required
-  type: V2FilterType.AGE_RANGE
+  type: V2FilterType.AGE_RANGE;
 
   // optional
   value?: IV2NumberRange;
@@ -85,6 +89,17 @@ export interface V2FilterAge extends Omit<V2FilterBasic, 'min' | 'max'> {
 }
 
 /**
+ * Phone number
+ */
+export interface V2FilterPhoneNumber extends Omit<V2FilterBasic, 'address'> {
+  // required
+  type: V2FilterType.PHONE_NUMBER;
+  address: AddressModel;
+  field: string;
+  fieldIsArray: boolean;
+}
+
+/**
  * Filter
  */
-export type V2Filter = V2FilterText | V2FilterMultipleSelect | V2FilterDate | V2FilterAge;
+export type V2Filter = V2FilterText | V2FilterMultipleSelect | V2FilterDate | V2FilterAge | V2FilterPhoneNumber;

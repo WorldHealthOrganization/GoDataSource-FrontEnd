@@ -75,6 +75,17 @@
       [max]="extendedColDef.columnDefinition.filter.max"
       (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-number-range-v2>
 
+    <!-- Phone number -->
+    <app-form-input-v2
+      *ngSwitchCase="V2FilterType.PHONE_NUMBER"
+      class="gd-list-table-column-filter-input"
+      [(ngModel)]="extendedColDef.columnDefinition.filter.address.phoneNumber"
+      [name]="'filterBy' + extendedColDef.field"
+      placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+      neverFloatLabel="true"
+      autocomplete="off"
+      (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-input-v2>
+
   </div>
 
 </div>

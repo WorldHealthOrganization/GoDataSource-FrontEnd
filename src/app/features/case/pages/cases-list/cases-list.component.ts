@@ -136,9 +136,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
 
   // address model needed for filters
-  filterAddressModel: AddressModel = new AddressModel({
-    geoLocationAccurate: null
-  });
   filterAddressParentLocationIds: string[] = [];
 
   // user list
@@ -268,6 +265,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    * Initialize Side Table Columns
    */
   private initializeTableColumns(): void {
+    // address model used to search by phone number, address line, postal code, city....
+    const filterAddressModel: AddressModel = new AddressModel({
+      geoLocationAccurate: null
+    });
+
     // default table columns
     this.tableColumns = [
       {
@@ -458,7 +460,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: 'mainAddress.phoneNumber'
         },
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.PHONE_NUMBER,
+          address: filterAddressModel,
+          field: 'addresses',
+          fieldIsArray: true
+        }
       },
       {
         field: 'location',
