@@ -40,9 +40,6 @@ export class AppFormSelectMultipleV2Component
   // float label
   @Input() neverFloatLabel: boolean = false;
 
-  // clearable ?
-  @Input() clearable: boolean = false;
-
   // tooltip
   @Input() optionTooltipKey: string;
 

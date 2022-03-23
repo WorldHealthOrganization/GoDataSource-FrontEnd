@@ -72,13 +72,6 @@
         [maxBufferPx]="480"
         style="height: 20rem; overflow-x: hidden;">
 
-        <!-- Empty option used to select nothing -->
-        <mat-option
-          *ngIf="clearable"
-          [value]="null">
-          {{ 'LNG_COMMON_LABEL_NONE' | translate }}
-        </mat-option>
-
         <!-- Options -->
         <mat-option
           *cdkVirtualFor="let option of filteredOptions; templateCacheSize: 0"
