@@ -7,7 +7,7 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import { GenericDataService } from '../../data/generic.data.service';
 
 @Injectable()
-export class YesNoDataResolver implements Resolve<ILabelValuePairModel[]> {
+export class YesNoAllDataResolver implements Resolve<ILabelValuePairModel[]> {
   /**
    * Constructor
    */

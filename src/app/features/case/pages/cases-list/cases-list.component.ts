@@ -574,7 +574,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           address: filterAddressModel,
           field: 'addresses',
           fieldIsArray: true,
-          options: this.activatedRoute.snapshot.data.yesNo
+          options: this.activatedRoute.snapshot.data.yesNoAll
         },
         sortable: true
       },
@@ -611,6 +611,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             return data.classification === Constants.CASE_CLASSIFICATION.NOT_A_CASE;
           }
         },
+        // #TODO - filter
         sortable: true
       },
       {
@@ -620,6 +621,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: V2ColumnFormat.BOOLEAN
         },
+        // #TODO - filter
         sortable: true
       },
       {
