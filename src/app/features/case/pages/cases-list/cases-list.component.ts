@@ -459,7 +459,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         },
         sortable: true,
         filter: {
-          type: V2FilterType.PHONE_NUMBER,
+          type: V2FilterType.ADDRESS_PHONE_NUMBER,
           address: filterAddressModel,
           field: 'addresses',
           fieldIsArray: true
@@ -472,7 +472,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           type: 'mainAddress.location.name'
         },
         filter: {
-          type: V2FilterType.MULTIPLE_LOCATION,
+          type: V2FilterType.ADDRESS_MULTIPLE_LOCATION,
           address: filterAddressModel,
           field: 'addresses',
           fieldIsArray: true

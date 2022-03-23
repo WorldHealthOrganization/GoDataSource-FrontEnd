@@ -12,8 +12,8 @@ export enum V2FilterType {
   MULTIPLE_SELECT,
   DATE_RANGE,
   AGE_RANGE,
-  PHONE_NUMBER,
-  MULTIPLE_LOCATION
+  ADDRESS_PHONE_NUMBER,
+  ADDRESS_MULTIPLE_LOCATION
 }
 
 /**
@@ -92,9 +92,9 @@ export interface V2FilterAge extends Omit<V2FilterBasic, 'min' | 'max' | 'value'
 /**
  * Phone number
  */
-export interface V2FilterPhoneNumber extends Omit<V2FilterBasic, 'address'> {
+export interface V2FilterAddressPhoneNumber extends Omit<V2FilterBasic, 'address'> {
   // required
-  type: V2FilterType.PHONE_NUMBER;
+  type: V2FilterType.ADDRESS_PHONE_NUMBER;
   address: AddressModel;
   field: string;
   fieldIsArray: boolean;
@@ -103,9 +103,9 @@ export interface V2FilterPhoneNumber extends Omit<V2FilterBasic, 'address'> {
 /**
  * Location
  */
-export interface V2FilterMultipleLocation extends Omit<V2FilterBasic, 'address'> {
+export interface V2FilterAddressMultipleLocation extends Omit<V2FilterBasic, 'address'> {
   // required
-  type: V2FilterType.MULTIPLE_LOCATION;
+  type: V2FilterType.ADDRESS_MULTIPLE_LOCATION;
   address: AddressModel;
   field: string;
   fieldIsArray: boolean;
@@ -114,4 +114,4 @@ export interface V2FilterMultipleLocation extends Omit<V2FilterBasic, 'address'>
 /**
  * Filter
  */
-export type V2Filter = V2FilterText | V2FilterMultipleSelect | V2FilterDate | V2FilterAge | V2FilterPhoneNumber | V2FilterMultipleLocation;
+export type V2Filter = V2FilterText | V2FilterMultipleSelect | V2FilterDate | V2FilterAge | V2FilterAddressPhoneNumber | V2FilterAddressMultipleLocation;

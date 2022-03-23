@@ -77,7 +77,7 @@
 
     <!-- Phone number -->
     <app-form-input-v2
-      *ngSwitchCase="V2FilterType.PHONE_NUMBER"
+      *ngSwitchCase="V2FilterType.ADDRESS_PHONE_NUMBER"
       class="gd-list-table-column-filter-input"
       [(ngModel)]="extendedColDef.columnDefinition.filter.address.phoneNumber"
       [name]="'filterBy' + extendedColDef.field"
@@ -88,7 +88,7 @@
 
     <!-- Location -->
     <app-form-select-location-multiple-v2
-      *ngSwitchCase="V2FilterType.MULTIPLE_LOCATION"
+      *ngSwitchCase="V2FilterType.ADDRESS_MULTIPLE_LOCATION"
       class="gd-list-table-column-filter-input"
       [(ngModel)]="extendedColDef.columnDefinition.filter.address.filterLocationIds"
       [name]="'filterBy' + extendedColDef.field"

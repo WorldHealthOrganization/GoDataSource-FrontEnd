@@ -2880,7 +2880,7 @@ export abstract class ListComponent implements OnDestroy {
         break;
 
       // phone number
-      case V2FilterType.PHONE_NUMBER:
+      case V2FilterType.ADDRESS_PHONE_NUMBER:
         // filter
         this.filterByAddress(
           column.columnDefinition.filter.field,
@@ -2893,7 +2893,7 @@ export abstract class ListComponent implements OnDestroy {
         break;
 
       // phone number
-      case V2FilterType.MULTIPLE_LOCATION:
+      case V2FilterType.ADDRESS_MULTIPLE_LOCATION:
         // filter
         this.filterByAddress(
           column.columnDefinition.filter.field,
