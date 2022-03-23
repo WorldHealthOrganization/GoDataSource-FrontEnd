@@ -138,7 +138,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   // user list
   userList$: Observable<UserModel[]>;
 
-  yesNoOptionsList$: Observable<any[]>;
   occupationsList$: Observable<any[]>;
   outcomeList$: Observable<any[]>;
   pregnancyStatsList$: Observable<any[]>;
@@ -195,7 +194,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
     // reference data
-    this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
     this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
     this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
     this.pregnancyStatsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PREGNANCY_STATUS);
@@ -570,6 +568,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: V2ColumnFormat.BOOLEAN,
           field: 'mainAddress.geoLocationAccurate'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION,
+          address: filterAddressModel,
+          field: 'addresses',
+          fieldIsArray: true,
+          options: this.activatedRoute.snapshot.data.yesNo
         },
         sortable: true
       },

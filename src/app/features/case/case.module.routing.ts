@@ -8,6 +8,7 @@ import { PageChangeConfirmationGuard } from '../../core/services/guards/page-cha
 import { ClassificationDataResolver } from '../../core/services/resolvers/data/classification.resolver';
 import { OutcomeDataResolver } from '../../core/services/resolvers/data/outcome.resolver';
 import { GenderDataResolver } from '../../core/services/resolvers/data/gender.resolver';
+import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.resolver';
 
 const routes: Routes = [
   // Cases list
@@ -23,7 +24,8 @@ const routes: Routes = [
     resolve: {
       classification: ClassificationDataResolver,
       outcome: OutcomeDataResolver,
-      gender: GenderDataResolver
+      gender: GenderDataResolver,
+      yesNo: YesNoDataResolver
     }
   },
   // Create Case

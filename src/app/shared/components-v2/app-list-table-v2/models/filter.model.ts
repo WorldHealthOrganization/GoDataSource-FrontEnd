@@ -14,7 +14,8 @@ export enum V2FilterType {
   AGE_RANGE,
   ADDRESS_PHONE_NUMBER,
   ADDRESS_MULTIPLE_LOCATION,
-  ADDRESS_FIELD
+  ADDRESS_FIELD,
+  ADDRESS_ACCURATE_GEO_LOCATION
 }
 
 /**
@@ -126,6 +127,19 @@ export interface V2FilterAddressField extends Omit<V2FilterBasic, 'address' | 'a
 }
 
 /**
+ * Simple address field
+ */
+export interface V2FilterAddressAccurateGeoLocation extends Omit<V2FilterBasic, 'address' | 'options'> {
+  // required
+  type: V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION;
+  address: AddressModel;
+  field: string;
+  fieldIsArray: boolean;
+  options: ILabelValuePairModel[];
+}
+
+/**
  * Filter
  */
-export type V2Filter = V2FilterText | V2FilterMultipleSelect | V2FilterDate | V2FilterAge | V2FilterAddressPhoneNumber | V2FilterAddressMultipleLocation | V2FilterAddressField;
+export type V2Filter = V2FilterText | V2FilterMultipleSelect | V2FilterDate | V2FilterAge | V2FilterAddressPhoneNumber
+| V2FilterAddressMultipleLocation | V2FilterAddressField | V2FilterAddressAccurateGeoLocation;

@@ -2883,6 +2883,7 @@ export abstract class ListComponent implements OnDestroy {
       case V2FilterType.ADDRESS_PHONE_NUMBER:
       case V2FilterType.ADDRESS_MULTIPLE_LOCATION:
       case V2FilterType.ADDRESS_FIELD:
+      case V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION:
         // filter
         this.filterByAddress(
           column.columnDefinition.filter.field,

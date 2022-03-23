@@ -6,7 +6,8 @@
     appearance="outline">
 
     <!-- Place holder -->
-    <mat-label>
+    <mat-label
+      *ngIf="!neverFloatLabel">
       {{ placeholder | translate }}
     </mat-label>
 
@@ -17,6 +18,7 @@
       [errorStateMatcher]="errMatcher"
       [disabled]="disabled"
       [required]="required"
+      [placeholder]="neverFloatLabel ? (placeholder | translate) : undefined"
       panelClass="gd-form-select-single-v2-panel"
       (click)="vScrollToFirstSelectedOption()"
       (opened)="vScrollToFirstSelectedOption()">
