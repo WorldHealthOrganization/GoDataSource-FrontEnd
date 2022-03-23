@@ -31,7 +31,9 @@
   <div
     *ngIf="component.showHeaderFilters && extendedColDef.columnDefinition.filter"
     [ngSwitch]="extendedColDef.columnDefinition.filter.type"
-    class="gd-list-table-column-filter">
+    class="gd-list-table-column-filter"
+    (mousedown)="$event.stopPropagation()"
+    (keydown)="$event.stopPropagation()">
 
     <!-- Text -->
     <app-form-input-v2
@@ -41,7 +43,6 @@
       [name]="'filterBy' + extendedColDef.field"
       placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
       neverFloatLabel="true"
-      (mousedown)="$event.stopPropagation()"
       autocomplete="off"
       (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-input-v2>
 
@@ -52,14 +53,18 @@
       [(ngModel)]="extendedColDef.columnDefinition.filter.value"
       [name]="'filterBy' + extendedColDef.field"
       placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
-      neverFloatLabel="off"
+      neverFloatLabel="true"
       [options]="extendedColDef.columnDefinition.filter.options"
       (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-select-multiple-v2>
 
     <!-- Date range -->
-    <!-- #TODO -->
-    <div
-      *ngSwitchCase="V2FilterType.DATE_RANGE">TODO</div>
+    <app-form-date-range-v2
+      *ngSwitchCase="V2FilterType.DATE_RANGE"
+      class="gd-list-table-column-filter-input"
+      [(ngModel)]="extendedColDef.columnDefinition.filter.value"
+      [name]="'filterBy' + extendedColDef.field"
+      placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+      (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-date-range-v2>
 
     <!-- Age range -->
     <!-- #TODO -->

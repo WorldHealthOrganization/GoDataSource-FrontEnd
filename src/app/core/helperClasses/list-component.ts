@@ -31,6 +31,7 @@ import { IBasicCount } from '../models/basic-count.interface';
 import { AuthenticatedComponent } from '../components/authenticated/authenticated.component';
 import { IExtendedColDef } from '../../shared/components-v2/app-list-table-v2/models/extended-column.model';
 import { V2FilterTextType, V2FilterType } from '../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { IV2DateRange } from '../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
 
 /**
  * Used by caching filter
@@ -857,7 +858,7 @@ export abstract class ListComponent implements OnDestroy {
      * @param {string} property
      * @param value Object with 'startDate' and 'endDate' properties
      */
-  filterByDateRangeField(property: string, value: {startDate: Date, endDate: Date}) {
+  filterByDateRangeField(property: string, value: IV2DateRange) {
     // filter by date range
     this.queryBuilder.filter.byDateRange(property, value);
 
@@ -2850,6 +2851,17 @@ export abstract class ListComponent implements OnDestroy {
           column.columnDefinition.filter.value,
           null,
           true
+        );
+
+        // finished
+        break;
+
+      // multiple select
+      case V2FilterType.DATE_RANGE:
+        // filter
+        this.filterByDateRangeField(
+          column.columnDefinition.field,
+          column.columnDefinition.filter.value
         );
 
         // finished

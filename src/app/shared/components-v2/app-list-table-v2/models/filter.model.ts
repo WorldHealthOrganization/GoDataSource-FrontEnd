@@ -1,6 +1,6 @@
-import { Moment } from '../../../../core/helperClasses/x-moment';
 import { ILabelValuePairModel } from '../../../forms-v2/core/label-value-pair.model';
 import { IExtendedColDef } from './extended-column.model';
+import { IV2DateRange } from '../../../forms-v2/components/app-form-date-range-v2/models/date.model';
 
 /**
  * Filter Type
@@ -9,11 +9,7 @@ export enum V2FilterType {
   TEXT,
   MULTIPLE_SELECT,
   DATE_RANGE,
-  AGE_RANGE,
-
-  // #TODO
-  NUMBER_RANGE,
-  DATETIME_RANGE
+  AGE_RANGE
 }
 
 /**
@@ -67,10 +63,7 @@ export interface V2FilterDate extends V2FilterBasic {
   type: V2FilterType.DATE_RANGE
 
   // optional
-  // #TODO
-  value?: any;
-  min?: Moment;
-  max?: Moment;
+  value?: IV2DateRange;
 }
 
 /**
@@ -87,36 +80,7 @@ export interface V2FilterAge extends V2FilterBasic {
   // max?: Moment;
 }
 
-
-
-// #TODO
-/**
- * Number range
- */
-export interface V2FilterNumber extends V2FilterBasic {
-  // required
-  type: V2FilterType.NUMBER_RANGE
-  min: number;
-  max: number;
-
-  // optional
-  value?: number;
-}
-
-/**
- * Datetime range
- */
-export interface V2FilterDateTime extends V2FilterBasic {
-  // required
-  type: V2FilterType.DATETIME_RANGE
-
-  // optional
-  value?: Moment;
-  min?: Moment;
-  max?: Moment;
-}
-
 /**
  * Filter
  */
-export type V2Filter = V2FilterText | V2FilterMultipleSelect | V2FilterDate | V2FilterAge | V2FilterNumber | V2FilterDateTime;
+export type V2Filter = V2FilterText | V2FilterMultipleSelect | V2FilterDate | V2FilterAge;
