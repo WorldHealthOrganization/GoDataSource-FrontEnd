@@ -584,6 +584,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: V2ColumnFormat.DATE
         },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
         sortable: true
       },
       {
@@ -592,6 +595,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATE
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
         },
         sortable: true
       },

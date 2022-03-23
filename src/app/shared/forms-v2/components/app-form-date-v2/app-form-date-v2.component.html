@@ -15,13 +15,13 @@
     <input
       matInput
       [(ngModel)]="value"
-      (blur)="onTouchItem()"
       [errorStateMatcher]="errMatcher"
       [disabled]="disabled"
       [required]="required"
       [placeholder]="neverFloatLabel ? (placeholder | translate) : undefined"
       [autocomplete]="autocomplete"
-      [matDatepicker]="pickerStartDate">
+      [matDatepicker]="pickerStartDate"
+      (blur)="onTouchItem()">
     <mat-datepicker-toggle
       matSuffix
       [for]="pickerStartDate"></mat-datepicker-toggle>
