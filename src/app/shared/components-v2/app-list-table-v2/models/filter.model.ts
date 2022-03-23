@@ -1,6 +1,7 @@
 import { ILabelValuePairModel } from '../../../forms-v2/core/label-value-pair.model';
 import { IExtendedColDef } from './extended-column.model';
 import { IV2DateRange } from '../../../forms-v2/components/app-form-date-range-v2/models/date.model';
+import { IV2NumberRange } from '../../../forms-v2/components/app-form-number-range-v2/models/number.model';
 
 /**
  * Filter Type
@@ -26,9 +27,13 @@ interface V2FilterBasic {
   // required
   type: V2FilterType;
 
+  // optional
+  search?: (column: IExtendedColDef) => void;
+
   // never
   options?: never;
-  search?: (column: IExtendedColDef) => void;
+  min?: never;
+  max?: never;
 }
 
 /**
@@ -69,15 +74,14 @@ export interface V2FilterDate extends V2FilterBasic {
 /**
  * Age range
  */
-export interface V2FilterAge extends V2FilterBasic {
+export interface V2FilterAge extends Omit<V2FilterBasic, 'min' | 'max'> {
   // required
   type: V2FilterType.AGE_RANGE
 
   // optional
-  // #TODO
-  value?: any;
-  // min?: Moment;
-  // max?: Moment;
+  value?: IV2NumberRange;
+  min?: number;
+  max?: number;
 }
 
 /**

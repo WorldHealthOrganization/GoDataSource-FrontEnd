@@ -1,5 +1,5 @@
 import { V2Action } from './action.model';
-import { V2Filter, V2FilterDate, V2FilterDateTime } from './filter.model';
+import { V2Filter, V2FilterDate } from './filter.model';
 
 /**
  * Column pinned
@@ -92,7 +92,7 @@ interface IV2ColumnDatetime extends Omit<IV2ColumnBasic, 'format'> {
   };
 
   // optional
-  filter?: V2FilterDateTime;
+  // filter?: V2FilterDateTime;
 }
 
 /**

@@ -438,7 +438,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         },
         sortable: true,
         filter: {
-          type: V2FilterType.AGE_RANGE
+          type: V2FilterType.AGE_RANGE,
+          min: 0,
+          max: Constants.DEFAULT_AGE_MAX_YEARS
         }
       },
       {

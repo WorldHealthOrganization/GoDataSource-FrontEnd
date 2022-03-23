@@ -32,6 +32,7 @@ import { AuthenticatedComponent } from '../components/authenticated/authenticate
 import { IExtendedColDef } from '../../shared/components-v2/app-list-table-v2/models/extended-column.model';
 import { V2FilterTextType, V2FilterType } from '../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2DateRange } from '../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
+import { IV2NumberRange } from '../../shared/forms-v2/components/app-form-number-range-v2/models/number.model';
 
 /**
  * Used by caching filter
@@ -822,7 +823,7 @@ export abstract class ListComponent implements OnDestroy {
      */
   filterByAgeRangeField(
     property: string,
-    value: FormRangeModel
+    value: IV2NumberRange
   ) {
     // filter by age range
     this.queryBuilder.filter.byAgeRange(property, value);
@@ -2856,10 +2857,21 @@ export abstract class ListComponent implements OnDestroy {
         // finished
         break;
 
-      // multiple select
+      // date range
       case V2FilterType.DATE_RANGE:
         // filter
         this.filterByDateRangeField(
+          column.columnDefinition.field,
+          column.columnDefinition.filter.value
+        );
+
+        // finished
+        break;
+
+      // age range - years
+      case V2FilterType.AGE_RANGE:
+        // filter
+        this.filterByAgeRangeField(
           column.columnDefinition.field,
           column.columnDefinition.filter.value
         );

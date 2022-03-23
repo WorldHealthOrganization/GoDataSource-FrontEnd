@@ -63,13 +63,17 @@
       class="gd-list-table-column-filter-input"
       [(ngModel)]="extendedColDef.columnDefinition.filter.value"
       [name]="'filterBy' + extendedColDef.field"
-      placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
       (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-date-range-v2>
 
     <!-- Age range -->
-    <!-- #TODO -->
-    <div
-      *ngSwitchCase="V2FilterType.AGE_RANGE">TODO</div>
+    <app-form-number-range-v2
+      *ngSwitchCase="V2FilterType.AGE_RANGE"
+      class="gd-list-table-column-filter-input"
+      [(ngModel)]="extendedColDef.columnDefinition.filter.value"
+      [name]="'filterBy' + extendedColDef.field"
+      [min]="extendedColDef.columnDefinition.filter.min"
+      [max]="extendedColDef.columnDefinition.filter.max"
+      (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-number-range-v2>
 
   </div>
 
