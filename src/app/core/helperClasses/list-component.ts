@@ -2879,21 +2879,10 @@ export abstract class ListComponent implements OnDestroy {
         // finished
         break;
 
-      // phone number
+      // address
       case V2FilterType.ADDRESS_PHONE_NUMBER:
-        // filter
-        this.filterByAddress(
-          column.columnDefinition.filter.field,
-          column.columnDefinition.filter.fieldIsArray,
-          column.columnDefinition.filter.address,
-          column.columnDefinition.filter.address.filterLocationIds
-        );
-
-        // finished
-        break;
-
-      // phone number
       case V2FilterType.ADDRESS_MULTIPLE_LOCATION:
+      case V2FilterType.ADDRESS_FIELD:
         // filter
         this.filterByAddress(
           column.columnDefinition.filter.field,

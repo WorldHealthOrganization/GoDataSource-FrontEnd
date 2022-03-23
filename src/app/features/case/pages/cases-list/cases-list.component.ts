@@ -490,6 +490,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: 'mainAddress.emailAddress'
         },
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          address: filterAddressModel,
+          addressField: 'emailAddress',
+          field: 'addresses',
+          fieldIsArray: true
+        },
         sortable: true
       },
       {
@@ -498,6 +505,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'mainAddress.addressLine1'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          address: filterAddressModel,
+          addressField: 'addressLine1',
+          field: 'addresses',
+          fieldIsArray: true
         },
         sortable: true
       },
@@ -508,6 +522,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: 'mainAddress.city'
         },
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          address: filterAddressModel,
+          addressField: 'city',
+          field: 'addresses',
+          fieldIsArray: true
+        },
         sortable: true
       },
       {
@@ -516,8 +537,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lat'
-        },
-        sortable: true
+        }
       },
       {
         field: 'addresses.geoLocation.lng',
@@ -525,8 +545,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lng'
-        },
-        sortable: true
+        }
       },
       {
         field: 'addresses.postalCode',
@@ -534,6 +553,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'mainAddress.postalCode'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          address: filterAddressModel,
+          addressField: 'postalCode',
+          field: 'addresses',
+          fieldIsArray: true
         },
         sortable: true
       },
