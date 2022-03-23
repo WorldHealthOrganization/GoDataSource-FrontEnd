@@ -135,9 +135,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
 
 
-  // address model needed for filters
-  filterAddressParentLocationIds: string[] = [];
-
   // user list
   userList$: Observable<UserModel[]>;
 
@@ -473,6 +470,12 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         label: 'LNG_CASE_FIELD_LABEL_ADDRESS_LOCATION',
         format: {
           type: 'mainAddress.location.name'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_LOCATION,
+          address: filterAddressModel,
+          field: 'addresses',
+          fieldIsArray: true
         },
         link: (data) => {
           return data.mainAddress?.location?.name ?

@@ -17,7 +17,7 @@
       {{extendedColDef.headerName}}
     </div>
 
-    <!-- Label -->
+    <!-- Sort Icon -->
     <div
       class="gd-list-table-column-header-sort">
       <mat-icon
@@ -85,6 +85,18 @@
       neverFloatLabel="true"
       autocomplete="off"
       (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-input-v2>
+
+    <!-- Location -->
+    <app-form-select-location-multiple-v2
+      *ngSwitchCase="V2FilterType.MULTIPLE_LOCATION"
+      class="gd-list-table-column-filter-input"
+      [(ngModel)]="extendedColDef.columnDefinition.filter.address.filterLocationIds"
+      [name]="'filterBy' + extendedColDef.field"
+      placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+      neverFloatLabel="true"
+      useOutbreakLocations="true"
+      (ngModelChange)="component.columnFilterBy(extendedColDef)">
+    </app-form-select-location-multiple-v2>
 
   </div>
 

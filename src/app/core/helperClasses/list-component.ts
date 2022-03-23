@@ -931,7 +931,7 @@ export abstract class ListComponent implements OnDestroy {
     // add condition if we were able to create it
     if (
       searchQb &&
-            !searchQb.isEmpty()
+      !searchQb.isEmpty()
     ) {
       this.queryBuilder.merge(searchQb);
     }
@@ -2886,9 +2886,20 @@ export abstract class ListComponent implements OnDestroy {
           column.columnDefinition.filter.field,
           column.columnDefinition.filter.fieldIsArray,
           column.columnDefinition.filter.address,
+          column.columnDefinition.filter.address.filterLocationIds
+        );
 
-          // #TODO - add location ids
-          []
+        // finished
+        break;
+
+      // phone number
+      case V2FilterType.MULTIPLE_LOCATION:
+        // filter
+        this.filterByAddress(
+          column.columnDefinition.filter.field,
+          column.columnDefinition.filter.fieldIsArray,
+          column.columnDefinition.filter.address,
+          column.columnDefinition.filter.address.filterLocationIds
         );
 
         // finished

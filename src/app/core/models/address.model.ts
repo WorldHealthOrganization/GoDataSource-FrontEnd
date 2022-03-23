@@ -26,6 +26,9 @@ export class AddressModel {
   phoneNumber: string;
   emailAddress: string;
 
+  // used by ui
+  filterLocationIds: string[];
+
   /**
      * Search for current address
      * @param addresses
@@ -269,7 +272,7 @@ export class AddressModel {
       // check for geo location accurate
       if (
         addressModel.geoLocationAccurate === false ||
-                addressModel.geoLocationAccurate === true
+        addressModel.geoLocationAccurate === true
       ) {
         query.geoLocationAccurate = {
           [addressModel.geoLocationAccurate === false ? '$ne' : '$eq']: true
@@ -299,7 +302,7 @@ export class AddressModel {
       // check for geo location accurate
       if (
         addressModel.geoLocationAccurate === false ||
-                addressModel.geoLocationAccurate === true
+        addressModel.geoLocationAccurate === true
       ) {
         query[`${property}.geoLocationAccurate`] = {
           [addressModel.geoLocationAccurate === false ? 'ne' : 'eq']: true
