@@ -14,7 +14,8 @@
   [pageIndex]="pageIndex"
   [pageSettingsKey]="appliedListFilter !== Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS ? UserSettings.CASE_FIELDS : UserSettings.CASE_WITHOUT_RELATIONSHIPS_FIELDS"
   (pageChange)="changePage($event)"
-  (sortBy)="sortBy($event, { age: [ 'years', 'months' ] })"></app-list-table-v2>
+  (sortBy)="sortBy($event, { age: [ 'years', 'months' ] })"
+  (filterBy)="filterBy($event)"></app-list-table-v2>
 
 <!--
 <app-side-filters

@@ -1,5 +1,5 @@
 <div
-  class="gd-form-number-v2">
+  class="gd-form-date-v2">
 
   <!-- Input data -->
   <mat-form-field
@@ -21,9 +21,12 @@
       [required]="required"
       [placeholder]="neverFloatLabel ? (placeholder | translate) : undefined"
       [autocomplete]="autocomplete"
-      [min]="min"
-      [max]="max"
-      type="number">
+      [matDatepicker]="pickerStartDate">
+    <mat-datepicker-toggle
+      matSuffix
+      [for]="pickerStartDate"></mat-datepicker-toggle>
+    <mat-datepicker
+      #pickerStartDate></mat-datepicker>
 
     <!-- Errors -->
     <mat-error

@@ -7,7 +7,7 @@ import { catchError, map } from 'rxjs/operators';
 import { ToastV2Service } from '../../helper/toast-v2.service';
 
 @Injectable()
-export class ClassificationDataResolver implements IMapResolverV2<ReferenceDataEntryModel> {
+export class GenderDataResolver implements IMapResolverV2<ReferenceDataEntryModel> {
   /**
    * Constructor
    */
@@ -21,7 +21,7 @@ export class ClassificationDataResolver implements IMapResolverV2<ReferenceDataE
    */
   resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
     return this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION)
+      .getReferenceDataByCategory(ReferenceDataCategory.GENDER)
       .pipe(
         map((data) => {
           // construct map

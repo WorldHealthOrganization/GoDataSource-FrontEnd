@@ -57,11 +57,13 @@ import { ToastV2Service } from './helper/toast-v2.service';
 import { ClassificationDataResolver } from './resolvers/data/classification.resolver';
 import { RiskDataResolver } from './resolvers/data/risk.resolver';
 import { OutcomeDataResolver } from './resolvers/data/outcome.resolver';
+import { GenderDataResolver } from './resolvers/data/gender.resolver';
 
 // export the list of services
 export const services: any[] = [
   // resolver services
   ClassificationDataResolver,
+  GenderDataResolver,
   LanguageResolver,
   OutcomeDataResolver,
   RiskDataResolver,

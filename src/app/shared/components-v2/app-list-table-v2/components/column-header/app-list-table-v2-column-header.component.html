@@ -29,12 +29,63 @@
 
   <!-- Filter -->
   <div
-    *ngIf="component.showHeaderFilters"
-    class="gd-list-table-column-filter">
-    <!-- TODO - input, select, ... 1 row, no wrap so we have fixed height to determine loading & no data overlay height and position... -->
+    *ngIf="component.showHeaderFilters && extendedColDef.columnDefinition.filter"
+    [ngSwitch]="extendedColDef.columnDefinition.filter.type"
+    class="gd-list-table-column-filter"
+    (mousedown)="$event.stopPropagation()"
+    (keydown)="$event.stopPropagation()">
+
+    <!-- Text -->
     <app-form-input-v2
-      placeholder="bla bla"
-      [neverFloatLabel]="true"></app-form-input-v2>
+      *ngSwitchCase="V2FilterType.TEXT"
+      class="gd-list-table-column-filter-input"
+      [(ngModel)]="extendedColDef.columnDefinition.filter.value"
+      [name]="'filterBy' + extendedColDef.field"
+      placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+      neverFloatLabel="true"
+      autocomplete="off"
+      (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-input-v2>
+
+    <!-- Multiple select -->
+    <app-form-select-multiple-v2
+      *ngSwitchCase="V2FilterType.MULTIPLE_SELECT"
+      class="gd-list-table-column-filter-input"
+      [(ngModel)]="extendedColDef.columnDefinition.filter.value"
+      [name]="'filterBy' + extendedColDef.field"
+      placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+      neverFloatLabel="true"
+      [options]="extendedColDef.columnDefinition.filter.options"
+      (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-select-multiple-v2>
+
+    <!-- Date range -->
+    <app-form-date-range-v2
+      *ngSwitchCase="V2FilterType.DATE_RANGE"
+      class="gd-list-table-column-filter-input"
+      [(ngModel)]="extendedColDef.columnDefinition.filter.value"
+      [name]="'filterBy' + extendedColDef.field"
+      (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-date-range-v2>
+
+    <!-- Age range -->
+    <app-form-number-range-v2
+      *ngSwitchCase="V2FilterType.AGE_RANGE"
+      class="gd-list-table-column-filter-input"
+      [(ngModel)]="extendedColDef.columnDefinition.filter.value"
+      [name]="'filterBy' + extendedColDef.field"
+      [min]="extendedColDef.columnDefinition.filter.min"
+      [max]="extendedColDef.columnDefinition.filter.max"
+      (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-number-range-v2>
+
+    <!-- Phone number -->
+    <app-form-input-v2
+      *ngSwitchCase="V2FilterType.PHONE_NUMBER"
+      class="gd-list-table-column-filter-input"
+      [(ngModel)]="extendedColDef.columnDefinition.filter.address.phoneNumber"
+      [name]="'filterBy' + extendedColDef.field"
+      placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+      neverFloatLabel="true"
+      autocomplete="off"
+      (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-input-v2>
+
   </div>
 
 </div>

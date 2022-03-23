@@ -56,9 +56,6 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   recordsSubscription: Subscription;
   private _records$: Observable<BaseModel[]>;
   @Input() set records$(records$: Observable<BaseModel[]>) {
-    // cancel previous one
-    this.stopGetRecords();
-
     // set the new observable
     this._records$ = records$;
 
@@ -171,6 +168,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     field: string,
     direction: RequestSortDirection
   }>();
+
+  // filter by
+  @Output() filterBy = new EventEmitter<IExtendedColDef>();
 
   // saving columns
   savingColumns: boolean = false;
@@ -326,6 +326,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       // finished
       return;
     }
+
+    // cancel previous one
+    this.stopGetRecords();
 
     // retrieve data
     this._agTable.api.showLoadingOverlay();
@@ -1320,5 +1323,13 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         // update layout
         this.detectChanges();
       });
+  }
+
+  /**
+   * Filter by
+   */
+  columnFilterBy(column: IExtendedColDef): void {
+    // filter
+    this.filterBy.emit(column);
   }
 }

@@ -12,10 +12,7 @@ import { DebounceTimeCaller } from './debounce-time-caller';
 import { MetricContactsSeenEachDays } from '../models/metrics/metric-contacts-seen-each-days.model';
 import { FormCheckboxComponent } from '../../shared/xt-forms/components/form-checkbox/form-checkbox.component';
 import { ContactFollowedUp, MetricContactsWithSuccessfulFollowUp } from '../models/metrics/metric.contacts-with-success-follow-up.model';
-import {
-  AddressModel,
-  AddressType
-} from '../models/address.model';
+import { AddressModel, AddressType } from '../models/address.model';
 import { moment, Moment } from './x-moment';
 import { ListHelperService } from '../services/helper/list-helper.service';
 import { SubscriptionLike } from 'rxjs/internal/types';
@@ -32,6 +29,10 @@ import { OutbreakModel } from '../models/outbreak.model';
 import { IV2GroupedData } from '../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import { IBasicCount } from '../models/basic-count.interface';
 import { AuthenticatedComponent } from '../components/authenticated/authenticated.component';
+import { IExtendedColDef } from '../../shared/components-v2/app-list-table-v2/models/extended-column.model';
+import { V2FilterTextType, V2FilterType } from '../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { IV2DateRange } from '../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
+import { IV2NumberRange } from '../../shared/forms-v2/components/app-form-number-range-v2/models/number.model';
 
 /**
  * Used by caching filter
@@ -822,7 +823,7 @@ export abstract class ListComponent implements OnDestroy {
      */
   filterByAgeRangeField(
     property: string,
-    value: FormRangeModel
+    value: IV2NumberRange
   ) {
     // filter by age range
     this.queryBuilder.filter.byAgeRange(property, value);
@@ -858,7 +859,7 @@ export abstract class ListComponent implements OnDestroy {
      * @param {string} property
      * @param value Object with 'startDate' and 'endDate' properties
      */
-  filterByDateRangeField(property: string, value: {startDate: Date, endDate: Date}) {
+  filterByDateRangeField(property: string, value: IV2DateRange) {
     // filter by date range
     this.queryBuilder.filter.byDateRange(property, value);
 
@@ -2551,6 +2552,33 @@ export abstract class ListComponent implements OnDestroy {
     this.saveCacheToUrl(currentUserCache[this.getCachedFilterPageKey()]);
   }
 
+  // /**
+  //  * Visible columns
+  //  * @param visibleColumns
+  //  */
+  // applySideColumnsChanged(visibleColumns: string[]) {
+  //   // apply side columns
+  //   this.visibleTableColumns = visibleColumns;
+  //
+  //   // disabled saved filters for current user ?
+  //   const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
+  //   if (
+  //     authUser.dontCacheFilters ||
+  //     this._disableFilterCaching
+  //   ) {
+  //     return;
+  //   }
+  //
+  //   // reload data into columns from cached filters
+  //   // load saved filters
+  //   const currentUserCache: ICachedFilter = this.getCachedFilters(true);
+  //   const currentUserCacheForCurrentPath: ICachedFilterItems = currentUserCache[this.getCachedFilterPageKey()];
+  //   if (currentUserCacheForCurrentPath) {
+  //     // load saved input values
+  //     this.loadCachedInputValues(currentUserCacheForCurrentPath);
+  //   }
+  // }
+
   /**
      * Load cached input values
      */
@@ -2777,6 +2805,94 @@ export abstract class ListComponent implements OnDestroy {
     if (this.loadingDialog) {
       this.loadingDialog.close();
       this.loadingDialog = null;
+    }
+  }
+
+  /**
+   * Filter by
+   */
+  filterBy(column: IExtendedColDef): void {
+    // custom filter ?
+    if (column.columnDefinition.filter.search) {
+      // call
+      column.columnDefinition.filter.search(column);
+
+      // finished
+      return;
+    }
+
+    // filter accordingly
+    switch (column.columnDefinition.filter.type) {
+
+      // text
+      case V2FilterType.TEXT:
+
+        // text filter type
+        switch (column.columnDefinition.filter.textType) {
+          case V2FilterTextType.STARTS_WITH:
+
+            // filter
+            this.filterByTextField(
+              column.columnDefinition.field,
+              column.columnDefinition.filter.value
+            );
+
+            // finished
+            break;
+        }
+
+        // finished
+        break;
+
+      // multiple select
+      case V2FilterType.MULTIPLE_SELECT:
+        // filter
+        this.filterBySelectField(
+          column.columnDefinition.field,
+          column.columnDefinition.filter.value,
+          null,
+          true
+        );
+
+        // finished
+        break;
+
+      // date range
+      case V2FilterType.DATE_RANGE:
+        // filter
+        this.filterByDateRangeField(
+          column.columnDefinition.field,
+          column.columnDefinition.filter.value
+        );
+
+        // finished
+        break;
+
+      // age range - years
+      case V2FilterType.AGE_RANGE:
+        // filter
+        this.filterByAgeRangeField(
+          column.columnDefinition.field,
+          column.columnDefinition.filter.value
+        );
+
+        // finished
+        break;
+
+      // phone number
+      case V2FilterType.PHONE_NUMBER:
+        // filter
+        this.filterByAddress(
+          column.columnDefinition.filter.field,
+          column.columnDefinition.filter.fieldIsArray,
+          column.columnDefinition.filter.address,
+
+          // #TODO - add location ids
+          []
+        );
+
+        // finished
+        break;
     }
   }
 }

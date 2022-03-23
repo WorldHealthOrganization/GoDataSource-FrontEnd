@@ -2,39 +2,28 @@ import {
   ChangeDetectionStrategy, ChangeDetectorRef,
   Component,
   forwardRef,
-  Host, Input,
+  Host,
   OnDestroy,
   Optional,
-  SkipSelf, ViewEncapsulation
+  SkipSelf
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
+import { IV2DateRange } from './models/date.model';
 
 @Component({
-  selector: 'app-form-number-v2',
-  templateUrl: './app-form-number-v2.component.html',
-  styleUrls: ['./app-form-number-v2.component.scss'],
+  selector: 'app-form-date-range-v2',
+  templateUrl: './app-form-date-range-v2.component.html',
   providers: [{
     provide: NG_VALUE_ACCESSOR,
-    useExisting: forwardRef(() => AppFormNumberV2Component),
+    useExisting: forwardRef(() => AppFormDateRangeV2Component),
     multi: true
   }],
-  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppFormNumberV2Component
-  extends AppFormBaseV2<number> implements OnDestroy {
-
-  // float label
-  @Input() neverFloatLabel: boolean = false;
-
-  // autocomplete
-  @Input() autocomplete: string;
-
-  // min / max
-  @Input() min: number;
-  @Input() max: number;
+export class AppFormDateRangeV2Component
+  extends AppFormBaseV2<IV2DateRange> implements OnDestroy {
 
   /**
    * Constructor
@@ -56,5 +45,19 @@ export class AppFormNumberV2Component
    */
   ngOnDestroy(): void {
     super.onDestroy();
+  }
+
+  /**
+   * Write value
+   */
+  writeValue(value: IV2DateRange) {
+    // don't allow undefined values, but don't mark it as dirty either
+    value = value || {
+      startDate: undefined,
+      endDate: undefined
+    };
+
+    // write
+    super.writeValue(value);
   }
 }

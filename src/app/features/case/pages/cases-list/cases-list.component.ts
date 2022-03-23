@@ -44,6 +44,8 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { LocationModel } from '../../../../core/models/location.model';
+import { V2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { IExtendedColDef } from '../../../../shared/components-v2/app-list-table-v2/models/extended-column.model';
 
 @Component({
   selector: 'app-cases-list',
@@ -134,16 +136,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
 
   // address model needed for filters
-  filterAddressModel: AddressModel = new AddressModel({
-    geoLocationAccurate: null
-  });
   filterAddressParentLocationIds: string[] = [];
 
   // user list
   userList$: Observable<UserModel[]>;
 
-  caseClassificationsList$: Observable<any[]>;
-  genderList$: Observable<any[]>;
   yesNoOptionsList$: Observable<any[]>;
   occupationsList$: Observable<any[]>;
   outcomeList$: Observable<any[]>;
@@ -201,7 +198,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
     // reference data
-    this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
     this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
     this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
     this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
@@ -269,32 +265,53 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    * Initialize Side Table Columns
    */
   private initializeTableColumns(): void {
+    // address model used to search by phone number, address line, postal code, city....
+    const filterAddressModel: AddressModel = new AddressModel({
+      geoLocationAccurate: null
+    });
+
     // default table columns
     this.tableColumns = [
       {
         field: 'lastName',
         label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
         pinned: IV2ColumnPinned.LEFT,
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
       },
       {
         field: 'firstName',
         label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
         pinned: IV2ColumnPinned.LEFT,
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
       },
       {
         field: 'middleName',
         label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
         notVisible: true,
         pinned: IV2ColumnPinned.LEFT,
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
       },
       {
         field: 'visualId',
         label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
         pinned: IV2ColumnPinned.LEFT,
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
       },
       {
         field: 'statuses',
@@ -368,12 +385,40 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       {
         field: 'classification',
         label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          search: (column: IExtendedColDef) => {
+            // create condition
+            const values: string[] = (column.columnDefinition.filter as V2FilterMultipleSelect).value;
+            const condition = {
+              classification: {
+                inq: values
+              }
+            };
+
+            // remove existing filter
+            this.queryBuilder.filter.removeExactCondition(condition);
+
+            // add new filter
+            this.filterBySelectField(
+              'classification',
+              values,
+              null,
+              false
+            );
+          }
+        }
       },
       {
         field: 'outcomeId',
         label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        }
       },
       {
         field: 'dateOfOutcome',
@@ -382,7 +427,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           type: V2ColumnFormat.DATE
         },
         notVisible: true,
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
       },
       {
         field: 'age',
@@ -390,12 +438,21 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: V2ColumnFormat.AGE
         },
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.AGE_RANGE,
+          min: 0,
+          max: Constants.DEFAULT_AGE_MAX_YEARS
+        }
       },
       {
         field: 'gender',
         label: 'LNG_CASE_FIELD_LABEL_GENDER',
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        }
       },
       {
         field: 'phoneNumber',
@@ -403,7 +460,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: 'mainAddress.phoneNumber'
         },
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.PHONE_NUMBER,
+          address: filterAddressModel,
+          field: 'addresses',
+          fieldIsArray: true
+        }
       },
       {
         field: 'location',
@@ -1830,7 +1893,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         fieldName: 'gender',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_GENDER',
         type: FilterType.MULTISELECT,
-        options$: this.genderList$,
+        // options$: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         sortable: true
       }),
       new FilterModel({
@@ -1886,7 +1949,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         fieldName: 'classification',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
         type: FilterType.MULTISELECT,
-        options$: this.caseClassificationsList$
+        // options$: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
       }),
       new FilterModel({
         fieldName: 'dateOfInfection',
@@ -2275,21 +2338,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       .subscribe((response) => {
         this.pageCount = response;
       });
-  }
-
-  /**
-     * Filter by Classification field
-     * @param values
-     */
-  filterByClassificationField(values) {
-    // create condition
-    const condition = {classification: {inq: values}};
-
-    // remove existing filter
-    this.queryBuilder.filter.removeExactCondition(condition);
-
-    // add new filter
-    this.filterBySelectField('classification', values, 'value', false);
   }
 
   /**

@@ -7,6 +7,7 @@ import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 import { ClassificationDataResolver } from '../../core/services/resolvers/data/classification.resolver';
 import { OutcomeDataResolver } from '../../core/services/resolvers/data/outcome.resolver';
+import { GenderDataResolver } from '../../core/services/resolvers/data/gender.resolver';
 
 const routes: Routes = [
   // Cases list
@@ -21,7 +22,8 @@ const routes: Routes = [
     },
     resolve: {
       classification: ClassificationDataResolver,
-      outcome: OutcomeDataResolver
+      outcome: OutcomeDataResolver,
+      gender: GenderDataResolver
     }
   },
   // Create Case

@@ -27,10 +27,19 @@ export class RiskDataResolver implements IMapResolverV2<ReferenceDataEntryModel>
           // construct map
           const response: IResolverV2ResponseModel<ReferenceDataEntryModel> = {
             list: data.entries,
-            map: {}
+            map: {},
+            options: []
           };
           data.entries.forEach((item) => {
+            // map
             response.map[item.id] = item;
+
+            // add option
+            response.options.push({
+              label: item.value,
+              value: item.id,
+              data: item
+            });
           });
 
           // finished
