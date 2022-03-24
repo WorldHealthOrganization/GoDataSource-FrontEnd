@@ -733,6 +733,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: 'createdByUser.name'
         },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+        },
         exclude: (): boolean => {
           return !UserModel.canView(this.authUser);
         },
@@ -757,6 +761,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'updatedByUser.name'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
         },
         exclude: (): boolean => {
           return !UserModel.canView(this.authUser);
