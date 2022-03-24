@@ -19,9 +19,8 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
-import { catchError, map, share, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { catchError, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
-import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
@@ -137,9 +136,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
 
 
-  // user list
-  userList$: Observable<UserModel[]>;
-
   occupationsList$: Observable<any[]>;
   outcomeList$: Observable<any[]>;
   pregnancyStatsList$: Observable<any[]>;
@@ -179,7 +175,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     private i18nService: I18nService,
     private genericDataService: GenericDataService,
     private clusterDataService: ClusterDataService,
-    private userDataService: UserDataService,
     private entityHelperService: EntityHelperService,
     private redirectService: RedirectService
   ) {
@@ -190,9 +185,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    * Component initialized
    */
   ngOnInit() {
-    // retrieve users
-    this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
-
     // reference data
     this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
     this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
@@ -641,6 +633,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'responsibleUser.name'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
         },
         exclude: (): boolean => {
           return !UserModel.canList(this.authUser);
@@ -2121,7 +2117,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           fieldName: 'responsibleUserId',
           fieldLabel: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
           type: FilterType.MULTISELECT,
-          options$: this.userList$,
+          // options$: this.userList$,
           optionsLabelKey: 'name',
           optionsValueKey: 'id'
         })
