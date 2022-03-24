@@ -288,9 +288,6 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
             this.needsRefreshList(true);
           });
       });
-
-    // initialize Side Table Columns
-    this.initializeTableColumns();
   }
 
   /**
@@ -306,6 +303,11 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
       this.outbreakSubscriber = null;
     }
   }
+
+  /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {}
 
   /**
      * Retrieve contact/case data
@@ -401,113 +403,113 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
   /**
      * Initialize Side Table Columns
      */
-  private initializeTableColumns() {
-    // default table columns
-    // this.tableColumns = [
-    //   new VisibleColumnModel({
-    //     field: 'checkbox',
-    //     required: true,
-    //     excludeFromSave: true
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'date',
-    //     label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'team',
-    //     label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'statusId',
-    //     label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'targeted',
-    //     label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'index',
-    //     label: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'area',
-    //     label: 'LNG_FOLLOW_UP_FIELD_LABEL_AREA'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'phoneNumber',
-    //     label: 'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'address.emailAddress',
-    //     label: 'LNG_FOLLOW_UP_FIELD_LABEL_EMAIL',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'address.addressLine1',
-    //     label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'address.city',
-    //     label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'address.geoLocation.lat',
-    //     label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'address.geoLocation.lng',
-    //     label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'address.postalCode',
-    //     label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'address.geoLocationAccurate',
-    //     label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'responsibleUserId',
-    //     label: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID',
-    //     visible: false,
-    //     excludeFromDisplay: (): boolean => {
-    //       return !UserModel.canList(this.authUser);
-    //     }
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'deleted',
-    //     label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'createdBy',
-    //     label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'createdAt',
-    //     label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_AT',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'updatedBy',
-    //     label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_BY',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'updatedAt',
-    //     label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_AT',
-    //     visible: false
-    //   })
-    // ];
-  }
+  // private initializeTableColumnsOLD() {
+  //   // default table columns
+  //   // this.tableColumns = [
+  //   //   new VisibleColumnModel({
+  //   //     field: 'checkbox',
+  //   //     required: true,
+  //   //     excludeFromSave: true
+  //   //   }),
+  //   //   new VisibleColumnModel({
+  //   //     field: 'date',
+  //   //     label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE'
+  //   //   }),
+  //   //   new VisibleColumnModel({
+  //   //     field: 'team',
+  //   //     label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
+  //   //     visible: false
+  //   //   }),
+  //   //   new VisibleColumnModel({
+  //   //     field: 'statusId',
+  //   //     label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID'
+  //   //   }),
+  //   //   new VisibleColumnModel({
+  //   //     field: 'targeted',
+  //   //     label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED'
+  //   //   }),
+  //   //   new VisibleColumnModel({
+  //   //     field: 'index',
+  //   //     label: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP'
+  //   //   }),
+  //   //   new VisibleColumnModel({
+  //   //     field: 'area',
+  //   //     label: 'LNG_FOLLOW_UP_FIELD_LABEL_AREA'
+  //   //   }),
+  //   //   new VisibleColumnModel({
+  //   //     field: 'phoneNumber',
+  //   //     label: 'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER'
+  //   //   }),
+  //   //   new VisibleColumnModel({
+  //   //     field: 'address.emailAddress',
+  //   //     label: 'LNG_FOLLOW_UP_FIELD_LABEL_EMAIL',
+  //   //     visible: false
+  //   //   }),
+  //   //   new VisibleColumnModel({
+  //   //     field: 'address.addressLine1',
+  //   //     label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
+  //   //     visible: false
+  //   //   }),
+  //   //   new VisibleColumnModel({
+  //   //     field: 'address.city',
+  //   //     label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+  //   //     visible: false
+  //   //   }),
+  //   //   new VisibleColumnModel({
+  //   //     field: 'address.geoLocation.lat',
+  //   //     label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
+  //   //     visible: false
+  //   //   }),
+  //   //   new VisibleColumnModel({
+  //   //     field: 'address.geoLocation.lng',
+  //   //     label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
+  //   //     visible: false
+  //   //   }),
+  //   //   new VisibleColumnModel({
+  //   //     field: 'address.postalCode',
+  //   //     label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
+  //   //     visible: false
+  //   //   }),
+  //   //   new VisibleColumnModel({
+  //   //     field: 'address.geoLocationAccurate',
+  //   //     label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
+  //   //     visible: false
+  //   //   }),
+  //   //   new VisibleColumnModel({
+  //   //     field: 'responsibleUserId',
+  //   //     label: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID',
+  //   //     visible: false,
+  //   //     excludeFromDisplay: (): boolean => {
+  //   //       return !UserModel.canList(this.authUser);
+  //   //     }
+  //   //   }),
+  //   //   new VisibleColumnModel({
+  //   //     field: 'deleted',
+  //   //     label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED',
+  //   //     visible: false
+  //   //   }),
+  //   //   new VisibleColumnModel({
+  //   //     field: 'createdBy',
+  //   //     label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY',
+  //   //     visible: false
+  //   //   }),
+  //   //   new VisibleColumnModel({
+  //   //     field: 'createdAt',
+  //   //     label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_AT',
+  //   //     visible: false
+  //   //   }),
+  //   //   new VisibleColumnModel({
+  //   //     field: 'updatedBy',
+  //   //     label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_BY',
+  //   //     visible: false
+  //   //   }),
+  //   //   new VisibleColumnModel({
+  //   //     field: 'updatedAt',
+  //   //     label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_AT',
+  //   //     visible: false
+  //   //   })
+  //   // ];
+  // }
 
   /**
      * Initialize Side Filters

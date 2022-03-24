@@ -164,6 +164,11 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
   }
 
   /**
+   * Initialize side table columns
+   */
+  protected initializeTableColumns(): void {}
+
+  /**
    * Initialize breadcrumbs
    */
   initializeBreadcrumbs(): void {

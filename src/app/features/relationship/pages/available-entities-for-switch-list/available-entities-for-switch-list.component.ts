@@ -124,6 +124,11 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
   }
 
   /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {}
+
+  /**
      * @Overrides parent method
      */
   onDataInitialized() {

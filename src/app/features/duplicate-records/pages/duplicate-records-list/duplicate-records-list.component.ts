@@ -102,6 +102,11 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
   }
 
   /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {}
+
+  /**
    * Initialize breadcrumbs
    */
   initializeBreadcrumbs(): void {

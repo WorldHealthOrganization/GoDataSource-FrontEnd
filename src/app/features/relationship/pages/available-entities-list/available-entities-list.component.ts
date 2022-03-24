@@ -127,6 +127,11 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
   }
 
   /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {}
+
+  /**
      * @Overrides parent method
      */
   onDataInitialized() {

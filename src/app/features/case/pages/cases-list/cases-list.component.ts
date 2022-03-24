@@ -197,9 +197,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     this.yesNoOptionsWithoutAllList$ = this.genericDataService.getFilterYesNoOptions(true);
     this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
 
-    // initialize table Columns
-    this.initializeTableColumns();
-
     // initialize quick actions
     this.initializeQuickActions();
 
@@ -251,7 +248,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   /**
    * Initialize Side Table Columns
    */
-  private initializeTableColumns(): void {
+  protected initializeTableColumns(): void {
     // address model used to search by phone number, address line, postal code, city....
     const filterAddressModel: AddressModel = new AddressModel({
       geoLocationAccurate: null
