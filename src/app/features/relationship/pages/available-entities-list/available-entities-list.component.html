@@ -73,18 +73,18 @@
                                 </button>
 
                                 <mat-menu #actionsMenuMultipleRecords="matMenu">
-                                    <button
-                                        *ngIf="!checkedAllRecords"
-                                        mat-menu-item
-                                        (click)="checkAllRecords()">
-                                        {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL' | translate }}
-                                    </button>
-                                    <button
-                                        *ngIf="checkedRecords.length > 0"
-                                        mat-menu-item
-                                        (click)="uncheckAllRecords()">
-                                        {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}
-                                    </button>
+<!--                                    <button-->
+<!--                                        *ngIf="!checkedAllRecords"-->
+<!--                                        mat-menu-item-->
+<!--                                        (click)="checkAllRecords()">-->
+<!--                                        {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL' | translate }}-->
+<!--                                    </button>-->
+<!--                                    <button-->
+<!--                                        *ngIf="checkedRecords.length > 0"-->
+<!--                                        mat-menu-item-->
+<!--                                        (click)="uncheckAllRecords()">-->
+<!--                                        {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}-->
+<!--                                    </button>-->
                                 </mat-menu>
                             </div>
 
@@ -94,13 +94,13 @@
                         </div>
                     </mat-header-cell>
                     <mat-cell *matCellDef="let item;" fxFlex="70px" [style.color]="getPersonTypeColor(item.type)">
-                        <app-form-checkbox
-                            #listCheckedIndividual
-                            [name]="'listCheckedIndividual[' + item.id + ']'"
-                            class="table-checkbox"
-                            ngModel
-                            (optionChanged)="checkedRecord(item, $event)">
-                        </app-form-checkbox>
+<!--                        <app-form-checkbox-->
+<!--                            #listCheckedIndividual-->
+<!--                            [name]="'listCheckedIndividual[' + item.id + ']'"-->
+<!--                            class="table-checkbox"-->
+<!--                            ngModel-->
+<!--                            (optionChanged)="checkedRecord(item, $event)">-->
+<!--                        </app-form-checkbox>-->
                     </mat-cell>
                 </ng-container>
 
