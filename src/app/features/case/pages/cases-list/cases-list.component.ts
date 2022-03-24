@@ -44,7 +44,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { LocationModel } from '../../../../core/models/location.model';
-import { V2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { V2FilterBoolean, V2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IExtendedColDef } from '../../../../shared/components-v2/app-list-table-v2/models/extended-column.model';
 
 @Component({
@@ -129,6 +129,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
   ];
 
+  // used to filter cases
+  notACaseFilter: boolean | string = false;
 
 
 
@@ -157,8 +159,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
   // provide constants to template
   Constants = Constants;
-
-  notACaseFilter: boolean | string = false;
 
   // subscribers
   outbreakSubscriber: Subscription;
@@ -611,7 +611,16 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             return data.classification === Constants.CASE_CLASSIFICATION.NOT_A_CASE;
           }
         },
-        // #TODO - filter
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          search: (column) => {
+            // update not a case
+            this.notACaseFilter = (column.columnDefinition.filter as V2FilterBoolean).value;
+
+            // refresh
+            this.needsRefreshList();
+          }
+        },
         sortable: true
       },
       {
@@ -2119,8 +2128,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   }
 
   /**
-     * Classification conditions
-     */
+   * Classification conditions
+   */
   private addClassificationConditions() {
     // create classification condition
     const trueCondition = {classification: {eq: Constants.CASE_CLASSIFICATION.NOT_A_CASE}};

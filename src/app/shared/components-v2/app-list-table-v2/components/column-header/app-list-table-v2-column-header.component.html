@@ -121,6 +121,18 @@
       (ngModelChange)="component.columnFilterBy(extendedColDef)">
     </app-form-select-single-v2>
 
+    <!-- Boolean -->
+    <app-form-select-single-v2
+      *ngSwitchCase="V2FilterType.BOOLEAN"
+      class="gd-list-table-column-filter-input"
+      [(ngModel)]="extendedColDef.columnDefinition.filter.value"
+      [name]="'filterBy' + extendedColDef.field"
+      [options]="yesNoAllOptions"
+      placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+      neverFloatLabel="true"
+      (ngModelChange)="component.columnFilterBy(extendedColDef)">
+    </app-form-select-single-v2>
+
   </div>
 
 </div>

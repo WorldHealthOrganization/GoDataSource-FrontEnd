@@ -1249,7 +1249,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       oldColumn &&
       oldColumn !== column
     ) {
-      oldComponent.changeDetectorRef.detectChanges();
+      oldComponent.detectChanges();
     }
 
     // sort
