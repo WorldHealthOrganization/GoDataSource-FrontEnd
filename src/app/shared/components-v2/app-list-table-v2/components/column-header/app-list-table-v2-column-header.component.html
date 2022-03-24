@@ -17,7 +17,7 @@
       {{extendedColDef.headerName}}
     </div>
 
-    <!-- Label -->
+    <!-- Sort Icon -->
     <div
       class="gd-list-table-column-header-sort">
       <mat-icon
@@ -75,9 +75,9 @@
       [max]="extendedColDef.columnDefinition.filter.max"
       (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-number-range-v2>
 
-    <!-- Phone number -->
+    <!-- Address phone number -->
     <app-form-input-v2
-      *ngSwitchCase="V2FilterType.PHONE_NUMBER"
+      *ngSwitchCase="V2FilterType.ADDRESS_PHONE_NUMBER"
       class="gd-list-table-column-filter-input"
       [(ngModel)]="extendedColDef.columnDefinition.filter.address.phoneNumber"
       [name]="'filterBy' + extendedColDef.field"
@@ -85,6 +85,41 @@
       neverFloatLabel="true"
       autocomplete="off"
       (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-input-v2>
+
+    <!-- Address multiple location -->
+    <app-form-select-location-multiple-v2
+      *ngSwitchCase="V2FilterType.ADDRESS_MULTIPLE_LOCATION"
+      class="gd-list-table-column-filter-input"
+      [(ngModel)]="extendedColDef.columnDefinition.filter.address.filterLocationIds"
+      [name]="'filterBy' + extendedColDef.field"
+      placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+      neverFloatLabel="true"
+      useOutbreakLocations="true"
+      (ngModelChange)="component.columnFilterBy(extendedColDef)">
+    </app-form-select-location-multiple-v2>
+
+    <!-- Address field -->
+    <app-form-input-v2
+      *ngSwitchCase="V2FilterType.ADDRESS_FIELD"
+      class="gd-list-table-column-filter-input"
+      [(ngModel)]="extendedColDef.columnDefinition.filter.address[extendedColDef.columnDefinition.filter.addressField]"
+      [name]="'filterBy' + extendedColDef.field"
+      placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+      neverFloatLabel="true"
+      (ngModelChange)="component.columnFilterBy(extendedColDef)">
+    </app-form-input-v2>
+
+    <!-- Address accurate geo location -->
+    <app-form-select-single-v2
+      *ngSwitchCase="V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION"
+      class="gd-list-table-column-filter-input"
+      [(ngModel)]="extendedColDef.columnDefinition.filter.address.geoLocationAccurate"
+      [name]="'filterBy' + extendedColDef.field"
+      [options]="extendedColDef.columnDefinition.filter.options"
+      placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+      neverFloatLabel="true"
+      (ngModelChange)="component.columnFilterBy(extendedColDef)">
+    </app-form-select-single-v2>
 
   </div>
 

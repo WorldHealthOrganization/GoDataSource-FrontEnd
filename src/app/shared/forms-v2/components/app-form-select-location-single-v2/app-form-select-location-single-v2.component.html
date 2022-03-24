@@ -1,0 +1,78 @@
+<div
+  class="gd-form-select-location-single-v2">
+
+  <!-- Input data -->
+  <mat-form-field
+    appearance="outline">
+
+    <!-- Place holder -->
+    <mat-label
+      *ngIf="!neverFloatLabel">
+      {{ placeholder | translate }}
+    </mat-label>
+
+    <!-- Select -->
+    <mat-select
+      [(ngModel)]="value"
+      (closed)="onTouchItem()"
+      [errorStateMatcher]="errMatcher"
+      [disabled]="disabled"
+      [required]="required"
+      [placeholder]="neverFloatLabel ? (placeholder | translate) : undefined"
+      panelClass="gd-form-select-location-single-v2-panel"
+      (click)="vScrollToFirstSelectedOption()"
+      (opened)="vScrollToFirstSelectedOption()">
+
+      <!-- Search filter -->
+      <mat-option>
+        <!-- Search option -->
+        <ngx-mat-select-search
+          [(ngModel)]="searchValue"
+          [placeholderLabel]="'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_TYPE_TO_SEARCH_TEXT' | translate"
+          [noEntriesFoundLabel]="locationLoading ? undefined : currentNotFoundText | translate:notFoundTextData"
+          [clearSearchInput]="false"
+          [disableScrollToActiveOnOptionsChanged]="true"
+          [preventHomeEndKeyPropagation]="true"
+          [searching]="locationLoading"
+          (ngModelChange)="search()">
+        </ngx-mat-select-search>
+      </mat-option>
+
+      <!-- vscroll -->
+      <cdk-virtual-scroll-viewport
+        #cdkVirtualScrollViewport
+        [itemSize]="40"
+        [minBufferPx]="240"
+        [maxBufferPx]="480"
+        style="height: 20rem; overflow-x: hidden;">
+
+        <!-- Empty option used to select nothing -->
+        <mat-option
+          *ngIf="clearable"
+          [value]="null">
+          {{ 'LNG_COMMON_LABEL_NONE' | translate }}
+        </mat-option>
+
+        <!-- Options -->
+        <mat-option
+          *cdkVirtualFor="let location of locations; templateCacheSize: 0"
+          [value]="location.id"
+          [disabled]="location.disabled">
+          <span
+            [style.padding-left]="(location.level * 30) + 'px'"
+            [innerHTML]="location.label | highlight:searchValue">
+          </span>
+        </mat-option>
+
+      </cdk-virtual-scroll-viewport>
+
+    </mat-select>
+
+    <!-- Errors -->
+    <mat-error
+      *ngIf="control?.invalid && control?.touched">
+      {{ getErrorMessages() }}
+    </mat-error>
+
+  </mat-form-field>
+</div>

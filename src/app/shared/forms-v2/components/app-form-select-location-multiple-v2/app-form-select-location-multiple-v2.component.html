@@ -1,5 +1,5 @@
 <div
-  class="gd-form-select-single-v2">
+  class="gd-form-select-location-single-v2">
 
   <!-- Input data -->
   <mat-form-field
@@ -19,33 +19,24 @@
       [disabled]="disabled"
       [required]="required"
       [placeholder]="neverFloatLabel ? (placeholder | translate) : undefined"
-      panelClass="gd-form-select-single-v2-panel"
+      panelClass="gd-form-select-location-single-v2-panel"
+      multiple="true"
       (click)="vScrollToFirstSelectedOption()"
-      (opened)="vScrollToFirstSelectedOption()">
-
-      <!-- Selected value -->
-      <mat-select-trigger
-        *ngIf="value">
-
-        <!-- Icon -->
-        <mat-icon
-          *ngIf="allOptionsMap[value]?.icon">{{allOptionsMap[value].icon}}</mat-icon>
-
-        <!-- Label -->
-        {{allOptionsMap[value]?.label}}
-
-      </mat-select-trigger>
+      (opened)="vScrollToFirstSelectedOption()"
+      (ngModelChange)="updateSelected()">
 
       <!-- Search filter -->
       <mat-option>
+        <!-- Search option -->
         <ngx-mat-select-search
-          ngModel
-          [placeholderLabel]="'LNG_COMMON_LABEL_SEARCH' | translate"
-          [noEntriesFoundLabel]="null"
-          [clearSearchInput]="true"
+          [(ngModel)]="searchValue"
+          [placeholderLabel]="'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_TYPE_TO_SEARCH_TEXT' | translate"
+          [noEntriesFoundLabel]="locationLoading ? undefined : currentNotFoundText | translate:notFoundTextData"
+          [clearSearchInput]="false"
           [disableScrollToActiveOnOptionsChanged]="true"
           [preventHomeEndKeyPropagation]="true"
-          (ngModelChange)="filterOptions($event)">
+          [searching]="locationLoading"
+          (ngModelChange)="search()">
         </ngx-mat-select-search>
       </mat-option>
 
@@ -57,29 +48,15 @@
         [maxBufferPx]="480"
         style="height: 20rem; overflow-x: hidden;">
 
-        <!-- Empty option used to select nothing -->
-        <mat-option
-          *ngIf="clearable"
-          [value]="null">
-          {{ 'LNG_COMMON_LABEL_NONE' | translate }}
-        </mat-option>
-
         <!-- Options -->
         <mat-option
-          *cdkVirtualFor="let option of filteredOptions; templateCacheSize: 0"
-          [value]="option.value"
-          [disabled]="option.disabled">
-          <div
-            [matTooltip]="optionTooltipKey ? option.data[optionTooltipKey] : undefined">
-
-            <!-- Icon -->
-            <mat-icon
-              *ngIf="option.icon">{{option.icon}}</mat-icon>
-
-            <!-- Label -->
-            {{option.label}}
-
-          </div>
+          *cdkVirtualFor="let location of locations; templateCacheSize: 0"
+          [value]="location.id"
+          [disabled]="location.disabled">
+          <span
+            [style.padding-left]="(location.level * 30) + 'px'"
+            [innerHTML]="location.label | highlight:searchValue">
+          </span>
         </mat-option>
 
       </cdk-virtual-scroll-viewport>
@@ -88,17 +65,13 @@
       <ng-container
         *ngIf="value">
 
-        <!-- Option -->
+        <!-- Options -->
         <mat-option
+          *ngFor="let location of selectedLocations"
           style="height: 0; display: none;"
-          [value]="value">
-
-          <!-- Icon -->
-          <mat-icon
-            *ngIf="allOptionsMap[value]?.icon">{{allOptionsMap[value].icon}}</mat-icon>
-
+          [value]="location.id">
           <!-- Label -->
-          {{allOptionsMap[value]?.label}}
+          {{location.label}}
         </mat-option>
 
       </ng-container>

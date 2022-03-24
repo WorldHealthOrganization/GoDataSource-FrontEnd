@@ -135,13 +135,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
 
 
-  // address model needed for filters
-  filterAddressParentLocationIds: string[] = [];
-
   // user list
   userList$: Observable<UserModel[]>;
 
-  yesNoOptionsList$: Observable<any[]>;
   occupationsList$: Observable<any[]>;
   outcomeList$: Observable<any[]>;
   pregnancyStatsList$: Observable<any[]>;
@@ -198,7 +194,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
     // reference data
-    this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
     this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
     this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
     this.pregnancyStatsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PREGNANCY_STATUS);
@@ -462,7 +457,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         },
         sortable: true,
         filter: {
-          type: V2FilterType.PHONE_NUMBER,
+          type: V2FilterType.ADDRESS_PHONE_NUMBER,
           address: filterAddressModel,
           field: 'addresses',
           fieldIsArray: true
@@ -473,6 +468,12 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         label: 'LNG_CASE_FIELD_LABEL_ADDRESS_LOCATION',
         format: {
           type: 'mainAddress.location.name'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_MULTIPLE_LOCATION,
+          address: filterAddressModel,
+          field: 'addresses',
+          fieldIsArray: true
         },
         link: (data) => {
           return data.mainAddress?.location?.name ?
@@ -487,6 +488,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: 'mainAddress.emailAddress'
         },
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          address: filterAddressModel,
+          addressField: 'emailAddress',
+          field: 'addresses',
+          fieldIsArray: true
+        },
         sortable: true
       },
       {
@@ -495,6 +503,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'mainAddress.addressLine1'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          address: filterAddressModel,
+          addressField: 'addressLine1',
+          field: 'addresses',
+          fieldIsArray: true
         },
         sortable: true
       },
@@ -505,6 +520,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: 'mainAddress.city'
         },
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          address: filterAddressModel,
+          addressField: 'city',
+          field: 'addresses',
+          fieldIsArray: true
+        },
         sortable: true
       },
       {
@@ -513,8 +535,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lat'
-        },
-        sortable: true
+        }
       },
       {
         field: 'addresses.geoLocation.lng',
@@ -522,8 +543,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lng'
-        },
-        sortable: true
+        }
       },
       {
         field: 'addresses.postalCode',
@@ -531,6 +551,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'mainAddress.postalCode'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          address: filterAddressModel,
+          addressField: 'postalCode',
+          field: 'addresses',
+          fieldIsArray: true
         },
         sortable: true
       },
@@ -542,6 +569,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           type: V2ColumnFormat.BOOLEAN,
           field: 'mainAddress.geoLocationAccurate'
         },
+        filter: {
+          type: V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION,
+          address: filterAddressModel,
+          field: 'addresses',
+          fieldIsArray: true,
+          options: this.activatedRoute.snapshot.data.yesNoAll
+        },
         sortable: true
       },
       {
@@ -549,6 +583,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
         format: {
           type: V2ColumnFormat.DATE
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
         },
         sortable: true
       },
@@ -558,6 +595,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATE
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
         },
         sortable: true
       },
@@ -571,6 +611,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             return data.classification === Constants.CASE_CLASSIFICATION.NOT_A_CASE;
           }
         },
+        // #TODO - filter
         sortable: true
       },
       {
@@ -580,6 +621,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: V2ColumnFormat.BOOLEAN
         },
+        // #TODO - filter
         sortable: true
       },
       {

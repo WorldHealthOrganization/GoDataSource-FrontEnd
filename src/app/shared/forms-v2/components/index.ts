@@ -7,6 +7,8 @@ import { AppFormSelectMultipleV2Component } from './app-form-select-multiple-v2/
 import { AppFormDateV2Component } from './app-form-date-v2/app-form-date-v2.component';
 import { AppFormDateRangeV2Component } from './app-form-date-range-v2/app-form-date-range-v2.component';
 import { AppFormNumberRangeV2Component } from './app-form-number-range-v2/app-form-number-range-v2.component';
+import { AppFormSelectLocationSingleV2Component } from './app-form-select-location-single-v2/app-form-select-location-single-v2.component';
+import { AppFormSelectLocationMultipleV2Component } from './app-form-select-location-multiple-v2/app-form-select-location-multiple-v2.component';
 
 export const components: any[] = [
   AppFormCheckboxV2Component,
@@ -16,6 +18,8 @@ export const components: any[] = [
   AppFormNumberRangeV2Component,
   AppFormNumberV2Component,
   AppFormRadioButtonGroupV2Component,
+  AppFormSelectLocationMultipleV2Component,
+  AppFormSelectLocationSingleV2Component,
   AppFormSelectMultipleV2Component,
   AppFormSelectSingleV2Component
 ];
