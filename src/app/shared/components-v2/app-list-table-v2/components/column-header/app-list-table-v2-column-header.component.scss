@@ -16,6 +16,8 @@
         }
 
         .gd-list-table-column-header-sort {
+          width: 2.4rem;
+
           .mat-icon {
             color: var(--gd-primary);
             @include flex(flex);

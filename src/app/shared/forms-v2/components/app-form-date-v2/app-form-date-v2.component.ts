@@ -5,7 +5,7 @@ import {
   Host,
   Input, OnDestroy,
   Optional,
-  SkipSelf
+  SkipSelf, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
@@ -20,6 +20,7 @@ import { DEFAULT_FORMAT } from '../../../xt-forms/components/form-datepicker/for
 @Component({
   selector: 'app-form-date-v2',
   templateUrl: './app-form-date-v2.component.html',
+  styleUrls: ['./app-form-date-v2.component.scss'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -52,6 +53,7 @@ import { DEFAULT_FORMAT } from '../../../xt-forms/components/form-datepicker/for
       ]
     }
   ],
+  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppFormDateV2Component

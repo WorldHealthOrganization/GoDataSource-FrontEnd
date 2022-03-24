@@ -5,7 +5,7 @@ import {
   Host, Input,
   OnDestroy,
   Optional,
-  SkipSelf
+  SkipSelf, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
@@ -15,11 +15,13 @@ import { IV2NumberRange } from './models/number.model';
 @Component({
   selector: 'app-form-number-range-v2',
   templateUrl: './app-form-number-range-v2.component.html',
+  styleUrls: ['./app-form-number-range-v2.component.scss'],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
     useExisting: forwardRef(() => AppFormNumberRangeV2Component),
     multi: true
   }],
+  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppFormNumberRangeV2Component

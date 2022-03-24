@@ -6,6 +6,10 @@
     &.cdk-overlay-dark-backdrop {
       background: rgba(0, 0, 0, 0.85);
     }
+
+    &.mat-overlay-transparent-backdrop {
+      background: transparent;
+    }
   }
 
   .mat-dialog-container {
