@@ -659,6 +659,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           format: {
             type: V2ColumnFormat.BUTTON
           },
+          filter: {
+            type: V2FilterType.NUMBER_RANGE,
+            min: 0
+          },
           sortable: true,
           cssCellClass: 'gd-cell-button',
           buttonLabel: (item) => (item.numberOfContacts || '').toLocaleString('en'),
@@ -682,6 +686,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES',
           format: {
             type: V2ColumnFormat.BUTTON
+          },
+          filter: {
+            type: V2FilterType.NUMBER_RANGE,
+            min: 0
           },
           sortable: true,
           cssCellClass: 'gd-cell-button',

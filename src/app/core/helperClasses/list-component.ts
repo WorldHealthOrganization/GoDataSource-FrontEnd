@@ -2,7 +2,6 @@ import { ISerializedQueryBuilder, RequestFilter, RequestFilterOperator, RequestQ
 import * as _ from 'lodash';
 import { ReplaySubject, Subscriber, Subscription } from 'rxjs';
 import { ApplyListFilter, Constants } from '../models/constants';
-import { FormRangeModel } from '../../shared/components/form-range/form-range.model';
 import { Directive, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ResetInputOnSideFilterDirective, ResetLocationOnSideFilterDirective } from '../../shared/directives/reset-input-on-side-filter/reset-input-on-side-filter.directive';
 import { PageEvent } from '@angular/material/paginator';
@@ -809,7 +808,7 @@ export abstract class ListComponent implements OnDestroy {
      * @param {string} property
      * @param {FormRangeModel} value Object with 'from' and 'to' properties
      */
-  filterByRangeField(property: string, value: FormRangeModel) {
+  filterByRangeField(property: string, value: IV2NumberRange) {
     this.queryBuilder.filter.byRange(property, value);
 
     // refresh list
@@ -2899,6 +2898,17 @@ export abstract class ListComponent implements OnDestroy {
       case V2FilterType.BOOLEAN:
         // filter
         this.filterByBooleanUsingExistField(
+          column.columnDefinition.field,
+          column.columnDefinition.filter.value
+        );
+
+        // finished
+        break;
+
+      // number range
+      case V2FilterType.NUMBER_RANGE:
+        // filter
+        this.filterByRangeField(
           column.columnDefinition.field,
           column.columnDefinition.filter.value
         );

@@ -133,6 +133,16 @@
       (ngModelChange)="component.columnFilterBy(extendedColDef)">
     </app-form-select-single-v2>
 
+    <!-- Number range -->
+    <app-form-number-range-v2
+      *ngSwitchCase="V2FilterType.NUMBER_RANGE"
+      class="gd-list-table-column-filter-input"
+      [(ngModel)]="extendedColDef.columnDefinition.filter.value"
+      [name]="'filterBy' + extendedColDef.field"
+      [min]="extendedColDef.columnDefinition.filter.min"
+      [max]="extendedColDef.columnDefinition.filter.max"
+      (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-number-range-v2>
+
   </div>
 
 </div>

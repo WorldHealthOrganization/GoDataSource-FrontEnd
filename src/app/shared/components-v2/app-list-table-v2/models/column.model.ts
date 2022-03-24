@@ -127,7 +127,7 @@ export interface IV2ColumnButton {
   notResizable?: boolean;
   cssCellClass?: string;
   sortable?: boolean;
-  filter?: never;
+  filter?: V2Filter;
 }
 
 /**
