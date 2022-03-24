@@ -101,17 +101,6 @@ export class EntityHelperService {
                 const entityInputs: V2SideDialogConfigInput[] = [];
                 const relationshipsInputs: V2SideDialogConfigInput[] = [];
 
-                // attach entity fields information
-                this.lightEntity(relationshipData.model)
-                  .forEach((labelValue) => {
-                    entityInputs.push({
-                      type: V2SideDialogConfigInputType.KEY_VALUE,
-                      name: `entities-list-key-value-${relationshipData.model.id}-${labelValue.label}`,
-                      placeholder: labelValue.label,
-                      value: labelValue.value
-                    });
-                  });
-
                 // View full resource link
                 entityInputs.push({
                   type: V2SideDialogConfigInputType.LINK,
@@ -123,7 +112,20 @@ export class EntityHelperService {
                     'view'
                   ],
                   visible: () => relationshipData.model.type !== EntityType.CONTACT_OF_CONTACT || selectedOutbreak?.isContactsOfContactsActive
+                }, {
+                  type: V2SideDialogConfigInputType.DIVIDER
                 });
+
+                // attach entity fields information
+                this.lightEntity(relationshipData.model)
+                  .forEach((labelValue) => {
+                    entityInputs.push({
+                      type: V2SideDialogConfigInputType.KEY_VALUE,
+                      name: `entities-list-key-value-${relationshipData.model.id}-${labelValue.label}`,
+                      placeholder: labelValue.label,
+                      value: labelValue.value
+                    });
+                  });
 
                 // add entities to the list
                 entitiesList.panels.push({
@@ -139,6 +141,19 @@ export class EntityHelperService {
                   new EntityModel(relationshipData.model)
                 ];
 
+                // View full resource link
+                const sourcePerson = relationshipData.relationship.sourcePerson;
+                relationshipsInputs.push({
+                  type: V2SideDialogConfigInputType.LINK,
+                  name: `relationship-list-view-list-${relationshipData.relationship.id}`,
+                  placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_FULL_RESOURCE',
+                  link: () => [
+                    `/relationships/${sourcePerson.type}/${sourcePerson.id}/contacts/${relationshipData.relationship.id}/view`
+                  ]
+                }, {
+                  type: V2SideDialogConfigInputType.DIVIDER
+                });
+
                 // attach entity fields information
                 this.lightRelationship(relationshipData.relationship)
                   .forEach((labelValue) => {
@@ -150,17 +165,6 @@ export class EntityHelperService {
                     });
                   });
 
-                // View full resource link
-                const sourcePerson = relationshipData.relationship.sourcePerson;
-                relationshipsInputs.push({
-                  type: V2SideDialogConfigInputType.LINK,
-                  name: `relationship-list-view-list-${relationshipData.relationship.id}`,
-                  placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_FULL_RESOURCE',
-                  link: () => [
-                    `/relationships/${sourcePerson.type}/${sourcePerson.id}/contacts/${relationshipData.relationship.id}/view`
-                  ]
-                });
-
                 // add relationships to the list
                 relationshipList.panels.push({
                   type: V2SideDialogConfigInputType.ACCORDION_PANEL,
@@ -170,7 +174,6 @@ export class EntityHelperService {
                     `${entity.name} - ${relationshipData.model.name}`,
                   inputs: relationshipsInputs
                 });
-
               });
 
 

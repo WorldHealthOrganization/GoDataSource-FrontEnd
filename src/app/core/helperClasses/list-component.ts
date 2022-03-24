@@ -269,6 +269,12 @@ export abstract class ListComponent implements OnDestroy {
       this.initializeBreadcrumbs();
     });
 
+    // initialize side columns
+    // wait for binding so some things get processed
+    setTimeout(() => {
+      this.initializeTableColumns();
+    });
+
     // listen for outbreak selection
     this.selectedOutbreakSubscription = this.listHelperService.outbreakDataService
       .getSelectedOutbreakSubject()
