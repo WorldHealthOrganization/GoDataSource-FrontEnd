@@ -943,7 +943,7 @@ export abstract class ListComponent implements OnDestroy {
      * Filter by deleted field
      * @param value
      */
-  filterByDeletedField(value: boolean | null | undefined) {
+  filterByDeletedField(value: boolean | '') {
     // filter
     if (value === false) {
       this.queryBuilder.excludeDeleted();
@@ -2912,6 +2912,14 @@ export abstract class ListComponent implements OnDestroy {
           column.columnDefinition.field,
           column.columnDefinition.filter.value
         );
+
+        // finished
+        break;
+
+      // deleted
+      case V2FilterType.DELETED:
+        // filter
+        this.filterByDeletedField(column.columnDefinition.filter.value);
 
         // finished
         break;

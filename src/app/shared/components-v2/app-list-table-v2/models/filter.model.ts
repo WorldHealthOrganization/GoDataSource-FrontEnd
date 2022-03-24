@@ -17,7 +17,8 @@ export enum V2FilterType {
   ADDRESS_FIELD,
   ADDRESS_ACCURATE_GEO_LOCATION,
   BOOLEAN,
-  NUMBER_RANGE
+  NUMBER_RANGE,
+  DELETED
 }
 
 /**
@@ -148,7 +149,7 @@ export interface V2FilterBoolean extends Omit<V2FilterBasic, 'value'> {
   type: V2FilterType.BOOLEAN;
 
   // optional
-  value?: boolean | string;
+  value?: boolean | '';
 }
 
 /**
@@ -165,7 +166,19 @@ interface V2FilterNumber extends Omit<V2FilterBasic, 'min' | 'max' | 'value'> {
 }
 
 /**
+ * Deleted
+ */
+export interface V2FilterDeleted extends Omit<V2FilterBasic, 'value'> {
+  // required
+  type: V2FilterType.DELETED;
+
+  // optional
+  value?: boolean | '';
+}
+
+/**
  * Filter
  */
 export type V2Filter = V2FilterText | V2FilterMultipleSelect | V2FilterDate | V2FilterAge | V2FilterAddressPhoneNumber
-| V2FilterAddressMultipleLocation | V2FilterAddressField | V2FilterAddressAccurateGeoLocation | V2FilterBoolean | V2FilterNumber;
+| V2FilterAddressMultipleLocation | V2FilterAddressField | V2FilterAddressAccurateGeoLocation | V2FilterBoolean | V2FilterNumber
+| V2FilterDeleted;

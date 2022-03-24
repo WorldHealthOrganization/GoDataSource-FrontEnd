@@ -721,6 +721,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: V2ColumnFormat.BOOLEAN
         },
+        filter: {
+          type: V2FilterType.DELETED
+        },
         sortable: true
       },
       {
