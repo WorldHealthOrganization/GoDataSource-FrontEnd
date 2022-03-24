@@ -630,7 +630,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: V2ColumnFormat.BOOLEAN
         },
-        // #TODO - filter
+        filter: {
+          type: V2FilterType.BOOLEAN
+        },
         sortable: true
       },
       {

@@ -2894,6 +2894,17 @@ export abstract class ListComponent implements OnDestroy {
 
         // finished
         break;
+
+      // boolean
+      case V2FilterType.BOOLEAN:
+        // filter
+        this.filterByBooleanUsingExistField(
+          column.columnDefinition.field,
+          column.columnDefinition.filter.value
+        );
+
+        // finished
+        break;
     }
   }
 }
