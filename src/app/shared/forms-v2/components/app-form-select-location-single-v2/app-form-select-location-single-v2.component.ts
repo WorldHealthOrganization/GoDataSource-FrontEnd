@@ -13,7 +13,7 @@ import { MAT_SELECT_CONFIG } from '@angular/material/select';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { AppFormLocationBaseV2 } from '../../core/app-form-location-base-v2';
+import { AppFormLocationBaseV2, ILocation } from '../../core/app-form-location-base-v2';
 
 @Component({
   selector: 'app-form-select-location-single-v2',
@@ -34,6 +34,10 @@ import { AppFormLocationBaseV2 } from '../../core/app-form-location-base-v2';
 })
 export class AppFormSelectLocationSingleV2Component
   extends AppFormLocationBaseV2<string> implements OnInit, OnDestroy {
+
+  // selected location
+  selectedLocation: ILocation;
+
   // clearable ?
   @Input() clearable: boolean = false;
 
@@ -93,5 +97,15 @@ export class AppFormSelectLocationSingleV2Component
         }
       }
     }
+  }
+
+  /**
+   * Update selected items
+   */
+  updateSelected(): void {
+    // update selected list
+    this.selectedLocation = this.value && this.locationMap[this.value] ?
+      this.locationMap[this.value] :
+      this.selectedLocation;
   }
 }

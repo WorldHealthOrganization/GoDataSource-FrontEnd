@@ -21,7 +21,8 @@
       [placeholder]="neverFloatLabel ? (placeholder | translate) : undefined"
       panelClass="gd-form-select-location-single-v2-panel"
       (click)="vScrollToFirstSelectedOption()"
-      (opened)="vScrollToFirstSelectedOption()">
+      (opened)="vScrollToFirstSelectedOption()"
+      (ngModelChange)="updateSelected()">
 
       <!-- Search filter -->
       <mat-option>
@@ -65,6 +66,20 @@
         </mat-option>
 
       </cdk-virtual-scroll-viewport>
+
+      <!-- Selected option(s) hack to handle not visible in virtual scroll options -->
+      <ng-container
+        *ngIf="value && selectedLocation">
+
+        <!-- Options -->
+        <mat-option
+          style="height: 0; display: none;"
+          [value]="selectedLocation.id">
+          <!-- Label -->
+          {{selectedLocation.label}}
+        </mat-option>
+
+      </ng-container>
 
     </mat-select>
 

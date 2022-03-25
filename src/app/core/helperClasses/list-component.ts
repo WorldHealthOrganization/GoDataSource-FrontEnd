@@ -18,6 +18,7 @@ import { IBasicCount } from '../models/basic-count.interface';
 import { AuthenticatedComponent } from '../components/authenticated/authenticated.component';
 import { ICachedFilter, ICachedFilterItems, ICachedInputsValues, ICachedSortItem } from './models/cache.model';
 import { ListAppliedFiltersComponent } from './list-applied-filters-component';
+import { V2FilterType } from '../../shared/components-v2/app-list-table-v2/models/filter.model';
 
 /**
  * List component
@@ -69,11 +70,6 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
   // table columns
   tableColumns: IV2Column[] = [];
 
-  // query
-  queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(() => {
-    this.updateCachedFilters();
-  });
-
   // apply has more limit
   protected applyHasMoreLimit: boolean = true;
 
@@ -81,7 +77,11 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
   public pageSize: number = Constants.DEFAULT_PAGE_SIZE;
   private paginatorInitialized = false;
 
-
+  // table sort by
+  private tableSortBy: {
+    field?: string,
+    direction?: RequestSortDirection
+  } = {};
 
 
 
@@ -385,8 +385,8 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
     }
 
     // sort information
-    const property = data?.field;
-    const direction = data?.direction;
+    this.tableSortBy.field = data?.field;
+    this.tableSortBy.direction = data?.direction;
 
     // remove previous sort columns, we can sort only by one column at a time
     this.queryBuilder.sort.clear();
@@ -402,24 +402,24 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
 
     // sort
     if (
-      property &&
-      direction
+      this.tableSortBy.field &&
+      this.tableSortBy.direction
     ) {
       // add sorting criteria
       if (
         objectDetailsSort &&
-        objectDetailsSort[property]
+        objectDetailsSort[this.tableSortBy.field]
       ) {
-        _.each(objectDetailsSort[property], (childProperty: string) => {
+        _.each(objectDetailsSort[this.tableSortBy.field], (childProperty: string) => {
           this.queryBuilder.sort.by(
-            `${property}.${childProperty}`,
-            direction
+            `${this.tableSortBy.field}.${childProperty}`,
+            this.tableSortBy.direction
           );
         });
       } else {
         this.queryBuilder.sort.by(
-          property,
-          direction
+          this.tableSortBy.field,
+          this.tableSortBy.direction
         );
       }
     }
@@ -521,6 +521,9 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
      * Reset table sort columns
      */
   clearHeaderSort() {
+    // update table v2 and trigger sortBy to update this.tableSortBy and ..update cached filters
+    // #TODO
+
     // if (this.matTableSort) {
     //   this.matTableSort.sort({
     //     id: null
@@ -698,8 +701,8 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
   }
 
   /**
-     * Retrieve cached filters
-     */
+   * Retrieve cached filters
+   */
   private getCachedFilters(forLoadingFilters: boolean): ICachedFilter {
     // user information
     const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
@@ -722,7 +725,7 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
     // check if we have something in url, which has priority against storage
     if (
       this.listHelperService.route.snapshot.queryParams &&
-            this.listHelperService.route.snapshot.queryParams.cachedListFilters
+      this.listHelperService.route.snapshot.queryParams.cachedListFilters
     ) {
       try {
         // retrieve data
@@ -731,9 +734,9 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
         // validate cached url filter
         if (
           cachedListFilters.sideFilters === undefined ||
-                    cachedListFilters.sort === undefined ||
-                    cachedListFilters.inputs === undefined ||
-                    cachedListFilters.queryBuilder === undefined
+          cachedListFilters.sort === undefined ||
+          cachedListFilters.inputs === undefined ||
+          cachedListFilters.queryBuilder === undefined
         ) {
           // display only if we're loading data, for save it doesn't matter since we will overwrite it
           if (forLoadingFilters) {
@@ -753,8 +756,8 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
   }
 
   /**
-     * Retrieve filter key for current page
-     */
+   * Retrieve filter key for current page
+   */
   private getCachedFilterPageKey(): string {
     // get path
     let filterKey: string = this.listHelperService.location.path();
@@ -779,65 +782,86 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
   }
 
   /**
-     * Retrieve input values
-     */
+   * Retrieve input values
+   */
   private getInputsValuesForCache(): ICachedInputsValues {
     // initialize
     const inputValues: ICachedInputsValues = {};
 
-    // // determine filter input values
-    // // keeping in mind that all filters should have ResetInputOnSideFilterDirective directives
-    // (this.filterInputs || []).forEach((input: ResetInputOnSideFilterDirective) => {
-    //   // should we jump this one ?
-    //   if (input.disableCachedFilterOverwrite) {
-    //     return;
-    //   }
-    //
-    //   // update value
-    //   inputValues[input.control.name] = input.control && input.control.valueAccessor instanceof ValueAccessorBase ?
-    //     (input.control.valueAccessor as ValueAccessorBase<any>).value :
-    //     input.control.value;
-    // });
-    //
-    // // determine location input values
-    // // keeping in mind that all filters should have ResetLocationOnSideFilterDirective directives
-    // (this.filterLocationInputs || []).forEach((input: ResetLocationOnSideFilterDirective) => {
-    //   // should we jump this one ?
-    //   if (input.disableCachedFilterOverwrite) {
-    //     return;
-    //   }
-    //
-    //   // update value
-    //   inputValues[input.component.name] = input.component.value;
-    // });
+    // determine filter input values
+    (this.tableColumns || []).forEach((column) => {
+      // has no filter ?
+      if (!column.filter) {
+        return;
+      }
+
+      // handle accordingly to filter type
+      let value: any;
+      switch (column.filter.type) {
+        case V2FilterType.ADDRESS_PHONE_NUMBER:
+          // get value
+          value = column.filter.address.phoneNumber;
+
+          // finished
+          break;
+
+        case V2FilterType.ADDRESS_MULTIPLE_LOCATION:
+          // get value
+          value = column.filter.address.filterLocationIds;
+
+          // finished
+          break;
+
+        case V2FilterType.ADDRESS_FIELD:
+          // get value
+          value = column.filter.address[column.filter.addressField];
+
+          // finished
+          break;
+
+        case V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION:
+          // get value
+          value = column.filter.address.geoLocationAccurate;
+
+          // finished
+          break;
+
+        default:
+          value = column.filter.value;
+      }
+
+      // nothing to do ?
+      if (value === undefined) {
+        return;
+      }
+
+      // update value
+      inputValues[column.field] = value;
+    });
 
     // finished
     return inputValues;
   }
 
   /**
-     * Determine what columns are sorted by
-     */
+   * Determine what columns are sorted by
+   */
   private getTableSortForCache(): ICachedSortItem {
-    // // nothing sorted by ?
-    // if (
-    //   !this.matTableSort ||
-    //   !this.matTableSort.direction
-    // ) {
-    //   return null;
-    // }
-    //
-    // // set sort values
-    // return {
-    //   active: this.matTableSort.active,
-    //   direction: this.matTableSort.direction as RequestSortDirection
-    // };
-    return {} as any;
+    // nothing sorted by ?
+    if (!this.tableSortBy.direction) {
+      return null;
+    }
+
+    // set sort values
+    return {
+      active: this.tableSortBy.field,
+      direction: this.tableSortBy.direction
+    };
   }
 
   /**
-     * Merge query params to url
-     */
+   * Merge query params to url
+   */
   private mergeQueryParamsToUrl(queryParams: {
     [queryParamKey: string]: any
   }): void {
@@ -862,8 +886,8 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
   }
 
   /**
-     * Save cache to url
-     */
+   * Save cache to url
+   */
   private saveCacheToUrl(currentUserCache: ICachedFilterItems): void {
     this.mergeQueryParamsToUrl({
       cachedListFilters: JSON.stringify(currentUserCache)
@@ -871,8 +895,8 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
   }
 
   /**
-     * Update cached query
-     */
+   * Update cached query
+   */
   private updateCachedFilters(): void {
     // disabled saved filters for current user ?
     const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
@@ -960,28 +984,53 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
         return;
       }
 
-      // // update filter input values
-      // // keeping in mind that all filters should have ResetInputOnSideFilterDirective directives
-      // (this.filterInputs || []).forEach((input: ResetInputOnSideFilterDirective) => {
-      //   if (
-      //     input.control &&
-      //               currentUserCacheForCurrentPath.inputs[input.control.name] !== undefined &&
-      //               input.control.valueAccessor instanceof ValueAccessorBase
-      //   ) {
-      //     input.updateToAfterPristineValueIsTaken(currentUserCacheForCurrentPath.inputs[input.control.name]);
-      //   }
-      // });
-      //
-      // // update filter input values
-      // // keeping in mind that all filters should have ResetLocationOnSideFilterDirective directives
-      // (this.filterLocationInputs || []).forEach((input: ResetLocationOnSideFilterDirective) => {
-      //   if (
-      //     input.component &&
-      //               currentUserCacheForCurrentPath.inputs[input.component.name] !== undefined
-      //   ) {
-      //     input.updateToAfterPristineValueIsTaken(currentUserCacheForCurrentPath.inputs[input.component.name]);
-      //   }
-      // });
+      // update filter input values
+      (this.tableColumns || []).forEach((column) => {
+        // has no filter ?
+        if (!column.filter) {
+          return;
+        }
+
+        // determine if we have cached value
+        const value: any = currentUserCacheForCurrentPath.inputs[column.field];
+        if (value === undefined) {
+          return;
+        }
+
+        // handle accordingly to filter type
+        switch (column.filter.type) {
+          case V2FilterType.ADDRESS_PHONE_NUMBER:
+            // get value
+            column.filter.address.phoneNumber = value;
+
+            // finished
+            break;
+
+          case V2FilterType.ADDRESS_MULTIPLE_LOCATION:
+            // get value
+            column.filter.address.filterLocationIds = value;
+
+            // finished
+            break;
+
+          case V2FilterType.ADDRESS_FIELD:
+            // get value
+            column.filter.address[column.filter.addressField] = value;
+
+            // finished
+            break;
+
+          case V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION:
+            // get value
+            column.filter.address.geoLocationAccurate = value;
+
+            // finished
+            break;
+
+          default:
+            column.filter.value = value;
+        }
+      });
     });
   }
 
