@@ -201,13 +201,13 @@
                         {{'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="sampleIdentifierFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('sampleIdentifier', $event)"
-                            app-reset-input-on-side-filter>
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="sampleIdentifierFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByTextField('sampleIdentifier', $event)"-->
+<!--                            app-reset-input-on-side-filter>-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -225,12 +225,12 @@
                         {{'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-daterange
-                            name="dateSampleTakenFilter"
-                            ngModel
-                            (changed)="filterByDateRangeField('dateSampleTaken', $event)"
-                            app-reset-input-on-side-filter>
-                        </app-form-daterange>
+<!--                        <app-form-daterange-->
+<!--                            name="dateSampleTakenFilter"-->
+<!--                            ngModel-->
+<!--                            (changed)="filterByDateRangeField('dateSampleTaken', $event)"-->
+<!--                            app-reset-input-on-side-filter>-->
+<!--                        </app-form-daterange>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -248,12 +248,12 @@
                         {{'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-daterange
-                            name="dateSampleDeliveredFilter"
-                            ngModel
-                            (changed)="filterByDateRangeField('dateSampleDelivered', $event)"
-                            app-reset-input-on-side-filter>
-                        </app-form-daterange>
+<!--                        <app-form-daterange-->
+<!--                            name="dateSampleDeliveredFilter"-->
+<!--                            ngModel-->
+<!--                            (changed)="filterByDateRangeField('dateSampleDelivered', $event)"-->
+<!--                            app-reset-input-on-side-filter>-->
+<!--                        </app-form-daterange>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -271,12 +271,12 @@
                         {{'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-daterange
-                            name="dateOfResultFilter"
-                            ngModel
-                            (changed)="filterByDateRangeField('dateOfResult', $event)"
-                            app-reset-input-on-side-filter>
-                        </app-form-daterange>
+<!--                        <app-form-daterange-->
+<!--                            name="dateOfResultFilter"-->
+<!--                            ngModel-->
+<!--                            (changed)="filterByDateRangeField('dateOfResult', $event)"-->
+<!--                            app-reset-input-on-side-filter>-->
+<!--                        </app-form-daterange>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -294,17 +294,17 @@
                         {{'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="labNameFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="labNamesList$ | async"
-                            (optionChanged)="filterBySelectField('labName', $event)"
-                            multiple="true"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="labNameFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="labNamesList$ | async"-->
+<!--                            (optionChanged)="filterBySelectField('labName', $event)"-->
+<!--                            multiple="true"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayInvisibleItems]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -325,17 +325,17 @@
                         {{'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="sampleTypeFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="sampleTypesList$ | async"
-                            (optionChanged)="filterBySelectField('sampleType', $event)"
-                            multiple="true"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="sampleTypeFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="sampleTypesList$ | async"-->
+<!--                            (optionChanged)="filterBySelectField('sampleType', $event)"-->
+<!--                            multiple="true"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayInvisibleItems]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -356,17 +356,17 @@
                         {{'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="testTypeFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="testTypesList$ | async"
-                            (optionChanged)="filterBySelectField('testType', $event)"
-                            multiple="true"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="testTypeFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="testTypesList$ | async"-->
+<!--                            (optionChanged)="filterBySelectField('testType', $event)"-->
+<!--                            multiple="true"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayInvisibleItems]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -387,17 +387,17 @@
                         {{'LNG_LAB_RESULT_FIELD_LABEL_RESULT' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="resultFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="labTestResultsList$ | async"
-                            (optionChanged)="filterBySelectField('result', $event)"
-                            multiple="true"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="resultFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="labTestResultsList$ | async"-->
+<!--                            (optionChanged)="filterBySelectField('result', $event)"-->
+<!--                            multiple="true"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayInvisibleItems]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -418,14 +418,14 @@
                         {{'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="testedFor"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('testedFor', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="testedFor"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByTextField('testedFor', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -443,17 +443,17 @@
                         {{'LNG_LAB_RESULT_FIELD_LABEL_STATUS' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="statusFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="progressOptionsList$ | async"
-                            (optionChanged)="filterBySelectField('status', $event)"
-                            multiple="true"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="statusFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="progressOptionsList$ | async"-->
+<!--                            (optionChanged)="filterBySelectField('status', $event)"-->
+<!--                            multiple="true"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayInvisibleItems]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -471,17 +471,17 @@
                         {{'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="hasSequenceFilter"
-                            [ngModel]="''"
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="yesNoOptionsList$ | async"
-                            (optionChanged)="filterByBooleanField('sequence.hasSequence', $event.value)"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayFilterIcon]="true"
-                            [clearable]="false">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="hasSequenceFilter"-->
+<!--                            [ngModel]="''"-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="yesNoOptionsList$ | async"-->
+<!--                            (optionChanged)="filterByBooleanField('sequence.hasSequence', $event.value)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayFilterIcon]="true"-->
+<!--                            [clearable]="false">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -498,12 +498,12 @@
                         {{'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-daterange
-                            name="seqDateSampleSentFilter"
-                            ngModel
-                            (changed)="filterByDateRangeField('sequence.dateSampleSent', $event)"
-                            app-reset-input-on-side-filter>
-                        </app-form-daterange>
+<!--                        <app-form-daterange-->
+<!--                            name="seqDateSampleSentFilter"-->
+<!--                            ngModel-->
+<!--                            (changed)="filterByDateRangeField('sequence.dateSampleSent', $event)"-->
+<!--                            app-reset-input-on-side-filter>-->
+<!--                        </app-form-daterange>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -521,18 +521,18 @@
                         {{'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="seqLaboratoryFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="sequenceLabOptionsList$ | async"
-                            (optionChanged)="filterBySelectField('sequence.labId', $event)"
-                            multiple="true"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="seqLaboratoryFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="sequenceLabOptionsList$ | async"-->
+<!--                            (optionChanged)="filterBySelectField('sequence.labId', $event)"-->
+<!--                            multiple="true"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayInvisibleItems]="true"-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -552,12 +552,12 @@
                         {{'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-daterange
-                            name="seqDateResultFilter"
-                            ngModel
-                            (changed)="filterByDateRangeField('sequence.dateResult', $event)"
-                            app-reset-input-on-side-filter>
-                        </app-form-daterange>
+<!--                        <app-form-daterange-->
+<!--                            name="seqDateResultFilter"-->
+<!--                            ngModel-->
+<!--                            (changed)="filterByDateRangeField('sequence.dateResult', $event)"-->
+<!--                            app-reset-input-on-side-filter>-->
+<!--                        </app-form-daterange>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -575,18 +575,18 @@
                         {{'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="seqResultFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="sequenceResultOptionsList$ | async"
-                            (optionChanged)="filterBySelectField('sequence.resultId', $event)"
-                            multiple="true"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="seqResultFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="sequenceResultOptionsList$ | async"-->
+<!--                            (optionChanged)="filterBySelectField('sequence.resultId', $event)"-->
+<!--                            multiple="true"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayInvisibleItems]="true"-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -606,14 +606,14 @@
                         {{'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="seqNoSeqReasonFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('sequence.noSequenceReason', $event, undefined, true)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="seqNoSeqReasonFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByTextField('sequence.noSequenceReason', $event, undefined, true)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -630,17 +630,17 @@
                         {{'LNG_LAB_RESULT_FIELD_LABEL_DELETED' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="deletedFilter"
-                            [ngModel]="false"
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="yesNoOptionsList$ | async"
-                            (optionChanged)="filterByDeletedField($event.value)"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayFilterIcon]="true"
-                            [clearable]="false">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="deletedFilter"-->
+<!--                            [ngModel]="false"-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="yesNoOptionsList$ | async"-->
+<!--                            (optionChanged)="filterByDeletedField($event.value)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayFilterIcon]="true"-->
+<!--                            [clearable]="false">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -657,19 +657,19 @@
                         {{'LNG_LAB_RESULT_FIELD_LABEL_CREATED_BY' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="createdByFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="userList$ | async"
-                            (optionChanged)="filterBySelectField('createdBy', $event, 'id')"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayFilterIcon]="true"
-                            optionLabelKey="name"
-                            optionValueKey="id"
-                            [multiple]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="createdByFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="userList$ | async"-->
+<!--                            (optionChanged)="filterBySelectField('createdBy', $event, 'id')"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayFilterIcon]="true"-->
+<!--                            optionLabelKey="name"-->
+<!--                            optionValueKey="id"-->
+<!--                            [multiple]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -686,12 +686,12 @@
                         {{ 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_AT' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-daterange
-                            name="createdAtFilter"
-                            ngModel
-                            (changed)="filterByDateRangeField('createdAt', $event)"
-                            app-reset-input-on-side-filter>
-                        </app-form-daterange>
+<!--                        <app-form-daterange-->
+<!--                            name="createdAtFilter"-->
+<!--                            ngModel-->
+<!--                            (changed)="filterByDateRangeField('createdAt', $event)"-->
+<!--                            app-reset-input-on-side-filter>-->
+<!--                        </app-form-daterange>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -708,19 +708,19 @@
                         {{ 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_BY' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="updatedByFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="userList$ | async"
-                            (optionChanged)="filterBySelectField('updatedBy', $event, 'id')"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayFilterIcon]="true"
-                            optionLabelKey="name"
-                            optionValueKey="id"
-                            [multiple]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="updatedByFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="userList$ | async"-->
+<!--                            (optionChanged)="filterBySelectField('updatedBy', $event, 'id')"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayFilterIcon]="true"-->
+<!--                            optionLabelKey="name"-->
+<!--                            optionValueKey="id"-->
+<!--                            [multiple]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -737,12 +737,12 @@
                         {{ 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_AT' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-daterange
-                            name="updatedAtFilter"
-                            ngModel
-                            (changed)="filterByDateRangeField('updatedAt', $event)"
-                            app-reset-input-on-side-filter>
-                        </app-form-daterange>
+<!--                        <app-form-daterange-->
+<!--                            name="updatedAtFilter"-->
+<!--                            ngModel-->
+<!--                            (changed)="filterByDateRangeField('updatedAt', $event)"-->
+<!--                            app-reset-input-on-side-filter>-->
+<!--                        </app-form-daterange>-->
                     </div>
                 </div>
             </mat-header-cell>

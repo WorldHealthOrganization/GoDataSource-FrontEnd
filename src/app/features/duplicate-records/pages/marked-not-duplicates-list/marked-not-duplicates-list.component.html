@@ -67,14 +67,14 @@
                         {{'LNG_ENTITY_FIELD_LABEL_LAST_NAME' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="lastNameFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('lastName', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="lastNameFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByTextField('lastName', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -92,14 +92,14 @@
                         {{'LNG_ENTITY_FIELD_LABEL_FIRST_NAME' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="firstNameFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('firstName', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="firstNameFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByTextField('firstName', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -116,14 +116,14 @@
                         {{'LNG_ENTITY_FIELD_LABEL_VISUAL_ID' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="visualId"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('visualId', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="visualId"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByTextField('visualId', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -141,16 +141,16 @@
                         {{'LNG_ENTITY_FIELD_LABEL_AGE' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-range
-                            name="ageFilter"
-                            ngModel
-                            (changed)="filterByAgeRangeField('age', $event)"
-                            app-reset-input-on-side-filter
-                            [min]="0"
-                            [max]="Constants.DEFAULT_AGE_MAX_YEARS"
-                            fromPlaceholder="LNG_AGE_FIELD_FILTER_LABEL_FROM"
-                            toPlaceholder="LNG_AGE_FIELD_FILTER_LABEL_TO">
-                        </app-form-range>
+<!--                        <app-form-range-->
+<!--                            name="ageFilter"-->
+<!--                            ngModel-->
+<!--                            (changed)="filterByAgeRangeField('age', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [min]="0"-->
+<!--                            [max]="Constants.DEFAULT_AGE_MAX_YEARS"-->
+<!--                            fromPlaceholder="LNG_AGE_FIELD_FILTER_LABEL_FROM"-->
+<!--                            toPlaceholder="LNG_AGE_FIELD_FILTER_LABEL_TO">-->
+<!--                        </app-form-range>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -167,18 +167,18 @@
                         {{'LNG_ENTITY_FIELD_LABEL_GENDER' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="genderFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="genderList$ | async"
-                            (optionChanged)="filterBySelectField('gender', $event)"
-                            multiple="true"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="genderFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="genderList$ | async"-->
+<!--                            (optionChanged)="filterBySelectField('gender', $event)"-->
+<!--                            multiple="true"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayInvisibleItems]="true"-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -195,14 +195,14 @@
                         {{'LNG_ENTITY_FIELD_LABEL_PHONE_NUMBER' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="phoneNumberFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByPhoneNumber('addresses.phoneNumber', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="phoneNumberFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByPhoneNumber('addresses.phoneNumber', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>

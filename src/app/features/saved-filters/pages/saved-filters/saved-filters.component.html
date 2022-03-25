@@ -57,14 +57,14 @@
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{'LNG_SAVED_FILTERS_FIELD_LABEL_NAME' | translate}}</div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="nameFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('name', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="nameFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByTextField('name', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -80,16 +80,16 @@
                 <div class="table-header-cell" fxLayout="column">
                     <div mat-sort-header class="column-header">{{'LNG_SAVED_FILTERS_FIELD_LABEL_PUBLIC' | translate}}</div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="publicFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="yesNoOptionsList$ | async"
-                            (optionChanged)="filterByBooleanField('isPublic', $event.value)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true"
-                            [clearable]="false">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="publicFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="yesNoOptionsList$ | async"-->
+<!--                            (optionChanged)="filterByBooleanField('isPublic', $event.value)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true"-->
+<!--                            [clearable]="false">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -117,18 +117,18 @@
                 <div class="table-header-cell" fxLayout="column">
                     <div mat-sort-header class="column-header">{{'LNG_SAVED_FILTERS_FIELD_LABEL_FOR_PAGE' | translate}}</div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="filterKeysFilter"
-                            ngModel
-                            [options]="pagesWithSavedFilters"
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterBySelectField('filterKey', $event)"
-                            app-reset-input-on-side-filter
-                            optionLabelKey="label"
-                            optionLabelValue="value"
-                            [displayFilterIcon]="true"
-                            [multiple]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="filterKeysFilter"-->
+<!--                            ngModel-->
+<!--                            [options]="pagesWithSavedFilters"-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterBySelectField('filterKey', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            optionLabelKey="label"-->
+<!--                            optionLabelValue="value"-->
+<!--                            [displayFilterIcon]="true"-->
+<!--                            [multiple]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -145,19 +145,19 @@
                         {{ 'LNG_SAVED_FILTERS_FIELD_LABEL_CREATED_BY' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="createdByFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="userList$ | async"
-                            (optionChanged)="filterBySelectField('createdBy', $event, 'id')"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayFilterIcon]="true"
-                            optionLabelKey="name"
-                            optionValueKey="id"
-                            [multiple]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="createdByFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="userList$ | async"-->
+<!--                            (optionChanged)="filterBySelectField('createdBy', $event, 'id')"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayFilterIcon]="true"-->
+<!--                            optionLabelKey="name"-->
+<!--                            optionValueKey="id"-->
+<!--                            [multiple]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -175,19 +175,19 @@
                         {{ 'LNG_SAVED_FILTERS_FIELD_LABEL_UPDATED_BY' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="updatedByFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="userList$ | async"
-                            (optionChanged)="filterBySelectField('updatedBy', $event, 'id')"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayFilterIcon]="true"
-                            optionLabelKey="name"
-                            optionValueKey="id"
-                            [multiple]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="updatedByFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="userList$ | async"-->
+<!--                            (optionChanged)="filterBySelectField('updatedBy', $event, 'id')"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayFilterIcon]="true"-->
+<!--                            optionLabelKey="name"-->
+<!--                            optionValueKey="id"-->
+<!--                            [multiple]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -205,12 +205,12 @@
                         {{ 'LNG_SAVED_FILTERS_FIELD_LABEL_UPDATED_AT' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-daterange
-                            name="updatedAtFilter"
-                            ngModel
-                            (changed)="filterByDateRangeField('updatedAt', $event)"
-                            app-reset-input-on-side-filter>
-                        </app-form-daterange>
+<!--                        <app-form-daterange-->
+<!--                            name="updatedAtFilter"-->
+<!--                            ngModel-->
+<!--                            (changed)="filterByDateRangeField('updatedAt', $event)"-->
+<!--                            app-reset-input-on-side-filter>-->
+<!--                        </app-form-daterange>-->
                     </div>
                 </div>
             </mat-header-cell>

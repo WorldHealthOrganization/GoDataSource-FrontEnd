@@ -966,13 +966,13 @@
                                             {{ 'LNG_IMPORT_RESULT_FIELD_LABEL_RECORD_NO' | translate }}
                                         </div>
                                         <div class="column-filter">
-                                            <app-form-range
-                                                name="recordNoFilter"
-                                                ngModel
-                                                (changed)="filterByRangeField('recordNo', $event)"
-                                                app-reset-input-on-side-filter
-                                                [min]="1">
-                                            </app-form-range>
+<!--                                            <app-form-range-->
+<!--                                                name="recordNoFilter"-->
+<!--                                                ngModel-->
+<!--                                                (changed)="filterByRangeField('recordNo', $event)"-->
+<!--                                                app-reset-input-on-side-filter-->
+<!--                                                [min]="1">-->
+<!--                                            </app-form-range>-->
                                         </div>
                                     </div>
                                 </mat-header-cell>
@@ -990,14 +990,14 @@
                                             {{'LNG_IMPORT_RESULT_FIELD_LABEL_ERROR_MESSAGE' | translate}}
                                         </div>
                                         <div class="column-filter">
-                                            <app-form-input
-                                                name="errorMessageFilter"
-                                                ngModel
-                                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
-                                                (optionChanged)="filterByTextContainingField('error.message', $event, true)"
-                                                app-reset-input-on-side-filter
-                                                [displayFilterIcon]="true">
-                                            </app-form-input>
+<!--                                            <app-form-input-->
+<!--                                                name="errorMessageFilter"-->
+<!--                                                ngModel-->
+<!--                                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "-->
+<!--                                                (optionChanged)="filterByTextContainingField('error.message', $event, true)"-->
+<!--                                                app-reset-input-on-side-filter-->
+<!--                                                [displayFilterIcon]="true">-->
+<!--                                            </app-form-input>-->
                                         </div>
                                     </div>
                                 </mat-header-cell>

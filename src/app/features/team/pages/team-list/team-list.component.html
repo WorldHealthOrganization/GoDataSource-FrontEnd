@@ -86,14 +86,14 @@
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{ "LNG_TEAM_FIELD_LABEL_NAME" | translate}}</div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="nameFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('name', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="nameFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByTextField('name', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -135,20 +135,20 @@
                         </mat-menu>
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="userIdFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
-                            [options]="usersList$ | async"
-                            (optionChanged)="filterBySelectField('userIds', $event, 'id')"
-                            multiple="true"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true"
-                            optionValueKey="id"
-                            optionLabelKey="name">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="userIdFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "-->
+<!--                            [options]="usersList$ | async"-->
+<!--                            (optionChanged)="filterBySelectField('userIds', $event, 'id')"-->
+<!--                            multiple="true"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayInvisibleItems]="true"-->
+<!--                            [displayFilterIcon]="true"-->
+<!--                            optionValueKey="id"-->
+<!--                            optionLabelKey="name">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -226,16 +226,16 @@
                         </mat-menu>
                     </div>
                     <div class="column-filter">
-                        <app-form-location-dropdown
-                            fxFlex
-                            name="locationIds"
-                            [(ngModel)]="filterAddressParentLocationIds"
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            multiple="true"
-                            (itemChanged)="filterBySelectField('parentLocationIdFilter', filterAddressParentLocationIds, null)"
-                            app-reset-location-on-side-filter
-                            [useOutbreakLocations]="true">
-                        </app-form-location-dropdown>
+<!--                        <app-form-location-dropdown-->
+<!--                            fxFlex-->
+<!--                            name="locationIds"-->
+<!--                            [(ngModel)]="filterAddressParentLocationIds"-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            multiple="true"-->
+<!--                            (itemChanged)="filterBySelectField('parentLocationIdFilter', filterAddressParentLocationIds, null)"-->
+<!--                            app-reset-location-on-side-filter-->
+<!--                            [useOutbreakLocations]="true">-->
+<!--                        </app-form-location-dropdown>-->
                     </div>
                 </div>
             </mat-header-cell>

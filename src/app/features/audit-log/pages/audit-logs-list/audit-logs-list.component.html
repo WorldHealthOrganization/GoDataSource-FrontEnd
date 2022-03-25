@@ -59,18 +59,18 @@
                 <div class="table-header-cell" fxLayout="column">
                     <div mat-sort-header class="column-header">{{'LNG_AUDIT_LOG_FIELD_LABEL_ACTION' | translate}}</div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="actionFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
-                            [options]="auditLogActionsList$ | async"
-                            (optionChanged)="filterBySelectField('action', $event)"
-                            multiple="true"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="actionFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "-->
+<!--                            [options]="auditLogActionsList$ | async"-->
+<!--                            (optionChanged)="filterBySelectField('action', $event)"-->
+<!--                            multiple="true"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayInvisibleItems]="true"-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -86,18 +86,18 @@
                 <div class="table-header-cell" fxLayout="column">
                     <div mat-sort-header class="column-header">{{'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_NAME' | translate}}</div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="modelNameFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
-                            [options]="dataModuleList"
-                            (optionChanged)="filterBySelectField('modelName', $event)"
-                            multiple="true"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="modelNameFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "-->
+<!--                            [options]="dataModuleList"-->
+<!--                            (optionChanged)="filterBySelectField('modelName', $event)"-->
+<!--                            multiple="true"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayInvisibleItems]="true"-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -113,14 +113,14 @@
                 <div class="table-header-cell" fxLayout="column">
                     <div mat-sort-header class="column-header">{{'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_ID' | translate}}</div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="recordIdFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
-                            (optionChanged)="filterByTextField('recordId', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="recordIdFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "-->
+<!--                            (optionChanged)="filterByTextField('recordId', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -136,12 +136,12 @@
                 <div class="table-header-cell" fxLayout="column">
                     <div mat-sort-header class="column-header">{{'LNG_AUDIT_LOG_FIELD_LABEL_CREATED_AT' | translate}}</div>
                     <div class="column-filter">
-                        <app-form-daterange
-                            name="createdAtFilter"
-                            [ngModel]="dateFilterDefaultValue"
-                            (changed)="filterByDateRangeField('createdAt', $event)"
-                            app-reset-input-on-side-filter>
-                        </app-form-daterange>
+<!--                        <app-form-daterange-->
+<!--                            name="createdAtFilter"-->
+<!--                            [ngModel]="dateFilterDefaultValue"-->
+<!--                            (changed)="filterByDateRangeField('createdAt', $event)"-->
+<!--                            app-reset-input-on-side-filter>-->
+<!--                        </app-form-daterange>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -173,20 +173,20 @@
                 <div class="table-header-cell" fxLayout="column">
                     <div class="column-header">{{'LNG_AUDIT_LOG_FIELD_LABEL_USER' | translate}}</div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="userIdFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
-                            [options]="usersList$ | async"
-                            (optionChanged)="filterBySelectField('userId', $event, 'id')"
-                            multiple="true"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true"
-                            optionValueKey="id"
-                            optionLabelKey="name">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="userIdFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "-->
+<!--                            [options]="usersList$ | async"-->
+<!--                            (optionChanged)="filterBySelectField('userId', $event, 'id')"-->
+<!--                            multiple="true"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayInvisibleItems]="true"-->
+<!--                            [displayFilterIcon]="true"-->
+<!--                            optionValueKey="id"-->
+<!--                            optionLabelKey="name">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -202,14 +202,14 @@
                 <div class="table-header-cell" fxLayout="column">
                     <div mat-sort-header class="column-header">{{'LNG_AUDIT_LOG_FIELD_LABEL_USER_ROLES' | translate}}</div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="userRoleFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
-                            (optionChanged)="filterByTextContainingField('userRole', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="userRoleFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "-->
+<!--                            (optionChanged)="filterByTextContainingField('userRole', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -225,14 +225,14 @@
                 <div class="table-header-cell" fxLayout="column">
                     <div mat-sort-header class="column-header">{{'LNG_AUDIT_LOG_FIELD_LABEL_IP_ADDRESS' | translate}}</div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="userIPAddressFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
-                            (optionChanged)="filterByTextField('userIPAddress', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="userIPAddressFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "-->
+<!--                            (optionChanged)="filterByTextField('userIPAddress', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>

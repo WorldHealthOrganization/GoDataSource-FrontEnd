@@ -226,7 +226,11 @@ module.exports = {
         "sourceType": "module"
       },
       "plugins": ["@angular-eslint/template"],
-      "rules": {}
+      "rules": {
+        "@angular-eslint/template/eqeqeq": ["error"],
+        "@angular-eslint/template/no-any": ["error"],
+        "@angular-eslint/template/no-duplicate-attributes": ["error"]
+      }
     }
   ]
 };

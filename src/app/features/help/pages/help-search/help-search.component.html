@@ -65,19 +65,19 @@
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{'LNG_HELP_ITEM_FIELD_LABEL_CATEGORY' | translate}}</div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="categoryFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="helpCategoriesList$ | async"
-                            (optionChanged)="filterBySelectField('categoryId', $event, 'id')"
-                            optionLabelKey="name"
-                            optionValueKey="id"
-                            [multiple]="true"
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="categoryFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="helpCategoriesList$ | async"-->
+<!--                            (optionChanged)="filterBySelectField('categoryId', $event, 'id')"-->
+<!--                            optionLabelKey="name"-->
+<!--                            optionValueKey="id"-->
+<!--                            [multiple]="true"-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayInvisibleItems]="true"-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>

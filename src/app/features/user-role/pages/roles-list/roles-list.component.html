@@ -74,14 +74,14 @@
                         {{ 'LNG_USER_ROLE_FIELD_LABEL_NAME' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="nameFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('name', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="nameFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByTextField('name', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -99,15 +99,15 @@
                         {{ 'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="descriptionFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('description', $event)"
-                            multiple="true"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="descriptionFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByTextField('description', $event)"-->
+<!--                            multiple="true"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -150,18 +150,18 @@
                         </mat-menu>
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="userListFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="userList$ | async"
-                            (optionChanged)="filterBySelectField('users._id', $event, 'id')"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true"
-                            optionLabelKey="name"
-                            optionValueKey="id"
-                            [multiple]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="userListFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="userList$ | async"-->
+<!--                            (optionChanged)="filterBySelectField('users._id', $event, 'id')"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true"-->
+<!--                            optionLabelKey="name"-->
+<!--                            optionValueKey="id"-->
+<!--                            [multiple]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -239,28 +239,28 @@
                         </mat-menu>
                     </div>
                     <div class="column-filter">
-                        <app-form-select-groups
-                            name="rolesFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [groups]="availablePermissions$ | async"
-                            [defaultValues]="PermissionModel.HIDDEN_PERMISSIONS"
-                            removeDefaultOptionOnOptionChanged="true"
-                            groupLabelKey="groupLabel"
-                            groupValueKey="groupAllId"
-                            groupOptionsKey="permissions"
-                            groupOptionLabelKey="label"
-                            groupOptionValueKey="id"
-                            groupOptionHiddenKey="hidden"
-                            groupAllLabel="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_ALL"
-                            groupAllTooltip="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_ALL_DESCRIPTION"
-                            groupNoneLabel="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_NONE"
-                            groupNoneTooltip="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_NONE_DESCRIPTION"
-                            groupPartialLabel="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL"
-                            groupPartialTooltip="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL_DESCRIPTION"
-                            app-reset-input-on-side-filter
-                            (optionChanged)="filterBySelectField('permissionIds', $event, null)">
-                        </app-form-select-groups>
+<!--                        <app-form-select-groups-->
+<!--                            name="rolesFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [groups]="availablePermissions$ | async"-->
+<!--                            [defaultValues]="PermissionModel.HIDDEN_PERMISSIONS"-->
+<!--                            removeDefaultOptionOnOptionChanged="true"-->
+<!--                            groupLabelKey="groupLabel"-->
+<!--                            groupValueKey="groupAllId"-->
+<!--                            groupOptionsKey="permissions"-->
+<!--                            groupOptionLabelKey="label"-->
+<!--                            groupOptionValueKey="id"-->
+<!--                            groupOptionHiddenKey="hidden"-->
+<!--                            groupAllLabel="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_ALL"-->
+<!--                            groupAllTooltip="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_ALL_DESCRIPTION"-->
+<!--                            groupNoneLabel="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_NONE"-->
+<!--                            groupNoneTooltip="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_NONE_DESCRIPTION"-->
+<!--                            groupPartialLabel="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL"-->
+<!--                            groupPartialTooltip="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL_DESCRIPTION"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            (optionChanged)="filterBySelectField('permissionIds', $event, null)">-->
+<!--                        </app-form-select-groups>-->
                     </div>
                 </div>
             </mat-header-cell>
