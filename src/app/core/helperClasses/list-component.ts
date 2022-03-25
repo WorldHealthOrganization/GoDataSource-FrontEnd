@@ -78,7 +78,7 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
   private paginatorInitialized = false;
 
   // table sort by
-  private tableSortBy: {
+  tableSortBy: {
     field?: string,
     direction?: RequestSortDirection
   } = {};
@@ -89,9 +89,6 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
 
 
 
-
-  // sort by disabled ?
-  private _sortByDisabled: boolean = false;
 
   // refresh only after we finish changing data
   // by default each time we get back to a page we should display loading spinner
@@ -378,11 +375,6 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
       [property: string]: string[]
     }
   ) {
-    // sort by disabled ?
-    if (this._sortByDisabled) {
-      return;
-    }
-
     // sort information
     this.tableSortBy.field = data?.field;
     this.tableSortBy.direction = data?.direction;
@@ -1025,36 +1017,21 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
   /**
      * Load cached sort column
      */
-  private loadCachedSortColumn(_currentUserCacheForCurrentPath: ICachedFilterItems): void {
-    // // wait for inputs to be rendered
-    // setTimeout(() => {
-    //   // no sort applied ?
-    //   // make sure we have the mat table visible
-    //   if (
-    //     !currentUserCacheForCurrentPath.sort ||
-    //             !currentUserCacheForCurrentPath.sort.active ||
-    //             !this.matTableSort
-    //   ) {
-    //     return;
-    //   }
-    //
-    //   // reset state so that start is the first sort direction that you will see
-    //   this._sortByDisabled = true;
-    //   this.matTableSort.sort({
-    //     id: null,
-    //     start: currentUserCacheForCurrentPath.sort.direction,
-    //     disableClear: false
-    //   });
-    //   this.matTableSort.sort({
-    //     id: currentUserCacheForCurrentPath.sort.active,
-    //     start: currentUserCacheForCurrentPath.sort.direction,
-    //     disableClear: false
-    //   });
-    //
-    //   // ugly hack
-    //   (this.matTableSort.sortables.get(currentUserCacheForCurrentPath.sort.active) as MatSortHeader)._setAnimationTransitionState({ toState: 'active' });
-    //   this._sortByDisabled = false;
-    // });
+  private loadCachedSortColumn(currentUserCacheForCurrentPath: ICachedFilterItems): void {
+    // no sort applied ?
+    if (
+      !currentUserCacheForCurrentPath.sort ||
+      !currentUserCacheForCurrentPath.sort.active ||
+      !currentUserCacheForCurrentPath.sort.direction
+    ) {
+      return;
+    }
+
+    // reset state so that start is the first sort direction that you will see
+    this.tableSortBy = {
+      field: currentUserCacheForCurrentPath.sort.active,
+      direction: currentUserCacheForCurrentPath.sort.direction
+    };
   }
 
   /**
