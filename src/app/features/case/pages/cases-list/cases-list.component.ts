@@ -1719,7 +1719,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                   label: classificationId,
                   value: countResponse.classification[classificationId].count,
                   color: classification.map[classificationId] ? classification.map[classificationId].getColorCode() : Constants.DEFAULT_COLOR_REF_DATA,
-                  order: classification.map[classificationId].order !== undefined ?
+                  order: classification.map[classificationId]?.order !== undefined ?
                     classification.map[classificationId].order :
                     Number.MAX_SAFE_INTEGER
                 });
