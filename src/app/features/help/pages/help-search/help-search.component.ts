@@ -77,7 +77,7 @@ export class HelpSearchComponent extends ListComponent implements OnInit, OnDest
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**

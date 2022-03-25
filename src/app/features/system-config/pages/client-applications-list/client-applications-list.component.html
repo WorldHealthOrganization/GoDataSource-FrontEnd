@@ -80,48 +80,48 @@
                         </button>
 
                         <mat-menu #columnActions="matMenu">
-                            <button
-                                mat-menu-item
-                                (click)="toggleColumn('credentials', true)">
-                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_SHOW_ALL' | translate }}
-                            </button>
-                            <button
-                                mat-menu-item
-                                (click)="toggleColumn('credentials', false)">
-                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_HIDE_ALL' | translate }}
-                            </button>
+<!--                            <button-->
+<!--                                mat-menu-item-->
+<!--                                (click)="toggleColumn('credentials', true)">-->
+<!--                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_SHOW_ALL' | translate }}-->
+<!--                            </button>-->
+<!--                            <button-->
+<!--                                mat-menu-item-->
+<!--                                (click)="toggleColumn('credentials', false)">-->
+<!--                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_HIDE_ALL' | translate }}-->
+<!--                            </button>-->
                         </mat-menu>
                     </div>
                 </div>
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item">
-                <!-- Hidden Credentials -->
-                <ng-container *ngIf="!isCellExpanded('credentials', item.id); else displayCredentialsDiv">
-                    <button
-                        type="button"
-                        mat-button
-                        color="accent"
-                        (click)="toggleCell('credentials', item.id, true)"
-                    >
-                        {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_SHOW' | translate}}
-                    </button>
-                </ng-container>
+<!--                &lt;!&ndash; Hidden Credentials &ndash;&gt;-->
+<!--                <ng-container *ngIf="!isCellExpanded('credentials', item.id); else displayCredentialsDiv">-->
+<!--                    <button-->
+<!--                        type="button"-->
+<!--                        mat-button-->
+<!--                        color="accent"-->
+<!--                        (click)="toggleCell('credentials', item.id, true)"-->
+<!--                    >-->
+<!--                        {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_SHOW' | translate}}-->
+<!--                    </button>-->
+<!--                </ng-container>-->
 
-                <!-- Visible Credentials -->
-                <ng-template
-                    #displayCredentialsDiv>
-                    {{ item.credentials?.clientId + ' / ' + item.credentials?.clientSecret }}
+<!--                &lt;!&ndash; Visible Credentials &ndash;&gt;-->
+<!--                <ng-template-->
+<!--                    #displayCredentialsDiv>-->
+<!--                    {{ item.credentials?.clientId + ' / ' + item.credentials?.clientSecret }}-->
 
-                    <button
-                        type="button"
-                        mat-button
-                        color="accent"
-                        (click)="toggleCell('credentials', item.id, false)"
-                    >
-                        {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_HIDE' | translate}}
-                    </button>
-                </ng-template>
+<!--                    <button-->
+<!--                        type="button"-->
+<!--                        mat-button-->
+<!--                        color="accent"-->
+<!--                        (click)="toggleCell('credentials', item.id, false)"-->
+<!--                    >-->
+<!--                        {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_HIDE' | translate}}-->
+<!--                    </button>-->
+<!--                </ng-template>-->
             </mat-cell>
         </ng-container>
 

@@ -160,7 +160,7 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**

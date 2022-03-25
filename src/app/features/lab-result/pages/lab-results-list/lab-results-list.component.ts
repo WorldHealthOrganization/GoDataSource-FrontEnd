@@ -372,7 +372,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
 
     // outbreak subscriber
     if (this.outbreakSubscriber) {

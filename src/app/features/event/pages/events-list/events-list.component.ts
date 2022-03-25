@@ -383,7 +383,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
 
     // outbreak subscriber
     if (this.outbreakSubscriber) {
@@ -800,8 +800,8 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
       anonymizeFields: this.relationshipAnonymizeFields,
       fieldsGroupList: this.fieldsGroupListRelationships,
       fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
-      exportStart: () => { this.showLoadingDialog(); },
-      exportFinished: () => { this.closeLoadingDialog(); }
+      // exportStart: () => { this.showLoadingDialog(); },
+      // exportFinished: () => { this.closeLoadingDialog(); }
     });
   }
 

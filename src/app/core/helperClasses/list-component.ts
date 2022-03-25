@@ -1,23 +1,14 @@
-import { ISerializedQueryBuilder, RequestFilter, RequestFilterOperator, RequestQueryBuilder, RequestSortDirection } from './request-query-builder';
+import { RequestQueryBuilder, RequestSortDirection } from './request-query-builder';
 import * as _ from 'lodash';
 import { ReplaySubject, Subscriber, Subscription } from 'rxjs';
-import { ApplyListFilter, Constants } from '../models/constants';
-import { Directive, OnDestroy, ViewChild } from '@angular/core';
+import { Constants } from '../models/constants';
 import { PageEvent } from '@angular/material/paginator';
-import { MatSort, MatSortable, MatSortHeader } from '@angular/material/sort';
-import { SideFiltersComponent } from '../../shared/components/side-filters/side-filters.component';
 import { DebounceTimeCaller } from './debounce-time-caller';
-import { MetricContactsSeenEachDays } from '../models/metrics/metric-contacts-seen-each-days.model';
-import { ContactFollowedUp, MetricContactsWithSuccessfulFollowUp } from '../models/metrics/metric.contacts-with-success-follow-up.model';
-import { AddressModel, AddressType } from '../models/address.model';
-import { moment, Moment } from './x-moment';
 import { ListHelperService } from '../services/helper/list-helper.service';
 import { SubscriptionLike } from 'rxjs/internal/types';
 import { StorageKey } from '../services/helper/storage.service';
 import { UserModel, UserSettings } from '../models/user.model';
-import { SavedFilterData } from '../models/saved-filters.model';
 import * as LzString from 'lz-string';
-import { LoadingDialogModel } from '../../shared/components';
 import { IV2Column } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { IV2ActionIconLabel, IV2ActionMenuLabel, V2ActionMenuItem } from '../../shared/components-v2/app-list-table-v2/models/action.model';
@@ -25,57 +16,13 @@ import { OutbreakModel } from '../models/outbreak.model';
 import { IV2GroupedData } from '../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import { IBasicCount } from '../models/basic-count.interface';
 import { AuthenticatedComponent } from '../components/authenticated/authenticated.component';
-import { IExtendedColDef } from '../../shared/components-v2/app-list-table-v2/models/extended-column.model';
-import { V2FilterTextType, V2FilterType } from '../../shared/components-v2/app-list-table-v2/models/filter.model';
-import { IV2DateRange } from '../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
-import { IV2NumberRange } from '../../shared/forms-v2/components/app-form-number-range-v2/models/number.model';
-
-/**
- * Used by caching filter
- */
-interface ICachedSortItem {
-  active: string;
-  direction: RequestSortDirection;
-}
-
-/**
- * Used by caching filter
- */
-interface ICachedFilterItems {
-  // keep the actual query executed to bring data
-  queryBuilder: ISerializedQueryBuilder;
-
-  // keep filters information
-  inputs: {
-    [inputName: string]: any
-  };
-
-  // keep sort information
-  sort: ICachedSortItem;
-
-  // side filters
-  sideFilters: SavedFilterData;
-}
-
-/**
- * Used by caching filter
- */
-interface ICachedFilter {
-  [filterKey: string]: ICachedFilterItems;
-}
-
-/**
- * Used by caching filter
- */
-interface ICachedInputsValues {
-  [inputName: string]: any;
-}
+import { ICachedFilter, ICachedFilterItems, ICachedInputsValues, ICachedSortItem } from './models/cache.model';
+import { ListAppliedFiltersComponent } from './list-applied-filters-component';
 
 /**
  * List component
  */
-@Directive()
-export abstract class ListComponent implements OnDestroy {
+export abstract class ListComponent extends ListAppliedFiltersComponent {
   // handle pop state changes
   private static locationSubscription: SubscriptionLike;
 
@@ -119,87 +66,29 @@ export abstract class ListComponent implements OnDestroy {
   // constants
   UserSettings = UserSettings;
 
-
-
-
-
-
-
-
-  /**
-     * Retrieve Mat Table sort handler
-     */
-  @ViewChild('table', { read: MatSort }) matTableSort: MatSort;
-
-  /**
-     * Retrieve Side Filters
-     */
-  @ViewChild(SideFiltersComponent) sideFilter: SideFiltersComponent;
-
-  /**
-   * List table columns
-   */
+  // table columns
   tableColumns: IV2Column[] = [];
 
-  /**
-     * List of cells to be expanded for row/column
-     *  Example:
-     *      {
-     *          columnName: {
-     *              rowId1: true,
-     *              rowId2: false,
-     *              rowId3: true
-     *          }
-     *      }
-     */
-  expandCell: {
-    string?: {
-      string?: boolean
-    }[]
-  } = {};
-
-  /**
-     * Expand all cells for a certain column
-     *  Example:
-     *      {
-     *          columnName1: true,
-     *          columnName2: false
-     *      }
-     */
-  expandAllCellsForColumn: {string?: boolean} = {};
-
-  /**
-     * Query builder
-     * @type {RequestQueryBuilder}
-     */
-  public queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(() => {
+  // query
+  queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(() => {
     this.updateCachedFilters();
   });
-
-  // loading dialog
-  private loadingDialog: LoadingDialogModel;
-
-  /**
-     * Applied list filter on this list page
-     */
-  public appliedListFilter: ApplyListFilter;
-
-  /**
-     * Preparing loading filter ?
-     */
-  public appliedListFilterLoading: boolean = false;
 
   // apply has more limit
   protected applyHasMoreLimit: boolean = true;
 
-  /**
-     * List Filter Query Builder
-     */
-  protected appliedListFilterQueryBuilder: RequestQueryBuilder;
-
   // pagination
   public pageSize: number = Constants.DEFAULT_PAGE_SIZE;
   private paginatorInitialized = false;
+
+
+
+
+
+
+
+
+
 
   // sort by disabled ?
   private _sortByDisabled: boolean = false;
@@ -260,6 +149,25 @@ export abstract class ListComponent implements OnDestroy {
     protected listHelperService: ListHelperService,
     disableFilterCaching: boolean = false
   ) {
+    // parent constructor
+    super(
+      listHelperService,
+      () => {
+        this.updateCachedFilters();
+      },
+      (
+        instant?: boolean,
+        resetPagination?: boolean,
+        triggeredByPageChange?: boolean
+      ) => {
+        this.needsRefreshList(
+          instant !== undefined ? instant : false,
+          resetPagination !== undefined ? resetPagination : true,
+          triggeredByPageChange !== undefined ? triggeredByPageChange : false
+        );
+      }
+    );
+
     // get auth data
     this.authUser = this.listHelperService.authDataService.getAuthenticatedUser();
 
@@ -348,7 +256,7 @@ export abstract class ListComponent implements OnDestroy {
   /**
    * Release resources
    */
-  ngOnDestroy(): void {
+  onDestroy(): void {
     // release subscribers
     this.releaseSubscribers();
 
@@ -442,7 +350,7 @@ export abstract class ListComponent implements OnDestroy {
     // do we need to reset pagination (aka go to the first page) ?
     if (
       resetPagination &&
-            this.paginatorInitialized
+      this.paginatorInitialized
     ) {
       // re-calculate items count (filters have changed)
       if (this.triggerListCountRefresh) {
@@ -461,8 +369,6 @@ export abstract class ListComponent implements OnDestroy {
 
   /**
    * Sort asc / desc by specific fields
-   * @param data
-   * @param objectDetailsSort
    */
   public sortBy(
     data: {
@@ -486,13 +392,13 @@ export abstract class ListComponent implements OnDestroy {
     this.queryBuilder.sort.clear();
 
     // retrieve Side filters
-    let queryBuilder;
-    if (
-      this.sideFilter &&
-      (queryBuilder = this.sideFilter.getQueryBuilder())
-    ) {
-      this.queryBuilder.sort.merge(queryBuilder.sort);
-    }
+    // let queryBuilder;
+    // if (
+    //   this.sideFilter &&
+    //   (queryBuilder = this.sideFilter.getQueryBuilder())
+    // ) {
+    //   this.queryBuilder.sort.merge(queryBuilder.sort);
+    // }
 
     // sort
     if (
@@ -523,336 +429,6 @@ export abstract class ListComponent implements OnDestroy {
       false,
       false
     );
-  }
-
-  /**
-     * Filter the list by a text field
-     * @param {string | string[]} property
-     * @param {string} value
-     * @param {RequestFilterOperator} operator
-     */
-  filterByTextField(
-    property: string | string[],
-    value: string,
-    operator?: RequestFilterOperator,
-    useLike?: boolean
-  ) {
-    // default values
-    if (operator === undefined) {
-      operator = RequestFilterOperator.OR;
-    }
-
-    // filter
-    if (_.isArray(property)) {
-      this.queryBuilder.filter.byTextMultipleProperties(
-        property as string[],
-        value,
-        true,
-        operator
-      );
-    } else {
-      this.queryBuilder.filter.byText(
-        property as string,
-        value,
-        true,
-        useLike
-      );
-    }
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter by phone number
-     * @param {string} property
-     * @param {string} value
-     * @param {string} regexMethod
-     */
-  filterByPhoneNumber(
-    property: string,
-    value: string,
-    regexMethod: string = 'regex'
-  ) {
-    this.queryBuilder.filter.byPhoneNumber(
-      property as string,
-      value,
-      true,
-      regexMethod
-    );
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter the list by equality
-     * @param {string} property
-     * @param {*} value
-     */
-  filterByEquality(
-    property: string | string[],
-    value: any
-  ) {
-    this.queryBuilder.filter.byEquality(
-      property as string,
-      value
-    );
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter the list by a text field
-     * @param {string} property
-     * @param {string} value
-     * @param {boolean} useLike
-     */
-  filterByTextContainingField(
-    property: string,
-    value: string,
-    useLike?: boolean
-  ) {
-    this.queryBuilder.filter.byContainingText(
-      property as string,
-      value,
-      true,
-      useLike
-    );
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter the list by a text field
-     * @param {string} property
-     * @param {string} value
-     */
-  filterByBooleanField(property: string, value: boolean | null | undefined) {
-    this.queryBuilder.filter.byBoolean(property, value);
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter all records that don't have value on a specific field
-     * @param property
-     */
-  filterByNotHavingValue(
-    property: string
-  ): void {
-    // filter
-    this.queryBuilder.filter.byNotHavingValue(property);
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter the list by a range field ('from' / 'to')
-     * @param {string} property
-     * @param {FormRangeModel} value Object with 'from' and 'to' properties
-     */
-  filterByRangeField(property: string, value: IV2NumberRange) {
-    this.queryBuilder.filter.byRange(property, value);
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter the list by an age range field ('from' / 'to')
-     * @param {string} property
-     * @param {FormRangeModel} value Object with 'from' and 'to' properties
-     */
-  filterByAgeRangeField(
-    property: string,
-    value: IV2NumberRange
-  ) {
-    // filter by age range
-    this.queryBuilder.filter.byAgeRange(property, value);
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter the list by a date field ( startOf day => endOf day )
-     * @param {string} property
-     * @param value Date
-     */
-  filterByDateField(property: string, value: Moment) {
-    // filter by date
-    if (_.isEmpty(value)) {
-      this.queryBuilder.filter.byDateRange(property, value);
-    } else {
-      this.queryBuilder.filter.byDateRange(
-        property, {
-          startDate: moment(value).startOf('day'),
-          endDate: moment(value).endOf('day')
-        }
-      );
-    }
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter the list by a date range field ('startDate' / 'endDate')
-     * @param {string} property
-     * @param value Object with 'startDate' and 'endDate' properties
-     */
-  filterByDateRangeField(property: string, value: IV2DateRange) {
-    // filter by date range
-    this.queryBuilder.filter.byDateRange(property, value);
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter the list by a Select / Multi-Select field
-     * @param {string} property
-     * @param {any | any[]} values
-     * @param {string} valueKey
-     * @param {boolean} replace
-     */
-  filterBySelectField(property: string, values: any | any[], valueKey: string = 'value', replace: boolean = true) {
-    // no value ?
-    if (values === false) {
-      this.queryBuilder.filter.byBoolean(
-        property,
-        false,
-        true
-      );
-    } else {
-      this.queryBuilder.filter.bySelect(property, values, replace, valueKey);
-    }
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter by boolean with exists condition
-     * @param {string} property
-     * @param value
-     */
-  filterByBooleanUsingExistField(property: string, value: any) {
-    // filter by boolean using exist
-    this.queryBuilder.filter.byBooleanUsingExist(property, value);
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter by current address
-     */
-  filterByAddress(
-    property: string,
-    isArray: boolean,
-    addressModel: AddressModel,
-    addressParentLocationIds: string[],
-    useLike: boolean = false
-  ) {
-    // remove the previous conditions
-    this.queryBuilder.filter.removePathCondition('address');
-    this.queryBuilder.filter.removePathCondition('addresses');
-    this.queryBuilder.filter.removePathCondition('and.address');
-    this.queryBuilder.filter.removePathCondition('and.addresses');
-
-    // create a query builder
-    const searchQb: RequestQueryBuilder = AddressModel.buildAddressFilter(
-      property,
-      isArray,
-      addressModel,
-      addressParentLocationIds,
-      useLike
-    );
-
-    // add condition if we were able to create it
-    if (
-      searchQb &&
-      !searchQb.isEmpty()
-    ) {
-      this.queryBuilder.merge(searchQb);
-    }
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter by deleted field
-     * @param value
-     */
-  filterByDeletedField(value: boolean | '') {
-    // filter
-    if (value === false) {
-      this.queryBuilder.excludeDeleted();
-      this.queryBuilder.filter.remove('deleted');
-    } else {
-      this.queryBuilder.includeDeleted();
-      if (value === true) {
-        this.queryBuilder.filter.where({
-          'deleted': {
-            'eq': true
-          }
-        }, true);
-      } else {
-        this.queryBuilder.filter.remove('deleted');
-      }
-    }
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter by relation
-     * @param {string | string[]} relation
-     * @returns {RequestFilter}
-     */
-  filterByRelation(relation: string | string[]): RequestFilter {
-    // make sure we always have an array of relations
-    const relations: string[] = (_.isArray(relation) ?
-      relation :
-      [relation]
-    ) as string[];
-
-    // go through all the relations until we get the desired query builder
-    let relationQB: RequestQueryBuilder = this.queryBuilder;
-    _.each(relations, (rel: string) => {
-      relationQB = relationQB.include(rel).queryBuilder;
-    });
-
-    // refresh list
-    // this one isn't executed instantly, so there should be enough time to setup the relation filter
-    this.needsRefreshList();
-
-    // retrieve filter
-    return relationQB.filter;
-  }
-
-  /**
-     * Filter by child query builder
-     * @param {string} qbFilterKey
-     * @returns {RequestFilter}
-     */
-  filterByChildQueryBuilder(
-    qbFilterKey: string
-  ): RequestFilter {
-    const childQueryBuilder = this.queryBuilder.addChildQueryBuilder(qbFilterKey);
-
-    // refresh list
-    this.needsRefreshList();
-
-    return childQueryBuilder.filter;
   }
 
   /**
@@ -945,11 +521,11 @@ export abstract class ListComponent implements OnDestroy {
      * Reset table sort columns
      */
   clearHeaderSort() {
-    if (this.matTableSort) {
-      this.matTableSort.sort({
-        id: null
-      } as MatSortable);
-    }
+    // if (this.matTableSort) {
+    //   this.matTableSort.sort({
+    //     id: null
+    //   } as MatSortable);
+    // }
 
     // refresh of the list is done automatically after debounce time
     // #
@@ -982,13 +558,13 @@ export abstract class ListComponent implements OnDestroy {
     this.resetFiltersAddDefault();
 
     // retrieve Side filters
-    let queryBuilder;
-    if (
-      this.sideFilter &&
-            (queryBuilder = this.sideFilter.getQueryBuilder())
-    ) {
-      this.queryBuilder.merge(queryBuilder);
-    }
+    // let queryBuilder;
+    // if (
+    //   this.sideFilter &&
+    //   (queryBuilder = this.sideFilter.getQueryBuilder())
+    // ) {
+    //   this.queryBuilder.merge(queryBuilder);
+    // }
 
     // apply list filters which is mandatory
     this.mergeListFilterToMainFilter();
@@ -1004,9 +580,8 @@ export abstract class ListComponent implements OnDestroy {
   }
 
   /**
-     * Apply the filters selected from the Side Filters section
-     * @param {RequestQueryBuilder} queryBuilder
-     */
+   * Apply the filters selected from the Side Filters section
+   */
   applySideFilters(queryBuilder: RequestQueryBuilder) {
     // clear query builder of conditions and sorting criterias
     this.clearQueryBuilder();
@@ -1025,19 +600,6 @@ export abstract class ListComponent implements OnDestroy {
 
     // refresh list
     this.needsRefreshList(true);
-  }
-
-  /**
-     * Apply list filter
-     */
-  protected mergeListFilterToMainFilter() {
-    // finished with list filter
-    this.appliedListFilterLoading = false;
-
-    // merge filter query builder
-    if (this.appliedListFilterQueryBuilder) {
-      this.queryBuilder.merge(_.cloneDeep(this.appliedListFilterQueryBuilder));
-    }
   }
 
   /**
@@ -1067,10 +629,8 @@ export abstract class ListComponent implements OnDestroy {
   }
 
   /**
-     * Update page breadcrumbs based on the applied filter
-     * @param {string} listFilter
-     * @param listFilterData
-     */
+   * Update page breadcrumbs based on the applied filter
+   */
   protected setListFilterBreadcrumbs(
     _listFilter: string,
     _listFilterData: any = {}
@@ -1135,968 +695,6 @@ export abstract class ListComponent implements OnDestroy {
     //     )
     //   );
     // }
-  }
-
-  /**
-     * Verify what list filter is sent into the query params and updates the query builder based in this.
-     * @param queryParams
-     */
-  protected applyListFilters(
-    queryParams: {
-      applyListFilter,
-      x,
-      date,
-      global
-    }
-  ): void {
-    // there are no filters to apply ?
-    if (!this.appliedListFilter) {
-      return;
-    }
-
-    // get global filter values
-    const globalFilters = this.getGlobalFilterValues(queryParams);
-    let globalQb: RequestQueryBuilder;
-
-    // check params for apply list filter
-    switch (this.appliedListFilter) {
-      // Filter contacts on the followup list
-      case Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWUP_LIST:
-
-        // get the correct query builder and merge with the existing one
-        this.listHelperService.listFilterDataService
-          .filterContactsOnFollowUpLists(
-            globalFilters.date,
-            globalFilters.locationId,
-            globalFilters.classificationId
-          )
-          .subscribe((qbFilterContactsOnFollowUpLists) => {
-            // merge query builder
-            this.appliedListFilterQueryBuilder = qbFilterContactsOnFollowUpLists;
-            this.mergeListFilterToMainFilter();
-
-            // refresh list
-            this.needsRefreshList(true);
-          });
-        break;
-
-        // filter cases deceased
-      case Constants.APPLY_LIST_FILTER.CASES_DECEASED:
-        // add condition for deceased cases
-        this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.getGlobalFilterQB(
-          null,
-          null,
-          'addresses.parentLocationIdFilter',
-          globalFilters.locationId,
-          globalFilters.classificationId
-        );
-
-        // condition already include by default on cases list page
-        // qb.filter.bySelect(
-        //     'classification',
-        //     this.globalFilterClassificationId,
-        //     false,
-        //     null
-        // );
-
-        // date
-        if (globalFilters.date) {
-          this.appliedListFilterQueryBuilder.filter.byDateRange(
-            'dateOfOutcome', {
-              endDate: globalFilters.date.endOf('day').format()
-            }
-          );
-        }
-
-        // deceased
-        this.appliedListFilterQueryBuilder.filter.where({
-          outcomeId: Constants.OUTCOME_STATUS.DECEASED
-        }, true);
-
-        // merge query builder
-        this.mergeListFilterToMainFilter();
-
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // filter cases isolated
-      case Constants.APPLY_LIST_FILTER.CASES_ISOLATED:
-        // add condition for deceased cases
-        globalQb = this.listHelperService.listFilterDataService.getGlobalFilterQB(
-          null,
-          null,
-          'addresses.parentLocationIdFilter',
-          globalFilters.locationId,
-          globalFilters.classificationId
-        );
-
-        // date
-        if (globalFilters.date) {
-          globalQb.filter.byDateRange(
-            'dateOfReporting', {
-              endDate: globalFilters.date.endOf('day').format()
-            }
-          );
-        }
-
-        // condition already include by default on cases list page
-        // qb.filter.bySelect(
-        //     'classification',
-        //     this.globalFilterClassificationId,
-        //     false,
-        //     null
-        // );
-
-        // get the correct query builder and merge with the existing one
-        this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterCasesIsolated(globalFilters.date);
-        if (!globalQb.isEmpty()) {
-          this.appliedListFilterQueryBuilder.merge(globalQb);
-        }
-
-        // merge query builder
-        this.mergeListFilterToMainFilter();
-
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // filter cases hospitalised
-      case Constants.APPLY_LIST_FILTER.CASES_HOSPITALISED:
-        // add condition for deceased cases
-        globalQb = this.listHelperService.listFilterDataService.getGlobalFilterQB(
-          null,
-          null,
-          'addresses.parentLocationIdFilter',
-          globalFilters.locationId,
-          globalFilters.classificationId
-        );
-
-        // date
-        if (globalFilters.date) {
-          globalQb.filter.byDateRange(
-            'dateOfReporting', {
-              endDate: globalFilters.date.endOf('day').format()
-            }
-          );
-        }
-
-        // condition already include by default on cases list page
-        // qb.filter.bySelect(
-        //     'classification',
-        //     this.globalFilterClassificationId,
-        //     false,
-        //     null
-        // );
-
-        // get the correct query builder and merge with the existing one
-        this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterCasesHospitalized(globalFilters.date);
-        if (!globalQb.isEmpty()) {
-          this.appliedListFilterQueryBuilder.merge(globalQb);
-        }
-
-        // merge query builder
-        this.mergeListFilterToMainFilter();
-
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-      case Constants.APPLY_LIST_FILTER.CASES_NOT_HOSPITALISED:
-        globalQb = this.listHelperService.listFilterDataService.getGlobalFilterQB(
-          null,
-          null,
-          'addresses.parentLocationIdFilter',
-          globalFilters.locationId,
-          globalFilters.classificationId
-        );
-
-        // date
-        if (globalFilters.date) {
-          globalQb.filter.byDateRange(
-            'dateOfReporting', {
-              endDate: globalFilters.date.endOf('day').format()
-            }
-          );
-        }
-
-        // condition already include by default on cases list page
-        // qb.filter.bySelect(
-        //     'classification',
-        //     this.globalFilterClassificationId,
-        //     false,
-        //     null
-        // );
-
-        // get the correct query builder and merge with the existing one
-        this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterCasesNotHospitalized(globalFilters.date);
-        if (!globalQb.isEmpty()) {
-          this.appliedListFilterQueryBuilder.merge(globalQb);
-        }
-
-        // merge query builder
-        this.mergeListFilterToMainFilter();
-
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // Filter contacts not seen
-      case Constants.APPLY_LIST_FILTER.CONTACTS_NOT_SEEN:
-        // get the number of days if it was updated
-        const noDaysNotSeen = _.get(queryParams, 'x', null);
-        // get the correct query builder and merge with the existing one
-        this.listHelperService.listFilterDataService
-          .filterContactsNotSeen(
-            globalFilters.date,
-            globalFilters.locationId,
-            globalFilters.classificationId,
-            noDaysNotSeen
-          )
-          .subscribe((qbFilterContactsNotSeen) => {
-            // merge query builder
-            this.appliedListFilterQueryBuilder = qbFilterContactsNotSeen;
-            this.mergeListFilterToMainFilter();
-
-            // refresh list
-            this.needsRefreshList(true);
-          });
-        break;
-
-        // filter cases with less than x contacts
-      case Constants.APPLY_LIST_FILTER.CASES_LESS_CONTACTS:
-        // get the number of contacts if it was updated
-        const noLessContacts = _.get(queryParams, 'x', null);
-
-        // get the correct query builder and merge with the existing one
-        this.listHelperService.listFilterDataService
-          .filterCasesLessThanContacts(
-            globalFilters.date,
-            globalFilters.locationId,
-            globalFilters.classificationId,
-            noLessContacts
-          )
-          .subscribe((qbFilterCasesLessThanContacts) => {
-            // merge query builder
-            this.appliedListFilterQueryBuilder = qbFilterCasesLessThanContacts;
-            this.mergeListFilterToMainFilter();
-
-            // refresh list
-            this.needsRefreshList(true);
-          });
-        break;
-
-        // filter cases by classification criteria
-      case Constants.APPLY_LIST_FILTER.CASE_SUMMARY:
-        globalQb = this.listHelperService.listFilterDataService.getGlobalFilterQB(
-          null,
-          null,
-          'addresses.parentLocationIdFilter',
-          globalFilters.locationId
-        );
-
-        // date
-        if (globalFilters.date) {
-          globalQb.filter.byDateRange(
-            'dateOfReporting', {
-              endDate: globalFilters.date.endOf('day').format()
-            }
-          );
-        }
-
-        // filter by classification
-        const classificationCriteria = _.get(queryParams, 'x', null);
-
-        // merge query builder
-        this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
-        this.appliedListFilterQueryBuilder.filter.where({
-          // add and condition because otherwise classification filter if overwritten by the default one
-          and: [
-            classificationCriteria === 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_UNCLASSIFIED' ? {
-              or: [
-                {
-                  classification: {
-                    exists: false
-                  }
-                }, {
-                  classification: {
-                    type: 'null'
-                  }
-                }, {
-                  classification: {
-                    eq: ''
-                  }
-                }
-              ]
-            } : {
-              classification: {
-                eq: classificationCriteria
-              }
-            }
-          ]
-        }, true);
-
-        if (!globalQb.isEmpty()) {
-          this.appliedListFilterQueryBuilder.merge(globalQb);
-        }
-
-        this.mergeListFilterToMainFilter();
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-      case Constants.APPLY_LIST_FILTER.CASES_BY_LOCATION:
-        // add condition for deceased cases
-        this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
-
-        // construct query builder to filter by location
-        const locationId = _.get(queryParams, 'locationId', null);
-        this.appliedListFilterQueryBuilder.filter.where({
-          addresses: {
-            elemMatch: {
-              typeId: AddressType.CURRENT_ADDRESS,
-              parentLocationIdFilter: {
-                // fix for not beeing consistent through the website, sometimes we use elemMatch other times $elemMatch which causes some issues on the api
-                // if we want to fix this we need to change in many places, so this is an workaround
-                $in: [locationId]
-              }
-            }
-          }
-        });
-
-        // date
-        if (globalFilters.date) {
-          this.appliedListFilterQueryBuilder.filter.byDateRange(
-            'dateOfReporting', {
-              endDate: globalFilters.date.endOf('day').format()
-            }
-          );
-        }
-
-        // condition already include by default on cases list page
-        // qb.filter.bySelect(
-        //     'classification',
-        //     this.globalFilterClassificationId,
-        //     false,
-        //     null
-        // );
-
-        // classification
-        if (!_.isEmpty(globalFilters.classificationId)) {
-          this.appliedListFilterQueryBuilder.filter.where({
-            and: [{
-              classification: {
-                inq: globalFilters.classificationId
-              }
-            }]
-          });
-        }
-
-        // main filters
-        this.mergeListFilterToMainFilter();
-
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // Filter contacts lost to follow-up
-      case Constants.APPLY_LIST_FILTER.CONTACTS_LOST_TO_FOLLOW_UP:
-        // get the correct query builder and merge with the existing one
-        this.listHelperService.listFilterDataService.filterContactsLostToFollowUp(
-          globalFilters.date,
-          globalFilters.locationId,
-          globalFilters.classificationId
-        )
-          .subscribe((qbFilterContactsLostToFollowUp) => {
-            // merge query builder
-            this.appliedListFilterQueryBuilder = qbFilterContactsLostToFollowUp;
-            this.mergeListFilterToMainFilter();
-
-            // refresh list
-            this.needsRefreshList(true);
-          });
-        break;
-
-        // Filter cases in known transmission chains
-      case Constants.APPLY_LIST_FILTER.CASES_IN_THE_TRANSMISSION_CHAINS:
-        // get the number of days if it was updated
-        const noDaysInChains = _.get(queryParams, 'x', null);
-        // get the correct query builder and merge with the existing one
-        this.listHelperService.listFilterDataService.filterCasesInKnownChains(
-          globalFilters.date,
-          globalFilters.locationId,
-          globalFilters.classificationId,
-          noDaysInChains
-        )
-          .subscribe((qbFilterCasesInKnownChains) => {
-            // merge query builder
-            this.appliedListFilterQueryBuilder = qbFilterCasesInKnownChains;
-            this.mergeListFilterToMainFilter();
-
-            // refresh list
-            this.needsRefreshList(true);
-          });
-        break;
-
-        // filter cases among contacts
-      case Constants.APPLY_LIST_FILTER.CASES_PREVIOUS_DAYS_CONTACTS:
-        // get the number of days  if it was updated
-        const noDaysAmongContacts = _.get(queryParams, 'x', null);
-        // get the correct query builder and merge with the existing one
-        this.listHelperService.listFilterDataService.filterCasesAmongKnownContacts(
-          globalFilters.date,
-          globalFilters.locationId,
-          globalFilters.classificationId,
-          noDaysAmongContacts
-        )
-          .subscribe((qbFilterCasesAmongKnownContacts) => {
-            // merge query builder
-            this.appliedListFilterQueryBuilder = qbFilterCasesAmongKnownContacts;
-            this.mergeListFilterToMainFilter();
-
-            // refresh list
-            this.needsRefreshList(true);
-          });
-        break;
-
-        // filter suspect cases with pending lab result
-      case Constants.APPLY_LIST_FILTER.CASES_PENDING_LAB_RESULT:
-        // add condition for deceased cases
-        globalQb = this.listHelperService.listFilterDataService.getGlobalFilterQB(
-          null,
-          null,
-          'addresses.parentLocationIdFilter',
-          globalFilters.locationId,
-          globalFilters.classificationId
-        );
-
-        // condition already include by default on cases list page
-        // globalQb.filter.bySelect(
-        //     'classification',
-        //     this.globalFilterClassificationId,
-        //     false,
-        //     null
-        // );
-
-        // date
-        if (globalFilters.date) {
-          globalQb.filter.byDateRange(
-            'dateOfReporting', {
-              endDate: globalFilters.date.endOf('day').format()
-            }
-          );
-        }
-
-        // get the correct query builder and merge with the existing one
-        this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterCasesPendingLabResult();
-        if (!globalQb.isEmpty()) {
-          this.appliedListFilterQueryBuilder.merge(globalQb);
-        }
-
-        // merge query builder
-        this.mergeListFilterToMainFilter();
-
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // filter suspect cases refusing treatment
-      case Constants.APPLY_LIST_FILTER.CASES_REFUSING_TREATMENT:
-        // add condition for deceased cases
-        globalQb = this.listHelperService.listFilterDataService.getGlobalFilterQB(
-          null,
-          null,
-          'addresses.parentLocationIdFilter',
-          globalFilters.locationId,
-          globalFilters.classificationId
-        );
-
-        // condition already include by default on cases list page
-        // globalQb.filter.bySelect(
-        //     'classification',
-        //     this.globalFilterClassificationId,
-        //     false,
-        //     null
-        // );
-
-        // date
-        if (globalFilters.date) {
-          globalQb.filter.byDateRange(
-            'dateOfReporting', {
-              endDate: globalFilters.date.endOf('day').format()
-            }
-          );
-        }
-
-        // get the correct query builder and merge with the existing one
-        this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterCasesRefusingTreatment();
-        if (!globalQb.isEmpty()) {
-          this.appliedListFilterQueryBuilder.merge(globalQb);
-        }
-
-        // merge query builder
-        this.mergeListFilterToMainFilter();
-
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // filter cases among contacts
-      case Constants.APPLY_LIST_FILTER.NO_OF_ACTIVE_TRANSMISSION_CHAINS:
-        // get the correct query builder and merge with the existing one
-        this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterActiveChainsOfTransmission();
-
-        // change the way we build query
-        this.appliedListFilterQueryBuilder.filter.firstLevelConditions();
-
-        // date
-        if (globalFilters.date) {
-          this.appliedListFilterQueryBuilder.filter.byDateRange(
-            'contactDate', {
-              endDate: globalFilters.date.endOf('day').format()
-            }
-          );
-        }
-
-        // location
-        if (globalFilters.locationId) {
-          this.appliedListFilterQueryBuilder.addChildQueryBuilder('person').filter.where({
-            or: [
-              {
-                type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT',
-                'address.parentLocationIdFilter': globalFilters.locationId
-              }, {
-                type: {
-                  inq: [
-                    'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
-                    'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'
-                  ]
-                },
-                'addresses.parentLocationIdFilter': globalFilters.locationId
-              }
-            ]
-          });
-        }
-
-        // classification
-        if (!_.isEmpty(globalFilters.classificationId)) {
-          // define classification conditions
-          const classificationConditions = {
-            or: [
-              {
-                type: {
-                  neq: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE'
-                }
-              }, {
-                type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
-                classification: {
-                  inq: globalFilters.classificationId
-                }
-              }
-            ]
-          };
-
-          // top level classification
-          this.appliedListFilterQueryBuilder.filter.where(classificationConditions);
-
-          // person
-          this.appliedListFilterQueryBuilder.addChildQueryBuilder('person').filter.where(classificationConditions);
-        }
-
-        // merge query builder
-        this.mergeListFilterToMainFilter();
-
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // filter contacts becoming cases overtime and place
-      case Constants.APPLY_LIST_FILTER.CONTACTS_BECOME_CASES:
-        // add condition for deceased cases
-        this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.getGlobalFilterQB(
-          null,
-          null,
-          'addresses.parentLocationIdFilter',
-          globalFilters.locationId,
-          globalFilters.classificationId
-        );
-
-        // date
-        if (globalFilters.date) {
-          this.appliedListFilterQueryBuilder.filter.byDateRange(
-            'dateBecomeCase', {
-              endDate: globalFilters.date.endOf('day').format()
-            }
-          );
-        }
-
-        // do we need to include default condition ?
-        if (!this.appliedListFilterQueryBuilder.filter.has('dateBecomeCase')) {
-          // any date
-          this.appliedListFilterQueryBuilder.filter.where({
-            'dateBecomeCase': {
-              neq: null
-            }
-          });
-        }
-
-        // exclude discarded cases
-        this.appliedListFilterQueryBuilder.filter.where({
-          classification: {
-            neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
-          }
-        });
-
-        // include was contact cases
-        this.appliedListFilterQueryBuilder.filter.byBoolean(
-          'wasContact',
-          true
-        );
-
-        // merge query builder
-        this.mergeListFilterToMainFilter();
-
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // refresh list on query params changes ( example browser back button was pressed )
-      case Constants.APPLY_LIST_FILTER.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES:
-        // no extra filter
-        this.appliedListFilterQueryBuilder = null;
-        this.mergeListFilterToMainFilter();
-
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // filter cases without relationships
-      case Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS:
-        this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterCasesWithoutRelationships();
-        this.mergeListFilterToMainFilter();
-
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // filter events without relationships
-      case Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS:
-        this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterEventsWithoutRelationships();
-        this.mergeListFilterToMainFilter();
-
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // Filter contacts seen
-      case Constants.APPLY_LIST_FILTER.CONTACTS_SEEN:
-        this.listHelperService.listFilterDataService.filterContactsSeen(
-          globalFilters.date,
-          globalFilters.locationId,
-          globalFilters.classificationId
-        )
-          .subscribe((result: MetricContactsSeenEachDays) => {
-            // merge query builder
-            this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
-            this.appliedListFilterQueryBuilder.filter.where({
-              id: {
-                'inq': result.contactIDs
-              }
-            }, true);
-            this.mergeListFilterToMainFilter();
-
-            // refresh list
-            this.needsRefreshList(true);
-          });
-        break;
-
-        // Filter contacts witch successful follow-up
-      case Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWED_UP:
-        this.listHelperService.listFilterDataService
-          .filterContactsWithSuccessfulFollowup(
-            globalFilters.date,
-            globalFilters.locationId,
-            globalFilters.classificationId
-          )
-          .subscribe((result: MetricContactsWithSuccessfulFollowUp) => {
-            const contactIDs: string[] = _.chain(result.contacts)
-              .filter((item: ContactFollowedUp) => item.successfulFollowupsCount > 0)
-              .map((item: ContactFollowedUp) => {
-                return item.id;
-              }).value();
-            // merge query builder
-            this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
-            this.appliedListFilterQueryBuilder.filter.where({
-              id: {
-                'inq': contactIDs
-              }
-            }, true);
-
-            this.mergeListFilterToMainFilter();
-
-            // refresh list
-            this.needsRefreshList(true);
-          });
-        break;
-
-        // Filter cases without date of onset.
-      case Constants.APPLY_LIST_FILTER.CASES_WITHOUT_DATE_OF_ONSET_CHAIN:
-        // get the case ids that need to be updated
-        const caseIds = _.get(queryParams, 'caseIds', null);
-        // get the correct query builder and merge with the existing one
-        // merge query builder
-        this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
-        this.appliedListFilterQueryBuilder.filter.where({
-          id: {
-            'inq': Array.isArray(caseIds) ? caseIds : [caseIds]
-          }
-        }, true);
-        this.mergeListFilterToMainFilter();
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // Filter cases without date of last contact
-      case Constants.APPLY_LIST_FILTER.CASES_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN:
-        // get the case ids that need to be updated
-        const caseLCIds = _.get(queryParams, 'caseIds', null);
-        // get the correct query builder and merge with the existing one
-        // merge query builder
-        this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
-        this.appliedListFilterQueryBuilder.filter.where({
-          id: {
-            'inq': Array.isArray(caseLCIds) ? caseLCIds : [caseLCIds]
-          }
-        }, true);
-        this.mergeListFilterToMainFilter();
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // Filter cases without date of reporting
-      case Constants.APPLY_LIST_FILTER.CASES_WITHOUT_DATE_OF_REPORTING_CHAIN:
-        // get the case ids that need to be updated
-        const caseDRIds = _.get(queryParams, 'caseIds', null);
-        // get the correct query builder and merge with the existing one
-        // merge query builder
-        this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
-        this.appliedListFilterQueryBuilder.filter.where({
-          id: {
-            'inq': Array.isArray(caseDRIds) ? caseDRIds : [caseDRIds]
-          }
-        }, true);
-        this.mergeListFilterToMainFilter();
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // Filter contacts without date of last contact.
-      case Constants.APPLY_LIST_FILTER.CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN:
-        // get the contact ids that need to be updated
-        const contactIds = _.get(queryParams, 'contactIds', null);
-        // get the correct query builder and merge with the existing one
-        // merge query builder
-        this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
-        this.appliedListFilterQueryBuilder.filter.where({
-          id: {
-            'inq': Array.isArray(contactIds) ? contactIds : [contactIds]
-          }
-        }, true);
-        this.mergeListFilterToMainFilter();
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // Filter contacts without date of last contact.
-      case Constants.APPLY_LIST_FILTER.CONTACTS_WITHOUT_DATE_OF_REPORTING_CHAIN:
-        // get the contact ids that need to be updated
-        const contactDRIds = _.get(queryParams, 'contactIds', null);
-        // get the correct query builder and merge with the existing one
-        // merge query builder
-        this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
-        this.appliedListFilterQueryBuilder.filter.where({
-          id: {
-            'inq': Array.isArray(contactDRIds) ? contactDRIds : [contactDRIds]
-          }
-        }, true);
-        this.mergeListFilterToMainFilter();
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // Filter events without date
-      case Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_DATE_CHAIN:
-        // get the event ids that need to be updated
-        const eventIds = _.get(queryParams, 'eventIds', null);
-        // get the correct query builder and merge with the existing one
-        // merge query builder
-        this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
-        this.appliedListFilterQueryBuilder.filter.where({
-          id: {
-            'inq': Array.isArray(eventIds) ? eventIds : [eventIds]
-          }
-        }, true);
-        this.mergeListFilterToMainFilter();
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // Filter events without date
-      case Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_DATE_OF_REPORTING_CHAIN:
-        // get the event ids that need to be updated
-        const eventDRIds = _.get(queryParams, 'eventIds', null);
-        // get the correct query builder and merge with the existing one
-        // merge query builder
-        this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
-        this.appliedListFilterQueryBuilder.filter.where({
-          id: {
-            'inq': Array.isArray(eventDRIds) ? eventDRIds : [eventDRIds]
-          }
-        }, true);
-        this.mergeListFilterToMainFilter();
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // Filter cases who are not identified though known contact list
-      case Constants.APPLY_LIST_FILTER.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS:
-        // add condition for deceased cases
-        globalQb = this.listHelperService.listFilterDataService.getGlobalFilterQB(
-          null,
-          null,
-          'addresses.parentLocationIdFilter',
-          globalFilters.locationId,
-          globalFilters.classificationId
-        );
-
-        // date
-        if (globalFilters.date) {
-          globalQb.filter.byDateRange(
-            'dateOfReporting', {
-              endDate: globalFilters.date.endOf('day').format()
-            }
-          );
-        }
-
-        // get the correct query builder and merge with the existing one
-        // includes
-        // classification: {
-        //     neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
-        // }
-        this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterCasesNotIdentifiedThroughContacts();
-        if (!globalQb.isEmpty()) {
-          this.appliedListFilterQueryBuilder.merge(globalQb);
-        }
-
-        // merge query builder
-        this.mergeListFilterToMainFilter();
-
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // Filter context sensitive help items
-      case Constants.APPLY_LIST_FILTER.CONTEXT_SENSITIVE_HELP_ITEMS:
-        // get the help items ids that need to be updated
-        const helpItemsIds = _.get(queryParams, 'helpItemsIds', null);
-        const itemsIds: string[] = (_.isArray(helpItemsIds) ?
-          helpItemsIds :
-          [helpItemsIds]
-        ) as string[];
-        // get the correct query builder and merge with the existing one
-        // merge query builder
-        this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
-        this.appliedListFilterQueryBuilder.filter.where({
-          id: {
-            'inq': itemsIds
-          }
-        }, true);
-        this.mergeListFilterToMainFilter();
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-    }
-  }
-
-  /**
-     * Retrieve Global Filter Values
-     * @param queryParams
-     */
-  getGlobalFilterValues(queryParams: {
-    global?: string | {
-      date?: Moment,
-      locationId?: string,
-      classificationId?: string[]
-    }
-  }): {
-      date?: Moment,
-      locationId?: string,
-      classificationId?: string[]
-    } {
-    // do we need to decode global filters ?
-    const global: {
-      date?: Moment,
-      locationId?: string,
-      classificationId?: string[]
-    } = !queryParams.global ?
-      {} : (
-        _.isString(queryParams.global) ?
-          JSON.parse(queryParams.global as string) :
-          queryParams.global
-      );
-
-    // parse date
-    if (global.date) {
-      global.date = moment(global.date);
-    }
-
-    // finished
-    return global;
-  }
-
-  /**
-     * Check if a row's cell is expanded
-     * @param columnName
-     * @param rowId
-     */
-  public isCellExpanded(columnName: string, rowId: string): boolean {
-    // is the whole column marked to be expanded?
-    const columnExpanded = _.get(this.expandAllCellsForColumn, columnName);
-    // is cell marked to be expanded/collapsed?
-    const cellExpanded = _.get(this.expandCell, `${columnName}.${rowId}`);
-
-    // note that individual cell configuration overrides generic configuration
-    // e.g. if columnExpanded = true, but cellExpanded = false, then the cell is NOT expanded
-    return (
-    // expand the cell if it is marked individually
-      cellExpanded === true ||
-            // expand the cell if column is expanded and cell is NOT collapsed individually
-            (columnExpanded === true) && (cellExpanded !== false)
-    );
-  }
-
-  /**
-     * Expand/Collapse a cell individually
-     * @param columnName
-     * @param rowId
-     * @param expand Expand or Collapse the cell?
-     */
-  public toggleCell(columnName: string, rowId: string, expand: boolean) {
-    _.set(this.expandCell, `${columnName}.${rowId}`, expand);
-  }
-
-  /**
-     * Expand/Collapse all cells of a certain column
-     * @param columnName
-     * @param expand Expand or Collapse the cells?
-     */
-  public toggleColumn(columnName: string, expand: boolean) {
-    // remove individual cells configurations
-    delete this.expandCell[columnName];
-
-    // set column configuration
-    this.expandAllCellsForColumn[columnName] = expand;
   }
 
   /**
@@ -2221,19 +819,20 @@ export abstract class ListComponent implements OnDestroy {
      * Determine what columns are sorted by
      */
   private getTableSortForCache(): ICachedSortItem {
-    // nothing sorted by ?
-    if (
-      !this.matTableSort ||
-            !this.matTableSort.direction
-    ) {
-      return null;
-    }
-
-    // set sort values
-    return {
-      active: this.matTableSort.active,
-      direction: this.matTableSort.direction as RequestSortDirection
-    };
+    // // nothing sorted by ?
+    // if (
+    //   !this.matTableSort ||
+    //   !this.matTableSort.direction
+    // ) {
+    //   return null;
+    // }
+    //
+    // // set sort values
+    // return {
+    //   active: this.matTableSort.active,
+    //   direction: this.matTableSort.direction as RequestSortDirection
+    // };
+    return {} as any;
   }
 
   /**
@@ -2279,7 +878,7 @@ export abstract class ListComponent implements OnDestroy {
     const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
     if (
       authUser.dontCacheFilters ||
-            this._disableFilterCaching
+      this._disableFilterCaching
     ) {
       return;
     }
@@ -2290,9 +889,9 @@ export abstract class ListComponent implements OnDestroy {
       queryBuilder: this.queryBuilder.serialize(),
       inputs: this.getInputsValuesForCache(),
       sort: this.getTableSortForCache(),
-      sideFilters: this.sideFilter ?
-        this.sideFilter.toSaveData() :
-        null
+      sideFilters: null // this.sideFilter ?
+      //   this.sideFilter.toSaveData() :
+      //   null
     };
 
     // update the new filter
@@ -2309,7 +908,6 @@ export abstract class ListComponent implements OnDestroy {
 
   // /**
   //  * Visible columns
-  //  * @param visibleColumns
   //  */
   // applySideColumnsChanged(visibleColumns: string[]) {
   //   // apply side columns
@@ -2390,55 +988,55 @@ export abstract class ListComponent implements OnDestroy {
   /**
      * Load cached sort column
      */
-  private loadCachedSortColumn(currentUserCacheForCurrentPath: ICachedFilterItems): void {
-    // wait for inputs to be rendered
-    setTimeout(() => {
-      // no sort applied ?
-      // make sure we have the mat table visible
-      if (
-        !currentUserCacheForCurrentPath.sort ||
-                !currentUserCacheForCurrentPath.sort.active ||
-                !this.matTableSort
-      ) {
-        return;
-      }
-
-      // reset state so that start is the first sort direction that you will see
-      this._sortByDisabled = true;
-      this.matTableSort.sort({
-        id: null,
-        start: currentUserCacheForCurrentPath.sort.direction,
-        disableClear: false
-      });
-      this.matTableSort.sort({
-        id: currentUserCacheForCurrentPath.sort.active,
-        start: currentUserCacheForCurrentPath.sort.direction,
-        disableClear: false
-      });
-
-      // ugly hack
-      (this.matTableSort.sortables.get(currentUserCacheForCurrentPath.sort.active) as MatSortHeader)._setAnimationTransitionState({ toState: 'active' });
-      this._sortByDisabled = false;
-    });
+  private loadCachedSortColumn(_currentUserCacheForCurrentPath: ICachedFilterItems): void {
+    // // wait for inputs to be rendered
+    // setTimeout(() => {
+    //   // no sort applied ?
+    //   // make sure we have the mat table visible
+    //   if (
+    //     !currentUserCacheForCurrentPath.sort ||
+    //             !currentUserCacheForCurrentPath.sort.active ||
+    //             !this.matTableSort
+    //   ) {
+    //     return;
+    //   }
+    //
+    //   // reset state so that start is the first sort direction that you will see
+    //   this._sortByDisabled = true;
+    //   this.matTableSort.sort({
+    //     id: null,
+    //     start: currentUserCacheForCurrentPath.sort.direction,
+    //     disableClear: false
+    //   });
+    //   this.matTableSort.sort({
+    //     id: currentUserCacheForCurrentPath.sort.active,
+    //     start: currentUserCacheForCurrentPath.sort.direction,
+    //     disableClear: false
+    //   });
+    //
+    //   // ugly hack
+    //   (this.matTableSort.sortables.get(currentUserCacheForCurrentPath.sort.active) as MatSortHeader)._setAnimationTransitionState({ toState: 'active' });
+    //   this._sortByDisabled = false;
+    // });
   }
 
   /**
      * Load side filters
      */
-  private loadSideFilters(currentUserCacheForCurrentPath: ICachedFilterItems): void {
-    // wait for inputs to be rendered
-    setTimeout(() => {
-      // no side filters ?
-      if (
-        !currentUserCacheForCurrentPath.sideFilters ||
-                !this.sideFilter
-      ) {
-        return;
-      }
-
-      // load side filters
-      this.sideFilter.generateFiltersFromFilterData(new SavedFilterData(currentUserCacheForCurrentPath.sideFilters));
-    });
+  private loadSideFilters(_currentUserCacheForCurrentPath: ICachedFilterItems): void {
+    // // wait for inputs to be rendered
+    // setTimeout(() => {
+    //   // no side filters ?
+    //   if (
+    //     !currentUserCacheForCurrentPath.sideFilters ||
+    //     !this.sideFilter
+    //   ) {
+    //     return;
+    //   }
+    //
+    //   // load side filters
+    //   this.sideFilter.generateFiltersFromFilterData(new SavedFilterData(currentUserCacheForCurrentPath.sideFilters));
+    // });
   }
 
   /**
@@ -2543,142 +1141,6 @@ export abstract class ListComponent implements OnDestroy {
       if (this.queryBuilder.paginator.limit) {
         this.pageSize = this.queryBuilder.paginator.limit;
       }
-    }
-  }
-
-  /**
-     * Display loading dialog
-     */
-  showLoadingDialog() {
-    this.loadingDialog = this.listHelperService.dialogService.showLoadingDialog();
-  }
-
-  /**
-     * Hide loading dialog
-     */
-  closeLoadingDialog() {
-    if (this.loadingDialog) {
-      this.loadingDialog.close();
-      this.loadingDialog = null;
-    }
-  }
-
-  /**
-   * Filter by
-   */
-  filterBy(column: IExtendedColDef): void {
-    // custom filter ?
-    if (column.columnDefinition.filter.search) {
-      // call
-      column.columnDefinition.filter.search(column);
-
-      // finished
-      return;
-    }
-
-    // filter accordingly
-    switch (column.columnDefinition.filter.type) {
-
-      // text
-      case V2FilterType.TEXT:
-
-        // text filter type
-        switch (column.columnDefinition.filter.textType) {
-          case V2FilterTextType.STARTS_WITH:
-
-            // filter
-            this.filterByTextField(
-              column.columnDefinition.field,
-              column.columnDefinition.filter.value
-            );
-
-            // finished
-            break;
-        }
-
-        // finished
-        break;
-
-      // multiple select
-      case V2FilterType.MULTIPLE_SELECT:
-        // filter
-        this.filterBySelectField(
-          column.columnDefinition.field,
-          column.columnDefinition.filter.value,
-          null,
-          true
-        );
-
-        // finished
-        break;
-
-      // date range
-      case V2FilterType.DATE_RANGE:
-        // filter
-        this.filterByDateRangeField(
-          column.columnDefinition.field,
-          column.columnDefinition.filter.value
-        );
-
-        // finished
-        break;
-
-      // age range - years
-      case V2FilterType.AGE_RANGE:
-        // filter
-        this.filterByAgeRangeField(
-          column.columnDefinition.field,
-          column.columnDefinition.filter.value
-        );
-
-        // finished
-        break;
-
-      // address
-      case V2FilterType.ADDRESS_PHONE_NUMBER:
-      case V2FilterType.ADDRESS_MULTIPLE_LOCATION:
-      case V2FilterType.ADDRESS_FIELD:
-      case V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION:
-        // filter
-        this.filterByAddress(
-          column.columnDefinition.filter.field,
-          column.columnDefinition.filter.fieldIsArray,
-          column.columnDefinition.filter.address,
-          column.columnDefinition.filter.address.filterLocationIds
-        );
-
-        // finished
-        break;
-
-      // boolean
-      case V2FilterType.BOOLEAN:
-        // filter
-        this.filterByBooleanUsingExistField(
-          column.columnDefinition.field,
-          column.columnDefinition.filter.value
-        );
-
-        // finished
-        break;
-
-      // number range
-      case V2FilterType.NUMBER_RANGE:
-        // filter
-        this.filterByRangeField(
-          column.columnDefinition.field,
-          column.columnDefinition.filter.value
-        );
-
-        // finished
-        break;
-
-      // deleted
-      case V2FilterType.DELETED:
-        // filter
-        this.filterByDeletedField(column.columnDefinition.filter.value);
-
-        // finished
-        break;
     }
   }
 }

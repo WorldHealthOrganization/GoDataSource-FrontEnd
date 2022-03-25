@@ -139,7 +139,7 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
 
     // outbreak subscriber
     if (this.outbreakSubscriber) {

@@ -418,7 +418,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
 
     // outbreak subscriber
     if (this.outbreakSubscriber) {
@@ -1033,8 +1033,8 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
       anonymizeFields: this.relationshipAnonymizeFields,
       fieldsGroupList: this.fieldsGroupListRelationships,
       fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
-      exportStart: () => { this.showLoadingDialog(); },
-      exportFinished: () => { this.closeLoadingDialog(); }
+      // exportStart: () => { this.showLoadingDialog(); },
+      // exportFinished: () => { this.closeLoadingDialog(); }
     });
   }
 

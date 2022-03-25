@@ -138,7 +138,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   // /**

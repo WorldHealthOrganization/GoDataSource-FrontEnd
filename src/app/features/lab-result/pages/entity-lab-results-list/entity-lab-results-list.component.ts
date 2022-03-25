@@ -390,7 +390,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**

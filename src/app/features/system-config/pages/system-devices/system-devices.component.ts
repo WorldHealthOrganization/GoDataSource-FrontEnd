@@ -142,7 +142,7 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**
@@ -244,13 +244,13 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
     this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_DEVICE', device)
       .subscribe((answer: DialogAnswer) => {
         if (answer.button === DialogAnswerButton.Yes) {
-          this.showLoadingDialog();
+          // this.showLoadingDialog();
           this.deviceDataService
             .deleteDevice(device.id)
             .pipe(
               catchError((err) => {
                 this.toastV2Service.error(err);
-                this.closeLoadingDialog();
+                // this.closeLoadingDialog();
                 return throwError(err);
               })
             )
@@ -258,7 +258,7 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
               this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE_SUCCESS_MESSAGE');
 
               this.needsRefreshList();
-              this.closeLoadingDialog();
+              // this.closeLoadingDialog();
             });
         }
       });
@@ -273,19 +273,19 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
     this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_WIPE_DEVICE', device)
       .subscribe((answer: DialogAnswer) => {
         if (answer.button === DialogAnswerButton.Yes) {
-          this.showLoadingDialog();
+          // this.showLoadingDialog();
           this.deviceDataService
             .wipeDevice(device.id)
             .pipe(
               catchError((err) => {
                 this.toastV2Service.error(err);
-                this.closeLoadingDialog();
+                // this.closeLoadingDialog();
                 return throwError(err);
               })
             )
             .subscribe(() => {
               this.needsRefreshList();
-              this.closeLoadingDialog();
+              // this.closeLoadingDialog();
             });
         }
       });

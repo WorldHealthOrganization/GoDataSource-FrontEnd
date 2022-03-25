@@ -143,7 +143,7 @@ export class RolesListComponent extends ListComponent implements OnInit, OnDestr
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**

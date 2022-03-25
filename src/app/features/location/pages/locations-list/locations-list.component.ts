@@ -197,7 +197,7 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**
@@ -325,7 +325,7 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
       .subscribe((answer: DialogAnswer) => {
         if (answer.button === DialogAnswerButton.Yes) {
           // delete record
-          this.showLoadingDialog();
+          // this.showLoadingDialog();
           this.locationDataService
             .deleteLocation(location.id)
             .pipe(
@@ -338,7 +338,7 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
                 }
               }) => {
                 // check if we have a model in use error
-                this.closeLoadingDialog();
+                // this.closeLoadingDialog();
                 if (err.code === ErrorCodes.MODEL_IN_USE) {
                   this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_LOCATION_USED', location)
                     .subscribe((answerC: DialogAnswer) => {
@@ -361,7 +361,7 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
               FormLocationDropdownComponent.CACHE = {};
 
               // hide loading
-              this.closeLoadingDialog();
+              // this.closeLoadingDialog();
 
               // reload data
               this.needsRefreshList(true);

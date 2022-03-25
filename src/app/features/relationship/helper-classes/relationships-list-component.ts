@@ -196,7 +196,7 @@ export abstract class RelationshipsListComponent extends ListComponent implement
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**

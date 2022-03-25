@@ -99,7 +99,7 @@ export class ViewHelpDialogComponent extends ListComponent implements OnDestroy 
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**

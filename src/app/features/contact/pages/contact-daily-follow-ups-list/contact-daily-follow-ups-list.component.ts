@@ -1250,7 +1250,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
           .subscribe((answer: DialogAnswer) => {
             if (answer.button === DialogAnswerButton.Yes) {
               // display loading
-              this.showLoadingDialog();
+              // this.showLoadingDialog();
 
               // generate follow-ups
               this.followUpsDataService
@@ -1266,7 +1266,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 .pipe(
                   catchError((err) => {
                     // hide loading
-                    this.closeLoadingDialog();
+                    // this.closeLoadingDialog();
 
                     // error
                     this.toastV2Service.error(err);
@@ -1275,7 +1275,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 )
                 .subscribe(() => {
                   // hide loading
-                  this.closeLoadingDialog();
+                  // this.closeLoadingDialog();
 
                   // finished
                   this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
