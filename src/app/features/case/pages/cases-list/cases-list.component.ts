@@ -129,7 +129,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   ];
 
   // used to filter cases
-  notACaseFilter: boolean | string = false;
+  notACaseFilter: boolean | '' = false;
 
 
 
@@ -251,7 +251,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   protected initializeTableColumns(): void {
     // address model used to search by phone number, address line, postal code, city....
     const filterAddressModel: AddressModel = new AddressModel({
-      geoLocationAccurate: null
+      geoLocationAccurate: ''
     });
 
     // default table columns
@@ -602,6 +602,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         },
         filter: {
           type: V2FilterType.BOOLEAN,
+          value: this.notACaseFilter,
           search: (column) => {
             // update not a case
             this.notACaseFilter = (column.columnDefinition.filter as V2FilterBoolean).value;
@@ -719,7 +720,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           type: V2ColumnFormat.BOOLEAN
         },
         filter: {
-          type: V2FilterType.DELETED
+          type: V2FilterType.DELETED,
+          value: false
         },
         sortable: true
       },
