@@ -1828,46 +1828,47 @@ export class EventsListComponent
    * Export selected events
    */
   exportSelectedEvents() {
-    // get list of selected ids
-    const selectedRecords: false | string[] = this.validateCheckedRecords();
-    if (!selectedRecords) {
-      return;
-    }
-
-    // construct query builder
-    const qb = new RequestQueryBuilder();
-    qb.filter.bySelect('id', selectedRecords, true, null);
-
-    // display export dialog
-    this.dialogService.showExportDialog({
-      // required
-      message: 'LNG_PAGE_LIST_EVENTS_EXPORT_TITLE',
-      url: this.exportEventsUrl,
-      fileName: this.eventsDataExportFileName,
-
-      // configure
-      isAsyncExport: true,
-      displayUseDbColumns: true,
-      displayJsonReplaceUndefinedWithNull: true,
-      // exportProgress: (data) => { this.showExportProgress(data); },
-
-      // optional
-      allowedExportTypes: this.allowedExportTypes,
-      queryBuilder: qb,
-      displayEncrypt: true,
-      displayAnonymize: true,
-      displayFieldsGroupList: true,
-      displayUseQuestionVariable: false,
-      anonymizeFields: this.anonymizeFields,
-      fieldsGroupList: this.fieldsGroupList,
-      fieldsGroupListRequired: this.fieldsGroupListRequired,
-      exportStart: () => {
-        this.showLoadingDialog();
-      },
-      exportFinished: () => {
-        this.closeLoadingDialog();
-      },
-    });
+    // // get list of selected ids
+    // const selectedRecords: false | string[] = this.validateCheckedRecords();
+    // if (!selectedRecords) {
+    //   return;
+    // }
+    //
+    // // construct query builder
+    // const qb = new RequestQueryBuilder();
+    // qb.filter.bySelect(
+    //   'id',
+    //   selectedRecords,
+    //   true,
+    //   null
+    // );
+    //
+    // // display export dialog
+    // this.dialogService.showExportDialog({
+    //   // required
+    //   message: 'LNG_PAGE_LIST_EVENTS_EXPORT_TITLE',
+    //   url: this.exportEventsUrl,
+    //   fileName: this.eventsDataExportFileName,
+    //
+    //   // configure
+    //   isAsyncExport: true,
+    //   displayUseDbColumns: true,
+    //   displayJsonReplaceUndefinedWithNull: true,
+    //   // exportProgress: (data) => { this.showExportProgress(data); },
+    //
+    //   // optional
+    //   allowedExportTypes: this.allowedExportTypes,
+    //   queryBuilder: qb,
+    //   displayEncrypt: true,
+    //   displayAnonymize: true,
+    //   displayFieldsGroupList: true,
+    //   displayUseQuestionVariable: false,
+    //   anonymizeFields: this.anonymizeFields,
+    //   fieldsGroupList: this.fieldsGroupList,
+    //   fieldsGroupListRequired: this.fieldsGroupListRequired,
+    //   exportStart: () => { this.showLoadingDialog(); },
+    //   exportFinished: () => { this.closeLoadingDialog(); }
+    // });
   }
 
   exportEvents(qb: RequestQueryBuilder): void {
@@ -1959,53 +1960,50 @@ export class EventsListComponent
    * Export relationships for selected events
    */
   exportSelectedEventsRelationship() {
-    // get list of selected ids
-    const selectedRecords: false | string[] = this.validateCheckedRecords();
-    if (!selectedRecords) {
-      return;
-    }
-
-    // construct query builder
-    const qb = new RequestQueryBuilder();
-    const personsQb = qb.addChildQueryBuilder('person');
-
-    // id
-    personsQb.filter.bySelect('id', selectedRecords, true, null);
-
-    // type
-    personsQb.filter.byEquality('type', EntityType.EVENT);
-
-    // display export dialog
-    this.dialogService.showExportDialog({
-      // required
-      message: 'LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIPS_TITLE',
-      url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
-      fileName: this.i18nService.instant(
-        'LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIP_FILE_NAME'
-      ),
-
-      // configure
-      isAsyncExport: true,
-      displayUseDbColumns: true,
-      displayJsonReplaceUndefinedWithNull: true,
-      // exportProgress: (data) => { this.showExportProgress(data); },
-
-      // optional
-      queryBuilder: qb,
-      displayEncrypt: true,
-      displayAnonymize: true,
-      displayFieldsGroupList: true,
-      allowedExportTypes: this.allowedExportTypes,
-      anonymizeFields: this.relationshipAnonymizeFields,
-      fieldsGroupList: this.relationshipFieldGroups,
-      fieldsGroupListRequired: this.relationshipFieldGroupsRequires,
-      exportStart: () => {
-        this.showLoadingDialog();
-      },
-      exportFinished: () => {
-        this.closeLoadingDialog();
-      },
-    });
+    // // get list of selected ids
+    // const selectedRecords: false | string[] = this.validateCheckedRecords();
+    // if (!selectedRecords) {
+    //   return;
+    // }
+    //
+    // // construct query builder
+    // const qb = new RequestQueryBuilder();
+    // const personsQb = qb.addChildQueryBuilder('person');
+    //
+    // // id
+    // personsQb.filter.bySelect('id', selectedRecords, true, null);
+    //
+    // // type
+    // personsQb.filter.byEquality(
+    //   'type',
+    //   EntityType.EVENT
+    // );
+    //
+    // // display export dialog
+    // this.dialogService.showExportDialog({
+    //   // required
+    //   message: 'LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIPS_TITLE',
+    //   url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
+    //   fileName: this.i18nService.instant('LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIP_FILE_NAME'),
+    //
+    //   // configure
+    //   isAsyncExport: true,
+    //   displayUseDbColumns: true,
+    //   displayJsonReplaceUndefinedWithNull: true,
+    //   // exportProgress: (data) => { this.showExportProgress(data); },
+    //
+    //   // optional
+    //   queryBuilder: qb,
+    //   displayEncrypt: true,
+    //   displayAnonymize: true,
+    //   displayFieldsGroupList: true,
+    //   allowedExportTypes: this.allowedExportTypes,
+    //   anonymizeFields: this.relationshipAnonymizeFields,
+    //   fieldsGroupList: this.fieldsGroupListRelationships,
+    //   fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
+    //   exportStart: () => { this.showLoadingDialog(); },
+    //   exportFinished: () => { this.closeLoadingDialog(); }
+    // });
   }
 
   private exportEventRelationships(qb: RequestQueryBuilder): void {

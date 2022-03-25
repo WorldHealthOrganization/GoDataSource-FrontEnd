@@ -37,8 +37,8 @@ import { MAT_SELECT_CONFIG } from '@angular/material/select';
 export class AppFormSelectMultipleV2Component
   extends AppFormBaseV2<string[]> implements OnDestroy {
 
-  // clearable ?
-  @Input() clearable: boolean = false;
+  // float label
+  @Input() neverFloatLabel: boolean = false;
 
   // tooltip
   @Input() optionTooltipKey: string;

@@ -217,6 +217,11 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
   }
 
   /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {}
+
+  /**
      * Initialize breadcrumbs
      */
   // private initializeBreadcrumbs() {

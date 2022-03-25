@@ -24,6 +24,8 @@ export const EnglishUsLang = {
     'LNG_COMMON_LABEL_NOTIFICATION_HISTORY': 'There are {{length}} error(s). Click here to see details',
     'LNG_COMMON_LABEL_HISTORY_TITLE': 'Errors',
     'LNG_COMMON_LABEL_STATUSES': 'Status',
+    'LNG_COMMON_LABEL_HEADER_FILTER_SHOW': 'Show header filters',
+    'LNG_COMMON_LABEL_HEADER_FILTER_HIDE': 'Hide header filters',
     'LNG_MULTIPLE_SNACKBAR_BUTTON_CLOSE_ALL': 'Clear all'
 
 
@@ -33,5 +35,7 @@ export const EnglishUsLang = {
      */
     // LNG_LAYOUT_ACTIVE_OUTBREAK_LABEL
     // LNG_SIDE_COLUMNS_ERROR_NO_COLUMN_SELECTED
+    // LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_LOADING_TEXT
+    // LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_HOVER_TOOLTIP
   }
 };

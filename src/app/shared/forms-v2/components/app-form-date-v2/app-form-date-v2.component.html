@@ -1,0 +1,38 @@
+<div
+  class="gd-form-date-v2">
+
+  <!-- Input data -->
+  <mat-form-field
+    appearance="outline">
+
+    <!-- Place holder -->
+    <mat-label
+      *ngIf="!neverFloatLabel">
+      {{ placeholder | translate }}
+    </mat-label>
+
+    <!-- Input -->
+    <input
+      matInput
+      [(ngModel)]="value"
+      [errorStateMatcher]="errMatcher"
+      [disabled]="disabled"
+      [required]="required"
+      [placeholder]="neverFloatLabel ? (placeholder | translate) : undefined"
+      [autocomplete]="autocomplete"
+      [matDatepicker]="pickerStartDate"
+      (blur)="onTouchItem()">
+    <mat-datepicker-toggle
+      matSuffix
+      [for]="pickerStartDate"></mat-datepicker-toggle>
+    <mat-datepicker
+      #pickerStartDate></mat-datepicker>
+
+    <!-- Errors -->
+    <mat-error
+      *ngIf="control?.invalid && control?.touched">
+      {{ getErrorMessages() }}
+    </mat-error>
+
+  </mat-form-field>
+</div>

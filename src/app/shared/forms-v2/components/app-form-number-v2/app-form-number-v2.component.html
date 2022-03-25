@@ -6,7 +6,8 @@
     appearance="outline">
 
     <!-- Place holder -->
-    <mat-label>
+    <mat-label
+      *ngIf="!neverFloatLabel">
       {{ placeholder | translate }}
     </mat-label>
 
@@ -18,6 +19,10 @@
       [errorStateMatcher]="errMatcher"
       [disabled]="disabled"
       [required]="required"
+      [placeholder]="neverFloatLabel ? (placeholder | translate) : undefined"
+      [autocomplete]="autocomplete"
+      [min]="min"
+      [max]="max"
       type="number">
 
     <!-- Errors -->

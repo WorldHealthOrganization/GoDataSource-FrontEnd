@@ -121,6 +121,11 @@
           color: var(--gd-primary);
         }
       }
+
+      .gd-list-table-header-right-header-filters-active {
+        background: rgba(var(--gd-primary-rgb), 0.25);
+        color: var(--gd-primary);
+      }
     }
   }
 

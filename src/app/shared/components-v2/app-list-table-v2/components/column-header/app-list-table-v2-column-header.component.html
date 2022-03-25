@@ -17,24 +17,144 @@
       {{extendedColDef.headerName}}
     </div>
 
-    <!-- Label -->
-    <mat-icon
-      *ngIf="extendedColDef.columnDefinition.sortable && component.sortByColumn === extendedColDef"
-      fxGrow="0"
-      class="gd-list-table-column-header-sort"
-      [class.gd-list-table-column-header-sort-asc]="component.sortByDirection === RequestSortDirection.ASC"
-      [class.gd-list-table-column-header-sort-desc]="component.sortByDirection === RequestSortDirection.DESC">south</mat-icon>
+    <!-- Sort Icon -->
+    <div
+      class="gd-list-table-column-header-sort">
+      <mat-icon
+        *ngIf="extendedColDef.columnDefinition.sortable && component.sortByColumn === extendedColDef"
+        [class.gd-list-table-column-header-sort-desc]="component.sortByDirection === RequestSortDirection.DESC">south</mat-icon>
+    </div>
 
   </div>
 
   <!-- Filter -->
   <div
-    *ngIf="component.showHeaderFilters"
-    class="gd-list-table-column-filter">
-    <!-- TODO - input, select, ... 1 row, no wrap so we have fixed height to determine loading & no data overlay height and position... -->
+    *ngIf="component.showHeaderFilters && extendedColDef.columnDefinition.filter"
+    [ngSwitch]="extendedColDef.columnDefinition.filter.type"
+    class="gd-list-table-column-filter"
+    (mousedown)="$event.stopPropagation()"
+    (keydown)="$event.stopPropagation()">
+
+    <!-- Text -->
     <app-form-input-v2
-      placeholder="bla bla"
-      [neverFloatLabel]="true"></app-form-input-v2>
+      *ngSwitchCase="V2FilterType.TEXT"
+      class="gd-list-table-column-filter-input"
+      [(ngModel)]="extendedColDef.columnDefinition.filter.value"
+      [name]="'filterBy' + extendedColDef.field"
+      placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+      neverFloatLabel="true"
+      autocomplete="off"
+      (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-input-v2>
+
+    <!-- Multiple select -->
+    <app-form-select-multiple-v2
+      *ngSwitchCase="V2FilterType.MULTIPLE_SELECT"
+      class="gd-list-table-column-filter-input"
+      [(ngModel)]="extendedColDef.columnDefinition.filter.value"
+      [name]="'filterBy' + extendedColDef.field"
+      placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+      neverFloatLabel="true"
+      [options]="extendedColDef.columnDefinition.filter.options"
+      (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-select-multiple-v2>
+
+    <!-- Date range -->
+    <app-form-date-range-v2
+      *ngSwitchCase="V2FilterType.DATE_RANGE"
+      class="gd-list-table-column-filter-input"
+      [(ngModel)]="extendedColDef.columnDefinition.filter.value"
+      [name]="'filterBy' + extendedColDef.field"
+      (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-date-range-v2>
+
+    <!-- Age range -->
+    <app-form-number-range-v2
+      *ngSwitchCase="V2FilterType.AGE_RANGE"
+      class="gd-list-table-column-filter-input"
+      [(ngModel)]="extendedColDef.columnDefinition.filter.value"
+      [name]="'filterBy' + extendedColDef.field"
+      [min]="extendedColDef.columnDefinition.filter.min"
+      [max]="extendedColDef.columnDefinition.filter.max"
+      (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-number-range-v2>
+
+    <!-- Address phone number -->
+    <app-form-input-v2
+      *ngSwitchCase="V2FilterType.ADDRESS_PHONE_NUMBER"
+      class="gd-list-table-column-filter-input"
+      [(ngModel)]="extendedColDef.columnDefinition.filter.address.phoneNumber"
+      [name]="'filterBy' + extendedColDef.field"
+      placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+      neverFloatLabel="true"
+      autocomplete="off"
+      (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-input-v2>
+
+    <!-- Address multiple location -->
+    <app-form-select-location-multiple-v2
+      *ngSwitchCase="V2FilterType.ADDRESS_MULTIPLE_LOCATION"
+      class="gd-list-table-column-filter-input"
+      [(ngModel)]="extendedColDef.columnDefinition.filter.address.filterLocationIds"
+      [name]="'filterBy' + extendedColDef.field"
+      placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+      neverFloatLabel="true"
+      useOutbreakLocations="true"
+      (ngModelChange)="component.columnFilterBy(extendedColDef)">
+    </app-form-select-location-multiple-v2>
+
+    <!-- Address field -->
+    <app-form-input-v2
+      *ngSwitchCase="V2FilterType.ADDRESS_FIELD"
+      class="gd-list-table-column-filter-input"
+      [(ngModel)]="extendedColDef.columnDefinition.filter.address[extendedColDef.columnDefinition.filter.addressField]"
+      [name]="'filterBy' + extendedColDef.field"
+      placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+      neverFloatLabel="true"
+      (ngModelChange)="component.columnFilterBy(extendedColDef)">
+    </app-form-input-v2>
+
+    <!-- Address accurate geo location -->
+    <app-form-select-single-v2
+      *ngSwitchCase="V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION"
+      class="gd-list-table-column-filter-input"
+      [(ngModel)]="extendedColDef.columnDefinition.filter.address.geoLocationAccurate"
+      [name]="'filterBy' + extendedColDef.field"
+      [options]="extendedColDef.columnDefinition.filter.options"
+      placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+      neverFloatLabel="true"
+      (ngModelChange)="component.columnFilterBy(extendedColDef)">
+    </app-form-select-single-v2>
+
+    <!-- Boolean -->
+    <app-form-select-single-v2
+      *ngSwitchCase="V2FilterType.BOOLEAN"
+      class="gd-list-table-column-filter-input"
+      [(ngModel)]="extendedColDef.columnDefinition.filter.value"
+      [name]="'filterBy' + extendedColDef.field"
+      [options]="yesNoAllOptions"
+      placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+      neverFloatLabel="true"
+      (ngModelChange)="component.columnFilterBy(extendedColDef)">
+    </app-form-select-single-v2>
+
+    <!-- Number range -->
+    <app-form-number-range-v2
+      *ngSwitchCase="V2FilterType.NUMBER_RANGE"
+      class="gd-list-table-column-filter-input"
+      [(ngModel)]="extendedColDef.columnDefinition.filter.value"
+      [name]="'filterBy' + extendedColDef.field"
+      [min]="extendedColDef.columnDefinition.filter.min"
+      [max]="extendedColDef.columnDefinition.filter.max"
+      (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-number-range-v2>
+
+    <!-- Deleted -->
+    <app-form-select-single-v2
+      *ngSwitchCase="V2FilterType.DELETED"
+      class="gd-list-table-column-filter-input"
+      [(ngModel)]="extendedColDef.columnDefinition.filter.value"
+      [name]="'filterBy' + extendedColDef.field"
+      [options]="yesNoAllOptions"
+      placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+      neverFloatLabel="true"
+      (ngModelChange)="component.columnFilterBy(extendedColDef)">
+    </app-form-select-single-v2>
+
   </div>
 
 </div>

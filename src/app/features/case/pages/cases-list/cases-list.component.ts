@@ -19,9 +19,8 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
-import { catchError, map, share, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { catchError, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
-import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
@@ -44,6 +43,8 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { LocationModel } from '../../../../core/models/location.model';
+import { V2FilterBoolean, V2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { IExtendedColDef } from '../../../../shared/components-v2/app-list-table-v2/models/extended-column.model';
 
 @Component({
   selector: 'app-cases-list',
@@ -127,24 +128,14 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
   ];
 
+  // used to filter cases
+  notACaseFilter: boolean | string = false;
 
 
 
 
 
 
-  // address model needed for filters
-  filterAddressModel: AddressModel = new AddressModel({
-    geoLocationAccurate: null
-  });
-  filterAddressParentLocationIds: string[] = [];
-
-  // user list
-  userList$: Observable<UserModel[]>;
-
-  caseClassificationsList$: Observable<any[]>;
-  genderList$: Observable<any[]>;
-  yesNoOptionsList$: Observable<any[]>;
   occupationsList$: Observable<any[]>;
   outcomeList$: Observable<any[]>;
   pregnancyStatsList$: Observable<any[]>;
@@ -165,8 +156,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   // provide constants to template
   Constants = Constants;
 
-  notACaseFilter: boolean | string = false;
-
   // subscribers
   outbreakSubscriber: Subscription;
 
@@ -186,7 +175,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     private i18nService: I18nService,
     private genericDataService: GenericDataService,
     private clusterDataService: ClusterDataService,
-    private userDataService: UserDataService,
     private entityHelperService: EntityHelperService,
     private redirectService: RedirectService
   ) {
@@ -197,12 +185,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    * Component initialized
    */
   ngOnInit() {
-    // retrieve users
-    this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
-
     // reference data
-    this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
-    this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
     this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
     this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
     this.pregnancyStatsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PREGNANCY_STATUS);
@@ -213,9 +196,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
     this.yesNoOptionsWithoutAllList$ = this.genericDataService.getFilterYesNoOptions(true);
     this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
-
-    // initialize table Columns
-    this.initializeTableColumns();
 
     // initialize quick actions
     this.initializeQuickActions();
@@ -268,33 +248,54 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   /**
    * Initialize Side Table Columns
    */
-  private initializeTableColumns(): void {
+  protected initializeTableColumns(): void {
+    // address model used to search by phone number, address line, postal code, city....
+    const filterAddressModel: AddressModel = new AddressModel({
+      geoLocationAccurate: null
+    });
+
     // default table columns
     this.tableColumns = [
       {
         field: 'lastName',
         label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
         pinned: IV2ColumnPinned.LEFT,
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
       },
       {
         field: 'firstName',
         label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
         pinned: IV2ColumnPinned.LEFT,
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
       },
       {
         field: 'middleName',
         label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
         notVisible: true,
         pinned: IV2ColumnPinned.LEFT,
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
       },
       {
         field: 'visualId',
         label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
         pinned: IV2ColumnPinned.LEFT,
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
       },
       {
         field: 'statuses',
@@ -368,12 +369,40 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       {
         field: 'classification',
         label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          search: (column: IExtendedColDef) => {
+            // create condition
+            const values: string[] = (column.columnDefinition.filter as V2FilterMultipleSelect).value;
+            const condition = {
+              classification: {
+                inq: values
+              }
+            };
+
+            // remove existing filter
+            this.queryBuilder.filter.removeExactCondition(condition);
+
+            // add new filter
+            this.filterBySelectField(
+              'classification',
+              values,
+              null,
+              false
+            );
+          }
+        }
       },
       {
         field: 'outcomeId',
         label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        }
       },
       {
         field: 'dateOfOutcome',
@@ -382,7 +411,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           type: V2ColumnFormat.DATE
         },
         notVisible: true,
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
       },
       {
         field: 'age',
@@ -390,12 +422,21 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: V2ColumnFormat.AGE
         },
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.AGE_RANGE,
+          min: 0,
+          max: Constants.DEFAULT_AGE_MAX_YEARS
+        }
       },
       {
         field: 'gender',
         label: 'LNG_CASE_FIELD_LABEL_GENDER',
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        }
       },
       {
         field: 'phoneNumber',
@@ -403,13 +444,25 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: 'mainAddress.phoneNumber'
         },
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.ADDRESS_PHONE_NUMBER,
+          address: filterAddressModel,
+          field: 'addresses',
+          fieldIsArray: true
+        }
       },
       {
         field: 'location',
         label: 'LNG_CASE_FIELD_LABEL_ADDRESS_LOCATION',
         format: {
           type: 'mainAddress.location.name'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_MULTIPLE_LOCATION,
+          address: filterAddressModel,
+          field: 'addresses',
+          fieldIsArray: true
         },
         link: (data) => {
           return data.mainAddress?.location?.name ?
@@ -424,6 +477,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: 'mainAddress.emailAddress'
         },
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          address: filterAddressModel,
+          addressField: 'emailAddress',
+          field: 'addresses',
+          fieldIsArray: true
+        },
         sortable: true
       },
       {
@@ -432,6 +492,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'mainAddress.addressLine1'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          address: filterAddressModel,
+          addressField: 'addressLine1',
+          field: 'addresses',
+          fieldIsArray: true
         },
         sortable: true
       },
@@ -442,6 +509,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: 'mainAddress.city'
         },
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          address: filterAddressModel,
+          addressField: 'city',
+          field: 'addresses',
+          fieldIsArray: true
+        },
         sortable: true
       },
       {
@@ -450,8 +524,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lat'
-        },
-        sortable: true
+        }
       },
       {
         field: 'addresses.geoLocation.lng',
@@ -459,8 +532,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lng'
-        },
-        sortable: true
+        }
       },
       {
         field: 'addresses.postalCode',
@@ -468,6 +540,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'mainAddress.postalCode'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          address: filterAddressModel,
+          addressField: 'postalCode',
+          field: 'addresses',
+          fieldIsArray: true
         },
         sortable: true
       },
@@ -479,6 +558,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           type: V2ColumnFormat.BOOLEAN,
           field: 'mainAddress.geoLocationAccurate'
         },
+        filter: {
+          type: V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION,
+          address: filterAddressModel,
+          field: 'addresses',
+          fieldIsArray: true,
+          options: this.activatedRoute.snapshot.data.yesNoAll
+        },
         sortable: true
       },
       {
@@ -486,6 +572,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
         format: {
           type: V2ColumnFormat.DATE
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
         },
         sortable: true
       },
@@ -495,6 +584,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATE
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
         },
         sortable: true
       },
@@ -508,6 +600,16 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             return data.classification === Constants.CASE_CLASSIFICATION.NOT_A_CASE;
           }
         },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          search: (column) => {
+            // update not a case
+            this.notACaseFilter = (column.columnDefinition.filter as V2FilterBoolean).value;
+
+            // refresh
+            this.needsRefreshList();
+          }
+        },
         sortable: true
       },
       {
@@ -517,6 +619,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: V2ColumnFormat.BOOLEAN
         },
+        filter: {
+          type: V2FilterType.BOOLEAN
+        },
         sortable: true
       },
       {
@@ -525,6 +630,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'responsibleUser.name'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
         },
         exclude: (): boolean => {
           return !UserModel.canList(this.authUser);
@@ -546,6 +655,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS',
           format: {
             type: V2ColumnFormat.BUTTON
+          },
+          filter: {
+            type: V2FilterType.NUMBER_RANGE,
+            min: 0
           },
           sortable: true,
           cssCellClass: 'gd-cell-button',
@@ -570,6 +683,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES',
           format: {
             type: V2ColumnFormat.BUTTON
+          },
+          filter: {
+            type: V2FilterType.NUMBER_RANGE,
+            min: 0
           },
           sortable: true,
           cssCellClass: 'gd-cell-button',
@@ -601,6 +718,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: V2ColumnFormat.BOOLEAN
         },
+        filter: {
+          type: V2FilterType.DELETED
+        },
         sortable: true
       },
       {
@@ -609,6 +729,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'createdByUser.name'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
         },
         exclude: (): boolean => {
           return !UserModel.canView(this.authUser);
@@ -626,6 +750,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: V2ColumnFormat.DATETIME
         },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
         sortable: true
       },
       {
@@ -634,6 +761,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'updatedByUser.name'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
         },
         exclude: (): boolean => {
           return !UserModel.canView(this.authUser);
@@ -650,6 +781,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
         },
         sortable: true
       },
@@ -1830,7 +1964,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         fieldName: 'gender',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_GENDER',
         type: FilterType.MULTISELECT,
-        options$: this.genderList$,
+        // options$: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         sortable: true
       }),
       new FilterModel({
@@ -1886,7 +2020,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         fieldName: 'classification',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
         type: FilterType.MULTISELECT,
-        options$: this.caseClassificationsList$
+        // options$: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
       }),
       new FilterModel({
         fieldName: 'dateOfInfection',
@@ -2005,7 +2139,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           fieldName: 'responsibleUserId',
           fieldLabel: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
           type: FilterType.MULTISELECT,
-          options$: this.userList$,
+          // options$: this.userList$,
           optionsLabelKey: 'name',
           optionsValueKey: 'id'
         })
@@ -2014,8 +2148,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   }
 
   /**
-     * Classification conditions
-     */
+   * Classification conditions
+   */
   private addClassificationConditions() {
     // create classification condition
     const trueCondition = {classification: {eq: Constants.CASE_CLASSIFICATION.NOT_A_CASE}};
@@ -2275,21 +2409,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       .subscribe((response) => {
         this.pageCount = response;
       });
-  }
-
-  /**
-     * Filter by Classification field
-     * @param values
-     */
-  filterByClassificationField(values) {
-    // create condition
-    const condition = {classification: {inq: values}};
-
-    // remove existing filter
-    this.queryBuilder.filter.removeExactCondition(condition);
-
-    // add new filter
-    this.filterBySelectField('classification', values, 'value', false);
   }
 
   /**

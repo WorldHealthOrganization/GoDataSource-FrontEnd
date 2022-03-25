@@ -139,6 +139,11 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
   }
 
   /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {}
+
+  /**
    * Initialize breadcrumbs
    */
   initializeBreadcrumbs(): void {

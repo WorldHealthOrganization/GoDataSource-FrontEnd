@@ -157,6 +157,11 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
   }
 
   /**
+   * Initialize side table columns
+   */
+  protected initializeTableColumns(): void {}
+
+  /**
      * Initialize breadcrumbs
      */
   // private initializeBreadcrumbs() {

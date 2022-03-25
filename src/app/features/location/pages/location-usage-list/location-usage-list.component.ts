@@ -148,6 +148,11 @@ export class LocationUsageListComponent extends ListComponent implements OnInit,
   }
 
   /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {}
+
+  /**
      * Initialize breadcrumbs
      */
   // initializeBreadcrumbs() {

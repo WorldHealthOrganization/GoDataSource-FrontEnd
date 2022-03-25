@@ -167,62 +167,62 @@
                         </button>
 
                         <mat-menu #actionsMenuMultipleRecords="matMenu">
-                            <button
-                                *ngIf="!checkedAllRecords"
-                                mat-menu-item
-                                (click)="checkAllRecords()">
-                                {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL' | translate }}
-                            </button>
+<!--                            <button-->
+<!--                                *ngIf="!checkedAllRecords"-->
+<!--                                mat-menu-item-->
+<!--                                (click)="checkAllRecords()">-->
+<!--                                {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL' | translate }}-->
+<!--                            </button>-->
 
-                            <ng-container
-                                *ngIf="checkedRecords.length > 0">
-                                <button
-                                    mat-menu-item
-                                    (click)="uncheckAllRecords()">
-                                    {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}
-                                </button>
+<!--                            <ng-container-->
+<!--                                *ngIf="checkedRecords.length > 0">-->
+<!--                                <button-->
+<!--                                    mat-menu-item-->
+<!--                                    (click)="uncheckAllRecords()">-->
+<!--                                    {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}-->
+<!--                                </button>-->
 
-                                <mat-divider></mat-divider>
+<!--                                <mat-divider></mat-divider>-->
 
-                                <button
-                                    *ngIf="isContact &&
-                                        FollowUpModel.canBulkModify(authUser)"
-                                    mat-menu-item
-                                    (click)="modifySelectedFollowUps()">
-                                    {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_MODIFY_SELECTED_FOLLOW_UPS' | translate }}
-                                </button>
+<!--                                <button-->
+<!--                                    *ngIf="isContact &&-->
+<!--                                        FollowUpModel.canBulkModify(authUser)"-->
+<!--                                    mat-menu-item-->
+<!--                                    (click)="modifySelectedFollowUps()">-->
+<!--                                    {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_MODIFY_SELECTED_FOLLOW_UPS' | translate }}-->
+<!--                                </button>-->
 
-                                <button
-                                    *ngIf="exportFollowUpsUrl && FollowUpModel.canExport(authUser)"
-                                    mat-menu-item
-                                    (click)="exportSelectedFollowUps()">
-                                    {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_EXPORT_SELECTED_FOLLOW_UPS' | translate }}
-                                </button>
+<!--                                <button-->
+<!--                                    *ngIf="exportFollowUpsUrl && FollowUpModel.canExport(authUser)"-->
+<!--                                    mat-menu-item-->
+<!--                                    (click)="exportSelectedFollowUps()">-->
+<!--                                    {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_EXPORT_SELECTED_FOLLOW_UPS' | translate }}-->
+<!--                                </button>-->
 
-                                <button
-                                    *ngIf="isContact &&
-                                        FollowUpModel.canBulkDelete(authUser)"
-                                    [disabled]="!checkedOnlyNotDeletedRecords"
-                                    mat-menu-item
-                                    (click)="deleteSelectedFollowUps()">
-                                    <div
-                                        [matTooltip]="'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_DELETE_SELECTED_FOLLOW_UPS_DESCRIPTION' | translate">
-                                        {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_DELETE_SELECTED_FOLLOW_UPS' | translate }}
-                                    </div>
-                                </button>
+<!--                                <button-->
+<!--                                    *ngIf="isContact &&-->
+<!--                                        FollowUpModel.canBulkDelete(authUser)"-->
+<!--                                    [disabled]="!checkedOnlyNotDeletedRecords"-->
+<!--                                    mat-menu-item-->
+<!--                                    (click)="deleteSelectedFollowUps()">-->
+<!--                                    <div-->
+<!--                                        [matTooltip]="'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_DELETE_SELECTED_FOLLOW_UPS_DESCRIPTION' | translate">-->
+<!--                                        {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_DELETE_SELECTED_FOLLOW_UPS' | translate }}-->
+<!--                                    </div>-->
+<!--                                </button>-->
 
-                                <button
-                                    *ngIf="isContact &&
-                                        FollowUpModel.canBulkRestore(authUser)"
-                                    [disabled]="!checkedOnlyDeletedRecords"
-                                    mat-menu-item
-                                    (click)="restoreSelectedFollowUps()">
-                                    <div
-                                        [matTooltip]="'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_RESTORE_SELECTED_FOLLOW_UPS_DESCRIPTION' | translate">
-                                        {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_RESTORE_SELECTED_FOLLOW_UPS' | translate}}
-                                    </div>
-                                </button>
-                            </ng-container>
+<!--                                <button-->
+<!--                                    *ngIf="isContact &&-->
+<!--                                        FollowUpModel.canBulkRestore(authUser)"-->
+<!--                                    [disabled]="!checkedOnlyDeletedRecords"-->
+<!--                                    mat-menu-item-->
+<!--                                    (click)="restoreSelectedFollowUps()">-->
+<!--                                    <div-->
+<!--                                        [matTooltip]="'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_RESTORE_SELECTED_FOLLOW_UPS_DESCRIPTION' | translate">-->
+<!--                                        {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_RESTORE_SELECTED_FOLLOW_UPS' | translate}}-->
+<!--                                    </div>-->
+<!--                                </button>-->
+<!--                            </ng-container>-->
                         </mat-menu>
                     </div>
                     <div class="column-filter">
@@ -231,13 +231,13 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item;" fxFlex="60px">
-                <app-form-checkbox
-                    #listCheckedIndividual
-                    [name]="'listCheckedIndividual[' + item.id + ']'"
-                    class="table-checkbox"
-                    ngModel
-                    (optionChanged)="checkedRecord(item, $event)">
-                </app-form-checkbox>
+<!--                <app-form-checkbox-->
+<!--                    #listCheckedIndividual-->
+<!--                    [name]="'listCheckedIndividual[' + item.id + ']'"-->
+<!--                    class="table-checkbox"-->
+<!--                    ngModel-->
+<!--                    (optionChanged)="checkedRecord(item, $event)">-->
+<!--                </app-form-checkbox>-->
             </mat-cell>
         </ng-container>
 

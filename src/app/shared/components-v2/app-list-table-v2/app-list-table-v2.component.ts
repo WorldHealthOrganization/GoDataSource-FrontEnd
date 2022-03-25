@@ -49,14 +49,13 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   private static readonly STANDARD_SHAPE_SIZE: number = 12;
   private static readonly STANDARD_SHAPE_GAP: number = 6;
   private static readonly STANDARD_SHAPE_PADDING: number = 12;
+  private static readonly STANDARD_HEADER_HEIGHT: number = 40;
+  private static readonly STANDARD_HEADER_WITH_FILTER_HEIGHT: number = 88;
 
   // records
   recordsSubscription: Subscription;
   private _records$: Observable<BaseModel[]>;
   @Input() set records$(records$: Observable<BaseModel[]>) {
-    // cancel previous one
-    this.stopGetRecords();
-
     // set the new observable
     this._records$ = records$;
 
@@ -77,9 +76,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   /**
    * Ag table api handlers
    */
-  // #TODO
-  // private _agTable: {
-  _agTable: {
+  private _agTable: {
     api: GridApi,
     columnApi: ColumnApi
   } = null;
@@ -114,16 +111,20 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   @Input() addAction: IV2ActionIconLabel;
 
   // show header filters ?
-  private _showHeaderFilters: boolean = false;
+  savingHeaderFilterVisibility: boolean = false;
+  private _showHeaderFilters: boolean = true;
   set showHeaderFilters(showHeaderFilters: boolean) {
     // set data
     this._showHeaderFilters = showHeaderFilters;
 
-    // update header height
-    this._agTable?.api.setHeaderHeight(showHeaderFilters ? 88 : 40);
+    // set header height
+    this.updateHeaderHeight();
 
     // re-render header columns
     this.updateColumnDefinitions();
+
+    // save header filter visibility
+    this.saveHeaderFilterVisibility();
   }
   get showHeaderFilters(): boolean {
     return this._showHeaderFilters;
@@ -168,6 +169,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     direction: RequestSortDirection
   }>();
 
+  // filter by
+  @Output() filterBy = new EventEmitter<IExtendedColDef>();
+
   // saving columns
   savingColumns: boolean = false;
 
@@ -175,11 +179,13 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   private _pageSettingsKey: UserSettings;
   private _pageSettingsKeyLPinned: string;
   private _pageSettingsKeyRPinned: string;
+  private _pageSettingsKeyHeaderFilter: string;
   @Input() set pageSettingsKey(pageSettingsKey: UserSettings) {
     // set data
     this._pageSettingsKey = pageSettingsKey;
     this._pageSettingsKeyLPinned = this._pageSettingsKey ? `${this._pageSettingsKey}LPinned` : this._pageSettingsKey;
     this._pageSettingsKeyRPinned = this._pageSettingsKey ? `${this._pageSettingsKey}RPinned` : this._pageSettingsKey;
+    this._pageSettingsKeyHeaderFilter = this._pageSettingsKey ? `${this._pageSettingsKey}HeaderFilter` : this._pageSettingsKey;
 
     // update columns definitions
     this.updateColumnDefinitions();
@@ -260,6 +266,11 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // update table size
     this.resizeTable();
+
+    // update filter visibility
+    const authUser: UserModel = this.authDataService.getAuthenticatedUser();
+    const filterVisibility: boolean | undefined = authUser.getSettings(this._pageSettingsKeyHeaderFilter);
+    this.showHeaderFilters = filterVisibility === undefined || filterVisibility;
   }
 
   /**
@@ -315,6 +326,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       // finished
       return;
     }
+
+    // cancel previous one
+    this.stopGetRecords();
 
     // retrieve data
     this._agTable.api.showLoadingOverlay();
@@ -811,6 +825,14 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // some type of columns should have a fixed width
     this.adjustFixedSizeColumns();
+
+    // set min width to column depending on the current content
+    // - it would've been better if we could've set it to header width, and not cel content too
+    this._agTable.columnApi.getAllColumns().forEach((column) => {
+      const colDef = column.getColDef();
+      colDef.minWidth = column.getActualWidth();
+      column.setColDef(colDef, colDef);
+    });
   }
 
   /**
@@ -1206,7 +1228,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   }
 
   /**
-   * Sort by - used in AppListTableV2ColumnHeaderComponent
+   * Sort by - used in AppListTableV2ColumnHeaderComponent even if it is marked as not used...
    */
   columnSortBy(
     component: AppListTableV2ColumnHeaderComponent,
@@ -1227,7 +1249,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       oldColumn &&
       oldColumn !== column
     ) {
-      oldComponent.changeDetectorRef.detectChanges();
+      oldComponent.detectChanges();
     }
 
     // sort
@@ -1260,7 +1282,54 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     }
 
     // set header height
-    // @TODO
-    this._agTable?.api.setHeaderHeight(this.showHeaderFilters ? 88 : 40);
+    this.updateHeaderHeight();
+  }
+
+  /**
+   * Update header height
+   */
+  private updateHeaderHeight(): void {
+    this._agTable?.api.setHeaderHeight(this.showHeaderFilters ? AppListTableV2Component.STANDARD_HEADER_WITH_FILTER_HEIGHT : AppListTableV2Component.STANDARD_HEADER_HEIGHT);
+  }
+
+  /**
+   * Save header filter visibility
+   */
+  private saveHeaderFilterVisibility(): void {
+    // display loading spinner while saving
+    this.savingHeaderFilterVisibility = true;
+
+    // update layout
+    this.detectChanges();
+
+    // update settings
+    this.authDataService
+      .updateSettingsForCurrentUser({
+        [this._pageSettingsKeyHeaderFilter]: this.showHeaderFilters
+      })
+      .pipe(
+        catchError((err) => {
+          // error
+          this.toastV2Service.error(err);
+
+          // send error down the road
+          return throwError(err);
+        })
+      )
+      .subscribe(() => {
+        // finished saving
+        this.savingHeaderFilterVisibility = false;
+
+        // update layout
+        this.detectChanges();
+      });
+  }
+
+  /**
+   * Filter by
+   */
+  columnFilterBy(column: IExtendedColDef): void {
+    // filter
+    this.filterBy.emit(column);
   }
 }

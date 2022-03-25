@@ -2,7 +2,7 @@ import {
   ChangeDetectionStrategy, ChangeDetectorRef,
   Component,
   forwardRef,
-  Host,
+  Host, Input,
   OnDestroy,
   Optional,
   SkipSelf, ViewEncapsulation
@@ -25,6 +25,17 @@ import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 })
 export class AppFormNumberV2Component
   extends AppFormBaseV2<number> implements OnDestroy {
+
+  // float label
+  @Input() neverFloatLabel: boolean = false;
+
+  // autocomplete
+  @Input() autocomplete: string;
+
+  // min / max
+  @Input() min: number;
+  @Input() max: number;
+
   /**
    * Constructor
    */

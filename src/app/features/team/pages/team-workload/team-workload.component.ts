@@ -155,6 +155,11 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
   }
 
   /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {}
+
+  /**
    * Initialize breadcrumbs
    */
   initializeBreadcrumbs(): void {

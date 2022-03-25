@@ -16,13 +16,17 @@
         }
 
         .gd-list-table-column-header-sort {
-          color: var(--gd-primary);
-          @include flex(flex);
-          @include flex_align_items(center);
-          @include flex_justify(center);
+          width: 2.4rem;
 
-          &.gd-list-table-column-header-sort-desc {
-            @include rotate(180deg);
+          .mat-icon {
+            color: var(--gd-primary);
+            @include flex(flex);
+            @include flex_align_items(center);
+            @include flex_justify(center);
+
+            &.gd-list-table-column-header-sort-desc {
+              @include rotate(180deg);
+            }
           }
         }
 

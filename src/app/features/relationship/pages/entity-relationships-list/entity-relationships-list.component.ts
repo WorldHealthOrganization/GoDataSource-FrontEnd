@@ -20,10 +20,8 @@ import { RelationshipsListComponent } from '../../helper-classes/relationships-l
 import { throwError } from 'rxjs';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ClusterModel } from '../../../../core/models/cluster.model';
@@ -142,7 +140,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
       outbreakDataService, entityDataService
     );
     // set checkbox key ( id ) path for current list component
-    this.checkedKeyPath = 'relationship.id';
+    // this.checkedKeyPath = 'relationship.id';
   }
 
   ngOnInit() {
@@ -498,90 +496,90 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
      * Bulk delete selected relationships
      */
   deleteSelectedRelationships() {
-    // get list of selected relationships
-    const selectedRelationships: boolean | string[] = this.validateCheckedRecords();
-    if (!selectedRelationships) {
-      return;
-    }
-    const qb = new RequestQueryBuilder();
-
-    qb.filter.where({
-      'id': {
-        'inq': selectedRelationships
-      }
-    });
-
-    this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIPS')
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          this.relationshipDataService
-            .deleteBulkRelationships(this.selectedOutbreak.id, qb)
-            .pipe(
-              catchError((err) => {
-                this.toastV2Service.error(err);
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              this.toastV2Service.success('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS_SUCCESS_MESSAGE');
-
-              this.needsRefreshList(true);
-            });
-        }
-      });
+    // // get list of selected relationships
+    // const selectedRelationships: boolean | string[] = this.validateCheckedRecords();
+    // if (!selectedRelationships) {
+    //   return;
+    // }
+    // const qb = new RequestQueryBuilder();
+    //
+    // qb.filter.where({
+    //   'id': {
+    //     'inq': selectedRelationships
+    //   }
+    // });
+    //
+    // this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIPS')
+    //   .subscribe((answer: DialogAnswer) => {
+    //     if (answer.button === DialogAnswerButton.Yes) {
+    //       this.relationshipDataService
+    //         .deleteBulkRelationships(this.selectedOutbreak.id, qb)
+    //         .pipe(
+    //           catchError((err) => {
+    //             this.toastV2Service.error(err);
+    //             return throwError(err);
+    //           })
+    //         )
+    //         .subscribe(() => {
+    //           this.toastV2Service.success('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS_SUCCESS_MESSAGE');
+    //
+    //           this.needsRefreshList(true);
+    //         });
+    //     }
+    //   });
   }
 
   /**
      * Share selected relationships with other people
      */
   shareSelectedRelationships() {
-    // get list of selected relationship ids
-    const selectedRelationshipRecords: false | string[] = this.validateCheckedRecords();
-    if (!selectedRelationshipRecords) {
-      return;
-    }
-
-    // determine list of model ids
-    const selectedRecords: string[] = _.map(selectedRelationshipRecords, (idRelationship: string) => this.relationshipsListRecordsMap[idRelationship].model.id)
-      .filter((record, index, self) => {
-        // keep only unique dates
-        return self.indexOf(record) === index;
-      });
-
-    // redirect to next step
-    this.router.navigate(
-      [`/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/share`],
-      {
-        queryParams: {
-          selectedTargetIds: JSON.stringify(selectedRecords)
-        }
-      }
-    );
+    // // get list of selected relationship ids
+    // const selectedRelationshipRecords: false | string[] = this.validateCheckedRecords();
+    // if (!selectedRelationshipRecords) {
+    //   return;
+    // }
+    //
+    // // determine list of model ids
+    // const selectedRecords: string[] = _.map(selectedRelationshipRecords, (idRelationship: string) => this.relationshipsListRecordsMap[idRelationship].model.id)
+    //   .filter((record, index, self) => {
+    //     // keep only unique dates
+    //     return self.indexOf(record) === index;
+    //   });
+    //
+    // // redirect to next step
+    // this.router.navigate(
+    //   [`/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/share`],
+    //   {
+    //     queryParams: {
+    //       selectedTargetIds: JSON.stringify(selectedRecords)
+    //     }
+    //   }
+    // );
   }
 
   changeSourceForSelectedRelationships() {
-    const selectedRecords: false | string [] = this.validateCheckedRecords();
-
-    if (!selectedRecords) {
-      return;
-    }
-
-    const selectedTargetPersons = {};
-    // pass the selected target persons for not including them in available peoples
-    _.forEach(this.relationshipsListRecordsMap, (model) => {
-      const targetPerson: RelationshipPersonModel = _.find(model.relationship.persons, 'target');
-      selectedTargetPersons[targetPerson.id] = true;
-    });
-
-    this.router.navigate(
-      [`/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/switch`],
-      {
-        queryParams: {
-          selectedTargetIds: JSON.stringify(selectedRecords),
-          selectedPersonsIds: JSON.stringify(Object.keys(selectedTargetPersons)),
-          entityType: JSON.stringify(this.entityType)
-        }
-      }
-    );
+    // const selectedRecords: false | string [] = this.validateCheckedRecords();
+    //
+    // if (!selectedRecords) {
+    //   return;
+    // }
+    //
+    // const selectedTargetPersons = {};
+    // // pass the selected target persons for not including them in available peoples
+    // _.forEach(this.relationshipsListRecordsMap, (model) => {
+    //   const targetPerson: RelationshipPersonModel = _.find(model.relationship.persons, 'target');
+    //   selectedTargetPersons[targetPerson.id] = true;
+    // });
+    //
+    // this.router.navigate(
+    //   [`/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/switch`],
+    //   {
+    //     queryParams: {
+    //       selectedTargetIds: JSON.stringify(selectedRecords),
+    //       selectedPersonsIds: JSON.stringify(Object.keys(selectedTargetPersons)),
+    //       entityType: JSON.stringify(this.entityType)
+    //     }
+    //   }
+    // );
   }
 }
