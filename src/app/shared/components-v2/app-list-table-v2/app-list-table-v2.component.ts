@@ -230,8 +230,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     return this._sortBy?.direction;
   }
   @Input() set sortColumn(info: {
-    field: string,
-    direction: RequestSortDirection
+    field?: string,
+    direction?: RequestSortDirection
   }) {
     // nothing to do ?
     if (
