@@ -13,6 +13,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { Constants } from '../../../../core/models/constants';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import {
   ExportFieldsGroupModelNameEnum,
@@ -34,9 +35,9 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
+import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import {
@@ -47,6 +48,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { CountedItemsListItem, DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import {
@@ -86,9 +88,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
   showCountPills: boolean = false;
 
   outbreakSubscriber: Subscription;
-
-  // user list
-  userList$: Observable<UserModel[]>;
 
   // list of export fields groups
   fieldsGroupList: LabelValuePair[];
@@ -387,10 +386,10 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     private referenceDataDataService: ReferenceDataDataService,
     private dialogService: DialogService,
     private i18nService: I18nService,
-    private userDataService: UserDataService,
     private locationDataService: LocationDataService,
     private dialogV2Service: DialogV2Service,
     private activatedRoute: ActivatedRoute,
+    private entityHelperService: EntityHelperService,
   ) {
     super(listHelperService);
   }
@@ -403,9 +402,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     this.contactsOfContactsDataExportFileName = this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE') +
             ' - ' +
             this.contactsOfContactsDataExportFileName;
-
-    // retrieve users
-    this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
     this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
     this.riskLevelRefData$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL).pipe(share());
@@ -469,8 +465,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         this.fieldsGroupListRelationshipsRequired = fieldsGroupList.toRequiredList();
       });
 
-    this.initTableColumms();
-
     this.initializeQuickActions();
 
     this.initializeGroupActions();
@@ -492,7 +486,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     }
   }
 
-  private initTableColumms() {
+  protected initializeTableColumms() {
     // address model used to search by phone number, address line, postal code, city....
     const filterAddressModel: AddressModel = new AddressModel({
       geoLocationAccurate: null,
@@ -511,6 +505,8 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
       {
         field: 'middleName',
         label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
+        notVisible: true,
+        pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
           type: V2FilterType.TEXT,
@@ -529,6 +525,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
       {
         field: 'visualId',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID',
+        pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
           type: V2FilterType.TEXT,
@@ -562,51 +559,118 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         field: 'addresses.city',
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
         notVisible: true,
+        format: {
+          type: 'mainAddress.city'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          address: filterAddressModel,
+          addressField: 'city',
+          field: 'addresses',
+          fieldIsArray: true
+        },
         sortable: true,
       },
       {
         field: 'addresses.emailAddress',
         label: 'LNG_CONTACT_FIELD_LABEL_EMAIL',
         notVisible: true,
+        format: {
+          type: 'mainAddress.emailAddress'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          address: filterAddressModel,
+          addressField: 'emailAddress',
+          field: 'addresses',
+          fieldIsArray: true
+        },
         sortable: true,
       },
       {
         field: 'addresses.geoLocation.lat',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
         notVisible: true,
-        sortable: true,
+        format: {
+          type: 'mainAddress.geoLocation.lat'
+        }
       },
       {
         field: 'addresses.geoLocation.lng',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
         notVisible: true,
-        sortable: true,
+        format: {
+          type: 'mainAddress.geoLocation.lng'
+        }
       },
       {
         field: 'addresses.postalCode',
         label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
         notVisible: true,
+        format: {
+          type: 'mainAddress.postalCode'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          address: filterAddressModel,
+          addressField: 'postalCode',
+          field: 'addresses',
+          fieldIsArray: true
+        },
         sortable: true,
       },
       {
         field: 'addresses.geoLocationAccurate',
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
         notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN,
+          field: 'mainAddress.geoLocationAccurate'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION,
+          address: filterAddressModel,
+          field: 'addresses',
+          fieldIsArray: true,
+          options: this.activatedRoute.snapshot.data.yesNoAll
+        },
+        sortable: true
       },
       {
         field: 'age',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE',
+        format: {
+          type: V2ColumnFormat.AGE
+        },
         sortable: true,
+        filter: {
+          type: V2FilterType.AGE_RANGE,
+          min: 0,
+          max: Constants.DEFAULT_AGE_MAX_YEARS
+        }
       },
       {
         field: 'gender',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER',
         sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        }
       },
       {
         field: 'phoneNumber',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PHONE_NUMBER',
+        format: {
+          type: 'mainAddress.phoneNumber'
+        },
         sortable: true,
+        filter: {
+          type: V2FilterType.ADDRESS_PHONE_NUMBER,
+          address: filterAddressModel,
+          field: 'addresses',
+          fieldIsArray: true
+        }
       },
       {
         field: 'riskLevel',
@@ -622,43 +686,124 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         field: 'responsibleUserId',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
         notVisible: true,
+        format: {
+          type: 'responsibleUser.name'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+        },
         exclude: (): boolean => {
           return !UserModel.canList(this.authUser);
         },
+        link: (data) => {
+          return data.responsibleUserId ?
+            `/users/${data.responsibleUserId}/view` :
+            undefined;
+        }
       },
       {
         field: 'numberOfExposures',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
-        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BUTTON
+        },
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
         sortable: true,
+        cssCellClass: 'gd-cell-button',
+        buttonLabel: (item) => (item.numberOfExposures || '').toLocaleString('en'),
+        color: 'text',
+        click: (item) => {
+          // if we do not have exposures return
+          if (item.numberOfExposures < 1) {
+            return;
+          }
+
+          // display dialog
+          this.entityHelperService.exposures(
+            this.selectedOutbreak,
+            item
+          );
+        },
+        disabled: (data) => !RelationshipModel.canList(this.authUser) || !data.canListRelationshipExposures(this.authUser)
       },
       {
         field: 'deleted',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DELETED',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.DELETED
+        },
         sortable: true,
       },
       {
         field: 'createdBy',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_CREATED_BY',
         notVisible: true,
-        sortable: true,
+        format: {
+          type: 'createdByUser.name'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+        },
+        exclude: (): boolean => {
+          return !UserModel.canView(this.authUser);
+        },
+        link: (data) => {
+          return data.createdBy ?
+            `/users/${data.createdBy}/view` :
+            undefined;
+        }
       },
       {
         field: 'createdAt',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_CREATED_AT',
         notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
         sortable: true,
       },
       {
         field: 'updatedBy',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_UPDATED_BY',
         notVisible: true,
-        sortable: true,
+        format: {
+          type: 'updatedByUser.name'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+        },
+        exclude: (): boolean => {
+          return !UserModel.canView(this.authUser);
+        },
+        link: (data) => {
+          return data.updatedBy ?
+            `/users/${data.updatedBy}/view` :
+            undefined;
+        }
       },
       {
         field: 'updatedAt',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_UPDATED_AT',
         notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
         sortable: true,
       },
     ];
@@ -1175,7 +1320,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
           fieldName: 'responsibleUserId',
           fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
           type: FilterType.MULTISELECT,
-          options$: this.userList$,
+          // options$: this.userList$,
           optionsLabelKey: 'name',
           optionsValueKey: 'id'
         })

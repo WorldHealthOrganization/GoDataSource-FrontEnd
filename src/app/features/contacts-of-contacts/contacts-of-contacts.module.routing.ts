@@ -6,6 +6,8 @@ import { PERMISSION } from '../../core/models/permission.model';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 import { RiskDataResolver } from '../../core/services/resolvers/data/risk.resolver';
+import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
+import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 import * as fromPages from './pages';
 
 const routes: Routes = [
@@ -14,7 +16,9 @@ const routes: Routes = [
     path: '',
     component: fromPages.ContactsOfContactsListComponent,
     resolve: {
-      risk: RiskDataResolver
+      risk: RiskDataResolver,
+      user: UserDataResolver,
+      yesNoAll: YesNoAllDataResolver
     }
   },
   // Create contact of contact
