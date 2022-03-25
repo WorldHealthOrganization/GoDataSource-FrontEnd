@@ -1,3 +1,24 @@
+<app-list-table-v2
+  [pageTitle]="'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE'"
+  [records$]="contactsOfContactsList$"
+  (refreshData)="needsRefreshList(true, false)"
+  (refreshDataCount)="refreshListCount(false)"
+  [columns]="tableColumns"
+  [breadcrumbs]="breadcrumbs"
+  [quickActions]="quickActions"
+  [groupActions]="groupActions"
+  [addAction]="addAction"
+  [groupedData]="groupedData"
+  [pageCount]="pageCount"
+  [pageSize]="pageSize"
+  [pageIndex]="pageIndex"
+  [pageSettingsKey]="UserSettings.CONTACT_OF_CONTACT_FIELDS"
+  (pageChange)="changePage($event)"
+  (sortBy)="sortBy($event, { age: [ 'years', 'months' ] })"
+  (filterBy)="filterBy($event)"></app-list-table-v2>
+
+
+
 <!--
 <app-topnav>
     <ng-container dynamic-section>
@@ -77,7 +98,7 @@
 <!--    (visibleColumnsChanged)="applySideColumnsChanged($event)">-->
 <!--</app-side-columns>-->
 
-<div fxLayout fxLayoutAlign="space-between end">
+<!-- <div fxLayout fxLayoutAlign="space-between end"> -->
     <!--Total number of records from the list-->
 <!--    <app-total-number-of-records-->
 <!--        [value]="contactsOfContactsListCount$ | async"-->
@@ -85,7 +106,7 @@
 <!--    </app-total-number-of-records>-->
 
     <!--Contacts of Contacts grouped by risk level-->
-    <a
+    <!-- <a
         *ngIf="!appliedListFilter && !showCountPills; else countPills"
         class="xlink-button margin-right-x"
         (click)="showCountPills = true">
@@ -99,28 +120,28 @@
             [items]="countedContactsOfContactsByRiskLevel$ | async"
             (optionChanged)="$event.label === 'LNG_REFERENCE_DATA_CATEGORY_RISK_LEVEL_UNCLASSIFIED' ? filterByNotHavingValue('riskLevel') : filterByEquality('riskLevel',  $event.label)">
         </app-counted-items-list>
-    </ng-template>
-</div>
+    </ng-template> -->
+<!-- </div> -->
 
-<app-side-filters
+<!-- <app-side-filters
     [filterOptions]="availableSideFilters"
     (filtersApplied)="applySideFilters($event)"
     [savedFiltersType]="savedFiltersType">
-</app-side-filters>
+</app-side-filters> -->
 
-<mat-card class="page-section page-content">
+<!-- <mat-card class="page-section page-content"> -->
     <!-- Table top info -->
-    <div
-        fxLayout="row">
+    <!-- <div
+        fxLayout="row"> -->
         <!-- Filters message -->
-        <div
+        <!-- <div
             fxFlex fxGrow="0" fxLayoutAlign="start center"
             class="filters-applied">
             {{ queryBuilder.isEmptyOnlyFilters() ? '' : ('LNG_COMMON_LABEL_FILTERS_USED' | translate) }}
-        </div>
+        </div> -->
 
         <!-- Filter buttons -->
-        <div
+        <!-- <div
             fxFlex
             class="reset-filters">
             <button
@@ -137,23 +158,23 @@
                 (click)="needsRefreshList(true)">
                 {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
             </button>
-        </div>
-    </div>
+        </div> -->
+    <!-- </div> -->
 
     <!-- Hover question effects / actions -->
-    <app-hover-row-actions
+    <!-- <app-hover-row-actions
         #hoverRow
         [active]="!refreshingList"
         leftSideClass="hover-row-actions-mat-table-left"
-    ></app-hover-row-actions>
+    ></app-hover-row-actions> -->
 
-    <mat-table #table [dataSource]="contactsOfContactsList$ | async" matSort
-               (matSortChange)="sortBy($event, { age: [ 'years', 'months' ] })">
+    <!-- <mat-table #table [dataSource]="contactsOfContactsList$ | async" matSort
+               (matSortChange)="sortBy($event, { age: [ 'years', 'months' ] })"> -->
         <!-- Checkbox -->
-        <ng-container matColumnDef="checkbox">
-            <mat-header-cell *matHeaderCellDef fxFlex="60px">
-                <div class="table-header-cell">
-                    <div>
+        <!-- <ng-container matColumnDef="checkbox"> -->
+            <!-- <mat-header-cell *matHeaderCellDef fxFlex="60px"> -->
+                <!-- <div class="table-header-cell"> -->
+                    <!-- <div>
                         <button
                             type="button"
                             class="bulk-actions-button"
@@ -215,13 +236,13 @@
                                 </ng-container>
                             </ng-container>
                         </mat-menu>
-                    </div>
-                    <div class="column-filter">
+                    </div> -->
+                    <!-- <div class="column-filter"> -->
                         <!-- placeholder -->
-                    </div>
-                </div>
-            </mat-header-cell>
-            <mat-cell *matCellDef="let item;" fxFlex="60px">
+                    <!-- </div> -->
+                <!-- </div> -->
+            <!-- </mat-header-cell> -->
+            <!-- <mat-cell *matCellDef="let item;" fxFlex="60px">
                 <app-form-checkbox
                     #listCheckedIndividual
                     [name]="'listCheckedIndividual[' + item.id + ']'"
@@ -229,11 +250,11 @@
                     ngModel
                     (optionChanged)="checkedRecord(item, $event)">
                 </app-form-checkbox>
-            </mat-cell>
-        </ng-container>
+            </mat-cell> -->
+        <!-- </ng-container> -->
 
         <!-- Last Name -->
-        <ng-container matColumnDef="lastName">
+        <!-- <ng-container matColumnDef="lastName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column">
                     <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME' | translate}}</div>
@@ -248,17 +269,17 @@
                         </app-form-input>
                     </div>
                 </div>
-            </mat-header-cell>
+            </mat-header-cell> -->
 
-            <mat-cell
+            <!-- <mat-cell
                 *matCellDef="let item"
                 [style.color]="getRiskColor(item)">
                 {{ item.lastName }}
-            </mat-cell>
-        </ng-container>
+            </mat-cell> -->
+        <!-- </ng-container> -->
 
         <!-- First Name -->
-        <ng-container matColumnDef="firstName">
+        <!-- <ng-container matColumnDef="firstName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{ "LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME" | translate}}
@@ -280,10 +301,10 @@
                 [style.color]="getRiskColor(item)">
                 {{ item.firstName }}
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Visual ID -->
-        <ng-container matColumnDef="visualId">
+        <!-- <ng-container matColumnDef="visualId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column">
                     <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID' | translate }}</div>
@@ -305,10 +326,10 @@
                 [style.color]="getRiskColor(item)">
                 {{ item.visualId }}
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Location  -->
-        <ng-container matColumnDef="location">
+        <!-- <ng-container matColumnDef="location">
             <mat-header-cell *matHeaderCellDef
                              class="location-drop-down-column-header">
                 <div class="table-header-cell" fxLayout="column">
@@ -333,10 +354,10 @@
                 [style.color]="getRiskColor(item)">
                 {{ item.mainAddress?.location?.name }}
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Address -->
-        <ng-container matColumnDef="addresses.addressLine1">
+        <!-- <ng-container matColumnDef="addresses.addressLine1">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div class="column-header">
@@ -357,10 +378,10 @@
             <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.mainAddress?.addressLine1 }}
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- City -->
-        <ng-container matColumnDef="addresses.city">
+        <!-- <ng-container matColumnDef="addresses.city">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">
@@ -381,10 +402,10 @@
             <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.mainAddress?.city }}
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Email -->
-        <ng-container matColumnDef="addresses.emailAddress">
+        <!-- <ng-container matColumnDef="addresses.emailAddress">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">
@@ -407,44 +428,44 @@
                 [style.color]="getRiskColor(item)">
                 {{ item.mainAddress?.emailAddress }}
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Latitude -->
-        <ng-container matColumnDef="addresses.geoLocation.lat">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">
+        <!-- <ng-container matColumnDef="addresses.geoLocation.lat"> -->
+            <!-- <mat-header-cell *matHeaderCellDef> -->
+                <!-- <div class="table-header-cell"> -->
+                    <!-- <div mat-sort-header class="column-header">
                         {{'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT' | translate}}
-                    </div>
-                    <div class="column-filter">
+                    </div> -->
+                    <!-- <div class="column-filter"> -->
                         <!-- placeholder -->
-                    </div>
-                </div>
-            </mat-header-cell>
-            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
+                    <!-- </div> -->
+                <!-- </div> -->
+            <!-- </mat-header-cell> -->
+            <!-- <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.mainAddress?.geoLocation?.lat }}
-            </mat-cell>
-        </ng-container>
+            </mat-cell> -->
+        <!-- </ng-container>  -->
 
         <!-- Longitude -->
-        <ng-container matColumnDef="addresses.geoLocation.lng">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">
+        <!-- <ng-container matColumnDef="addresses.geoLocation.lng"> -->
+            <!-- <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell"> -->
+                    <!-- <div mat-sort-header class="column-header">
                         {{'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG' | translate}}
-                    </div>
-                    <div class="column-filter">
+                    </div> -->
+                    <!-- <div class="column-filter"> -->
                         <!-- placeholder -->
-                    </div>
-                </div>
-            </mat-header-cell>
-            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
+                    <!-- </div> -->
+                <!-- </div>
+            </mat-header-cell> -->
+            <!-- <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.mainAddress?.geoLocation?.lng }}
-            </mat-cell>
-        </ng-container>
+            </mat-cell> -->
+        <!-- </ng-container> -->
 
         <!-- Postal Code -->
-        <ng-container matColumnDef="addresses.postalCode">
+        <!-- <ng-container matColumnDef="addresses.postalCode">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">
@@ -465,10 +486,10 @@
             <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.mainAddress?.postalCode }}
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Coordinates are accurate? -->
-        <ng-container matColumnDef="addresses.geoLocationAccurate">
+        <!-- <ng-container matColumnDef="addresses.geoLocationAccurate">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">
@@ -494,10 +515,10 @@
                     [value]="item.mainAddress?.geoLocationAccurate">
                 </app-yes-no-label>
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Age -->
-        <ng-container matColumnDef="age">
+        <!-- <ng-container matColumnDef="age">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE' | translate}}</div>
@@ -520,10 +541,10 @@
                 [style.color]="getRiskColor(item)">
                 <app-age-label [age]="item.age"></app-age-label>
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Gender -->
-        <ng-container matColumnDef="gender">
+        <!-- <ng-container matColumnDef="gender">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{ "LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER" | translate }}</div>
@@ -548,10 +569,10 @@
                 [style.color]="getRiskColor(item)">
                 {{ item.gender | translate }}
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Phone number -->
-        <ng-container matColumnDef="phoneNumber">
+        <!-- <ng-container matColumnDef="phoneNumber">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PHONE_NUMBER'| translate}}</div>
@@ -572,10 +593,10 @@
                 [style.color]="getRiskColor(item)">
                 {{ item.mainAddress?.phoneNumber }}
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Risk Level -->
-        <ng-container matColumnDef="riskLevel">
+        <!-- <ng-container matColumnDef="riskLevel">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL' | translate }}
@@ -604,10 +625,10 @@
                     [value]="item.riskLevel">
                 </app-reference-data-label>
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Date of last contact -->
-        <ng-container matColumnDef="dateOfLastContact">
+        <!-- <ng-container matColumnDef="dateOfLastContact">
             <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">
@@ -629,10 +650,10 @@
                 [style.color]="getRiskColor(item)">
                 {{ item.dateOfLastContact | dateDefault }}
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Responsible User -->
-        <ng-container matColumnDef="responsibleUserId">
+        <!-- <ng-container matColumnDef="responsibleUserId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div class="column-header">
@@ -660,10 +681,10 @@
                 [style.color]="getRiskColor(item)">
                 {{ item.responsibleUser?.name }}
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Deleted -->
-        <ng-container matColumnDef="deleted">
+        <!-- <ng-container matColumnDef="deleted">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DELETED' | translate }}</div>
@@ -689,10 +710,10 @@
                     [value]="item.deleted">
                 </app-yes-no-label>
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Number of Exposures -->
-        <ng-container matColumnDef="numberOfExposures">
+        <!-- <ng-container matColumnDef="numberOfExposures">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div
@@ -718,10 +739,10 @@
                 class="mat-table-number-column">
                 {{ item.numberOfExposures }}
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Created By -->
-        <ng-container matColumnDef="createdBy">
+        <!-- <ng-container matColumnDef="createdBy">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div class="column-header">
@@ -749,10 +770,10 @@
                 [style.color]="getRiskColor(item)">
                 {{ item.createdByUser?.name }}
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Created At -->
-        <ng-container matColumnDef="createdAt">
+        <!-- <ng-container matColumnDef="createdAt">
             <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">
@@ -774,10 +795,10 @@
                 [style.color]="getRiskColor(item)">
                 {{ item.createdAt | dateTimeDefault }}
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Modified By -->
-        <ng-container matColumnDef="updatedBy">
+        <!-- <ng-container matColumnDef="updatedBy">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div class="column-header">
@@ -805,10 +826,10 @@
                 [style.color]="getRiskColor(item)">
                 {{ item.updatedByUser?.name }}
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Updated At -->
-        <ng-container matColumnDef="updatedAt">
+        <!-- <ng-container matColumnDef="updatedAt">
             <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">
@@ -830,23 +851,23 @@
                 [style.color]="getRiskColor(item)">
                 {{ item.updatedAt | dateTimeDefault }}
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
-        <mat-header-row *matHeaderRowDef="[]"></mat-header-row>
+        <!-- <mat-header-row *matHeaderRowDef="[]"></mat-header-row>
         <mat-row
             *matRowDef="let item; columns: []"
             app-hover-row-actions
             [hoverRowActionsComponent]="hoverRow"
             [hoverRowActions]="recordActions"
             [hoverRowActionData]="item"
-        ></mat-row>
-    </mat-table>
+        ></mat-row> -->
+    <!-- </mat-table> -->
 
-    <div
+    <!-- <div
         *ngIf="refreshingList"
         class="mat-table-loading-data">
         <mat-spinner></mat-spinner>
-    </div>
+    </div> -->
 
 <!--    &lt;!&ndash; No data &ndash;&gt;-->
 <!--    <div-->
@@ -865,4 +886,4 @@
 <!--        (page)="changePage($event)">-->
 <!--    </app-mat-paginator-extended>-->
 
-</mat-card>
+<!-- </mat-card> -->

@@ -1,16 +1,21 @@
-import { RouterModule, Routes } from '@angular/router';
-import * as fromPages from './pages';
 import { ModuleWithProviders } from '@angular/core';
-import { AuthGuard } from '../../core/services/guards/auth-guard.service';
-import { PERMISSION } from '../../core/models/permission.model';
-import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
+import { RouterModule, Routes } from '@angular/router';
+
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
+import { PERMISSION } from '../../core/models/permission.model';
+import { AuthGuard } from '../../core/services/guards/auth-guard.service';
+import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
+import { RiskDataResolver } from '../../core/services/resolvers/data/risk.resolver';
+import * as fromPages from './pages';
 
 const routes: Routes = [
   // Contacts of contacts list
   {
     path: '',
-    component: fromPages.ContactsOfContactsListComponent
+    component: fromPages.ContactsOfContactsListComponent,
+    resolve: {
+      risk: RiskDataResolver
+    }
   },
   // Create contact of contact
   {
