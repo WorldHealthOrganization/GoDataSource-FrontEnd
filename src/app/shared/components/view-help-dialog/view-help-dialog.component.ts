@@ -103,6 +103,11 @@ export class ViewHelpDialogComponent extends ListComponent implements OnDestroy 
   }
 
   /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {}
+
+  /**
    * Initialize breadcrumbs
    */
   initializeBreadcrumbs(): void {

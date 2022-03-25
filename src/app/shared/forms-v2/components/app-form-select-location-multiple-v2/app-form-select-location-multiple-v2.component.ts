@@ -5,7 +5,7 @@ import {
   Host,
   OnDestroy, OnInit,
   Optional,
-  SkipSelf
+  SkipSelf, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
@@ -18,6 +18,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 @Component({
   selector: 'app-form-select-location-multiple-v2',
   templateUrl: './app-form-select-location-multiple-v2.component.html',
+  styleUrls: ['./app-form-select-location-multiple-v2.component.scss'],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
     useExisting: forwardRef(() => AppFormSelectLocationMultipleV2Component),
@@ -31,6 +32,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
       ]
     }
   }],
+  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppFormSelectLocationMultipleV2Component

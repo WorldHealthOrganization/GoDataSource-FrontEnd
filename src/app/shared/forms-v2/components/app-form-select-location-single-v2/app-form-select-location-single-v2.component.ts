@@ -5,7 +5,7 @@ import {
   Host, Input,
   OnDestroy, OnInit,
   Optional,
-  SkipSelf
+  SkipSelf, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
@@ -18,6 +18,7 @@ import { AppFormLocationBaseV2 } from '../../core/app-form-location-base-v2';
 @Component({
   selector: 'app-form-select-location-single-v2',
   templateUrl: './app-form-select-location-single-v2.component.html',
+  styleUrls: ['./app-form-select-location-single-v2.component.scss'],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
     useExisting: forwardRef(() => AppFormSelectLocationSingleV2Component),
@@ -28,6 +29,7 @@ import { AppFormLocationBaseV2 } from '../../core/app-form-location-base-v2';
       overlayPanelClass: 'gd-cdk-overlay-pane-location'
     }
   }],
+  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppFormSelectLocationSingleV2Component

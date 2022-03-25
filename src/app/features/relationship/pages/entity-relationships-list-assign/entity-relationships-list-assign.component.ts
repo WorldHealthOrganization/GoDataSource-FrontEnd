@@ -460,21 +460,21 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
   }
 
   selectEntities() {
-    // get list of selected ids
-    const selectedRecords: false | string[] = this.validateCheckedRecords();
-    if (!selectedRecords) {
-      return;
-    }
-
-    // redirect to next step
-    this.router.navigate(
-      [`/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/share/create-bulk`],
-      {
-        queryParams: {
-          selectedSourceIds: JSON.stringify(selectedRecords),
-          selectedTargetIds: JSON.stringify(this.selectedTargetIds)
-        }
-      }
-    );
+    // // get list of selected ids
+    // const selectedRecords: false | string[] = this.validateCheckedRecords();
+    // if (!selectedRecords) {
+    //   return;
+    // }
+    //
+    // // redirect to next step
+    // this.router.navigate(
+    //   [`/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/share/create-bulk`],
+    //   {
+    //     queryParams: {
+    //       selectedSourceIds: JSON.stringify(selectedRecords),
+    //       selectedTargetIds: JSON.stringify(this.selectedTargetIds)
+    //     }
+    //   }
+    // );
   }
 }

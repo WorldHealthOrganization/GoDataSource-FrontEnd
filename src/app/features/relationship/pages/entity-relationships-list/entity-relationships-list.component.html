@@ -82,52 +82,52 @@
                         </button>
 
                         <mat-menu #actionsMenuMultipleRecords="matMenu">
-                            <button
-                                *ngIf="!checkedAllRecords"
-                                mat-menu-item
-                                (click)="checkAllRecords()">
-                                {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL' | translate }}
-                            </button>
-                            <button
-                                *ngIf="checkedRecords.length > 0"
-                                mat-menu-item
-                                (click)="uncheckAllRecords()">
-                                {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}
-                            </button>
+<!--                            <button-->
+<!--                                *ngIf="!checkedAllRecords"-->
+<!--                                mat-menu-item-->
+<!--                                (click)="checkAllRecords()">-->
+<!--                                {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL' | translate }}-->
+<!--                            </button>-->
+<!--                            <button-->
+<!--                                *ngIf="checkedRecords.length > 0"-->
+<!--                                mat-menu-item-->
+<!--                                (click)="uncheckAllRecords()">-->
+<!--                                {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}-->
+<!--                            </button>-->
 
-                            <ng-container *ngIf="(RelationshipModel.canShare(authUser) && entityCanShare) ||
-                                entityCanChangeSource || (RelationshipModel.canBulkDelete(authUser) && entityCanBulkDelete)">
+<!--                            <ng-container *ngIf="(RelationshipModel.canShare(authUser) && entityCanShare) ||-->
+<!--                                entityCanChangeSource || (RelationshipModel.canBulkDelete(authUser) && entityCanBulkDelete)">-->
 
-                                <mat-divider></mat-divider>
+<!--                                <mat-divider></mat-divider>-->
 
-                                <button
-                                    *ngIf="RelationshipModel.canShare(authUser) && entityCanShare"
-                                    [disabled]="checkedRecords.length < 1"
-                                    mat-menu-item
-                                    (click)="shareSelectedRelationships()">
-                                    {{ shareSelectedRelationshipsButtonLabel | translate }}
-                                </button>
+<!--                                <button-->
+<!--                                    *ngIf="RelationshipModel.canShare(authUser) && entityCanShare"-->
+<!--                                    [disabled]="checkedRecords.length < 1"-->
+<!--                                    mat-menu-item-->
+<!--                                    (click)="shareSelectedRelationships()">-->
+<!--                                    {{ shareSelectedRelationshipsButtonLabel | translate }}-->
+<!--                                </button>-->
 
-                                <button
-                                    *ngIf="relationshipType === RelationshipType.CONTACT && entityCanChangeSource"
-                                    mat-menu-item
-                                    [disabled]="checkedRecords.length === 0"
-                                    (click)="changeSourceForSelectedRelationships()">
-                                    {{ 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_CHANGE_SOURCE' | translate }}
-                                </button>
+<!--                                <button-->
+<!--                                    *ngIf="relationshipType === RelationshipType.CONTACT && entityCanChangeSource"-->
+<!--                                    mat-menu-item-->
+<!--                                    [disabled]="checkedRecords.length === 0"-->
+<!--                                    (click)="changeSourceForSelectedRelationships()">-->
+<!--                                    {{ 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_CHANGE_SOURCE' | translate }}-->
+<!--                                </button>-->
 
-                                <ng-container
-                                    *ngIf="RelationshipModel.canBulkDelete(authUser) && entityCanBulkDelete">
-                                    <mat-divider></mat-divider>
+<!--                                <ng-container-->
+<!--                                    *ngIf="RelationshipModel.canBulkDelete(authUser) && entityCanBulkDelete">-->
+<!--                                    <mat-divider></mat-divider>-->
 
-                                    <button
-                                        [disabled]="checkedRecords.length < 1"
-                                        mat-menu-item
-                                        (click)="deleteSelectedRelationships()">
-                                        {{ 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS' | translate }}
-                                    </button>
-                                </ng-container>
-                            </ng-container>
+<!--                                    <button-->
+<!--                                        [disabled]="checkedRecords.length < 1"-->
+<!--                                        mat-menu-item-->
+<!--                                        (click)="deleteSelectedRelationships()">-->
+<!--                                        {{ 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS' | translate }}-->
+<!--                                    </button>-->
+<!--                                </ng-container>-->
+<!--                            </ng-container>-->
                         </mat-menu>
                     </div>
                     <div class="column-filter">
@@ -136,13 +136,13 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item;" fxFlex="60px">
-                <app-form-checkbox
-                    #listCheckedIndividual
-                    [name]="'listCheckedIndividual[' + item.relationship.id + ']'"
-                    class="table-checkbox"
-                    ngModel
-                    (optionChanged)="checkedRecord(item, $event)">
-                </app-form-checkbox>
+<!--                <app-form-checkbox-->
+<!--                    #listCheckedIndividual-->
+<!--                    [name]="'listCheckedIndividual[' + item.relationship.id + ']'"-->
+<!--                    class="table-checkbox"-->
+<!--                    ngModel-->
+<!--                    (optionChanged)="checkedRecord(item, $event)">-->
+<!--                </app-form-checkbox>-->
             </mat-cell>
         </ng-container>
 

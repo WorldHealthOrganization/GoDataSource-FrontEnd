@@ -834,6 +834,11 @@ export class ImportDataComponent
   }
 
   /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {}
+
+  /**
      * Process file data
      */
   private processFileData(

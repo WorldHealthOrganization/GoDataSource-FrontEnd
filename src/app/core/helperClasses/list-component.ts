@@ -2,15 +2,12 @@ import { ISerializedQueryBuilder, RequestFilter, RequestFilterOperator, RequestQ
 import * as _ from 'lodash';
 import { ReplaySubject, Subscriber, Subscription } from 'rxjs';
 import { ApplyListFilter, Constants } from '../models/constants';
-import { FormRangeModel } from '../../shared/components/form-range/form-range.model';
-import { Directive, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { ResetInputOnSideFilterDirective, ResetLocationOnSideFilterDirective } from '../../shared/directives/reset-input-on-side-filter/reset-input-on-side-filter.directive';
+import { Directive, OnDestroy, ViewChild } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { MatSort, MatSortable, MatSortHeader } from '@angular/material/sort';
 import { SideFiltersComponent } from '../../shared/components/side-filters/side-filters.component';
 import { DebounceTimeCaller } from './debounce-time-caller';
 import { MetricContactsSeenEachDays } from '../models/metrics/metric-contacts-seen-each-days.model';
-import { FormCheckboxComponent } from '../../shared/xt-forms/components/form-checkbox/form-checkbox.component';
 import { ContactFollowedUp, MetricContactsWithSuccessfulFollowUp } from '../models/metrics/metric.contacts-with-success-follow-up.model';
 import { AddressModel, AddressType } from '../models/address.model';
 import { moment, Moment } from './x-moment';
@@ -18,7 +15,6 @@ import { ListHelperService } from '../services/helper/list-helper.service';
 import { SubscriptionLike } from 'rxjs/internal/types';
 import { StorageKey } from '../services/helper/storage.service';
 import { UserModel, UserSettings } from '../models/user.model';
-import { ValueAccessorBase } from '../../shared/xt-forms/core';
 import { SavedFilterData } from '../models/saved-filters.model';
 import * as LzString from 'lz-string';
 import { LoadingDialogModel } from '../../shared/components';
@@ -127,15 +123,8 @@ export abstract class ListComponent implements OnDestroy {
 
 
 
-  /**
-     * Determine all children that we need to reset when side filters are being applied
-     */
-  @ViewChildren(ResetInputOnSideFilterDirective) protected filterInputs: QueryList<ResetInputOnSideFilterDirective>;
 
-  /**
-     * Determine all location children that we need to reset when side filters are being applied
-     */
-  @ViewChildren(ResetLocationOnSideFilterDirective) protected filterLocationInputs: QueryList<ResetLocationOnSideFilterDirective>;
+
 
   /**
      * Retrieve Mat Table sort handler
@@ -146,11 +135,6 @@ export abstract class ListComponent implements OnDestroy {
      * Retrieve Side Filters
      */
   @ViewChild(SideFiltersComponent) sideFilter: SideFiltersComponent;
-
-  /**
-     * Individual checkboxes selects
-     */
-  @ViewChildren('listCheckedIndividual') protected listCheckedIndividualInputs: QueryList<FormCheckboxComponent>;
 
   /**
    * List table columns
@@ -217,124 +201,8 @@ export abstract class ListComponent implements OnDestroy {
   public pageSize: number = Constants.DEFAULT_PAGE_SIZE;
   private paginatorInitialized = false;
 
-  // Models for the checkbox functionality
-  private checkboxModels: {
-    multiCheck: boolean,
-    keyPath: string,
-    records: any[],
-    checkAll: boolean,
-    checkedOnlyDeletedRecords: boolean,
-    checkedOnlyNotDeletedRecords: boolean,
-    checkedRecords: {
-      [id: string]: boolean
-    }
-  } = {
-      multiCheck: true,
-      keyPath: null,
-      records: [],
-      checkAll: false,
-      checkedOnlyDeletedRecords: false,
-      checkedOnlyNotDeletedRecords: false,
-      checkedRecords: {}
-    };
-
   // sort by disabled ?
   private _sortByDisabled: boolean = false;
-
-  /**
-     * Did we check at least one record ?
-     */
-  get checkedAtLeastOneRecord(): boolean {
-    return !_.isEmpty(this.checkboxModels.checkedRecords);
-  }
-
-  /**
-     * Checked only deleted records ?
-     */
-  get checkedOnlyDeletedRecords(): boolean {
-    return this.checkboxModels.checkedOnlyDeletedRecords;
-  }
-
-  /**
-     * Checked only not deleted records ?
-     */
-  get checkedOnlyNotDeletedRecords(): boolean {
-    return this.checkboxModels.checkedOnlyNotDeletedRecords;
-  }
-
-  /**
-     * Set checkbox behaviour ( key path - id used to identify a record )
-     */
-  set checkedKeyPath(keyPath: string) {
-    this.checkboxModels.keyPath = keyPath;
-  }
-
-  /**
-     * Get checkbox behaviour ( key path - id used to identify a record )
-     */
-  get checkedKeyPath(): string {
-    return this.checkboxModels.keyPath;
-  }
-
-  /**
-     * Set checkbox behaviour ( can or can't select multiple checkboxes at the same time )
-     */
-  set checkedIsMultiSelect(multiCheck: boolean) {
-    this.checkboxModels.multiCheck = multiCheck;
-  }
-
-  /**
-     * Get checkbox behaviour ( can or can't select multiple checkboxes at the same time )
-     */
-  get checkedIsMultiSelect(): boolean {
-    return this.checkboxModels.multiCheck;
-  }
-
-  /**
-     * All checkbox selected
-     * @param value
-     */
-  set checkedAllRecords(value: boolean) {
-    // set master check all
-    this.checkboxModels.checkAll = value;
-
-    // check/un-check all individual checkboxes
-    this.checkboxModels.checkedOnlyNotDeletedRecords = this.checkboxModels.checkAll;
-    this.checkboxModels.checkedOnlyDeletedRecords = this.checkboxModels.checkAll;
-    this.checkboxModels.checkedRecords = {};
-    if (this.checkboxModels.checkAll) {
-      this.checkboxModels.records.forEach((record: any) => {
-        // check record
-        this.checkboxModels.checkedRecords[this.getCheckRecordKey(record)] = true;
-
-        // all records are deleted ?
-        if (!record.deleted) {
-          this.checkboxModels.checkedOnlyDeletedRecords = false;
-        }
-
-        // all records aren't deleted ?
-        if (record.deleted) {
-          this.checkboxModels.checkedOnlyNotDeletedRecords = false;
-        }
-      });
-    }
-
-    // go through all html checkboxes and update their value - this is faster than using binding which slows down a lot the page
-    if (
-      this.listCheckedIndividualInputs &&
-            this.listCheckedIndividualInputs.length > 0
-    ) {
-      this.listCheckedIndividualInputs.forEach((checkbox: FormCheckboxComponent) => {
-        // retrieve id
-        const id = checkbox.name.substring(checkbox.name.lastIndexOf('[') + 1, checkbox.name.lastIndexOf(']'));
-        checkbox.value = !!this.checkboxModels.checkedRecords[id];
-      });
-    }
-  }
-
-  get checkedAllRecords(): boolean {
-    return this.checkboxModels.checkAll;
-  }
 
   // refresh only after we finish changing data
   // by default each time we get back to a page we should display loading spinner
@@ -359,18 +227,9 @@ export abstract class ListComponent implements OnDestroy {
 
     // refresh list
     this.refreshingList = true;
-    this.refreshList((records: any[]) => {
-      // wait for binding
-      setTimeout(() => {
-        // reset checked items
-        this.resetCheckboxData();
-
-        // set items that can be checked
-        this.checkboxModels.records = records || [];
-
-        // finished refreshing list
-        this.refreshingList = false;
-      });
+    this.refreshList(() => {
+      // finished refreshing list
+      this.refreshingList = false;
     }, triggeredByPageChange);
   }));
 
@@ -408,6 +267,12 @@ export abstract class ListComponent implements OnDestroy {
     // wait for binding so some things get processed
     setTimeout(() => {
       this.initializeBreadcrumbs();
+    });
+
+    // initialize side columns
+    // wait for binding so some things get processed
+    setTimeout(() => {
+      this.initializeTableColumns();
     });
 
     // listen for outbreak selection
@@ -494,6 +359,11 @@ export abstract class ListComponent implements OnDestroy {
   }
 
   /**
+   * Initialize side table columns
+   */
+  protected abstract initializeTableColumns(): void;
+
+  /**
    * Selected outbreak changed
    */
   protected selectedOutbreakChanged(): void {}
@@ -557,26 +427,6 @@ export abstract class ListComponent implements OnDestroy {
   }
 
   /**
-     * Reset checkbox data
-     */
-  private resetCheckboxData() {
-    this.checkboxModels.records = [];
-    this.checkboxModels.checkAll = false;
-    this.checkboxModels.checkedOnlyDeletedRecords = false;
-    this.checkboxModels.checkedOnlyNotDeletedRecords = false;
-    this.checkboxModels.checkedRecords = {};
-  }
-
-  /**
-     * Retrieve record key used by list component checkboxes
-     */
-  private getCheckRecordKey(record: any): string {
-    return this.checkedKeyPath ?
-      _.get(record, this.checkedKeyPath) :
-      record.id;
-  }
-
-  /**
      * Tell list that we need to refresh list
      */
   public needsRefreshList(
@@ -588,9 +438,6 @@ export abstract class ListComponent implements OnDestroy {
     if (triggeredByPageChange) {
       this._triggeredByPageChange = true;
     }
-
-    // reset checked items
-    this.resetCheckboxData();
 
     // do we need to reset pagination (aka go to the first page) ?
     if (
@@ -809,7 +656,7 @@ export abstract class ListComponent implements OnDestroy {
      * @param {string} property
      * @param {FormRangeModel} value Object with 'from' and 'to' properties
      */
-  filterByRangeField(property: string, value: FormRangeModel) {
+  filterByRangeField(property: string, value: IV2NumberRange) {
     this.queryBuilder.filter.byRange(property, value);
 
     // refresh list
@@ -944,7 +791,7 @@ export abstract class ListComponent implements OnDestroy {
      * Filter by deleted field
      * @param value
      */
-  filterByDeletedField(value: boolean | null | undefined) {
+  filterByDeletedField(value: boolean | '') {
     // filter
     if (value === false) {
       this.queryBuilder.excludeDeleted();
@@ -1076,19 +923,19 @@ export abstract class ListComponent implements OnDestroy {
      * Clear table filters
      */
   clearHeaderFilters() {
-    // clear header filters
-    if (this.filterInputs) {
-      this.filterInputs.forEach((input: ResetInputOnSideFilterDirective) => {
-        input.reset();
-      });
-    }
-
-    // clear location header filters
-    if (this.filterLocationInputs) {
-      this.filterLocationInputs.forEach((input: ResetLocationOnSideFilterDirective) => {
-        input.reset();
-      });
-    }
+    // // clear header filters
+    // if (this.filterInputs) {
+    //   this.filterInputs.forEach((input: ResetInputOnSideFilterDirective) => {
+    //     input.reset();
+    //   });
+    // }
+    //
+    // // clear location header filters
+    // if (this.filterLocationInputs) {
+    //   this.filterLocationInputs.forEach((input: ResetLocationOnSideFilterDirective) => {
+    //     input.reset();
+    //   });
+    // }
 
     // refresh of the list is done automatically after debounce time
     // #
@@ -2209,98 +2056,6 @@ export abstract class ListComponent implements OnDestroy {
   }
 
   /**
-     * Individual Checkbox
-     */
-  checkedRecord(item: any, checked: boolean) {
-    // set value
-    const id: string = this.getCheckRecordKey(item);
-    if (checked) {
-      this.checkboxModels.checkedRecords[id] = true;
-    } else {
-      delete this.checkboxModels.checkedRecords[id];
-    }
-
-    // reset check all
-    let checkedAll: boolean = true;
-    this.checkboxModels.checkedOnlyDeletedRecords = true;
-    this.checkboxModels.checkedOnlyNotDeletedRecords = true;
-    this.checkboxModels.records.forEach((record: any) => {
-      // uncheck checked all ?
-      const idRecord: string = this.getCheckRecordKey(record);
-      if (!this.checkboxModels.checkedRecords[idRecord]) {
-        checkedAll = false;
-      }
-
-      // check only checked records
-      if (this.checkboxModels.checkedRecords[idRecord]) {
-        // all records are deleted ?
-        if (!record.deleted) {
-          this.checkboxModels.checkedOnlyDeletedRecords = false;
-        }
-
-        // all records aren't deleted ?
-        if (record.deleted) {
-          this.checkboxModels.checkedOnlyNotDeletedRecords = false;
-        }
-
-        // single select? - uncheck others
-        if (
-          !this.checkedIsMultiSelect &&
-                    idRecord !== id
-        ) {
-          // update the view
-          delete this.checkboxModels.checkedRecords[idRecord];
-          this.listCheckedIndividualInputs.forEach((checkbox: FormCheckboxComponent) => {
-            if (checkbox.name === 'listCheckedIndividual[' + idRecord + ']') {
-              checkbox.value = false;
-            }
-          });
-        }
-      }
-    });
-
-    // set check all value
-    this.checkboxModels.checkAll = checkedAll;
-  }
-
-  /**
-     * Retrieve list of checked records ( an array of IDs )
-     */
-  get checkedRecords(): string[] {
-    return Object.keys(this.checkboxModels.checkedRecords || {});
-  }
-
-  /**
-     * Check that we have at least one record selected
-     */
-  validateCheckedRecords() {
-    // get list of ids
-    const selectedRecords: string[] = this.checkedRecords;
-
-    // validate
-    if (selectedRecords.length < 1) {
-      // display message
-      if (this.listHelperService.toastV2Service) {
-        this.listHelperService.toastV2Service.error('LNG_COMMON_LABEL_NO_RECORDS_SELECTED');
-      }
-
-      // not valid
-      return false;
-    }
-
-    // valid, send list of IDs back
-    return selectedRecords;
-  }
-
-  public checkAllRecords() {
-    this.checkedAllRecords = true;
-  }
-
-  public uncheckAllRecords() {
-    this.checkedAllRecords = false;
-  }
-
-  /**
      * Check if a row's cell is expanded
      * @param columnName
      * @param rowId
@@ -2432,31 +2187,31 @@ export abstract class ListComponent implements OnDestroy {
     // initialize
     const inputValues: ICachedInputsValues = {};
 
-    // determine filter input values
-    // keeping in mind that all filters should have ResetInputOnSideFilterDirective directives
-    (this.filterInputs || []).forEach((input: ResetInputOnSideFilterDirective) => {
-      // should we jump this one ?
-      if (input.disableCachedFilterOverwrite) {
-        return;
-      }
-
-      // update value
-      inputValues[input.control.name] = input.control && input.control.valueAccessor instanceof ValueAccessorBase ?
-        (input.control.valueAccessor as ValueAccessorBase<any>).value :
-        input.control.value;
-    });
-
-    // determine location input values
-    // keeping in mind that all filters should have ResetLocationOnSideFilterDirective directives
-    (this.filterLocationInputs || []).forEach((input: ResetLocationOnSideFilterDirective) => {
-      // should we jump this one ?
-      if (input.disableCachedFilterOverwrite) {
-        return;
-      }
-
-      // update value
-      inputValues[input.component.name] = input.component.value;
-    });
+    // // determine filter input values
+    // // keeping in mind that all filters should have ResetInputOnSideFilterDirective directives
+    // (this.filterInputs || []).forEach((input: ResetInputOnSideFilterDirective) => {
+    //   // should we jump this one ?
+    //   if (input.disableCachedFilterOverwrite) {
+    //     return;
+    //   }
+    //
+    //   // update value
+    //   inputValues[input.control.name] = input.control && input.control.valueAccessor instanceof ValueAccessorBase ?
+    //     (input.control.valueAccessor as ValueAccessorBase<any>).value :
+    //     input.control.value;
+    // });
+    //
+    // // determine location input values
+    // // keeping in mind that all filters should have ResetLocationOnSideFilterDirective directives
+    // (this.filterLocationInputs || []).forEach((input: ResetLocationOnSideFilterDirective) => {
+    //   // should we jump this one ?
+    //   if (input.disableCachedFilterOverwrite) {
+    //     return;
+    //   }
+    //
+    //   // update value
+    //   inputValues[input.component.name] = input.component.value;
+    // });
 
     // finished
     return inputValues;
@@ -2580,8 +2335,8 @@ export abstract class ListComponent implements OnDestroy {
   // }
 
   /**
-     * Load cached input values
-     */
+   * Load cached input values
+   */
   private loadCachedInputValues(currentUserCacheForCurrentPath: ICachedFilterItems): void {
     // already waiting for execution ?
     if (this._nextTimerForLoadCachedInputValues !== undefined) {
@@ -2607,28 +2362,28 @@ export abstract class ListComponent implements OnDestroy {
         return;
       }
 
-      // update filter input values
-      // keeping in mind that all filters should have ResetInputOnSideFilterDirective directives
-      (this.filterInputs || []).forEach((input: ResetInputOnSideFilterDirective) => {
-        if (
-          input.control &&
-                    currentUserCacheForCurrentPath.inputs[input.control.name] !== undefined &&
-                    input.control.valueAccessor instanceof ValueAccessorBase
-        ) {
-          input.updateToAfterPristineValueIsTaken(currentUserCacheForCurrentPath.inputs[input.control.name]);
-        }
-      });
-
-      // update filter input values
-      // keeping in mind that all filters should have ResetLocationOnSideFilterDirective directives
-      (this.filterLocationInputs || []).forEach((input: ResetLocationOnSideFilterDirective) => {
-        if (
-          input.component &&
-                    currentUserCacheForCurrentPath.inputs[input.component.name] !== undefined
-        ) {
-          input.updateToAfterPristineValueIsTaken(currentUserCacheForCurrentPath.inputs[input.component.name]);
-        }
-      });
+      // // update filter input values
+      // // keeping in mind that all filters should have ResetInputOnSideFilterDirective directives
+      // (this.filterInputs || []).forEach((input: ResetInputOnSideFilterDirective) => {
+      //   if (
+      //     input.control &&
+      //               currentUserCacheForCurrentPath.inputs[input.control.name] !== undefined &&
+      //               input.control.valueAccessor instanceof ValueAccessorBase
+      //   ) {
+      //     input.updateToAfterPristineValueIsTaken(currentUserCacheForCurrentPath.inputs[input.control.name]);
+      //   }
+      // });
+      //
+      // // update filter input values
+      // // keeping in mind that all filters should have ResetLocationOnSideFilterDirective directives
+      // (this.filterLocationInputs || []).forEach((input: ResetLocationOnSideFilterDirective) => {
+      //   if (
+      //     input.component &&
+      //               currentUserCacheForCurrentPath.inputs[input.component.name] !== undefined
+      //   ) {
+      //     input.updateToAfterPristineValueIsTaken(currentUserCacheForCurrentPath.inputs[input.component.name]);
+      //   }
+      // });
     });
   }
 
@@ -2714,7 +2469,7 @@ export abstract class ListComponent implements OnDestroy {
     const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
     if (
       authUser.dontCacheFilters ||
-            this._disableFilterCaching
+      this._disableFilterCaching
     ) {
       // trigger finish callback
       this.beforeCacheLoadFilters();
@@ -2891,6 +2646,36 @@ export abstract class ListComponent implements OnDestroy {
           column.columnDefinition.filter.address,
           column.columnDefinition.filter.address.filterLocationIds
         );
+
+        // finished
+        break;
+
+      // boolean
+      case V2FilterType.BOOLEAN:
+        // filter
+        this.filterByBooleanUsingExistField(
+          column.columnDefinition.field,
+          column.columnDefinition.filter.value
+        );
+
+        // finished
+        break;
+
+      // number range
+      case V2FilterType.NUMBER_RANGE:
+        // filter
+        this.filterByRangeField(
+          column.columnDefinition.field,
+          column.columnDefinition.filter.value
+        );
+
+        // finished
+        break;
+
+      // deleted
+      case V2FilterType.DELETED:
+        // filter
+        this.filterByDeletedField(column.columnDefinition.filter.value);
 
         // finished
         break;

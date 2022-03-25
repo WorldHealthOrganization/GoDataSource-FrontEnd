@@ -15,7 +15,10 @@ export enum V2FilterType {
   ADDRESS_PHONE_NUMBER,
   ADDRESS_MULTIPLE_LOCATION,
   ADDRESS_FIELD,
-  ADDRESS_ACCURATE_GEO_LOCATION
+  ADDRESS_ACCURATE_GEO_LOCATION,
+  BOOLEAN,
+  NUMBER_RANGE,
+  DELETED
 }
 
 /**
@@ -47,7 +50,7 @@ interface V2FilterBasic {
 /**
  * Text
  */
-export interface V2FilterText extends Omit<V2FilterBasic, 'value'> {
+interface V2FilterText extends Omit<V2FilterBasic, 'value'> {
   // required
   type: V2FilterType.TEXT;
   textType: V2FilterTextType;
@@ -82,7 +85,7 @@ export interface V2FilterDate extends Omit<V2FilterBasic, 'value'> {
 /**
  * Age range
  */
-export interface V2FilterAge extends Omit<V2FilterBasic, 'min' | 'max' | 'value'> {
+interface V2FilterAge extends Omit<V2FilterBasic, 'min' | 'max' | 'value'> {
   // required
   type: V2FilterType.AGE_RANGE;
 
@@ -95,7 +98,7 @@ export interface V2FilterAge extends Omit<V2FilterBasic, 'min' | 'max' | 'value'
 /**
  * Address phone number
  */
-export interface V2FilterAddressPhoneNumber extends Omit<V2FilterBasic, 'address'> {
+interface V2FilterAddressPhoneNumber extends Omit<V2FilterBasic, 'address'> {
   // required
   type: V2FilterType.ADDRESS_PHONE_NUMBER;
   address: AddressModel;
@@ -106,7 +109,7 @@ export interface V2FilterAddressPhoneNumber extends Omit<V2FilterBasic, 'address
 /**
  * Address location
  */
-export interface V2FilterAddressMultipleLocation extends Omit<V2FilterBasic, 'address'> {
+interface V2FilterAddressMultipleLocation extends Omit<V2FilterBasic, 'address'> {
   // required
   type: V2FilterType.ADDRESS_MULTIPLE_LOCATION;
   address: AddressModel;
@@ -117,7 +120,7 @@ export interface V2FilterAddressMultipleLocation extends Omit<V2FilterBasic, 'ad
 /**
  * Simple address field
  */
-export interface V2FilterAddressField extends Omit<V2FilterBasic, 'address' | 'addressField'> {
+interface V2FilterAddressField extends Omit<V2FilterBasic, 'address' | 'addressField'> {
   // required
   type: V2FilterType.ADDRESS_FIELD;
   address: AddressModel;
@@ -129,7 +132,7 @@ export interface V2FilterAddressField extends Omit<V2FilterBasic, 'address' | 'a
 /**
  * Simple address field
  */
-export interface V2FilterAddressAccurateGeoLocation extends Omit<V2FilterBasic, 'address' | 'options'> {
+interface V2FilterAddressAccurateGeoLocation extends Omit<V2FilterBasic, 'address' | 'options'> {
   // required
   type: V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION;
   address: AddressModel;
@@ -139,7 +142,43 @@ export interface V2FilterAddressAccurateGeoLocation extends Omit<V2FilterBasic, 
 }
 
 /**
+ * Boolean
+ */
+export interface V2FilterBoolean extends Omit<V2FilterBasic, 'value'> {
+  // required
+  type: V2FilterType.BOOLEAN;
+
+  // optional
+  value?: boolean | '';
+}
+
+/**
+ * Number range
+ */
+interface V2FilterNumber extends Omit<V2FilterBasic, 'min' | 'max' | 'value'> {
+  // required
+  type: V2FilterType.NUMBER_RANGE;
+
+  // optional
+  value?: IV2NumberRange;
+  min?: number;
+  max?: number;
+}
+
+/**
+ * Deleted
+ */
+export interface V2FilterDeleted extends Omit<V2FilterBasic, 'value'> {
+  // required
+  type: V2FilterType.DELETED;
+
+  // optional
+  value?: boolean | '';
+}
+
+/**
  * Filter
  */
 export type V2Filter = V2FilterText | V2FilterMultipleSelect | V2FilterDate | V2FilterAge | V2FilterAddressPhoneNumber
-| V2FilterAddressMultipleLocation | V2FilterAddressField | V2FilterAddressAccurateGeoLocation;
+| V2FilterAddressMultipleLocation | V2FilterAddressField | V2FilterAddressAccurateGeoLocation | V2FilterBoolean | V2FilterNumber
+| V2FilterDeleted;

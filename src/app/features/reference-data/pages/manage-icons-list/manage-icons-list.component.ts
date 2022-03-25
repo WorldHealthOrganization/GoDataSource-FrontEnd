@@ -102,6 +102,11 @@ export class ManageIconsListComponent extends ListComponent implements OnInit, O
   }
 
   /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {}
+
+  /**
      * Initialize breadcrumbs
      */
   // initializeBreadcrumbs() {

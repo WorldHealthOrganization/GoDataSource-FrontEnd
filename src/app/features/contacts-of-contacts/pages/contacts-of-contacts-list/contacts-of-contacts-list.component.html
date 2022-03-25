@@ -187,20 +187,20 @@
                         </button>
 
                         <mat-menu #actionsMenuMultipleRecords="matMenu">
-                            <button
-                                *ngIf="!checkedAllRecords"
-                                mat-menu-item
-                                (click)="checkAllRecords()">
-                                {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL' | translate }}
-                            </button>
-                            <button
-                                *ngIf="checkedRecords.length > 0"
-                                mat-menu-item
-                                (click)="uncheckAllRecords()">
-                                {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}
-                            </button>
+<!--                            <button-->
+<!--                                *ngIf="!checkedAllRecords"-->
+<!--                                mat-menu-item-->
+<!--                                (click)="checkAllRecords()">-->
+<!--                                {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL' | translate }}-->
+<!--                            </button>-->
+<!--                            <button-->
+<!--                                *ngIf="checkedRecords.length > 0"-->
+<!--                                mat-menu-item-->
+<!--                                (click)="uncheckAllRecords()">-->
+<!--                                {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}-->
+<!--                            </button>-->
 
-                            <mat-divider></mat-divider>
+                            <!-- <mat-divider></mat-divider>
 
                             <button
                                 *ngIf="exportContactsOfContactsUrl && ContactOfContactModel.canExport(authUser)"
@@ -234,9 +234,9 @@
                                         {{ 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_MODIFY_CONTACTS_OF_CONTACTS' | translate }}
                                     </button>
                                 </ng-container>
-                            </ng-container>
-                        </mat-menu>
-                    </div> -->
+                            </ng-container> -->
+                        <!-- </mat-menu> -->
+                    <!-- </div>  -->
                     <!-- <div class="column-filter"> -->
                         <!-- placeholder -->
                     <!-- </div> -->

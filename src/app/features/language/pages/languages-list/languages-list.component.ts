@@ -148,6 +148,11 @@ export class LanguagesListComponent
   }
 
   /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {}
+
+  /**
      * Table columns
      */
   tableHeaderColumns(): string[] {

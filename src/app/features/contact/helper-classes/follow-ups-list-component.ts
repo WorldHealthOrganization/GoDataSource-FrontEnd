@@ -6,7 +6,6 @@ import { DialogAnswer, DialogAnswerButton, DialogField, ModifyContactFollowUpQue
 import { DialogService, ExportDataExtension } from '../../../core/services/helper/dialog.service';
 import { FollowUpsDataService } from '../../../core/services/data/follow-ups.data.service';
 import { Constants } from '../../../core/models/constants';
-import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
 import { Router } from '@angular/router';
 import { TeamModel } from '../../../core/models/team.model';
@@ -224,99 +223,99 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
      * Delete selected follow-ups
      */
   deleteSelectedFollowUps() {
-    // get list of selected follow-ups ids
-    const selectedRecords: false |  string[] = this.validateCheckedRecords();
-    if (!selectedRecords) {
-      return;
-    }
-
-    // show confirm dialog to confirm the action
-    this.dialogService
-      .showConfirm('LNG_DIALOG_CONFIRM_DELETE_MULTIPLE_FOLLOW_UPS')
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          // construct filter
-          const qb = new RequestQueryBuilder();
-
-          qb.filter.
-            where({
-              id: {
-                inq: selectedRecords
-              }
-            });
-
-          // display loading
-          this.showLoadingDialog();
-          this.followUpsDataService
-            .deleteBulkFollowUps(this.selectedOutbreak.id, qb)
-            .pipe(
-              catchError((err) => {
-                // hide dialog
-                this.closeLoadingDialog();
-
-                this.listHelperService.toastV2Service.error(err);
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              // hide dialog
-              this.closeLoadingDialog();
-
-              this.listHelperService.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
-
-              this.needsRefreshList(true);
-            });
-        }
-      });
+    // // get list of selected follow-ups ids
+    // const selectedRecords: false |  string[] = this.validateCheckedRecords();
+    // if (!selectedRecords) {
+    //   return;
+    // }
+    //
+    // // show confirm dialog to confirm the action
+    // this.dialogService
+    //   .showConfirm('LNG_DIALOG_CONFIRM_DELETE_MULTIPLE_FOLLOW_UPS')
+    //   .subscribe((answer: DialogAnswer) => {
+    //     if (answer.button === DialogAnswerButton.Yes) {
+    //       // construct filter
+    //       const qb = new RequestQueryBuilder();
+    //
+    //       qb.filter.
+    //         where({
+    //           id: {
+    //             inq: selectedRecords
+    //           }
+    //         });
+    //
+    //       // display loading
+    //       this.showLoadingDialog();
+    //       this.followUpsDataService
+    //         .deleteBulkFollowUps(this.selectedOutbreak.id, qb)
+    //         .pipe(
+    //           catchError((err) => {
+    //             // hide dialog
+    //             this.closeLoadingDialog();
+    //
+    //             this.listHelperService.toastV2Service.error(err);
+    //             return throwError(err);
+    //           })
+    //         )
+    //         .subscribe(() => {
+    //           // hide dialog
+    //           this.closeLoadingDialog();
+    //
+    //           this.listHelperService.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
+    //
+    //           this.needsRefreshList(true);
+    //         });
+    //     }
+    //   });
   }
 
   /**
      * Restore selected follow-ups
      */
   restoreSelectedFollowUps() {
-    // get list of selected follow-ups ids
-    const selectedRecords: false |  string[] = this.validateCheckedRecords();
-    if (!selectedRecords) {
-      return;
-    }
-
-    // show confirm dialog to confirm the action
-    this.dialogService
-      .showConfirm('LNG_DIALOG_CONFIRM_RESTORE_MULTIPLE_FOLLOW_UPS')
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          // construct filter
-          const qb = new RequestQueryBuilder();
-
-          qb.filter.
-            where({
-              id: {
-                inq: selectedRecords
-              }
-            });
-          // display loading
-          this.showLoadingDialog();
-          this.followUpsDataService
-            .restoreBulkFollowUps(this.selectedOutbreak.id, qb)
-            .pipe(
-              catchError((err) => {
-                // hide dialog
-                this.closeLoadingDialog();
-
-                this.listHelperService.toastV2Service.error(err);
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              // hide dialog
-              this.closeLoadingDialog();
-
-              this.listHelperService.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
-
-              this.needsRefreshList(true);
-            });
-        }
-      });
+    // // get list of selected follow-ups ids
+    // const selectedRecords: false |  string[] = this.validateCheckedRecords();
+    // if (!selectedRecords) {
+    //   return;
+    // }
+    //
+    // // show confirm dialog to confirm the action
+    // this.dialogService
+    //   .showConfirm('LNG_DIALOG_CONFIRM_RESTORE_MULTIPLE_FOLLOW_UPS')
+    //   .subscribe((answer: DialogAnswer) => {
+    //     if (answer.button === DialogAnswerButton.Yes) {
+    //       // construct filter
+    //       const qb = new RequestQueryBuilder();
+    //
+    //       qb.filter.
+    //         where({
+    //           id: {
+    //             inq: selectedRecords
+    //           }
+    //         });
+    //       // display loading
+    //       this.showLoadingDialog();
+    //       this.followUpsDataService
+    //         .restoreBulkFollowUps(this.selectedOutbreak.id, qb)
+    //         .pipe(
+    //           catchError((err) => {
+    //             // hide dialog
+    //             this.closeLoadingDialog();
+    //
+    //             this.listHelperService.toastV2Service.error(err);
+    //             return throwError(err);
+    //           })
+    //         )
+    //         .subscribe(() => {
+    //           // hide dialog
+    //           this.closeLoadingDialog();
+    //
+    //           this.listHelperService.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
+    //
+    //           this.needsRefreshList(true);
+    //         });
+    //     }
+    //   });
   }
 
   /**
@@ -351,72 +350,72 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
      * Modify selected follow-ups
      */
   modifySelectedFollowUps() {
-    // get list of selected ids
-    const selectedRecords: false | string[] = this.validateCheckedRecords();
-    if (!selectedRecords) {
-      return;
-    }
-
-    // redirect to next step
-    this.router.navigate(
-      ['/contacts/follow-ups/modify-list'],
-      {
-        queryParams: {
-          followUpsIds: JSON.stringify(selectedRecords)
-        }
-      }
-    );
+    // // get list of selected ids
+    // const selectedRecords: false | string[] = this.validateCheckedRecords();
+    // if (!selectedRecords) {
+    //   return;
+    // }
+    //
+    // // redirect to next step
+    // this.router.navigate(
+    //   ['/contacts/follow-ups/modify-list'],
+    //   {
+    //     queryParams: {
+    //       followUpsIds: JSON.stringify(selectedRecords)
+    //     }
+    //   }
+    // );
   }
 
   /**
      * Export selected follow-ups
      */
   exportSelectedFollowUps() {
-    // get list of selected ids
-    const selectedRecords: false | string[] = this.validateCheckedRecords();
-    if (!selectedRecords) {
-      return;
-    }
-
-    // construct query builder
-    const qb = new RequestQueryBuilder();
-    qb.filter.bySelect(
-      'id',
-      selectedRecords,
-      true,
-      null
-    );
-
-    // display export dialog
-    this.dialogService.showExportDialog({
-      // required
-      message: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE',
-      url: this.exportFollowUpsUrl,
-      fileName: this.followUpsDataExportFileName,
-
-      // configure
-      isAsyncExport: true,
-      displayUseDbColumns: true,
-      displayJsonReplaceUndefinedWithNull: true,
-      // exportProgress: (data) => { this.showExportProgress(data); },
-
-      // optional
-      allowedExportTypes: this.allowedExportTypes,
-      queryBuilder: qb,
-      displayEncrypt: true,
-      displayAnonymize: true,
-      displayFieldsGroupList: true,
-      displayUseQuestionVariable: true,
-      anonymizeFields: this.anonymizeFields,
-      fieldsGroupList: this.fieldsGroupList,
-      fieldsGroupListRequired: this.fieldsGroupListRequired,
-      exportStart: () => {
-        this.showLoadingDialog();
-      },
-      exportFinished: () => {
-        this.closeLoadingDialog();
-      }
-    });
+    // // get list of selected ids
+    // const selectedRecords: false | string[] = this.validateCheckedRecords();
+    // if (!selectedRecords) {
+    //   return;
+    // }
+    //
+    // // construct query builder
+    // const qb = new RequestQueryBuilder();
+    // qb.filter.bySelect(
+    //   'id',
+    //   selectedRecords,
+    //   true,
+    //   null
+    // );
+    //
+    // // display export dialog
+    // this.dialogService.showExportDialog({
+    //   // required
+    //   message: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE',
+    //   url: this.exportFollowUpsUrl,
+    //   fileName: this.followUpsDataExportFileName,
+    //
+    //   // configure
+    //   isAsyncExport: true,
+    //   displayUseDbColumns: true,
+    //   displayJsonReplaceUndefinedWithNull: true,
+    //   // exportProgress: (data) => { this.showExportProgress(data); },
+    //
+    //   // optional
+    //   allowedExportTypes: this.allowedExportTypes,
+    //   queryBuilder: qb,
+    //   displayEncrypt: true,
+    //   displayAnonymize: true,
+    //   displayFieldsGroupList: true,
+    //   displayUseQuestionVariable: true,
+    //   anonymizeFields: this.anonymizeFields,
+    //   fieldsGroupList: this.fieldsGroupList,
+    //   fieldsGroupListRequired: this.fieldsGroupListRequired,
+    //   exportStart: () => {
+    //     this.showLoadingDialog();
+    //   },
+    //   exportFinished: () => {
+    //     this.closeLoadingDialog();
+    //   }
+    // });
   }
 
   /**

@@ -234,6 +234,11 @@ export class ContactRangeFollowUpsListComponent
   }
 
   /**
+   * Initialize side table columns
+   */
+  protected initializeTableColumns(): void {}
+
+  /**
      * Initialize breadcrumbs
      */
   // private initializeBreadcrumbs() {

@@ -105,6 +105,11 @@ export class TransmissionChainsListComponent extends ListComponent implements On
   }
 
   /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {}
+
+  /**
      * Initialize filters
      */
   resetFiltersAddDefault() {

@@ -210,6 +210,11 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
   }
 
   /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {}
+
+  /**
      * Initialize breadcrumbs
      */
   // private initializeBreadcrumbs() {

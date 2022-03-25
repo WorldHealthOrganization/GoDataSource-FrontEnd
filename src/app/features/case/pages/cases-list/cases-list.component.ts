@@ -19,9 +19,8 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
-import { catchError, map, share, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { catchError, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
-import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
@@ -44,7 +43,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { LocationModel } from '../../../../core/models/location.model';
-import { V2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { V2FilterBoolean, V2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IExtendedColDef } from '../../../../shared/components-v2/app-list-table-v2/models/extended-column.model';
 
 @Component({
@@ -129,14 +128,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
   ];
 
+  // used to filter cases
+  notACaseFilter: boolean | string = false;
 
 
 
 
 
-
-  // user list
-  userList$: Observable<UserModel[]>;
 
   occupationsList$: Observable<any[]>;
   outcomeList$: Observable<any[]>;
@@ -158,8 +156,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   // provide constants to template
   Constants = Constants;
 
-  notACaseFilter: boolean | string = false;
-
   // subscribers
   outbreakSubscriber: Subscription;
 
@@ -179,7 +175,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     private i18nService: I18nService,
     private genericDataService: GenericDataService,
     private clusterDataService: ClusterDataService,
-    private userDataService: UserDataService,
     private entityHelperService: EntityHelperService,
     private redirectService: RedirectService
   ) {
@@ -190,9 +185,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    * Component initialized
    */
   ngOnInit() {
-    // retrieve users
-    this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
-
     // reference data
     this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
     this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
@@ -204,9 +196,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
     this.yesNoOptionsWithoutAllList$ = this.genericDataService.getFilterYesNoOptions(true);
     this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
-
-    // initialize table Columns
-    this.initializeTableColumns();
 
     // initialize quick actions
     this.initializeQuickActions();
@@ -259,7 +248,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   /**
    * Initialize Side Table Columns
    */
-  private initializeTableColumns(): void {
+  protected initializeTableColumns(): void {
     // address model used to search by phone number, address line, postal code, city....
     const filterAddressModel: AddressModel = new AddressModel({
       geoLocationAccurate: null
@@ -611,7 +600,16 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             return data.classification === Constants.CASE_CLASSIFICATION.NOT_A_CASE;
           }
         },
-        // #TODO - filter
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          search: (column) => {
+            // update not a case
+            this.notACaseFilter = (column.columnDefinition.filter as V2FilterBoolean).value;
+
+            // refresh
+            this.needsRefreshList();
+          }
+        },
         sortable: true
       },
       {
@@ -621,7 +619,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: V2ColumnFormat.BOOLEAN
         },
-        // #TODO - filter
+        filter: {
+          type: V2FilterType.BOOLEAN
+        },
         sortable: true
       },
       {
@@ -630,6 +630,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'responsibleUser.name'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
         },
         exclude: (): boolean => {
           return !UserModel.canList(this.authUser);
@@ -651,6 +655,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS',
           format: {
             type: V2ColumnFormat.BUTTON
+          },
+          filter: {
+            type: V2FilterType.NUMBER_RANGE,
+            min: 0
           },
           sortable: true,
           cssCellClass: 'gd-cell-button',
@@ -675,6 +683,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES',
           format: {
             type: V2ColumnFormat.BUTTON
+          },
+          filter: {
+            type: V2FilterType.NUMBER_RANGE,
+            min: 0
           },
           sortable: true,
           cssCellClass: 'gd-cell-button',
@@ -706,6 +718,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: V2ColumnFormat.BOOLEAN
         },
+        filter: {
+          type: V2FilterType.DELETED
+        },
         sortable: true
       },
       {
@@ -714,6 +729,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'createdByUser.name'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
         },
         exclude: (): boolean => {
           return !UserModel.canView(this.authUser);
@@ -731,6 +750,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         format: {
           type: V2ColumnFormat.DATETIME
         },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
         sortable: true
       },
       {
@@ -739,6 +761,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: 'updatedByUser.name'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
         },
         exclude: (): boolean => {
           return !UserModel.canView(this.authUser);
@@ -755,6 +781,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
         },
         sortable: true
       },
@@ -1690,7 +1719,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                   label: classificationId,
                   value: countResponse.classification[classificationId].count,
                   color: classification.map[classificationId] ? classification.map[classificationId].getColorCode() : Constants.DEFAULT_COLOR_REF_DATA,
-                  order: classification.map[classificationId].order !== undefined ?
+                  order: classification.map[classificationId]?.order !== undefined ?
                     classification.map[classificationId].order :
                     Number.MAX_SAFE_INTEGER
                 });
@@ -2110,7 +2139,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           fieldName: 'responsibleUserId',
           fieldLabel: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
           type: FilterType.MULTISELECT,
-          options$: this.userList$,
+          // options$: this.userList$,
           optionsLabelKey: 'name',
           optionsValueKey: 'id'
         })
@@ -2119,8 +2148,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   }
 
   /**
-     * Classification conditions
-     */
+   * Classification conditions
+   */
   private addClassificationConditions() {
     // create classification condition
     const trueCondition = {classification: {eq: Constants.CASE_CLASSIFICATION.NOT_A_CASE}};

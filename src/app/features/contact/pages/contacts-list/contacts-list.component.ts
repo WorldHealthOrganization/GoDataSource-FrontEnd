@@ -1355,55 +1355,55 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
      * Export selected records
      */
   exportSelectedContacts() {
-    // get list of contacts that we want to export
-    const selectedRecords: false | string[] = this.validateCheckedRecords();
-    if (!selectedRecords) {
-      return;
-    }
-
-    // construct query builder
-    const qb = new RequestQueryBuilder();
-    qb.filter.bySelect(
-      'id',
-      selectedRecords,
-      true,
-      null
-    );
-
-    // display export dialog
-    this.dialogService.showExportDialog({
-      // required
-      message: 'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE',
-      url: this.exportContactsUrl,
-      fileName: this.contactsDataExportFileName,
-
-      // configure
-      isAsyncExport: true,
-      displayUseDbColumns: true,
-      displayJsonReplaceUndefinedWithNull: true,
-      // exportProgress: (data) => { this.showExportProgress(data); },
-      extraDialogFields: [
-        new DialogField({
-          name: 'includeCaseFields',
-          placeholder: 'LNG_PAGE_LIST_CONTACTS_EXPORT_CASE_INFORMATION',
-          description: 'LNG_PAGE_LIST_CONTACTS_EXPORT_CASE_INFORMATION_DESCRIPTION',
-          fieldType: DialogFieldType.BOOLEAN
-        })
-      ],
-
-      // optional
-      allowedExportTypes: this.allowedExportTypes,
-      queryBuilder: qb,
-      displayEncrypt: true,
-      displayAnonymize: true,
-      displayFieldsGroupList: true,
-      displayUseQuestionVariable: true,
-      anonymizeFields: this.anonymizeFields,
-      fieldsGroupList: this.fieldsGroupList,
-      fieldsGroupListRequired: this.fieldsGroupListRequired,
-      exportStart: () => { this.showLoadingDialog(); },
-      exportFinished: () => { this.closeLoadingDialog(); }
-    });
+    // // get list of contacts that we want to export
+    // const selectedRecords: false | string[] = this.validateCheckedRecords();
+    // if (!selectedRecords) {
+    //   return;
+    // }
+    //
+    // // construct query builder
+    // const qb = new RequestQueryBuilder();
+    // qb.filter.bySelect(
+    //   'id',
+    //   selectedRecords,
+    //   true,
+    //   null
+    // );
+    //
+    // // display export dialog
+    // this.dialogService.showExportDialog({
+    //   // required
+    //   message: 'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE',
+    //   url: this.exportContactsUrl,
+    //   fileName: this.contactsDataExportFileName,
+    //
+    //   // configure
+    //   isAsyncExport: true,
+    //   displayUseDbColumns: true,
+    //   displayJsonReplaceUndefinedWithNull: true,
+    //   // exportProgress: (data) => { this.showExportProgress(data); },
+    //   extraDialogFields: [
+    //     new DialogField({
+    //       name: 'includeCaseFields',
+    //       placeholder: 'LNG_PAGE_LIST_CONTACTS_EXPORT_CASE_INFORMATION',
+    //       description: 'LNG_PAGE_LIST_CONTACTS_EXPORT_CASE_INFORMATION_DESCRIPTION',
+    //       fieldType: DialogFieldType.BOOLEAN
+    //     })
+    //   ],
+    //
+    //   // optional
+    //   allowedExportTypes: this.allowedExportTypes,
+    //   queryBuilder: qb,
+    //   displayEncrypt: true,
+    //   displayAnonymize: true,
+    //   displayFieldsGroupList: true,
+    //   displayUseQuestionVariable: true,
+    //   anonymizeFields: this.anonymizeFields,
+    //   fieldsGroupList: this.fieldsGroupList,
+    //   fieldsGroupListRequired: this.fieldsGroupListRequired,
+    //   exportStart: () => { this.showLoadingDialog(); },
+    //   exportFinished: () => { this.closeLoadingDialog(); }
+    // });
   }
 
 
@@ -1411,92 +1411,92 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
      * Export contacts dossier
      */
   exportSelectedContactsDossier() {
-    // get list of selected ids
-    const selectedRecords: false | string[] = this.validateCheckedRecords();
-    if (!selectedRecords) {
-      return;
-    }
-
-    // display export only if we have a selected outbreak
-    if (this.selectedOutbreak) {
-      // remove id from list
-      const anonymizeFields = _.filter(this.anonymizeFields, (value: LabelValuePair) => {
-        return value.value !== 'id';
-      });
-
-      // display export dialog
-      this.dialogService.showExportDialog({
-        message: 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_DOSSIER_DIALOG_TITLE',
-        url: `outbreaks/${this.selectedOutbreak.id}/contacts/dossier`,
-        fileName: this.contactsDataExportFileName,
-        fileType: ExportDataExtension.ZIP,
-        displayAnonymize: true,
-        anonymizeFields: anonymizeFields,
-        anonymizeFieldsKey: 'data',
-        extraAPIData: {
-          contacts: selectedRecords
-        },
-        isPOST: true,
-        exportStart: () => { this.showLoadingDialog(); },
-        exportFinished: () => { this.closeLoadingDialog(); }
-      });
-    }
+    // // get list of selected ids
+    // const selectedRecords: false | string[] = this.validateCheckedRecords();
+    // if (!selectedRecords) {
+    //   return;
+    // }
+    //
+    // // display export only if we have a selected outbreak
+    // if (this.selectedOutbreak) {
+    //   // remove id from list
+    //   const anonymizeFields = _.filter(this.anonymizeFields, (value: LabelValuePair) => {
+    //     return value.value !== 'id';
+    //   });
+    //
+    //   // display export dialog
+    //   this.dialogService.showExportDialog({
+    //     message: 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_DOSSIER_DIALOG_TITLE',
+    //     url: `outbreaks/${this.selectedOutbreak.id}/contacts/dossier`,
+    //     fileName: this.contactsDataExportFileName,
+    //     fileType: ExportDataExtension.ZIP,
+    //     displayAnonymize: true,
+    //     anonymizeFields: anonymizeFields,
+    //     anonymizeFieldsKey: 'data',
+    //     extraAPIData: {
+    //       contacts: selectedRecords
+    //     },
+    //     isPOST: true,
+    //     exportStart: () => { this.showLoadingDialog(); },
+    //     exportFinished: () => { this.closeLoadingDialog(); }
+    //   });
+    // }
   }
 
   /**
      * Export relationships for selected contacts
      */
   exportSelectedContactsRelationship() {
-    // get list of selected ids
-    const selectedRecords: false | string[] = this.validateCheckedRecords();
-    if (!selectedRecords) {
-      return;
-    }
-
-    // construct query builder
-    const qb = new RequestQueryBuilder();
-    const personsQb = qb.addChildQueryBuilder('person');
-
-    // retrieve only relationships that have at least one persons as desired type
-    qb.filter.byEquality(
-      'persons.type',
-      EntityType.CONTACT
-    );
-
-    // id
-    personsQb.filter.bySelect('id', selectedRecords, true, null);
-
-    // type
-    personsQb.filter.byEquality(
-      'type',
-      EntityType.CONTACT
-    );
-
-    // display export dialog
-    this.dialogService.showExportDialog({
-      // required
-      message: 'LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIPS_TITLE',
-      url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
-      fileName: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME'),
-
-      // configure
-      isAsyncExport: true,
-      displayUseDbColumns: true,
-      displayJsonReplaceUndefinedWithNull: true,
-      // exportProgress: (data) => { this.showExportProgress(data); },
-
-      // optional
-      queryBuilder: qb,
-      displayEncrypt: true,
-      displayAnonymize: true,
-      displayFieldsGroupList: true,
-      allowedExportTypes: this.allowedExportTypes,
-      anonymizeFields: this.relationshipAnonymizeFields,
-      fieldsGroupList: this.fieldsGroupListRelationships,
-      fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
-      exportStart: () => { this.showLoadingDialog(); },
-      exportFinished: () => { this.closeLoadingDialog(); }
-    });
+    // // get list of selected ids
+    // const selectedRecords: false | string[] = this.validateCheckedRecords();
+    // if (!selectedRecords) {
+    //   return;
+    // }
+    //
+    // // construct query builder
+    // const qb = new RequestQueryBuilder();
+    // const personsQb = qb.addChildQueryBuilder('person');
+    //
+    // // retrieve only relationships that have at least one persons as desired type
+    // qb.filter.byEquality(
+    //   'persons.type',
+    //   EntityType.CONTACT
+    // );
+    //
+    // // id
+    // personsQb.filter.bySelect('id', selectedRecords, true, null);
+    //
+    // // type
+    // personsQb.filter.byEquality(
+    //   'type',
+    //   EntityType.CONTACT
+    // );
+    //
+    // // display export dialog
+    // this.dialogService.showExportDialog({
+    //   // required
+    //   message: 'LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIPS_TITLE',
+    //   url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
+    //   fileName: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME'),
+    //
+    //   // configure
+    //   isAsyncExport: true,
+    //   displayUseDbColumns: true,
+    //   displayJsonReplaceUndefinedWithNull: true,
+    //   // exportProgress: (data) => { this.showExportProgress(data); },
+    //
+    //   // optional
+    //   queryBuilder: qb,
+    //   displayEncrypt: true,
+    //   displayAnonymize: true,
+    //   displayFieldsGroupList: true,
+    //   allowedExportTypes: this.allowedExportTypes,
+    //   anonymizeFields: this.relationshipAnonymizeFields,
+    //   fieldsGroupList: this.fieldsGroupListRelationships,
+    //   fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
+    //   exportStart: () => { this.showLoadingDialog(); },
+    //   exportFinished: () => { this.closeLoadingDialog(); }
+    // });
   }
 
   /**
@@ -1594,20 +1594,20 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
      * Modify selected contacts
      */
   bulkModifyContacts() {
-    // get list of contacts that we want to modify
-    const selectedRecords: false | string[] = this.validateCheckedRecords();
-    if (!selectedRecords) {
-      return;
-    }
-
-    // redirect to modify contacts page
-    this.router.navigate(
-      ['/contacts', 'modify-bulk'], {
-        queryParams: {
-          contactIds: JSON.stringify(selectedRecords)
-        }
-      }
-    );
+    // // get list of contacts that we want to modify
+    // const selectedRecords: false | string[] = this.validateCheckedRecords();
+    // if (!selectedRecords) {
+    //   return;
+    // }
+    //
+    // // redirect to modify contacts page
+    // this.router.navigate(
+    //   ['/contacts', 'modify-bulk'], {
+    //     queryParams: {
+    //       contactIds: JSON.stringify(selectedRecords)
+    //     }
+    //   }
+    // );
   }
 
   /**

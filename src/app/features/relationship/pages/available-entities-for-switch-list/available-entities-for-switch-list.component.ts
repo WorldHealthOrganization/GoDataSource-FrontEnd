@@ -17,8 +17,6 @@ import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryMo
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { EntityType } from '../../../../core/models/entity-type';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { AddressType } from '../../../../core/models/address.model';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
@@ -73,7 +71,6 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
     private toastV2Service: ToastV2Service,
     private relationshipDataService: RelationshipDataService,
     private referenceDataDataService: ReferenceDataDataService,
-    private dialogService: DialogService,
     private genericDataService: GenericDataService
   ) {
     // parent
@@ -83,7 +80,7 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
     );
 
     // disable multi select for current list component
-    this.checkedIsMultiSelect = false;
+    // this.checkedIsMultiSelect = false;
   }
 
   /**
@@ -125,6 +122,11 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
     // release parent resources
     super.ngOnDestroy();
   }
+
+  /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {}
 
   /**
      * @Overrides parent method
@@ -363,58 +365,58 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
      * Switch cases with selected entity
      */
   switchWithSelectedRecord() {
-    // get the selected record
-    const selectedRecordId = this.checkedRecords[0];
-    if (!selectedRecordId) {
-      return;
-    }
-
-    // create query builder for relationships
-    const qb = new RequestQueryBuilder();
-
-    // filter
-    qb.filter.where({
-      id: {
-        inq: this.selectedRecordsIds
-      }
-    });
-
-    // display loading
-    const loadingDialog = this.dialogService.showLoadingDialog();
-    this.dialogService
-      .showConfirm('LNG_DIALOG_CONFIRM_CHANGE_SOURCE')
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          this.relationshipDataService
-            .bulkChangeSource(
-              this.selectedOutbreak.id,
-              selectedRecordId,
-              qb
-            )
-            .pipe(
-              catchError((err) => {
-                // hide dialog
-                loadingDialog.close();
-
-                this.toastV2Service.error(err);
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              // hide dialog
-              loadingDialog.close();
-
-              // saved
-              this.toastV2Service.success('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_ACTION_SET_SOURCE_SUCCESS_MESSAGE');
-
-              // redirect
-              this.router.navigate(['/relationships', this.entityType, selectedRecordId, 'contacts']);
-            });
-        } else {
-          // hide dialog
-          loadingDialog.close();
-        }
-      });
+    // // get the selected record
+    // const selectedRecordId = this.checkedRecords[0];
+    // if (!selectedRecordId) {
+    //   return;
+    // }
+    //
+    // // create query builder for relationships
+    // const qb = new RequestQueryBuilder();
+    //
+    // // filter
+    // qb.filter.where({
+    //   id: {
+    //     inq: this.selectedRecordsIds
+    //   }
+    // });
+    //
+    // // display loading
+    // const loadingDialog = this.dialogService.showLoadingDialog();
+    // this.dialogService
+    //   .showConfirm('LNG_DIALOG_CONFIRM_CHANGE_SOURCE')
+    //   .subscribe((answer: DialogAnswer) => {
+    //     if (answer.button === DialogAnswerButton.Yes) {
+    //       this.relationshipDataService
+    //         .bulkChangeSource(
+    //           this.selectedOutbreak.id,
+    //           selectedRecordId,
+    //           qb
+    //         )
+    //         .pipe(
+    //           catchError((err) => {
+    //             // hide dialog
+    //             loadingDialog.close();
+    //
+    //             this.toastV2Service.error(err);
+    //             return throwError(err);
+    //           })
+    //         )
+    //         .subscribe(() => {
+    //           // hide dialog
+    //           loadingDialog.close();
+    //
+    //           // saved
+    //           this.toastV2Service.success('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_ACTION_SET_SOURCE_SUCCESS_MESSAGE');
+    //
+    //           // redirect
+    //           this.router.navigate(['/relationships', this.entityType, selectedRecordId, 'contacts']);
+    //         });
+    //     } else {
+    //       // hide dialog
+    //       loadingDialog.close();
+    //     }
+    //   });
   }
 
   /**

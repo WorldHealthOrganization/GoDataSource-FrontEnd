@@ -149,6 +149,11 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
   }
 
   /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {}
+
+  /**
    * Initialize breadcrumbs
    */
   initializeBreadcrumbs(): void {
