@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Params, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import * as _ from 'lodash';
 import { Observable, of, throwError } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { catchError, map, share, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { catchError, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
@@ -27,7 +27,6 @@ import { EventDataService } from '../../../../core/services/data/event.data.serv
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
@@ -39,6 +38,7 @@ import {
 } from '../../../../core/services/helper/models/dialog-v2.model';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import {
   IV2BottomDialogConfigButtonType,
@@ -46,6 +46,7 @@ import {
 import { IV2BreadcrumbAction } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import {
   V2SideDialogConfigInputType,
 } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
@@ -72,18 +73,12 @@ export class EventsListComponent
   OutbreakModel = OutbreakModel;
   UserModel = UserModel;
 
-  // FIXME: should be deleted if it's not sent as input to app-list-table-v2
   // address model needed for filters
   filterAddressModel: AddressModel = new AddressModel({
     geoLocationAccurate: null,
   });
 
-  // FIXME: should be deleted if it's not sent as input to app-list-table-v2
   filterAddressParentLocationIds: string[] = [];
-
-  // FIXME: should be deleted if it's not sent as input to app-list-table-v2
-  // user list
-  userList$: Observable<UserModel[]>;
 
   // list of export fields groups
   fieldsGroupList: LabelValuePair[];
@@ -100,7 +95,6 @@ export class EventsListComponent
   // list of existing events
   eventsList$: Observable<EventModel[]>;
 
-  // FIXME: should be deleted if it's not sent as input to app-list-table-v2
   yesNoOptionsList$: Observable<any>;
 
   // provide constants to template
@@ -504,11 +498,11 @@ export class EventsListComponent
     private dialogService: DialogService,
     private genericDataService: GenericDataService,
     private i18nService: I18nService,
-    private userDataService: UserDataService,
     private redirectService: RedirectService,
     private entityHelperService: EntityHelperService,
     private dialogV2Service: DialogV2Service,
     private locationDataService: LocationDataService,
+    private activatedRoute: ActivatedRoute
   ) {
     super(listHelperService);
   }
@@ -524,9 +518,6 @@ export class EventsListComponent
       this.eventsDataExportFileName;
 
     this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
-
-    // retrieve users
-    this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
     // subscribe to the Selected Outbreak
     this.outbreakSubscriber = this.outbreakDataService
@@ -572,12 +563,7 @@ export class EventsListComponent
         this.relationshipFieldGroupsRequires = fieldsGroupList.toRequiredList();
       });
 
-    // initialize Side Table Columns
-    this.initializeTableColumns();
-
-    this.initTableColumns();
-
-    this.initQuickActions();
+    this.initializeQuickActions();
 
     this.initializeGroupActions();
 
@@ -598,13 +584,22 @@ export class EventsListComponent
     }
   }
 
-  initTableColumns(): void {
+  protected initializeTableColumns(): void {
+    // address model used to search by phone number, address line, postal code, city....
+    const filterAddressModel: AddressModel = new AddressModel({
+      geoLocationAccurate: null
+    });
+
     this.tableColumns = [
       {
         field: 'name',
         label: 'LNG_EVENT_FIELD_LABEL_NAME',
         pinned: IV2ColumnPinned.LEFT,
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
       },
       {
         field: 'date',
@@ -612,6 +607,10 @@ export class EventsListComponent
         format: {
           type: V2ColumnFormat.DATE,
         },
+        sortable: true,
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
       },
       {
         field: 'description',
@@ -622,11 +621,25 @@ export class EventsListComponent
         field: 'phoneNumber',
         label: 'LNG_EVENT_FIELD_LABEL_PHONE_NUMBER',
         notVisible: true,
+        sortable: true,
+        filter: {
+          type: V2FilterType.ADDRESS_PHONE_NUMBER,
+          address: filterAddressModel,
+          field: 'addresses',
+          fieldIsArray: true
+        }
       },
       {
         field: 'address.emailAddress',
         label: 'LNG_EVENT_FIELD_LABEL_EMAIL',
         notVisible: true,
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          address: filterAddressModel,
+          addressField: 'emailAddress',
+          field: 'addresses',
+          fieldIsArray: true
+        },
         sortable: true
       },
       {
@@ -677,6 +690,7 @@ export class EventsListComponent
         {
           field: 'numberOfExposures',
           label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+          sortable: true,
           format: {
             type: V2ColumnFormat.BUTTON,
           },
@@ -704,16 +718,33 @@ export class EventsListComponent
       {
         field: 'deleted',
         label: 'LNG_EVENT_FIELD_LABEL_DELETED',
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.DELETED
+        },
         sortable: true
       },
       {
         field: 'createdBy',
         label: 'LNG_EVENT_FIELD_LABEL_CREATED_BY',
-        sortable: true,
         notVisible: true,
         format: {
-          type: V2ColumnFormat.BOOLEAN,
+          type: 'createdByUser.name'
         },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+        },
+        exclude: (): boolean => {
+          return !UserModel.canView(this.authUser);
+        },
+        link: (data) => {
+          return data.createdBy ?
+            `/users/${data.createdBy}/view` :
+            undefined;
+        }
       },
       {
         field: 'createdAt',
@@ -723,14 +754,23 @@ export class EventsListComponent
         format: {
           type: V2ColumnFormat.DATETIME,
         },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
       },
       {
         field: 'updatedBy',
         label: 'LNG_EVENT_FIELD_LABEL_UPDATED_BY',
-        sortable: true,
         notVisible: true,
         format: {
           type: 'updatedByUser.name',
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+        },
+        exclude: (): boolean => {
+          return !UserModel.canView(this.authUser);
         },
         link: (data) => {
           return data.updatedBy ? `/users/${data.updatedBy}/view` : undefined;
@@ -741,6 +781,9 @@ export class EventsListComponent
         label: 'LNG_EVENT_FIELD_LABEL_UPDATED_AT',
         sortable: true,
         notVisible: true,
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
         format: {
           type: V2ColumnFormat.DATETIME,
         },
@@ -753,6 +796,12 @@ export class EventsListComponent
         format: {
           type: 'mainAddress.location.name',
         },
+        filter: {
+          type: V2FilterType.ADDRESS_MULTIPLE_LOCATION,
+          address: filterAddressModel,
+          field: 'addresses',
+          fieldIsArray: true
+        },
         link: (data) => {
           return data.mainAddress?.location?.name
             ? `/locations/${data.mainAddress.location.id}/view`
@@ -762,20 +811,34 @@ export class EventsListComponent
       {
         field: 'address.addressLine1',
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
-        sortable: true,
         notVisible: true,
         format: {
           type: 'mainAddress.addressLine1',
         },
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          address: filterAddressModel,
+          addressField: 'addressLine1',
+          field: 'addresses',
+          fieldIsArray: true
+        },
+        sortable: true
       },
       {
         field: 'address.city',
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
-        sortable: true,
         notVisible: true,
         format: {
           type: 'mainAddress.city',
         },
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          address: filterAddressModel,
+          addressField: 'city',
+          field: 'addresses',
+          fieldIsArray: true
+        },
+        sortable: true
       },
       {
         field: 'addresses.geoLocation.lat',
@@ -784,7 +847,7 @@ export class EventsListComponent
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lat',
-        },
+        }
       },
       {
         field: 'addresses.geoLocation.lng',
@@ -793,16 +856,23 @@ export class EventsListComponent
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lng',
-        },
+        }
       },
       {
         field: 'addresses.postalCode',
         label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
-        sortable: true,
         notVisible: true,
         format: {
           type: 'mainAddress.postalCode',
         },
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          address: filterAddressModel,
+          addressField: 'postalCode',
+          field: 'addresses',
+          fieldIsArray: true
+        },
+        sortable: true
       },
       {
         field: 'addresses.geoLocationAccurate',
@@ -812,6 +882,13 @@ export class EventsListComponent
         format: {
           type: V2ColumnFormat.BOOLEAN,
           field: 'mainAddress.geoLocationAccurate',
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION,
+          address: filterAddressModel,
+          field: 'addresses',
+          fieldIsArray: true,
+          options: this.activatedRoute.snapshot.data.yesNoAll
         },
       },
 
@@ -1156,7 +1233,7 @@ export class EventsListComponent
     );
   }
 
-  initQuickActions(): void {
+  private initializeQuickActions(): void {
     this.quickActions = {
       type: V2ActionType.MENU,
       label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
@@ -1368,23 +1445,6 @@ export class EventsListComponent
   }
 
   /**
-   * Initialize add action
-   */
-  initializeAddAction(): void {
-    this.addAction = {
-      type: V2ActionType.ICON_LABEL,
-      label: 'LNG_COMMON_BUTTON_ADD',
-      icon: 'add_circle_outline',
-      action: {
-        link: (): string[] => ['/events', 'create'],
-      },
-      visible: (): boolean => {
-        return EventModel.canCreate(this.authUser);
-      },
-    };
-  }
-
-  /**
    * Initialize group actions
    */
   private initializeGroupActions(): void {
@@ -1450,129 +1510,21 @@ export class EventsListComponent
     ];
   }
 
-  // FIXME: should be deleted if it's not used anymore
   /**
-   * Initialize Side Table Columns
+   * Initialize add action
    */
-  initializeTableColumns() {
-    // default table columns
-    // this.tableColumns = [
-    //   new VisibleColumnModel({
-    //     field: 'checkbox',
-    //     required: true,
-    //     excludeFromSave: true
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'name',
-    //     label: 'LNG_EVENT_FIELD_LABEL_NAME'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'date',
-    //     label: 'LNG_EVENT_FIELD_LABEL_DATE'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'description',
-    //     label: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'phoneNumber',
-    //     label: 'LNG_EVENT_FIELD_LABEL_PHONE_NUMBER',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'address.emailAddress',
-    //     label: 'LNG_EVENT_FIELD_LABEL_EMAIL',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'responsibleUserId',
-    //     label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
-    //     visible: false,
-    //     excludeFromDisplay: (): boolean => {
-    //       return !UserModel.canList(this.authUser);
-    //     }
-    //   })
-    // ];
-    //
-    // // number of contacts & exposures columns should be visible only on pages where we have relationships
-    // // for cases without relationships we don't need these columns
-    // if (this.appliedListFilter !== Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS) {
-    //   this.tableColumns.push(
-    //     new VisibleColumnModel({
-    //       field: 'numberOfContacts',
-    //       label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS',
-    //       visible: false
-    //     }),
-    //     new VisibleColumnModel({
-    //       field: 'numberOfExposures',
-    //       label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
-    //       visible: false
-    //     })
-    //   );
-    // }
-    //
-    // // rest of columns :)
-    // this.tableColumns.push(
-    //   new VisibleColumnModel({
-    //     field: 'deleted',
-    //     label: 'LNG_EVENT_FIELD_LABEL_DELETED'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'createdBy',
-    //     label: 'LNG_EVENT_FIELD_LABEL_CREATED_BY',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'createdAt',
-    //     label: 'LNG_EVENT_FIELD_LABEL_CREATED_AT',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'updatedBy',
-    //     label: 'LNG_EVENT_FIELD_LABEL_UPDATED_BY',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'updatedAt',
-    //     label: 'LNG_EVENT_FIELD_LABEL_UPDATED_AT',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'location',
-    //     label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'address.addressLine1',
-    //     label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'address.city',
-    //     label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'address.geoLocation.lat',
-    //     label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'address.geoLocation.lng',
-    //     label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'address.postalCode',
-    //     label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'address.geoLocationAccurate',
-    //     label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
-    //     visible: false
-    //   })
-    // );
+  private initializeAddAction(): void {
+    this.addAction = {
+      type: V2ActionType.ICON_LABEL,
+      label: 'LNG_COMMON_BUTTON_ADD',
+      icon: 'add_circle_outline',
+      action: {
+        link: (): string[] => ['/events', 'create'],
+      },
+      visible: (): boolean => {
+        return EventModel.canCreate(this.authUser);
+      },
+    };
   }
 
   /**
@@ -1621,7 +1573,6 @@ export class EventsListComponent
     }
   }
 
-  // FIXME: should be deleted if it's not used anymore
   /**
    * Fields retrieved from api to reduce payload size
    */
@@ -1629,7 +1580,6 @@ export class EventsListComponent
     return [];
   }
 
-  // FIXME: should be deleted if it's not used anymore
   /**
    * Re(load) the Events list
    */
@@ -1722,42 +1672,46 @@ export class EventsListComponent
     }
   }
 
-  // FIXME: should be deleted if it's not used anymore
   /**
    * Get total number of items, based on the applied filters
    */
   refreshListCount(applyHasMoreLimit?: boolean) {
-    if (this.selectedOutbreak) {
-      // set apply value
-      if (applyHasMoreLimit !== undefined) {
-        this.applyHasMoreLimit = applyHasMoreLimit;
-      }
-
-      // remove paginator from query builder
-      const countQueryBuilder = _.cloneDeep(this.queryBuilder);
-      countQueryBuilder.paginator.clear();
-      countQueryBuilder.sort.clear();
-
-      // apply has more limit
-      if (this.applyHasMoreLimit) {
-        countQueryBuilder.flag('applyHasMoreLimit', true);
-      }
-
-      // count
-      this.eventDataService
-        .getEventsCount(this.selectedOutbreak.id, countQueryBuilder)
-        .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            return throwError(err);
-          }),
-          // should be the last pipe
-          takeUntil(this.destroyed$)
-        )
-        .subscribe((response) => {
-          this.pageCount = response;
-        });
+    if (!this.selectedOutbreak) {
+      return;
     }
+
+    // reset
+    this.pageCount = undefined;
+
+    // set apply value
+    if (applyHasMoreLimit !== undefined) {
+      this.applyHasMoreLimit = applyHasMoreLimit;
+    }
+
+    // remove paginator from query builder
+    const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+    countQueryBuilder.paginator.clear();
+    countQueryBuilder.sort.clear();
+
+    // apply has more limit
+    if (this.applyHasMoreLimit) {
+      countQueryBuilder.flag('applyHasMoreLimit', true);
+    }
+
+    // count
+    this.eventDataService
+      .getEventsCount(this.selectedOutbreak.id, countQueryBuilder)
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        }),
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      )
+      .subscribe((response) => {
+        this.pageCount = response;
+      });
   }
 
   /**
@@ -1823,7 +1777,6 @@ export class EventsListComponent
       });
   }
 
-  // FIXME: should be deleted if not used anymore
   /**
    * Export selected events
    */
@@ -1955,7 +1908,6 @@ export class EventsListComponent
       });
   }
 
-  // FIXME: should be deleted if it's not used anymore
   /**
    * Export relationships for selected events
    */
@@ -2134,7 +2086,6 @@ export class EventsListComponent
     });
   }
 
-  // FIXME: should be deleted if it's not used anymore
   /**
    * Display contacts popup
    */
@@ -2151,7 +2102,6 @@ export class EventsListComponent
     // );
   }
 
-  // FIXME: should be deleted if it's not used anymore
   /**
    * Display exposures popup
    */
