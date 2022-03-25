@@ -1681,6 +1681,30 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   private initializeGroupedData(): void {
     this.groupedData = {
       label: 'LNG_PAGE_LIST_CASES_ACTION_SHOW_GROUP_BY_CLASSIFICATION_PILLS',
+      click: (
+        item,
+        group
+      ) => {
+        // no need to refresh group
+        group.data.blockNextGet = true;
+
+        // filter by group data
+        if (!item) {
+          this.filterByEquality(
+            'classification',
+            null
+          );
+        } else if (item.label === 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_UNCLASSIFIED') {
+          // clear
+          this.filterByNotHavingValue('classification');
+        } else {
+          // search
+          this.filterByEquality(
+            'classification',
+            item.label
+          );
+        }
+      },
       data: {
         loading: false,
         values: [],
@@ -1696,6 +1720,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           clonedQueryBuilder.paginator.clear();
           clonedQueryBuilder.sort.clear();
           clonedQueryBuilder.clearFields();
+
+          // remove any classification filters so we see all options
+          clonedQueryBuilder.filter.remove('classification');
 
           // load data
           return this.caseDataService
@@ -2161,11 +2188,22 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     this.queryBuilder.filter.removeExactCondition(trueCondition);
     this.queryBuilder.filter.removeExactCondition(falseCondition);
 
+    // check if we are searching by not a case classification
+    let notACaseFilter = this.notACaseFilter;
+    if (_.isEqual(
+      this.queryBuilder.filter.get('classification'),
+      {
+        classification: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+      }
+    )) {
+      notACaseFilter = true;
+    }
+
     // filter by classification
-    if (this.notACaseFilter === true) {
+    if (notACaseFilter === true) {
       // show cases that are NOT classified as Not a Case
       this.queryBuilder.filter.where(trueCondition);
-    } else if (this.notACaseFilter === false) {
+    } else if (notACaseFilter === false) {
       // show cases classified as Not a Case
       this.queryBuilder.filter.where(falseCondition);
     }
