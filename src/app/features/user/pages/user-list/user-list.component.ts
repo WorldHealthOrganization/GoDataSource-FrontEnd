@@ -154,7 +154,7 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**

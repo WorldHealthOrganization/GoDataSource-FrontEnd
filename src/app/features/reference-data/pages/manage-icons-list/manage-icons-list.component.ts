@@ -98,7 +98,7 @@ export class ManageIconsListComponent extends ListComponent implements OnInit, O
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**

@@ -448,7 +448,7 @@
                     <div class="column-filter">
                         <app-form-select
                             name="outcomeFilter"
-                            [ngModel]="false"
+                            ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="outcomeList$  | async"
                             (optionChanged)="filterBySelectField('outcomeId', $event)"

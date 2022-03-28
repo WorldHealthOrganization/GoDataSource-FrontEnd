@@ -313,7 +313,7 @@ export class RequestFilter {
   ): RequestFilter {
     if (
       _.isEmpty(value) &&
-            !_.isNumber(value)
+      !_.isNumber(value)
     ) {
       // remove filter
       this.remove(property);

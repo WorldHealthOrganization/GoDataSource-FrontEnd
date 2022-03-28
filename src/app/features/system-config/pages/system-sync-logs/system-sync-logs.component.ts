@@ -185,7 +185,7 @@ export class SystemSyncLogsComponent
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**
@@ -440,7 +440,7 @@ export class SystemSyncLogsComponent
       })).subscribe((answer: DialogAnswer) => {
         if (answer.button === DialogAnswerButton.Yes) {
           // display loading
-          this.showLoadingDialog();
+          // this.showLoadingDialog();
 
           // construct query
           const qb = new RequestQueryBuilder();
@@ -455,7 +455,7 @@ export class SystemSyncLogsComponent
             .pipe(
               catchError((err) => {
                 this.toastV2Service.error(err);
-                this.closeLoadingDialog();
+                // this.closeLoadingDialog();
                 return throwError(err);
               })
             )
@@ -467,7 +467,7 @@ export class SystemSyncLogsComponent
               this.needsRefreshList(true);
 
               // hide loading
-              this.closeLoadingDialog();
+              // this.closeLoadingDialog();
             });
         }
       });
@@ -488,10 +488,10 @@ export class SystemSyncLogsComponent
         fileType: ExportDataExtension.ZIP,
         exportStart: () => {
           // display loading dialog
-          this.showLoadingDialog();
+          // this.showLoadingDialog();
         },
         exportFinished: () => {
-          this.closeLoadingDialog();
+          // this.closeLoadingDialog();
         },
         extraDialogFields: [
           new DialogField({

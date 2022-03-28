@@ -431,13 +431,13 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
       this.queryBuilder.sort.clear();
 
       // retrieve Side filters
-      let queryBuilder;
-      if (
-        this.sideFilter &&
-                (queryBuilder = this.sideFilter.getQueryBuilder())
-      ) {
-        this.queryBuilder.sort.merge(queryBuilder.sort);
-      }
+      // let queryBuilder;
+      // if (
+      //   this.sideFilter &&
+      //   (queryBuilder = this.sideFilter.getQueryBuilder())
+      // ) {
+      //   this.queryBuilder.sort.merge(queryBuilder.sort);
+      // }
 
       // apply sort
       this.queryBuilder.sort.by('firstName', direction);

@@ -161,9 +161,11 @@
         <div
           *ngFor="let groupValue of groupedData.data.values"
           class="gd-list-top-grouped-data-value"
+          [class.gd-list-top-grouped-data-value-active]="groupValue.active"
           fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="1.6rem"
           [style.background-color]="groupValue.bgColor"
-          [style.color]="groupValue.textColor">
+          [style.color]="groupValue.textColor"
+          (click)="clickGroupValue(groupValue)">
 
           <!-- Label -->
           <div

@@ -153,7 +153,7 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**
@@ -658,21 +658,21 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
               answer.inputValue.value.disabled = true;
             }
 
-            this.showLoadingDialog();
+            // this.showLoadingDialog();
             this.systemSettingsDataService
               .modifySystemSettings({
                 dataBackup: answer.inputValue.value
               })
               .pipe(
                 catchError((err) => {
-                  this.closeLoadingDialog();
+                  // this.closeLoadingDialog();
                   this.toastV2Service.error(err);
                   return throwError(err);
                 })
               )
               .subscribe(() => {
                 // display success message
-                this.closeLoadingDialog();
+                // this.closeLoadingDialog();
                 this.toastV2Service.success('LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SUCCESS_MESSAGE');
 
                 // refresh settings

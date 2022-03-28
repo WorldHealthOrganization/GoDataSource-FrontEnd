@@ -138,7 +138,7 @@ export class LocationUsageListComponent extends ListComponent implements OnInit,
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
 
     // release subscriber
     if (this.outbreakSubscriber) {

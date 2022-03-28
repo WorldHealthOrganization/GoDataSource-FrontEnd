@@ -31,7 +31,7 @@
         <div
             fxFlex fxGrow="0" fxLayoutAlign="start center"
             class="filters-applied">
-            {{ queryBuilder.isEmptyOnlyFilters() ? '' : ('LNG_COMMON_LABEL_FILTERS_USED' | translate) }}
+<!--            {{ queryBuilder.isEmptyOnlyFilters() ? '' : ('LNG_COMMON_LABEL_FILTERS_USED' | translate) }}-->
         </div>
 
         <!-- Filter buttons -->
@@ -68,14 +68,14 @@
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{'LNG_LANGUAGE_FIELD_LABEL_NAME' | translate}}</div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="nameFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'| translate"
-                            (optionChanged)="filterByTextField('name', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="nameFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'| translate"-->
+<!--                            (optionChanged)="filterByTextField('name', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>

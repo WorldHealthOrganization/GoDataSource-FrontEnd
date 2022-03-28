@@ -146,7 +146,7 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
 
     if (this.getSelectedOutbreakSubject) {
       this.getSelectedOutbreakSubject.unsubscribe();

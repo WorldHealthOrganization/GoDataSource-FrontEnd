@@ -29,7 +29,7 @@
         <div
             fxFlex fxGrow="0" fxLayoutAlign="start center"
             class="filters-applied">
-            {{ queryBuilder.isEmptyOnlyFilters() ? '' : ('LNG_COMMON_LABEL_FILTERS_USED' | translate) }}
+<!--            {{ queryBuilder.isEmptyOnlyFilters() ? '' : ('LNG_COMMON_LABEL_FILTERS_USED' | translate) }}-->
         </div>
 
         <!-- Filter buttons -->
@@ -69,14 +69,14 @@
                         {{'LNG_ASYNC_COT_FIELD_LABEL_NAME' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="nameFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('name', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="nameFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByTextField('name', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -94,12 +94,12 @@
                         {{'LNG_ASYNC_COT_FIELD_LABEL_START_DATE' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-daterange
-                            name="startDateFilter"
-                            ngModel
-                            (changed)="filterByDateRangeField('startDate', $event)"
-                            app-reset-input-on-side-filter>
-                        </app-form-daterange>
+<!--                        <app-form-daterange-->
+<!--                            name="startDateFilter"-->
+<!--                            ngModel-->
+<!--                            (changed)="filterByDateRangeField('startDate', $event)"-->
+<!--                            app-reset-input-on-side-filter>-->
+<!--                        </app-form-daterange>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -117,12 +117,12 @@
                         {{'LNG_ASYNC_COT_FIELD_LABEL_END_DATE' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-daterange
-                            name="endDateFilter"
-                            ngModel
-                            (changed)="filterByDateRangeField('endDate', $event)"
-                            app-reset-input-on-side-filter>
-                        </app-form-daterange>
+<!--                        <app-form-daterange-->
+<!--                            name="endDateFilter"-->
+<!--                            ngModel-->
+<!--                            (changed)="filterByDateRangeField('endDate', $event)"-->
+<!--                            app-reset-input-on-side-filter>-->
+<!--                        </app-form-daterange>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -140,18 +140,18 @@
                         {{'LNG_ASYNC_COT_FIELD_LABEL_STATUS' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="statusFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="statusList$ | async"
-                            (optionChanged)="filterBySelectField('status', $event)"
-                            multiple="true"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="statusFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="statusList$ | async"-->
+<!--                            (optionChanged)="filterBySelectField('status', $event)"-->
+<!--                            multiple="true"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayInvisibleItems]="true"-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -194,14 +194,14 @@
                         {{'LNG_ASYNC_COT_FIELD_LABEL_ERROR' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="errorFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('error', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="errorFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByTextField('error', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>

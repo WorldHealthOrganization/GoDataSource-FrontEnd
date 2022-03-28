@@ -87,7 +87,7 @@ export class ReferenceDataCategoriesListComponent
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**

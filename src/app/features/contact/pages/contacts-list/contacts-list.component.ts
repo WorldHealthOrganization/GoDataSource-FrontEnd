@@ -703,7 +703,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
 
     // outbreak subscriber
     if (this.outbreakSubscriber) {
@@ -1585,8 +1585,8 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
       anonymizeFields: this.relationshipAnonymizeFields,
       fieldsGroupList: this.fieldsGroupListRelationships,
       fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
-      exportStart: () => { this.showLoadingDialog(); },
-      exportFinished: () => { this.closeLoadingDialog(); }
+      // exportStart: () => { this.showLoadingDialog(); },
+      // exportFinished: () => { this.closeLoadingDialog(); }
     });
   }
 
@@ -1629,7 +1629,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
     countQueryBuilder.fields('id', 'followUp');
 
     // display loading while determining how many records will be deleted
-    this.showLoadingDialog();
+    // this.showLoadingDialog();
 
     // make all requests in parallel
     forkJoin([
@@ -1642,7 +1642,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
       [statuses, records]: [LabelValuePair[], ContactModel[]]
     ) => {
       // hide loading
-      this.closeLoadingDialog();
+      // this.closeLoadingDialog();
 
       // display change status dialog
       this.dialogService
@@ -1680,7 +1680,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             }));
 
             // display loading while determining how many records will be deleted
-            this.showLoadingDialog();
+            // this.showLoadingDialog();
 
             // update statuses
             this.contactDataService
@@ -1690,7 +1690,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
               )
               .pipe(
                 catchError((err) => {
-                  this.closeLoadingDialog();
+                  // this.closeLoadingDialog();
                   this.toastV2Service.error(err);
                   return throwError(err);
                 })
@@ -1704,7 +1704,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                 );
 
                 // close dialog
-                this.closeLoadingDialog();
+                // this.closeLoadingDialog();
 
                 // refresh list
                 this.needsRefreshList(true);

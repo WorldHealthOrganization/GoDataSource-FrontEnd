@@ -129,7 +129,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   ];
 
   // used to filter cases
-  notACaseFilter: boolean | string = false;
+  notACaseFilter: boolean | '' = false;
 
 
 
@@ -215,7 +215,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
 
     // outbreak subscriber
     if (this.outbreakSubscriber) {
@@ -251,7 +251,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   protected initializeTableColumns(): void {
     // address model used to search by phone number, address line, postal code, city....
     const filterAddressModel: AddressModel = new AddressModel({
-      geoLocationAccurate: null
+      geoLocationAccurate: ''
     });
 
     // default table columns
@@ -602,6 +602,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         },
         filter: {
           type: V2FilterType.BOOLEAN,
+          value: this.notACaseFilter,
           search: (column) => {
             // update not a case
             this.notACaseFilter = (column.columnDefinition.filter as V2FilterBoolean).value;
@@ -719,7 +720,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           type: V2ColumnFormat.BOOLEAN
         },
         filter: {
-          type: V2FilterType.DELETED
+          type: V2FilterType.DELETED,
+          value: false
         },
         sortable: true
       },
@@ -1679,6 +1681,30 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   private initializeGroupedData(): void {
     this.groupedData = {
       label: 'LNG_PAGE_LIST_CASES_ACTION_SHOW_GROUP_BY_CLASSIFICATION_PILLS',
+      click: (
+        item,
+        group
+      ) => {
+        // no need to refresh group
+        group.data.blockNextGet = true;
+
+        // filter by group data
+        if (!item) {
+          this.filterByEquality(
+            'classification',
+            null
+          );
+        } else if (item.label === 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_UNCLASSIFIED') {
+          // clear
+          this.filterByNotHavingValue('classification');
+        } else {
+          // search
+          this.filterByEquality(
+            'classification',
+            item.label
+          );
+        }
+      },
       data: {
         loading: false,
         values: [],
@@ -1694,6 +1720,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           clonedQueryBuilder.paginator.clear();
           clonedQueryBuilder.sort.clear();
           clonedQueryBuilder.clearFields();
+
+          // remove any classification filters so we see all options
+          clonedQueryBuilder.filter.remove('classification');
 
           // load data
           return this.caseDataService
@@ -2159,11 +2188,22 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     this.queryBuilder.filter.removeExactCondition(trueCondition);
     this.queryBuilder.filter.removeExactCondition(falseCondition);
 
+    // check if we are searching by not a case classification
+    let notACaseFilter = this.notACaseFilter;
+    if (_.isEqual(
+      this.queryBuilder.filter.get('classification'),
+      {
+        classification: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+      }
+    )) {
+      notACaseFilter = true;
+    }
+
     // filter by classification
-    if (this.notACaseFilter === true) {
+    if (notACaseFilter === true) {
       // show cases that are NOT classified as Not a Case
       this.queryBuilder.filter.where(trueCondition);
-    } else if (this.notACaseFilter === false) {
+    } else if (notACaseFilter === false) {
       // show cases classified as Not a Case
       this.queryBuilder.filter.where(falseCondition);
     }

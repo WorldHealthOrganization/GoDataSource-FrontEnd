@@ -149,7 +149,7 @@ export class ClientApplicationsListComponent
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**
@@ -446,12 +446,12 @@ export class ClientApplicationsListComponent
         })
       ],
       fileExtension: 'png',
-      exportStart: () => {
-        this.showLoadingDialog();
-      },
-      exportFinished: () => {
-        this.closeLoadingDialog();
-      }
+      // exportStart: () => {
+      //   this.showLoadingDialog();
+      // },
+      // exportFinished: () => {
+      //   this.closeLoadingDialog();
+      // }
     });
   }
 }

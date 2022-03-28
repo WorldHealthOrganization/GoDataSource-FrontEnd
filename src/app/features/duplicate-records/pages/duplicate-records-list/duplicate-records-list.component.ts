@@ -92,7 +92,7 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
 
     // outbreak subscriber
     if (this.outbreakSubscriber) {

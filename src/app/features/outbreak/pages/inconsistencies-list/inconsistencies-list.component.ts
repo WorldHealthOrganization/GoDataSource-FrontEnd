@@ -135,7 +135,7 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**

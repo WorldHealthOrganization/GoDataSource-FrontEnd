@@ -166,7 +166,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   protected initializeFollowUpsPrint() {

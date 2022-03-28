@@ -48,7 +48,7 @@
         <div
             fxFlex fxGrow="0" fxLayoutAlign="start center"
             class="filters-applied">
-            {{ queryBuilder.isEmptyOnlyFilters() ? '' : ('LNG_COMMON_LABEL_FILTERS_USED' | translate) }}
+<!--            {{ queryBuilder.isEmptyOnlyFilters() ? '' : ('LNG_COMMON_LABEL_FILTERS_USED' | translate) }}-->
         </div>
 
         <!-- Filter buttons -->
@@ -86,14 +86,14 @@
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{ "LNG_TEAM_FIELD_LABEL_NAME" | translate}}</div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="nameFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('name', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="nameFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByTextField('name', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -122,75 +122,75 @@
                         </button>
 
                         <mat-menu #columnActions="matMenu">
-                            <button
-                                mat-menu-item
-                                (click)="toggleColumn('users', true)">
-                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND_ALL' | translate }}
-                            </button>
-                            <button
-                                mat-menu-item
-                                (click)="toggleColumn('users', false)">
-                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE_ALL' | translate }}
-                            </button>
+<!--                            <button-->
+<!--                                mat-menu-item-->
+<!--                                (click)="toggleColumn('users', true)">-->
+<!--                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND_ALL' | translate }}-->
+<!--                            </button>-->
+<!--                            <button-->
+<!--                                mat-menu-item-->
+<!--                                (click)="toggleColumn('users', false)">-->
+<!--                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE_ALL' | translate }}-->
+<!--                            </button>-->
                         </mat-menu>
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="userIdFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
-                            [options]="usersList$ | async"
-                            (optionChanged)="filterBySelectField('userIds', $event, 'id')"
-                            multiple="true"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true"
-                            optionValueKey="id"
-                            optionLabelKey="name">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="userIdFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "-->
+<!--                            [options]="usersList$ | async"-->
+<!--                            (optionChanged)="filterBySelectField('userIds', $event, 'id')"-->
+<!--                            multiple="true"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayInvisibleItems]="true"-->
+<!--                            [displayFilterIcon]="true"-->
+<!--                            optionValueKey="id"-->
+<!--                            optionLabelKey="name">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item">
-                <ng-container *ngIf="!isCellExpanded('users', item.id)">
-                    <app-number-of-items-label
-                        [value]="item.members?.length"
-                    ></app-number-of-items-label>
+<!--                <ng-container *ngIf="!isCellExpanded('users', item.id)">-->
+<!--                    <app-number-of-items-label-->
+<!--                        [value]="item.members?.length"-->
+<!--                    ></app-number-of-items-label>-->
 
-                    <button
-                        type="button"
-                        mat-button
-                        color="accent"
-                        (click)="toggleCell('users', item.id, true)"
-                    >
-                        {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND' | translate}}
-                    </button>
-                </ng-container>
+<!--                    <button-->
+<!--                        type="button"-->
+<!--                        mat-button-->
+<!--                        color="accent"-->
+<!--                        (click)="toggleCell('users', item.id, true)"-->
+<!--                    >-->
+<!--                        {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND' | translate}}-->
+<!--                    </button>-->
+<!--                </ng-container>-->
 
-                <div
-                    *ngIf="isCellExpanded('users', item.id)"
-                    fxLayout="column" fxLayoutAlign="start start"
-                >
-                    <mat-chip-list fxLayout="row wrap">
-                        <mat-chip
-                            *ngFor="let member of item.members"
-                            [matTooltip]="member.name"
-                        >
-                            {{ member.name }}
-                        </mat-chip>
-                    </mat-chip-list>
+<!--                <div-->
+<!--                    *ngIf="isCellExpanded('users', item.id)"-->
+<!--                    fxLayout="column" fxLayoutAlign="start start"-->
+<!--                >-->
+<!--                    <mat-chip-list fxLayout="row wrap">-->
+<!--                        <mat-chip-->
+<!--                            *ngFor="let member of item.members"-->
+<!--                            [matTooltip]="member.name"-->
+<!--                        >-->
+<!--                            {{ member.name }}-->
+<!--                        </mat-chip>-->
+<!--                    </mat-chip-list>-->
 
-                    <button
-                        type="button"
-                        mat-button
-                        color="accent"
-                        (click)="toggleCell('users', item.id, false)"
-                    >
-                        {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE' | translate}}
-                    </button>
-                </div>
+<!--                    <button-->
+<!--                        type="button"-->
+<!--                        mat-button-->
+<!--                        color="accent"-->
+<!--                        (click)="toggleCell('users', item.id, false)"-->
+<!--                    >-->
+<!--                        {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE' | translate}}-->
+<!--                    </button>-->
+<!--                </div>-->
             </mat-cell>
         </ng-container>
 
@@ -213,70 +213,70 @@
                         </button>
 
                         <mat-menu #columnActions="matMenu">
-                            <button
-                                mat-menu-item
-                                (click)="toggleColumn('locations', true)">
-                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND_ALL' | translate }}
-                            </button>
-                            <button
-                                mat-menu-item
-                                (click)="toggleColumn('locations', false)">
-                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE_ALL' | translate }}
-                            </button>
+<!--                            <button-->
+<!--                                mat-menu-item-->
+<!--                                (click)="toggleColumn('locations', true)">-->
+<!--                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND_ALL' | translate }}-->
+<!--                            </button>-->
+<!--                            <button-->
+<!--                                mat-menu-item-->
+<!--                                (click)="toggleColumn('locations', false)">-->
+<!--                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE_ALL' | translate }}-->
+<!--                            </button>-->
                         </mat-menu>
                     </div>
                     <div class="column-filter">
-                        <app-form-location-dropdown
-                            fxFlex
-                            name="locationIds"
-                            [(ngModel)]="filterAddressParentLocationIds"
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            multiple="true"
-                            (itemChanged)="filterBySelectField('parentLocationIdFilter', filterAddressParentLocationIds, null)"
-                            app-reset-location-on-side-filter
-                            [useOutbreakLocations]="true">
-                        </app-form-location-dropdown>
+<!--                        <app-form-location-dropdown-->
+<!--                            fxFlex-->
+<!--                            name="locationIds"-->
+<!--                            [(ngModel)]="filterAddressParentLocationIds"-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            multiple="true"-->
+<!--                            (itemChanged)="filterBySelectField('parentLocationIdFilter', filterAddressParentLocationIds, null)"-->
+<!--                            app-reset-location-on-side-filter-->
+<!--                            [useOutbreakLocations]="true">-->
+<!--                        </app-form-location-dropdown>-->
                     </div>
                 </div>
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item">
-                <ng-container *ngIf="!isCellExpanded('locations', item.id)">
-                    <app-number-of-items-label
-                        [value]="item.locationIds?.length"
-                    ></app-number-of-items-label>
+<!--                <ng-container *ngIf="!isCellExpanded('locations', item.id)">-->
+<!--                    <app-number-of-items-label-->
+<!--                        [value]="item.locationIds?.length"-->
+<!--                    ></app-number-of-items-label>-->
 
-                    <button
-                        type="button"
-                        mat-button
-                        color="accent"
-                        (click)="toggleCell('locations', item.id, true)"
-                    >
-                        {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND' | translate}}
-                    </button>
-                </ng-container>
+<!--                    <button-->
+<!--                        type="button"-->
+<!--                        mat-button-->
+<!--                        color="accent"-->
+<!--                        (click)="toggleCell('locations', item.id, true)"-->
+<!--                    >-->
+<!--                        {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND' | translate}}-->
+<!--                    </button>-->
+<!--                </ng-container>-->
 
-                <div
-                    *ngIf="isCellExpanded('locations', item.id)"
-                    fxLayout="column" fxLayoutAlign="start start">
-                    <mat-chip-list fxLayout="row wrap">
-                        <mat-chip
-                            *ngFor="let location of item.locations"
-                            [matTooltip]="location.name"
-                        >
-                            {{ location.name }}
-                        </mat-chip>
-                    </mat-chip-list>
+<!--                <div-->
+<!--                    *ngIf="isCellExpanded('locations', item.id)"-->
+<!--                    fxLayout="column" fxLayoutAlign="start start">-->
+<!--                    <mat-chip-list fxLayout="row wrap">-->
+<!--                        <mat-chip-->
+<!--                            *ngFor="let location of item.locations"-->
+<!--                            [matTooltip]="location.name"-->
+<!--                        >-->
+<!--                            {{ location.name }}-->
+<!--                        </mat-chip>-->
+<!--                    </mat-chip-list>-->
 
-                    <button
-                        type="button"
-                        mat-button
-                        color="accent"
-                        (click)="toggleCell('locations', item.id, false)"
-                    >
-                        {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE' | translate}}
-                    </button>
-                </div>
+<!--                    <button-->
+<!--                        type="button"-->
+<!--                        mat-button-->
+<!--                        color="accent"-->
+<!--                        (click)="toggleCell('locations', item.id, false)"-->
+<!--                    >-->
+<!--                        {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE' | translate}}-->
+<!--                    </button>-->
+<!--                </div>-->
             </mat-cell>
         </ng-container>
 

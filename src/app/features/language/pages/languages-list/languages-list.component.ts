@@ -144,7 +144,7 @@ export class LanguagesListComponent
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**
@@ -222,18 +222,18 @@ export class LanguagesListComponent
       .subscribe((answer: DialogAnswer) => {
         if (answer.button === DialogAnswerButton.Yes) {
           // delete language
-          this.showLoadingDialog();
+          // this.showLoadingDialog();
           this.languageDataService
             .deleteLanguage(language.id)
             .pipe(
               catchError((err) => {
-                this.closeLoadingDialog();
+                // this.closeLoadingDialog();
                 this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.closeLoadingDialog();
+              // this.closeLoadingDialog();
 
               this.toastV2Service.success('LNG_PAGE_LIST_LANGUAGES_ACTION_DELETE_SUCCESS_MESSAGE');
 
@@ -258,8 +258,8 @@ export class LanguagesListComponent
       url: `languages/${language.id}/language-tokens/export`,
       fileName: language.name,
       fileType: ExportDataExtension.XLSX,
-      exportStart: () => { this.showLoadingDialog(); },
-      exportFinished: () => { this.closeLoadingDialog(); }
+      // exportStart: () => { this.showLoadingDialog(); },
+      // exportFinished: () => { this.closeLoadingDialog(); }
     });
   }
 }

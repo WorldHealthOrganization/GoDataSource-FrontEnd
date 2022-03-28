@@ -817,7 +817,7 @@ export class ImportDataComponent
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
 
     // remove window resize listener
     window.removeEventListener(

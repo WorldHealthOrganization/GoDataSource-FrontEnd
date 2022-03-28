@@ -145,7 +145,7 @@ export class HelpItemsListComponent extends ListComponent implements OnInit, OnD
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**

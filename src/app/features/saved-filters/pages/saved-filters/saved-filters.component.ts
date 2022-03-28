@@ -107,7 +107,7 @@ export class SavedFiltersComponent extends ListComponent implements OnInit, OnDe
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**

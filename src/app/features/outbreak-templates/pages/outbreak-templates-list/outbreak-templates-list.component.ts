@@ -224,7 +224,7 @@ export class OutbreakTemplatesListComponent
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**

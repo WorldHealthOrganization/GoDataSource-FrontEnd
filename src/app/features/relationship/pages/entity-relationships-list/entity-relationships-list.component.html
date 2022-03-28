@@ -154,14 +154,14 @@
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_LAST_NAME' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="lastNameFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField(['lastName', 'name'], $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="lastNameFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByTextField(['lastName', 'name'], $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -179,14 +179,14 @@
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_FIRST_NAME' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="firstNameFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField(['firstName', 'name'], $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="firstNameFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByTextField(['firstName', 'name'], $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -204,14 +204,14 @@
                         {{ 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_VISUAL_ID' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="visualIdFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('visualId', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="visualIdFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByTextField('visualId', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -229,12 +229,12 @@
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-daterange
-                            name="dateFilter"
-                            ngModel
-                            (changed)="filterByChildQueryBuilder('relationship').byDateRange('contactDate', $event)"
-                            app-reset-input-on-side-filter>
-                        </app-form-daterange>
+<!--                        <app-form-daterange-->
+<!--                            name="dateFilter"-->
+<!--                            ngModel-->
+<!--                            (changed)="filterByChildQueryBuilder('relationship').byDateRange('contactDate', $event)"-->
+<!--                            app-reset-input-on-side-filter>-->
+<!--                        </app-form-daterange>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -252,18 +252,18 @@
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="certaintyLevelFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="certaintyLevelList$ | async"
-                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('certaintyLevelId', $event)"
-                            multiple="true"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="certaintyLevelFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="certaintyLevelList$ | async"-->
+<!--                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('certaintyLevelId', $event)"-->
+<!--                            multiple="true"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayInvisibleItems]="true"-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -284,18 +284,18 @@
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="exposureType"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="exposureTypeList$ | async"
-                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('exposureTypeId', $event)"
-                            multiple="true"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="exposureType"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="exposureTypeList$ | async"-->
+<!--                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('exposureTypeId', $event)"-->
+<!--                            multiple="true"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayInvisibleItems]="true"-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -316,18 +316,18 @@
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="exposureFrequency"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="exposuresFrequencyList$ | async"
-                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('exposureFrequencyId', $event)"
-                            multiple="true"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="exposureFrequency"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="exposuresFrequencyList$ | async"-->
+<!--                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('exposureFrequencyId', $event)"-->
+<!--                            multiple="true"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayInvisibleItems]="true"-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -348,18 +348,18 @@
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="exposureDuration"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="exposureDurationList$ | async"
-                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('exposureDurationId', $event)"
-                            multiple="true"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="exposureDuration"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="exposureDurationList$ | async"-->
+<!--                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('exposureDurationId', $event)"-->
+<!--                            multiple="true"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayInvisibleItems]="true"-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -380,18 +380,18 @@
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_RELATION' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="relation"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="relationshipTypeList$ | async"
-                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('socialRelationshipTypeId', $event)"
-                            multiple="true"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="relation"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="relationshipTypeList$ | async"-->
+<!--                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('socialRelationshipTypeId', $event)"-->
+<!--                            multiple="true"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayInvisibleItems]="true"-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -412,14 +412,14 @@
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="socialRelationshipDetailFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByChildQueryBuilder('relationship').byText('socialRelationshipDetail', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="socialRelationshipDetailFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByChildQueryBuilder('relationship').byText('socialRelationshipDetail', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -437,18 +437,18 @@
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="clusterIdFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="clusterOptions$ | async"
-                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('clusterId', $event)"
-                            multiple="true"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="clusterIdFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="clusterOptions$ | async"-->
+<!--                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('clusterId', $event)"-->
+<!--                            multiple="true"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayInvisibleItems]="true"-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -471,19 +471,19 @@
                         {{ 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_BY' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="createdByFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="userList$ | async"
-                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('createdBy', $event, true, 'id')"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayFilterIcon]="true"
-                            optionLabelKey="name"
-                            optionValueKey="id"
-                            [multiple]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="createdByFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="userList$ | async"-->
+<!--                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('createdBy', $event, true, 'id')"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayFilterIcon]="true"-->
+<!--                            optionLabelKey="name"-->
+<!--                            optionValueKey="id"-->
+<!--                            [multiple]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -500,12 +500,12 @@
                         {{ 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_AT' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-daterange
-                            name="createdAtFilter"
-                            ngModel
-                            (changed)="filterByChildQueryBuilder('relationship').byDateRange('createdAt', $event)"
-                            app-reset-input-on-side-filter>
-                        </app-form-daterange>
+<!--                        <app-form-daterange-->
+<!--                            name="createdAtFilter"-->
+<!--                            ngModel-->
+<!--                            (changed)="filterByChildQueryBuilder('relationship').byDateRange('createdAt', $event)"-->
+<!--                            app-reset-input-on-side-filter>-->
+<!--                        </app-form-daterange>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -522,19 +522,19 @@
                         {{ 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_BY' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="updatedByFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="userList$ | async"
-                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('updatedBy', $event, true, 'id')"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayFilterIcon]="true"
-                            optionLabelKey="name"
-                            optionValueKey="id"
-                            [multiple]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="updatedByFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="userList$ | async"-->
+<!--                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('updatedBy', $event, true, 'id')"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayFilterIcon]="true"-->
+<!--                            optionLabelKey="name"-->
+<!--                            optionValueKey="id"-->
+<!--                            [multiple]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -551,12 +551,12 @@
                         {{ 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_AT' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-daterange
-                            name="updatedAtFilter"
-                            ngModel
-                            (changed)="filterByChildQueryBuilder('relationship').byDateRange('updatedAt', $event)"
-                            app-reset-input-on-side-filter>
-                        </app-form-daterange>
+<!--                        <app-form-daterange-->
+<!--                            name="updatedAtFilter"-->
+<!--                            ngModel-->
+<!--                            (changed)="filterByChildQueryBuilder('relationship').byDateRange('updatedAt', $event)"-->
+<!--                            app-reset-input-on-side-filter>-->
+<!--                        </app-form-daterange>-->
                     </div>
                 </div>
             </mat-header-cell>
