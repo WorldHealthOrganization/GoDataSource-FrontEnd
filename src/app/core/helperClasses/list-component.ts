@@ -78,7 +78,7 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
   private paginatorInitialized = false;
 
   // table sort by
-  private tableSortBy: {
+  tableSortBy: {
     field?: string,
     direction?: RequestSortDirection
   } = {};
@@ -89,9 +89,6 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
 
 
 
-
-  // sort by disabled ?
-  private _sortByDisabled: boolean = false;
 
   // refresh only after we finish changing data
   // by default each time we get back to a page we should display loading spinner
@@ -124,7 +121,6 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
 
   // disable next load from cache input values ?
   private _disableNextLoadCachedInputValues: boolean = false;
-  private _nextTimerForLoadCachedInputValues: number;
   private _loadedCachedFilterPage: string;
   private _disableFilterCaching: boolean = false;
   get disableFilterCaching(): boolean {
@@ -171,17 +167,20 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
     // get auth data
     this.authUser = this.listHelperService.authDataService.getAuthenticatedUser();
 
-    // initialize breadcrumbs
+
     // wait for binding so some things get processed
     setTimeout(() => {
+      // initialize breadcrumbs
       this.initializeBreadcrumbs();
+
+      // initialize side columns
+      this.initializeTableColumns();
+
+      // load saved filters
+      this.loadCachedFilters();
     });
 
-    // initialize side columns
-    // wait for binding so some things get processed
-    setTimeout(() => {
-      this.initializeTableColumns();
-    });
+
 
     // listen for outbreak selection
     this.selectedOutbreakSubscription = this.listHelperService.outbreakDataService
@@ -198,14 +197,11 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
       });
 
 
-
+    // disable filter caching ?
+    this._disableFilterCaching = disableFilterCaching;
 
     // check filters
     this.checkListFilters();
-
-    // load saved filters
-    this._disableFilterCaching = disableFilterCaching;
-    this.loadCachedFilters();
 
     // remove old subscription since we shouldn't have more than one list component visible at the same time ( at least not now )
     if (ListComponent.locationSubscription) {
@@ -379,11 +375,6 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
       [property: string]: string[]
     }
   ) {
-    // sort by disabled ?
-    if (this._sortByDisabled) {
-      return;
-    }
-
     // sort information
     this.tableSortBy.field = data?.field;
     this.tableSortBy.direction = data?.direction;
@@ -960,113 +951,87 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
    * Load cached input values
    */
   private loadCachedInputValues(currentUserCacheForCurrentPath: ICachedFilterItems): void {
-    // already waiting for execution ?
-    if (this._nextTimerForLoadCachedInputValues !== undefined) {
+    // allow next reset
+    if (this._disableNextLoadCachedInputValues) {
+      // allow next reset
+      this._disableNextLoadCachedInputValues = false;
+
+      // finished
       return;
     }
 
-    // wait for inputs to be rendered
-    this._nextTimerForLoadCachedInputValues = setTimeout(() => {
-      // reset call
-      this._nextTimerForLoadCachedInputValues = undefined;
+    // nothing to load ?
+    if (_.isEmpty(currentUserCacheForCurrentPath.inputs)) {
+      return;
+    }
 
-      // allow next reset
-      if (this._disableNextLoadCachedInputValues) {
-        // allow next reset
-        this._disableNextLoadCachedInputValues = false;
-
-        // finished
+    // update filter input values
+    (this.tableColumns || []).forEach((column) => {
+      // has no filter ?
+      if (!column.filter) {
         return;
       }
 
-      // nothing to load ?
-      if (_.isEmpty(currentUserCacheForCurrentPath.inputs)) {
+      // determine if we have cached value
+      const value: any = currentUserCacheForCurrentPath.inputs[column.field];
+      if (value === undefined) {
         return;
       }
 
-      // update filter input values
-      (this.tableColumns || []).forEach((column) => {
-        // has no filter ?
-        if (!column.filter) {
-          return;
-        }
+      // handle accordingly to filter type
+      switch (column.filter.type) {
+        case V2FilterType.ADDRESS_PHONE_NUMBER:
+          // get value
+          column.filter.address.phoneNumber = value;
 
-        // determine if we have cached value
-        const value: any = currentUserCacheForCurrentPath.inputs[column.field];
-        if (value === undefined) {
-          return;
-        }
+          // finished
+          break;
 
-        // handle accordingly to filter type
-        switch (column.filter.type) {
-          case V2FilterType.ADDRESS_PHONE_NUMBER:
-            // get value
-            column.filter.address.phoneNumber = value;
+        case V2FilterType.ADDRESS_MULTIPLE_LOCATION:
+          // get value
+          column.filter.address.filterLocationIds = value;
 
-            // finished
-            break;
+          // finished
+          break;
 
-          case V2FilterType.ADDRESS_MULTIPLE_LOCATION:
-            // get value
-            column.filter.address.filterLocationIds = value;
+        case V2FilterType.ADDRESS_FIELD:
+          // get value
+          column.filter.address[column.filter.addressField] = value;
 
-            // finished
-            break;
+          // finished
+          break;
 
-          case V2FilterType.ADDRESS_FIELD:
-            // get value
-            column.filter.address[column.filter.addressField] = value;
+        case V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION:
+          // get value
+          column.filter.address.geoLocationAccurate = value;
 
-            // finished
-            break;
+          // finished
+          break;
 
-          case V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION:
-            // get value
-            column.filter.address.geoLocationAccurate = value;
-
-            // finished
-            break;
-
-          default:
-            column.filter.value = value;
-        }
-      });
+        default:
+          column.filter.value = value;
+      }
     });
   }
 
   /**
      * Load cached sort column
      */
-  private loadCachedSortColumn(_currentUserCacheForCurrentPath: ICachedFilterItems): void {
-    // // wait for inputs to be rendered
-    // setTimeout(() => {
-    //   // no sort applied ?
-    //   // make sure we have the mat table visible
-    //   if (
-    //     !currentUserCacheForCurrentPath.sort ||
-    //             !currentUserCacheForCurrentPath.sort.active ||
-    //             !this.matTableSort
-    //   ) {
-    //     return;
-    //   }
-    //
-    //   // reset state so that start is the first sort direction that you will see
-    //   this._sortByDisabled = true;
-    //   this.matTableSort.sort({
-    //     id: null,
-    //     start: currentUserCacheForCurrentPath.sort.direction,
-    //     disableClear: false
-    //   });
-    //   this.matTableSort.sort({
-    //     id: currentUserCacheForCurrentPath.sort.active,
-    //     start: currentUserCacheForCurrentPath.sort.direction,
-    //     disableClear: false
-    //   });
-    //
-    //   // ugly hack
-    //   (this.matTableSort.sortables.get(currentUserCacheForCurrentPath.sort.active) as MatSortHeader)._setAnimationTransitionState({ toState: 'active' });
-    //   this._sortByDisabled = false;
-    // });
+  private loadCachedSortColumn(currentUserCacheForCurrentPath: ICachedFilterItems): void {
+    // no sort applied ?
+    if (
+      !currentUserCacheForCurrentPath.sort ||
+      !currentUserCacheForCurrentPath.sort.active ||
+      !currentUserCacheForCurrentPath.sort.direction
+    ) {
+      return;
+    }
+
+    // reset state so that start is the first sort direction that you will see
+    this.tableSortBy = {
+      field: currentUserCacheForCurrentPath.sort.active,
+      direction: currentUserCacheForCurrentPath.sort.direction
+    };
   }
 
   /**

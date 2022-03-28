@@ -84,6 +84,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     retrieveData?: true,
     updateColumnDefinitions?: {
       overwriteVisibleColumns?: string[]
+    },
+    setSortColumn?: {
+      field: string,
+      direction: RequestSortDirection
     }
   } = {};
 
@@ -224,6 +228,35 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   }
   get sortByDirection(): RequestSortDirection | null {
     return this._sortBy?.direction;
+  }
+  @Input() set sortColumn(info: {
+    field: string,
+    direction: RequestSortDirection
+  }) {
+    // nothing to do ?
+    if (
+      !info ||
+      !info.field ||
+      !info.direction
+    ) {
+      return;
+    }
+
+    // set sort column
+    if (
+      !this._agTable ||
+      !this._agTable.columnApi
+    ) {
+      this._callWhenReady.setSortColumn = {
+        field: info.field,
+        direction: info.direction
+      };
+    } else {
+      this.updateSortColumn(
+        info.field,
+        info.direction
+      );
+    }
   }
 
   // constants
@@ -1266,7 +1299,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // redraw the old one ?
     if (
       oldColumn &&
-      oldColumn !== column
+      oldColumn !== column &&
+      oldComponent
     ) {
       oldComponent.detectChanges();
     }
@@ -1298,6 +1332,15 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     if (this._callWhenReady.retrieveData) {
       // call
       this.retrieveData();
+    }
+
+    // call methods to select sort column
+    if (this._callWhenReady.setSortColumn) {
+      // call
+      this.updateSortColumn(
+        this._callWhenReady.setSortColumn.field,
+        this._callWhenReady.setSortColumn.direction
+      );
     }
 
     // set header height
@@ -1386,5 +1429,23 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // trigger click
     this.groupedData.click(groupValue, this.groupedData);
+  }
+
+  /**
+   * Update sort column
+   */
+  private updateSortColumn(
+    field: string,
+    direction: RequestSortDirection
+  ): void {
+    // already called
+    delete this._callWhenReady.setSortColumn;
+
+    // reset
+    this._sortBy.component = null;
+
+    // retrieve column
+    this._sortBy.column = this._agTable.columnApi.getColumn(field).getUserProvidedColDef() as IExtendedColDef;
+    this._sortBy.direction = direction;
   }
 }
