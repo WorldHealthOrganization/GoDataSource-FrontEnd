@@ -494,7 +494,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
   protected initializeTableColumns() {
     // address model used to search by phone number, address line, postal code, city....
     const filterAddressModel: AddressModel = new AddressModel({
-      geoLocationAccurate: null,
+      geoLocationAccurate: '',
     });
 
     this.tableColumns = [
@@ -786,7 +786,8 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
           type: V2ColumnFormat.BOOLEAN
         },
         filter: {
-          type: V2FilterType.DELETED
+          type: V2FilterType.DELETED,
+          value: false
         },
         sortable: true,
       },
@@ -1085,6 +1086,10 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         // no need to refresh group
         group.data.blockNextGet = true;
 
+        // remove previous conditions
+        this.queryBuilder.filter.removePathCondition('riskLevel');
+        this.queryBuilder.filter.removePathCondition('or.riskLevel');
+
         // filter by group data
         if (!item) {
           this.filterByEquality(
@@ -1117,6 +1122,9 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
           clonedQueryBuilder.paginator.clear();
           clonedQueryBuilder.sort.clear();
           clonedQueryBuilder.clearFields();
+
+          // remove any riskLevel filters so we see all options
+          clonedQueryBuilder.filter.remove('riskLevel');
 
           // load data
           return this.contactsOfContactsDataService
@@ -1391,12 +1399,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
           })
         )
         .pipe(
-
-          // handle errors
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            return throwError(err);
-          }),
 
           // should be the last pipe
           takeUntil(this.destroyed$)
