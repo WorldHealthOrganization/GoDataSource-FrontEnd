@@ -205,6 +205,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     this.updateColumnDefinitions();
   };
 
+  // info values - used to display additional information relevant for this page
+  @Input() infos: string[];
+
   // legends
   legends: {
     // required

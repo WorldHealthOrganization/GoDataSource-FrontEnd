@@ -14,6 +14,7 @@
   [pageIndex]="pageIndex"
   [pageSettingsKey]="appliedListFilter !== Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS ? UserSettings.CASE_FIELDS : UserSettings.CASE_WITHOUT_RELATIONSHIPS_FIELDS"
   [sortColumn]="tableSortBy"
+  [infos]="infos"
   (pageChange)="changePage($event)"
   (sortBy)="sortBy($event, { age: [ 'years', 'months' ] })"
   (filterBy)="filterBy($event)"></app-list-table-v2>
@@ -24,24 +25,6 @@
     (filtersApplied)="applySideFilters($event)"
     [savedFiltersType]="savedFiltersType">
 </app-side-filters>
-
-<div fxLayout fxLayoutAlign="space-between end">
-    <a
-        *ngIf="!appliedListFilter && !showCountPills; else countPills"
-        class="xlink-button margin-right-x"
-        (click)="showCountPills = true">
-        {{ 'LNG_PAGE_LIST_CASES_ACTION_SHOW_GROUP_BY_CLASSIFICATION_PILLS' | translate }}
-    </a>
-    <ng-template
-        #countPills>
-        <app-counted-items-list
-            *ngIf="!appliedListFilter"
-            fxFlex
-            [items]="countedCasesGroupedByClassification$ | async"
-            (optionChanged)="$event.label === 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_UNCLASSIFIED' ? filterByNotHavingValue('classification') : filterByEquality('classification',  $event.label)">
-        </app-counted-items-list>
-    </ng-template>
-</div>
 
 <mat-card class="page-section page-content">
 

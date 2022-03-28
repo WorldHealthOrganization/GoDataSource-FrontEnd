@@ -346,6 +346,14 @@
         class="gd-list-table-bottom-left-legend"
         [innerHTML]="legend.html | safeHtml"></div>
 
+      <!-- Info -->
+      <div
+        *ngFor="let info of infos"
+        fxLayoutAlign="start center"
+        class="gd-list-table-bottom-left-info">
+        {{info | translate}}
+      </div>
+
     </div>
 
     <!-- Right -->

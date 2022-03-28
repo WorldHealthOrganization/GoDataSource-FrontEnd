@@ -128,6 +128,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
   ];
 
+  // additional page information
+  infos: string[] = [
+    'LNG_PAGE_LIST_CASES_NOT_A_CASE_INFO_LABEL'
+  ];
+
   // used to filter cases
   notACaseFilter: boolean | '' = false;
 
