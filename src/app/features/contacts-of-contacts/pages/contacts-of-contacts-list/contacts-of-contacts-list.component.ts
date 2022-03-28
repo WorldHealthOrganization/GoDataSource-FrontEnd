@@ -486,7 +486,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     }
   }
 
-  protected initializeTableColumms() {
+  protected initializeTableColumns() {
     // address model used to search by phone number, address line, postal code, city....
     const filterAddressModel: AddressModel = new AddressModel({
       geoLocationAccurate: null,
@@ -1113,128 +1113,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         }
       }
     };
-  }
-
-  /**
-     * Initialize Side Table Columns
-     */
-  initializeTableColumns() {
-    // default table columns
-    // this.tableColumns = [
-    //   new VisibleColumnModel({
-    //     field: 'checkbox',
-    //     required: true,
-    //     excludeFromSave: true
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'lastName',
-    //     label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'firstName',
-    //     label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'visualId',
-    //     label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'location',
-    //     label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_LOCATION'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'addresses.addressLine1',
-    //     label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'addresses.city',
-    //     label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'addresses.emailAddress',
-    //     label: 'LNG_CONTACT_FIELD_LABEL_EMAIL',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'addresses.geoLocation.lat',
-    //     label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'addresses.geoLocation.lng',
-    //     label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'addresses.postalCode',
-    //     label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'addresses.geoLocationAccurate',
-    //     label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'age',
-    //     label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'gender',
-    //     label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'phoneNumber',
-    //     label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PHONE_NUMBER'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'riskLevel',
-    //     label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'dateOfLastContact',
-    //     label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'responsibleUserId',
-    //     label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
-    //     visible: false,
-    //     excludeFromDisplay: (): boolean => {
-    //       return !UserModel.canList(this.authUser);
-    //     }
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'numberOfExposures',
-    //     label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'deleted',
-    //     label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DELETED'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'createdBy',
-    //     label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_CREATED_BY',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'createdAt',
-    //     label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_CREATED_AT',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'updatedBy',
-    //     label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_UPDATED_BY',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'updatedAt',
-    //     label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_UPDATED_AT',
-    //     visible: false
-    //   })
-    // ];
   }
 
   /**
