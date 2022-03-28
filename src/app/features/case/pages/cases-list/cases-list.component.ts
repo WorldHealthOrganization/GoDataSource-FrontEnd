@@ -13,11 +13,9 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import * as _ from 'lodash';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
@@ -149,7 +147,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   vaccineList$: Observable<any[]>;
   vaccineStatusList$: Observable<any[]>;
 
-  clustersListAsLabelValuePair$: Observable<LabelValuePair[]>;
   caseRiskLevelsList$: Observable<any[]>;
   yesNoOptionsWithoutAllList$: Observable<any[]>;
 
@@ -179,7 +176,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     private dialogV2Service: DialogV2Service,
     private i18nService: I18nService,
     private genericDataService: GenericDataService,
-    private clusterDataService: ClusterDataService,
     private entityHelperService: EntityHelperService,
     private redirectService: RedirectService
   ) {
@@ -241,9 +237,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
       // finished
       return;
     }
-
-    // export cases url
-    this.clustersListAsLabelValuePair$ = this.clusterDataService.getClusterListAsLabelValue(this.selectedOutbreak.id);
 
     // initialize side filters
     this.initializeSideFilters();
@@ -2126,7 +2119,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         fieldName: 'clusterId',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_CLUSTER_NAME',
         type: FilterType.MULTISELECT,
-        options$: this.clustersListAsLabelValuePair$,
+        // this.clustersListAsLabelValuePair$ = this.clusterDataService.getClusterListAsLabelValue(this.selectedOutbreak.id);
+        // options$: this.clustersListAsLabelValuePair$,
         relationshipPath: ['relationships'],
         relationshipLabel: 'LNG_CASE_FIELD_LABEL_CLUSTER'
       }),
