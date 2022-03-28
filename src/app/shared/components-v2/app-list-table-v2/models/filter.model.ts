@@ -31,7 +31,7 @@ export enum V2FilterTextType {
 /**
  * Base
  */
-interface V2FilterBasic {
+interface IV2FilterBasic {
   // required
   type: V2FilterType;
 
@@ -50,7 +50,7 @@ interface V2FilterBasic {
 /**
  * Text
  */
-interface V2FilterText extends Omit<V2FilterBasic, 'value'> {
+interface IV2FilterText extends Omit<IV2FilterBasic, 'value'> {
   // required
   type: V2FilterType.TEXT;
   textType: V2FilterTextType;
@@ -62,7 +62,7 @@ interface V2FilterText extends Omit<V2FilterBasic, 'value'> {
 /**
  * Multiple select
  */
-export interface V2FilterMultipleSelect extends Omit<V2FilterBasic, 'options' | 'value'> {
+export interface IV2FilterMultipleSelect extends Omit<IV2FilterBasic, 'options' | 'value'> {
   // required
   type: V2FilterType.MULTIPLE_SELECT;
   options: ILabelValuePairModel[];
@@ -74,7 +74,7 @@ export interface V2FilterMultipleSelect extends Omit<V2FilterBasic, 'options' | 
 /**
  * Date range
  */
-export interface V2FilterDate extends Omit<V2FilterBasic, 'value'> {
+export interface IV2FilterDate extends Omit<IV2FilterBasic, 'value'> {
   // required
   type: V2FilterType.DATE_RANGE;
 
@@ -85,7 +85,7 @@ export interface V2FilterDate extends Omit<V2FilterBasic, 'value'> {
 /**
  * Age range
  */
-interface V2FilterAge extends Omit<V2FilterBasic, 'min' | 'max' | 'value'> {
+interface IV2FilterAge extends Omit<IV2FilterBasic, 'min' | 'max' | 'value'> {
   // required
   type: V2FilterType.AGE_RANGE;
 
@@ -98,7 +98,7 @@ interface V2FilterAge extends Omit<V2FilterBasic, 'min' | 'max' | 'value'> {
 /**
  * Address phone number
  */
-interface V2FilterAddressPhoneNumber extends Omit<V2FilterBasic, 'address'> {
+interface IV2FilterAddressPhoneNumber extends Omit<IV2FilterBasic, 'address'> {
   // required
   type: V2FilterType.ADDRESS_PHONE_NUMBER;
   address: AddressModel;
@@ -109,7 +109,7 @@ interface V2FilterAddressPhoneNumber extends Omit<V2FilterBasic, 'address'> {
 /**
  * Address location
  */
-interface V2FilterAddressMultipleLocation extends Omit<V2FilterBasic, 'address'> {
+interface IV2FilterAddressMultipleLocation extends Omit<IV2FilterBasic, 'address'> {
   // required
   type: V2FilterType.ADDRESS_MULTIPLE_LOCATION;
   address: AddressModel;
@@ -120,7 +120,7 @@ interface V2FilterAddressMultipleLocation extends Omit<V2FilterBasic, 'address'>
 /**
  * Simple address field
  */
-interface V2FilterAddressField extends Omit<V2FilterBasic, 'address' | 'addressField'> {
+interface IV2FilterAddressField extends Omit<IV2FilterBasic, 'address' | 'addressField'> {
   // required
   type: V2FilterType.ADDRESS_FIELD;
   address: AddressModel;
@@ -132,7 +132,7 @@ interface V2FilterAddressField extends Omit<V2FilterBasic, 'address' | 'addressF
 /**
  * Simple address field
  */
-interface V2FilterAddressAccurateGeoLocation extends Omit<V2FilterBasic, 'address' | 'options'> {
+interface IV2FilterAddressAccurateGeoLocation extends Omit<IV2FilterBasic, 'address' | 'options'> {
   // required
   type: V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION;
   address: AddressModel;
@@ -144,7 +144,7 @@ interface V2FilterAddressAccurateGeoLocation extends Omit<V2FilterBasic, 'addres
 /**
  * Boolean
  */
-export interface V2FilterBoolean extends Omit<V2FilterBasic, 'value'> {
+export interface IV2FilterBoolean extends Omit<IV2FilterBasic, 'value'> {
   // required
   type: V2FilterType.BOOLEAN;
 
@@ -155,7 +155,7 @@ export interface V2FilterBoolean extends Omit<V2FilterBasic, 'value'> {
 /**
  * Number range
  */
-interface V2FilterNumber extends Omit<V2FilterBasic, 'min' | 'max' | 'value'> {
+interface IV2FilterNumber extends Omit<IV2FilterBasic, 'min' | 'max' | 'value'> {
   // required
   type: V2FilterType.NUMBER_RANGE;
 
@@ -168,7 +168,7 @@ interface V2FilterNumber extends Omit<V2FilterBasic, 'min' | 'max' | 'value'> {
 /**
  * Deleted
  */
-export interface V2FilterDeleted extends Omit<V2FilterBasic, 'value'> {
+export interface IV2FilterDeleted extends Omit<IV2FilterBasic, 'value'> {
   // required
   type: V2FilterType.DELETED;
 
@@ -179,6 +179,6 @@ export interface V2FilterDeleted extends Omit<V2FilterBasic, 'value'> {
 /**
  * Filter
  */
-export type V2Filter = V2FilterText | V2FilterMultipleSelect | V2FilterDate | V2FilterAge | V2FilterAddressPhoneNumber
-| V2FilterAddressMultipleLocation | V2FilterAddressField | V2FilterAddressAccurateGeoLocation | V2FilterBoolean | V2FilterNumber
-| V2FilterDeleted;
+export type V2Filter = IV2FilterText | IV2FilterMultipleSelect | IV2FilterDate | IV2FilterAge | IV2FilterAddressPhoneNumber
+| IV2FilterAddressMultipleLocation | IV2FilterAddressField | IV2FilterAddressAccurateGeoLocation | IV2FilterBoolean | IV2FilterNumber
+| IV2FilterDeleted;

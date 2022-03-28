@@ -107,6 +107,11 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
   protected initializeTableColumns(): void {}
 
   /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
    * Initialize breadcrumbs
    */
   initializeBreadcrumbs(): void {
@@ -115,7 +120,7 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
   /**
    * Fields retrieved from api to reduce payload size
    */
-  refreshListFields(): string[] {
+  protected refreshListFields(): string[] {
     return [];
   }
 

@@ -517,6 +517,12 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
     //   }));
     // }
   }
+
+  /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
   /**
      * Initialize Side Filters
      */
@@ -606,7 +612,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
   /**
    * Fields retrieved from api to reduce payload size
    */
-  refreshListFields(): string[] {
+  protected refreshListFields(): string[] {
     return [];
   }
 

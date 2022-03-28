@@ -160,6 +160,11 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
   protected initializeTableColumns(): void {}
 
   /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
    * Initialize breadcrumbs
    */
   initializeBreadcrumbs(): void {
@@ -168,7 +173,7 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
   /**
    * Fields retrieved from api to reduce payload size
    */
-  refreshListFields(): string[] {
+  protected refreshListFields(): string[] {
     return [];
   }
 

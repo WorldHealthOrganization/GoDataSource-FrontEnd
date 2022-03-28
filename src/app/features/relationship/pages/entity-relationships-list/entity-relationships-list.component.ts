@@ -325,6 +325,11 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
   }
 
   /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
    * Initialize breadcrumbs
    */
   initializeBreadcrumbs(): void {
@@ -333,7 +338,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
   /**
    * Fields retrieved from api to reduce payload size
    */
-  refreshListFields(): string[] {
+  protected refreshListFields(): string[] {
     return [];
   }
 

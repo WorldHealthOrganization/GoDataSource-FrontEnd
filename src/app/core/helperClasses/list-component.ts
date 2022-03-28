@@ -171,6 +171,9 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
       // initialize side columns
       this.initializeTableColumns();
 
+      // initialize advanced filters
+      this.initializeTableAdvancedFilters();
+
       // load saved filters
       this.loadCachedFilters();
     });
@@ -260,6 +263,11 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
   protected abstract initializeTableColumns(): void;
 
   /**
+   * Initialize side table advanced filters
+   */
+  protected abstract initializeTableAdvancedFilters(): void;
+
+  /**
    * Selected outbreak changed
    */
   protected selectedOutbreakChanged(): void {}
@@ -267,12 +275,12 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
   /**
    * Initialize breadcrumbs
    */
-  public abstract initializeBreadcrumbs(): void;
+  protected abstract initializeBreadcrumbs(): void;
 
   /**
    * Fields retrieved from api to reduce payload size
    */
-  public abstract refreshListFields(): string[];
+  protected abstract refreshListFields(): string[];
 
   /**
      * Refresh list

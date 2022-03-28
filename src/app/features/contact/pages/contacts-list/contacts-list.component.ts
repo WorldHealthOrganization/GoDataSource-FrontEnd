@@ -862,6 +862,11 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
   }
 
   /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
      * Initialize Side Filters
      */
   initializeSideFilters() {
@@ -1128,13 +1133,13 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
   /**
    * Initialize breadcrumbs
    */
-  initializeBreadcrumbs(): void {
+  protected initializeBreadcrumbs(): void {
   }
 
   /**
    * Fields retrieved from api to reduce payload size
    */
-  refreshListFields(): string[] {
+  protected refreshListFields(): string[] {
     return [];
   }
 

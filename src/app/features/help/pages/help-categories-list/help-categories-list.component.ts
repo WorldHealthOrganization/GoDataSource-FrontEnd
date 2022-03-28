@@ -157,6 +157,11 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
   }
 
   /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
    * Initialize breadcrumbs
    */
   initializeBreadcrumbs(): void {
@@ -165,7 +170,7 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
   /**
    * Fields retrieved from api to reduce payload size
    */
-  refreshListFields(): string[] {
+  protected refreshListFields(): string[] {
     return [];
   }
 

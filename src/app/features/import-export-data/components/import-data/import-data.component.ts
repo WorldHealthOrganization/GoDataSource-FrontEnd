@@ -839,6 +839,11 @@ export class ImportDataComponent
   protected initializeTableColumns(): void {}
 
   /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
      * Process file data
      */
   private processFileData(
@@ -3349,7 +3354,7 @@ export class ImportDataComponent
   /**
    * Fields retrieved from api to reduce payload size
    */
-  refreshListFields(): string[] {
+  protected refreshListFields(): string[] {
     return [];
   }
 

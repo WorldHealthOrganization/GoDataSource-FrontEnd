@@ -153,6 +153,11 @@ export class LanguagesListComponent
   protected initializeTableColumns(): void {}
 
   /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
      * Table columns
      */
   tableHeaderColumns(): string[] {
@@ -170,7 +175,7 @@ export class LanguagesListComponent
   /**
    * Fields retrieved from api to reduce payload size
    */
-  refreshListFields(): string[] {
+  protected refreshListFields(): string[] {
     return [];
   }
 

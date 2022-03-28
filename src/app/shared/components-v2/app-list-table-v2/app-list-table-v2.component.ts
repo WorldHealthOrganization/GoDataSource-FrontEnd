@@ -34,6 +34,7 @@ import { AppListTableV2NoDataComponent } from './components/no-data/app-list-tab
 import { GridApi } from '@ag-grid-community/core/dist/cjs/es5/gridApi';
 import { ColumnApi } from '@ag-grid-community/core/dist/cjs/es5/columns/columnApi';
 import { SavedFiltersService } from '../../../core/services/data/saved-filters.data.service';
+import { V2AdvancedFilter } from './models/advanced-filter.model';
 
 /**
  * Component
@@ -115,8 +116,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   // add button
   @Input() addAction: IV2ActionIconLabel;
 
-  // advanced filters type
+  // advanced filters
   @Input() advancedFilterType: string;
+  @Input() advancedFilters: V2AdvancedFilter[];
 
   // show header filters ?
   savingHeaderFilterVisibility: boolean = false;
@@ -1503,7 +1505,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
             options: [],
             clearable: true
           }, {
-            type: V2SideDialogConfigInputType.DIVIDER
+            type: V2SideDialogConfigInputType.FILTER_LIST,
+            name: 'filters',
+            items: []
           }
         ],
         bottomButtons: [],

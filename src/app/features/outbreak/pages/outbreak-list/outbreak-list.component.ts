@@ -390,6 +390,11 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
   }
 
   /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
    * Initialize breadcrumbs
    */
   initializeBreadcrumbs(): void {
@@ -398,7 +403,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
   /**
    * Fields retrieved from api to reduce payload size
    */
-  refreshListFields(): string[] {
+  protected refreshListFields(): string[] {
     return [];
   }
 

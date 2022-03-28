@@ -382,6 +382,11 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
   protected initializeTableColumns(): void {}
 
   /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
      * Retrieve case data
      */
   retrieveCaseData() {
@@ -1077,13 +1082,13 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
   /**
    * Initialize breadcrumbs
    */
-  initializeBreadcrumbs(): void {
+  protected initializeBreadcrumbs(): void {
   }
 
   /**
    * Fields retrieved from api to reduce payload size
    */
-  refreshListFields(): string[] {
+  protected refreshListFields(): string[] {
     return [];
   }
 

@@ -26,7 +26,8 @@ export enum V2SideDialogConfigInputType {
   ACCORDION_PANEL,
   KEY_VALUE,
   HTML,
-  FILTER_LIST
+  FILTER_LIST,
+  FILTER_LIST_ITEM
 }
 
 /**
@@ -203,12 +204,34 @@ export interface IV2SideDialogConfigInputAccordion extends IV2SideDialogConfigIn
 }
 
 /**
+ * Side dialog input - filter list item
+ */
+export interface IV2SideDialogConfigInputFilterListItem extends IV2SideDialogConfigInputBase {
+  // required
+  type: V2SideDialogConfigInputType.FILTER_LIST_ITEM;
+  filterBy: IV2SideDialogConfigInputSingleDropdown;
+}
+
+/**
+ * Side dialog input - filter list
+ */
+export interface IV2SideDialogConfigInputFilterList extends IV2SideDialogConfigInputBase {
+  // required
+  type: V2SideDialogConfigInputType.FILTER_LIST;
+  name: string;
+  items: IV2SideDialogConfigInputFilterListItem[];
+
+  // not used
+  placeholder?: never;
+}
+
+/**
  * Side dialog inputs
  */
 export type V2SideDialogConfigInputFromInput = IV2SideDialogConfigInputCheckbox | IV2SideDialogConfigInputText | IV2SideDialogConfigInputSingleDropdown
 | IV2SideDialogConfigInputMultiDropdown | IV2SideDialogConfigInputNumber;
 export type V2SideDialogConfigInput = IV2SideDialogConfigInputDivider | IV2SideDialogConfigInputKeyValue | IV2SideDialogConfigInputHTML
-| V2SideDialogConfigInputFromInput | IV2SideDialogConfigInputLink | IV2SideDialogConfigInputAccordion;
+| V2SideDialogConfigInputFromInput | IV2SideDialogConfigInputLink | IV2SideDialogConfigInputAccordion | IV2SideDialogConfigInputFilterList;
 
 /**
  * Side dialog inputs map

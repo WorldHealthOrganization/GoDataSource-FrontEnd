@@ -231,6 +231,33 @@
 
             </div>
 
+            <!-- Filter list -->
+            <div
+              *ngSwitchCase="V2SideDialogConfigInputType.FILTER_LIST"
+              fxLayout="column"
+              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-filter-list {{input.cssClasses}}">
+
+              <!-- Buttons -->
+              <div
+                fxLayout="row" fxLayoutAlign="end">
+
+                <!-- Add -->
+                <button
+                  type="button"
+                  mat-flat-button color="primary">
+                  {{'LNG_SIDE_FILTERS_ADD_ANOTHER_FILTER_BUTTON' | translate}}
+                </button>
+
+              </div>
+
+              <!-- Filters -->
+              <div
+                *ngFor="let inputItem of input.items">
+                test
+              </div>
+
+            </div>
+
           </div>
         </ng-template>
 
