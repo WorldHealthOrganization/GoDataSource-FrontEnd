@@ -233,19 +233,24 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    * Selected outbreak was changed
    */
   selectedOutbreakChanged(): void {
-    // export cases url
+    // no outbreak selected ?
     if (
-      this.selectedOutbreak &&
-      this.selectedOutbreak.id
+      !this.selectedOutbreak ||
+      !this.selectedOutbreak.id
     ) {
-      this.clustersListAsLabelValuePair$ = this.clusterDataService.getClusterListAsLabelValue(this.selectedOutbreak.id);
-
-      // initialize side filters
-      this.initializeSideFilters();
+      // finished
+      return;
     }
+
+    // export cases url
+    this.clustersListAsLabelValuePair$ = this.clusterDataService.getClusterListAsLabelValue(this.selectedOutbreak.id);
+
+    // initialize side filters
+    this.initializeSideFilters();
 
     // initialize pagination
     this.initPaginator();
+
     // ...and re-load the list when the Selected Outbreak is changed
     this.needsRefreshList(true);
   }
