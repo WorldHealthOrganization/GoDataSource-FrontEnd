@@ -552,7 +552,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             items: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).list.map((item) => {
               return {
                 form: {
-                  type: IV2ColumnStatusFormType.SQUARE,
+                  type: IV2ColumnStatusFormType.TRIANGLE,
                   color: item.getColorCode()
                 },
                 label: item.id
@@ -571,7 +571,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             risk.map[data.id]
           ) {
             forms.push({
-              type: IV2ColumnStatusFormType.SQUARE,
+              type: IV2ColumnStatusFormType.TRIANGLE,
               color: risk.map[data.id].getColorCode()
             });
           }
