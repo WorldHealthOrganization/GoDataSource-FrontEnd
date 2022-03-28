@@ -20,7 +20,7 @@ import { IV2GroupedData, IV2GroupedDataValue } from './models/grouped-data.model
 import { IBasicCount } from '../../../core/models/basic-count.interface';
 import { PageEvent } from '@angular/material/paginator';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
-import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputCheckbox, V2SideDialogConfigInput, V2SideDialogConfigInputType } from '../app-side-dialog-v2/models/side-dialog-config.model';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputCheckbox, IV2SideDialogConfigInputSingleDropdown, V2SideDialogConfigInput, V2SideDialogConfigInputType } from '../app-side-dialog-v2/models/side-dialog-config.model';
 import { UserModel, UserSettings } from '../../../core/models/user.model';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { catchError } from 'rxjs/operators';
@@ -28,11 +28,12 @@ import { AppListTableV2ButtonComponent } from './components/button/app-list-tabl
 import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 import { AppListTableV2SelectionHeaderComponent } from './components/selection-header/app-list-table-v2-selection-header.component';
 import { AppListTableV2ColumnHeaderComponent } from './components/column-header/app-list-table-v2-column-header.component';
-import { RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
+import { RequestQueryBuilder, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
 import { AppListTableV2LoadingComponent } from './components/loading/app-list-table-v2-loading.component';
 import { AppListTableV2NoDataComponent } from './components/no-data/app-list-table-v2-no-data.component';
 import { GridApi } from '@ag-grid-community/core/dist/cjs/es5/gridApi';
 import { ColumnApi } from '@ag-grid-community/core/dist/cjs/es5/columns/columnApi';
+import { SavedFiltersService } from '../../../core/services/data/saved-filters.data.service';
 
 /**
  * Component
@@ -113,6 +114,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
   // add button
   @Input() addAction: IV2ActionIconLabel;
+
+  // advanced filters type
+  @Input() advancedFilterType: string;
 
   // show header filters ?
   savingHeaderFilterVisibility: boolean = false;
@@ -299,7 +303,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     protected router: Router,
     protected dialogV2Service: DialogV2Service,
     protected authDataService: AuthDataService,
-    protected toastV2Service: ToastV2Service
+    protected toastV2Service: ToastV2Service,
+    protected savedFiltersService: SavedFiltersService
   ) {}
 
   /**
@@ -1469,5 +1474,78 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // retrieve column
     this._sortBy.column = this._agTable.columnApi.getColumn(field).getUserProvidedColDef() as IExtendedColDef;
     this._sortBy.direction = direction;
+  }
+
+  /**
+   * Show advanced filters
+   */
+  showAdvancedFilters(): void {
+    // no advanced filter type set ?
+    if (!this.advancedFilterType) {
+      throw new Error('Advanced filter type missing...');
+    }
+
+    // display filters dialog
+    this.dialogV2Service
+      .showSideDialog({
+        title: {
+          get: () => 'LNG_SIDE_FILTERS_TITLE'
+        },
+        hideInputFilter: true,
+        width: '30rem',
+        inputs: [
+          {
+            type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+            placeholder: 'LNG_SIDE_FILTERS_LOAD_FILTER_LABEL',
+            name: 'savedFilterList',
+            value: undefined,
+            options: [],
+            clearable: true
+          }, {
+            type: V2SideDialogConfigInputType.DIVIDER
+          }
+        ],
+        bottomButtons: [],
+        initialized: (handler) => {
+          // display loading
+          handler.loading.show();
+
+          // construct query for saved filter
+          const qb = new RequestQueryBuilder();
+
+          // no need to retrieve all fields
+          qb.fields(
+            'id',
+            'name',
+            'readOnly'
+          );
+
+          // retrieve items specific to our page
+          qb.filter.where({
+            filterKey: {
+              eq: this.advancedFilterType
+            }
+          });
+
+          // retrieve saved filters
+          this.savedFiltersService
+            .getSavedFiltersList(qb)
+            .subscribe((savedFilters) => {
+              // set saved filters options
+              (handler.data.map.savedFilterList as IV2SideDialogConfigInputSingleDropdown).options = savedFilters.map((item) => {
+                return {
+                  label: item.name,
+                  value: item.id
+                };
+              });
+
+              // hide loading
+              handler.loading.hide();
+            });
+        }
+      })
+      .subscribe(() => {
+        // #TODO
+      });
   }
 }

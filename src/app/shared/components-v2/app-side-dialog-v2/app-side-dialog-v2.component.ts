@@ -44,10 +44,12 @@ export class AppSideDialogV2Component implements OnDestroy {
 
   // dialog config
   config: IV2SideDialogConfig;
-  dialogData: IV2SideDialogData;
   dialogHandler: IV2SideDialogHandler = {
     // form
     form: null,
+
+    // dialog data
+    data: undefined,
 
     // update
     update: {
@@ -273,7 +275,7 @@ export class AppSideDialogV2Component implements OnDestroy {
     this.filterByValue = undefined;
     this.filteredInputs = undefined;
     this.filteredForceParent = undefined;
-    this.dialogData = undefined;
+    this.dialogHandler.data = undefined;
     this.loading = undefined;
 
     // trigger response
@@ -345,7 +347,7 @@ export class AppSideDialogV2Component implements OnDestroy {
     this.sendResponse(
       button.type,
       button.key,
-      this.dialogData
+      this.dialogHandler.data
     );
   }
 
@@ -458,12 +460,12 @@ export class AppSideDialogV2Component implements OnDestroy {
    */
   updateInputs(): void {
     // map inputs
-    this.dialogData = {
+    this.dialogHandler.data = {
       inputs: this.config.inputs,
       map: {}
     };
     this.config.inputs.forEach((input) => {
-      this.dialogData.map[input.name] = input;
+      this.dialogHandler.data.map[input.name] = input;
     });
   }
 }

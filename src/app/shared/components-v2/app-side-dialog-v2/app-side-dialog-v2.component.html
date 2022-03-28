@@ -75,7 +75,7 @@
           #commonPart
           let-input="input">
           <div
-            *ngIf="!input.visible || input.visible(dialogData, dialogHandler, input)"
+            *ngIf="!input.visible || input.visible(dialogHandler.data, dialogHandler, input)"
             [ngSwitch]="input.type">
 
             <!-- Divider -->
@@ -91,9 +91,9 @@
               [(ngModel)]="input.checked"
               [name]="input.name"
               [placeholder]="input.placeholder"
-              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler, input)"
+              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
               [tooltip]="input.tooltip"
-              (ngModelChange)="input.change ? input.change(dialogData, dialogHandler, input) : undefined"></app-form-checkbox-v2>
+              (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-checkbox-v2>
 
             <!-- Text -->
             <app-form-input-v2
@@ -102,9 +102,9 @@
               [(ngModel)]="input.value"
               [name]="input.name"
               [placeholder]="input.placeholder"
-              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler, input)"
-              [required]="input.validators?.required && input.validators?.required(dialogData, dialogHandler, input)"
-              (ngModelChange)="input.change ? input.change(dialogData, dialogHandler, input) : undefined"></app-form-input-v2>
+              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
+              [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
+              (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-input-v2>
 
             <!-- Number -->
             <app-form-number-v2
@@ -113,9 +113,9 @@
               [(ngModel)]="input.value"
               [name]="input.name"
               [placeholder]="input.placeholder"
-              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler, input)"
-              [required]="input.validators?.required && input.validators?.required(dialogData, dialogHandler, input)"
-              (ngModelChange)="input.change ? input.change(dialogData, dialogHandler, input) : undefined"></app-form-number-v2>
+              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
+              [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
+              (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-number-v2>
 
             <!-- Dropdown - single -->
             <app-form-select-single-v2
@@ -125,9 +125,10 @@
               [name]="input.name"
               [placeholder]="input.placeholder"
               [options]="input.options"
-              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler, input)"
-              [required]="input.validators?.required && input.validators?.required(dialogData, dialogHandler, input)"
-              (ngModelChange)="input.change ? input.change(dialogData, dialogHandler, input) : undefined"></app-form-select-single-v2>
+              [clearable]="input.clearable"
+              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
+              [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
+              (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-select-single-v2>
 
             <!-- Dropdown - multiple -->
             <app-form-select-multiple-v2
@@ -137,9 +138,9 @@
               [name]="input.name"
               [placeholder]="input.placeholder"
               [options]="input.options"
-              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler, input)"
-              [required]="input.validators?.required && input.validators?.required(dialogData, dialogHandler, input)"
-              (ngModelChange)="input.change ? input.change(dialogData, dialogHandler, input) : undefined"></app-form-select-multiple-v2>
+              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
+              [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
+              (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-select-multiple-v2>
 
             <!-- Key-Value -->
             <div
@@ -171,9 +172,9 @@
               mat-flat-button
               color="text"
               class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-link {{input.cssClasses}}"
-              [routerLink]="input.link(dialogData, dialogHandler, input)"
-              [queryParams]="input.linkQueryParams ? input.linkQueryParams(dialogData, dialogHandler, input) : undefined"
-              [disabled]="input.disabled && input.disabled(dialogData, dialogHandler, input)"
+              [routerLink]="input.link(dialogHandler.data, dialogHandler, input)"
+              [queryParams]="input.linkQueryParams ? input.linkQueryParams(dialogHandler.data, dialogHandler, input) : undefined"
+              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
               (click)="hide(true)">
               {{input.placeholder | translate}}
             </a>
@@ -193,11 +194,11 @@
                 <ng-container
                   *ngFor="let panel of input.panels">
                   <mat-expansion-panel
-                    *ngIf="!panel.visible || panel.visible(dialogData, dialogHandler, panel)"
+                    *ngIf="!panel.visible || panel.visible(dialogHandler.data, dialogHandler, panel)"
                     class="gd-app-side-dialog-v2-content-middle-item-input-panel {{panel.cssClasses}}"
                     [class.gd-app-side-dialog-v2-content-middle-item-input-panel-not-expandable]="!panel.inputs || panel.inputs.length < 1"
                     [style.height]="filteredInputs === false || (filteredInputs && !filteredInputs[input.name] && !filteredInputs[panel.name] && !filteredForceParent[panel.name]) ? 0 : undefined"
-                    [disabled]="panel.disabled && panel.disabled(dialogData, dialogHandler, panel)"
+                    [disabled]="panel.disabled && panel.disabled(dialogHandler.data, dialogHandler, panel)"
                     togglePosition="before">
 
                     <!-- Panel header -->
@@ -210,8 +211,8 @@
                           type="button"
                           mat-icon-button
                           [color]="panel.iconButton.color"
-                          [disabled]="panel.iconButton.disabled && panel.iconButton.disabled(dialogData, dialogHandler, panel.iconButton)"
-                          (click)="$event.stopPropagation(); panel.iconButton.click(dialogData, dialogHandler, panel.iconButton);"><mat-icon>{{panel.iconButton.icon}}</mat-icon></button>
+                          [disabled]="panel.iconButton.disabled && panel.iconButton.disabled(dialogHandler.data, dialogHandler, panel.iconButton)"
+                          (click)="$event.stopPropagation(); panel.iconButton.click(dialogHandler.data, dialogHandler, panel.iconButton);"><mat-icon>{{panel.iconButton.icon}}</mat-icon></button>
                       </mat-panel-description>
                     </mat-expansion-panel-header>
 
@@ -264,7 +265,7 @@
           type="button"
           mat-flat-button [color]="button.color"
           class="gd-app-side-dialog-v2-content-bottom-button"
-          [disabled]="button.disabled && button.disabled(dialogData, dialogHandler, button)"
+          [disabled]="button.disabled && button.disabled(dialogHandler.data, dialogHandler, button)"
           (click)="clickedButton(button)">
           {{button.label | translate}}
         </button>

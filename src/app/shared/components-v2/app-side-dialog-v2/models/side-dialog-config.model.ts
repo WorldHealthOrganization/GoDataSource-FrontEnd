@@ -25,7 +25,8 @@ export enum V2SideDialogConfigInputType {
   ACCORDION,
   ACCORDION_PANEL,
   KEY_VALUE,
-  HTML
+  HTML,
+  FILTER_LIST
 }
 
 /**
@@ -132,6 +133,7 @@ export interface IV2SideDialogConfigInputSingleDropdown extends IV2SideDialogCon
 
   // optional
   validators?: IV2SideDialogConfigInputValidator;
+  clearable?: boolean;
 }
 
 /**
@@ -291,6 +293,7 @@ export interface IV2SideDialog {
 export interface IV2SideDialogHandler {
   // required
   form: NgForm;
+  data: IV2SideDialogData;
   hide: () => void;
   update: {
     inputs: (inputs: V2SideDialogConfigInput[]) => void
