@@ -1078,6 +1078,30 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
   private initializeGroupedData(): void {
     this.groupedData = {
       label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_SHOW_GROUP_BY_RISK_PILLS',
+      click: (
+        item,
+        group
+      ) => {
+        // no need to refresh group
+        group.data.blockNextGet = true;
+
+        // filter by group data
+        if (!item) {
+          this.filterByEquality(
+            'riskLevel',
+            null
+          );
+        } else if (item.label === 'LNG_REFERENCE_DATA_CATEGORY_RISK_LEVEL_UNCLASSIFIED') {
+          // clear
+          this.filterByNotHavingValue('riskLevel');
+        } else {
+          // search
+          this.filterByEquality(
+            'riskLevel',
+            item.label
+          );
+        }
+      },
       data: {
         loading: false,
         values: [],
