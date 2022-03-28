@@ -3,7 +3,7 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import * as _ from 'lodash';
 import { Observable, of, throwError } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { catchError, map, mergeMap, share, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { catchError, map, mergeMap, share, switchMap, takeUntil } from 'rxjs/operators';
 
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder, RequestRelationBuilder } from '../../../../core/helperClasses/request-query-builder';
@@ -1309,7 +1309,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
    * Re(load) the Contacts list
    */
   refreshList(
-    finishCallback: (records: any[]) => void,
     triggeredByPageChange: boolean
   ) {
     if (this.selectedOutbreak) {
@@ -1392,22 +1391,16 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
           })
         )
         .pipe(
-          tap((data: any[]) => {
-            finishCallback(data);
-          }),
 
           // handle errors
           catchError((err) => {
             this.toastV2Service.error(err);
-            finishCallback([]);
             return throwError(err);
           }),
 
           // should be the last pipe
           takeUntil(this.destroyed$)
         );
-    } else {
-      finishCallback([]);
     }
   }
 
