@@ -23,7 +23,7 @@ import { RequestQueryBuilder, RequestRelationBuilder } from '../../../../core/he
 import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Constants } from '../../../../core/models/constants';
-import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
+import { catchError, map, mergeMap, share } from 'rxjs/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
@@ -657,36 +657,26 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
    * Re(load) the Contacts list
    */
   refreshList(
-    finishCallback: (records: any[]) => void,
     triggeredByPageChange: boolean
   ) {
-    if (this.selectedOutbreak) {
-      // refresh list of contacts grouped by risk level
-      if (!triggeredByPageChange) {
-        this.getContactsOfContactsGroupedByRiskLevel();
-      }
-
-      // retrieve created user & modified user information
-      this.queryBuilder.include('createdByUser', true);
-      this.queryBuilder.include('updatedByUser', true);
-
-      // retrieve responsible user information
-      this.queryBuilder.include('responsibleUser', true);
-
-      // retrieve location list
-      this.queryBuilder.include('locations', true);
-
-      // retrieve the list of Contacts
-      this.contactsOfContactsList$ = this.contactsOfContactsDataService
-        .getContactsOfContactsList(this.selectedOutbreak.id, this.queryBuilder)
-        .pipe(
-          tap((data: any[]) => {
-            finishCallback(data);
-          })
-        );
-    } else {
-      finishCallback([]);
+    // refresh list of contacts grouped by risk level
+    if (!triggeredByPageChange) {
+      this.getContactsOfContactsGroupedByRiskLevel();
     }
+
+    // retrieve created user & modified user information
+    this.queryBuilder.include('createdByUser', true);
+    this.queryBuilder.include('updatedByUser', true);
+
+    // retrieve responsible user information
+    this.queryBuilder.include('responsibleUser', true);
+
+    // retrieve location list
+    this.queryBuilder.include('locations', true);
+
+    // retrieve the list of Contacts
+    this.contactsOfContactsList$ = this.contactsOfContactsDataService
+      .getContactsOfContactsList(this.selectedOutbreak.id, this.queryBuilder);
   }
 
   /**

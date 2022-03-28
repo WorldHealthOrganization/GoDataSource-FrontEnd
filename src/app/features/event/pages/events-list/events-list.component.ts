@@ -14,7 +14,7 @@ import { DialogAnswer } from '../../../../shared/components/dialog/dialog.compon
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { catchError, share, tap } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -532,34 +532,26 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
   /**
    * Re(load) the Events list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
-    if (this.selectedOutbreak) {
-      // retrieve created user & modified user information
-      this.queryBuilder.include('createdByUser', true);
-      this.queryBuilder.include('updatedByUser', true);
+  refreshList() {
+    // retrieve created user & modified user information
+    this.queryBuilder.include('createdByUser', true);
+    this.queryBuilder.include('updatedByUser', true);
 
-      // retrieve responsible user information
-      this.queryBuilder.include('responsibleUser', true);
+    // retrieve responsible user information
+    this.queryBuilder.include('responsibleUser', true);
 
-      // retrieve location list
-      this.queryBuilder.include('location', true);
+    // retrieve location list
+    this.queryBuilder.include('location', true);
 
-      // retrieve the list of Events
-      this.eventsList$ = this.eventDataService
-        .getEventsList(this.selectedOutbreak.id, this.queryBuilder)
-        .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            finishCallback([]);
-            return throwError(err);
-          }),
-          tap((data: any[]) => {
-            finishCallback(data);
-          })
-        );
-    } else {
-      finishCallback([]);
-    }
+    // retrieve the list of Events
+    this.eventsList$ = this.eventDataService
+      .getEventsList(this.selectedOutbreak.id, this.queryBuilder)
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        })
+      );
   }
 
   /**

@@ -3356,7 +3356,7 @@ export class ImportDataComponent
   /**
    * Re(load) the Events list
    */
-  refreshList(finishCallback: (records: any[]) => void): void {
+  refreshList(): void {
     // do we have import log id, there is no point in continuing otherwise ?
     if (
       !this.asyncResponse ||
@@ -3387,11 +3387,7 @@ export class ImportDataComponent
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
-          finishCallback([]);
           return throwError(err);
-        }),
-        tap((data: any[]) => {
-          finishCallback(data);
         })
       );
   }

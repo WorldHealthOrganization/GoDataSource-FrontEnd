@@ -7,7 +7,7 @@ import { Observable, throwError } from 'rxjs/index';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
-import { catchError, map, share, tap } from 'rxjs/internal/operators';
+import { catchError, map, share } from 'rxjs/internal/operators';
 import * as _ from 'lodash';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
@@ -22,13 +22,14 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
   selector: 'app-available-entities-for-switch-list',
   templateUrl: './available-entities-for-switch-list.component.html'
 })
 export class AvailableEntitiesForSwitchListComponent extends RelationshipsListComponent implements OnInit, OnDestroy {
-  entitiesList$: Observable<(CaseModel|ContactModel|EventModel)[]>;
+  entitiesList$: Observable<(CaseModel|ContactModel|EventModel|ContactOfContactModel)[]>;
   entitiesListCount$: Observable<IBasicCount>;
   entityType: EntityType;
 
@@ -222,7 +223,7 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
   /**
    * Re(load) the available Entities list, based on the applied filter, sort criterias
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     if (
       this.entityType &&
             this.entityId &&
@@ -253,15 +254,9 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
         .pipe(
           catchError((err) => {
             this.toastV2Service.error(err);
-            finishCallback([]);
             return throwError(err);
-          }),
-          tap((data: any[]) => {
-            finishCallback(data);
           })
         );
-    } else {
-      finishCallback([]);
     }
   }
 

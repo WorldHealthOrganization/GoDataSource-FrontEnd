@@ -7,7 +7,7 @@ import { HelpDataService } from '../../../../core/services/data/help.data.servic
 import { HelpItemModel } from '../../../../core/models/help-item.model';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import * as _ from 'lodash';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { UserSettings } from '../../../../core/models/user.model';
 import { HoverRowAction } from '../../../../shared/components';
 import { throwError } from 'rxjs/internal/observable/throwError';
@@ -113,7 +113,7 @@ export class HelpSearchComponent extends ListComponent implements OnInit, OnDest
   /**
    * Re(load) the items list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     this.queryBuilder.filter.where({approved: true}, true);
     // retrieve the list of items
     if (_.isEmpty(this.searchedTerm)) {
@@ -127,11 +127,7 @@ export class HelpSearchComponent extends ListComponent implements OnInit, OnDest
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
-          finishCallback([]);
           return throwError(err);
-        }),
-        tap((data: any[]) => {
-          finishCallback(data);
         })
       );
   }

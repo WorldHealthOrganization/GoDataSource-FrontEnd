@@ -7,7 +7,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { catchError, share, tap } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
@@ -187,7 +187,7 @@ export class RolesListComponent extends ListComponent implements OnInit, OnDestr
   /**
    * Re(load) the User Roles list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     // make sure we include user information
     this.queryBuilder.filter.flag(
       'includeUsers',
@@ -200,11 +200,7 @@ export class RolesListComponent extends ListComponent implements OnInit, OnDestr
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
-          finishCallback([]);
           return throwError(err);
-        }),
-        tap((data: any[]) => {
-          finishCallback(data);
         })
       );
   }

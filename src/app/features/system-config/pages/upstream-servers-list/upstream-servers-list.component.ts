@@ -202,7 +202,7 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
   /**
    * Refresh list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     this.upstreamServerList = [];
     this.upstreamServerListAll = undefined;
     this.refreshListCount();
@@ -211,7 +211,6 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
-          finishCallback([]);
           return throwError(err);
         })
       )
@@ -230,9 +229,6 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
 
         // refresh the total count
         this.refreshListCount();
-
-        // finished
-        finishCallback(this.upstreamServerList);
       });
   }
 

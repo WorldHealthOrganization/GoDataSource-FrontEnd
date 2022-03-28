@@ -5,7 +5,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
@@ -250,23 +250,15 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
   /**
    * Re(load) the Cases list, based on the applied filter, sort criterias
    */
-  refreshList(finishCallback: (records: any[]) => void) {
-    if (this.selectedOutbreak) {
-      // retrieve the list
-      this.relationshipList$ = this.relationshipDataService
-        .getLongPeriodBetweenDateOfOnset(this.selectedOutbreak.id)
-        .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            finishCallback([]);
-            return throwError(err);
-          }),
-          tap((data: any[]) => {
-            finishCallback(data);
-          })
-        );
-    } else {
-      finishCallback([]);
-    }
+  refreshList() {
+    // retrieve the list
+    this.relationshipList$ = this.relationshipDataService
+      .getLongPeriodBetweenDateOfOnset(this.selectedOutbreak.id)
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        })
+      );
   }
 }

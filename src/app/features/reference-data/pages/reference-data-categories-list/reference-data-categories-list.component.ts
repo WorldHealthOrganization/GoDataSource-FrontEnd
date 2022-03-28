@@ -5,7 +5,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { HoverRowAction } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { IconModel } from '../../../../core/models/icon.model';
@@ -111,18 +111,14 @@ export class ReferenceDataCategoriesListComponent
   /**
    * Re(load) the Reference Data Categories list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     // load reference data
     this.referenceData$ = this.referenceDataDataService
       .getReferenceData()
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
-          finishCallback([]);
           return throwError(err);
-        }),
-        tap((data: any[]) => {
-          finishCallback(data);
         })
       );
   }

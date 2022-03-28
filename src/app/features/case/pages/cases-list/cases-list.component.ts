@@ -19,7 +19,7 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
-import { catchError, map, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { ContactModel } from '../../../../core/models/contact.model';
@@ -2292,118 +2292,101 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    * Re(load) the Cases list, based on the applied filter, sort criterias
    */
   refreshList(
-    finishCallback: (records: any[]) => void,
     triggeredByPageChange: boolean
   ) {
-    if (this.selectedOutbreak) {
-      // classification conditions - not really necessary since refreshListCount is always called before this one
-      this.addClassificationConditions();
+    // classification conditions - not really necessary since refreshListCount is always called before this one
+    this.addClassificationConditions();
 
-      // retrieve created user & modified user information
-      this.queryBuilder.include('createdByUser', true);
-      this.queryBuilder.include('updatedByUser', true);
+    // retrieve created user & modified user information
+    this.queryBuilder.include('createdByUser', true);
+    this.queryBuilder.include('updatedByUser', true);
 
-      // retrieve responsible user information
-      this.queryBuilder.include('responsibleUser', true);
+    // retrieve responsible user information
+    this.queryBuilder.include('responsibleUser', true);
 
-      // refresh badges list with applied filter
-      if (!triggeredByPageChange) {
-        this.initializeGroupedData();
-      }
-
-      // retrieve the list of Cases
-      this.casesList$ = this.caseDataService
-        .getCasesList(this.selectedOutbreak.id, this.queryBuilder)
-        .pipe(
-          switchMap((data) => {
-            // determine locations that we need to retrieve
-            const locationsIdsMap: {
-              [locationId: string]: true
-            } = {};
-            data.forEach((item) => {
-              (item.addresses || []).forEach((address) => {
-                // nothing to add ?
-                if (!address?.locationId) {
-                  return;
-                }
-
-                // add location to list
-                locationsIdsMap[address.locationId] = true;
-              });
-            });
-
-            // determine ids
-            const locationIds: string[] = Object.keys(locationsIdsMap);
-
-            // nothing to retrieve ?
-            if (locationIds.length < 1) {
-              return of(data);
-            }
-
-            // construct location query builder
-            const qb = new RequestQueryBuilder();
-            qb.filter.bySelect(
-              'id',
-              locationIds,
-              false,
-              null
-            );
-
-            // retrieve locations
-            return this.locationDataService
-              .getLocationsList(qb)
-              .pipe(
-                map((locations) => {
-                  // map locations
-                  const locationsMap: {
-                    [locationId: string]: LocationModel
-                  } = {};
-                  locations.forEach((location) => {
-                    locationsMap[location.id] = location;
-                  });
-
-                  // set locations
-                  data.forEach((item) => {
-                    (item.addresses || []).forEach((address) => {
-                      address.location = address.locationId && locationsMap[address.locationId] ?
-                        locationsMap[address.locationId] :
-                        address.location;
-                    });
-                  });
-
-                  // finished
-                  return data;
-                })
-              );
-          })
-        )
-        .pipe(
-          // process data
-          map((cases: CaseModel[]) => {
-            return EntityModel.determineAlertness(
-              this.selectedOutbreak.caseInvestigationTemplate,
-              cases
-            );
-          }),
-
-          // finished
-          tap((data: any[]) => {
-            finishCallback(data);
-          }),
-
-          // handle errors
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            finishCallback([]);
-            return throwError(err);
-          }),
-
-          // should be the last pipe
-          takeUntil(this.destroyed$)
-        );
-    } else {
-      finishCallback([]);
+    // refresh badges list with applied filter
+    if (!triggeredByPageChange) {
+      this.initializeGroupedData();
     }
+
+    // retrieve the list of Cases
+    this.casesList$ = this.caseDataService
+      .getCasesList(this.selectedOutbreak.id, this.queryBuilder)
+      .pipe(
+        switchMap((data) => {
+          // determine locations that we need to retrieve
+          const locationsIdsMap: {
+            [locationId: string]: true
+          } = {};
+          data.forEach((item) => {
+            (item.addresses || []).forEach((address) => {
+              // nothing to add ?
+              if (!address?.locationId) {
+                return;
+              }
+
+              // add location to list
+              locationsIdsMap[address.locationId] = true;
+            });
+          });
+
+          // determine ids
+          const locationIds: string[] = Object.keys(locationsIdsMap);
+
+          // nothing to retrieve ?
+          if (locationIds.length < 1) {
+            return of(data);
+          }
+
+          // construct location query builder
+          const qb = new RequestQueryBuilder();
+          qb.filter.bySelect(
+            'id',
+            locationIds,
+            false,
+            null
+          );
+
+          // retrieve locations
+          return this.locationDataService
+            .getLocationsList(qb)
+            .pipe(
+              map((locations) => {
+                // map locations
+                const locationsMap: {
+                  [locationId: string]: LocationModel
+                } = {};
+                locations.forEach((location) => {
+                  locationsMap[location.id] = location;
+                });
+
+                // set locations
+                data.forEach((item) => {
+                  (item.addresses || []).forEach((address) => {
+                    address.location = address.locationId && locationsMap[address.locationId] ?
+                      locationsMap[address.locationId] :
+                      address.location;
+                  });
+                });
+
+                // finished
+                return data;
+              })
+            );
+        })
+      )
+      .pipe(
+        // process data
+        map((cases: CaseModel[]) => {
+          return EntityModel.determineAlertness(
+            this.selectedOutbreak.caseInvestigationTemplate,
+            cases
+          );
+        }),
+
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      );
   }
 
   /**

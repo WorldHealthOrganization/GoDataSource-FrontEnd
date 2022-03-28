@@ -239,7 +239,7 @@ export class TransmissionChainsListComponent extends ListComponent implements On
   /**
    * Re(load) the Transmission Chains list, based on the applied filter, sort criterias
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     // reset items
     this.transmissionChains = [];
     this.transmissionChainsAll = undefined;
@@ -298,7 +298,6 @@ export class TransmissionChainsListComponent extends ListComponent implements On
         .pipe(
           catchError((err) => {
             this.toastV2Service.error(err);
-            finishCallback([]);
             return throwError(err);
           })
         )
@@ -316,12 +315,7 @@ export class TransmissionChainsListComponent extends ListComponent implements On
 
           // refresh the total count
           this.refreshListCount();
-
-          // finished
-          finishCallback(this.transmissionChains);
         });
-    } else {
-      finishCallback([]);
     }
   }
 

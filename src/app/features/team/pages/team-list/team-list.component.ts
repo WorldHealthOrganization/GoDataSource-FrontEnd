@@ -12,7 +12,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
-import { catchError, share, tap } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
@@ -169,18 +169,14 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
   /**
    * Re(load) the list of Teams
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     // retrieve the list of Teams
     this.teamsList$ = this.teamDataService
       .getTeamsList(this.queryBuilder)
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
-          finishCallback([]);
           return throwError(err);
-        }),
-        tap((data: any[]) => {
-          finishCallback(data);
         })
       );
   }
