@@ -8,13 +8,11 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ApplyListFilter, Constants } from '../../../../core/models/constants';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
-import { ReferenceDataCategory, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
@@ -139,17 +137,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
 
 
-  occupationsList$: Observable<any[]>;
-  outcomeList$: Observable<any[]>;
-  pregnancyStatsList$: Observable<any[]>;
-
-  // vaccines
-  vaccineList$: Observable<any[]>;
-  vaccineStatusList$: Observable<any[]>;
-
-  caseRiskLevelsList$: Observable<any[]>;
-  yesNoOptionsWithoutAllList$: Observable<any[]>;
-
   // available side filters
   availableSideFilters: FilterModel[] = [];
   // saved filters type
@@ -172,10 +159,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     private locationDataService: LocationDataService,
     private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
-    private referenceDataDataService: ReferenceDataDataService,
     private dialogV2Service: DialogV2Service,
     private i18nService: I18nService,
-    private genericDataService: GenericDataService,
     private entityHelperService: EntityHelperService,
     private redirectService: RedirectService
   ) {
@@ -186,18 +171,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    * Component initialized
    */
   ngOnInit() {
-    // reference data
-    this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
-    this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
-    this.pregnancyStatsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PREGNANCY_STATUS);
-    this.vaccineList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.VACCINES);
-    this.vaccineStatusList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.VACCINES_STATUS);
-
-    // init side filters
-    this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
-    this.yesNoOptionsWithoutAllList$ = this.genericDataService.getFilterYesNoOptions(true);
-    this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
-
     // initialize quick actions
     this.initializeQuickActions();
 
@@ -2027,14 +2000,16 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         fieldName: 'occupation',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
         type: FilterType.MULTISELECT,
-        options$: this.occupationsList$,
+        // this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
+        // options$: this.occupationsList$,
         sortable: true
       }),
       new FilterModel({
         fieldName: 'riskLevel',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
         type: FilterType.MULTISELECT,
-        options$: this.caseRiskLevelsList$
+        // this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
+        // options$: this.caseRiskLevelsList$
       }),
       new FilterModel({
         fieldName: 'riskReason',
@@ -2078,13 +2053,14 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         fieldName: 'safeBurial',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
         type: FilterType.SELECT,
-        options$: this.yesNoOptionsWithoutAllList$
+        // this.yesNoOptionsWithoutAllList$ = this.genericDataService.getFilterYesNoOptions(true);
+        // options$: this.yesNoOptionsWithoutAllList$
       }),
       new FilterModel({
         fieldName: 'isDateOfOnsetApproximate',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
         type: FilterType.SELECT,
-        options$: this.yesNoOptionsWithoutAllList$
+        // options$: this.yesNoOptionsWithoutAllList$
       }),
       new FilterModel({
         fieldName: 'dateOfReporting',
@@ -2095,25 +2071,26 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         fieldName: 'isDateOfReportingApproximate',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
         type: FilterType.SELECT,
-        options$: this.yesNoOptionsWithoutAllList$
+        // options$: this.yesNoOptionsWithoutAllList$
       }),
       new FilterModel({
         fieldName: 'transferRefused',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
         type: FilterType.SELECT,
-        options$: this.yesNoOptionsWithoutAllList$
+        // options$: this.yesNoOptionsWithoutAllList$
       }),
       new FilterModel({
         fieldName: 'outcomeId',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_OUTCOME',
         type: FilterType.MULTISELECT,
-        options$: this.outcomeList$
+        // this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
+        // options$: this.outcomeList$
       }),
       new FilterModel({
         fieldName: 'wasContact',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
         type: FilterType.SELECT,
-        options$: this.yesNoOptionsWithoutAllList$
+        // options$: this.yesNoOptionsWithoutAllList$
       }),
       new FilterModel({
         fieldName: 'clusterId',
@@ -2134,19 +2111,22 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         fieldName: 'pregnancyStatus',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
         type: FilterType.MULTISELECT,
-        options$: this.pregnancyStatsList$
+        // this.pregnancyStatsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PREGNANCY_STATUS);
+        // options$: this.pregnancyStatsList$
       }),
       new FilterModel({
         fieldName: 'vaccinesReceived.vaccine',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_VACCINE',
         type: FilterType.MULTISELECT,
-        options$: this.vaccineList$
+        // this.vaccineList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.VACCINES);
+        // options$: this.vaccineList$
       }),
       new FilterModel({
         fieldName: 'vaccinesReceived.status',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_VACCINE_STATUS',
         type: FilterType.MULTISELECT,
-        options$: this.vaccineStatusList$
+        // this.vaccineStatusList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.VACCINES_STATUS);
+        // options$: this.vaccineStatusList$
       }),
       new FilterModel({
         fieldName: 'vaccinesReceived.date',
