@@ -92,7 +92,6 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
 
   // refresh only after we finish changing data
   // by default each time we get back to a page we should display loading spinner
-  public refreshingList: boolean = true;
   private _triggeredByPageChange: boolean = false;
   private triggerListRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
     // disabled ?
@@ -112,10 +111,8 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
     }
 
     // refresh list
-    this.refreshingList = true;
     this.refreshList(() => {
       // finished refreshing list
-      this.refreshingList = false;
     }, triggeredByPageChange);
   }));
 
@@ -220,9 +217,6 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
           ) {
             return;
           }
-
-          // reset loading
-          this.refreshingList = true;
 
           // clear all filters
           this.queryBuilder = new RequestQueryBuilder(() => {

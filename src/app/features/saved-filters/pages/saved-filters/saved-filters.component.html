@@ -44,10 +44,10 @@
     </div>
 
     <!-- Hover question effects / actions -->
-    <app-hover-row-actions
-        #hoverRow
-        [active]="!refreshingList"
-    ></app-hover-row-actions>
+<!--    <app-hover-row-actions-->
+<!--        #hoverRow-->
+<!--        [active]="!refreshingList"-->
+<!--    ></app-hover-row-actions>-->
 
     <mat-table #table [dataSource]="savedFiltersList$ | async" matSort (matSortChange)="sortBy($event)">
 
@@ -223,19 +223,19 @@
 
         <mat-header-row *matHeaderRowDef="fixedTableColumns"></mat-header-row>
         <mat-row
-            *matRowDef="let item; columns: fixedTableColumns"
-            app-hover-row-actions
-            [hoverRowActionsComponent]="hoverRow"
-            [hoverRowActions]="recordActions"
-            [hoverRowActionData]="item"
-        ></mat-row>
+            *matRowDef="let item; columns: fixedTableColumns">
+<!--            app-hover-row-actions-->
+<!--            [hoverRowActionsComponent]="hoverRow"-->
+<!--            [hoverRowActions]="recordActions"-->
+<!--            [hoverRowActionData]="item"-->
+        </mat-row>
     </mat-table>
 
-    <div
-        *ngIf="refreshingList"
-        class="mat-table-loading-data">
-        <mat-spinner></mat-spinner>
-    </div>
+<!--    <div-->
+<!--        *ngIf="refreshingList"-->
+<!--        class="mat-table-loading-data">-->
+<!--        <mat-spinner></mat-spinner>-->
+<!--    </div>-->
 
 <!--    &lt;!&ndash; No data &ndash;&gt;-->
 <!--    <div-->

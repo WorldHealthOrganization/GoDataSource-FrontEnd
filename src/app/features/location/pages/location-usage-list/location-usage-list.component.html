@@ -21,10 +21,10 @@
     </div>
 
     <!-- Hover question effects / actions -->
-    <app-hover-row-actions
-        #hoverRow
-        [active]="!refreshingList"
-    ></app-hover-row-actions>
+<!--    <app-hover-row-actions-->
+<!--        #hoverRow-->
+<!--        [active]="!refreshingList"-->
+<!--    ></app-hover-row-actions>-->
 
     <mat-table #table [dataSource]="usageDetailsList">
         <!-- Type -->
@@ -68,12 +68,12 @@
 
         <mat-header-row *matHeaderRowDef="fixedTableColumns"></mat-header-row>
         <mat-row
-            *matRowDef="let item; columns: fixedTableColumns"
-            app-hover-row-actions
-            [hoverRowActionsComponent]="hoverRow"
-            [hoverRowActions]="recordActions"
-            [hoverRowActionData]="item"
-        ></mat-row>
+            *matRowDef="let item; columns: fixedTableColumns">
+<!--            app-hover-row-actions-->
+<!--            [hoverRowActionsComponent]="hoverRow"-->
+<!--            [hoverRowActions]="recordActions"-->
+<!--            [hoverRowActionData]="item"-->
+        </mat-row>
     </mat-table>
 
     <div
@@ -82,11 +82,11 @@
         {{ 'LNG_PAGE_LIST_USAGE_LOCATIONS_LABEL_MORE_RECORDS' | translate:usageDetailsListMore }}
     </div>
 
-    <div
-        *ngIf="refreshingList"
-        class="mat-table-loading-data">
-        <mat-spinner></mat-spinner>
-    </div>
+<!--    <div-->
+<!--        *ngIf="refreshingList"-->
+<!--        class="mat-table-loading-data">-->
+<!--        <mat-spinner></mat-spinner>-->
+<!--    </div>-->
 
 <!--    &lt;!&ndash; No data &ndash;&gt;-->
 <!--    <div-->
