@@ -48,7 +48,12 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { CountedItemsListItem, DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import {
+  IV2ColumnPinned,
+  IV2ColumnStatusFormType,
+  V2ColumnFormat,
+  V2ColumnStatusForm,
+} from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import {
@@ -531,6 +536,49 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH,
         },
+      },
+      {
+        field: 'statuses',
+        label: 'LNG_COMMON_LABEL_STATUSES',
+        format: {
+          type: V2ColumnFormat.STATUS
+        },
+        notResizable: true,
+        pinned: true,
+        legends: [
+          // risk
+          {
+            title: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL',
+            items: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).list.map((item) => {
+              return {
+                form: {
+                  type: IV2ColumnStatusFormType.SQUARE,
+                  color: item.getColorCode()
+                },
+                label: item.id
+              };
+            })
+          }
+        ],
+        forms: (_column, data: ContactOfContactModel): V2ColumnStatusForm[] => {
+          // construct list of forms that we need to display
+          const forms: V2ColumnStatusForm[] = [];
+
+          // risk
+          const risk = this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>;
+          if (
+            data.id &&
+            risk.map[data.id]
+          ) {
+            forms.push({
+              type: IV2ColumnStatusFormType.SQUARE,
+              color: risk.map[data.id].getColorCode()
+            });
+          }
+
+          // finished
+          return forms;
+        }
       },
       {
         field: 'location',
