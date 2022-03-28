@@ -111,9 +111,7 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
     }
 
     // refresh list
-    this.refreshList(() => {
-      // finished refreshing list
-    }, triggeredByPageChange);
+    this.refreshList(triggeredByPageChange);
   }));
 
   // disable next load from cache input values ?
@@ -280,7 +278,6 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
      * Refresh list
      */
   public abstract refreshList(
-    finishCallback: (records: any[]) => void,
     triggeredByPageChange?: boolean
   );
 
