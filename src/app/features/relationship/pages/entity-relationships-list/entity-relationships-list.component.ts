@@ -340,7 +340,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
   /**
    * Re(load) the Relationships list, based on the applied filter, sort criterias
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     if (
       this.relationshipType &&
             this.entityType &&
@@ -360,7 +360,6 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
           .pipe(
             catchError((err) => {
               this.toastV2Service.error(err);
-              finishCallback([]);
               return throwError(err);
             }),
             tap((entities: EntityModel[]) => {
@@ -369,9 +368,6 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
               (entities || []).forEach((entity) => {
                 this.relationshipsListRecordsMap[entity.relationship.id] = entity;
               });
-
-              // finished
-              finishCallback(entities);
             })
           );
       } else {
@@ -389,14 +385,9 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
               (entities || []).forEach((entity) => {
                 this.relationshipsListRecordsMap[entity.relationship.id] = entity;
               });
-
-              // finished
-              finishCallback(entities);
             })
           );
       }
-    } else {
-      finishCallback([]);
     }
   }
 

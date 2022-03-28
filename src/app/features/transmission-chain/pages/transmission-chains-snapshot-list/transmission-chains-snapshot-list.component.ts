@@ -9,7 +9,7 @@ import { DialogAnswer, DialogAnswerButton, HoverRowAction, HoverRowActionType } 
 import { CotSnapshotModel } from '../../../../core/models/cot-snapshot.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
-import { catchError, share, tap } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
@@ -172,13 +172,12 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent imple
   /**
    * Re(load) the Cases list, based on the applied filter, sort criterias
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     // we need the outbreak to continue
     if (
       !this.selectedOutbreak ||
             !this.selectedOutbreak.id
     ) {
-      finishCallback([]);
       return;
     }
 
@@ -205,11 +204,7 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent imple
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
-          finishCallback([]);
           return throwError(err);
-        }),
-        tap((data: any[]) => {
-          finishCallback(data);
         })
       );
   }

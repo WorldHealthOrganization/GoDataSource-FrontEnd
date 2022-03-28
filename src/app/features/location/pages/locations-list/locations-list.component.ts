@@ -13,7 +13,7 @@ import * as _ from 'lodash';
 import { ErrorCodes } from '../../../../core/enums/error-codes.enum';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { FormLocationDropdownComponent, LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
-import { catchError, share, tap } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder';
@@ -273,7 +273,7 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
   /**
    * Re(load) the list of Locations
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     // retrieve created user & modified user information
     this.queryBuilder.include('createdByUser', true);
     this.queryBuilder.include('updatedByUser', true);
@@ -288,11 +288,7 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
-          finishCallback([]);
           return throwError(err);
-        }),
-        tap((data: any[]) => {
-          finishCallback(data);
         })
       );
   }

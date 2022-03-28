@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DialogAnswer, DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { catchError, share, tap } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import * as _ from 'lodash';
@@ -178,17 +178,13 @@ export class ManageIconsListComponent extends ListComponent implements OnInit, O
   /**
    * Retrieve Icons
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     this.iconsList$ = this.iconDataService
       .getIconsList(this.queryBuilder)
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
-          finishCallback([]);
           return throwError(err);
-        }),
-        tap((data: any[]) => {
-          finishCallback(data);
         })
       );
   }

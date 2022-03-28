@@ -16,7 +16,7 @@ import { SystemSettingsDataService } from '../../../../core/services/data/system
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { SystemUpstreamServerModel } from '../../../../core/models/system-upstream-server.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { catchError, map, share, tap } from 'rxjs/operators';
+import { catchError, map, share } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -241,14 +241,13 @@ export class SystemSyncLogsComponent
   /**
    * Refresh list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     // sync logs
     this.syncLogsList$ = this.systemSyncLogDataService
       .getSyncLogList(this.queryBuilder)
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
-          finishCallback([]);
           return throwError(err);
         }),
         map((syncLogs: SystemSyncLogModel[]) => {
@@ -268,9 +267,6 @@ export class SystemSyncLogsComponent
             // finished
             return log;
           });
-        }),
-        tap((data: any[]) => {
-          finishCallback(data);
         })
       );
   }

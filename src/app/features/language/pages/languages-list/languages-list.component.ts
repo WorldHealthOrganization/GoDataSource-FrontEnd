@@ -6,7 +6,7 @@ import { LanguageDataService } from '../../../../core/services/data/language.dat
 import { LanguageModel } from '../../../../core/models/language.model';
 import { DialogAnswer, DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
-import { catchError, share, tap } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
@@ -177,18 +177,14 @@ export class LanguagesListComponent
   /**
    * Re(load) the Languages list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     // retrieve the list of Languages
     this.languagesList$ = this.languageDataService
       .getLanguagesList(this.queryBuilder)
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
-          finishCallback([]);
           return throwError(err);
-        }),
-        tap((data: any[]) => {
-          finishCallback(data);
         })
       );
   }

@@ -14,11 +14,12 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ActivatedRoute } from '@angular/router';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { catchError, share, tap } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { HoverRowAction } from '../../../../shared/components';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
   selector: 'app-inconsistencies-list',
@@ -32,7 +33,7 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
   outbreak: OutbreakModel;
 
   // entities
-  entitiesList$: Observable<(CaseModel | ContactModel | EventModel)[]>;
+  entitiesList$: Observable<(CaseModel | ContactModel | EventModel | ContactOfContactModel)[]>;
 
   personTypesListMap: { [id: string]: ReferenceDataEntryModel };
 
@@ -159,23 +160,15 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
   /**
    * Re(load) list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
-    if (this.outbreak) {
-      this.entitiesList$ = this.outbreakDataService
-        .getPeopleInconsistencies(this.outbreak.id, this.queryBuilder)
-        .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            finishCallback([]);
-            return throwError(err);
-          }),
-          tap((data: any[]) => {
-            finishCallback(data);
-          })
-        );
-    } else {
-      finishCallback([]);
-    }
+  refreshList() {
+    this.entitiesList$ = this.outbreakDataService
+      .getPeopleInconsistencies(this.outbreak.id, this.queryBuilder)
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        })
+      );
   }
 
   /**

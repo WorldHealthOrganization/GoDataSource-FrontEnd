@@ -15,7 +15,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { catchError, share, tap } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { Router } from '@angular/router';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
@@ -613,72 +613,64 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
   /**
    * Re(load) the Lab Results list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
-    if (this.selectedOutbreak) {
-      // retrieve created user & modified user information
-      this.queryBuilder.include('createdByUser', true);
-      this.queryBuilder.include('updatedByUser', true);
+  refreshList() {
+    // retrieve created user & modified user information
+    this.queryBuilder.include('createdByUser', true);
+    this.queryBuilder.include('updatedByUser', true);
 
-      // retrieve only case lab results ?
-      if (
-        CaseModel.canListLabResult(this.authUser) && (
-          !this.selectedOutbreak.isContactLabResultsActive ||
-                    !ContactModel.canListLabResult(this.authUser)
-        )
-      ) {
+    // retrieve only case lab results ?
+    if (
+      CaseModel.canListLabResult(this.authUser) && (
+        !this.selectedOutbreak.isContactLabResultsActive ||
+                  !ContactModel.canListLabResult(this.authUser)
+      )
+    ) {
+      // force filter by cases
+      this.queryBuilder.filter.byEquality(
+        'personType',
+        EntityType.CASE
+      );
+
+      // reset filter
+      this.personTypeSelected = [EntityType.CASE];
+    } else if (
+      ContactModel.canListLabResult(this.authUser) &&
+              !CaseModel.canListLabResult(this.authUser)
+    ) {
+      // outbreak allows this case ?
+      if (this.selectedOutbreak.isContactLabResultsActive) {
         // force filter by cases
         this.queryBuilder.filter.byEquality(
           'personType',
-          EntityType.CASE
+          EntityType.CONTACT
         );
 
         // reset filter
-        this.personTypeSelected = [EntityType.CASE];
-      } else if (
-        ContactModel.canListLabResult(this.authUser) &&
-                !CaseModel.canListLabResult(this.authUser)
-      ) {
-        // outbreak allows this case ?
-        if (this.selectedOutbreak.isContactLabResultsActive) {
-          // force filter by cases
-          this.queryBuilder.filter.byEquality(
-            'personType',
-            EntityType.CONTACT
-          );
-
-          // reset filter
-          this.personTypeSelected = [EntityType.CONTACT];
-        } else {
-          // can't see any labs :)
-          // force filter by cases
-          this.queryBuilder.filter.byEquality(
-            'personType',
-            '-'
-          );
-
-          // reset filter
-          this.personTypeSelected = [];
-        }
+        this.personTypeSelected = [EntityType.CONTACT];
       } else {
-        // NOT POSSIBLE TO ACCESS THIS PAGE WITHOUT HAVING AT LEAST ONE OF THE TWO PERMISSIONS ( case / contact list lab results )
-      }
-
-      // retrieve the list of lab results
-      this.labResultsList$ = this.labResultDataService
-        .getOutbreakLabResults(this.selectedOutbreak.id, this.queryBuilder)
-        .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            finishCallback([]);
-            return throwError(err);
-          }),
-          tap((data: any[]) => {
-            finishCallback(data);
-          })
+        // can't see any labs :)
+        // force filter by cases
+        this.queryBuilder.filter.byEquality(
+          'personType',
+          '-'
         );
+
+        // reset filter
+        this.personTypeSelected = [];
+      }
     } else {
-      finishCallback([]);
+      // NOT POSSIBLE TO ACCESS THIS PAGE WITHOUT HAVING AT LEAST ONE OF THE TWO PERMISSIONS ( case / contact list lab results )
     }
+
+    // retrieve the list of lab results
+    this.labResultsList$ = this.labResultDataService
+      .getOutbreakLabResults(this.selectedOutbreak.id, this.queryBuilder)
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        })
+      );
   }
 
   /**

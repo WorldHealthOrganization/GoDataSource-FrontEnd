@@ -175,7 +175,7 @@ export class UserWorkloadComponent extends ListComponent implements OnInit, OnDe
   /**
    * Refresh list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     if (
       this.selectedOutbreak &&
             !_.isEmpty(this.usersData)
@@ -211,7 +211,6 @@ export class UserWorkloadComponent extends ListComponent implements OnInit, OnDe
               this.displayLoading = false;
 
               this.toastV2Service.error(err);
-              finishCallback([]);
               return throwError(err);
             })
           )
@@ -221,23 +220,14 @@ export class UserWorkloadComponent extends ListComponent implements OnInit, OnDe
 
             // format data
             this.formatData(metricUsersFollowups);
-
-            // finished
-            finishCallback([]);
           });
       } else {
         // hide loading
         this.displayLoading = false;
-
-        // finished
-        finishCallback([]);
       }
     } else {
       // hide loading
       this.displayLoading = false;
-
-      // finished
-      finishCallback([]);
     }
   }
 

@@ -13,7 +13,7 @@ import { SystemBackupDataService } from '../../../../core/services/data/system-b
 import * as _ from 'lodash';
 import { Constants } from '../../../../core/models/constants';
 import { MatDialogRef } from '@angular/material/dialog';
-import { catchError, share, tap } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
@@ -229,17 +229,13 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
   /**
    * Refresh list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     this.backupsList$ = this.systemBackupDataService
       .getBackupList(this.queryBuilder)
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
-          finishCallback([]);
           return throwError(err);
-        }),
-        tap((data: any[]) => {
-          finishCallback(data);
         })
       );
   }

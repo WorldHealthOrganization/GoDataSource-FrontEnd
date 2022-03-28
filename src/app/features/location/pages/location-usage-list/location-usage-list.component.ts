@@ -194,7 +194,7 @@ export class LocationUsageListComponent extends ListComponent implements OnInit,
   /**
    * Re(load) the list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     if (this.locationId) {
       // retrieve outbreaks
       this.outbreakDataService
@@ -202,7 +202,6 @@ export class LocationUsageListComponent extends ListComponent implements OnInit,
         .pipe(
           catchError((err) => {
             this.toastV2Service.error(err);
-            finishCallback([]);
             return throwError(err);
           })
         )
@@ -224,7 +223,6 @@ export class LocationUsageListComponent extends ListComponent implements OnInit,
             .pipe(
               catchError((err) => {
                 this.toastV2Service.error(err);
-                finishCallback([]);
                 return throwError(err);
               })
             )
@@ -259,13 +257,8 @@ export class LocationUsageListComponent extends ListComponent implements OnInit,
                 total: usageData.items.length
               } : null;
               this.usageDetailsList = usageData.items.slice(0, Constants.DEFAULT_USAGE_MAX_RECORDS_DISPLAYED);
-
-              // finished
-              finishCallback(this.usageDetailsList);
             });
         });
-    } else {
-      finishCallback([]);
     }
   }
 }

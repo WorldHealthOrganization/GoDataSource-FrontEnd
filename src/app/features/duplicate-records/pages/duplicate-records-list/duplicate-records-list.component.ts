@@ -122,28 +122,20 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
   /**
    * Re(load) the list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
-    if (this.selectedOutbreak) {
-      // retrieve the list
-      this.duplicatesList = null;
-      this.outbreakDataService
-        .getPeoplePossibleDuplicates(this.selectedOutbreak.id, this.queryBuilder)
-        .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            finishCallback([]);
-            return throwError(err);
-          })
-        )
-        .subscribe((duplicatesList) => {
-          this.duplicatesList = duplicatesList;
-
-          // finished
-          finishCallback([]);
-        });
-    } else {
-      finishCallback([]);
-    }
+  refreshList() {
+    // retrieve the list
+    this.duplicatesList = null;
+    this.outbreakDataService
+      .getPeoplePossibleDuplicates(this.selectedOutbreak.id, this.queryBuilder)
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        })
+      )
+      .subscribe((duplicatesList) => {
+        this.duplicatesList = duplicatesList;
+      });
   }
 
   /**

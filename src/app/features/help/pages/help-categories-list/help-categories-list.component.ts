@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { catchError, share, tap } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import * as _ from 'lodash';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
@@ -172,18 +172,14 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
   /**
    * Re(load) the categories list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     // retrieve the list of Categories
     this.helpCategoriesList$ = this.helpDataService
       .getHelpCategoryList(this.queryBuilder)
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
-          finishCallback([]);
           return throwError(err);
-        }),
-        tap((data: any[]) => {
-          finishCallback(data);
         })
       );
   }

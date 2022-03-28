@@ -8,6 +8,9 @@
 /* Toastr */
 @import '~ngx-toastr/toastr';
 
+/* popperjs */
+@import "~ngx-popperjs/css/theme-white.css";
+
 /* Global Components */
 @import './components/overlay';
 @import './components/button';

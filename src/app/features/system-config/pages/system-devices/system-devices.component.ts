@@ -8,7 +8,7 @@ import { DeviceDataService } from '../../../../core/services/data/device.data.se
 import { DeviceModel } from '../../../../core/models/device.model';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { throwError } from 'rxjs';
-import { catchError, share, tap } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
@@ -202,17 +202,13 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
   /**
    * Refresh list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     this.devicesList$ = this.deviceDataService
       .getDevices(this.queryBuilder)
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
-          finishCallback([]);
           return throwError(err);
-        }),
-        tap((data: any[]) => {
-          finishCallback(data);
         })
       );
   }

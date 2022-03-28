@@ -4,7 +4,7 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { SavedFiltersService } from '../../../../core/services/data/saved-filters.data.service';
 import * as _ from 'lodash';
 import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
-import { catchError, share, tap } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
@@ -131,7 +131,7 @@ export class SavedFiltersComponent extends ListComponent implements OnInit, OnDe
   /**
    * Re(load) the Saved filters list, based on the applied filter, sort criterias
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     // retrieve created user & modified user information
     this.queryBuilder.include('createdByUser', true);
     this.queryBuilder.include('updatedByUser', true);
@@ -142,11 +142,7 @@ export class SavedFiltersComponent extends ListComponent implements OnInit, OnDe
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
-          finishCallback([]);
           return throwError(err);
-        }),
-        tap((data: any[]) => {
-          finishCallback(data);
         })
       );
   }
