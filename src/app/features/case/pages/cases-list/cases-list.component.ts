@@ -1664,6 +1664,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         // no need to refresh group
         group.data.blockNextGet = true;
 
+        // remove previous conditions
+        this.queryBuilder.filter.removePathCondition('classification');
+        this.queryBuilder.filter.removePathCondition('or.classification');
+
         // filter by group data
         if (!item) {
           this.filterByEquality(
@@ -1699,6 +1703,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
           // remove any classification filters so we see all options
           clonedQueryBuilder.filter.remove('classification');
+          clonedQueryBuilder.filter.removePathCondition('or.classification');
 
           // load data
           return this.caseDataService

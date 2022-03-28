@@ -1437,6 +1437,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     if (this._groupedDataPreviousClickedValue === groupValue) {
       // unselect
       delete this._groupedDataPreviousClickedValue.active;
+      this._groupedDataPreviousClickedValue = undefined;
 
       // trigger click
       this.groupedData.click(null, this.groupedData);
