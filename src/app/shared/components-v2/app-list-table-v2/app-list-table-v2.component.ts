@@ -206,7 +206,26 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   };
 
   // info values - used to display additional information relevant for this page
-  @Input() infos: string[];
+  private _infos: string[];
+  infosJoined: string;
+  @Input() set infos(infos: string[]) {
+    // set info
+    this._infos = infos;
+
+    // join message
+    this.infosJoined = '';
+    if (
+      this._infos &&
+      this._infos.length > 0
+    ) {
+      this._infos.forEach((info) => {
+        this.infosJoined += `<div>${this.translateService.instant(info)}</div>`;
+      });
+    }
+  }
+
+  // filters applied ?
+  @Input() filtersApplied: boolean = false;
 
   // legends
   legends: {

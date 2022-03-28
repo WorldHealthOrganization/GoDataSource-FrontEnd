@@ -14,6 +14,11 @@ export abstract class ListQueryComponent {
   // query
   protected queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(this.queryBuilderChangedCallback);
 
+  // filters applied ?
+  get filtersApplied(): boolean {
+    return !this.queryBuilder.isEmptyOnlyFilters();
+  }
+
   /**
    * Constructor
    */

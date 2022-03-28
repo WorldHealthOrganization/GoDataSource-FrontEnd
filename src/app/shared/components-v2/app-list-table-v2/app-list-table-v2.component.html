@@ -107,7 +107,6 @@
 
               </ng-container>
 
-
               <!-- Divider -->
               <ng-template
                 #divider>
@@ -244,6 +243,35 @@
       fxFlex fxLayout="row" fxGrow="0" fxLayoutGap="0.8rem"
       class="gd-list-table-header-right">
 
+      <!-- Filters applied -->
+      <div
+        *ngIf="filtersApplied"
+        class="gd-list-table-header-right-filters-applied">
+        {{'LNG_COMMON_LABEL_FILTERS_USED' | translate}}
+      </div>
+
+      <!-- Info -->
+      <div
+        *ngIf="infosJoined"
+        class="gd-list-table-header-right-info">
+        <!-- Content -->
+        <popper-content
+          #popperContent>
+          <div
+            [innerHtml]="infosJoined">
+          </div>
+        </popper-content>
+
+        <!-- help button -->
+        <mat-icon
+          [popper]="popperContent"
+          popperTrigger="hover"
+          popperPlacement="bottom"
+          popperPreventOverflow="true"
+          popperPositionFixed="true"
+          popperAppendTo="body">help</mat-icon>
+      </div>
+
       <!-- Reset filters -->
       <button
         type="button"
@@ -345,14 +373,6 @@
         fxLayout="row wrap" fxLayoutAlign="start center"
         class="gd-list-table-bottom-left-legend"
         [innerHTML]="legend.html | safeHtml"></div>
-
-      <!-- Info -->
-      <div
-        *ngFor="let info of infos"
-        fxLayoutAlign="start center"
-        class="gd-list-table-bottom-left-info">
-        {{info | translate}}
-      </div>
 
     </div>
 
