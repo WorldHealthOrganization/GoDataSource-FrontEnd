@@ -242,6 +242,52 @@
               width: 70%;
             }
           }
+
+          /* Slide-in panel filters */
+          .gd-app-side-dialog-v2-content-middle-item-input-filter-list {
+            .gd-app-side-dialog-v2-content-middle-item-input-filter-list-buttons {
+              position: relative;
+
+              &:after {
+                background: rgba(var(--gd-secondary-rgb), 0.25);
+                bottom: -1.6rem;
+                content: '';
+                display: block;
+                height: 0.1rem;
+                left: -1.6rem;
+                position: absolute;
+                width: calc(100% + 3.2rem);
+              }
+            }
+
+            .gd-app-side-dialog-v2-content-middle-item-input-filter-list-container {
+              height: calc(100vh - 27.1rem);
+              margin: 0 -1.6rem;
+              overflow-y: auto;
+              padding: 1.6rem;
+            }
+
+            .gd-app-side-dialog-v2-content-middle-item-input-filter-list-item {
+              .gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-left {
+                // border: 0.1rem solid var(--gd-secondary);
+                // border-top: 0 none;
+                // @include border-radius(0.4rem 0 0.4rem 0.4rem);
+              }
+
+              .gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-right {
+                // @include border-radius(0 0.4rem 0.4rem 0);
+                // font-size: 1.6rem;
+                // height: 2.4rem;
+                // min-width: 2.4rem;
+                // padding: 0.4rem;
+                // width: 2.4rem;
+
+                // .mat-icon {
+                //   font-size: 1.6rem;
+                // }
+              }
+            }
+          }
         }
 
         /* Slide-in panel not found */
