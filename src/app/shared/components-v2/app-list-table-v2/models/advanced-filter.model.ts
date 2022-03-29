@@ -216,6 +216,15 @@ interface IV2AdvancedFilterText extends IV2AdvancedFilterBase {
 }
 
 /**
+ * Advanced filter - Single select
+ */
+interface IV2AdvancedFilterSingleSelect extends IV2AdvancedFilterBase {
+  // required
+  type: V2AdvancedFilterType.SELECT;
+  options: ILabelValuePairModel[];
+}
+
+/**
  * Advanced filter - Multiple select
  */
 interface IV2AdvancedFilterMultipleSelect extends IV2AdvancedFilterBase {
@@ -259,5 +268,5 @@ interface IV2AdvancedFilterDateRange extends IV2AdvancedFilterBase {
 }
 
 // advanced filter
-export type V2AdvancedFilter = IV2AdvancedFilterText | IV2AdvancedFilterMultipleSelect | IV2AdvancedFilterAgeRange | IV2AdvancedFilterAddress
+export type V2AdvancedFilter = IV2AdvancedFilterText | IV2AdvancedFilterSingleSelect | IV2AdvancedFilterMultipleSelect | IV2AdvancedFilterAgeRange | IV2AdvancedFilterAddress
 | IV2AdvancedFilterAddressPhoneNumber | IV2AdvancedFilterDateRange;

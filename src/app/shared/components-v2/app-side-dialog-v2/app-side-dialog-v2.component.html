@@ -313,6 +313,15 @@
                           neverFloatLabel="true"
                           autocomplete="off"></app-form-input-v2>
 
+                        <!-- Single select -->
+                        <app-form-select-single-v2
+                          *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.SELECT
+                            && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                          [(ngModel)]="filter.value"
+                          [name]="filter.name"
+                          [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                          [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.options"></app-form-select-single-v2>
+
                         <!-- Multiple select -->
                         <app-form-select-multiple-v2
                           *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.MULTISELECT

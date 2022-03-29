@@ -1412,17 +1412,16 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         field: 'dateBecomeCase',
         label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE'
         // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'safeBurial',
+        label: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
+        options: this.activatedRoute.snapshot.data.yesNoAll
       }
     ];
     // // set available side filters
     // this.availableSideFilters = [
-    //   new FilterModel({
-    //     fieldName: 'safeBurial',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
-    //     type: FilterType.SELECT,
-    //     // this.yesNoOptionsWithoutAllList$ = this.genericDataService.getFilterYesNoOptions(true);
-    //     // options$: this.yesNoOptionsWithoutAllList$
-    //   }),
     //   new FilterModel({
     //     fieldName: 'isDateOfOnsetApproximate',
     //     fieldLabel: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
