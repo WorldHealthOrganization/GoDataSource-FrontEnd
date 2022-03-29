@@ -103,11 +103,15 @@
       .gd-app-side-dialog-v2-content-middle {
         overflow-x: hidden;
         overflow-y: overlay;
-        padding: 1.6rem;
+        padding: 1.6rem 1.6rem 0;
 
         /* Slide-in panel content item */
         .gd-app-side-dialog-v2-content-middle-item {
           margin-bottom: 0.8rem;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
 
           /* Slide-in panel divider */
           .gd-app-side-dialog-v2-content-middle-item-input-divider {
@@ -245,6 +249,7 @@
 
           /* Slide-in panel filters */
           .gd-app-side-dialog-v2-content-middle-item-input-filter-list {
+            /* Filters - top buttons */
             .gd-app-side-dialog-v2-content-middle-item-input-filter-list-buttons {
               position: relative;
 
@@ -260,31 +265,102 @@
               }
             }
 
+            /* Filters - scrollable container with all filters */
             .gd-app-side-dialog-v2-content-middle-item-input-filter-list-container {
               height: calc(100vh - 27.1rem);
               margin: 0 -1.6rem;
-              overflow-y: auto;
+              overflow-y: overlay;
               padding: 1.6rem;
             }
 
+            /* Filters - filter item */
             .gd-app-side-dialog-v2-content-middle-item-input-filter-list-item {
-              .gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-left {
-                // border: 0.1rem solid var(--gd-secondary);
-                // border-top: 0 none;
-                // @include border-radius(0.4rem 0 0.4rem 0.4rem);
+              /* Filters - filter item - delete button */
+              .gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-right {
+                @include border-radius(0 0.4rem 0.4rem 0);
+                font-size: 1.6rem;
+                height: 2.4rem;
+                min-width: 2.4rem;
+                padding: 0.4rem;
+                width: 2.4rem;
+
+                .mat-icon {
+                  font-size: 1.6rem;
+                }
               }
 
-              .gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-right {
-                // @include border-radius(0 0.4rem 0.4rem 0);
-                // font-size: 1.6rem;
-                // height: 2.4rem;
-                // min-width: 2.4rem;
-                // padding: 0.4rem;
-                // width: 2.4rem;
+              /* Filters - filter item - empty */
+              &.gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-no-value {
+                .gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-left {
+                  /* Filters - filter item - parent select */
+                  > app-form-select-single-v2 {
+                    .gd-form-select-single-v2 {
+                      .mat-form-field {
+                        .mat-form-field-wrapper {
+                          .mat-form-field-flex {
+                            .mat-form-field-outline,
+                            .mat-form-field-outline-thick {
+                              .mat-form-field-outline-end {
+                                @include border-radius(0 0 0.4rem 0);
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
 
-                // .mat-icon {
-                //   font-size: 1.6rem;
-                // }
+              /* Filters - filter item - with value */
+              &:not(.gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-no-value) {
+                .gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-left {
+                  border: 0.1rem solid var(--gd-secondary);
+                  border-top: 0 none;
+                  @include border-radius(0.4rem 0 0.4rem 0.4rem);
+                  /* Filters - filter item - parent select */
+                  > app-form-select-single-v2 {
+                    .gd-form-select-single-v2 {
+                      .mat-form-field {
+                        .mat-form-field-wrapper {
+                          .mat-form-field-flex {
+                            background: rgba(var(--gd-secondary-rgb), 0.1);
+
+                            .mat-form-field-outline,
+                            .mat-form-field-outline-thick {
+                              .mat-form-field-outline-start {
+                                border-left: 0 none;
+                                @include border-radius(0.4rem 0 0 0);
+                              }
+  
+                              .mat-form-field-outline-end {
+                                border-right: 0 none;
+                                @include border-radius(0);
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+
+                  .gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-left-inner {
+                    padding: 0 1.6rem;
+
+                    .gd-form-number-v2,
+                    .gd-form-date-v2 {
+                      .mat-form-field {
+                        .mat-form-field-wrapper {
+                          .mat-form-field-flex {
+                            .mat-form-field-infix {
+                              width: 8rem;
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
               }
             }
           }
