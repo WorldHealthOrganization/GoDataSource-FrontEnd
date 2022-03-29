@@ -2,6 +2,7 @@ import { Subscriber } from 'rxjs';
 import { ILabelValuePairModel } from '../../../forms-v2/core/label-value-pair.model';
 import { NgForm } from '@angular/forms';
 import { Params } from '@angular/router';
+import { V2AdvancedFilter } from '../../app-list-table-v2/models/advanced-filter.model';
 
 /**
  * Side dialog config
@@ -210,6 +211,7 @@ export interface IV2SideDialogConfigInputFilterListItem extends IV2SideDialogCon
   // required
   type: V2SideDialogConfigInputType.FILTER_LIST_ITEM;
   filterBy: IV2SideDialogConfigInputSingleDropdown;
+  comparator: IV2SideDialogConfigInputSingleDropdown;
 }
 
 /**
@@ -219,7 +221,8 @@ export interface IV2SideDialogConfigInputFilterList extends IV2SideDialogConfigI
   // required
   type: V2SideDialogConfigInputType.FILTER_LIST;
   name: string;
-  items: IV2SideDialogConfigInputFilterListItem[];
+  options: V2AdvancedFilter[];
+  filters: IV2SideDialogConfigInputFilterListItem[];
 
   // not used
   placeholder?: never;

@@ -40,6 +40,7 @@ import { LocationDataService } from '../../../../core/services/data/location.dat
 import { LocationModel } from '../../../../core/models/location.model';
 import { IV2FilterBoolean, IV2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IExtendedColDef } from '../../../../shared/components-v2/app-list-table-v2/models/extended-column.model';
+import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 
 @Component({
   selector: 'app-cases-list',
@@ -1311,6 +1312,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    * Initialize advanced filters
    */
   protected initializeTableAdvancedFilters(): void {
+    this.advancedFilters = [
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'firstName',
+        label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME'
+      }
+    ];
     // // if there is no outbreak, we can't fully initialize side filters
     // if (
     //   !this.selectedOutbreak ||

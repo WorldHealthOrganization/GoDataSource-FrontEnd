@@ -239,21 +239,74 @@
 
               <!-- Buttons -->
               <div
-                fxLayout="row" fxLayoutAlign="end">
+                fxLayout="row" fxLayoutAlign="space-between">
 
                 <!-- Add -->
                 <button
                   type="button"
-                  mat-flat-button color="primary">
+                  mat-flat-button color="primary"
+                  (click)="addAdvancedFilter(input)">
                   {{'LNG_SIDE_FILTERS_ADD_ANOTHER_FILTER_BUTTON' | translate}}
+                </button>
+
+                <!-- Reset filters -->
+                <button
+                  type="button"
+                  mat-flat-button color="text">
+                  {{'LNG_COMMON_BUTTON_RESET_FILTERS' | translate}}
                 </button>
 
               </div>
 
               <!-- Filters -->
               <div
-                *ngFor="let inputItem of input.items">
-                test
+                *ngFor="let filter of input.filters"
+                fxLayout="row" fxLayoutAlign="start start"
+                class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-item">
+
+                <!-- Left -->
+                <div
+                  fxFlex
+                  class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-left">
+
+                  <!-- Filter Type -->
+                  <app-form-select-single-v2
+                    [(ngModel)]="filter.filterBy.value"
+                    [name]="filter.filterBy.name"
+                    [options]="filter.filterBy.options"
+                    [placeholder]="filter.filterBy.placeholder"
+                    neverFloatLabel="true"
+                    (ngModelChange)="filter.filterBy.change(dialogHandler.data, dialogHandler, filter)">
+                  </app-form-select-single-v2>
+
+                  <div
+                    *ngIf="filter.filterBy.value">
+                    <!-- Filter Comparator -->
+                    <app-form-select-single-v2
+                      [(ngModel)]="filter.comparator.value"
+                      [name]="filter.comparator.name"
+                      [options]="filter.comparator.options"
+                      [placeholder]="filter.comparator.placeholder"
+                      neverFloatLabel="true">
+                    </app-form-select-single-v2>
+
+                    <!-- Filter Value -->
+                    <!-- #TODO -->
+                  </div>
+
+                </div>
+
+                <!-- Right -->
+                <button
+                  fxGrow="0"
+                  class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-right"
+                  type="button"
+                  mat-icon-button
+                  color="warn"
+                  [matTooltip]="'LNG_COMMON_BUTTON_RESET_FILTERS' | translate">
+                  <mat-icon>delete</mat-icon>
+                </button>
+
               </div>
 
             </div>

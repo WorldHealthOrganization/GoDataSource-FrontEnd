@@ -19,6 +19,7 @@ import { AuthenticatedComponent } from '../components/authenticated/authenticate
 import { ICachedFilter, ICachedFilterItems, ICachedInputsValues, ICachedSortItem } from './models/cache.model';
 import { ListAppliedFiltersComponent } from './list-applied-filters-component';
 import { V2FilterType } from '../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { V2AdvancedFilter } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 
 /**
  * List component
@@ -47,6 +48,9 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
 
   // grouped data
   groupedData: IV2GroupedData;
+
+  // advanced filters
+  advancedFilters: V2AdvancedFilter[];
 
   // selected outbreak
   selectedOutbreak: OutbreakModel;

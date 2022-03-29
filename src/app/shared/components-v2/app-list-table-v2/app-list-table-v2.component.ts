@@ -1507,7 +1507,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           }, {
             type: V2SideDialogConfigInputType.FILTER_LIST,
             name: 'filters',
-            items: []
+            options: this.advancedFilters,
+            filters: []
           }
         ],
         bottomButtons: [],

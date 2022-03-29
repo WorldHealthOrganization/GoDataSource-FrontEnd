@@ -5,6 +5,7 @@ import {
   IV2SideDialogConfigButton,
   IV2SideDialogConfigButtonType,
   IV2SideDialogConfigInputAccordionPanel,
+  IV2SideDialogConfigInputFilterList, IV2SideDialogConfigInputFilterListItem,
   IV2SideDialogData,
   IV2SideDialogHandler,
   IV2SideDialogResponse,
@@ -466,6 +467,47 @@ export class AppSideDialogV2Component implements OnDestroy {
     };
     this.config.inputs.forEach((input) => {
       this.dialogHandler.data.map[input.name] = input;
+    });
+  }
+
+  /**
+   * Add filter
+   */
+  addAdvancedFilter(input: IV2SideDialogConfigInputFilterList): void {
+    // add filter
+    input.filters.push({
+      type: V2SideDialogConfigInputType.FILTER_LIST_ITEM,
+
+      // filter type
+      filterBy: {
+        type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+        value: undefined,
+        name: `${input.name}.filters[${input.filters.length}]`,
+        placeholder: 'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER',
+        options: input.options.map((option) => {
+          return {
+            label: option.label,
+            value: option.field,
+            data: option
+          };
+        }),
+        change: (_data, _handler, filter) => {
+          // reset comparator selected value
+          (filter as unknown as IV2SideDialogConfigInputFilterListItem).comparator.value = undefined;
+
+          // set comparator options
+          // #TODO
+        }
+      },
+
+      // filter comparator
+      comparator: {
+        type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+        value: undefined,
+        name: `${input.name}.comparator[${input.filters.length}]`,
+        placeholder: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL',
+        options: []
+      }
     });
   }
 }
