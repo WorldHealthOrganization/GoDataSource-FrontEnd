@@ -288,7 +288,8 @@
                       [name]="filter.comparator.name"
                       [options]="filter.comparator.options"
                       [placeholder]="filter.comparator.placeholder"
-                      neverFloatLabel="true">
+                      neverFloatLabel="true"
+                      (ngModelChange)="filter.comparator.change(dialogHandler.data, dialogHandler, filter)">
                     </app-form-select-single-v2>
 
                     <!-- Filter Value -->

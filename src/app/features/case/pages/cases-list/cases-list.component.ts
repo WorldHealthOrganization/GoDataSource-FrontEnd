@@ -1373,17 +1373,16 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
         options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
         // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'riskReason',
+        label: 'LNG_CASE_FIELD_LABEL_RISK_REASON'
+        // sortable: true
       }
     ];
-    //
     // // set available side filters
     // this.availableSideFilters = [
-    //   new FilterModel({
-    //     fieldName: 'riskReason',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_RISK_REASON',
-    //     type: FilterType.TEXT,
-    //     sortable: true
-    //   }),
     //   new FilterModel({
     //     fieldName: 'visualId',
     //     fieldLabel: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
