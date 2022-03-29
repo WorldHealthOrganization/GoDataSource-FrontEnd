@@ -1313,60 +1313,59 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    */
   protected initializeTableAdvancedFilters(): void {
     this.advancedFilters = [
+      // Case
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'firstName',
         label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME'
+        // sortable: true
+      }, {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'middleName',
+        label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME'
+        // sortable: true
+      }, {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'lastName',
+        label: 'LNG_CASE_FIELD_LABEL_LAST_NAME'
+        // sortable: true
+      }, {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'gender',
+        label: 'LNG_CASE_FIELD_LABEL_GENDER',
+        options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_AGE,
+        field: 'age',
+        label: 'LNG_CASE_FIELD_LABEL_AGE'
+        // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.ADDRESS,
+        field: 'addresses',
+        label: 'LNG_CASE_FIELD_LABEL_ADDRESSES',
+        isArray: true
+      },
+
+
+      {
+        type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
+        field: 'addresses',
+        label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
+        isArray: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'occupation',
+        label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
+        options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
       }
     ];
-    // // if there is no outbreak, we can't fully initialize side filters
-    // if (
-    //   !this.selectedOutbreak ||
-    //   !this.selectedOutbreak.id
-    // ) {
-    //   return;
-    // }
     //
     // // set available side filters
     // this.availableSideFilters = [
-    //   // Case
-    //   new FilterModel({
-    //     fieldName: 'firstName',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
-    //     type: FilterType.TEXT,
-    //     sortable: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'middleName',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
-    //     type: FilterType.TEXT,
-    //     sortable: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'lastName',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
-    //     type: FilterType.TEXT,
-    //     sortable: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'gender',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_GENDER',
-    //     type: FilterType.MULTISELECT,
-    //     // options$: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //     sortable: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'age',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_AGE',
-    //     type: FilterType.RANGE_AGE,
-    //     sortable: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'addresses',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES',
-    //     type: FilterType.ADDRESS,
-    //     addressFieldIsArray: true
-    //   }),
     //   new FilterModel({
     //     fieldName: 'dob',
     //     fieldLabel: 'LNG_CASE_FIELD_LABEL_DOB',

@@ -60,6 +60,7 @@ import { OutcomeDataResolver } from './resolvers/data/outcome.resolver';
 import { GenderDataResolver } from './resolvers/data/gender.resolver';
 import { YesNoAllDataResolver } from './resolvers/data/yes-no-all.resolver';
 import { UserDataResolver } from './resolvers/data/user.resolver';
+import { OccupationDataResolver } from './resolvers/data/occupation.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -67,6 +68,7 @@ export const services: any[] = [
   ClassificationDataResolver,
   GenderDataResolver,
   LanguageResolver,
+  OccupationDataResolver,
   OutcomeDataResolver,
   RiskDataResolver,
   UserDataResolver,

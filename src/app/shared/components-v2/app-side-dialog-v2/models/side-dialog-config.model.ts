@@ -212,6 +212,9 @@ export interface IV2SideDialogConfigInputFilterListItem extends IV2SideDialogCon
   type: V2SideDialogConfigInputType.FILTER_LIST_ITEM;
   filterBy: IV2SideDialogConfigInputSingleDropdown;
   comparator: IV2SideDialogConfigInputSingleDropdown;
+
+  // optional
+  value?: any;
 }
 
 /**
@@ -226,6 +229,10 @@ export interface IV2SideDialogConfigInputFilterList extends IV2SideDialogConfigI
 
   // not used
   placeholder?: never;
+  optionsAsLabelValue?: ILabelValuePairModel[];
+  optionsAsLabelValueMap?: {
+    [optionId: string]: ILabelValuePairModel
+  };
 }
 
 /**
