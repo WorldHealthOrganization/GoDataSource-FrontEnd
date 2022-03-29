@@ -1340,7 +1340,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         type: V2AdvancedFilterType.RANGE_AGE,
         field: 'age',
         label: 'LNG_CASE_FIELD_LABEL_AGE'
-        // sortable: true
       },
       {
         type: V2AdvancedFilterType.ADDRESS,
@@ -1365,41 +1364,40 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         field: 'occupation',
         label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
         options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
-        // sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'riskLevel',
         label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
         options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
-        // sortable: true
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'riskReason',
         label: 'LNG_CASE_FIELD_LABEL_RISK_REASON'
         // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'visualId',
+        label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID'
+        // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'classification',
+        label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+        options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateOfInfection',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION'
+        // sortable: true
       }
     ];
     // // set available side filters
     // this.availableSideFilters = [
-    //   new FilterModel({
-    //     fieldName: 'visualId',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
-    //     type: FilterType.TEXT,
-    //     sortable: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'classification',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-    //     type: FilterType.MULTISELECT,
-    //     // options$: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'dateOfInfection',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
-    //     type: FilterType.RANGE_DATE
-    //   }),
     //   new FilterModel({
     //     fieldName: 'dateOfOnset',
     //     fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
