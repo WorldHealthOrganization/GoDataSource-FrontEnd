@@ -1463,6 +1463,18 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         // sortable: true
       },
       {
+        type: V2AdvancedFilterType.RANGE_NUMBER,
+        field: 'numberOfContacts',
+        label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS'
+        // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_NUMBER,
+        field: 'numberOfExposures',
+        label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES'
+        // sortable: true
+      },
+      {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'clusterId',
         label: 'LNG_CASE_FIELD_LABEL_CLUSTER_NAME',
@@ -1536,16 +1548,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     //     fieldLabel: 'LNG_CASE_FIELD_LABEL_VACCINE_DATE',
     //     type: FilterType.RANGE_DATE
     //   }),
-    //   new FilterModel({
-    //     fieldName: 'numberOfContacts',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS',
-    //     type: FilterType.RANGE_NUMBER
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'numberOfExposures',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES',
-    //     type: FilterType.RANGE_NUMBER
-    //   })
     // ];
     //
     // // allowed to filter by responsible user ?

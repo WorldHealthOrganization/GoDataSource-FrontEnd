@@ -286,7 +286,16 @@ interface IV2AdvancedFilterDateRange extends IV2AdvancedFilterBase {
   type: V2AdvancedFilterType.RANGE_DATE;
 }
 
+/**
+ * Advanced filter - Number Range
+ */
+interface IV2AdvancedFilterNumberRange extends IV2AdvancedFilterBase {
+  // required
+  type: V2AdvancedFilterType.RANGE_NUMBER;
+}
+
 // advanced filter
 export type V2AdvancedFilter = IV2AdvancedFilterText | IV2AdvancedFilterSingleSelect | IV2AdvancedFilterSingleSelectLoader
 | IV2AdvancedFilterMultipleSelect | IV2AdvancedFilterMultipleSelectLoader
-| IV2AdvancedFilterAgeRange | IV2AdvancedFilterAddress | IV2AdvancedFilterAddressPhoneNumber | IV2AdvancedFilterDateRange;
+| IV2AdvancedFilterAgeRange | IV2AdvancedFilterAddress | IV2AdvancedFilterAddressPhoneNumber | IV2AdvancedFilterDateRange
+| IV2AdvancedFilterNumberRange;
