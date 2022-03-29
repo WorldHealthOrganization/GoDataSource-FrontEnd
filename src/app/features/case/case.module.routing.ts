@@ -12,6 +12,7 @@ import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { OccupationDataResolver } from '../../core/services/resolvers/data/occupation.resolver';
 import { RiskDataResolver } from '../../core/services/resolvers/data/risk.resolver';
+import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.resolver';
 
 const routes: Routes = [
   // Cases list
@@ -31,6 +32,7 @@ const routes: Routes = [
       outcome: OutcomeDataResolver,
       risk: RiskDataResolver,
       yesNoAll: YesNoAllDataResolver,
+      yesNo: YesNoDataResolver,
       user: UserDataResolver
     }
   },

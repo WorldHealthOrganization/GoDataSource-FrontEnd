@@ -1417,17 +1417,17 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         type: V2AdvancedFilterType.SELECT,
         field: 'safeBurial',
         label: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
-        options: this.activatedRoute.snapshot.data.yesNoAll
+        options: this.activatedRoute.snapshot.data.yesNo
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'isDateOfOnsetApproximate',
+        label: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
+        options: this.activatedRoute.snapshot.data.yesNo
       }
     ];
     // // set available side filters
     // this.availableSideFilters = [
-    //   new FilterModel({
-    //     fieldName: 'isDateOfOnsetApproximate',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
-    //     type: FilterType.SELECT,
-    //     // options$: this.yesNoOptionsWithoutAllList$
-    //   }),
     //   new FilterModel({
     //     fieldName: 'dateOfReporting',
     //     fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
