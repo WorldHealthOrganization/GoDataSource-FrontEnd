@@ -31,6 +31,10 @@ export class AppFormNumberRangeV2Component
   @Input() min: number;
   @Input() max: number;
 
+  // visible
+  @Input() fromHidden: boolean;
+  @Input() toHidden: boolean;
+
   /**
    * Constructor
    */
@@ -39,11 +43,15 @@ export class AppFormNumberRangeV2Component
     protected translateService: TranslateService,
     protected changeDetectorRef: ChangeDetectorRef
   ) {
+    // parent initialization
     super(
       controlContainer,
       translateService,
       changeDetectorRef
     );
+
+    // value initialization
+    this.writeValue(undefined);
   }
 
   /**

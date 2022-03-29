@@ -18,6 +18,10 @@ import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v
 import { NgForm } from '@angular/forms';
 import { Location } from '@angular/common';
 import { SubscriptionLike } from 'rxjs/internal/types';
+import { V2AdvancedFilter, V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../app-list-table-v2/models/advanced-filter.model';
+import { Constants } from '../../../core/models/constants';
+import { v4 as uuid } from 'uuid';
+import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model';
 
 /**
  * Component
@@ -199,6 +203,9 @@ export class AppSideDialogV2Component implements OnDestroy {
 
   // constants
   V2SideDialogConfigInputType = V2SideDialogConfigInputType;
+  V2AdvancedFilterType = V2AdvancedFilterType;
+  V2AdvancedFilterComparatorType = V2AdvancedFilterComparatorType;
+  Constants = Constants;
 
   // subscriptions
   locationSubscription: SubscriptionLike;
@@ -466,7 +473,32 @@ export class AppSideDialogV2Component implements OnDestroy {
       map: {}
     };
     this.config.inputs.forEach((input) => {
+      // map input
       this.dialogHandler.data.map[input.name] = input;
+
+      // if type list of filters, then further processing is needed
+      if (input.type === V2SideDialogConfigInputType.FILTER_LIST) {
+        // process options
+        input.optionsAsLabelValue = [];
+        input.optionsAsLabelValueMap = {};
+        input.options.forEach((filterOption) => {
+          // option id
+          const id: string = filterOption.id || uuid();
+
+          // create option
+          const option: ILabelValuePairModel = {
+            label: filterOption.label,
+            value: id,
+            data: filterOption
+          };
+
+          // attach option
+          input.optionsAsLabelValue.push(option);
+
+          // map option
+          input.optionsAsLabelValueMap[id] = option;
+        });
+      }
     });
   }
 
@@ -478,25 +510,29 @@ export class AppSideDialogV2Component implements OnDestroy {
     input.filters.push({
       type: V2SideDialogConfigInputType.FILTER_LIST_ITEM,
 
+      // selected value
+      value: undefined,
+      name: `${input.name}.value[${input.filters.length}]`,
+
       // filter type
       filterBy: {
         type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
         value: undefined,
         name: `${input.name}.filters[${input.filters.length}]`,
         placeholder: 'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER',
-        options: input.options.map((option) => {
-          return {
-            label: option.label,
-            value: option.field,
-            data: option
-          };
-        }),
-        change: (_data, _handler, filter) => {
+        options: input.optionsAsLabelValue,
+        change: (data, _handler, filter) => {
           // reset comparator selected value
-          (filter as unknown as IV2SideDialogConfigInputFilterListItem).comparator.value = undefined;
+          const filterItem = filter as unknown as IV2SideDialogConfigInputFilterListItem;
+          filterItem.comparator.value = undefined;
 
           // set comparator options
-          // #TODO
+          const filterOption: V2AdvancedFilter = filterItem.filterBy.value ?
+            (data.map.filters as IV2SideDialogConfigInputFilterList).optionsAsLabelValueMap[filterItem.filterBy.value].data as V2AdvancedFilter :
+            undefined;
+          filterItem.comparator.options = filterOption ?
+            V2AdvancedFilterComparatorOptions[filterOption.type] :
+            [];
         }
       },
 
