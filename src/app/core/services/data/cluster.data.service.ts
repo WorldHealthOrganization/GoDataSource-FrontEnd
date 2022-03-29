@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { ClusterModel } from '../../models/cluster.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
@@ -9,19 +9,24 @@ import { EventModel } from '../../models/event.model';
 import { ContactModel } from '../../models/contact.model';
 import { EntityModel } from '../../models/entity-and-relationship.model';
 import * as _ from 'lodash';
-import { LabelValuePair } from '../../models/label-value-pair';
-import { map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { IBasicCount } from '../../models/basic-count.interface';
 import { ContactOfContactModel } from '../../models/contact-of-contact.model';
+import { IResolverV2ResponseModel } from '../resolvers/data/models/resolver-response.model';
+import { AuthDataService } from './auth.data.service';
+import { ToastV2Service } from '../helper/toast-v2.service';
 
 @Injectable()
 export class ClusterDataService {
-
+  /**
+   * Constructor
+   */
   constructor(
     private http: HttpClient,
-    private modelHelper: ModelHelperService
-  ) {
-  }
+    private modelHelper: ModelHelperService,
+    private authDataService: AuthDataService,
+    private toastV2Service: ToastV2Service
+  ) {}
 
   /**
      * Retrieve the list of Clusters for an Outbreak
@@ -43,17 +48,64 @@ export class ClusterDataService {
   }
 
   /**
-     * Get the clusters as labelValue pairs for side filters
-     * @param {string} outbreakId
-     * @returns {LabelValuePair[]}
-     */
-  getClusterListAsLabelValue(outbreakId: string): Observable<LabelValuePair[]> {
-    return this.getClusterList(outbreakId)
+   * Retrieve data
+   */
+  getResolveList(
+    outbreakId: string
+  ): Observable<IResolverV2ResponseModel<ClusterModel>> {
+    // user doesn't have rights ?
+    if (!ClusterModel.canList(this.authDataService.getAuthenticatedUser())) {
+      return of({
+        list: [],
+        map: {},
+        options: []
+      });
+    }
+
+    // construct query
+    const qb = new RequestQueryBuilder();
+    qb.fields(
+      'id',
+      'name'
+    );
+
+    // retrieve users
+    return this
+      .getClusterList(
+        outbreakId,
+        qb
+      )
       .pipe(
-        map((clusters) => {
-          return _.map(clusters, (cluster: ClusterModel) => {
-            return new LabelValuePair(cluster.name, cluster.id);
+        map((data) => {
+          // construct map
+          const response: IResolverV2ResponseModel<ClusterModel> = {
+            list: data,
+            map: {},
+            options: []
+          };
+          data.forEach((item) => {
+            // map
+            response.map[item.id] = item;
+
+            // add option
+            response.options.push({
+              label: item.name,
+              value: item.id,
+              data: item
+            });
           });
+
+          // finished
+          return response;
+        }),
+
+        // should be last one
+        catchError((err) => {
+          // display error
+          this.toastV2Service.error(err);
+
+          // send error further
+          return throwError(err);
         })
       );
   }

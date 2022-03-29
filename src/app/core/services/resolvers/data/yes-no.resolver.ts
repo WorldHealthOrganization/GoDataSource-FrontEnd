@@ -2,12 +2,12 @@ import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { ToastV2Service } from '../../helper/toast-v2.service';
-import { Resolve } from '@angular/router';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { GenericDataService } from '../../data/generic.data.service';
+import { IMapResolverV2, IResolverV2ResponseModel } from './models/resolver-response.model';
 
 @Injectable()
-export class YesNoDataResolver implements Resolve<ILabelValuePairModel[]> {
+export class YesNoDataResolver implements IMapResolverV2<ILabelValuePairModel> {
   /**
    * Constructor
    */
@@ -19,17 +19,26 @@ export class YesNoDataResolver implements Resolve<ILabelValuePairModel[]> {
   /**
    * Retrieve data
    */
-  resolve(): Observable<ILabelValuePairModel[]> {
+  resolve(): Observable<IResolverV2ResponseModel<ILabelValuePairModel>> {
     return this.genericDataService
       .getFilterYesNoOptions(true)
       .pipe(
         map((data) => {
           // construct map
-          const response: ILabelValuePairModel[] = [];
+          const response: IResolverV2ResponseModel<ILabelValuePairModel> = {
+            list: data,
+            map: {},
+            options: []
+          };
           data.forEach((item) => {
-            response.push({
+            // map
+            response.map[item.id] = item;
+
+            // add option
+            response.options.push({
               label: item.label,
-              value: item.value
+              value: item.value,
+              data: item
             });
           });
 

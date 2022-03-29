@@ -329,7 +329,8 @@ export interface IV2SideDialogHandler {
   data: IV2SideDialogData;
   hide: () => void;
   update: {
-    inputs: (inputs: V2SideDialogConfigInput[]) => void
+    inputs: (inputs: V2SideDialogConfigInput[]) => void,
+    refresh: () => void
   },
   buttons: {
     click: (buttonKey: string) => void

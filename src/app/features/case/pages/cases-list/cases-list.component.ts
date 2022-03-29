@@ -41,6 +41,7 @@ import { LocationModel } from '../../../../core/models/location.model';
 import { IV2FilterBoolean, IV2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IExtendedColDef } from '../../../../shared/components-v2/app-list-table-v2/models/extended-column.model';
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 
 @Component({
   selector: 'app-cases-list',
@@ -152,7 +153,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     private dialogV2Service: DialogV2Service,
     private i18nService: I18nService,
     private entityHelperService: EntityHelperService,
-    private redirectService: RedirectService
+    private redirectService: RedirectService,
+    private clusterDataService: ClusterDataService
   ) {
     super(listHelperService);
   }
@@ -526,7 +528,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           address: filterAddressModel,
           field: 'addresses',
           fieldIsArray: true,
-          options: this.activatedRoute.snapshot.data.yesNoAll
+          options: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options
         },
         sortable: true
       },
@@ -1417,14 +1419,14 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         type: V2AdvancedFilterType.SELECT,
         field: 'safeBurial',
         label: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
-        options: this.activatedRoute.snapshot.data.yesNo
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
         // sortable: true
       },
       {
         type: V2AdvancedFilterType.SELECT,
         field: 'isDateOfOnsetApproximate',
         label: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
-        options: this.activatedRoute.snapshot.data.yesNo
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
         // sortable: true
       },
       {
@@ -1437,14 +1439,14 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         type: V2AdvancedFilterType.SELECT,
         field: 'isDateOfReportingApproximate',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
-        options: this.activatedRoute.snapshot.data.yesNo
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
         // sortable: true
       },
       {
         type: V2AdvancedFilterType.SELECT,
         field: 'transferRefused',
         label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
-        options: this.activatedRoute.snapshot.data.yesNo
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
         // sortable: true
       },
       {
@@ -1457,16 +1459,46 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         type: V2AdvancedFilterType.SELECT,
         field: 'wasContact',
         label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
-        options: this.activatedRoute.snapshot.data.yesNo
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
         // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'clusterId',
+        label: 'LNG_CASE_FIELD_LABEL_CLUSTER_NAME',
+        optionsLoad: (finished) => {
+          this.clusterDataService
+            .getResolveList(
+              this.selectedOutbreak.id
+            )
+            .pipe(
+              // handle error
+              catchError((err) => {
+                // show error
+                this.toastV2Service.error(err);
+
+                // not found
+                finished(null);
+
+                // send error down the road
+                return throwError(err);
+              }),
+
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            )
+            .subscribe((data) => {
+              finished(data);
+            });
+        }
       }
     ];
     // // set available side filters
     // this.availableSideFilters = [
     //   new FilterModel({
-    //     fieldName: 'clusterId',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_CLUSTER_NAME',
-    //     type: FilterType.MULTISELECT,
+    //     fieldName: '',
+    //     fieldLabel: '',
+    //     type: FilterType.,
     //     // this.clustersListAsLabelValuePair$ = this.clusterDataService.getClusterListAsLabelValue(this.selectedOutbreak.id);
     //     // options$: this.clustersListAsLabelValuePair$,
     //     relationshipPath: ['relationships'],
