@@ -250,6 +250,14 @@ interface IV2AdvancedFilterAddressPhoneNumber extends IV2AdvancedFilterBase {
   isArray: boolean;
 }
 
+/**
+ * Advanced filter - Date Range
+ */
+interface IV2AdvancedFilterDateRange extends IV2AdvancedFilterBase {
+  // required
+  type: V2AdvancedFilterType.RANGE_DATE;
+}
+
 // advanced filter
 export type V2AdvancedFilter = IV2AdvancedFilterText | IV2AdvancedFilterMultipleSelect | IV2AdvancedFilterAgeRange | IV2AdvancedFilterAddress
-| IV2AdvancedFilterAddressPhoneNumber;
+| IV2AdvancedFilterAddressPhoneNumber | IV2AdvancedFilterDateRange;

@@ -1348,8 +1348,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         label: 'LNG_CASE_FIELD_LABEL_ADDRESSES',
         isArray: true
       },
-
-
       {
         type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
         field: 'addresses',
@@ -1357,35 +1355,22 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         isArray: true
       },
       {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dob',
+        label: 'LNG_CASE_FIELD_LABEL_DOB'
+        // sortable: true
+      },
+      {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'occupation',
         label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
         options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        // sortable: true
       }
     ];
     //
     // // set available side filters
     // this.availableSideFilters = [
-    //   new FilterModel({
-    //     fieldName: 'dob',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_DOB',
-    //     type: FilterType.RANGE_DATE,
-    //     sortable: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'addresses',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
-    //     type: FilterType.ADDRESS_PHONE_NUMBER,
-    //     addressFieldIsArray: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'occupation',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
-    //     type: FilterType.MULTISELECT,
-    //     // this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
-    //     // options$: this.occupationsList$,
-    //     sortable: true
-    //   }),
     //   new FilterModel({
     //     fieldName: 'riskLevel',
     //     fieldLabel: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',

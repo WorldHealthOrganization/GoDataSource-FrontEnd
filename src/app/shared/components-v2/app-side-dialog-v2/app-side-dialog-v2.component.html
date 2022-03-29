@@ -297,8 +297,13 @@
 
                       <!-- Text / Address phone number -->
                       <app-form-input-v2
-                        *ngIf="(input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.TEXT || input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.ADDRESS_PHONE_NUMBER)
-                          && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                        *ngIf="(
+                          input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.TEXT ||
+                          input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.ADDRESS_PHONE_NUMBER || (
+                              input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.ADDRESS &&
+                              filter.comparator.value === V2AdvancedFilterComparatorType.CONTAINS
+                          )
+                        ) && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
                         [(ngModel)]="filter.value"
                         [name]="filter.name"
                         [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_KEYWORD' | translate"
@@ -324,6 +329,15 @@
                         [max]="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.RANGE_AGE ? Constants.DEFAULT_AGE_MAX_YEARS : undefined"
                         [fromHidden]="filter.comparator.value === V2AdvancedFilterComparatorType.BEFORE"
                         [toHidden]="filter.comparator.value === V2AdvancedFilterComparatorType.AFTER"></app-form-number-range-v2>
+
+                      <!-- Date range -->
+                      <app-form-date-range-v2
+                        *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.RANGE_DATE
+                          && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                        [(ngModel)]="filter.value"
+                        [name]="filter.name"
+                        [fromHidden]="filter.comparator.value === V2AdvancedFilterComparatorType.BEFORE"
+                        [toHidden]="filter.comparator.value === V2AdvancedFilterComparatorType.AFTER"></app-form-date-range-v2>
 
                     </ng-container>
 
