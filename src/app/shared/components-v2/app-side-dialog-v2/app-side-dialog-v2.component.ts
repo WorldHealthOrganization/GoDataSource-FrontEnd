@@ -524,6 +524,7 @@ export class AppSideDialogV2Component implements OnDestroy {
         change: (data, _handler, filter) => {
           // reset comparator selected value
           const filterItem = filter as unknown as IV2SideDialogConfigInputFilterListItem;
+          filterItem.value = undefined;
           filterItem.comparator.value = undefined;
 
           // set comparator options
@@ -542,7 +543,12 @@ export class AppSideDialogV2Component implements OnDestroy {
         value: undefined,
         name: `${input.name}.comparator[${input.filters.length}]`,
         placeholder: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL',
-        options: []
+        options: [],
+        change: (_data, _handler, filter) => {
+          // reset comparator selected value
+          const filterItem = filter as unknown as IV2SideDialogConfigInputFilterListItem;
+          filterItem.value = undefined;
+        }
       }
     });
   }
