@@ -41,6 +41,7 @@ import { LocationModel } from '../../../../core/models/location.model';
 import { IV2FilterBoolean, IV2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IExtendedColDef } from '../../../../shared/components-v2/app-list-table-v2/models/extended-column.model';
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 
 @Component({
   selector: 'app-cases-list',
@@ -152,7 +153,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     private dialogV2Service: DialogV2Service,
     private i18nService: I18nService,
     private entityHelperService: EntityHelperService,
-    private redirectService: RedirectService
+    private redirectService: RedirectService,
+    private clusterDataService: ClusterDataService
   ) {
     super(listHelperService);
   }
@@ -526,7 +528,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           address: filterAddressModel,
           field: 'addresses',
           fieldIsArray: true,
-          options: this.activatedRoute.snapshot.data.yesNoAll
+          options: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options
         },
         sortable: true
       },
@@ -1340,7 +1342,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         type: V2AdvancedFilterType.RANGE_AGE,
         field: 'age',
         label: 'LNG_CASE_FIELD_LABEL_AGE'
-        // sortable: true
       },
       {
         type: V2AdvancedFilterType.ADDRESS,
@@ -1365,103 +1366,151 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         field: 'occupation',
         label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
         options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
-        // sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'riskLevel',
         label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
         options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
-        // sortable: true
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'riskReason',
         label: 'LNG_CASE_FIELD_LABEL_RISK_REASON'
         // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'visualId',
+        label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID'
+        // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'classification',
+        label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+        options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateOfInfection',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION'
+        // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateOfOnset',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET'
+        // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateOfOutcome',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME'
+        // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateBecomeCase',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE'
+        // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'safeBurial',
+        label: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
+        // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'isDateOfOnsetApproximate',
+        label: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
+        // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateOfReporting',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING'
+        // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'isDateOfReportingApproximate',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
+        // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'transferRefused',
+        label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
+        // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'outcomeId',
+        label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+        options: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'wasContact',
+        label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
+        // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_NUMBER,
+        field: 'numberOfContacts',
+        label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS'
+        // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_NUMBER,
+        field: 'numberOfExposures',
+        label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES'
+        // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'clusterId',
+        label: 'LNG_CASE_FIELD_LABEL_CLUSTER_NAME',
+        optionsLoad: (finished) => {
+          this.clusterDataService
+            .getResolveList(
+              this.selectedOutbreak.id
+            )
+            .pipe(
+              // handle error
+              catchError((err) => {
+                // show error
+                this.toastV2Service.error(err);
+
+                // not found
+                finished(null);
+
+                // send error down the road
+                return throwError(err);
+              }),
+
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            )
+            .subscribe((data) => {
+              finished(data);
+            });
+        }
       }
     ];
     // // set available side filters
     // this.availableSideFilters = [
     //   new FilterModel({
-    //     fieldName: 'visualId',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
-    //     type: FilterType.TEXT,
-    //     sortable: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'classification',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-    //     type: FilterType.MULTISELECT,
-    //     // options$: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'dateOfInfection',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
-    //     type: FilterType.RANGE_DATE
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'dateOfOnset',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
-    //     type: FilterType.RANGE_DATE
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'dateOfOutcome',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
-    //     type: FilterType.RANGE_DATE
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'dateBecomeCase',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
-    //     type: FilterType.RANGE_DATE
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'safeBurial',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
-    //     type: FilterType.SELECT,
-    //     // this.yesNoOptionsWithoutAllList$ = this.genericDataService.getFilterYesNoOptions(true);
-    //     // options$: this.yesNoOptionsWithoutAllList$
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'isDateOfOnsetApproximate',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
-    //     type: FilterType.SELECT,
-    //     // options$: this.yesNoOptionsWithoutAllList$
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'dateOfReporting',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
-    //     type: FilterType.RANGE_DATE
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'isDateOfReportingApproximate',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
-    //     type: FilterType.SELECT,
-    //     // options$: this.yesNoOptionsWithoutAllList$
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'transferRefused',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
-    //     type: FilterType.SELECT,
-    //     // options$: this.yesNoOptionsWithoutAllList$
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'outcomeId',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_OUTCOME',
-    //     type: FilterType.MULTISELECT,
-    //     // this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
-    //     // options$: this.outcomeList$
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'wasContact',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
-    //     type: FilterType.SELECT,
-    //     // options$: this.yesNoOptionsWithoutAllList$
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'clusterId',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_CLUSTER_NAME',
-    //     type: FilterType.MULTISELECT,
+    //     fieldName: '',
+    //     fieldLabel: '',
+    //     type: FilterType.,
     //     // this.clustersListAsLabelValuePair$ = this.clusterDataService.getClusterListAsLabelValue(this.selectedOutbreak.id);
     //     // options$: this.clustersListAsLabelValuePair$,
     //     relationshipPath: ['relationships'],
@@ -1499,16 +1548,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     //     fieldLabel: 'LNG_CASE_FIELD_LABEL_VACCINE_DATE',
     //     type: FilterType.RANGE_DATE
     //   }),
-    //   new FilterModel({
-    //     fieldName: 'numberOfContacts',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS',
-    //     type: FilterType.RANGE_NUMBER
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'numberOfExposures',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES',
-    //     type: FilterType.RANGE_NUMBER
-    //   })
     // ];
     //
     // // allowed to filter by responsible user ?

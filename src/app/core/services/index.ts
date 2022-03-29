@@ -61,6 +61,7 @@ import { GenderDataResolver } from './resolvers/data/gender.resolver';
 import { YesNoAllDataResolver } from './resolvers/data/yes-no-all.resolver';
 import { UserDataResolver } from './resolvers/data/user.resolver';
 import { OccupationDataResolver } from './resolvers/data/occupation.resolver';
+import { YesNoDataResolver } from './resolvers/data/yes-no.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -73,6 +74,7 @@ export const services: any[] = [
   RiskDataResolver,
   UserDataResolver,
   YesNoAllDataResolver,
+  YesNoDataResolver,
 
   // data services
   AuthDataService,

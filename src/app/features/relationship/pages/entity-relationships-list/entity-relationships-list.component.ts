@@ -18,7 +18,6 @@ import { RelationshipType } from '../../../../core/enums/relationship-type.enum'
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
 import { throwError } from 'rxjs';
-import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
@@ -131,7 +130,6 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     private relationshipDataService: RelationshipDataService,
     private referenceDataDataService: ReferenceDataDataService,
     private dialogService: DialogService,
-    private clusterDataService: ClusterDataService,
     private userDataService: UserDataService
   ) {
     // parent
@@ -157,7 +155,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                     ClusterModel.canList(this.authUser)
         ) {
           // update the selected outbreak
-          this.clusterOptions$ = this.clusterDataService.getClusterListAsLabelValue(outbreak.id).pipe(share());
+          // this.clusterOptions$ = this.clusterDataService.getClusterListAsLabelValue(outbreak.id).pipe(share());
         }
       });
 

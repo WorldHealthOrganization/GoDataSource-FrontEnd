@@ -70,6 +70,12 @@ export class AppSideDialogV2Component implements OnDestroy {
 
         // update UI
         this.changeDetectorRef.detectChanges();
+      },
+
+      // refresh inputs
+      refresh: () => {
+        // refresh inputs
+        this.updateInputs();
       }
     },
 

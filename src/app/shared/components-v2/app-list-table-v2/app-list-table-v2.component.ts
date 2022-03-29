@@ -20,7 +20,14 @@ import { IV2GroupedData, IV2GroupedDataValue } from './models/grouped-data.model
 import { IBasicCount } from '../../../core/models/basic-count.interface';
 import { PageEvent } from '@angular/material/paginator';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
-import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputCheckbox, IV2SideDialogConfigInputSingleDropdown, V2SideDialogConfigInput, V2SideDialogConfigInputType } from '../app-side-dialog-v2/models/side-dialog-config.model';
+import {
+  IV2SideDialogConfigButtonType,
+  IV2SideDialogConfigInputCheckbox,
+  IV2SideDialogConfigInputFilterList,
+  IV2SideDialogConfigInputSingleDropdown,
+  V2SideDialogConfigInput,
+  V2SideDialogConfigInputType
+} from '../app-side-dialog-v2/models/side-dialog-config.model';
 import { UserModel, UserSettings } from '../../../core/models/user.model';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { catchError } from 'rxjs/operators';
@@ -1507,7 +1514,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           }, {
             type: V2SideDialogConfigInputType.FILTER_LIST,
             name: 'filters',
-            options: this.advancedFilters,
+            options: [],
             filters: []
           }
         ],
@@ -1545,8 +1552,60 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
                 };
               });
 
-              // hide loading
-              handler.loading.hide();
+              // do we need to retrieve other data ?
+              (handler.data.map.filters as IV2SideDialogConfigInputFilterList).options = [];
+              const dataToRetrieve: {
+                filter: V2AdvancedFilter
+              }[] = [];
+              this.advancedFilters.forEach((advancedFilter) => {
+                // do we need to load data ?
+                if (!advancedFilter.optionsLoad) {
+                  // put the exact one in the list
+                  (handler.data.map.filters as IV2SideDialogConfigInputFilterList).options.push(advancedFilter);
+
+                  // finished
+                  return;
+                }
+
+                // add to list of data to retrieve
+                dataToRetrieve.push({
+                  filter: advancedFilter
+                });
+              });
+
+              // retrieve data - synchronously
+              const nextItem = () => {
+                // finished ?
+                if (dataToRetrieve.length < 1) {
+                  // reload inputs data
+                  handler.update.refresh();
+
+                  // hide loading
+                  handler.loading.hide();
+
+                  // finished
+                  return;
+                }
+
+                // get data
+                const itemToRetrieve = dataToRetrieve.splice(0, 1)[0];
+                itemToRetrieve.filter.optionsLoad((data) => {
+                  // clone item
+                  const newFilter: V2AdvancedFilter = _.cloneDeep(itemToRetrieve.filter);
+                  newFilter.options = data ?
+                    data.options :
+                    [];
+
+                  // put the exact one in the list
+                  (handler.data.map.filters as IV2SideDialogConfigInputFilterList).options.push(newFilter);
+
+                  // next one
+                  nextItem();
+                });
+              };
+
+              // start
+              nextItem();
             });
         }
       })

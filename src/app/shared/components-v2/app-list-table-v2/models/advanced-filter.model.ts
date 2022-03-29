@@ -1,4 +1,5 @@
 import { ILabelValuePairModel } from '../../../forms-v2/core/label-value-pair.model';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 
 /**
  * Advanced filter type
@@ -205,6 +206,10 @@ interface IV2AdvancedFilterBase {
 
   // optional
   id?: string;
+
+  // never
+  optionsLoad?: never;
+  options?: never;
 }
 
 /**
@@ -216,12 +221,35 @@ interface IV2AdvancedFilterText extends IV2AdvancedFilterBase {
 }
 
 /**
+ * Advanced filter - Single select
+ */
+interface IV2AdvancedFilterSingleSelect extends Omit<IV2AdvancedFilterBase, 'options'> {
+  // required
+  type: V2AdvancedFilterType.SELECT;
+  options: ILabelValuePairModel[];
+}
+interface IV2AdvancedFilterSingleSelectLoader extends Omit<IV2AdvancedFilterSingleSelect, 'options' | 'optionsLoad'> {
+  // required
+  optionsLoad: (finished: (data: IResolverV2ResponseModel<any>) => void) => void
+
+  // never
+  options?: never;
+}
+
+/**
  * Advanced filter - Multiple select
  */
-interface IV2AdvancedFilterMultipleSelect extends IV2AdvancedFilterBase {
+interface IV2AdvancedFilterMultipleSelect extends Omit<IV2AdvancedFilterBase, 'options'> {
   // required
   type: V2AdvancedFilterType.MULTISELECT;
   options: ILabelValuePairModel[];
+}
+interface IV2AdvancedFilterMultipleSelectLoader extends Omit<IV2AdvancedFilterMultipleSelect, 'options' | 'optionsLoad'> {
+  // required
+  optionsLoad: (finished: (data: IResolverV2ResponseModel<any>) => void) => void
+
+  // never
+  options?: never;
 }
 
 /**
@@ -258,6 +286,16 @@ interface IV2AdvancedFilterDateRange extends IV2AdvancedFilterBase {
   type: V2AdvancedFilterType.RANGE_DATE;
 }
 
+/**
+ * Advanced filter - Number Range
+ */
+interface IV2AdvancedFilterNumberRange extends IV2AdvancedFilterBase {
+  // required
+  type: V2AdvancedFilterType.RANGE_NUMBER;
+}
+
 // advanced filter
-export type V2AdvancedFilter = IV2AdvancedFilterText | IV2AdvancedFilterMultipleSelect | IV2AdvancedFilterAgeRange | IV2AdvancedFilterAddress
-| IV2AdvancedFilterAddressPhoneNumber | IV2AdvancedFilterDateRange;
+export type V2AdvancedFilter = IV2AdvancedFilterText | IV2AdvancedFilterSingleSelect | IV2AdvancedFilterSingleSelectLoader
+| IV2AdvancedFilterMultipleSelect | IV2AdvancedFilterMultipleSelectLoader
+| IV2AdvancedFilterAgeRange | IV2AdvancedFilterAddress | IV2AdvancedFilterAddressPhoneNumber | IV2AdvancedFilterDateRange
+| IV2AdvancedFilterNumberRange;

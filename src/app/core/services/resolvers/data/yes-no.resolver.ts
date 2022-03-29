@@ -7,7 +7,7 @@ import { GenericDataService } from '../../data/generic.data.service';
 import { IMapResolverV2, IResolverV2ResponseModel } from './models/resolver-response.model';
 
 @Injectable()
-export class YesNoAllDataResolver implements IMapResolverV2<ILabelValuePairModel> {
+export class YesNoDataResolver implements IMapResolverV2<ILabelValuePairModel> {
   /**
    * Constructor
    */
@@ -21,7 +21,7 @@ export class YesNoAllDataResolver implements IMapResolverV2<ILabelValuePairModel
    */
   resolve(): Observable<IResolverV2ResponseModel<ILabelValuePairModel>> {
     return this.genericDataService
-      .getFilterYesNoOptions()
+      .getFilterYesNoOptions(true)
       .pipe(
         map((data) => {
           // construct map
