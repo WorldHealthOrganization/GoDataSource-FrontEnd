@@ -587,7 +587,7 @@ export class EventsListComponent
   protected initializeTableColumns(): void {
     // address model used to search by phone number, address line, postal code, city....
     const filterAddressModel: AddressModel = new AddressModel({
-      geoLocationAccurate: null
+      geoLocationAccurate: ''
     });
 
     this.tableColumns = [
@@ -722,7 +722,8 @@ export class EventsListComponent
           type: V2ColumnFormat.BOOLEAN
         },
         filter: {
-          type: V2FilterType.DELETED
+          type: V2FilterType.DELETED,
+          value: false
         },
         sortable: true
       },
