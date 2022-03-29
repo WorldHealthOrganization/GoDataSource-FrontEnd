@@ -1478,6 +1478,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'clusterId',
         label: 'LNG_CASE_FIELD_LABEL_CLUSTER_NAME',
+        relationshipPath: ['relationships'],
+        relationshipLabel: 'LNG_CASE_FIELD_LABEL_CLUSTER',
         optionsLoad: (finished) => {
           this.clusterDataService
             .getResolveList(
@@ -1507,15 +1509,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     ];
     // // set available side filters
     // this.availableSideFilters = [
-    //   new FilterModel({
-    //     fieldName: '',
-    //     fieldLabel: '',
-    //     type: FilterType.,
-    //     // this.clustersListAsLabelValuePair$ = this.clusterDataService.getClusterListAsLabelValue(this.selectedOutbreak.id);
-    //     // options$: this.clustersListAsLabelValuePair$,
-    //     relationshipPath: ['relationships'],
-    //     relationshipLabel: 'LNG_CASE_FIELD_LABEL_CLUSTER'
-    //   }),
     //   new FilterModel({
     //     fieldName: 'questionnaireAnswers',
     //     fieldLabel: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
