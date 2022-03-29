@@ -126,6 +126,20 @@
         }
       }
 
+      .gd-list-table-header-right-filters-applied {
+        color: var(--gd-secondary);
+        font-size: 1.2rem;
+        font-style: italic;
+      }
+
+      .gd-list-table-header-right-info {
+        .mat-icon {
+          color: var(--gd-secondary);
+          height: 2rem;
+          width: 2rem;
+        }
+      }
+
       .gd-list-table-header-right-header-filters-active {
         background: rgba(var(--gd-primary-rgb), 0.25);
         color: var(--gd-primary);

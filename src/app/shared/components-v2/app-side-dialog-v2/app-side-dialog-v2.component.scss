@@ -180,7 +180,7 @@
 
             .mat-expansion-panel-body {
               .gd-app-side-dialog-v2-content-middle-item-input {
-                margin-bottom: 0.8rem;
+                margin-top: 0.8rem;
                 position: relative;
 
                 &:before {
@@ -202,10 +202,18 @@
                     visibility: visible;
                   }
                 }
+
+                &.gd-app-side-dialog-v2-content-middle-item-input-divider {
+                  margin-top: 0;
+
+                  &:before {
+                    display: none;
+                  }
+                }
               }
   
               .gd-app-side-dialog-v2-content-middle-item-input-link {
-                margin-bottom: 0;
+                margin: 0;
 
                 &:before {
                   display: none;

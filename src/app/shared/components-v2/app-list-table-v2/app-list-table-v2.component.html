@@ -240,7 +240,7 @@
 
     <!-- Right -->
     <div
-      fxFlex fxLayout="row" fxGrow="0" fxLayoutGap="0.8rem"
+      fxFlex fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="0.8rem"
       class="gd-list-table-header-right">
 
       <!-- Filters applied -->
@@ -253,6 +253,7 @@
       <!-- Info -->
       <div
         *ngIf="infosJoined"
+        fxFlex fxGrow="0" fxLayoutAlign="center"
         class="gd-list-table-header-right-info">
         <!-- Content -->
         <popper-content
