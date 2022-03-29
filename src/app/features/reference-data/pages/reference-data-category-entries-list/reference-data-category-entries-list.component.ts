@@ -229,6 +229,11 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
   }
 
   /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
    * Initialize breadcrumbs
    */
   initializeBreadcrumbs(): void {
@@ -237,7 +242,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
   /**
    * Fields retrieved from api to reduce payload size
    */
-  refreshListFields(): string[] {
+  protected refreshListFields(): string[] {
     return [];
   }
 

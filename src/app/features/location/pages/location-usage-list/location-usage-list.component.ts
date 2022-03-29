@@ -153,6 +153,11 @@ export class LocationUsageListComponent extends ListComponent implements OnInit,
   protected initializeTableColumns(): void {}
 
   /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
      * Initialize breadcrumbs
      */
   // initializeBreadcrumbs() {
@@ -187,7 +192,7 @@ export class LocationUsageListComponent extends ListComponent implements OnInit,
   /**
    * Fields retrieved from api to reduce payload size
    */
-  refreshListFields(): string[] {
+  protected refreshListFields(): string[] {
     return [];
   }
 

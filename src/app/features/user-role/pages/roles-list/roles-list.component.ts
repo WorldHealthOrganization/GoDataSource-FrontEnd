@@ -172,6 +172,11 @@ export class RolesListComponent extends ListComponent implements OnInit, OnDestr
   }
 
   /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
    * Initialize breadcrumbs
    */
   initializeBreadcrumbs(): void {
@@ -180,7 +185,7 @@ export class RolesListComponent extends ListComponent implements OnInit, OnDestr
   /**
    * Fields retrieved from api to reduce payload size
    */
-  refreshListFields(): string[] {
+  protected refreshListFields(): string[] {
     return [];
   }
 

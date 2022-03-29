@@ -4,6 +4,7 @@
 
   <!-- From -->
   <app-form-date-v2
+    *ngIf="!fromHidden"
     fxFlex
     [name]="name + '[startDate]'"
     [(ngModel)]="value.startDate"
@@ -17,6 +18,7 @@
 
   <!-- Separator -->
   <div
+    *ngIf="!fromHidden && !toHidden"
     fxLayoutAlign="center center"
     class="gd-form-date-range-separator-v2">
     —
@@ -24,6 +26,7 @@
 
   <!-- To -->
   <app-form-date-v2
+    *ngIf="!toHidden"
     fxFlex
     [name]="name + '[endDate]'"
     [(ngModel)]="value.endDate"

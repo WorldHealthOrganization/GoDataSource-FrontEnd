@@ -202,6 +202,11 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
   }
 
   /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
      * Reload system settings
      */
   refreshSystemSettings() {
@@ -222,7 +227,7 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
   /**
    * Fields retrieved from api to reduce payload size
    */
-  refreshListFields(): string[] {
+  protected refreshListFields(): string[] {
     return [];
   }
 

@@ -215,6 +215,11 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
   protected initializeTableColumns(): void {}
 
   /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
      * Initialize breadcrumbs
      */
   // private initializeBreadcrumbs() {
@@ -243,7 +248,7 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
   /**
    * Fields retrieved from api to reduce payload size
    */
-  refreshListFields(): string[] {
+  protected refreshListFields(): string[] {
     return [];
   }
 
