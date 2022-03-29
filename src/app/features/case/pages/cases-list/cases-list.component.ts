@@ -1418,46 +1418,51 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         field: 'safeBurial',
         label: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
         options: this.activatedRoute.snapshot.data.yesNo
+        // sortable: true
       },
       {
         type: V2AdvancedFilterType.SELECT,
         field: 'isDateOfOnsetApproximate',
         label: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
         options: this.activatedRoute.snapshot.data.yesNo
+        // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateOfReporting',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING'
+        // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'isDateOfReportingApproximate',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+        options: this.activatedRoute.snapshot.data.yesNo
+        // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'transferRefused',
+        label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
+        options: this.activatedRoute.snapshot.data.yesNo
+        // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'outcomeId',
+        label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+        options: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'wasContact',
+        label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
+        options: this.activatedRoute.snapshot.data.yesNo
+        // sortable: true
       }
     ];
     // // set available side filters
     // this.availableSideFilters = [
-    //   new FilterModel({
-    //     fieldName: 'dateOfReporting',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
-    //     type: FilterType.RANGE_DATE
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'isDateOfReportingApproximate',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
-    //     type: FilterType.SELECT,
-    //     // options$: this.yesNoOptionsWithoutAllList$
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'transferRefused',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
-    //     type: FilterType.SELECT,
-    //     // options$: this.yesNoOptionsWithoutAllList$
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'outcomeId',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_OUTCOME',
-    //     type: FilterType.MULTISELECT,
-    //     // this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
-    //     // options$: this.outcomeList$
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'wasContact',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
-    //     type: FilterType.SELECT,
-    //     // options$: this.yesNoOptionsWithoutAllList$
-    //   }),
     //   new FilterModel({
     //     fieldName: 'clusterId',
     //     fieldLabel: 'LNG_CASE_FIELD_LABEL_CLUSTER_NAME',

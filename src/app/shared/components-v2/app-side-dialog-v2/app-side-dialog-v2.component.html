@@ -264,7 +264,8 @@
                 <div
                   *ngFor="let filter of input.filters"
                   fxLayout="row" fxLayoutAlign="start start"
-                  class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-item">
+                  class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-item"
+                  [class.gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-no-value]="!filter.filterBy.value">
 
                   <!-- Left -->
                   <div
