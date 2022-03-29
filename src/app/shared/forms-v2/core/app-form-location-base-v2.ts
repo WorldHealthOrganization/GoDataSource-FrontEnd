@@ -36,7 +36,7 @@ export interface ILocation {
  * Location base
  */
 @Directive()
-export class AppFormLocationBaseV2<T>
+export abstract class AppFormLocationBaseV2<T>
   extends AppFormBaseV2<T> {
 
   // handles request cache..so we don't do the same request 100 times...
@@ -202,6 +202,9 @@ export class AppFormLocationBaseV2<T>
       AppFormLocationBaseV2.CACHE[methodKey][cacheKey].observer$;
   }
 
+  // update selected
+  abstract updateSelected(): void;
+
   /**
    * Constructor
    */
@@ -273,6 +276,33 @@ export class AppFormLocationBaseV2<T>
       this.outbreakSubscription.unsubscribe();
       this.outbreakSubscription = null;
     }
+  }
+
+  /**
+   * New location selected
+   */
+  writeValue(value: T) {
+    // save value
+    super.writeValue(value);
+
+    // add location condition & refresh
+    // only if we have data, if we don't then we need for user to input something so we don't retrieve the entire list of locations
+    // ( not even the top level - top level items are retrieved when empty search string is sent)
+    if (value) {
+      this.addLocationConditionAndRefresh();
+    }
+  }
+
+  /**
+   * Call both add condition & refresh
+   */
+  addLocationConditionAndRefresh() {
+    // bring location data
+    this.addLocationCondition();
+
+    // refresh locations
+    this.locationLoading = true;
+    this.refreshLocationList();
   }
 
   /**
@@ -357,6 +387,9 @@ export class AppFormLocationBaseV2<T>
 
         // set locations
         this.locations = locationItems;
+
+        // update selected location
+        this.updateSelected();
 
         // re-render
         this.changeDetectorRef.detectChanges();

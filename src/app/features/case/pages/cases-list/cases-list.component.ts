@@ -8,18 +8,14 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ApplyListFilter, Constants } from '../../../../core/models/constants';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
-import { ReferenceDataCategory, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import * as _ from 'lodash';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
-import { catchError, map, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { ContactModel } from '../../../../core/models/contact.model';
@@ -128,25 +124,18 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
   ];
 
+  // additional page information
+  infos: string[] = [
+    'LNG_PAGE_LIST_CASES_NOT_A_CASE_INFO_LABEL'
+  ];
+
   // used to filter cases
-  notACaseFilter: boolean | string = false;
+  notACaseFilter: boolean | '' = false;
 
 
 
 
 
-
-  occupationsList$: Observable<any[]>;
-  outcomeList$: Observable<any[]>;
-  pregnancyStatsList$: Observable<any[]>;
-
-  // vaccines
-  vaccineList$: Observable<any[]>;
-  vaccineStatusList$: Observable<any[]>;
-
-  clustersListAsLabelValuePair$: Observable<LabelValuePair[]>;
-  caseRiskLevelsList$: Observable<any[]>;
-  yesNoOptionsWithoutAllList$: Observable<any[]>;
 
   // available side filters
   availableSideFilters: FilterModel[] = [];
@@ -170,11 +159,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     private locationDataService: LocationDataService,
     private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
-    private referenceDataDataService: ReferenceDataDataService,
     private dialogV2Service: DialogV2Service,
     private i18nService: I18nService,
-    private genericDataService: GenericDataService,
-    private clusterDataService: ClusterDataService,
     private entityHelperService: EntityHelperService,
     private redirectService: RedirectService
   ) {
@@ -185,18 +171,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    * Component initialized
    */
   ngOnInit() {
-    // reference data
-    this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
-    this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
-    this.pregnancyStatsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PREGNANCY_STATUS);
-    this.vaccineList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.VACCINES);
-    this.vaccineStatusList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.VACCINES_STATUS);
-
-    // init side filters
-    this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
-    this.yesNoOptionsWithoutAllList$ = this.genericDataService.getFilterYesNoOptions(true);
-    this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
-
     // initialize quick actions
     this.initializeQuickActions();
 
@@ -215,7 +189,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
 
     // outbreak subscriber
     if (this.outbreakSubscriber) {
@@ -228,19 +202,21 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    * Selected outbreak was changed
    */
   selectedOutbreakChanged(): void {
-    // export cases url
+    // no outbreak selected ?
     if (
-      this.selectedOutbreak &&
-      this.selectedOutbreak.id
+      !this.selectedOutbreak ||
+      !this.selectedOutbreak.id
     ) {
-      this.clustersListAsLabelValuePair$ = this.clusterDataService.getClusterListAsLabelValue(this.selectedOutbreak.id);
-
-      // initialize side filters
-      this.initializeSideFilters();
+      // finished
+      return;
     }
+
+    // initialize side filters
+    this.initializeSideFilters();
 
     // initialize pagination
     this.initPaginator();
+
     // ...and re-load the list when the Selected Outbreak is changed
     this.needsRefreshList(true);
   }
@@ -251,7 +227,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   protected initializeTableColumns(): void {
     // address model used to search by phone number, address line, postal code, city....
     const filterAddressModel: AddressModel = new AddressModel({
-      geoLocationAccurate: null
+      geoLocationAccurate: ''
     });
 
     // default table columns
@@ -602,6 +578,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         },
         filter: {
           type: V2FilterType.BOOLEAN,
+          value: this.notACaseFilter,
           search: (column) => {
             // update not a case
             this.notACaseFilter = (column.columnDefinition.filter as V2FilterBoolean).value;
@@ -719,7 +696,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           type: V2ColumnFormat.BOOLEAN
         },
         filter: {
-          type: V2FilterType.DELETED
+          type: V2FilterType.DELETED,
+          value: false
         },
         sortable: true
       },
@@ -1679,6 +1657,30 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   private initializeGroupedData(): void {
     this.groupedData = {
       label: 'LNG_PAGE_LIST_CASES_ACTION_SHOW_GROUP_BY_CLASSIFICATION_PILLS',
+      click: (
+        item,
+        group
+      ) => {
+        // no need to refresh group
+        group.data.blockNextGet = true;
+
+        // filter by group data
+        if (!item) {
+          this.filterByEquality(
+            'classification',
+            null
+          );
+        } else if (item.label === 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_UNCLASSIFIED') {
+          // clear
+          this.filterByNotHavingValue('classification');
+        } else {
+          // search
+          this.filterByEquality(
+            'classification',
+            item.label
+          );
+        }
+      },
       data: {
         loading: false,
         values: [],
@@ -1694,6 +1696,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
           clonedQueryBuilder.paginator.clear();
           clonedQueryBuilder.sort.clear();
           clonedQueryBuilder.clearFields();
+
+          // remove any classification filters so we see all options
+          clonedQueryBuilder.filter.remove('classification');
 
           // load data
           return this.caseDataService
@@ -1995,14 +2000,16 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         fieldName: 'occupation',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
         type: FilterType.MULTISELECT,
-        options$: this.occupationsList$,
+        // this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
+        // options$: this.occupationsList$,
         sortable: true
       }),
       new FilterModel({
         fieldName: 'riskLevel',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
         type: FilterType.MULTISELECT,
-        options$: this.caseRiskLevelsList$
+        // this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
+        // options$: this.caseRiskLevelsList$
       }),
       new FilterModel({
         fieldName: 'riskReason',
@@ -2046,13 +2053,14 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         fieldName: 'safeBurial',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
         type: FilterType.SELECT,
-        options$: this.yesNoOptionsWithoutAllList$
+        // this.yesNoOptionsWithoutAllList$ = this.genericDataService.getFilterYesNoOptions(true);
+        // options$: this.yesNoOptionsWithoutAllList$
       }),
       new FilterModel({
         fieldName: 'isDateOfOnsetApproximate',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
         type: FilterType.SELECT,
-        options$: this.yesNoOptionsWithoutAllList$
+        // options$: this.yesNoOptionsWithoutAllList$
       }),
       new FilterModel({
         fieldName: 'dateOfReporting',
@@ -2063,31 +2071,33 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         fieldName: 'isDateOfReportingApproximate',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
         type: FilterType.SELECT,
-        options$: this.yesNoOptionsWithoutAllList$
+        // options$: this.yesNoOptionsWithoutAllList$
       }),
       new FilterModel({
         fieldName: 'transferRefused',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
         type: FilterType.SELECT,
-        options$: this.yesNoOptionsWithoutAllList$
+        // options$: this.yesNoOptionsWithoutAllList$
       }),
       new FilterModel({
         fieldName: 'outcomeId',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_OUTCOME',
         type: FilterType.MULTISELECT,
-        options$: this.outcomeList$
+        // this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
+        // options$: this.outcomeList$
       }),
       new FilterModel({
         fieldName: 'wasContact',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
         type: FilterType.SELECT,
-        options$: this.yesNoOptionsWithoutAllList$
+        // options$: this.yesNoOptionsWithoutAllList$
       }),
       new FilterModel({
         fieldName: 'clusterId',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_CLUSTER_NAME',
         type: FilterType.MULTISELECT,
-        options$: this.clustersListAsLabelValuePair$,
+        // this.clustersListAsLabelValuePair$ = this.clusterDataService.getClusterListAsLabelValue(this.selectedOutbreak.id);
+        // options$: this.clustersListAsLabelValuePair$,
         relationshipPath: ['relationships'],
         relationshipLabel: 'LNG_CASE_FIELD_LABEL_CLUSTER'
       }),
@@ -2101,19 +2111,22 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         fieldName: 'pregnancyStatus',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
         type: FilterType.MULTISELECT,
-        options$: this.pregnancyStatsList$
+        // this.pregnancyStatsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PREGNANCY_STATUS);
+        // options$: this.pregnancyStatsList$
       }),
       new FilterModel({
         fieldName: 'vaccinesReceived.vaccine',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_VACCINE',
         type: FilterType.MULTISELECT,
-        options$: this.vaccineList$
+        // this.vaccineList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.VACCINES);
+        // options$: this.vaccineList$
       }),
       new FilterModel({
         fieldName: 'vaccinesReceived.status',
         fieldLabel: 'LNG_CASE_FIELD_LABEL_VACCINE_STATUS',
         type: FilterType.MULTISELECT,
-        options$: this.vaccineStatusList$
+        // this.vaccineStatusList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.VACCINES_STATUS);
+        // options$: this.vaccineStatusList$
       }),
       new FilterModel({
         fieldName: 'vaccinesReceived.date',
@@ -2159,11 +2172,22 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     this.queryBuilder.filter.removeExactCondition(trueCondition);
     this.queryBuilder.filter.removeExactCondition(falseCondition);
 
+    // check if we are searching by not a case classification
+    let notACaseFilter = this.notACaseFilter;
+    if (_.isEqual(
+      this.queryBuilder.filter.get('classification'),
+      {
+        classification: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+      }
+    )) {
+      notACaseFilter = true;
+    }
+
     // filter by classification
-    if (this.notACaseFilter === true) {
+    if (notACaseFilter === true) {
       // show cases that are NOT classified as Not a Case
       this.queryBuilder.filter.where(trueCondition);
-    } else if (this.notACaseFilter === false) {
+    } else if (notACaseFilter === false) {
       // show cases classified as Not a Case
       this.queryBuilder.filter.where(falseCondition);
     }
@@ -2247,118 +2271,101 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    * Re(load) the Cases list, based on the applied filter, sort criterias
    */
   refreshList(
-    finishCallback: (records: any[]) => void,
     triggeredByPageChange: boolean
   ) {
-    if (this.selectedOutbreak) {
-      // classification conditions - not really necessary since refreshListCount is always called before this one
-      this.addClassificationConditions();
+    // classification conditions - not really necessary since refreshListCount is always called before this one
+    this.addClassificationConditions();
 
-      // retrieve created user & modified user information
-      this.queryBuilder.include('createdByUser', true);
-      this.queryBuilder.include('updatedByUser', true);
+    // retrieve created user & modified user information
+    this.queryBuilder.include('createdByUser', true);
+    this.queryBuilder.include('updatedByUser', true);
 
-      // retrieve responsible user information
-      this.queryBuilder.include('responsibleUser', true);
+    // retrieve responsible user information
+    this.queryBuilder.include('responsibleUser', true);
 
-      // refresh badges list with applied filter
-      if (!triggeredByPageChange) {
-        this.initializeGroupedData();
-      }
-
-      // retrieve the list of Cases
-      this.casesList$ = this.caseDataService
-        .getCasesList(this.selectedOutbreak.id, this.queryBuilder)
-        .pipe(
-          switchMap((data) => {
-            // determine locations that we need to retrieve
-            const locationsIdsMap: {
-              [locationId: string]: true
-            } = {};
-            data.forEach((item) => {
-              (item.addresses || []).forEach((address) => {
-                // nothing to add ?
-                if (!address?.locationId) {
-                  return;
-                }
-
-                // add location to list
-                locationsIdsMap[address.locationId] = true;
-              });
-            });
-
-            // determine ids
-            const locationIds: string[] = Object.keys(locationsIdsMap);
-
-            // nothing to retrieve ?
-            if (locationIds.length < 1) {
-              return of(data);
-            }
-
-            // construct location query builder
-            const qb = new RequestQueryBuilder();
-            qb.filter.bySelect(
-              'id',
-              locationIds,
-              false,
-              null
-            );
-
-            // retrieve locations
-            return this.locationDataService
-              .getLocationsList(qb)
-              .pipe(
-                map((locations) => {
-                  // map locations
-                  const locationsMap: {
-                    [locationId: string]: LocationModel
-                  } = {};
-                  locations.forEach((location) => {
-                    locationsMap[location.id] = location;
-                  });
-
-                  // set locations
-                  data.forEach((item) => {
-                    (item.addresses || []).forEach((address) => {
-                      address.location = address.locationId && locationsMap[address.locationId] ?
-                        locationsMap[address.locationId] :
-                        address.location;
-                    });
-                  });
-
-                  // finished
-                  return data;
-                })
-              );
-          })
-        )
-        .pipe(
-          // process data
-          map((cases: CaseModel[]) => {
-            return EntityModel.determineAlertness(
-              this.selectedOutbreak.caseInvestigationTemplate,
-              cases
-            );
-          }),
-
-          // finished
-          tap((data: any[]) => {
-            finishCallback(data);
-          }),
-
-          // handle errors
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            finishCallback([]);
-            return throwError(err);
-          }),
-
-          // should be the last pipe
-          takeUntil(this.destroyed$)
-        );
-    } else {
-      finishCallback([]);
+    // refresh badges list with applied filter
+    if (!triggeredByPageChange) {
+      this.initializeGroupedData();
     }
+
+    // retrieve the list of Cases
+    this.casesList$ = this.caseDataService
+      .getCasesList(this.selectedOutbreak.id, this.queryBuilder)
+      .pipe(
+        switchMap((data) => {
+          // determine locations that we need to retrieve
+          const locationsIdsMap: {
+            [locationId: string]: true
+          } = {};
+          data.forEach((item) => {
+            (item.addresses || []).forEach((address) => {
+              // nothing to add ?
+              if (!address?.locationId) {
+                return;
+              }
+
+              // add location to list
+              locationsIdsMap[address.locationId] = true;
+            });
+          });
+
+          // determine ids
+          const locationIds: string[] = Object.keys(locationsIdsMap);
+
+          // nothing to retrieve ?
+          if (locationIds.length < 1) {
+            return of(data);
+          }
+
+          // construct location query builder
+          const qb = new RequestQueryBuilder();
+          qb.filter.bySelect(
+            'id',
+            locationIds,
+            false,
+            null
+          );
+
+          // retrieve locations
+          return this.locationDataService
+            .getLocationsList(qb)
+            .pipe(
+              map((locations) => {
+                // map locations
+                const locationsMap: {
+                  [locationId: string]: LocationModel
+                } = {};
+                locations.forEach((location) => {
+                  locationsMap[location.id] = location;
+                });
+
+                // set locations
+                data.forEach((item) => {
+                  (item.addresses || []).forEach((address) => {
+                    address.location = address.locationId && locationsMap[address.locationId] ?
+                      locationsMap[address.locationId] :
+                      address.location;
+                  });
+                });
+
+                // finished
+                return data;
+              })
+            );
+        })
+      )
+      .pipe(
+        // process data
+        map((cases: CaseModel[]) => {
+          return EntityModel.determineAlertness(
+            this.selectedOutbreak.caseInvestigationTemplate,
+            cases
+          );
+        }),
+
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      );
   }
 
   /**

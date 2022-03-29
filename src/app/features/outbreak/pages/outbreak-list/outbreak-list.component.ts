@@ -17,7 +17,7 @@ import { DialogAnswer, DialogConfiguration, DialogField } from '../../../../shar
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { Router } from '@angular/router';
-import { catchError, map, share, switchMap, tap } from 'rxjs/operators';
+import { catchError, map, share, switchMap } from 'rxjs/operators';
 import { AnswerModel, QuestionModel } from '../../../../core/models/question.model';
 import { throwError } from 'rxjs';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
@@ -292,7 +292,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**
@@ -405,7 +405,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
   /**
    * Re(load) the Outbreaks list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     // retrieve created user & modified user information
     this.queryBuilder.include('createdByUser', true);
     this.queryBuilder.include('updatedByUser', true);
@@ -432,11 +432,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
-          finishCallback([]);
           return throwError(err);
-        }),
-        tap((data: any[]) => {
-          finishCallback(data);
         })
       );
   }

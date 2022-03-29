@@ -6,7 +6,7 @@ import { LanguageDataService } from '../../../../core/services/data/language.dat
 import { LanguageModel } from '../../../../core/models/language.model';
 import { DialogAnswer, DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
-import { catchError, share, tap } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
@@ -144,7 +144,7 @@ export class LanguagesListComponent
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**
@@ -177,18 +177,14 @@ export class LanguagesListComponent
   /**
    * Re(load) the Languages list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     // retrieve the list of Languages
     this.languagesList$ = this.languageDataService
       .getLanguagesList(this.queryBuilder)
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
-          finishCallback([]);
           return throwError(err);
-        }),
-        tap((data: any[]) => {
-          finishCallback(data);
         })
       );
   }
@@ -222,18 +218,18 @@ export class LanguagesListComponent
       .subscribe((answer: DialogAnswer) => {
         if (answer.button === DialogAnswerButton.Yes) {
           // delete language
-          this.showLoadingDialog();
+          // this.showLoadingDialog();
           this.languageDataService
             .deleteLanguage(language.id)
             .pipe(
               catchError((err) => {
-                this.closeLoadingDialog();
+                // this.closeLoadingDialog();
                 this.toastV2Service.error(err);
                 return throwError(err);
               })
             )
             .subscribe(() => {
-              this.closeLoadingDialog();
+              // this.closeLoadingDialog();
 
               this.toastV2Service.success('LNG_PAGE_LIST_LANGUAGES_ACTION_DELETE_SUCCESS_MESSAGE');
 
@@ -258,8 +254,8 @@ export class LanguagesListComponent
       url: `languages/${language.id}/language-tokens/export`,
       fileName: language.name,
       fileType: ExportDataExtension.XLSX,
-      exportStart: () => { this.showLoadingDialog(); },
-      exportFinished: () => { this.closeLoadingDialog(); }
+      // exportStart: () => { this.showLoadingDialog(); },
+      // exportFinished: () => { this.closeLoadingDialog(); }
     });
   }
 }

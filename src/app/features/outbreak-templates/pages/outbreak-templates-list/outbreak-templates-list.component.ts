@@ -9,7 +9,7 @@ import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template
 import { DialogAnswer, DialogAnswerButton, DialogConfiguration, DialogField } from '../../../../shared/components/dialog/dialog.component';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
-import { catchError, map, share, switchMap, tap } from 'rxjs/operators';
+import { catchError, map, share, switchMap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { Router } from '@angular/router';
@@ -224,7 +224,7 @@ export class OutbreakTemplatesListComponent
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**
@@ -300,18 +300,14 @@ export class OutbreakTemplatesListComponent
   /**
    * Re(load) the Outbreak Templates list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     // retrieve the list of Events
     this.outbreakTemplatesList$ = this.outbreakTemplateDataService
       .getOutbreakTemplatesList(this.queryBuilder)
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
-          finishCallback([]);
           return throwError(err);
-        }),
-        tap((data: any[]) => {
-          finishCallback(data);
         })
       );
   }

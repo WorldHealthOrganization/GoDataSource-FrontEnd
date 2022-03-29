@@ -218,7 +218,7 @@ export class TopnavComponent implements OnInit, OnDestroy {
    * Global search
    */
   globalSearch(): void {
-    console.log('global search by ', this.globalSearchValue);
+    // console.log('global search by ', this.globalSearchValue);
   }
 
   /**

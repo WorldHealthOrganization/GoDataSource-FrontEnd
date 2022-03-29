@@ -10,7 +10,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import * as _ from 'lodash';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Constants } from '../../../../core/models/constants';
-import { catchError, share, tap } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { HoverRowAction } from '../../../../shared/components';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
@@ -153,7 +153,7 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**
@@ -204,23 +204,15 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
   /**
    * Re(load) the Cluster people list, based on the applied filter, sort criterias
    */
-  refreshList(finishCallback: (records: any[]) => void) {
-    if (this.selectedOutbreak) {
-      this.clusterPeopleList$ = this.clusterDataService
-        .getClusterPeople(this.selectedOutbreak.id, this.cluster.id, this.queryBuilder)
-        .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            finishCallback([]);
-            return throwError(err);
-          }),
-          tap((data: any[]) => {
-            finishCallback(data);
-          })
-        );
-    } else {
-      finishCallback([]);
-    }
+  refreshList() {
+    this.clusterPeopleList$ = this.clusterDataService
+      .getClusterPeople(this.selectedOutbreak.id, this.cluster.id, this.queryBuilder)
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        })
+      );
   }
 
   /**

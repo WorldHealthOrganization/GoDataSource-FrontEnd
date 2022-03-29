@@ -14,7 +14,7 @@ import * as _ from 'lodash';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { catchError, map, share, tap } from 'rxjs/operators';
+import { catchError, map, share } from 'rxjs/operators';
 import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { AddressType } from '../../../../core/models/address.model';
@@ -22,6 +22,7 @@ import { throwError } from 'rxjs/internal/observable/throwError';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
   selector: 'app-available-entities-list',
@@ -29,7 +30,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 })
 export class AvailableEntitiesListComponent extends RelationshipsListComponent implements OnInit, OnDestroy {
   // entities list relationships
-  entitiesList$: Observable<(CaseModel|ContactModel|EventModel)[]>;
+  entitiesList$: Observable<(CaseModel|ContactModel|EventModel|ContactOfContactModel)[]>;
   entitiesListCount$: Observable<IBasicCount>;
 
   // available side filters
@@ -210,7 +211,7 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
   /**
    * Re(load) the available Entities list, based on the applied filter, sort criterias
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     if (
       this.entityType &&
             this.entityId &&
@@ -230,15 +231,9 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
         .pipe(
           catchError((err) => {
             this.toastV2Service.error(err);
-            finishCallback([]);
             return throwError(err);
-          }),
-          tap((data: any[]) => {
-            finishCallback(data);
           })
         );
-    } else {
-      finishCallback([]);
     }
   }
 
@@ -371,13 +366,13 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
       this.queryBuilder.sort.clear();
 
       // retrieve Side filters
-      let queryBuilder;
-      if (
-        this.sideFilter &&
-                (queryBuilder = this.sideFilter.getQueryBuilder())
-      ) {
-        this.queryBuilder.sort.merge(queryBuilder.sort);
-      }
+      // let queryBuilder;
+      // if (
+      //   this.sideFilter &&
+      //   (queryBuilder = this.sideFilter.getQueryBuilder())
+      // ) {
+      //   this.queryBuilder.sort.merge(queryBuilder.sort);
+      // }
 
       // apply sort
       this.queryBuilder.sort.by('firstName', direction);

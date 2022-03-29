@@ -224,7 +224,7 @@ export class ContactRangeFollowUpsListComponent
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
 
     // outbreak subscriber
     if (this.outbreakSubscriber) {
@@ -281,105 +281,97 @@ export class ContactRangeFollowUpsListComponent
   /**
    * Refresh list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
-    if (this.selectedOutbreak) {
-      // order by name
-      this.queryBuilder.sort.clear();
-      this.queryBuilder.sort
-        .by(
-          'contact.firstName',
-          RequestSortDirection.ASC
-        )
-        .by(
-          'contact.lastName',
-          RequestSortDirection.ASC
-        )
-        .by(
-          'contact.visualId',
-          RequestSortDirection.ASC
-        );
+  refreshList() {
+    // order by name
+    this.queryBuilder.sort.clear();
+    this.queryBuilder.sort
+      .by(
+        'contact.firstName',
+        RequestSortDirection.ASC
+      )
+      .by(
+        'contact.lastName',
+        RequestSortDirection.ASC
+      )
+      .by(
+        'contact.visualId',
+        RequestSortDirection.ASC
+      );
 
-      // retrieve the list of Follow Ups
-      this.displayLoading = true;
-      this.followUpsGroupedByContact = [];
-      let minDate: Moment;
-      let maxDate: Moment;
-      this.followUpsDataService
-        .getRangeFollowUpsList(
-          this.selectedOutbreak.id,
-          this.queryBuilder
-        )
-        .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            finishCallback([]);
-            return throwError(err);
-          })
-        )
-        .subscribe((rangeData: RangeFollowUpsModel[]) => {
-          this.followUpsGroupedByContact = _.map(rangeData, (data: RangeFollowUpsModel) => {
-            // determine follow-up questionnaire alertness
-            data.followUps = FollowUpModel.determineAlertness(
-              this.selectedOutbreak.contactFollowUpTemplate,
-              data.followUps
-            );
+    // retrieve the list of Follow Ups
+    this.displayLoading = true;
+    this.followUpsGroupedByContact = [];
+    let minDate: Moment;
+    let maxDate: Moment;
+    this.followUpsDataService
+      .getRangeFollowUpsList(
+        this.selectedOutbreak.id,
+        this.queryBuilder
+      )
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        })
+      )
+      .subscribe((rangeData: RangeFollowUpsModel[]) => {
+        this.followUpsGroupedByContact = _.map(rangeData, (data: RangeFollowUpsModel) => {
+          // determine follow-up questionnaire alertness
+          data.followUps = FollowUpModel.determineAlertness(
+            this.selectedOutbreak.contactFollowUpTemplate,
+            data.followUps
+          );
 
-            // get grouped followups by contact & date
-            return {
-              person: data.person,
-              followUps: _.chain(data.followUps)
-                .groupBy((followUp: FollowUpModel) => {
-                  // determine min & max dates
-                  const date = moment(followUp.date).startOf('day');
-                  if (followUp.statusId) {
-                    minDate = minDate ?
-                      (date.isBefore(minDate) ? date : minDate) :
-                      date;
-                    maxDate = maxDate ?
-                      (date.isAfter(maxDate) ? moment(date) : maxDate) :
-                      moment(date);
+          // get grouped followups by contact & date
+          return {
+            person: data.person,
+            followUps: _.chain(data.followUps)
+              .groupBy((followUp: FollowUpModel) => {
+                // determine min & max dates
+                const date = moment(followUp.date).startOf('day');
+                if (followUp.statusId) {
+                  minDate = minDate ?
+                    (date.isBefore(minDate) ? date : minDate) :
+                    date;
+                  maxDate = maxDate ?
+                    (date.isAfter(maxDate) ? moment(date) : maxDate) :
+                    moment(date);
+                }
+
+                // sort by date ascending
+                return date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+              })
+              .mapValues((followUpData: FollowUpModel[]) => {
+                return _.sortBy(
+                  followUpData,
+                  (followUp: FollowUpModel) => {
+                    return moment(followUp.date);
                   }
-
-                  // sort by date ascending
-                  return date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-                })
-                .mapValues((followUpData: FollowUpModel[]) => {
-                  return _.sortBy(
-                    followUpData,
-                    (followUp: FollowUpModel) => {
-                      return moment(followUp.date);
-                    }
-                  );
-                })
-                .value()
-            };
-          });
-
-          // create dates array
-          this.daysToDisplay = [];
-          if (
-            minDate &&
-                        maxDate
-          ) {
-            // push dates
-            while (minDate.isSameOrBefore(maxDate)) {
-              // add day to list
-              this.daysToDisplay.push(minDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
-
-              // next day
-              minDate.add('1', 'days');
-            }
-          }
-
-          // finished
-          finishCallback(rangeData);
-
-          // display data
-          this.displayLoading = false;
+                );
+              })
+              .value()
+          };
         });
-    } else {
-      finishCallback([]);
-    }
+
+        // create dates array
+        this.daysToDisplay = [];
+        if (
+          minDate &&
+                      maxDate
+        ) {
+          // push dates
+          while (minDate.isSameOrBefore(maxDate)) {
+            // add day to list
+            this.daysToDisplay.push(minDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
+
+            // next day
+            minDate.add('1', 'days');
+          }
+        }
+
+        // display data
+        this.displayLoading = false;
+      });
   }
 
   /**

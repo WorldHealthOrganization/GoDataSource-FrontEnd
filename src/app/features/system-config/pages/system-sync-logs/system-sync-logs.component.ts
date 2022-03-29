@@ -16,7 +16,7 @@ import { SystemSettingsDataService } from '../../../../core/services/data/system
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { SystemUpstreamServerModel } from '../../../../core/models/system-upstream-server.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { catchError, map, share, tap } from 'rxjs/operators';
+import { catchError, map, share } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -185,7 +185,7 @@ export class SystemSyncLogsComponent
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**
@@ -241,14 +241,13 @@ export class SystemSyncLogsComponent
   /**
    * Refresh list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     // sync logs
     this.syncLogsList$ = this.systemSyncLogDataService
       .getSyncLogList(this.queryBuilder)
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
-          finishCallback([]);
           return throwError(err);
         }),
         map((syncLogs: SystemSyncLogModel[]) => {
@@ -268,9 +267,6 @@ export class SystemSyncLogsComponent
             // finished
             return log;
           });
-        }),
-        tap((data: any[]) => {
-          finishCallback(data);
         })
       );
   }
@@ -440,7 +436,7 @@ export class SystemSyncLogsComponent
       })).subscribe((answer: DialogAnswer) => {
         if (answer.button === DialogAnswerButton.Yes) {
           // display loading
-          this.showLoadingDialog();
+          // this.showLoadingDialog();
 
           // construct query
           const qb = new RequestQueryBuilder();
@@ -455,7 +451,7 @@ export class SystemSyncLogsComponent
             .pipe(
               catchError((err) => {
                 this.toastV2Service.error(err);
-                this.closeLoadingDialog();
+                // this.closeLoadingDialog();
                 return throwError(err);
               })
             )
@@ -467,7 +463,7 @@ export class SystemSyncLogsComponent
               this.needsRefreshList(true);
 
               // hide loading
-              this.closeLoadingDialog();
+              // this.closeLoadingDialog();
             });
         }
       });
@@ -488,10 +484,10 @@ export class SystemSyncLogsComponent
         fileType: ExportDataExtension.ZIP,
         exportStart: () => {
           // display loading dialog
-          this.showLoadingDialog();
+          // this.showLoadingDialog();
         },
         exportFinished: () => {
-          this.closeLoadingDialog();
+          // this.closeLoadingDialog();
         },
         extraDialogFields: [
           new DialogField({

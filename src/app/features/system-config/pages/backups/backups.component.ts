@@ -13,7 +13,7 @@ import { SystemBackupDataService } from '../../../../core/services/data/system-b
 import * as _ from 'lodash';
 import { Constants } from '../../../../core/models/constants';
 import { MatDialogRef } from '@angular/material/dialog';
-import { catchError, share, tap } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
@@ -153,7 +153,7 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**
@@ -229,17 +229,13 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
   /**
    * Refresh list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     this.backupsList$ = this.systemBackupDataService
       .getBackupList(this.queryBuilder)
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
-          finishCallback([]);
           return throwError(err);
-        }),
-        tap((data: any[]) => {
-          finishCallback(data);
         })
       );
   }
@@ -658,21 +654,21 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
               answer.inputValue.value.disabled = true;
             }
 
-            this.showLoadingDialog();
+            // this.showLoadingDialog();
             this.systemSettingsDataService
               .modifySystemSettings({
                 dataBackup: answer.inputValue.value
               })
               .pipe(
                 catchError((err) => {
-                  this.closeLoadingDialog();
+                  // this.closeLoadingDialog();
                   this.toastV2Service.error(err);
                   return throwError(err);
                 })
               )
               .subscribe(() => {
                 // display success message
-                this.closeLoadingDialog();
+                // this.closeLoadingDialog();
                 this.toastV2Service.success('LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SUCCESS_MESSAGE');
 
                 // refresh settings

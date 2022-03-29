@@ -95,12 +95,12 @@
     </a>
     <ng-template
         #countPills>
-        <app-counted-items-list
-            *ngIf="!appliedListFilter"
-            fxFlex
-            [items]="countedFollowUpsGroupedByTeams$ | async"
-            (optionChanged)="filterBySelectField('teamId', $event.ids, null)">
-        </app-counted-items-list>
+<!--        <app-counted-items-list-->
+<!--            *ngIf="!appliedListFilter"-->
+<!--            fxFlex-->
+<!--            [items]="countedFollowUpsGroupedByTeams$ | async"-->
+<!--            (optionChanged)="filterBySelectField('teamId', $event.ids, null)">-->
+<!--        </app-counted-items-list>-->
     </ng-template>
 </div>
 
@@ -118,7 +118,7 @@
         <div
             fxFlex fxGrow="0" fxLayoutAlign="start center"
             class="filters-applied">
-            {{ queryBuilder.isEmptyOnlyFilters() ? '' : ('LNG_COMMON_LABEL_FILTERS_USED' | translate) }}
+<!--            {{ queryBuilder.isEmptyOnlyFilters() ? '' : ('LNG_COMMON_LABEL_FILTERS_USED' | translate) }}-->
         </div>
 
         <!-- Contact information -->
@@ -193,11 +193,11 @@
     </div>
 
     <!-- Hover question effects / actions -->
-    <app-hover-row-actions
-        #hoverRow
-        [active]="!refreshingList"
-        leftSideClass="hover-row-actions-mat-table-left"
-    ></app-hover-row-actions>
+<!--    <app-hover-row-actions-->
+<!--        #hoverRow-->
+<!--        [active]="!refreshingList"-->
+<!--        leftSideClass="hover-row-actions-mat-table-left"-->
+<!--    ></app-hover-row-actions>-->
 
     <mat-table #table [dataSource]="followUpsList$ | async" matSort (matSortChange)="sortBy($event)">
         <!-- Checkbox -->
@@ -296,14 +296,14 @@
                         {{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_LAST_NAME' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="contactLastName"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByRelation('contact').byText('lastName', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="contactLastName"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByRelation('contact').byText('lastName', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -321,14 +321,14 @@
                         {{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="contactFirstName"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByRelation('contact').byText('firstName', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="contactFirstName"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByRelation('contact').byText('firstName', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -358,14 +358,14 @@
                         {{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_VISUAL_ID' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="contactVisualId"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByRelation('contact').byText('visualId', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="contactVisualId"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByRelation('contact').byText('visualId', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -383,12 +383,12 @@
                         {{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-daterange
-                            name="dateOfLastContactDateFilter"
-                            ngModel
-                            (changed)="filterByRelation('contact').byDateRange('dateOfLastContact', $event)"
-                            app-reset-input-on-side-filter>
-                        </app-form-daterange>
+<!--                        <app-form-daterange-->
+<!--                            name="dateOfLastContactDateFilter"-->
+<!--                            ngModel-->
+<!--                            (changed)="filterByRelation('contact').byDateRange('dateOfLastContact', $event)"-->
+<!--                            app-reset-input-on-side-filter>-->
+<!--                        </app-form-daterange>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -404,12 +404,12 @@
                     <div mat-sort-header class="column-header">
                         {{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP' | translate }}</div>
                     <div class="column-filter">
-                        <app-form-daterange
-                            name="endDateDateFilter"
-                            ngModel
-                            (changed)="filterByRelation('contact').byDateRange('followUp.endDate', $event)"
-                            app-reset-input-on-side-filter>
-                        </app-form-daterange>
+<!--                        <app-form-daterange-->
+<!--                            name="endDateDateFilter"-->
+<!--                            ngModel-->
+<!--                            (changed)="filterByRelation('contact').byDateRange('followUp.endDate', $event)"-->
+<!--                            app-reset-input-on-side-filter>-->
+<!--                        </app-form-daterange>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -426,18 +426,18 @@
                         {{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="riskLevelFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="riskLevelsList$ | async"
-                            (optionChanged)="filterByRelation('contact').bySelect('riskLevel', $event)"
-                            multiple="true"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="riskLevelFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="riskLevelsList$ | async"-->
+<!--                            (optionChanged)="filterByRelation('contact').bySelect('riskLevel', $event)"-->
+<!--                            multiple="true"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayInvisibleItems]="true"-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -457,13 +457,13 @@
                         {{ 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-range
-                            name="indexFilter"
-                            ngModel
-                            (changed)="filterByRangeField('index', $event)"
-                            app-reset-input-on-side-filter
-                            [min]="0">
-                        </app-form-range>
+<!--                        <app-form-range-->
+<!--                            name="indexFilter"-->
+<!--                            ngModel-->
+<!--                            (changed)="filterByRangeField('index', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [min]="0">-->
+<!--                        </app-form-range>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -480,14 +480,14 @@
                         {{ 'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="phoneNumberFilter"
-                            [(ngModel)]="filterAddressModel.phoneNumber"
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByAddress('address', false, filterAddressModel, filterAddressParentLocationIds)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="phoneNumberFilter"-->
+<!--                            [(ngModel)]="filterAddressModel.phoneNumber"-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByAddress('address', false, filterAddressModel, filterAddressParentLocationIds)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -504,15 +504,15 @@
                         {{ 'LNG_FOLLOW_UP_FIELD_LABEL_AREA' | translate }}
                     </div>
                     <div class="column-filter location-drop-down-column-header-container">
-                        <app-form-location-dropdown
-                            name="locationFilter"
-                            [(ngModel)]="filterAddressParentLocationIds"
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (itemChanged)="filterBySelectField('usualPlaceOfResidenceLocationId.parentLocationIdFilter', filterAddressParentLocationIds, null)"
-                            multiple="true"
-                            app-reset-input-on-side-filter
-                            [useOutbreakLocations]="true">
-                        </app-form-location-dropdown>
+<!--                        <app-form-location-dropdown-->
+<!--                            name="locationFilter"-->
+<!--                            [(ngModel)]="filterAddressParentLocationIds"-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (itemChanged)="filterBySelectField('usualPlaceOfResidenceLocationId.parentLocationIdFilter', filterAddressParentLocationIds, null)"-->
+<!--                            multiple="true"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [useOutbreakLocations]="true">-->
+<!--                        </app-form-location-dropdown>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -527,14 +527,14 @@
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{'LNG_FOLLOW_UP_FIELD_LABEL_EMAIL' | translate}}</div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="emailFilter"
-                            [(ngModel)]="filterAddressModel.emailAddress"
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByAddress('address', false, filterAddressModel, filterAddressParentLocationIds)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="emailFilter"-->
+<!--                            [(ngModel)]="filterAddressModel.emailAddress"-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByAddress('address', false, filterAddressModel, filterAddressParentLocationIds)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -551,14 +551,14 @@
                         {{ 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="addressLine1Filter"
-                            [(ngModel)]="filterAddressModel.addressLine1"
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByAddress('address', false, filterAddressModel, filterAddressParentLocationIds)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="addressLine1Filter"-->
+<!--                            [(ngModel)]="filterAddressModel.addressLine1"-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByAddress('address', false, filterAddressModel, filterAddressParentLocationIds)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -575,14 +575,14 @@
                         {{'LNG_ADDRESS_FIELD_LABEL_CITY' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="cityFilter"
-                            [(ngModel)]="filterAddressModel.city"
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByAddress('address', false, filterAddressModel, filterAddressParentLocationIds)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="cityFilter"-->
+<!--                            [(ngModel)]="filterAddressModel.city"-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByAddress('address', false, filterAddressModel, filterAddressParentLocationIds)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -633,14 +633,14 @@
                         {{'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="postalCodeFilter"
-                            [(ngModel)]="filterAddressModel.postalCode"
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByAddress('address', false, filterAddressModel, filterAddressParentLocationIds)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="postalCodeFilter"-->
+<!--                            [(ngModel)]="filterAddressModel.postalCode"-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByAddress('address', false, filterAddressModel, filterAddressParentLocationIds)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -657,17 +657,17 @@
                         {{'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="geoLocationAccurateFilter"
-                            [(ngModel)]="filterAddressModel.geoLocationAccurate"
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="yesNoOptionsList$ | async"
-                            (optionChanged)="filterByAddress('address', false, filterAddressModel, filterAddressParentLocationIds)"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayFilterIcon]="true"
-                            [clearable]="false">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="geoLocationAccurateFilter"-->
+<!--                            [(ngModel)]="filterAddressModel.geoLocationAccurate"-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="yesNoOptionsList$ | async"-->
+<!--                            (optionChanged)="filterByAddress('address', false, filterAddressModel, filterAddressParentLocationIds)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayFilterIcon]="true"-->
+<!--                            [clearable]="false">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -727,20 +727,20 @@
                         {{ 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="responsibleUserIdFilter"
-                            [ngModel]="selectedResponsibleUserIdFilterValue"
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="userList$ | async"
-                            (optionChanged)="filterBySelectField('responsibleUserId', $event, 'id')"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true"
-                            optionLabelKey="name"
-                            optionValueKey="id"
-                            [multiple]="false">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="responsibleUserIdFilter"-->
+<!--                            [ngModel]="selectedResponsibleUserIdFilterValue"-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="userList$ | async"-->
+<!--                            (optionChanged)="filterBySelectField('responsibleUserId', $event, 'id')"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayInvisibleItems]="true"-->
+<!--                            [displayFilterIcon]="true"-->
+<!--                            optionLabelKey="name"-->
+<!--                            optionValueKey="id"-->
+<!--                            [multiple]="false">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -757,18 +757,18 @@
                         {{ 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="statusIdFilter"
-                            [ngModel]="selectedStatusFilterValue"
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="dailyStatusTypeOptions$ | async"
-                            (optionChanged)="filterBySelectField('statusId', $event)"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true"
-                            [multiple]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="statusIdFilter"-->
+<!--                            [ngModel]="selectedStatusFilterValue"-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="dailyStatusTypeOptions$ | async"-->
+<!--                            (optionChanged)="filterBySelectField('statusId', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayInvisibleItems]="true"-->
+<!--                            [displayFilterIcon]="true"-->
+<!--                            [multiple]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -788,17 +788,17 @@
                         {{ 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="targetedFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="yesNoOptionsList$ | async"
-                            (optionChanged)="filterByBooleanField('targeted', $event.value)"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayFilterIcon]="true"
-                            [clearable]="false">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="targetedFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="yesNoOptionsList$ | async"-->
+<!--                            (optionChanged)="filterByBooleanField('targeted', $event.value)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayFilterIcon]="true"-->
+<!--                            [clearable]="false">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -828,17 +828,17 @@
                         {{ 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="deletedFilter"
-                            [ngModel]="false"
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="yesNoOptionsList$ | async"
-                            (optionChanged)="filterByDeletedField($event.value)"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayFilterIcon]="true"
-                            [clearable]="false">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="deletedFilter"-->
+<!--                            [ngModel]="false"-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="yesNoOptionsList$ | async"-->
+<!--                            (optionChanged)="filterByDeletedField($event.value)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayFilterIcon]="true"-->
+<!--                            [clearable]="false">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -855,19 +855,19 @@
                         {{ 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="createdByFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="userList$ | async"
-                            (optionChanged)="filterBySelectField('createdBy', $event, 'id')"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayFilterIcon]="true"
-                            optionLabelKey="name"
-                            optionValueKey="id"
-                            [multiple]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="createdByFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="userList$ | async"-->
+<!--                            (optionChanged)="filterBySelectField('createdBy', $event, 'id')"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayFilterIcon]="true"-->
+<!--                            optionLabelKey="name"-->
+<!--                            optionValueKey="id"-->
+<!--                            [multiple]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -884,12 +884,12 @@
                         {{ 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_AT' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-daterange
-                            name="createdAtFilter"
-                            ngModel
-                            (changed)="filterByDateRangeField('createdAt', $event)"
-                            app-reset-input-on-side-filter>
-                        </app-form-daterange>
+<!--                        <app-form-daterange-->
+<!--                            name="createdAtFilter"-->
+<!--                            ngModel-->
+<!--                            (changed)="filterByDateRangeField('createdAt', $event)"-->
+<!--                            app-reset-input-on-side-filter>-->
+<!--                        </app-form-daterange>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -906,19 +906,19 @@
                         {{ 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_BY' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="updatedByFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="userList$ | async"
-                            (optionChanged)="filterBySelectField('updatedBy', $event, 'id')"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayFilterIcon]="true"
-                            optionLabelKey="name"
-                            optionValueKey="id"
-                            [multiple]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="updatedByFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="userList$ | async"-->
+<!--                            (optionChanged)="filterBySelectField('updatedBy', $event, 'id')"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayFilterIcon]="true"-->
+<!--                            optionLabelKey="name"-->
+<!--                            optionValueKey="id"-->
+<!--                            [multiple]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -935,12 +935,12 @@
                         {{ 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_AT' | translate }}
                     </div>
                     <div class="column-filter">
-                        <app-form-daterange
-                            name="updatedAtFilter"
-                            ngModel
-                            (changed)="filterByDateRangeField('updatedAt', $event)"
-                            app-reset-input-on-side-filter>
-                        </app-form-daterange>
+<!--                        <app-form-daterange-->
+<!--                            name="updatedAtFilter"-->
+<!--                            ngModel-->
+<!--                            (changed)="filterByDateRangeField('updatedAt', $event)"-->
+<!--                            app-reset-input-on-side-filter>-->
+<!--                        </app-form-daterange>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -951,19 +951,19 @@
 
         <mat-header-row *matHeaderRowDef="[]"></mat-header-row>
         <mat-row
-            *matRowDef="let item; columns: []"
-            app-hover-row-actions
-            [hoverRowActionsComponent]="hoverRow"
-            [hoverRowActions]="recordActions"
-            [hoverRowActionData]="item"
-        ></mat-row>
+            *matRowDef="let item; columns: []">
+<!--            app-hover-row-actions-->
+<!--            [hoverRowActionsComponent]="hoverRow"-->
+<!--            [hoverRowActions]="recordActions"-->
+<!--            [hoverRowActionData]="item"-->
+        </mat-row>
     </mat-table>
 
-    <div
-        *ngIf="refreshingList"
-        class="mat-table-loading-data">
-        <mat-spinner></mat-spinner>
-    </div>
+<!--    <div-->
+<!--        *ngIf="refreshingList"-->
+<!--        class="mat-table-loading-data">-->
+<!--        <mat-spinner></mat-spinner>-->
+<!--    </div>-->
 
 <!--    &lt;!&ndash; No data &ndash;&gt;-->
 <!--    <div-->

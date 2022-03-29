@@ -8,7 +8,7 @@ import { DeviceDataService } from '../../../../core/services/data/device.data.se
 import { DeviceModel } from '../../../../core/models/device.model';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { throwError } from 'rxjs';
-import { catchError, share, tap } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
@@ -142,7 +142,7 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**
@@ -202,17 +202,13 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
   /**
    * Refresh list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     this.devicesList$ = this.deviceDataService
       .getDevices(this.queryBuilder)
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
-          finishCallback([]);
           return throwError(err);
-        }),
-        tap((data: any[]) => {
-          finishCallback(data);
         })
       );
   }
@@ -244,13 +240,13 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
     this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_DEVICE', device)
       .subscribe((answer: DialogAnswer) => {
         if (answer.button === DialogAnswerButton.Yes) {
-          this.showLoadingDialog();
+          // this.showLoadingDialog();
           this.deviceDataService
             .deleteDevice(device.id)
             .pipe(
               catchError((err) => {
                 this.toastV2Service.error(err);
-                this.closeLoadingDialog();
+                // this.closeLoadingDialog();
                 return throwError(err);
               })
             )
@@ -258,7 +254,7 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
               this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE_SUCCESS_MESSAGE');
 
               this.needsRefreshList();
-              this.closeLoadingDialog();
+              // this.closeLoadingDialog();
             });
         }
       });
@@ -273,19 +269,19 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
     this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_WIPE_DEVICE', device)
       .subscribe((answer: DialogAnswer) => {
         if (answer.button === DialogAnswerButton.Yes) {
-          this.showLoadingDialog();
+          // this.showLoadingDialog();
           this.deviceDataService
             .wipeDevice(device.id)
             .pipe(
               catchError((err) => {
                 this.toastV2Service.error(err);
-                this.closeLoadingDialog();
+                // this.closeLoadingDialog();
                 return throwError(err);
               })
             )
             .subscribe(() => {
               this.needsRefreshList();
-              this.closeLoadingDialog();
+              // this.closeLoadingDialog();
             });
         }
       });

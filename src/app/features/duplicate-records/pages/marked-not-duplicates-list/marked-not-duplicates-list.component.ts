@@ -11,7 +11,7 @@ import { Constants } from '../../../../core/models/constants';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ActivatedRoute } from '@angular/router';
-import { catchError, share, tap } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
@@ -25,6 +25,7 @@ import { ContactDataService } from '../../../../core/services/data/contact.data.
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { EventModel } from '../../../../core/models/event.model';
 
 @Component({
   selector: 'app-cases-list',
@@ -40,7 +41,7 @@ export class MarkedNotDuplicatesListComponent
   recordId: string;
   recordType: EntityType;
   recordData: CaseModel | ContactModel | ContactOfContactModel;
-  notDuplicatesList$: Observable<(CaseModel | ContactModel | ContactOfContactModel)[]>;
+  notDuplicatesList$: Observable<(EventModel | CaseModel | ContactModel | ContactOfContactModel)[]>;
   notDuplicatesListCount$: Observable<IBasicCount>;
 
   // obs
@@ -189,7 +190,7 @@ export class MarkedNotDuplicatesListComponent
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
 
     // outbreak subscriber
     if (this.outbreakSubscriber) {
@@ -385,29 +386,21 @@ export class MarkedNotDuplicatesListComponent
   /**
    * Re(load) the Cases list, based on the applied filter, sort criterias
    */
-  refreshList(finishCallback: (records: any[]) => void) {
-    if (this.selectedOutbreak) {
-      // retrieve the list of Cases
-      this.notDuplicatesList$ = this.entityDataService
-        .getEntitiesMarkedAsNotDuplicates(
-          this.selectedOutbreak.id,
-          this.recordType,
-          this.recordId,
-          this.queryBuilder
-        )
-        .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            finishCallback([]);
-            return throwError(err);
-          }),
-          tap((data: any[]) => {
-            finishCallback(data);
-          })
-        );
-    } else {
-      finishCallback([]);
-    }
+  refreshList() {
+    // retrieve the list of Cases
+    this.notDuplicatesList$ = this.entityDataService
+      .getEntitiesMarkedAsNotDuplicates(
+        this.selectedOutbreak.id,
+        this.recordType,
+        this.recordId,
+        this.queryBuilder
+      )
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        })
+      );
   }
 
   /**

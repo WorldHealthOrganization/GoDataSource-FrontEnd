@@ -73,7 +73,7 @@ export class AppListTableV2ColumnHeaderComponent implements IHeaderAngularComp {
    */
   agInit(params: IHeaderParams): void {
     // retrieve extended column definition
-    this.extendedColDef = params.column.getColDef() as IExtendedColDef;
+    this.extendedColDef = params.column.getUserProvidedColDef() as IExtendedColDef;
     this.component = this.extendedColDef.columnDefinitionData;
   }
 

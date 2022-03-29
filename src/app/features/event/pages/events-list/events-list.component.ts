@@ -3,7 +3,7 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import * as _ from 'lodash';
 import { Observable, of, throwError } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { catchError, map, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
@@ -575,7 +575,7 @@ export class EventsListComponent
    */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
 
     // outbreak subscriber
     if (this.outbreakSubscriber) {
@@ -1584,93 +1584,81 @@ export class EventsListComponent
   /**
    * Re(load) the Events list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
-    if (this.selectedOutbreak) {
-      // retrieve created user & modified user information
-      this.queryBuilder.include('createdByUser', true);
-      this.queryBuilder.include('updatedByUser', true);
+  refreshList() {
+    // retrieve created user & modified user information
+    this.queryBuilder.include('createdByUser', true);
+    this.queryBuilder.include('updatedByUser', true);
 
-      // retrieve responsible user information
-      this.queryBuilder.include('responsibleUser', true);
+    // retrieve responsible user information
+    this.queryBuilder.include('responsibleUser', true);
 
-      // retrieve the list of Events
-      this.eventsList$ = this.eventDataService
-        .getEventsList(this.selectedOutbreak.id, this.queryBuilder)
-        .pipe(
-          switchMap((data) => {
-            // determine locations that we need to retrieve
-            const locationsIdsMap: {
-              [locationId: string]: true
-            } = {};
-            data.forEach((item) => {
-              // nothing to add ?
-              if (!item.address?.locationId) {
-                return;
-              }
-
-              // add location to list
-              locationsIdsMap[item.address.locationId] = true;
-            });
-
-            // determine ids
-            const locationIds: string[] = Object.keys(locationsIdsMap);
-
-            // nothing to retrieve ?
-            if (locationIds.length < 1) {
-              return of(data);
+    // retrieve the list of Events
+    this.eventsList$ = this.eventDataService
+      .getEventsList(this.selectedOutbreak.id, this.queryBuilder)
+      .pipe(
+        switchMap((data) => {
+          // determine locations that we need to retrieve
+          const locationsIdsMap: {
+            [locationId: string]: true
+          } = {};
+          data.forEach((item) => {
+            // nothing to add ?
+            if (!item.address?.locationId) {
+              return;
             }
 
-            // construct location query builder
-            const qb = new RequestQueryBuilder();
-            qb.filter.bySelect(
-              'id',
-              locationIds,
-              false,
-              null
+            // add location to list
+            locationsIdsMap[item.address.locationId] = true;
+          });
+
+          // determine ids
+          const locationIds: string[] = Object.keys(locationsIdsMap);
+
+          // nothing to retrieve ?
+          if (locationIds.length < 1) {
+            return of(data);
+          }
+
+          // construct location query builder
+          const qb = new RequestQueryBuilder();
+          qb.filter.bySelect(
+            'id',
+            locationIds,
+            false,
+            null
+          );
+
+          // retrieve locations
+          return this.locationDataService
+            .getLocationsList(qb)
+            .pipe(
+              map((locations) => {
+                // map locations
+                const locationsMap: {
+                  [locationId: string]: LocationModel
+                } = {};
+                locations.forEach((location) => {
+                  locationsMap[location.id] = location;
+                });
+
+                // set locations
+                data.forEach((item) => {
+                  item.address.location = item.address.locationId && locationsMap[item.address.locationId]
+                    ? locationsMap[item.address.locationId]
+                    : item.address.location;
+                });
+
+                // finished
+                return data;
+              })
             );
+        })
+      )
+      .pipe(
 
-            // retrieve locations
-            return this.locationDataService
-              .getLocationsList(qb)
-              .pipe(
-                map((locations) => {
-                  // map locations
-                  const locationsMap: {
-                    [locationId: string]: LocationModel
-                  } = {};
-                  locations.forEach((location) => {
-                    locationsMap[location.id] = location;
-                  });
-
-                  // set locations
-                  data.forEach((item) => {
-                    item.address.location = item.address.locationId && locationsMap[item.address.locationId]
-                      ? locationsMap[item.address.locationId]
-                      : item.address.location;
-                  });
-
-                  // finished
-                  return data;
-                })
-              );
-          })
-        )
-        .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            finishCallback([]);
-            return throwError(err);
-          }),
-          tap((data: any[]) => {
-            finishCallback(data);
-          }),
-
-          // should be the last pipe
-          takeUntil(this.destroyed$)
-        );
-    } else {
-      finishCallback([]);
-    }
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      );
   }
 
   /**
@@ -2076,14 +2064,10 @@ export class EventsListComponent
       displayFieldsGroupList: true,
       allowedExportTypes: this.allowedExportTypes,
       anonymizeFields: this.relationshipAnonymizeFields,
-      fieldsGroupList: this.relationshipFieldGroups,
-      fieldsGroupListRequired: this.relationshipFieldGroupsRequires,
-      exportStart: () => {
-        this.showLoadingDialog();
-      },
-      exportFinished: () => {
-        this.closeLoadingDialog();
-      },
+      // fieldsGroupList: this.fieldsGroupListRelationships,
+      // fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
+      // exportStart: () => { this.showLoadingDialog(); },
+      // exportFinished: () => { this.closeLoadingDialog(); }
     });
   }
 

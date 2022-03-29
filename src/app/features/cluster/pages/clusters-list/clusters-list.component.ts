@@ -9,7 +9,7 @@ import { DialogAnswer } from '../../../../shared/components/dialog/dialog.compon
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import * as _ from 'lodash';
-import { catchError, share, tap } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs/internal/Subscription';
@@ -154,7 +154,7 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
 
     // outbreak subscriber
     if (this.outbreakSubscriber) {
@@ -184,23 +184,15 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
   /**
    * Re(load) the Clusters list, based on the applied filter, sort criterias
    */
-  refreshList(finishCallback: (records: any[]) => void) {
-    if (this.selectedOutbreak) {
-      this.clustersList$ = this.clusterDataService
-        .getClusterList(this.selectedOutbreak.id, this.queryBuilder)
-        .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            finishCallback([]);
-            return throwError(err);
-          }),
-          tap((data: any[]) => {
-            finishCallback(data);
-          })
-        );
-    } else {
-      finishCallback([]);
-    }
+  refreshList() {
+    this.clustersList$ = this.clusterDataService
+      .getClusterList(this.selectedOutbreak.id, this.queryBuilder)
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        })
+      );
   }
 
   /**

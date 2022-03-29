@@ -16,7 +16,7 @@ import { AppListTableV2ActionsComponent } from './components/actions/app-list-ta
 import { IExtendedColDef } from './models/extended-column.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
 import { IV2ActionIconLabel, IV2ActionMenuLabel, V2ActionMenuItem, V2ActionType } from './models/action.model';
-import { IV2GroupedData } from './models/grouped-data.model';
+import { IV2GroupedData, IV2GroupedDataValue } from './models/grouped-data.model';
 import { IBasicCount } from '../../../core/models/basic-count.interface';
 import { PageEvent } from '@angular/material/paginator';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
@@ -84,6 +84,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     retrieveData?: true,
     updateColumnDefinitions?: {
       overwriteVisibleColumns?: string[]
+    },
+    setSortColumn?: {
+      field: string,
+      direction: RequestSortDirection
     }
   } = {};
 
@@ -132,10 +136,20 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
   // grouped data
   groupedDataExpanded: boolean = false;
+  private _groupedDataPreviousClickedValue: IV2GroupedDataValue;
   private _groupedData: IV2GroupedData;
   @Input() set groupedData(groupedData: IV2GroupedData) {
+    // keep old item
+    const oldGroupedData = this._groupedData;
+
     // set data
     this._groupedData = groupedData;
+
+    // blocked next get ?
+    if (oldGroupedData?.data.blockNextGet) {
+      this._groupedData.data.blockNextGet = true;
+      this._groupedData.data.values = oldGroupedData.data.values;
+    }
 
     // already expanded, refresh ?
     if (this.groupedDataExpanded) {
@@ -191,6 +205,28 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     this.updateColumnDefinitions();
   };
 
+  // info values - used to display additional information relevant for this page
+  private _infos: string[];
+  infosJoined: string;
+  @Input() set infos(infos: string[]) {
+    // set info
+    this._infos = infos;
+
+    // join message
+    this.infosJoined = '';
+    if (
+      this._infos &&
+      this._infos.length > 0
+    ) {
+      this._infos.forEach((info) => {
+        this.infosJoined += `<div>${this.translateService.instant(info)}</div>`;
+      });
+    }
+  }
+
+  // filters applied ?
+  @Input() filtersApplied: boolean = false;
+
   // legends
   legends: {
     // required
@@ -214,6 +250,35 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   }
   get sortByDirection(): RequestSortDirection | null {
     return this._sortBy?.direction;
+  }
+  @Input() set sortColumn(info: {
+    field?: string,
+    direction?: RequestSortDirection
+  }) {
+    // nothing to do ?
+    if (
+      !info ||
+      !info.field ||
+      !info.direction
+    ) {
+      return;
+    }
+
+    // set sort column
+    if (
+      !this._agTable ||
+      !this._agTable.columnApi
+    ) {
+      this._callWhenReady.setSortColumn = {
+        field: info.field,
+        direction: info.direction
+      };
+    } else {
+      this.updateSortColumn(
+        info.field,
+        info.direction
+      );
+    }
   }
 
   // constants
@@ -1104,6 +1169,15 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       return;
     }
 
+    // blocked next get ?
+    if (this.groupedData.data.blockNextGet) {
+      // allow next one
+      delete this.groupedData.data.blockNextGet;
+
+      // block
+      return;
+    }
+
     // get grouped data
     this.groupedData.data.get(
       this.groupedData,
@@ -1247,7 +1321,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // redraw the old one ?
     if (
       oldColumn &&
-      oldColumn !== column
+      oldColumn !== column &&
+      oldComponent
     ) {
       oldComponent.detectChanges();
     }
@@ -1279,6 +1354,15 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     if (this._callWhenReady.retrieveData) {
       // call
       this.retrieveData();
+    }
+
+    // call methods to select sort column
+    if (this._callWhenReady.setSortColumn) {
+      // call
+      this.updateSortColumn(
+        this._callWhenReady.setSortColumn.field,
+        this._callWhenReady.setSortColumn.direction
+      );
     }
 
     // set header height
@@ -1331,5 +1415,59 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   columnFilterBy(column: IExtendedColDef): void {
     // filter
     this.filterBy.emit(column);
+  }
+
+  /**
+   * Clicked group value
+   */
+  clickGroupValue(
+    groupValue: IV2GroupedDataValue
+  ): void {
+    // nothing to do ?
+    if (!this.groupedData.click) {
+      return;
+    }
+
+    // same item clicked, then unselect
+    if (this._groupedDataPreviousClickedValue === groupValue) {
+      // unselect
+      delete this._groupedDataPreviousClickedValue.active;
+
+      // trigger click
+      this.groupedData.click(null, this.groupedData);
+
+      // finished
+      return;
+    }
+
+    // unselect previous
+    if (this._groupedDataPreviousClickedValue) {
+      delete this._groupedDataPreviousClickedValue.active;
+    }
+
+    // select
+    this._groupedDataPreviousClickedValue = groupValue;
+    this._groupedDataPreviousClickedValue.active = true;
+
+    // trigger click
+    this.groupedData.click(groupValue, this.groupedData);
+  }
+
+  /**
+   * Update sort column
+   */
+  private updateSortColumn(
+    field: string,
+    direction: RequestSortDirection
+  ): void {
+    // already called
+    delete this._callWhenReady.setSortColumn;
+
+    // reset
+    this._sortBy.component = null;
+
+    // retrieve column
+    this._sortBy.column = this._agTable.columnApi.getColumn(field).getUserProvidedColDef() as IExtendedColDef;
+    this._sortBy.direction = direction;
   }
 }

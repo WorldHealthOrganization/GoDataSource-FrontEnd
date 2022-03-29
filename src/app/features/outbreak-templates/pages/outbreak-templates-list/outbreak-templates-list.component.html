@@ -38,7 +38,7 @@
         <div
             fxFlex fxGrow="0" fxLayoutAlign="start center"
             class="filters-applied">
-            {{ queryBuilder.isEmptyOnlyFilters() ? '' : ('LNG_COMMON_LABEL_FILTERS_USED' | translate) }}
+<!--            {{ queryBuilder.isEmptyOnlyFilters() ? '' : ('LNG_COMMON_LABEL_FILTERS_USED' | translate) }}-->
         </div>
 
         <!-- Filter buttons -->
@@ -63,10 +63,10 @@
     </div>
 
     <!-- Hover question effects / actions -->
-    <app-hover-row-actions
-        #hoverRow
-        [active]="!refreshingList"
-    ></app-hover-row-actions>
+<!--    <app-hover-row-actions-->
+<!--        #hoverRow-->
+<!--        [active]="!refreshingList"-->
+<!--    ></app-hover-row-actions>-->
 
     <mat-table #table [dataSource]="outbreakTemplatesList$ | async" matSort (matSortChange)="sortBy($event)">
 
@@ -76,14 +76,14 @@
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{ "LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_NAME" | translate}}</div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="nameFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('name', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="nameFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByTextField('name', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -99,14 +99,14 @@
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{ "LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DESCRIPTION" | translate}}</div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="descriptionFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('description', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+<!--                        <app-form-input-->
+<!--                            name="descriptionFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            (optionChanged)="filterByTextField('description', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-input>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -122,18 +122,18 @@
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DISEASE' | translate}}</div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="diseaseFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="diseasesList$ | async"
-                            multiple="true"
-                            (optionChanged)="filterBySelectField('disease', $event)"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="diseaseFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="diseasesList$ | async"-->
+<!--                            multiple="true"-->
+<!--                            (optionChanged)="filterBySelectField('disease', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayInvisibleItems]="true"-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -154,18 +154,18 @@
                         {{'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="generateFollowUpsTeamAssignmentAlgorithmFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="followUpsTeamAssignmentAlgorithm$ | async"
-                            multiple="true"
-                            (optionChanged)="filterBySelectField('generateFollowUpsTeamAssignmentAlgorithm', $event)"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="generateFollowUpsTeamAssignmentAlgorithmFilter"-->
+<!--                            ngModel-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="followUpsTeamAssignmentAlgorithm$ | async"-->
+<!--                            multiple="true"-->
+<!--                            (optionChanged)="filterBySelectField('generateFollowUpsTeamAssignmentAlgorithm', $event)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayInvisibleItems]="true"-->
+<!--                            [displayFilterIcon]="true">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -183,17 +183,17 @@
                         {{'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="generateFollowUpsOverwriteExistingFilter"
-                            [ngModel]="''"
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="yesNoOptionsList$ | async"
-                            (optionChanged)="filterByBooleanField('generateFollowUpsOverwriteExisting', $event.value)"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayFilterIcon]="true"
-                            [clearable]="false">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="generateFollowUpsOverwriteExistingFilter"-->
+<!--                            [ngModel]="''"-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="yesNoOptionsList$ | async"-->
+<!--                            (optionChanged)="filterByBooleanField('generateFollowUpsOverwriteExisting', $event.value)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayFilterIcon]="true"-->
+<!--                            [clearable]="false">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -211,17 +211,17 @@
                         {{'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="generateFollowUpsKeepTeamAssignmentFilter"
-                            [ngModel]="''"
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="yesNoOptionsList$ | async"
-                            (optionChanged)="filterByBooleanField('generateFollowUpsKeepTeamAssignment', $event.value)"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayFilterIcon]="true"
-                            [clearable]="false">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="generateFollowUpsKeepTeamAssignmentFilter"-->
+<!--                            [ngModel]="''"-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="yesNoOptionsList$ | async"-->
+<!--                            (optionChanged)="filterByBooleanField('generateFollowUpsKeepTeamAssignment', $event.value)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayFilterIcon]="true"-->
+<!--                            [clearable]="false">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -239,17 +239,17 @@
                         {{'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT' | translate}}
                     </div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="generateFollowUpsDateOfLastContact"
-                            [ngModel]="''"
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="yesNoOptionsList$ | async"
-                            (optionChanged)="filterByBooleanField('generateFollowUpsDateOfLastContact', $event.value)"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayFilterIcon]="true"
-                            [clearable]="false">
-                        </app-form-select>
+<!--                        <app-form-select-->
+<!--                            name="generateFollowUpsDateOfLastContact"-->
+<!--                            [ngModel]="''"-->
+<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                            [options]="yesNoOptionsList$ | async"-->
+<!--                            (optionChanged)="filterByBooleanField('generateFollowUpsDateOfLastContact', $event.value)"-->
+<!--                            app-reset-input-on-side-filter-->
+<!--                            [allowSelectionOfDisabledItems]="true"-->
+<!--                            [displayFilterIcon]="true"-->
+<!--                            [clearable]="false">-->
+<!--                        </app-form-select>-->
                     </div>
                 </div>
             </mat-header-cell>
@@ -261,19 +261,19 @@
 
         <mat-header-row *matHeaderRowDef="[]"></mat-header-row>
         <mat-row
-            *matRowDef="let item; columns: []"
-            app-hover-row-actions
-            [hoverRowActionsComponent]="hoverRow"
-            [hoverRowActions]="recordActions"
-            [hoverRowActionData]="item"
-        ></mat-row>
+            *matRowDef="let item; columns: []">
+<!--            app-hover-row-actions-->
+<!--            [hoverRowActionsComponent]="hoverRow"-->
+<!--            [hoverRowActions]="recordActions"-->
+<!--            [hoverRowActionData]="item"-->
+        </mat-row>
     </mat-table>
 
-    <div
-        *ngIf="refreshingList"
-        class="mat-table-loading-data">
-        <mat-spinner></mat-spinner>
-    </div>
+<!--    <div-->
+<!--        *ngIf="refreshingList"-->
+<!--        class="mat-table-loading-data">-->
+<!--        <mat-spinner></mat-spinner>-->
+<!--    </div>-->
 
 <!--    &lt;!&ndash; No data &ndash;&gt;-->
 <!--    <div-->

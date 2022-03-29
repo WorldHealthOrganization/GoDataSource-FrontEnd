@@ -7,7 +7,7 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { ReportCasesWithOnsetModel } from '../../../../core/models/report-cases-with-onset.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { EntityType } from '../../../../core/models/entity-type';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import * as _ from 'lodash';
@@ -207,7 +207,7 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
 
     // outbreak subscriber
     if (this.outbreakSubscriber) {
@@ -257,23 +257,15 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
   /**
    * Re(load) the Cases list, based on the applied filter, sort criterias
    */
-  refreshList(finishCallback: (records: any[]) => void) {
-    if (this.selectedOutbreak) {
-      // retrieve the list
-      this.casesWithOnsetList$ = this.relationshipDataService
-        .getCasesWithDateOnsetBeforePrimaryCase(this.selectedOutbreak.id)
-        .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            finishCallback([]);
-            return throwError(err);
-          }),
-          tap((data: any[]) => {
-            finishCallback(data);
-          })
-        );
-    } else {
-      finishCallback([]);
-    }
+  refreshList() {
+    // retrieve the list
+    this.casesWithOnsetList$ = this.relationshipDataService
+      .getCasesWithDateOnsetBeforePrimaryCase(this.selectedOutbreak.id)
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        })
+      );
   }
 }

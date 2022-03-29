@@ -62,7 +62,7 @@
             <div
                 fxFlex fxGrow="0" fxLayoutAlign="start center"
                 class="filters-applied">
-                {{ queryBuilder.isEmptyOnlyFilters() ? '' : ('LNG_COMMON_LABEL_FILTERS_USED' | translate) }}
+<!--                {{ queryBuilder.isEmptyOnlyFilters() ? '' : ('LNG_COMMON_LABEL_FILTERS_USED' | translate) }}-->
             </div>
 
             <!-- Filter buttons -->
@@ -86,11 +86,11 @@
             </div>
         </div>
 
-        <!-- Hover question effects / actions -->
-        <app-hover-row-actions
-            #hoverRow
-            [active]="!refreshingList"
-        ></app-hover-row-actions>
+<!--        &lt;!&ndash; Hover question effects / actions &ndash;&gt;-->
+<!--        <app-hover-row-actions-->
+<!--            #hoverRow-->
+<!--            [active]="!refreshingList"-->
+<!--        ></app-hover-row-actions>-->
 
         <mat-table #table [dataSource]="backupsList$ | async" matSort (matSortChange)="sortBy($event)">
             <!-- Description -->
@@ -100,14 +100,14 @@
                         <div mat-sort-header class="column-header">{{'LNG_BACKUP_FIELD_LABEL_DESCRIPTION' | translate}}
                         </div>
                         <div class="column-filter">
-                            <app-form-input
-                                name="descriptionFilter"
-                                ngModel
-                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                                (optionChanged)="filterByTextContainingField('description', $event)"
-                                app-reset-input-on-side-filter
-                                [displayFilterIcon]="true">
-                            </app-form-input>
+<!--                            <app-form-input-->
+<!--                                name="descriptionFilter"-->
+<!--                                ngModel-->
+<!--                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                                (optionChanged)="filterByTextContainingField('description', $event)"-->
+<!--                                app-reset-input-on-side-filter-->
+<!--                                [displayFilterIcon]="true">-->
+<!--                            </app-form-input>-->
                         </div>
                     </div>
                 </mat-header-cell>
@@ -125,14 +125,14 @@
                         <div mat-sort-header class="column-header">{{'LNG_BACKUP_FIELD_LABEL_LOCATION' | translate}}
                         </div>
                         <div class="column-filter">
-                            <app-form-input
-                                name="locationFilter"
-                                ngModel
-                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                                (optionChanged)="filterByTextContainingField('location', $event)"
-                                app-reset-input-on-side-filter
-                                [displayFilterIcon]="true">
-                            </app-form-input>
+<!--                            <app-form-input-->
+<!--                                name="locationFilter"-->
+<!--                                ngModel-->
+<!--                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                                (optionChanged)="filterByTextContainingField('location', $event)"-->
+<!--                                app-reset-input-on-side-filter-->
+<!--                                [displayFilterIcon]="true">-->
+<!--                            </app-form-input>-->
                         </div>
                     </div>
                 </mat-header-cell>
@@ -150,18 +150,18 @@
                     <div class="table-header-cell">
                         <div class="column-header">{{'LNG_BACKUP_FIELD_LABEL_MODULES' | translate}}</div>
                         <div class="column-filter">
-                            <app-form-select
-                                name="modulesFilter"
-                                ngModel
-                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                                [options]="backupModulesList$ | async"
-                                (optionChanged)="filterBySelectField('modules', $event)"
-                                multiple="true"
-                                app-reset-input-on-side-filter
-                                [allowSelectionOfDisabledItems]="true"
-                                [displayInvisibleItems]="true"
-                                [displayFilterIcon]="true">
-                            </app-form-select>
+<!--                            <app-form-select-->
+<!--                                name="modulesFilter"-->
+<!--                                ngModel-->
+<!--                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                                [options]="backupModulesList$ | async"-->
+<!--                                (optionChanged)="filterBySelectField('modules', $event)"-->
+<!--                                multiple="true"-->
+<!--                                app-reset-input-on-side-filter-->
+<!--                                [allowSelectionOfDisabledItems]="true"-->
+<!--                                [displayInvisibleItems]="true"-->
+<!--                                [displayFilterIcon]="true">-->
+<!--                            </app-form-select>-->
                         </div>
                     </div>
                 </mat-header-cell>
@@ -180,12 +180,12 @@
                     <div class="table-header-cell">
                         <div mat-sort-header class="column-header">{{'LNG_BACKUP_FIELD_LABEL_DATE' | translate}}</div>
                         <div class="column-filter">
-                            <app-form-daterange
-                                name="dateFilter"
-                                ngModel
-                                (changed)="filterByDateRangeField('date', $event)"
-                                app-reset-input-on-side-filter>
-                            </app-form-daterange>
+<!--                            <app-form-daterange-->
+<!--                                name="dateFilter"-->
+<!--                                ngModel-->
+<!--                                (changed)="filterByDateRangeField('date', $event)"-->
+<!--                                app-reset-input-on-side-filter>-->
+<!--                            </app-form-daterange>-->
                         </div>
                     </div>
                 </mat-header-cell>
@@ -201,18 +201,18 @@
                     <div class="table-header-cell">
                         <div mat-sort-header class="column-header">{{'LNG_BACKUP_FIELD_LABEL_STATUS' | translate}}</div>
                         <div class="column-filter">
-                            <app-form-select
-                                name="statusFilter"
-                                ngModel
-                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                                [options]="backupStatusList$ | async"
-                                (optionChanged)="filterBySelectField('status', $event)"
-                                multiple="true"
-                                app-reset-input-on-side-filter
-                                [allowSelectionOfDisabledItems]="true"
-                                [displayInvisibleItems]="true"
-                                [displayFilterIcon]="true">
-                            </app-form-select>
+<!--                            <app-form-select-->
+<!--                                name="statusFilter"-->
+<!--                                ngModel-->
+<!--                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                                [options]="backupStatusList$ | async"-->
+<!--                                (optionChanged)="filterBySelectField('status', $event)"-->
+<!--                                multiple="true"-->
+<!--                                app-reset-input-on-side-filter-->
+<!--                                [allowSelectionOfDisabledItems]="true"-->
+<!--                                [displayInvisibleItems]="true"-->
+<!--                                [displayFilterIcon]="true">-->
+<!--                            </app-form-select>-->
                         </div>
                     </div>
                 </mat-header-cell>
@@ -266,19 +266,19 @@
                             {{ 'LNG_BACKUP_FIELD_LABEL_USER' | translate }}
                         </div>
                         <div class="column-filter">
-                            <app-form-select
-                                name="usersFilter"
-                                ngModel
-                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                                [options]="usersList$ | async"
-                                multiple="true"
-                                (optionChanged)="filterBySelectField('userId', $event, 'id')"
-                                optionLabelKey="name"
-                                optionValueKey="id"
-                                app-reset-input-on-side-filter
-                                [allowSelectionOfDisabledItems]="true"
-                                [displayFilterIcon]="true">
-                            </app-form-select>
+<!--                            <app-form-select-->
+<!--                                name="usersFilter"-->
+<!--                                ngModel-->
+<!--                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                                [options]="usersList$ | async"-->
+<!--                                multiple="true"-->
+<!--                                (optionChanged)="filterBySelectField('userId', $event, 'id')"-->
+<!--                                optionLabelKey="name"-->
+<!--                                optionValueKey="id"-->
+<!--                                app-reset-input-on-side-filter-->
+<!--                                [allowSelectionOfDisabledItems]="true"-->
+<!--                                [displayFilterIcon]="true">-->
+<!--                            </app-form-select>-->
                         </div>
                     </div>
                 </mat-header-cell>
@@ -294,14 +294,14 @@
                     <div class="table-header-cell">
                         <div mat-sort-header class="column-header">{{'LNG_BACKUP_FIELD_LABEL_ERROR' | translate}}</div>
                         <div class="column-filter">
-                            <app-form-input
-                                name="errorFilter"
-                                ngModel
-                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                                (optionChanged)="filterByTextContainingField('error', $event)"
-                                app-reset-input-on-side-filter
-                                [displayFilterIcon]="true">
-                            </app-form-input>
+<!--                            <app-form-input-->
+<!--                                name="errorFilter"-->
+<!--                                ngModel-->
+<!--                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                                (optionChanged)="filterByTextContainingField('error', $event)"-->
+<!--                                app-reset-input-on-side-filter-->
+<!--                                [displayFilterIcon]="true">-->
+<!--                            </app-form-input>-->
                         </div>
                     </div>
                 </mat-header-cell>
@@ -313,19 +313,19 @@
 
             <mat-header-row *matHeaderRowDef="[]"></mat-header-row>
             <mat-row
-                *matRowDef="let item; columns: []"
-                app-hover-row-actions
-                [hoverRowActionsComponent]="hoverRow"
-                [hoverRowActions]="recordActions"
-                [hoverRowActionData]="item"
-            ></mat-row>
+                *matRowDef="let item; columns: []">
+<!--                app-hover-row-actions-->
+<!--                [hoverRowActionsComponent]="hoverRow"-->
+<!--                [hoverRowActions]="recordActions"-->
+<!--                [hoverRowActionData]="item"-->
+            </mat-row>
         </mat-table>
 
-        <div
-            *ngIf="refreshingList"
-            class="mat-table-loading-data">
-            <mat-spinner></mat-spinner>
-        </div>
+<!--        <div-->
+<!--            *ngIf="refreshingList"-->
+<!--            class="mat-table-loading-data">-->
+<!--            <mat-spinner></mat-spinner>-->
+<!--        </div>-->
 
 <!--        &lt;!&ndash; No data &ndash;&gt;-->
 <!--        <div-->

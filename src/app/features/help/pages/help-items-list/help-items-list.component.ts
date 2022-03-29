@@ -11,7 +11,7 @@ import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { catchError, share, tap } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { throwError } from 'rxjs';
 import * as _ from 'lodash';
@@ -145,7 +145,7 @@ export class HelpItemsListComponent extends ListComponent implements OnInit, OnD
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**
@@ -233,18 +233,14 @@ export class HelpItemsListComponent extends ListComponent implements OnInit, OnD
   /**
    * Re(load) the items list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     // retrieve the list of items
     this.helpItemsList$ = this.helpDataService
       .getHelpItemsCategoryList(this.categoryId, this.queryBuilder)
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
-          finishCallback([]);
           return throwError(err);
-        }),
-        tap((data: any[]) => {
-          finishCallback(data);
         })
       );
   }

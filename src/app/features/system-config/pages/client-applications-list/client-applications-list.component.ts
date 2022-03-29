@@ -149,7 +149,7 @@ export class ClientApplicationsListComponent
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**
@@ -199,7 +199,7 @@ export class ClientApplicationsListComponent
   /**
    * Refresh list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     this.clientApplicationsServerList = [];
     this.clientApplicationsServerListAll = undefined;
     this.refreshListCount();
@@ -215,7 +215,6 @@ export class ClientApplicationsListComponent
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
-          finishCallback([]);
           return throwError(err);
         })
       )
@@ -256,9 +255,6 @@ export class ClientApplicationsListComponent
 
         // refresh the total count
         this.refreshListCount();
-
-        // finished
-        finishCallback(this.clientApplicationsServerList);
       });
   }
 
@@ -446,12 +442,12 @@ export class ClientApplicationsListComponent
         })
       ],
       fileExtension: 'png',
-      exportStart: () => {
-        this.showLoadingDialog();
-      },
-      exportFinished: () => {
-        this.closeLoadingDialog();
-      }
+      // exportStart: () => {
+      //   this.showLoadingDialog();
+      // },
+      // exportFinished: () => {
+      //   this.closeLoadingDialog();
+      // }
     });
   }
 }

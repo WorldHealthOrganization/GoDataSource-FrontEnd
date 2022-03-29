@@ -138,7 +138,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   // /**
@@ -244,7 +244,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
   /**
    * Re(load) the Reference Data Categories list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     this.categoryEntries = [];
     this.categoryEntriesAll = undefined;
     this.refreshListCount();
@@ -254,7 +254,6 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
         .pipe(
           catchError((err) => {
             this.toastV2Service.error(err);
-            finishCallback([]);
             return throwError(err);
           }),
           map((category: ReferenceDataCategoryModel) => {
@@ -275,12 +274,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
 
           // refresh the total count
           this.refreshListCount();
-
-          // finished
-          finishCallback(entries);
         });
-    } else {
-      finishCallback([]);
     }
   }
 

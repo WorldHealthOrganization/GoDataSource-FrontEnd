@@ -9,7 +9,7 @@ import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/help
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
-import { catchError, share, tap } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
@@ -112,7 +112,7 @@ export class AuditLogsListComponent
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**
@@ -172,7 +172,7 @@ export class AuditLogsListComponent
   /**
    * Re(load) the list, based on the applied filter, sort criterias
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     // include user details
     this.queryBuilder.include('user', true);
 
@@ -187,11 +187,7 @@ export class AuditLogsListComponent
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
-          finishCallback([]);
           return throwError(err);
-        }),
-        tap((data: any[]) => {
-          finishCallback(data);
         })
       );
   }

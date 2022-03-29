@@ -154,7 +154,7 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**
@@ -222,18 +222,14 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
   /**
    * Re(load) the Users list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     // get the list of existing users
     this.usersList$ = this.userDataService
       .getUsersList(this.queryBuilder)
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
-          finishCallback([]);
           return throwError(err);
-        }),
-        tap((data: any[]) => {
-          finishCallback(data);
         })
       );
   }

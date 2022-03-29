@@ -3,7 +3,7 @@ import { SavedImportMappingService } from '../../../../core/services/data/saved-
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Observable } from 'rxjs';
 import { SavedImportMappingModel } from '../../../../core/models/saved-import-mapping.model';
-import { catchError, share, tap } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -107,7 +107,7 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**
@@ -131,7 +131,7 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
   /**
    * Re(load) the Clusters list, based on the applied filter, sort criterias
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     // retrieve created user & modified user information
     this.queryBuilder.include('createdByUser', true);
     this.queryBuilder.include('updatedByUser', true);
@@ -142,11 +142,7 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
-          finishCallback([]);
           return throwError(err);
-        }),
-        tap((data: any[]) => {
-          finishCallback(data);
         })
       );
   }

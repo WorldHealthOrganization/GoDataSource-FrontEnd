@@ -23,7 +23,7 @@ import { TeamDataService } from '../../../../core/services/data/team.data.servic
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { NgModel } from '@angular/forms';
-import { catchError, map, share, tap } from 'rxjs/operators';
+import { catchError, map, share } from 'rxjs/operators';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { FollowUpsListComponent } from '../../helper-classes/follow-ups-list-component';
 import { FollowUpPage } from '../../typings/follow-up-page';
@@ -1090,45 +1090,37 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
   /**
    * Refresh list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
-    if (this.selectedOutbreak) {
-      // add case id
-      if (this.caseId) {
-        this.queryBuilder.addChildQueryBuilder('case').filter.byEquality('id', this.caseId);
-      }
-
-      // retrieve created user & modified user information
-      this.queryBuilder.include('createdByUser', true);
-      this.queryBuilder.include('updatedByUser', true);
-
-      // include responsible user details
-      this.queryBuilder.include('responsibleUser', true);
-
-      // refresh badges
-      this.getFollowUpsGroupedByTeams();
-
-      // retrieve the list of Follow Ups
-      this.followUpsList$ = this.followUpsDataService
-        .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder)
-        .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            finishCallback([]);
-            return throwError(err);
-          }),
-          map((followUps: FollowUpModel[]) => {
-            return FollowUpModel.determineAlertness(
-              this.selectedOutbreak.contactFollowUpTemplate,
-              followUps
-            );
-          }),
-          tap((data: any[]) => {
-            finishCallback(data);
-          })
-        );
-    } else {
-      finishCallback([]);
+  refreshList() {
+    // add case id
+    if (this.caseId) {
+      this.queryBuilder.addChildQueryBuilder('case').filter.byEquality('id', this.caseId);
     }
+
+    // retrieve created user & modified user information
+    this.queryBuilder.include('createdByUser', true);
+    this.queryBuilder.include('updatedByUser', true);
+
+    // include responsible user details
+    this.queryBuilder.include('responsibleUser', true);
+
+    // refresh badges
+    this.getFollowUpsGroupedByTeams();
+
+    // retrieve the list of Follow Ups
+    this.followUpsList$ = this.followUpsDataService
+      .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder)
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        }),
+        map((followUps: FollowUpModel[]) => {
+          return FollowUpModel.determineAlertness(
+            this.selectedOutbreak.contactFollowUpTemplate,
+            followUps
+          );
+        })
+      );
   }
 
   /**
@@ -1250,7 +1242,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
           .subscribe((answer: DialogAnswer) => {
             if (answer.button === DialogAnswerButton.Yes) {
               // display loading
-              this.showLoadingDialog();
+              // this.showLoadingDialog();
 
               // generate follow-ups
               this.followUpsDataService
@@ -1266,7 +1258,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 .pipe(
                   catchError((err) => {
                     // hide loading
-                    this.closeLoadingDialog();
+                    // this.closeLoadingDialog();
 
                     // error
                     this.toastV2Service.error(err);
@@ -1275,7 +1267,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 )
                 .subscribe(() => {
                   // hide loading
-                  this.closeLoadingDialog();
+                  // this.closeLoadingDialog();
 
                   // finished
                   this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');

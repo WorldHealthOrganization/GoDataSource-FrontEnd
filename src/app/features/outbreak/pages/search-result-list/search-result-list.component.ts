@@ -9,8 +9,7 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import * as _ from 'lodash';
 import {
   catchError,
-  share,
-  tap
+  share
 } from 'rxjs/operators';
 import { HoverRowAction } from '../../../../shared/components';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
@@ -160,7 +159,7 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**
@@ -200,7 +199,7 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
   /**
    * Refresh list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     if (
       this.selectedOutbreak &&
             !_.isEmpty(this.searchValue)
@@ -215,15 +214,9 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
         .pipe(
           catchError((err) => {
             this.toastV2Service.error(err);
-            finishCallback([]);
             return throwError(err);
-          }),
-          tap((data: any[]) => {
-            finishCallback(data);
           })
         );
-    } else {
-      finishCallback([]);
     }
   }
 

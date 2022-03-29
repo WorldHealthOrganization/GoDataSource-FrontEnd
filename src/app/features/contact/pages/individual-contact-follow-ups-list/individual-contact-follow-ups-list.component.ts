@@ -19,7 +19,7 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
-import { catchError, map, share, tap } from 'rxjs/operators';
+import { catchError, map, share } from 'rxjs/operators';
 import { FollowUpsListComponent } from '../../helper-classes/follow-ups-list-component';
 import { DialogField, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { FollowUpPage } from '../../typings/follow-up-page';
@@ -614,7 +614,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
   /**
    * Refresh list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     if (
       this.selectedOutbreak &&
             this.recordId
@@ -647,7 +647,6 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
         .pipe(
           catchError((err) => {
             this.toastV2Service.error(err);
-            finishCallback([]);
             return throwError(err);
           }),
           map((followUps: FollowUpModel[]) => {
@@ -655,13 +654,8 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
               this.selectedOutbreak.contactFollowUpTemplate,
               followUps
             );
-          }),
-          tap((data: any[]) => {
-            finishCallback(data);
           })
         );
-    } else {
-      finishCallback([]);
     }
   }
 

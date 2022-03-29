@@ -16,7 +16,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import * as _ from 'lodash';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { catchError, share, tap } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { Constants } from '../../../../core/models/constants';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
@@ -390,7 +390,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**
@@ -666,7 +666,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
   /**
    * Re(load) the Case lab results list, based on the applied filter, sort criterias
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     if (
       this.selectedOutbreak &&
             this.personType &&
@@ -682,15 +682,9 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
         .pipe(
           catchError((err) => {
             this.toastV2Service.error(err);
-            finishCallback([]);
             return throwError(err);
-          }),
-          tap((data: any[]) => {
-            finishCallback(data);
           })
         );
-    } else {
-      finishCallback([]);
     }
   }
 

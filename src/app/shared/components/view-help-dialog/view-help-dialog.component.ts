@@ -3,7 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
 import { HelpItemModel } from '../../../core/models/help-item.model';
 import { ListComponent } from '../../../core/helperClasses/list-component';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { HelpDataService } from '../../../core/services/data/help.data.service';
 import * as _ from 'lodash';
 import { HelpCategoryModel } from '../../../core/models/help-category.model';
@@ -99,7 +99,7 @@ export class ViewHelpDialogComponent extends ListComponent implements OnDestroy 
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**
@@ -123,7 +123,7 @@ export class ViewHelpDialogComponent extends ListComponent implements OnDestroy 
   /**
    * Re(load) the items list
    */
-  refreshList(finishCallback: (records: any[]) => void) {
+  refreshList() {
     // make sure we retrieve only approved help items
     this.queryBuilder.filter.where({
       approved: true
@@ -151,11 +151,7 @@ export class ViewHelpDialogComponent extends ListComponent implements OnDestroy 
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
-          finishCallback([]);
           return throwError(err);
-        }),
-        tap((data: any[]) => {
-          finishCallback(data);
         })
       );
   }

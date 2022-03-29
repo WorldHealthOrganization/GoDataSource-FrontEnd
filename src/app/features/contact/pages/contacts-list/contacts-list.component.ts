@@ -23,7 +23,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Constants } from '../../../../core/models/constants';
 import { RiskLevelModel } from '../../../../core/models/risk-level.model';
 import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.model';
-import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
+import { catchError, map, mergeMap, share } from 'rxjs/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
@@ -703,7 +703,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
 
     // outbreak subscriber
     if (this.outbreakSubscriber) {
@@ -1142,41 +1142,32 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
    * Re(load) the Contacts list
    */
   refreshList(
-    finishCallback: (records: any[]) => void,
     triggeredByPageChange: boolean
   ) {
-    if (this.selectedOutbreak) {
-      // refresh list of contacts grouped by risk level
-      if (!triggeredByPageChange) {
-        this.getContactsGroupedByRiskLevel();
-      }
-
-      // retrieve created user & modified user information
-      this.queryBuilder.include('createdByUser', true);
-      this.queryBuilder.include('updatedByUser', true);
-
-      // retrieve responsible user information
-      this.queryBuilder.include('responsibleUser', true);
-
-      // retrieve location list
-      this.queryBuilder.include('locations', true);
-
-      // retrieve the list of Contacts
-      this.contactsList$ = this.contactDataService
-        .getContactsList(this.selectedOutbreak.id, this.queryBuilder)
-        .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            finishCallback([]);
-            return throwError(err);
-          }),
-          tap((data: any[]) => {
-            finishCallback(data);
-          })
-        );
-    } else {
-      finishCallback([]);
+    // refresh list of contacts grouped by risk level
+    if (!triggeredByPageChange) {
+      this.getContactsGroupedByRiskLevel();
     }
+
+    // retrieve created user & modified user information
+    this.queryBuilder.include('createdByUser', true);
+    this.queryBuilder.include('updatedByUser', true);
+
+    // retrieve responsible user information
+    this.queryBuilder.include('responsibleUser', true);
+
+    // retrieve location list
+    this.queryBuilder.include('locations', true);
+
+    // retrieve the list of Contacts
+    this.contactsList$ = this.contactDataService
+      .getContactsList(this.selectedOutbreak.id, this.queryBuilder)
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        })
+      );
   }
 
   /**
@@ -1585,8 +1576,8 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
       anonymizeFields: this.relationshipAnonymizeFields,
       fieldsGroupList: this.fieldsGroupListRelationships,
       fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
-      exportStart: () => { this.showLoadingDialog(); },
-      exportFinished: () => { this.closeLoadingDialog(); }
+      // exportStart: () => { this.showLoadingDialog(); },
+      // exportFinished: () => { this.closeLoadingDialog(); }
     });
   }
 
@@ -1629,7 +1620,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
     countQueryBuilder.fields('id', 'followUp');
 
     // display loading while determining how many records will be deleted
-    this.showLoadingDialog();
+    // this.showLoadingDialog();
 
     // make all requests in parallel
     forkJoin([
@@ -1642,7 +1633,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
       [statuses, records]: [LabelValuePair[], ContactModel[]]
     ) => {
       // hide loading
-      this.closeLoadingDialog();
+      // this.closeLoadingDialog();
 
       // display change status dialog
       this.dialogService
@@ -1680,7 +1671,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             }));
 
             // display loading while determining how many records will be deleted
-            this.showLoadingDialog();
+            // this.showLoadingDialog();
 
             // update statuses
             this.contactDataService
@@ -1690,7 +1681,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
               )
               .pipe(
                 catchError((err) => {
-                  this.closeLoadingDialog();
+                  // this.closeLoadingDialog();
                   this.toastV2Service.error(err);
                   return throwError(err);
                 })
@@ -1704,7 +1695,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                 );
 
                 // close dialog
-                this.closeLoadingDialog();
+                // this.closeLoadingDialog();
 
                 // refresh list
                 this.needsRefreshList(true);

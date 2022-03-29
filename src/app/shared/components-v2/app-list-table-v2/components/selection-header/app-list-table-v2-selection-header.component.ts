@@ -49,7 +49,7 @@ export class AppListTableV2SelectionHeaderComponent implements IHeaderAngularCom
    */
   agInit(params: IHeaderParams): void {
     // retrieve extended column definition
-    const extendedColDef: IExtendedColDef = params.column.getColDef() as IExtendedColDef;
+    const extendedColDef: IExtendedColDef = params.column.getUserProvidedColDef() as IExtendedColDef;
     this.component = extendedColDef.columnDefinitionData;
     this.action = (extendedColDef.columnDefinition as IV2ColumnAction).actions[0] as IV2ActionMenuIcon;
   }
