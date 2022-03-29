@@ -1394,25 +1394,28 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         field: 'dateOfInfection',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION'
         // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateOfOnset',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET'
+        // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateOfOutcome',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME'
+        // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateBecomeCase',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE'
+        // sortable: true
       }
     ];
     // // set available side filters
     // this.availableSideFilters = [
-    //   new FilterModel({
-    //     fieldName: 'dateOfOnset',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
-    //     type: FilterType.RANGE_DATE
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'dateOfOutcome',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
-    //     type: FilterType.RANGE_DATE
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'dateBecomeCase',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
-    //     type: FilterType.RANGE_DATE
-    //   }),
     //   new FilterModel({
     //     fieldName: 'safeBurial',
     //     fieldLabel: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
