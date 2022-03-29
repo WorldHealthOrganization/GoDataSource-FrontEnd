@@ -11,6 +11,7 @@ import { GenderDataResolver } from '../../core/services/resolvers/data/gender.re
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { OccupationDataResolver } from '../../core/services/resolvers/data/occupation.resolver';
+import { RiskDataResolver } from '../../core/services/resolvers/data/risk.resolver';
 
 const routes: Routes = [
   // Cases list
@@ -28,6 +29,7 @@ const routes: Routes = [
       gender: GenderDataResolver,
       occupation: OccupationDataResolver,
       outcome: OutcomeDataResolver,
+      risk: RiskDataResolver,
       yesNoAll: YesNoAllDataResolver,
       user: UserDataResolver
     }
