@@ -70,6 +70,12 @@ export class AppSideDialogV2Component implements OnDestroy {
 
         // update UI
         this.changeDetectorRef.detectChanges();
+      },
+
+      // refresh inputs
+      refresh: () => {
+        // refresh inputs
+        this.updateInputs();
       }
     },
 
@@ -485,9 +491,14 @@ export class AppSideDialogV2Component implements OnDestroy {
           // option id
           const id: string = filterOption.id || uuid();
 
+          // determine label
+          const label: string = filterOption.relationshipLabel ?
+            `${this.i18nService.instant(filterOption.relationshipLabel)} ${this.i18nService.instant(filterOption.label)}` :
+            filterOption.label;
+
           // create option
           const option: ILabelValuePairModel = {
-            label: filterOption.label,
+            label,
             value: id,
             data: filterOption
           };

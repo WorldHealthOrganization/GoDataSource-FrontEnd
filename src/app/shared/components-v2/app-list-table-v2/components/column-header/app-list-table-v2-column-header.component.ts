@@ -6,6 +6,7 @@ import { RequestSortDirection } from '../../../../../core/helperClasses/request-
 import { V2FilterType } from '../../models/filter.model';
 import { ActivatedRoute } from '@angular/router';
 import { ILabelValuePairModel } from '../../../../forms-v2/core/label-value-pair.model';
+import { IResolverV2ResponseModel } from '../../../../../core/services/resolvers/data/models/resolver-response.model';
 
 /**
  * Component
@@ -47,7 +48,7 @@ export class AppListTableV2ColumnHeaderComponent implements IHeaderAngularComp {
     private changeDetectorRef: ChangeDetectorRef,
     private activatedRoute: ActivatedRoute
   ) {
-    this.yesNoAllOptions = this.activatedRoute.snapshot.data.yesNoAll;
+    this.yesNoAllOptions = (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options;
   }
 
   /**

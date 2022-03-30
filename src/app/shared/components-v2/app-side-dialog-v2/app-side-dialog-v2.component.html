@@ -336,10 +336,12 @@
                           [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                           [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.options"></app-form-select-multiple-v2>
 
-                        <!-- Age range -->
+                        <!-- Number / Age range -->
                         <app-form-number-range-v2
-                          *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.RANGE_AGE
-                            && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                          *ngIf="(
+                            input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.RANGE_AGE ||
+                            input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.RANGE_NUMBER
+                          ) && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
                           [(ngModel)]="filter.value"
                           [name]="filter.name"
                           [min]="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.RANGE_AGE ? 0 : undefined"
