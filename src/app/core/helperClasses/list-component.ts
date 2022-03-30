@@ -188,6 +188,19 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
     this.selectedOutbreakSubscription = this.listHelperService.outbreakDataService
       .getSelectedOutbreakSubject()
       .subscribe((selectedOutbreak: OutbreakModel) => {
+        // ignore empty selection for now, no need to take in account ...de-selection
+        if (!selectedOutbreak) {
+          return;
+        }
+
+        // if same outbreak then don't trigger change
+        if (
+          this.selectedOutbreak &&
+          this.selectedOutbreak.id === selectedOutbreak.id
+        ) {
+          return;
+        }
+
         // select outbreak
         this.selectedOutbreak = selectedOutbreak;
 
