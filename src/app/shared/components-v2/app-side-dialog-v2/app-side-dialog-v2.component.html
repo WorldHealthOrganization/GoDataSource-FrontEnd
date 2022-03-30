@@ -234,12 +234,13 @@
             <!-- Filter list -->
             <div
               *ngSwitchCase="V2SideDialogConfigInputType.FILTER_LIST"
-              fxLayout="column"
+              fxLayout="column" fxLayoutGap="1.6rem"
               class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-filter-list {{input.cssClasses}}">
 
               <!-- Buttons -->
               <div
-                fxLayout="row" fxLayoutAlign="space-between">
+                fxLayout="row" fxLayoutAlign="space-between"
+                class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-buttons">
 
                 <!-- Add -->
                 <button
@@ -259,7 +260,9 @@
               </div>
 
               <!-- Filters -->
-              <div>
+              <div
+                fxLayout="column" fxLayoutGap="0.8rem"
+                class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-container">
 
                 <div
                   *ngFor="let filter of input.filters"
@@ -283,7 +286,8 @@
 
                     <!-- Filter setup -->
                     <div
-                      *ngIf="filter.filterBy.value">
+                      *ngIf="filter.filterBy.value"
+                      class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-left-inner">
 
                       <!-- Filter Comparator -->
                       <app-form-select-single-v2
