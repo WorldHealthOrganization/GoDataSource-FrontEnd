@@ -1,5 +1,6 @@
+<!-- [pageTitle]="eventsDataExportFileName" -->
 <app-list-table-v2 
-    [pageTitle]="eventsDataExportFileName"
+    [pageTitle]="appliedListFilter !== Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS ? 'LNG_PAGE_LIST_EVENTS_TITLE' : 'LNG_PAGE_DASHBOARD_EVENTS_WITHOUT_RELATIONSHIPS'"
     [records$]="eventsList$"
     (refreshData)="needsRefreshList(true, false)"
     (refreshDataCount)="refreshListCount(false)"
