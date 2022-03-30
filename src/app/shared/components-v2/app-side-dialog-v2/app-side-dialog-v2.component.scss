@@ -318,6 +318,8 @@
                   border: 0.1rem solid var(--gd-secondary);
                   border-top: 0 none;
                   @include border-radius(0.4rem 0 0.4rem 0.4rem);
+                  margin-bottom: 1.6rem;
+
                   /* Filters - filter item - parent select */
                   > app-form-select-single-v2 {
                     .gd-form-select-single-v2 {
