@@ -87,6 +87,10 @@
           }
         }
 
+        &.gd-list-top-grouped-data-value-not-active {
+          @include opacity(0.5);
+        }
+
         .gd-list-top-grouped-data-value-label {
           font-size: 1.8rem;
           font-weight: 500;
@@ -107,6 +111,10 @@
           @include opacity(0.5);
 
           &:hover {
+            @include opacity(1);
+          }
+
+          &.gd-list-top-grouped-data-value-active {
             @include opacity(1);
           }
         }
