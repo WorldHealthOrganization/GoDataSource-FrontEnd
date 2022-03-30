@@ -1482,44 +1482,35 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
         label: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
         options: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
         // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'vaccinesReceived.vaccine',
+        label: 'LNG_CASE_FIELD_LABEL_VACCINE',
+        options: (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'vaccinesReceived.status',
+        label: 'LNG_CASE_FIELD_LABEL_VACCINE_STATUS',
+        options: (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'vaccinesReceived.date',
+        label: 'LNG_CASE_FIELD_LABEL_VACCINE_DATE'
       }
     ];
-    // // set available side filters
-    // this.availableSideFilters = [
-    //   new FilterModel({
-    //     fieldName: 'vaccinesReceived.vaccine',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_VACCINE',
-    //     type: FilterType.MULTISELECT,
-    //     // this.vaccineList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.VACCINES);
-    //     // options$: this.vaccineList$
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'vaccinesReceived.status',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_VACCINE_STATUS',
-    //     type: FilterType.MULTISELECT,
-    //     // this.vaccineStatusList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.VACCINES_STATUS);
-    //     // options$: this.vaccineStatusList$
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'vaccinesReceived.date',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_VACCINE_DATE',
-    //     type: FilterType.RANGE_DATE
-    //   }),
-    // ];
-    //
-    // // allowed to filter by responsible user ?
-    // if (UserModel.canList(this.authUser)) {
-    //   this.availableSideFilters.push(
-    //     new FilterModel({
-    //       fieldName: 'responsibleUserId',
-    //       fieldLabel: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
-    //       type: FilterType.MULTISELECT,
-    //       // options$: this.userList$,
-    //       optionsLabelKey: 'name',
-    //       optionsValueKey: 'id'
-    //     })
-    //   );
-    // }
+
+    // allowed to filter by responsible user ?
+    if (UserModel.canList(this.authUser)) {
+      this.advancedFilters.push({
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'responsibleUserId',
+        label: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
+        options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+      });
+    }
   }
 
   /**
