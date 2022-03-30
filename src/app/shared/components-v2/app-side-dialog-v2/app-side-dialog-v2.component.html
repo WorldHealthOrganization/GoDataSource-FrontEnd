@@ -315,7 +315,7 @@
                           ) && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
                           [(ngModel)]="filter.value"
                           [name]="filter.name"
-                          [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_KEYWORD' | translate"
+                          placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_KEYWORD"
                           autocomplete="off"></app-form-input-v2>
 
                         <!-- Single select -->
@@ -324,7 +324,7 @@
                             && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
                           [(ngModel)]="filter.value"
                           [name]="filter.name"
-                          [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                          placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
                           [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.options"></app-form-select-single-v2>
 
                         <!-- Multiple select -->
@@ -333,7 +333,7 @@
                             && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
                           [(ngModel)]="filter.value"
                           [name]="filter.name"
-                          [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                          placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
                           [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.options"></app-form-select-multiple-v2>
 
                         <!-- Number / Age range -->
@@ -360,6 +360,44 @@
                           [toHidden]="filter.comparator.value === V2AdvancedFilterComparatorType.AFTER">
                         </app-form-date-range-v2>
 
+                        <!-- Location - single -->
+                        <app-form-select-location-single-v2
+                          *ngIf="(
+                            input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.LOCATION_SINGLE || (
+                              input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.ADDRESS &&
+                              filter.comparator.value === V2AdvancedFilterComparatorType.WITHIN
+                            )
+                          ) && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                          [(ngModel)]="filter.value"
+                          [name]="filter.name"
+                          placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION"
+                          useOutbreakLocations="true">
+                        </app-form-select-location-single-v2>
+
+                        <!-- Location - multiple -->
+                        <app-form-select-location-multiple-v2
+                          *ngIf="(
+                            input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.LOCATION_MULTIPLE || (
+                              input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.ADDRESS &&
+                              filter.comparator.value === V2AdvancedFilterComparatorType.LOCATION
+                            )
+                          ) && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                          [(ngModel)]="filter.value"
+                          [name]="filter.name"
+                          placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION"
+                          useOutbreakLocations="true">
+                        </app-form-select-location-multiple-v2>
+
+                        <!-- Address Within Radius -->
+                        <app-form-number-v2
+                          *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.ADDRESS &&
+                            filter.comparator.value === V2AdvancedFilterComparatorType.WITHIN"
+                          [(ngModel)]="filter.extraValues.radius.value"
+                          [name]="filter.extraValues.radius.name"
+                          placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN_MAX_DISTANCE"
+                          autocomplete="off">
+                        </app-form-number-v2>
+
                         <!-- Questionnaire answers -->
                         <ng-container
                           *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS">
@@ -367,7 +405,7 @@
                           <app-form-select-single-v2
                             [(ngModel)]="filter.value"
                             [name]="filter.name"
-                            [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION' | translate"
+                            placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION"
                             [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptions"
                             optionTooltipKey="label"
                             sortDisabled="true"

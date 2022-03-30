@@ -14,7 +14,8 @@ export enum V2AdvancedFilterType {
   RANGE_AGE = 'range_age',
   RANGE_DATE = 'range_date',
   ADDRESS = 'address',
-  LOCATION = 'location',
+  LOCATION_SINGLE = 'location_single',
+  LOCATION_MULTIPLE = 'location_multiple',
   ADDRESS_PHONE_NUMBER = 'address_phone_number',
   QUESTIONNAIRE_ANSWERS = 'questionnaire_answers',
   FILE = 'file'
@@ -169,8 +170,14 @@ export const V2AdvancedFilterComparatorOptions: {
     value: V2AdvancedFilterComparatorType.WITHIN
   }],
 
-  // location
-  [V2AdvancedFilterType.LOCATION]: [{
+  // location - single
+  [V2AdvancedFilterType.LOCATION_SINGLE]: [{
+    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION',
+    value: V2AdvancedFilterComparatorType.LOCATION
+  }],
+
+  // location - multiple
+  [V2AdvancedFilterType.LOCATION_MULTIPLE]: [{
     label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION',
     value: V2AdvancedFilterComparatorType.LOCATION
   }],
@@ -283,6 +290,22 @@ interface IV2AdvancedFilterAddressPhoneNumber extends IV2AdvancedFilterBase {
 }
 
 /**
+ * Advanced filter - location single
+ */
+export interface IV2AdvancedFilterSingleLocation extends IV2AdvancedFilterBase {
+  // required
+  type: V2AdvancedFilterType.LOCATION_SINGLE;
+}
+
+/**
+ * Advanced filter - location multiple
+ */
+export interface IV2AdvancedFilterMultipleLocation extends IV2AdvancedFilterBase {
+  // required
+  type: V2AdvancedFilterType.LOCATION_MULTIPLE;
+}
+
+/**
  * Advanced filter - Date Range
  */
 interface IV2AdvancedFilterDateRange extends IV2AdvancedFilterBase {
@@ -316,4 +339,5 @@ export interface IV2AdvancedFilterQuestionnaireAnswers extends IV2AdvancedFilter
 // advanced filter
 export type V2AdvancedFilter = IV2AdvancedFilterText | IV2AdvancedFilterSingleSelect | IV2AdvancedFilterSingleSelectLoader
 | IV2AdvancedFilterMultipleSelect | IV2AdvancedFilterMultipleSelectLoader | IV2AdvancedFilterAgeRange | IV2AdvancedFilterAddress
-| IV2AdvancedFilterAddressPhoneNumber | IV2AdvancedFilterDateRange | IV2AdvancedFilterNumberRange | IV2AdvancedFilterQuestionnaireAnswers;
+| IV2AdvancedFilterAddressPhoneNumber | IV2AdvancedFilterDateRange | IV2AdvancedFilterNumberRange | IV2AdvancedFilterQuestionnaireAnswers
+| IV2AdvancedFilterSingleLocation | IV2AdvancedFilterMultipleLocation;

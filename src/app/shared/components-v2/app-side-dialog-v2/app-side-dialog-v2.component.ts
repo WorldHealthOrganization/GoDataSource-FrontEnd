@@ -556,10 +556,13 @@ export class AppSideDialogV2Component implements OnDestroy {
           // reset comparator selected value
           filterItem.value = undefined;
           filterItem.comparator.value = undefined;
-          if (filterOption.type !== V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS) {
-            filterItem.extraValues =  undefined;
-          } else {
+          if (
+            filterOption &&
+            filterOption.type === V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS
+          ) {
             this.resetQuestionnaireFilter(filterItem);
+          } else {
+            filterItem.extraValues =  undefined;
           }
 
           // set comparator options
@@ -576,11 +579,29 @@ export class AppSideDialogV2Component implements OnDestroy {
         name: `${input.name}.comparator[${input.filters.length}]`,
         placeholder: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL',
         options: [],
-        change: (_data, _handler, filter) => {
+        change: (data, _handler, filter) => {
           // reset comparator selected value
           const filterItem = filter as unknown as IV2SideDialogConfigInputFilterListItem;
           filterItem.value = undefined;
-          filterItem.extraValues = undefined;
+
+          // reset extra value
+          const filterOption: V2AdvancedFilter = filterItem.filterBy.value ?
+            (data.map.filters as IV2SideDialogConfigInputFilterList).optionsAsLabelValueMap[filterItem.filterBy.value].data as V2AdvancedFilter :
+            undefined;
+          if (
+            filterOption &&
+            filterOption.type === V2AdvancedFilterType.ADDRESS &&
+            filterItem.comparator.value === V2AdvancedFilterComparatorType.WITHIN
+          ) {
+            filterItem.extraValues =  {
+              radius: {
+                name: uuid(),
+                value: undefined
+              }
+            };
+          } else {
+            filterItem.extraValues = undefined;
+          }
         }
       }
     });
