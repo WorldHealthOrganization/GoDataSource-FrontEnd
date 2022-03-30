@@ -8,13 +8,11 @@ import { Constants } from '../../../../core/models/constants';
  */
 export enum V2AdvancedFilterType {
   TEXT = 'text',
-  NUMBER = 'number',
   SELECT = 'select',
   MULTISELECT = 'multiselect',
   RANGE_NUMBER = 'range_number',
   RANGE_AGE = 'range_age',
   RANGE_DATE = 'range_date',
-  DATE = 'date',
   ADDRESS = 'address',
   LOCATION = 'location',
   ADDRESS_PHONE_NUMBER = 'address_phone_number',
@@ -87,18 +85,6 @@ export const V2AdvancedFilterComparatorOptions: {
     }
   ],
 
-  // number
-  [V2AdvancedFilterType.NUMBER]: [{
-    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_IS',
-    value: V2AdvancedFilterComparatorType.IS
-  }, {
-    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LESS_OR_EQUAL',
-    value: V2AdvancedFilterComparatorType.BEFORE
-  }, {
-    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_GREATER_OR_EQUAL',
-    value: V2AdvancedFilterComparatorType.AFTER
-  }],
-
   // select
   [V2AdvancedFilterType.SELECT]: [{
     label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_SELECT_HAS_AT_LEAST_ONE',
@@ -169,12 +155,6 @@ export const V2AdvancedFilterComparatorOptions: {
   }, {
     label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_DOESNT_HAVE_VALUE',
     value: V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE
-  }],
-
-  // date
-  [V2AdvancedFilterType.DATE]: [{
-    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_DAY_IS',
-    value: V2AdvancedFilterComparatorType.DATE
   }],
 
   // address
