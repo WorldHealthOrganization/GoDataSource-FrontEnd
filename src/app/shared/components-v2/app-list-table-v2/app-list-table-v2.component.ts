@@ -1524,7 +1524,21 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
             filters: []
           }
         ],
-        bottomButtons: [],
+        bottomButtons: [{
+          type: IV2SideDialogConfigButtonType.OTHER,
+          label: 'LNG_SIDE_FILTERS_APPLY_FILTERS_BUTTON',
+          color: 'primary',
+          key: 'apply'
+        }, {
+          type: IV2SideDialogConfigButtonType.OTHER,
+          label: 'LNG_SIDE_FILTERS_SAVE_FILTER_BUTTON',
+          color: 'secondary',
+          key: ''
+        }, {
+          type: IV2SideDialogConfigButtonType.CANCEL,
+          label: 'LNG_COMMON_BUTTON_CANCEL',
+          color: 'text'
+        }],
         initialized: (handler) => {
           // display loading
           handler.loading.show();
@@ -1620,8 +1634,14 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
             });
         }
       })
-      .subscribe(() => {
+      .subscribe((data) => {
+        // cancelled ?
+        if (data.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+          return;
+        }
+
         // #TODO
+        console.log(data);
       });
   }
 
