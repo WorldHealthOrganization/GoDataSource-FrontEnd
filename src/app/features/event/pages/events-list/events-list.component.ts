@@ -864,55 +864,6 @@ export class EventsListComponent
           action: {
             click: () => {
               this.exportEvents(this.queryBuilder);
-              // this.dialogV2Service.showExportData({
-              //   title: {
-              //     get: () => 'LNG_PAGE_LIST_EVENTS_EXPORT_TITLE',
-              //   },
-              //   export: {
-              //     url: `/outbreaks/${this.selectedOutbreak.id}/events/export`,
-              //     async: true,
-              //     method: ExportDataMethod.GET,
-              //     fileName: `${this.i18nService.instant(
-              //       'LNG_PAGE_LIST_EVENTS_TITLE'
-              //     )} - ${moment().format('YYYY-MM-DD')}`,
-              //     queryBuilder: this.queryBuilder,
-              //     allow: {
-              //       types: [
-              //         ExportDataExtension.CSV,
-              //         ExportDataExtension.XLS,
-              //         ExportDataExtension.XLSX,
-              //         ExportDataExtension.JSON,
-              //         ExportDataExtension.ODS,
-              //         ExportDataExtension.PDF,
-              //       ],
-              //       encrypt: true,
-              //       anonymize: {
-              //         fields: this.eventAnonymizeFields,
-              //       },
-              //       groups: {
-              //         fields: this.eventFieldGroups,
-              //         required: this.fieldsGroupListRequired,
-              //       },
-              //       dbColumns: true,
-              //       dbValues: true,
-              //       jsonReplaceUndefinedWithNull: true,
-              //       questionnaireVariables: true,
-              //     },
-              //     inputs: {
-              //       append: [
-              //         {
-              //           type: V2SideDialogConfigInputType.CHECKBOX,
-              //           placeholder:
-              //             'LNG_PAGE_LIST_EVENTS_EXPORT_CONTACT_INFORMATION',
-              //           tooltip:
-              //             'LNG_PAGE_LIST_EVENTS_EXPORT_CONTACT_INFORMATION_DESCRIPTION',
-              //           name: 'includeContactFields',
-              //           checked: false,
-              //         },
-              //       ],
-              //     },
-              //   },
-              // });
             },
           },
           visible: (): boolean => {
@@ -970,41 +921,6 @@ export class EventsListComponent
 
               // export
               this.exportEventRelationships(qb);
-              // this.dialogV2Service.showExportData({
-              //   title: {
-              //     get: () => 'LNG_PAGE_LIST_EVENT_EXPORT_RELATIONSHIPS_TITLE',
-              //   },
-              //   export: {
-              //     url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
-              //     async: true,
-              //     method: ExportDataMethod.GET,
-              //     fileName: `${this.i18nService.instant(
-              //       'LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIP_FILE_NAME'
-              //     )} - ${moment().format('YYYY-MM-DD')}`,
-              //     queryBuilder: qb,
-              //     allow: {
-              //       types: [
-              //         ExportDataExtension.CSV,
-              //         ExportDataExtension.XLS,
-              //         ExportDataExtension.XLSX,
-              //         ExportDataExtension.JSON,
-              //         ExportDataExtension.ODS,
-              //         ExportDataExtension.PDF,
-              //       ],
-              //       encrypt: true,
-              //       anonymize: {
-              //         fields: this.relationshipAnonymizeFields,
-              //       },
-              //       groups: {
-              //         fields: this.eventRelationshipFieldGroups,
-              //         required: this.relationshipFieldGroupsRequires,
-              //       },
-              //       dbColumns: true,
-              //       dbValues: true,
-              //       jsonReplaceUndefinedWithNull: true,
-              //     },
-              //   },
-              // });
             },
           },
           visible: (): boolean => {
