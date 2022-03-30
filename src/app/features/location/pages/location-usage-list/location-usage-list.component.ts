@@ -158,6 +158,26 @@ export class LocationUsageListComponent extends ListComponent implements OnInit,
   protected initializeTableAdvancedFilters(): void {}
 
   /**
+   * Initialize table quick actions
+   */
+  protected initializeQuickActions(): void {}
+
+  /**
+   * Initialize table group actions
+   */
+  protected initializeGroupActions(): void {}
+
+  /**
+   * Initialize table add action
+   */
+  protected initializeAddAction(): void {}
+
+  /**
+   * Initialize table grouped data
+   */
+  protected initializeGroupedData(): void {}
+
+  /**
      * Initialize breadcrumbs
      */
   // initializeBreadcrumbs() {

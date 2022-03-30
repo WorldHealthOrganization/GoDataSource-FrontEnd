@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { Observable, of, Subscription, throwError } from 'rxjs';
 import { UserModel } from '../../../../core/models/user.model';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -47,7 +47,7 @@ import { ClusterDataService } from '../../../../core/services/data/cluster.data.
   selector: 'app-cases-list',
   templateUrl: './cases-list.component.html'
 })
-export class CasesListComponent extends ListComponent implements OnInit, OnDestroy {
+export class CasesListComponent extends ListComponent implements OnDestroy {
   // list of existing cases
   casesList$: Observable<CaseModel[]>;
 
@@ -157,23 +157,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     private clusterDataService: ClusterDataService
   ) {
     super(listHelperService);
-  }
-
-  /**
-   * Component initialized
-   */
-  ngOnInit() {
-    // initialize quick actions
-    this.initializeQuickActions();
-
-    // initialize group actions
-    this.initializeGroupActions();
-
-    // initialize add action
-    this.initializeAddAction();
-
-    // initialize grouped data
-    this.initializeGroupedData();
   }
 
   /**
@@ -1551,7 +1534,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   /**
    * Initialize quick actions
    */
-  private initializeQuickActions(): void {
+  protected initializeQuickActions(): void {
     this.quickActions = {
       type: V2ActionType.MENU,
       label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
@@ -1751,7 +1734,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   /**
    * Initialize group actions
    */
-  private initializeGroupActions(): void {
+  protected initializeGroupActions(): void {
     this.groupActions = [
       {
         label: 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES',
@@ -1864,7 +1847,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   /**
    * Initialize add action
    */
-  private initializeAddAction(): void {
+  protected initializeAddAction(): void {
     this.addAction = {
       type: V2ActionType.ICON_LABEL,
       label: 'LNG_COMMON_BUTTON_ADD',
@@ -1881,7 +1864,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
   /**
    * Initialize grouped data
    */
-  private initializeGroupedData(): void {
+  protected initializeGroupedData(): void {
     this.groupedData = {
       label: 'LNG_PAGE_LIST_CASES_ACTION_SHOW_GROUP_BY_CLASSIFICATION_PILLS',
       click: (

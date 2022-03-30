@@ -149,6 +149,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
   // grouped data
   groupedDataExpanded: boolean = false;
+  groupedDataOneActive: boolean;
   private _groupedDataPreviousClickedValue: IV2GroupedDataValue;
   private _groupedData: IV2GroupedData;
   @Input() set groupedData(groupedData: IV2GroupedData) {
@@ -1442,6 +1443,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       return;
     }
 
+    // reset value
+    this.groupedDataOneActive = undefined;
+
     // same item clicked, then unselect
     if (this._groupedDataPreviousClickedValue === groupValue) {
       // unselect
@@ -1463,6 +1467,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // select
     this._groupedDataPreviousClickedValue = groupValue;
     this._groupedDataPreviousClickedValue.active = true;
+    this.groupedDataOneActive = true;
 
     // trigger click
     this.groupedData.click(groupValue, this.groupedData);
@@ -1502,7 +1507,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           get: () => 'LNG_SIDE_FILTERS_TITLE'
         },
         hideInputFilter: true,
-        width: '30rem',
+        width: '40rem',
         inputs: [
           {
             type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
