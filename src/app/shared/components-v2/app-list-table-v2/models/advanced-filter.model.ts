@@ -206,6 +206,8 @@ interface IV2AdvancedFilterBase {
 
   // optional
   id?: string;
+  relationshipPath?: string[];
+  relationshipLabel?: string;
 
   // never
   optionsLoad?: never;

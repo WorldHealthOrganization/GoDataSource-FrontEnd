@@ -194,15 +194,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
    * Selected outbreak was changed
    */
   selectedOutbreakChanged(): void {
-    // no outbreak selected ?
-    if (
-      !this.selectedOutbreak ||
-      !this.selectedOutbreak.id
-    ) {
-      // finished
-      return;
-    }
-
     // initialize pagination
     this.initPaginator();
 
@@ -1478,6 +1469,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'clusterId',
         label: 'LNG_CASE_FIELD_LABEL_CLUSTER_NAME',
+        relationshipPath: ['relationships'],
+        relationshipLabel: 'LNG_CASE_FIELD_LABEL_CLUSTER',
         optionsLoad: (finished) => {
           this.clusterDataService
             .getResolveList(
@@ -1503,25 +1496,15 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
               finished(data);
             });
         }
+      // }, {
+      //   type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
+      //   field: 'questionnaireAnswers',
+      //   label: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+      //   template: () => this.selectedOutbreak.caseInvestigationTemplate
       }
     ];
     // // set available side filters
     // this.availableSideFilters = [
-    //   new FilterModel({
-    //     fieldName: '',
-    //     fieldLabel: '',
-    //     type: FilterType.,
-    //     // this.clustersListAsLabelValuePair$ = this.clusterDataService.getClusterListAsLabelValue(this.selectedOutbreak.id);
-    //     // options$: this.clustersListAsLabelValuePair$,
-    //     relationshipPath: ['relationships'],
-    //     relationshipLabel: 'LNG_CASE_FIELD_LABEL_CLUSTER'
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'questionnaireAnswers',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-    //     type: FilterType.QUESTIONNAIRE_ANSWERS,
-    //     questionnaireTemplate: this.selectedOutbreak.caseInvestigationTemplate
-    //   }),
     //   new FilterModel({
     //     fieldName: 'pregnancyStatus',
     //     fieldLabel: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
@@ -2391,10 +2374,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
      * Get total number of items, based on the applied filters
      */
   refreshListCount(applyHasMoreLimit?: boolean) {
-    if (!this.selectedOutbreak) {
-      return;
-    }
-
     // reset
     this.pageCount = undefined;
 
