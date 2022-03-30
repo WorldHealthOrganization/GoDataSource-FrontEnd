@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import * as _ from 'lodash';
 import { Observable, of, throwError } from 'rxjs';
@@ -54,7 +54,7 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 })
 export class EventsListComponent
   extends ListComponent
-  implements OnInit, OnDestroy
+  implements OnDestroy
 {
 
   // field groups
@@ -136,20 +136,6 @@ export class EventsListComponent
   }
 
   /**
-   * Component initialized
-   */
-  ngOnInit() {
-    // initialize quick actions
-    this.initializeQuickActions();
-
-    // initialize group actions
-    this.initializeGroupActions();
-
-    // initialize add action
-    this.initializeAddAction();
-  }
-
-  /**
    * Release resources
    */
   ngOnDestroy() {
@@ -168,6 +154,9 @@ export class EventsListComponent
     this.needsRefreshList(true);
   }
 
+  /**
+   * Initialize Side Table Columns
+   */
   protected initializeTableColumns(): void {
     // address model used to search by phone number, address line, postal code, city....
     const filterAddressModel: AddressModel = new AddressModel({
@@ -818,7 +807,69 @@ export class EventsListComponent
     );
   }
 
-  private initializeQuickActions(): void {
+  /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {
+    this.advancedFilters = [
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'name',
+        label: 'LNG_EVENT_FIELD_LABEL_NAME'
+        // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'date',
+        label: 'LNG_EVENT_FIELD_LABEL_DATE',
+        // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'description',
+        label: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION',
+        // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.ADDRESS,
+        field: 'address',
+        label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
+        isArray: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateOfReporting',
+        label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING',
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'isDateOfReportingApproximate',
+        label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_NUMBER,
+        field: 'numberOfContacts',
+        label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS',
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_NUMBER,
+        field: 'numberOfExposures',
+        label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'responsibleUserId',
+        label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+        options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+      },
+
+    ];
+  }
+
+  /**
+   * Initialize quick actions
+   */
+  protected initializeQuickActions(): void {
     this.quickActions = {
       type: V2ActionType.MENU,
       label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
@@ -950,7 +1001,7 @@ export class EventsListComponent
   /**
    * Initialize group actions
    */
-  private initializeGroupActions(): void {
+  protected initializeGroupActions(): void {
     this.groupActions = [
       {
         label: 'LNG_PAGE_LIST_EVENTS_GROUP_ACTION_EXPORT_SELECTED_EVENTS',
@@ -1016,7 +1067,7 @@ export class EventsListComponent
   /**
    * Initialize add action
    */
-  private initializeAddAction(): void {
+  protected initializeAddAction(): void {
     this.addAction = {
       type: V2ActionType.ICON_LABEL,
       label: 'LNG_COMMON_BUTTON_ADD',
@@ -1031,88 +1082,176 @@ export class EventsListComponent
   }
 
   /**
-   * Initialize Table Advanced Filters
-   */
-  protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = [
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'name',
-        label: 'LNG_EVENT_FIELD_LABEL_NAME'
-        // sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'date',
-        label: 'LNG_EVENT_FIELD_LABEL_DATE',
-        // sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'description',
-        label: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION',
-        // sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.ADDRESS,
-        field: 'address',
-        label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
-        isArray: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateOfReporting',
-        label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING',
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'isDateOfReportingApproximate',
-        label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_NUMBER,
-        field: 'numberOfContacts',
-        label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS',
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_NUMBER,
-        field: 'numberOfExposures',
-        label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'responsibleUserId',
-        label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
-        options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
-      },
-
-    ];
-  }
-
-  /**
-   * Initialize table quick actions
-   */
-  protected initializeQuickActions(): void {}
-
-  /**
-   * Initialize table group actions
-   */
-  protected initializeGroupActions(): void {}
-
-  /**
-   * Initialize table add action
-   */
-  protected initializeAddAction(): void {}
-
-  /**
    * Initialize table grouped data
    */
   protected initializeGroupedData(): void {}
 
   /**
+   * Export event data
+   */
+  private exportEvents(qb: RequestQueryBuilder): void {
+    this.dialogV2Service
+      .showExportDataAfterLoadingData({
+        title: {
+          get: () => 'LNG_PAGE_LIST_EVENTS_EXPORT_TITLE'
+        },
+        load: (finished) => {
+          // retrieve the list of export fields groups for model
+          this.outbreakDataService
+            .getExportFieldsGroups(ExportFieldsGroupModelNameEnum.EVENT)
+            .pipe(
+              // handle errors
+              catchError((err) => {
+                // show error
+                this.toastV2Service.error(err);
+
+                // send error further
+                return throwError(err);
+              }),
+
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            )
+            .subscribe((fieldsGroupList) => {
+              // set groups
+              const eventFieldGroups: ILabelValuePairModel[] = fieldsGroupList.options.map((item) => ({
+                label: item.name,
+                value: item.name
+              }));
+
+              // group restrictions
+              const eventFieldGroupsRequires: IV2ExportDataConfigGroupsRequired = fieldsGroupList.toRequiredList();
+
+              // show export
+              finished({
+                title: {
+                  get: () => 'LNG_PAGE_LIST_EVENTS_EXPORT_TITLE'
+                },
+                export: {
+                  url: `/outbreaks/${this.selectedOutbreak.id}/events/export`,
+                  async: true,
+                  method: ExportDataMethod.POST,
+                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_EVENTS_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
+                  queryBuilder: qb,
+                  allow: {
+                    types: [
+                      ExportDataExtension.CSV,
+                      ExportDataExtension.XLS,
+                      ExportDataExtension.XLSX,
+                      ExportDataExtension.JSON,
+                      ExportDataExtension.ODS,
+                      ExportDataExtension.PDF
+                    ],
+                    encrypt: true,
+                    anonymize: {
+                      fields: this.eventAnonymizeFields
+                    },
+                    groups: {
+                      fields: eventFieldGroups,
+                      required: eventFieldGroupsRequires
+                    },
+                    dbColumns: true,
+                    dbValues: true,
+                    jsonReplaceUndefinedWithNull: true,
+                    questionnaireVariables: true
+                  },
+                  inputs: {
+                    append: [
+                      {
+                        type: V2SideDialogConfigInputType.CHECKBOX,
+                        placeholder: 'LNG_PAGE_LIST_EVENTS_EXPORT_CONTACT_INFORMATION',
+                        tooltip: 'LNG_PAGE_LIST_EVENTS_EXPORT_CONTACT_INFORMATION_DESCRIPTION',
+                        name: 'includeContactFields',
+                        checked: false
+                      }
+                    ]
+                  }
+                }
+              });
+            });
+        }
+      });
+  }
+
+  /**
+   * Export event relationships
+   */
+  private exportEventRelationships(qb: RequestQueryBuilder): void {
+    this.dialogV2Service
+      .showExportDataAfterLoadingData({
+        title: {
+          get: () => 'LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIPS_TITLE'
+        },
+        load: (finished) => {
+          // retrieve the list of export fields groups for model
+          this.outbreakDataService
+            .getExportFieldsGroups(ExportFieldsGroupModelNameEnum.RELATIONSHIP)
+            .pipe(
+              // handle errors
+              catchError((err) => {
+                // show error
+                this.toastV2Service.error(err);
+
+                // send error further
+                return throwError(err);
+              }),
+
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            )
+            .subscribe((fieldsGroupList) => {
+              // set groups
+              const relationshipFieldGroups: ILabelValuePairModel[] = fieldsGroupList.options.map((item) => ({
+                label: item.name,
+                value: item.name
+              }));
+
+              // group restrictions
+              const relationshipFieldGroupsRequires: IV2ExportDataConfigGroupsRequired = fieldsGroupList.toRequiredList();
+
+              // show export
+              finished({
+                title: {
+                  get: () => 'LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIPS_TITLE'
+                },
+                export: {
+                  url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
+                  async: true,
+                  method: ExportDataMethod.POST,
+                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIP_FILE_NAME')} - ${moment().format('YYYY-MM-DD')}`,
+                  queryBuilder: qb,
+                  allow: {
+                    types: [
+                      ExportDataExtension.CSV,
+                      ExportDataExtension.XLS,
+                      ExportDataExtension.XLSX,
+                      ExportDataExtension.JSON,
+                      ExportDataExtension.ODS,
+                      ExportDataExtension.PDF
+                    ],
+                    encrypt: true,
+                    anonymize: {
+                      fields: this.relationshipAnonymizeFields
+                    },
+                    groups: {
+                      fields: relationshipFieldGroups,
+                      required: relationshipFieldGroupsRequires
+                    },
+                    dbColumns: true,
+                    dbValues: true,
+                    jsonReplaceUndefinedWithNull: true
+                  }
+                }
+              });
+            });
+        }
+      });
+  }
+
+  /**
    * Initialize breadcrumbs
    */
-  initializeBreadcrumbs(): void {
+  protected initializeBreadcrumbs(): void {
     // determine if events page should be linkable
     let eventsAction: IV2BreadcrumbAction = null;
 
@@ -1281,162 +1420,6 @@ export class EventsListComponent
       )
       .subscribe((response) => {
         this.pageCount = response;
-      });
-  }
-
-  exportEvents(qb: RequestQueryBuilder): void {
-    this.dialogV2Service
-      .showExportDataAfterLoadingData({
-        title: {
-          get: () => 'LNG_PAGE_LIST_EVENTS_EXPORT_TITLE'
-        },
-        load: (finished) => {
-          // retrieve the list of export fields groups for model
-          this.outbreakDataService
-            .getExportFieldsGroups(ExportFieldsGroupModelNameEnum.EVENT)
-            .pipe(
-              // handle errors
-              catchError((err) => {
-                // show error
-                this.toastV2Service.error(err);
-
-                // send error further
-                return throwError(err);
-              }),
-
-              // should be the last pipe
-              takeUntil(this.destroyed$)
-            )
-            .subscribe((fieldsGroupList) => {
-              // set groups
-              const eventFieldGroups: ILabelValuePairModel[] = fieldsGroupList.options.map((item) => ({
-                label: item.name,
-                value: item.name
-              }));
-
-              // group restrictions
-              const eventFieldGroupsRequires: IV2ExportDataConfigGroupsRequired = fieldsGroupList.toRequiredList();
-
-              // show export
-              finished({
-                title: {
-                  get: () => 'LNG_PAGE_LIST_EVENTS_EXPORT_TITLE'
-                },
-                export: {
-                  url: `/outbreaks/${this.selectedOutbreak.id}/events/export`,
-                  async: true,
-                  method: ExportDataMethod.POST,
-                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_EVENTS_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
-                  queryBuilder: qb,
-                  allow: {
-                    types: [
-                      ExportDataExtension.CSV,
-                      ExportDataExtension.XLS,
-                      ExportDataExtension.XLSX,
-                      ExportDataExtension.JSON,
-                      ExportDataExtension.ODS,
-                      ExportDataExtension.PDF
-                    ],
-                    encrypt: true,
-                    anonymize: {
-                      fields: this.eventAnonymizeFields
-                    },
-                    groups: {
-                      fields: eventFieldGroups,
-                      required: eventFieldGroupsRequires
-                    },
-                    dbColumns: true,
-                    dbValues: true,
-                    jsonReplaceUndefinedWithNull: true,
-                    questionnaireVariables: true
-                  },
-                  inputs: {
-                    append: [
-                      {
-                        type: V2SideDialogConfigInputType.CHECKBOX,
-                        placeholder: 'LNG_PAGE_LIST_EVENTS_EXPORT_CONTACT_INFORMATION',
-                        tooltip: 'LNG_PAGE_LIST_EVENTS_EXPORT_CONTACT_INFORMATION_DESCRIPTION',
-                        name: 'includeContactFields',
-                        checked: false
-                      }
-                    ]
-                  }
-                }
-              });
-            });
-        }
-      });
-  }
-
-  private exportEventRelationships(qb: RequestQueryBuilder): void {
-    this.dialogV2Service
-      .showExportDataAfterLoadingData({
-        title: {
-          get: () => 'LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIPS_TITLE'
-        },
-        load: (finished) => {
-          // retrieve the list of export fields groups for model
-          this.outbreakDataService
-            .getExportFieldsGroups(ExportFieldsGroupModelNameEnum.RELATIONSHIP)
-            .pipe(
-              // handle errors
-              catchError((err) => {
-                // show error
-                this.toastV2Service.error(err);
-
-                // send error further
-                return throwError(err);
-              }),
-
-              // should be the last pipe
-              takeUntil(this.destroyed$)
-            )
-            .subscribe((fieldsGroupList) => {
-              // set groups
-              const relationshipFieldGroups: ILabelValuePairModel[] = fieldsGroupList.options.map((item) => ({
-                label: item.name,
-                value: item.name
-              }));
-
-              // group restrictions
-              const relationshipFieldGroupsRequires: IV2ExportDataConfigGroupsRequired = fieldsGroupList.toRequiredList();
-
-              // show export
-              finished({
-                title: {
-                  get: () => 'LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIPS_TITLE'
-                },
-                export: {
-                  url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
-                  async: true,
-                  method: ExportDataMethod.POST,
-                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIP_FILE_NAME')} - ${moment().format('YYYY-MM-DD')}`,
-                  queryBuilder: qb,
-                  allow: {
-                    types: [
-                      ExportDataExtension.CSV,
-                      ExportDataExtension.XLS,
-                      ExportDataExtension.XLSX,
-                      ExportDataExtension.JSON,
-                      ExportDataExtension.ODS,
-                      ExportDataExtension.PDF
-                    ],
-                    encrypt: true,
-                    anonymize: {
-                      fields: this.relationshipAnonymizeFields
-                    },
-                    groups: {
-                      fields: relationshipFieldGroups,
-                      required: relationshipFieldGroupsRequires
-                    },
-                    dbColumns: true,
-                    dbValues: true,
-                    jsonReplaceUndefinedWithNull: true
-                  }
-                }
-              });
-            });
-        }
       });
   }
 
