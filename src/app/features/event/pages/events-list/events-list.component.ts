@@ -29,7 +29,7 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
+import { ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
@@ -40,7 +40,6 @@ import {
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import {
   IV2BottomDialogConfigButtonType,
 } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
@@ -52,7 +51,6 @@ import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2
 import {
   V2SideDialogConfigInputType,
 } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 
@@ -75,22 +73,11 @@ export class EventsListComponent
   OutbreakModel = OutbreakModel;
   UserModel = UserModel;
 
-  // address model needed for filters
-  filterAddressModel: AddressModel = new AddressModel({
-    geoLocationAccurate: null,
-  });
-
-  filterAddressParentLocationIds: string[] = [];
-
-  // list of export fields groups
-  fieldsGroupList: LabelValuePair[];
 
   // field groups
   private eventFieldGroups: ILabelValuePairModel[];
   fieldsGroupListRequired: IExportFieldsGroupRequired;
-
-  // list of export fields groups
-  relationshipFieldGroups: LabelValuePair[];
+  eventsDataExportFileName: string = moment().format('YYYY-MM-DD');
   eventRelationshipFieldGroups: ILabelValuePairModel[];
   relationshipFieldGroupsRequires: IV2ExportDataConfigGroupsRequired;
 
@@ -106,18 +93,6 @@ export class EventsListComponent
   UserSettings = UserSettings;
 
   outbreakSubscriber: Subscription;
-
-  allowedExportTypes: ExportDataExtension[] = [
-    ExportDataExtension.CSV,
-    ExportDataExtension.XLS,
-    ExportDataExtension.XLSX,
-    ExportDataExtension.JSON,
-    ExportDataExtension.ODS,
-    ExportDataExtension.PDF,
-  ];
-
-  exportEventsUrl: string;
-  eventsDataExportFileName: string = moment().format('YYYY-MM-DD');
 
   // event anonymize fields
   private eventAnonymizeFields: ILabelValuePairModel[] = [
@@ -295,199 +270,6 @@ export class EventsListComponent
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' },
   ];
 
-  recordActions: HoverRowAction[] = [
-    // View Event
-    new HoverRowAction({
-      icon: 'visibility',
-      iconTooltip: 'LNG_PAGE_LIST_EVENTS_ACTION_VIEW_EVENT',
-      linkGenerator: (item: EventModel): string[] => {
-        return ['/events', item.id, 'view'];
-      },
-      visible: (item: EventModel): boolean => {
-        return !item.deleted && EventModel.canView(this.authUser);
-      },
-    }),
-
-    // Modify Event
-    new HoverRowAction({
-      icon: 'settings',
-      iconTooltip: 'LNG_PAGE_LIST_EVENTS_ACTION_MODIFY_EVENT',
-      linkGenerator: (item: EventModel): string[] => {
-        return ['/events', item.id, 'modify'];
-      },
-      visible: (item: EventModel): boolean => {
-        return (
-          !item.deleted &&
-          this.authUser &&
-          this.selectedOutbreak &&
-          this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-          EventModel.canModify(this.authUser)
-        );
-      },
-    }),
-
-    // Other actions
-    new HoverRowAction({
-      type: HoverRowActionType.MENU,
-      icon: 'moreVertical',
-      menuOptions: [
-        // Delete Event
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_EVENTS_ACTION_DELETE_EVENT',
-          click: (item: EventModel) => {
-            this.deleteEvent(item);
-          },
-          visible: (item: EventModel): boolean => {
-            return (
-              !item.deleted &&
-              this.authUser &&
-              this.selectedOutbreak &&
-              this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-              EventModel.canDelete(this.authUser)
-            );
-          },
-          class: 'mat-menu-item-delete',
-        }),
-
-        // Divider
-        new HoverRowAction({
-          type: HoverRowActionType.DIVIDER,
-          visible: (item: EventModel): boolean => {
-            // visible only if at least one of the previous...
-            return (
-              !item.deleted &&
-              this.authUser &&
-              this.selectedOutbreak &&
-              this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-              EventModel.canDelete(this.authUser)
-            );
-          },
-        }),
-
-        // Add Contact to Event
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_ACTION_ADD_CONTACT',
-          click: (item: EventModel) => {
-            this.router.navigate(['/contacts', 'create'], {
-              queryParams: {
-                entityType: EntityType.EVENT,
-                entityId: item.id,
-              },
-            });
-          },
-          visible: (item: EventModel): boolean => {
-            return (
-              !item.deleted &&
-              this.authUser &&
-              this.selectedOutbreak &&
-              this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-              ContactModel.canCreate(this.authUser) &&
-              EventModel.canCreateContact(this.authUser)
-            );
-          },
-        }),
-
-        // Bulk add contacts to event
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_ACTION_BULK_ADD_CONTACTS',
-          click: (item: EventModel) => {
-            this.router.navigate(['/contacts', 'create-bulk'], {
-              queryParams: {
-                entityType: EntityType.EVENT,
-                entityId: item.id,
-              },
-            });
-          },
-          visible: (item: EventModel): boolean => {
-            return (
-              !item.deleted &&
-              this.authUser &&
-              this.selectedOutbreak &&
-              this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-              ContactModel.canBulkCreate(this.authUser) &&
-              EventModel.canBulkCreateContact(this.authUser)
-            );
-          },
-        }),
-
-        // Divider
-        new HoverRowAction({
-          type: HoverRowActionType.DIVIDER,
-          visible: (item: EventModel): boolean => {
-            // visible only if at least one of the previous...
-            return (
-              !item.deleted &&
-              this.authUser &&
-              this.selectedOutbreak &&
-              this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-              ((ContactModel.canCreate(this.authUser) &&
-                EventModel.canCreateContact(this.authUser)) ||
-                (ContactModel.canBulkCreate(this.authUser) &&
-                  EventModel.canBulkCreateContact(this.authUser)))
-            );
-          },
-        }),
-
-        // See event contacts..
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM',
-          click: (item: EventModel) => {
-            this.router.navigate([
-              '/relationships',
-              EntityType.EVENT,
-              item.id,
-              'contacts',
-            ]);
-          },
-          visible: (item: EventModel): boolean => {
-            return (
-              !item.deleted &&
-              RelationshipModel.canList(this.authUser) &&
-              EventModel.canListRelationshipContacts(this.authUser)
-            );
-          },
-        }),
-
-        // See event exposures
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_ACTION_SEE_EXPOSURES_TO',
-          click: (item: EventModel) => {
-            this.router.navigate([
-              '/relationships',
-              EntityType.EVENT,
-              item.id,
-              'exposures',
-            ]);
-          },
-          visible: (item: EventModel): boolean => {
-            return (
-              !item.deleted &&
-              RelationshipModel.canList(this.authUser) &&
-              EventModel.canListRelationshipExposures(this.authUser)
-            );
-          },
-        }),
-
-        // Restore a deleted event
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_EVENT',
-          click: (item: EventModel) => {
-            this.restoreEvent(item);
-          },
-          visible: (item: EventModel): boolean => {
-            return (
-              item.deleted &&
-              this.authUser &&
-              this.selectedOutbreak &&
-              this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-              EventModel.canRestore(this.authUser)
-            );
-          },
-          class: 'mat-menu-item-restore',
-        }),
-      ],
-    }),
-  ];
 
   /**
    * Constructor
@@ -498,7 +280,6 @@ export class EventsListComponent
     private eventDataService: EventDataService,
     private outbreakDataService: OutbreakDataService,
     private toastV2Service: ToastV2Service,
-    private dialogService: DialogService,
     private genericDataService: GenericDataService,
     private i18nService: I18nService,
     private redirectService: RedirectService,
@@ -527,12 +308,6 @@ export class EventsListComponent
       .getSelectedOutbreakSubject()
       .subscribe((selectedOutbreak: OutbreakModel) => {
         this.selectedOutbreak = selectedOutbreak;
-
-        // export events url
-        this.exportEventsUrl = null;
-        if (this.selectedOutbreak && this.selectedOutbreak.id) {
-          this.exportEventsUrl = `/outbreaks/${this.selectedOutbreak.id}/events/export`;
-        }
 
         // initialize pagination
         this.initPaginator();
@@ -1765,116 +1540,6 @@ export class EventsListComponent
       });
   }
 
-  /**
-   * Delete specific event from outbreak
-   * @param {EventModel} event
-   */
-  deleteEvent(event: EventModel) {
-    // show confirm dialog
-    this.dialogService
-      .showConfirm('LNG_DIALOG_CONFIRM_DELETE_EVENT', event)
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          // delete contact
-          this.eventDataService
-            .deleteEvent(this.selectedOutbreak.id, event.id)
-            .pipe(
-              catchError((err) => {
-                this.toastV2Service.error(err);
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              this.toastV2Service.success(
-                'LNG_PAGE_LIST_EVENTS_ACTION_DELETE_SUCCESS_MESSAGE'
-              );
-
-              // reload data
-              this.needsRefreshList(true);
-            });
-        }
-      });
-  }
-
-  /**
-   * Restore an deleted event
-   * @param eventModel
-   */
-  restoreEvent(eventModel: EventModel) {
-    // show confirm dialog to confirm the action
-    this.dialogService
-      .showConfirm(
-        'LNG_DIALOG_CONFIRM_RESTORE_EVENT',
-        new EventModel(eventModel)
-      )
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          this.eventDataService
-            .restoreEvent(this.selectedOutbreak.id, eventModel.id)
-            .pipe(
-              catchError((err) => {
-                this.toastV2Service.error(err);
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              this.toastV2Service.success(
-                'LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_SUCCESS_MESSAGE'
-              );
-              // reload data
-              this.needsRefreshList(true);
-            });
-        }
-      });
-  }
-
-  /**
-   * Export selected events
-   */
-  exportSelectedEvents() {
-    // // get list of selected ids
-    // const selectedRecords: false | string[] = this.validateCheckedRecords();
-    // if (!selectedRecords) {
-    //   return;
-    // }
-    //
-    // // construct query builder
-    // const qb = new RequestQueryBuilder();
-    // qb.filter.bySelect(
-    //   'id',
-    //   selectedRecords,
-    //   true,
-    //   null
-    // );
-    //
-    // // display export dialog
-    // this.dialogService.showExportDialog({
-    //   // required
-    //   message: 'LNG_PAGE_LIST_EVENTS_EXPORT_TITLE',
-    //   url: this.exportEventsUrl,
-    //   fileName: this.eventsDataExportFileName,
-    //
-    //   // configure
-    //   isAsyncExport: true,
-    //   displayUseDbColumns: true,
-    //   displayJsonReplaceUndefinedWithNull: true,
-    //   // exportProgress: (data) => { this.showExportProgress(data); },
-    //
-    //   // optional
-    //   allowedExportTypes: this.allowedExportTypes,
-    //   queryBuilder: qb,
-    //   displayEncrypt: true,
-    //   displayAnonymize: true,
-    //   displayFieldsGroupList: true,
-    //   displayUseQuestionVariable: false,
-    //   anonymizeFields: this.anonymizeFields,
-    //   fieldsGroupList: this.fieldsGroupList,
-    //   fieldsGroupListRequired: this.fieldsGroupListRequired,
-    //   exportStart: () => { this.showLoadingDialog(); },
-    //   exportFinished: () => { this.closeLoadingDialog(); }
-    // });
-  }
-
   exportEvents(qb: RequestQueryBuilder): void {
     this.dialogV2Service
       .showExportDataAfterLoadingData({
@@ -1959,56 +1624,6 @@ export class EventsListComponent
       });
   }
 
-  /**
-   * Export relationships for selected events
-   */
-  exportSelectedEventsRelationship() {
-    // // get list of selected ids
-    // const selectedRecords: false | string[] = this.validateCheckedRecords();
-    // if (!selectedRecords) {
-    //   return;
-    // }
-    //
-    // // construct query builder
-    // const qb = new RequestQueryBuilder();
-    // const personsQb = qb.addChildQueryBuilder('person');
-    //
-    // // id
-    // personsQb.filter.bySelect('id', selectedRecords, true, null);
-    //
-    // // type
-    // personsQb.filter.byEquality(
-    //   'type',
-    //   EntityType.EVENT
-    // );
-    //
-    // // display export dialog
-    // this.dialogService.showExportDialog({
-    //   // required
-    //   message: 'LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIPS_TITLE',
-    //   url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
-    //   fileName: this.i18nService.instant('LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIP_FILE_NAME'),
-    //
-    //   // configure
-    //   isAsyncExport: true,
-    //   displayUseDbColumns: true,
-    //   displayJsonReplaceUndefinedWithNull: true,
-    //   // exportProgress: (data) => { this.showExportProgress(data); },
-    //
-    //   // optional
-    //   queryBuilder: qb,
-    //   displayEncrypt: true,
-    //   displayAnonymize: true,
-    //   displayFieldsGroupList: true,
-    //   allowedExportTypes: this.allowedExportTypes,
-    //   anonymizeFields: this.relationshipAnonymizeFields,
-    //   fieldsGroupList: this.fieldsGroupListRelationships,
-    //   fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
-    //   exportStart: () => { this.showLoadingDialog(); },
-    //   exportFinished: () => { this.closeLoadingDialog(); }
-    // });
-  }
-
   private exportEventRelationships(qb: RequestQueryBuilder): void {
     this.dialogV2Service
       .showExportDataAfterLoadingData({
@@ -2079,99 +1694,6 @@ export class EventsListComponent
             });
         }
       });
-  }
-
-  /**
-   * Export Event Relationships
-   */
-  exportFilteredEventsRelationships() {
-    // construct filter by event query builder
-    const qb = new RequestQueryBuilder();
-    const personsQb = qb.addChildQueryBuilder('person');
-
-    // retrieve only relationships that have at least one persons as desired type
-    qb.filter.byEquality('persons.type', EntityType.EVENT);
-
-    // merge out query builder
-    personsQb.merge(this.queryBuilder);
-
-    // remove pagination
-    personsQb.paginator.clear();
-
-    // attach condition only if not empty
-    if (!personsQb.filter.isEmpty()) {
-      // filter only events
-      personsQb.filter.byEquality('type', EntityType.EVENT);
-    }
-
-    // display export dialog
-    this.dialogService.showExportDialog({
-      // required
-      message: 'LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIPS_TITLE',
-      url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
-      fileName: this.i18nService.instant(
-        'LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIP_FILE_NAME'
-      ),
-
-      // configure
-      isAsyncExport: true,
-      displayUseDbColumns: true,
-      displayJsonReplaceUndefinedWithNull: true,
-      // exportProgress: (data) => { this.showExportProgress(data); },
-
-      // optional
-      queryBuilder: qb,
-      displayEncrypt: true,
-      displayAnonymize: true,
-      displayFieldsGroupList: true,
-      allowedExportTypes: this.allowedExportTypes,
-      anonymizeFields: this.relationshipAnonymizeFields,
-      // fieldsGroupList: this.fieldsGroupListRelationships,
-      // fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
-      // exportStart: () => { this.showLoadingDialog(); },
-      // exportFinished: () => { this.closeLoadingDialog(); }
-    });
-  }
-
-  /**
-   * Display contacts popup
-   */
-  displayContacts(entity: EventModel) {
-    // if we do not have contacts return
-    if (entity.numberOfContacts < 1) {
-      return;
-    }
-
-    // display dialog
-    // this.entityHelperService.displayContacts(
-    //   this.selectedOutbreak.id,
-    //   entity
-    // );
-  }
-
-  /**
-   * Display exposures popup
-   */
-  displayExposures(entity: EventModel) {
-    // if we do not have any exposure return
-    if (entity.numberOfExposures < 1) {
-      return;
-    }
-
-    // display dialog
-    // this.entityHelperService.displayExposures(
-    //   this.selectedOutbreak.id,
-    //   entity
-    // );
-  }
-
-  /**
-   * Navigate to Events without relationships
-   */
-  navigateToEventsWithoutRelationships() {
-    this.redirectService.to(['/events'], {
-      applyListFilter: Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS,
-    });
   }
 
   /**
