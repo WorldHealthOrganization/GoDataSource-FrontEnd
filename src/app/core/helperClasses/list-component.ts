@@ -166,7 +166,6 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
     // get auth data
     this.authUser = this.listHelperService.authDataService.getAuthenticatedUser();
 
-
     // wait for binding so some things get processed
     setTimeout(() => {
       // initialize breadcrumbs
@@ -193,8 +192,6 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
       // load saved filters
       this.loadCachedFilters();
     });
-
-
 
     // listen for outbreak selection
     this.selectedOutbreakSubscription = this.listHelperService.outbreakDataService
