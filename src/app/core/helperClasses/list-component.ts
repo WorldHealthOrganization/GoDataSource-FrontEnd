@@ -178,6 +178,18 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
       // initialize advanced filters
       this.initializeTableAdvancedFilters();
 
+      // initialize table quick actions
+      this.initializeQuickActions();
+
+      // initialize table group actions
+      this.initializeGroupActions();
+
+      // initialize table add actions
+      this.initializeAddAction();
+
+      // initialize table grouped data
+      this.initializeGroupedData();
+
       // load saved filters
       this.loadCachedFilters();
     });
@@ -188,6 +200,19 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
     this.selectedOutbreakSubscription = this.listHelperService.outbreakDataService
       .getSelectedOutbreakSubject()
       .subscribe((selectedOutbreak: OutbreakModel) => {
+        // ignore empty selection for now, no need to take in account ...de-selection
+        if (!selectedOutbreak) {
+          return;
+        }
+
+        // if same outbreak then don't trigger change
+        if (
+          this.selectedOutbreak &&
+          this.selectedOutbreak.id === selectedOutbreak.id
+        ) {
+          return;
+        }
+
         // select outbreak
         this.selectedOutbreak = selectedOutbreak;
 
@@ -262,14 +287,34 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
   }
 
   /**
-   * Initialize side table columns
+   * Initialize table columns
    */
   protected abstract initializeTableColumns(): void;
 
   /**
-   * Initialize side table advanced filters
+   * Initialize table advanced filters
    */
   protected abstract initializeTableAdvancedFilters(): void;
+
+  /**
+   * Initialize table quick actions
+   */
+  protected abstract initializeQuickActions(): void;
+
+  /**
+   * Initialize table group actions
+   */
+  protected abstract initializeGroupActions(): void;
+
+  /**
+   * Initialize table add action
+   */
+  protected abstract initializeAddAction(): void;
+
+  /**
+   * Initialize table grouped data
+   */
+  protected abstract initializeGroupedData(): void;
 
   /**
    * Selected outbreak changed
