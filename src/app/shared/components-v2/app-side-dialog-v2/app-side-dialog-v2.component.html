@@ -281,7 +281,8 @@
                       [name]="filter.filterBy.name"
                       [options]="filter.filterBy.options"
                       [placeholder]="filter.filterBy.placeholder"
-                      (ngModelChange)="filter.filterBy.change(dialogHandler.data, dialogHandler, filter)">
+                      (ngModelChange)="filter.filterBy.change(dialogHandler.data, dialogHandler, filter)"
+                      required="true">
                     </app-form-select-single-v2>
 
                     <!-- Filter setup -->
@@ -296,8 +297,8 @@
                         [name]="filter.comparator.name"
                         [options]="filter.comparator.options"
                         [placeholder]="filter.comparator.placeholder"
-                        neverFloatLabel="true"
-                        (ngModelChange)="filter.comparator.change(dialogHandler.data, dialogHandler, filter)">
+                        (ngModelChange)="filter.comparator.change(dialogHandler.data, dialogHandler, filter)"
+                        required="true">
                       </app-form-select-single-v2>
 
                       <!-- Filter Value -->
@@ -316,7 +317,8 @@
                           [(ngModel)]="filter.value"
                           [name]="filter.name"
                           placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_KEYWORD"
-                          autocomplete="off"></app-form-input-v2>
+                          autocomplete="off"
+                          required="true"></app-form-input-v2>
 
                         <!-- Single select -->
                         <app-form-select-single-v2
@@ -325,7 +327,9 @@
                           [(ngModel)]="filter.value"
                           [name]="filter.name"
                           placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
-                          [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.options"></app-form-select-single-v2>
+                          [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.options"
+                          required="true">
+                        </app-form-select-single-v2>
 
                         <!-- Multiple select -->
                         <app-form-select-multiple-v2
@@ -334,7 +338,9 @@
                           [(ngModel)]="filter.value"
                           [name]="filter.name"
                           placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
-                          [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.options"></app-form-select-multiple-v2>
+                          [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.options"
+                          required="true">
+                        </app-form-select-multiple-v2>
 
                         <!-- Number / Age range -->
                         <app-form-number-range-v2
@@ -347,7 +353,8 @@
                           [min]="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.RANGE_AGE ? 0 : undefined"
                           [max]="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.RANGE_AGE ? Constants.DEFAULT_AGE_MAX_YEARS : undefined"
                           [fromHidden]="filter.comparator.value === V2AdvancedFilterComparatorType.BEFORE"
-                          [toHidden]="filter.comparator.value === V2AdvancedFilterComparatorType.AFTER">
+                          [toHidden]="filter.comparator.value === V2AdvancedFilterComparatorType.AFTER"
+                          required="true">
                         </app-form-number-range-v2>
 
                         <!-- Date range -->
@@ -357,7 +364,8 @@
                           [(ngModel)]="filter.value"
                           [name]="filter.name"
                           [fromHidden]="filter.comparator.value === V2AdvancedFilterComparatorType.BEFORE"
-                          [toHidden]="filter.comparator.value === V2AdvancedFilterComparatorType.AFTER">
+                          [toHidden]="filter.comparator.value === V2AdvancedFilterComparatorType.AFTER"
+                          required="true">
                         </app-form-date-range-v2>
 
                         <!-- Location - single -->
@@ -371,7 +379,8 @@
                           [(ngModel)]="filter.value"
                           [name]="filter.name"
                           placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION"
-                          useOutbreakLocations="true">
+                          useOutbreakLocations="true"
+                          required="true">
                         </app-form-select-location-single-v2>
 
                         <!-- Location - multiple -->
@@ -385,7 +394,8 @@
                           [(ngModel)]="filter.value"
                           [name]="filter.name"
                           placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION"
-                          useOutbreakLocations="true">
+                          useOutbreakLocations="true"
+                          required="true">
                         </app-form-select-location-multiple-v2>
 
                         <!-- Address Within Radius -->
@@ -395,7 +405,8 @@
                           [(ngModel)]="filter.extraValues.radius.value"
                           [name]="filter.extraValues.radius.name"
                           placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN_MAX_DISTANCE"
-                          autocomplete="off">
+                          autocomplete="off"
+                          required="true">
                         </app-form-number-v2>
 
                         <!-- Questionnaire answers -->
@@ -409,7 +420,8 @@
                             [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptions"
                             optionTooltipKey="label"
                             sortDisabled="true"
-                            (ngModelChange)="resetQuestionnaireFilter(filter)">
+                            (ngModelChange)="resetQuestionnaireFilter(filter)"
+                            required="true">
                           </app-form-select-single-v2>
 
                           <!-- Filter details -->
@@ -421,14 +433,16 @@
                               [(ngModel)]="filter.extraValues.whichAnswer.value"
                               [name]="filter.extraValues.whichAnswer.name"
                               [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER' | translate"
-                              [options]="questionWhichAnswerOptions">
+                              [options]="questionWhichAnswerOptions"
+                              required="true">
                             </app-form-select-single-v2>
 
                             <!-- Which Answer Date -->
                             <app-form-date-range-v2
                               *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.multiAnswerParent"
                               [(ngModel)]="filter.extraValues.whichAnswerDate.value"
-                              [name]="filter.extraValues.whichAnswerDate.name">
+                              [name]="filter.extraValues.whichAnswerDate.name"
+                              required="true">
                             </app-form-date-range-v2>
 
                             <!-- Comparator used accordingly to field type -->
@@ -440,7 +454,8 @@
                               [name]="filter.extraValues.comparator.name"
                               [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL' | translate"
                               [options]="V2AdvancedFilterComparatorOptions[V2AdvancedFilterQuestionComparators[input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType]]"
-                              (ngModelChange)="resetQuestionnaireFilter(filter, 'filterValue')">
+                              (ngModelChange)="resetQuestionnaireFilter(filter, 'filterValue')"
+                              required="true">
                             </app-form-select-single-v2>
 
                             <!-- TEXT Filter -->
@@ -450,7 +465,8 @@
                               [(ngModel)]="filter.extraValues.filterValue.value"
                               [name]="filter.extraValues.filterValue.name"
                               placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_KEYWORD"
-                              autocomplete="off">
+                              autocomplete="off"
+                              required="true">
                             </app-form-input-v2>
 
                             <!-- DATE RANGE Filter -->
@@ -460,7 +476,8 @@
                               [(ngModel)]="filter.extraValues.filterValue.value"
                               [name]="filter.extraValues.filterValue.name"
                               [fromHidden]="filter.extraValues.comparator.value === V2AdvancedFilterComparatorType.BEFORE"
-                              [toHidden]="filter.extraValues.comparator.value === V2AdvancedFilterComparatorType.AFTER">
+                              [toHidden]="filter.extraValues.comparator.value === V2AdvancedFilterComparatorType.AFTER"
+                              required="true">
                             </app-form-date-range-v2>
 
                             <!-- SELECT Filter -->
@@ -472,7 +489,8 @@
                               [(ngModel)]="filter.extraValues.filterValue.value"
                               [name]="filter.extraValues.filterValue.name"
                               placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
-                              [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answers">
+                              [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answers"
+                              required="true">
                             </app-form-select-multiple-v2>
 
                             <!-- NUMBER Filter -->
@@ -482,7 +500,8 @@
                               [(ngModel)]="filter.extraValues.filterValue.value"
                               [name]="filter.extraValues.filterValue.name"
                               [fromHidden]="filter.extraValues.comparator.value === V2AdvancedFilterComparatorType.BEFORE"
-                              [toHidden]="filter.extraValues.comparator.value === V2AdvancedFilterComparatorType.AFTER">
+                              [toHidden]="filter.extraValues.comparator.value === V2AdvancedFilterComparatorType.AFTER"
+                              required="true">
                             </app-form-number-range-v2>
 
                             <!-- File Filter -->

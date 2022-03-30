@@ -1528,12 +1528,18 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           type: IV2SideDialogConfigButtonType.OTHER,
           label: 'LNG_SIDE_FILTERS_APPLY_FILTERS_BUTTON',
           color: 'primary',
-          key: 'apply'
+          key: 'apply',
+          disabled: (_data, handler): boolean => {
+            return !handler.form || handler.form.invalid;
+          }
         }, {
           type: IV2SideDialogConfigButtonType.OTHER,
           label: 'LNG_SIDE_FILTERS_SAVE_FILTER_BUTTON',
           color: 'secondary',
-          key: ''
+          key: 'save',
+          disabled: (_data, handler): boolean => {
+            return !handler.form || handler.form.invalid;
+          }
         }, {
           type: IV2SideDialogConfigButtonType.CANCEL,
           label: 'LNG_COMMON_BUTTON_CANCEL',
@@ -1642,6 +1648,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
         // #TODO
         console.log(data);
+        data.handler.hide();
       });
   }
 
