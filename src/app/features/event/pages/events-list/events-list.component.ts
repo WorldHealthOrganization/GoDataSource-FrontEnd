@@ -1,5 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 import * as _ from 'lodash';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
@@ -121,7 +121,6 @@ export class EventsListComponent
    */
   constructor(
     protected listHelperService: ListHelperService,
-    private router: Router,
     private eventDataService: EventDataService,
     private outbreakDataService: OutbreakDataService,
     private toastV2Service: ToastV2Service,
@@ -845,16 +844,19 @@ export class EventsListComponent
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'isDateOfReportingApproximate',
         label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+        // sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_NUMBER,
         field: 'numberOfContacts',
         label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS',
+        // sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_NUMBER,
         field: 'numberOfExposures',
         label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+        // sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
@@ -983,9 +985,12 @@ export class EventsListComponent
         {
           label: 'LNG_PAGE_LIST_EVENTS_ACTION_IMPORT_EVENTS_RELATIONSHIPS',
           action: {
-            click: () => {
-              this.goToRelationshipImportPage();
-            },
+            link: () => ['/import-export-data', 'relationships', 'import'],
+            linkQueryParams: (): Params => {
+              return {
+                from: Constants.APP_PAGE.EVENTS.value,
+              };
+            }
           },
           visible: (): boolean => {
             return (
@@ -1298,7 +1303,26 @@ export class EventsListComponent
    * Fields retrieved from api to reduce payload size
    */
   protected refreshListFields(): string[] {
-    return [];
+    return [
+      'id',
+      'name',
+      'date',
+      'description',
+      'address',
+      'responsibleUserId',
+      'numberOfContacts',
+      'numberOfExposures',
+      'deleted',
+      'createdBy',
+      'createdAt',
+      'updatedBy',
+      'updatedAt',
+      'outbreakId',
+      'inconsistencies',
+      'relationship',
+      'matchedDuplicateRelationships',
+      'responsibleUser',
+    ];
   }
 
   /**
@@ -1421,16 +1445,5 @@ export class EventsListComponent
       .subscribe((response) => {
         this.pageCount = response;
       });
-  }
-
-  /**
-   * Redirect to import relationship page
-   */
-  goToRelationshipImportPage() {
-    this.router.navigate(['/import-export-data', 'relationships', 'import'], {
-      queryParams: {
-        from: Constants.APP_PAGE.EVENTS.value,
-      },
-    });
   }
 }
