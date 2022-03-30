@@ -62,17 +62,6 @@ export class EventsListComponent
   extends ListComponent
   implements OnInit, OnDestroy
 {
-  // breadcrumbs
-  // breadcrumbs: BreadcrumbItemModel[] = [
-  //   new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '.', true)
-  // ];
-
-  // constants
-  EventModel = EventModel;
-  RelationshipModel = RelationshipModel;
-  OutbreakModel = OutbreakModel;
-  UserModel = UserModel;
-
 
   // field groups
   private eventFieldGroups: ILabelValuePairModel[];
