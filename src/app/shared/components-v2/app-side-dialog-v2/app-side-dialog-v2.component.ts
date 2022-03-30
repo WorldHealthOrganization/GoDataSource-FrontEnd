@@ -587,6 +587,23 @@ export class AppSideDialogV2Component implements OnDestroy {
   }
 
   /**
+   * Remove advanced filter
+   */
+  removeAdvancedFilter(
+    input: IV2SideDialogConfigInputFilterList,
+    filter: IV2SideDialogConfigInputFilterListItem
+  ): void {
+    // find index
+    const filterIndex: number = input.filters.findIndex((item) => item === filter);
+    if (filterIndex < 0) {
+      return;
+    }
+
+    // remove
+    input.filters.splice(filterIndex, 1);
+  }
+
+  /**
    * Reset extra values for questionnaire
    */
   resetQuestionnaireFilter(
