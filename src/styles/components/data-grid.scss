@@ -150,6 +150,18 @@
             }
           }
 
+          .gd-form-date-v2 {
+            .mat-form-field {
+              .mat-form-field-wrapper {
+                .mat-form-field-flex {
+                  .mat-form-field-infix {
+                    width: 7.5rem;
+                  }
+                }
+              }
+            }
+          }
+
           .gd-form-select-single-v2,
           .gd-form-select-multiple-v2,
           .gd-form-select-location-single-v2,
