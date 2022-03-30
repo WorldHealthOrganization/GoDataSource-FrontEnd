@@ -8,7 +8,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ApplyListFilter, Constants } from '../../../../core/models/constants';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
@@ -142,7 +142,6 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
   constructor(
     protected listHelperService: ListHelperService,
     private activatedRoute: ActivatedRoute,
-    private router: Router,
     private caseDataService: CaseDataService,
     private locationDataService: LocationDataService,
     private toastV2Service: ToastV2Service,
@@ -2339,8 +2338,8 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
   }
 
   /**
-     * Get total number of items, based on the applied filters
-     */
+   * Get total number of items, based on the applied filters
+   */
   refreshListCount(applyHasMoreLimit?: boolean) {
     // reset
     this.pageCount = undefined;
@@ -2382,16 +2381,5 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
       .subscribe((response) => {
         this.pageCount = response;
       });
-  }
-
-  /**
-     * Redirect to import relationship page
-     */
-  goToRelationshipImportPage() {
-    this.router.navigate(['/import-export-data', 'relationships', 'import'], {
-      queryParams: {
-        from: Constants.APP_PAGE.CASES.value
-      }
-    });
   }
 }
