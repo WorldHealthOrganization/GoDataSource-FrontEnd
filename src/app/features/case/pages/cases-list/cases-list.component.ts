@@ -1475,17 +1475,17 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
         field: 'questionnaireAnswers',
         label: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
         template: () => this.selectedOutbreak.caseInvestigationTemplate
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'pregnancyStatus',
+        label: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
+        options: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        // sortable: true
       }
     ];
     // // set available side filters
     // this.availableSideFilters = [
-    //   new FilterModel({
-    //     fieldName: 'pregnancyStatus',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
-    //     type: FilterType.MULTISELECT,
-    //     // this.pregnancyStatsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PREGNANCY_STATUS);
-    //     // options$: this.pregnancyStatsList$
-    //   }),
     //   new FilterModel({
     //     fieldName: 'vaccinesReceived.vaccine',
     //     fieldLabel: 'LNG_CASE_FIELD_LABEL_VACCINE',
