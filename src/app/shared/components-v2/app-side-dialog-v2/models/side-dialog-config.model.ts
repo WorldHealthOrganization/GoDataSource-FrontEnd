@@ -215,6 +215,9 @@ export interface IV2SideDialogConfigInputFilterListItem extends IV2SideDialogCon
 
   // optional
   value?: any;
+  extraValues?: {
+    [key: string]: any
+  };
 }
 
 /**

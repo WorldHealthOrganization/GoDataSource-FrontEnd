@@ -1,5 +1,7 @@
 import { ILabelValuePairModel } from '../../../forms-v2/core/label-value-pair.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { QuestionModel } from '../../../../core/models/question.model';
+import { Constants } from '../../../../core/models/constants';
 
 /**
  * Advanced filter type
@@ -38,6 +40,26 @@ export enum V2AdvancedFilterComparatorType {
   HAS_VALUE = 'has_value',
   DOESNT_HAVE_VALUE = 'doesnt_have_value'
 }
+
+/**
+ * Question which answer
+ */
+export enum V2AdvancedFilterQuestionWhichAnswer {
+  ANY_ANSWER = 'any',
+  LAST_ANSWER = 'last'
+}
+
+// question answer mapping
+export const V2AdvancedFilterQuestionComparators: {
+  [key: string]: V2AdvancedFilterType
+} = {
+  [Constants.ANSWER_TYPES.FREE_TEXT.value]: V2AdvancedFilterType.TEXT,
+  [Constants.ANSWER_TYPES.DATE_TIME.value]: V2AdvancedFilterType.RANGE_DATE,
+  [Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value]: V2AdvancedFilterType.MULTISELECT,
+  [Constants.ANSWER_TYPES.SINGLE_SELECTION.value]: V2AdvancedFilterType.MULTISELECT,
+  [Constants.ANSWER_TYPES.NUMERIC.value]: V2AdvancedFilterType.RANGE_NUMBER,
+  [Constants.ANSWER_TYPES.FILE_UPLOAD.value]: V2AdvancedFilterType.FILE
+};
 
 /**
  * Advanced filter comparator options
@@ -296,8 +318,22 @@ interface IV2AdvancedFilterNumberRange extends IV2AdvancedFilterBase {
   type: V2AdvancedFilterType.RANGE_NUMBER;
 }
 
+/**
+ * Advanced filter - Questionnaire Answers
+ */
+export interface IV2AdvancedFilterQuestionnaireAnswers extends IV2AdvancedFilterBase {
+  // required
+  type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS;
+  template: () => QuestionModel[];
+
+  // optional
+  templateOptions?: ILabelValuePairModel[];
+  templateOptionsMap?: {
+    [value: string]: ILabelValuePairModel
+  };
+}
+
 // advanced filter
 export type V2AdvancedFilter = IV2AdvancedFilterText | IV2AdvancedFilterSingleSelect | IV2AdvancedFilterSingleSelectLoader
-| IV2AdvancedFilterMultipleSelect | IV2AdvancedFilterMultipleSelectLoader
-| IV2AdvancedFilterAgeRange | IV2AdvancedFilterAddress | IV2AdvancedFilterAddressPhoneNumber | IV2AdvancedFilterDateRange
-| IV2AdvancedFilterNumberRange;
+| IV2AdvancedFilterMultipleSelect | IV2AdvancedFilterMultipleSelectLoader | IV2AdvancedFilterAgeRange | IV2AdvancedFilterAddress
+| IV2AdvancedFilterAddressPhoneNumber | IV2AdvancedFilterDateRange | IV2AdvancedFilterNumberRange | IV2AdvancedFilterQuestionnaireAnswers;

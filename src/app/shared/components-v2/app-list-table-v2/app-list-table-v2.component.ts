@@ -41,7 +41,8 @@ import { AppListTableV2NoDataComponent } from './components/no-data/app-list-tab
 import { GridApi } from '@ag-grid-community/core/dist/cjs/es5/gridApi';
 import { ColumnApi } from '@ag-grid-community/core/dist/cjs/es5/columns/columnApi';
 import { SavedFiltersService } from '../../../core/services/data/saved-filters.data.service';
-import { V2AdvancedFilter } from './models/advanced-filter.model';
+import { IV2AdvancedFilterQuestionnaireAnswers, V2AdvancedFilter, V2AdvancedFilterType } from './models/advanced-filter.model';
+import { AnswerModel, QuestionModel } from '../../../core/models/question.model';
 
 /**
  * Component
@@ -1563,6 +1564,11 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
                 filter: V2AdvancedFilter
               }[] = [];
               this.advancedFilters.forEach((advancedFilter) => {
+                // do we need to map questionnaire template to select options ?
+                if (advancedFilter.type === V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS) {
+                  this.processTemplate(advancedFilter);
+                }
+
                 // do we need to load data ?
                 if (!advancedFilter.optionsLoad) {
                   // put the exact one in the list
@@ -1616,6 +1622,88 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       })
       .subscribe(() => {
         // #TODO
+      });
+  }
+
+  /**
+   * Process template
+   */
+  private processTemplate(advancedFilter: IV2AdvancedFilterQuestionnaireAnswers): void {
+    // get template questions
+    const questions = advancedFilter.template() || [];
+
+    // reset template options
+    advancedFilter.templateOptions = [];
+    advancedFilter.templateOptionsMap = {};
+
+    // add question to list
+    const addQuestion = (
+      question: QuestionModel,
+      prefixOrder: string,
+      multiAnswerParent: boolean
+    ) => {
+      // add question to list
+      const orderLabel: string = (
+        prefixOrder ?
+          (prefixOrder + '.') :
+          ''
+      ) + question.order;
+      const label: string = `${orderLabel} ${this.i18nService.instant(question.text)}`;
+
+      // create option
+      const options = {
+        label,
+        value: question.variable,
+        data: {
+          question,
+          label,
+          multiAnswerParent: multiAnswerParent
+        }
+      };
+
+      // add to list of questions
+      advancedFilter.templateOptions.push(options);
+
+      // map question for easy access
+      advancedFilter.templateOptionsMap[question.variable] = options;
+
+      // add recursive sub-questions
+      if (
+        question.answers &&
+        question.answers.length > 0
+      ) {
+        question.answers.forEach((answer: AnswerModel) => {
+          if (
+            answer.additionalQuestions &&
+            answer.additionalQuestions.length > 0
+          ) {
+            answer.additionalQuestions
+              // ignore some types of questions
+              .filter((adQuestion) => adQuestion.answerType !== Constants.ANSWER_TYPES.MARKUP.value)
+              .forEach((childQuestion: QuestionModel, index: number) => {
+                childQuestion.order = index + 1;
+                addQuestion(
+                  childQuestion,
+                  orderLabel,
+                  multiAnswerParent
+                );
+              });
+          }
+        });
+      }
+    };
+
+    // determine list of questions to display
+    questions
+      // ignore some types of questions
+      .filter((adQuestion) => adQuestion.answerType !== Constants.ANSWER_TYPES.MARKUP.value)
+      .forEach((question: QuestionModel, index: number) => {
+        question.order = index + 1;
+        addQuestion(
+          question,
+          '',
+          question.multiAnswer
+        );
       });
   }
 }

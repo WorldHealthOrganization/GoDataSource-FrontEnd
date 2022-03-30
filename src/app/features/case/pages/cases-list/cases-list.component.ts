@@ -1,5 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
-import { Observable, of, Subscription, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { UserModel } from '../../../../core/models/user.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
@@ -136,9 +136,6 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
   // provide constants to template
   Constants = Constants;
 
-  // subscribers
-  outbreakSubscriber: Subscription;
-
   /**
    * Constructor
    */
@@ -165,12 +162,6 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
-
-    // outbreak subscriber
-    if (this.outbreakSubscriber) {
-      this.outbreakSubscriber.unsubscribe();
-      this.outbreakSubscriber = null;
-    }
   }
 
   /**
@@ -1479,11 +1470,11 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
               finished(data);
             });
         }
-      // }, {
-      //   type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
-      //   field: 'questionnaireAnswers',
-      //   label: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-      //   template: () => this.selectedOutbreak.caseInvestigationTemplate
+      }, {
+        type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
+        field: 'questionnaireAnswers',
+        label: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+        template: () => this.selectedOutbreak.caseInvestigationTemplate
       }
     ];
     // // set available side filters
@@ -1718,8 +1709,11 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
         {
           label: 'LNG_PAGE_LIST_CASES_ACTION_IMPORT_CASES_RELATIONSHIPS',
           action: {
-            click: () => {
-              this.goToRelationshipImportPage();
+            link: () => ['/import-export-data', 'relationships', 'import'],
+            linkQueryParams: (): Params => {
+              return {
+                from: Constants.APP_PAGE.CASES.value
+              };
             }
           },
           visible: (): boolean => {
