@@ -1,43 +1,43 @@
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
+import { IMapResolverV2, IResolverV2ResponseModel } from './models/resolver-response.model';
+import { ReferenceDataDataService } from '../../data/reference-data.data.service';
+import { ReferenceDataCategory, ReferenceDataEntryModel } from '../../../models/reference-data.model';
 import { catchError, map } from 'rxjs/operators';
 import { ToastV2Service } from '../../helper/toast-v2.service';
-import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
-import { GenericDataService } from '../../data/generic.data.service';
-import { IMapResolverV2, IResolverV2ResponseModel } from './models/resolver-response.model';
 
 @Injectable()
-export class YesNoAllDataResolver implements IMapResolverV2<ILabelValuePairModel> {
+export class VaccineStatusDataResolver implements IMapResolverV2<ReferenceDataEntryModel> {
   /**
    * Constructor
    */
   constructor(
-    private genericDataService: GenericDataService,
+    private referenceDataDataService: ReferenceDataDataService,
     private toastV2Service: ToastV2Service
   ) {}
 
   /**
    * Retrieve data
    */
-  resolve(): Observable<IResolverV2ResponseModel<ILabelValuePairModel>> {
-    return this.genericDataService
-      .getFilterYesNoOptions()
+  resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
+    return this.referenceDataDataService
+      .getReferenceDataByCategory(ReferenceDataCategory.VACCINES_STATUS)
       .pipe(
         map((data) => {
           // construct map
-          const response: IResolverV2ResponseModel<ILabelValuePairModel> = {
-            list: data,
+          const response: IResolverV2ResponseModel<ReferenceDataEntryModel> = {
+            list: data.entries,
             map: {},
             options: []
           };
-          data.forEach((item) => {
+          data.entries.forEach((item) => {
             // map
             response.map[item.id] = item;
 
             // add option
             response.options.push({
-              label: item.label,
-              value: item.value,
+              label: item.value,
+              value: item.id,
               data: item
             });
           });

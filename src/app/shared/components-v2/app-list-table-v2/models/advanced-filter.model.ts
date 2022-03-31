@@ -1,19 +1,21 @@
 import { ILabelValuePairModel } from '../../../forms-v2/core/label-value-pair.model';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { QuestionModel } from '../../../../core/models/question.model';
+import { Constants } from '../../../../core/models/constants';
 
 /**
  * Advanced filter type
  */
 export enum V2AdvancedFilterType {
   TEXT = 'text',
-  NUMBER = 'number',
   SELECT = 'select',
   MULTISELECT = 'multiselect',
   RANGE_NUMBER = 'range_number',
   RANGE_AGE = 'range_age',
   RANGE_DATE = 'range_date',
-  DATE = 'date',
   ADDRESS = 'address',
-  LOCATION = 'location',
+  LOCATION_SINGLE = 'location_single',
+  LOCATION_MULTIPLE = 'location_multiple',
   ADDRESS_PHONE_NUMBER = 'address_phone_number',
   QUESTIONNAIRE_ANSWERS = 'questionnaire_answers',
   FILE = 'file'
@@ -37,6 +39,26 @@ export enum V2AdvancedFilterComparatorType {
   HAS_VALUE = 'has_value',
   DOESNT_HAVE_VALUE = 'doesnt_have_value'
 }
+
+/**
+ * Question which answer
+ */
+export enum V2AdvancedFilterQuestionWhichAnswer {
+  ANY_ANSWER = 'any',
+  LAST_ANSWER = 'last'
+}
+
+// question answer mapping
+export const V2AdvancedFilterQuestionComparators: {
+  [key: string]: V2AdvancedFilterType
+} = {
+  [Constants.ANSWER_TYPES.FREE_TEXT.value]: V2AdvancedFilterType.TEXT,
+  [Constants.ANSWER_TYPES.DATE_TIME.value]: V2AdvancedFilterType.RANGE_DATE,
+  [Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value]: V2AdvancedFilterType.MULTISELECT,
+  [Constants.ANSWER_TYPES.SINGLE_SELECTION.value]: V2AdvancedFilterType.MULTISELECT,
+  [Constants.ANSWER_TYPES.NUMERIC.value]: V2AdvancedFilterType.RANGE_NUMBER,
+  [Constants.ANSWER_TYPES.FILE_UPLOAD.value]: V2AdvancedFilterType.FILE
+};
 
 /**
  * Advanced filter comparator options
@@ -63,18 +85,6 @@ export const V2AdvancedFilterComparatorOptions: {
       value: V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE
     }
   ],
-
-  // number
-  [V2AdvancedFilterType.NUMBER]: [{
-    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_IS',
-    value: V2AdvancedFilterComparatorType.IS
-  }, {
-    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LESS_OR_EQUAL',
-    value: V2AdvancedFilterComparatorType.BEFORE
-  }, {
-    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_GREATER_OR_EQUAL',
-    value: V2AdvancedFilterComparatorType.AFTER
-  }],
 
   // select
   [V2AdvancedFilterType.SELECT]: [{
@@ -148,12 +158,6 @@ export const V2AdvancedFilterComparatorOptions: {
     value: V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE
   }],
 
-  // date
-  [V2AdvancedFilterType.DATE]: [{
-    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_DAY_IS',
-    value: V2AdvancedFilterComparatorType.DATE
-  }],
-
   // address
   [V2AdvancedFilterType.ADDRESS]: [{
     label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_CONTAINS',
@@ -166,8 +170,14 @@ export const V2AdvancedFilterComparatorOptions: {
     value: V2AdvancedFilterComparatorType.WITHIN
   }],
 
-  // location
-  [V2AdvancedFilterType.LOCATION]: [{
+  // location - single
+  [V2AdvancedFilterType.LOCATION_SINGLE]: [{
+    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION',
+    value: V2AdvancedFilterComparatorType.LOCATION
+  }],
+
+  // location - multiple
+  [V2AdvancedFilterType.LOCATION_MULTIPLE]: [{
     label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION',
     value: V2AdvancedFilterComparatorType.LOCATION
   }],
@@ -205,6 +215,12 @@ interface IV2AdvancedFilterBase {
 
   // optional
   id?: string;
+  relationshipPath?: string[];
+  relationshipLabel?: string;
+
+  // never
+  optionsLoad?: never;
+  options?: never;
 }
 
 /**
@@ -216,12 +232,35 @@ interface IV2AdvancedFilterText extends IV2AdvancedFilterBase {
 }
 
 /**
+ * Advanced filter - Single select
+ */
+interface IV2AdvancedFilterSingleSelect extends Omit<IV2AdvancedFilterBase, 'options'> {
+  // required
+  type: V2AdvancedFilterType.SELECT;
+  options: ILabelValuePairModel[];
+}
+interface IV2AdvancedFilterSingleSelectLoader extends Omit<IV2AdvancedFilterSingleSelect, 'options' | 'optionsLoad'> {
+  // required
+  optionsLoad: (finished: (data: IResolverV2ResponseModel<any>) => void) => void
+
+  // never
+  options?: never;
+}
+
+/**
  * Advanced filter - Multiple select
  */
-interface IV2AdvancedFilterMultipleSelect extends IV2AdvancedFilterBase {
+interface IV2AdvancedFilterMultipleSelect extends Omit<IV2AdvancedFilterBase, 'options'> {
   // required
   type: V2AdvancedFilterType.MULTISELECT;
   options: ILabelValuePairModel[];
+}
+interface IV2AdvancedFilterMultipleSelectLoader extends Omit<IV2AdvancedFilterMultipleSelect, 'options' | 'optionsLoad'> {
+  // required
+  optionsLoad: (finished: (data: IResolverV2ResponseModel<any>) => void) => void
+
+  // never
+  options?: never;
 }
 
 /**
@@ -251,6 +290,22 @@ interface IV2AdvancedFilterAddressPhoneNumber extends IV2AdvancedFilterBase {
 }
 
 /**
+ * Advanced filter - location single
+ */
+export interface IV2AdvancedFilterSingleLocation extends IV2AdvancedFilterBase {
+  // required
+  type: V2AdvancedFilterType.LOCATION_SINGLE;
+}
+
+/**
+ * Advanced filter - location multiple
+ */
+export interface IV2AdvancedFilterMultipleLocation extends IV2AdvancedFilterBase {
+  // required
+  type: V2AdvancedFilterType.LOCATION_MULTIPLE;
+}
+
+/**
  * Advanced filter - Date Range
  */
 interface IV2AdvancedFilterDateRange extends IV2AdvancedFilterBase {
@@ -258,6 +313,31 @@ interface IV2AdvancedFilterDateRange extends IV2AdvancedFilterBase {
   type: V2AdvancedFilterType.RANGE_DATE;
 }
 
+/**
+ * Advanced filter - Number Range
+ */
+interface IV2AdvancedFilterNumberRange extends IV2AdvancedFilterBase {
+  // required
+  type: V2AdvancedFilterType.RANGE_NUMBER;
+}
+
+/**
+ * Advanced filter - Questionnaire Answers
+ */
+export interface IV2AdvancedFilterQuestionnaireAnswers extends IV2AdvancedFilterBase {
+  // required
+  type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS;
+  template: () => QuestionModel[];
+
+  // optional
+  templateOptions?: ILabelValuePairModel[];
+  templateOptionsMap?: {
+    [value: string]: ILabelValuePairModel
+  };
+}
+
 // advanced filter
-export type V2AdvancedFilter = IV2AdvancedFilterText | IV2AdvancedFilterMultipleSelect | IV2AdvancedFilterAgeRange | IV2AdvancedFilterAddress
-| IV2AdvancedFilterAddressPhoneNumber | IV2AdvancedFilterDateRange;
+export type V2AdvancedFilter = IV2AdvancedFilterText | IV2AdvancedFilterSingleSelect | IV2AdvancedFilterSingleSelectLoader
+| IV2AdvancedFilterMultipleSelect | IV2AdvancedFilterMultipleSelectLoader | IV2AdvancedFilterAgeRange | IV2AdvancedFilterAddress
+| IV2AdvancedFilterAddressPhoneNumber | IV2AdvancedFilterDateRange | IV2AdvancedFilterNumberRange | IV2AdvancedFilterQuestionnaireAnswers
+| IV2AdvancedFilterSingleLocation | IV2AdvancedFilterMultipleLocation;

@@ -20,7 +20,14 @@ import { IV2GroupedData, IV2GroupedDataValue } from './models/grouped-data.model
 import { IBasicCount } from '../../../core/models/basic-count.interface';
 import { PageEvent } from '@angular/material/paginator';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
-import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputCheckbox, IV2SideDialogConfigInputSingleDropdown, V2SideDialogConfigInput, V2SideDialogConfigInputType } from '../app-side-dialog-v2/models/side-dialog-config.model';
+import {
+  IV2SideDialogConfigButtonType,
+  IV2SideDialogConfigInputCheckbox,
+  IV2SideDialogConfigInputFilterList,
+  IV2SideDialogConfigInputSingleDropdown,
+  V2SideDialogConfigInput,
+  V2SideDialogConfigInputType
+} from '../app-side-dialog-v2/models/side-dialog-config.model';
 import { UserModel, UserSettings } from '../../../core/models/user.model';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { catchError } from 'rxjs/operators';
@@ -34,7 +41,8 @@ import { AppListTableV2NoDataComponent } from './components/no-data/app-list-tab
 import { GridApi } from '@ag-grid-community/core/dist/cjs/es5/gridApi';
 import { ColumnApi } from '@ag-grid-community/core/dist/cjs/es5/columns/columnApi';
 import { SavedFiltersService } from '../../../core/services/data/saved-filters.data.service';
-import { V2AdvancedFilter } from './models/advanced-filter.model';
+import { IV2AdvancedFilterQuestionnaireAnswers, V2AdvancedFilter, V2AdvancedFilterType } from './models/advanced-filter.model';
+import { AnswerModel, QuestionModel } from '../../../core/models/question.model';
 
 /**
  * Component
@@ -142,6 +150,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
   // grouped data
   groupedDataExpanded: boolean = false;
+  groupedDataOneActive: boolean;
   private _groupedDataPreviousClickedValue: IV2GroupedDataValue;
   private _groupedData: IV2GroupedData;
   @Input() set groupedData(groupedData: IV2GroupedData) {
@@ -1435,6 +1444,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       return;
     }
 
+    // reset value
+    this.groupedDataOneActive = undefined;
+
     // same item clicked, then unselect
     if (this._groupedDataPreviousClickedValue === groupValue) {
       // unselect
@@ -1456,6 +1468,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // select
     this._groupedDataPreviousClickedValue = groupValue;
     this._groupedDataPreviousClickedValue.active = true;
+    this.groupedDataOneActive = true;
 
     // trigger click
     this.groupedData.click(groupValue, this.groupedData);
@@ -1495,7 +1508,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           get: () => 'LNG_SIDE_FILTERS_TITLE'
         },
         hideInputFilter: true,
-        width: '30rem',
+        width: '40rem',
         inputs: [
           {
             type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
@@ -1507,11 +1520,31 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           }, {
             type: V2SideDialogConfigInputType.FILTER_LIST,
             name: 'filters',
-            options: this.advancedFilters,
+            options: [],
             filters: []
           }
         ],
-        bottomButtons: [],
+        bottomButtons: [{
+          type: IV2SideDialogConfigButtonType.OTHER,
+          label: 'LNG_SIDE_FILTERS_APPLY_FILTERS_BUTTON',
+          color: 'primary',
+          key: 'apply',
+          disabled: (_data, handler): boolean => {
+            return !handler.form || handler.form.invalid;
+          }
+        }, {
+          type: IV2SideDialogConfigButtonType.OTHER,
+          label: 'LNG_SIDE_FILTERS_SAVE_FILTER_BUTTON',
+          color: 'secondary',
+          key: 'save',
+          disabled: (_data, handler): boolean => {
+            return !handler.form || handler.form.invalid;
+          }
+        }, {
+          type: IV2SideDialogConfigButtonType.CANCEL,
+          label: 'LNG_COMMON_BUTTON_CANCEL',
+          color: 'text'
+        }],
         initialized: (handler) => {
           // display loading
           handler.loading.show();
@@ -1545,13 +1578,159 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
                 };
               });
 
-              // hide loading
-              handler.loading.hide();
+              // do we need to retrieve other data ?
+              (handler.data.map.filters as IV2SideDialogConfigInputFilterList).options = [];
+              const dataToRetrieve: {
+                filter: V2AdvancedFilter
+              }[] = [];
+              this.advancedFilters.forEach((advancedFilter) => {
+                // do we need to map questionnaire template to select options ?
+                if (advancedFilter.type === V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS) {
+                  this.processTemplate(advancedFilter);
+                }
+
+                // do we need to load data ?
+                if (!advancedFilter.optionsLoad) {
+                  // put the exact one in the list
+                  (handler.data.map.filters as IV2SideDialogConfigInputFilterList).options.push(advancedFilter);
+
+                  // finished
+                  return;
+                }
+
+                // add to list of data to retrieve
+                dataToRetrieve.push({
+                  filter: advancedFilter
+                });
+              });
+
+              // retrieve data - synchronously
+              const nextItem = () => {
+                // finished ?
+                if (dataToRetrieve.length < 1) {
+                  // reload inputs data
+                  handler.update.refresh();
+
+                  // hide loading
+                  handler.loading.hide();
+
+                  // finished
+                  return;
+                }
+
+                // get data
+                const itemToRetrieve = dataToRetrieve.splice(0, 1)[0];
+                itemToRetrieve.filter.optionsLoad((data) => {
+                  // clone item
+                  const newFilter: V2AdvancedFilter = _.cloneDeep(itemToRetrieve.filter);
+                  newFilter.options = data ?
+                    data.options :
+                    [];
+
+                  // put the exact one in the list
+                  (handler.data.map.filters as IV2SideDialogConfigInputFilterList).options.push(newFilter);
+
+                  // next one
+                  nextItem();
+                });
+              };
+
+              // start
+              nextItem();
             });
         }
       })
-      .subscribe(() => {
+      .subscribe((data) => {
+        // cancelled ?
+        if (data.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+          return;
+        }
+
         // #TODO
+        console.log(data);
+        data.handler.hide();
+      });
+  }
+
+  /**
+   * Process template
+   */
+  private processTemplate(advancedFilter: IV2AdvancedFilterQuestionnaireAnswers): void {
+    // get template questions
+    const questions = advancedFilter.template() || [];
+
+    // reset template options
+    advancedFilter.templateOptions = [];
+    advancedFilter.templateOptionsMap = {};
+
+    // add question to list
+    const addQuestion = (
+      question: QuestionModel,
+      prefixOrder: string,
+      multiAnswerParent: boolean
+    ) => {
+      // add question to list
+      const orderLabel: string = (
+        prefixOrder ?
+          (prefixOrder + '.') :
+          ''
+      ) + question.order;
+      const label: string = `${orderLabel} ${this.i18nService.instant(question.text)}`;
+
+      // create option
+      const options = {
+        label,
+        value: question.variable,
+        data: {
+          question,
+          label,
+          multiAnswerParent: multiAnswerParent
+        }
+      };
+
+      // add to list of questions
+      advancedFilter.templateOptions.push(options);
+
+      // map question for easy access
+      advancedFilter.templateOptionsMap[question.variable] = options;
+
+      // add recursive sub-questions
+      if (
+        question.answers &&
+        question.answers.length > 0
+      ) {
+        question.answers.forEach((answer: AnswerModel) => {
+          if (
+            answer.additionalQuestions &&
+            answer.additionalQuestions.length > 0
+          ) {
+            answer.additionalQuestions
+              // ignore some types of questions
+              .filter((adQuestion) => adQuestion.answerType !== Constants.ANSWER_TYPES.MARKUP.value)
+              .forEach((childQuestion: QuestionModel, index: number) => {
+                childQuestion.order = index + 1;
+                addQuestion(
+                  childQuestion,
+                  orderLabel,
+                  multiAnswerParent
+                );
+              });
+          }
+        });
+      }
+    };
+
+    // determine list of questions to display
+    questions
+      // ignore some types of questions
+      .filter((adQuestion) => adQuestion.answerType !== Constants.ANSWER_TYPES.MARKUP.value)
+      .forEach((question: QuestionModel, index: number) => {
+        question.order = index + 1;
+        addQuestion(
+          question,
+          '',
+          question.multiAnswer
+        );
       });
   }
 }

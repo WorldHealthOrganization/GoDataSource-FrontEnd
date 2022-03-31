@@ -5,7 +5,8 @@ import {
   IV2SideDialogConfigButton,
   IV2SideDialogConfigButtonType,
   IV2SideDialogConfigInputAccordionPanel,
-  IV2SideDialogConfigInputFilterList, IV2SideDialogConfigInputFilterListItem,
+  IV2SideDialogConfigInputFilterList,
+  IV2SideDialogConfigInputFilterListItem,
   IV2SideDialogData,
   IV2SideDialogHandler,
   IV2SideDialogResponse,
@@ -18,7 +19,7 @@ import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v
 import { NgForm } from '@angular/forms';
 import { Location } from '@angular/common';
 import { SubscriptionLike } from 'rxjs/internal/types';
-import { V2AdvancedFilter, V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../app-list-table-v2/models/advanced-filter.model';
+import { V2AdvancedFilter, V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterQuestionComparators, V2AdvancedFilterQuestionWhichAnswer, V2AdvancedFilterType } from '../app-list-table-v2/models/advanced-filter.model';
 import { Constants } from '../../../core/models/constants';
 import { v4 as uuid } from 'uuid';
 import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model';
@@ -70,6 +71,12 @@ export class AppSideDialogV2Component implements OnDestroy {
 
         // update UI
         this.changeDetectorRef.detectChanges();
+      },
+
+      // refresh inputs
+      refresh: () => {
+        // refresh inputs
+        this.updateInputs();
       }
     },
 
@@ -201,10 +208,23 @@ export class AppSideDialogV2Component implements OnDestroy {
     }
   } | undefined;
 
+  // questionnaire - which answer
+  questionWhichAnswerOptions: ILabelValuePairModel[] = [
+    {
+      label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER_ANY',
+      value: V2AdvancedFilterQuestionWhichAnswer.ANY_ANSWER
+    }, {
+      label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER_LAST',
+      value: V2AdvancedFilterQuestionWhichAnswer.LAST_ANSWER
+    }
+  ];
+
   // constants
   V2SideDialogConfigInputType = V2SideDialogConfigInputType;
   V2AdvancedFilterType = V2AdvancedFilterType;
   V2AdvancedFilterComparatorType = V2AdvancedFilterComparatorType;
+  V2AdvancedFilterQuestionComparators = V2AdvancedFilterQuestionComparators;
+  V2AdvancedFilterComparatorOptions = V2AdvancedFilterComparatorOptions;
   Constants = Constants;
 
   // subscriptions
@@ -485,9 +505,14 @@ export class AppSideDialogV2Component implements OnDestroy {
           // option id
           const id: string = filterOption.id || uuid();
 
+          // determine label
+          const label: string = filterOption.relationshipLabel ?
+            `${this.i18nService.instant(filterOption.relationshipLabel)} ${this.i18nService.instant(filterOption.label)}` :
+            filterOption.label;
+
           // create option
           const option: ILabelValuePairModel = {
-            label: filterOption.label,
+            label,
             value: id,
             data: filterOption
           };
@@ -522,15 +547,25 @@ export class AppSideDialogV2Component implements OnDestroy {
         placeholder: 'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER',
         options: input.optionsAsLabelValue,
         change: (data, _handler, filter) => {
-          // reset comparator selected value
+          // get filter
           const filterItem = filter as unknown as IV2SideDialogConfigInputFilterListItem;
-          filterItem.value = undefined;
-          filterItem.comparator.value = undefined;
-
-          // set comparator options
           const filterOption: V2AdvancedFilter = filterItem.filterBy.value ?
             (data.map.filters as IV2SideDialogConfigInputFilterList).optionsAsLabelValueMap[filterItem.filterBy.value].data as V2AdvancedFilter :
             undefined;
+
+          // reset comparator selected value
+          filterItem.value = undefined;
+          filterItem.comparator.value = undefined;
+          if (
+            filterOption &&
+            filterOption.type === V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS
+          ) {
+            this.resetQuestionnaireFilter(filterItem);
+          } else {
+            filterItem.extraValues =  undefined;
+          }
+
+          // set comparator options
           filterItem.comparator.options = filterOption ?
             V2AdvancedFilterComparatorOptions[filterOption.type] :
             [];
@@ -544,12 +579,88 @@ export class AppSideDialogV2Component implements OnDestroy {
         name: `${input.name}.comparator[${input.filters.length}]`,
         placeholder: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL',
         options: [],
-        change: (_data, _handler, filter) => {
+        change: (data, _handler, filter) => {
           // reset comparator selected value
           const filterItem = filter as unknown as IV2SideDialogConfigInputFilterListItem;
           filterItem.value = undefined;
+
+          // reset extra value
+          const filterOption: V2AdvancedFilter = filterItem.filterBy.value ?
+            (data.map.filters as IV2SideDialogConfigInputFilterList).optionsAsLabelValueMap[filterItem.filterBy.value].data as V2AdvancedFilter :
+            undefined;
+          if (
+            filterOption &&
+            filterOption.type === V2AdvancedFilterType.ADDRESS &&
+            filterItem.comparator.value === V2AdvancedFilterComparatorType.WITHIN
+          ) {
+            filterItem.extraValues =  {
+              radius: {
+                name: uuid(),
+                value: undefined
+              }
+            };
+          } else {
+            filterItem.extraValues = undefined;
+          }
         }
       }
     });
+  }
+
+  /**
+   * Remove advanced filter
+   */
+  removeAdvancedFilter(
+    input: IV2SideDialogConfigInputFilterList,
+    filter: IV2SideDialogConfigInputFilterListItem
+  ): void {
+    // find index
+    const filterIndex: number = input.filters.findIndex((item) => item === filter);
+    if (filterIndex < 0) {
+      return;
+    }
+
+    // remove
+    input.filters.splice(filterIndex, 1);
+  }
+
+  /**
+   * Reset extra values for questionnaire
+   */
+  resetQuestionnaireFilter(
+    filter: IV2SideDialogConfigInputFilterListItem,
+    ...specificProperties: string[]
+  ): void {
+    // reset everything ?
+    if (
+      !specificProperties ||
+      specificProperties.length < 1
+    ) {
+      filter.extraValues = {
+        whichAnswer: {
+          name: uuid(),
+          value: undefined
+        },
+        whichAnswerDate: {
+          name: uuid(),
+          value: undefined
+        },
+        comparator: {
+          name: uuid(),
+          value: undefined
+        },
+        filterValue: {
+          name: uuid(),
+          value: undefined
+        }
+      };
+    } else {
+      specificProperties.forEach((property) => {
+        filter.extraValues[property] = {
+          name: uuid(),
+          value: undefined
+        };
+      });
+    }
   }
 }

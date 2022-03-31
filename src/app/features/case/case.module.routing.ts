@@ -12,6 +12,10 @@ import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { OccupationDataResolver } from '../../core/services/resolvers/data/occupation.resolver';
 import { RiskDataResolver } from '../../core/services/resolvers/data/risk.resolver';
+import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.resolver';
+import { PregnancyStatusDataResolver } from '../../core/services/resolvers/data/pregnancy-status.resolver';
+import { VaccineDataResolver } from '../../core/services/resolvers/data/vaccine.resolver';
+import { VaccineStatusDataResolver } from '../../core/services/resolvers/data/vaccine-status.resolver';
 
 const routes: Routes = [
   // Cases list
@@ -29,9 +33,13 @@ const routes: Routes = [
       gender: GenderDataResolver,
       occupation: OccupationDataResolver,
       outcome: OutcomeDataResolver,
+      pregnancy: PregnancyStatusDataResolver,
       risk: RiskDataResolver,
       yesNoAll: YesNoAllDataResolver,
-      user: UserDataResolver
+      yesNo: YesNoDataResolver,
+      user: UserDataResolver,
+      vaccine: VaccineDataResolver,
+      vaccineStatus: VaccineStatusDataResolver
     }
   },
   // Create Case

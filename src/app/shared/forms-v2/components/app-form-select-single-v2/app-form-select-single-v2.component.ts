@@ -43,6 +43,9 @@ export class AppFormSelectSingleV2Component
   // tooltip
   @Input() optionTooltipKey: string;
 
+  // sort disabled
+  @Input() sortDisabled: boolean;
+
   // options
   filteredOptions: ILabelValuePairModel[];
   allOptionsMap: {
@@ -64,10 +67,12 @@ export class AppFormSelectSingleV2Component
         });
 
       // sort
-      this.allOptions
-        .sort((item1, item2) => {
-          return item1.label.toLowerCase().localeCompare(item2.label.toLowerCase());
-        });
+      if (!this.sortDisabled) {
+        this.allOptions
+          .sort((item1, item2) => {
+            return item1.label.toLowerCase().localeCompare(item2.label.toLowerCase());
+          });
+      }
     }
 
     // map for easy access

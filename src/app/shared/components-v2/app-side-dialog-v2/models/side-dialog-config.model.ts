@@ -215,6 +215,9 @@ export interface IV2SideDialogConfigInputFilterListItem extends IV2SideDialogCon
 
   // optional
   value?: any;
+  extraValues?: {
+    [key: string]: any
+  };
 }
 
 /**
@@ -329,7 +332,8 @@ export interface IV2SideDialogHandler {
   data: IV2SideDialogData;
   hide: () => void;
   update: {
-    inputs: (inputs: V2SideDialogConfigInput[]) => void
+    inputs: (inputs: V2SideDialogConfigInput[]) => void,
+    refresh: () => void
   },
   buttons: {
     click: (buttonKey: string) => void
