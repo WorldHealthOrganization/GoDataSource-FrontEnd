@@ -207,6 +207,11 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
   }
 
   /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
    * Initialize breadcrumbs
    */
   initializeBreadcrumbs(): void {
@@ -215,7 +220,7 @@ export class UserListComponent extends ListComponent implements OnInit, OnDestro
   /**
    * Fields retrieved from api to reduce payload size
    */
-  refreshListFields(): string[] {
+  protected refreshListFields(): string[] {
     return [];
   }
 

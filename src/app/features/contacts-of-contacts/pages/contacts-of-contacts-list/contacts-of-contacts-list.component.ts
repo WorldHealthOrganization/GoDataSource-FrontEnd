@@ -1196,6 +1196,11 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
   }
 
   /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
      * Initialize Side Filters
      */
   initializeSideFilters() {
@@ -1309,7 +1314,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
   /**
    * Fields retrieved from api to reduce payload size
    */
-  refreshListFields(): string[] {
+  protected refreshListFields(): string[] {
     return [];
   }
 

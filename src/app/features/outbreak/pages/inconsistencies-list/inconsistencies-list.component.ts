@@ -145,6 +145,11 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
   protected initializeTableColumns(): void {}
 
   /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
    * Initialize breadcrumbs
    */
   initializeBreadcrumbs(): void {
@@ -153,7 +158,7 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
   /**
    * Fields retrieved from api to reduce payload size
    */
-  refreshListFields(): string[] {
+  protected refreshListFields(): string[] {
     return [];
   }
 

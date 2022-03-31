@@ -16,6 +16,8 @@
   [sortColumn]="tableSortBy"
   [infos]="infos"
   [filtersApplied]="filtersApplied"
+  [advancedFilterType]="Constants.APP_PAGE.CASES.value"
+  [advancedFilters]="advancedFilters"
   (pageChange)="changePage($event)"
   (sortBy)="sortBy($event, { age: [ 'years', 'months' ] })"
   (filterBy)="filterBy($event)"></app-list-table-v2>

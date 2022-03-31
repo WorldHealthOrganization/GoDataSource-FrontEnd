@@ -269,6 +269,11 @@ export class OutbreakTemplatesListComponent
   }
 
   /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
      * Attach default projection
      */
   clearedQueryBuilder(): void {
@@ -293,7 +298,7 @@ export class OutbreakTemplatesListComponent
   /**
    * Fields retrieved from api to reduce payload size
    */
-  refreshListFields(): string[] {
+  protected refreshListFields(): string[] {
     return [];
   }
 

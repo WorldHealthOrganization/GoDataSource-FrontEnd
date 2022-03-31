@@ -5,6 +5,7 @@ import {
   IV2SideDialogConfigButton,
   IV2SideDialogConfigButtonType,
   IV2SideDialogConfigInputAccordionPanel,
+  IV2SideDialogConfigInputFilterList, IV2SideDialogConfigInputFilterListItem,
   IV2SideDialogData,
   IV2SideDialogHandler,
   IV2SideDialogResponse,
@@ -17,6 +18,10 @@ import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v
 import { NgForm } from '@angular/forms';
 import { Location } from '@angular/common';
 import { SubscriptionLike } from 'rxjs/internal/types';
+import { V2AdvancedFilter, V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../app-list-table-v2/models/advanced-filter.model';
+import { Constants } from '../../../core/models/constants';
+import { v4 as uuid } from 'uuid';
+import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model';
 
 /**
  * Component
@@ -44,10 +49,12 @@ export class AppSideDialogV2Component implements OnDestroy {
 
   // dialog config
   config: IV2SideDialogConfig;
-  dialogData: IV2SideDialogData;
   dialogHandler: IV2SideDialogHandler = {
     // form
     form: null,
+
+    // dialog data
+    data: undefined,
 
     // update
     update: {
@@ -196,6 +203,9 @@ export class AppSideDialogV2Component implements OnDestroy {
 
   // constants
   V2SideDialogConfigInputType = V2SideDialogConfigInputType;
+  V2AdvancedFilterType = V2AdvancedFilterType;
+  V2AdvancedFilterComparatorType = V2AdvancedFilterComparatorType;
+  Constants = Constants;
 
   // subscriptions
   locationSubscription: SubscriptionLike;
@@ -273,7 +283,7 @@ export class AppSideDialogV2Component implements OnDestroy {
     this.filterByValue = undefined;
     this.filteredInputs = undefined;
     this.filteredForceParent = undefined;
-    this.dialogData = undefined;
+    this.dialogHandler.data = undefined;
     this.loading = undefined;
 
     // trigger response
@@ -345,7 +355,7 @@ export class AppSideDialogV2Component implements OnDestroy {
     this.sendResponse(
       button.type,
       button.key,
-      this.dialogData
+      this.dialogHandler.data
     );
   }
 
@@ -458,12 +468,88 @@ export class AppSideDialogV2Component implements OnDestroy {
    */
   updateInputs(): void {
     // map inputs
-    this.dialogData = {
+    this.dialogHandler.data = {
       inputs: this.config.inputs,
       map: {}
     };
     this.config.inputs.forEach((input) => {
-      this.dialogData.map[input.name] = input;
+      // map input
+      this.dialogHandler.data.map[input.name] = input;
+
+      // if type list of filters, then further processing is needed
+      if (input.type === V2SideDialogConfigInputType.FILTER_LIST) {
+        // process options
+        input.optionsAsLabelValue = [];
+        input.optionsAsLabelValueMap = {};
+        input.options.forEach((filterOption) => {
+          // option id
+          const id: string = filterOption.id || uuid();
+
+          // create option
+          const option: ILabelValuePairModel = {
+            label: filterOption.label,
+            value: id,
+            data: filterOption
+          };
+
+          // attach option
+          input.optionsAsLabelValue.push(option);
+
+          // map option
+          input.optionsAsLabelValueMap[id] = option;
+        });
+      }
+    });
+  }
+
+  /**
+   * Add filter
+   */
+  addAdvancedFilter(input: IV2SideDialogConfigInputFilterList): void {
+    // add filter
+    input.filters.push({
+      type: V2SideDialogConfigInputType.FILTER_LIST_ITEM,
+
+      // selected value
+      value: undefined,
+      name: `${input.name}.value[${input.filters.length}]`,
+
+      // filter type
+      filterBy: {
+        type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+        value: undefined,
+        name: `${input.name}.filters[${input.filters.length}]`,
+        placeholder: 'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER',
+        options: input.optionsAsLabelValue,
+        change: (data, _handler, filter) => {
+          // reset comparator selected value
+          const filterItem = filter as unknown as IV2SideDialogConfigInputFilterListItem;
+          filterItem.value = undefined;
+          filterItem.comparator.value = undefined;
+
+          // set comparator options
+          const filterOption: V2AdvancedFilter = filterItem.filterBy.value ?
+            (data.map.filters as IV2SideDialogConfigInputFilterList).optionsAsLabelValueMap[filterItem.filterBy.value].data as V2AdvancedFilter :
+            undefined;
+          filterItem.comparator.options = filterOption ?
+            V2AdvancedFilterComparatorOptions[filterOption.type] :
+            [];
+        }
+      },
+
+      // filter comparator
+      comparator: {
+        type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+        value: undefined,
+        name: `${input.name}.comparator[${input.filters.length}]`,
+        placeholder: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL',
+        options: [],
+        change: (_data, _handler, filter) => {
+          // reset comparator selected value
+          const filterItem = filter as unknown as IV2SideDialogConfigInputFilterListItem;
+          filterItem.value = undefined;
+        }
+      }
     });
   }
 }

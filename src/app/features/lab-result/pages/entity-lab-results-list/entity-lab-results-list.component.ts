@@ -553,6 +553,11 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
   }
 
   /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
      * Initialize Side Filters
      */
   initializeSideFilters() {
@@ -659,7 +664,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
   /**
    * Fields retrieved from api to reduce payload size
    */
-  refreshListFields(): string[] {
+  protected refreshListFields(): string[] {
     return [];
   }
 

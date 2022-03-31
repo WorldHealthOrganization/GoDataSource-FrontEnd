@@ -130,6 +130,11 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
   protected initializeTableColumns(): void {}
 
   /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
      * @Overrides parent method
      */
   onDataInitialized() {
@@ -216,7 +221,7 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
   /**
    * Fields retrieved from api to reduce payload size
    */
-  refreshListFields(): string[] {
+  protected refreshListFields(): string[] {
     return [];
   }
 

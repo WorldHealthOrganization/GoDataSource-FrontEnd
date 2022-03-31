@@ -110,6 +110,11 @@ export class TransmissionChainsListComponent extends ListComponent implements On
   protected initializeTableColumns(): void {}
 
   /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
      * Initialize filters
      */
   resetFiltersAddDefault() {
@@ -232,7 +237,7 @@ export class TransmissionChainsListComponent extends ListComponent implements On
   /**
    * Fields retrieved from api to reduce payload size
    */
-  refreshListFields(): string[] {
+  protected refreshListFields(): string[] {
     return [];
   }
 

@@ -19,6 +19,7 @@ import { AuthenticatedComponent } from '../components/authenticated/authenticate
 import { ICachedFilter, ICachedFilterItems, ICachedInputsValues, ICachedSortItem } from './models/cache.model';
 import { ListAppliedFiltersComponent } from './list-applied-filters-component';
 import { V2FilterType } from '../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { V2AdvancedFilter } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 
 /**
  * List component
@@ -47,6 +48,9 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
 
   // grouped data
   groupedData: IV2GroupedData;
+
+  // advanced filters
+  advancedFilters: V2AdvancedFilter[];
 
   // selected outbreak
   selectedOutbreak: OutbreakModel;
@@ -171,6 +175,9 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
       // initialize side columns
       this.initializeTableColumns();
 
+      // initialize advanced filters
+      this.initializeTableAdvancedFilters();
+
       // load saved filters
       this.loadCachedFilters();
     });
@@ -260,6 +267,11 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
   protected abstract initializeTableColumns(): void;
 
   /**
+   * Initialize side table advanced filters
+   */
+  protected abstract initializeTableAdvancedFilters(): void;
+
+  /**
    * Selected outbreak changed
    */
   protected selectedOutbreakChanged(): void {}
@@ -267,12 +279,12 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
   /**
    * Initialize breadcrumbs
    */
-  public abstract initializeBreadcrumbs(): void;
+  protected abstract initializeBreadcrumbs(): void;
 
   /**
    * Fields retrieved from api to reduce payload size
    */
-  public abstract refreshListFields(): string[];
+  protected abstract refreshListFields(): string[];
 
   /**
      * Refresh list

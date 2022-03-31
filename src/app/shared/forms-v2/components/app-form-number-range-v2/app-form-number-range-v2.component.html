@@ -4,6 +4,7 @@
 
   <!-- From -->
   <app-form-number-v2
+    *ngIf="!fromHidden"
     fxFlex
     [name]="name + '[from]'"
     [(ngModel)]="value.from"
@@ -19,6 +20,7 @@
 
   <!-- Separator -->
   <div
+    *ngIf="!fromHidden && !toHidden"
     fxLayoutAlign="center center"
     class="gd-form-datetime-range-separator-v2">
     —
@@ -26,6 +28,7 @@
 
   <!-- To -->
   <app-form-number-v2
+    *ngIf="!toHidden"
     fxFlex
     [name]="name + '[to]'"
     [(ngModel)]="value.to"

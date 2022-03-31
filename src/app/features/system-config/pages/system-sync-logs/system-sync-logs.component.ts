@@ -226,6 +226,11 @@ export class SystemSyncLogsComponent
   }
 
   /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
    * Initialize breadcrumbs
    */
   initializeBreadcrumbs(): void {
@@ -234,7 +239,7 @@ export class SystemSyncLogsComponent
   /**
    * Fields retrieved from api to reduce payload size
    */
-  refreshListFields(): string[] {
+  protected refreshListFields(): string[] {
     return [];
   }
 

@@ -2,7 +2,7 @@ import {
   ChangeDetectionStrategy, ChangeDetectorRef,
   Component,
   forwardRef,
-  Host,
+  Host, Input,
   OnDestroy,
   Optional,
   SkipSelf, ViewEncapsulation
@@ -27,6 +27,10 @@ import { IV2DateRange } from './models/date.model';
 export class AppFormDateRangeV2Component
   extends AppFormBaseV2<IV2DateRange> implements OnDestroy {
 
+  // visible
+  @Input() fromHidden: boolean;
+  @Input() toHidden: boolean;
+
   /**
    * Constructor
    */
@@ -35,11 +39,15 @@ export class AppFormDateRangeV2Component
     protected translateService: TranslateService,
     protected changeDetectorRef: ChangeDetectorRef
   ) {
+    // parent initialization
     super(
       controlContainer,
       translateService,
       changeDetectorRef
     );
+
+    // value initialization
+    this.writeValue(undefined);
   }
 
   /**

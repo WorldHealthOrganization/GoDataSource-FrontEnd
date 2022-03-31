@@ -2,6 +2,7 @@ import { Subscriber } from 'rxjs';
 import { ILabelValuePairModel } from '../../../forms-v2/core/label-value-pair.model';
 import { NgForm } from '@angular/forms';
 import { Params } from '@angular/router';
+import { V2AdvancedFilter } from '../../app-list-table-v2/models/advanced-filter.model';
 
 /**
  * Side dialog config
@@ -25,7 +26,9 @@ export enum V2SideDialogConfigInputType {
   ACCORDION,
   ACCORDION_PANEL,
   KEY_VALUE,
-  HTML
+  HTML,
+  FILTER_LIST,
+  FILTER_LIST_ITEM
 }
 
 /**
@@ -132,6 +135,7 @@ export interface IV2SideDialogConfigInputSingleDropdown extends IV2SideDialogCon
 
   // optional
   validators?: IV2SideDialogConfigInputValidator;
+  clearable?: boolean;
 }
 
 /**
@@ -201,12 +205,43 @@ export interface IV2SideDialogConfigInputAccordion extends IV2SideDialogConfigIn
 }
 
 /**
+ * Side dialog input - filter list item
+ */
+export interface IV2SideDialogConfigInputFilterListItem extends IV2SideDialogConfigInputBase {
+  // required
+  type: V2SideDialogConfigInputType.FILTER_LIST_ITEM;
+  filterBy: IV2SideDialogConfigInputSingleDropdown;
+  comparator: IV2SideDialogConfigInputSingleDropdown;
+
+  // optional
+  value?: any;
+}
+
+/**
+ * Side dialog input - filter list
+ */
+export interface IV2SideDialogConfigInputFilterList extends IV2SideDialogConfigInputBase {
+  // required
+  type: V2SideDialogConfigInputType.FILTER_LIST;
+  name: string;
+  options: V2AdvancedFilter[];
+  filters: IV2SideDialogConfigInputFilterListItem[];
+
+  // not used
+  placeholder?: never;
+  optionsAsLabelValue?: ILabelValuePairModel[];
+  optionsAsLabelValueMap?: {
+    [optionId: string]: ILabelValuePairModel
+  };
+}
+
+/**
  * Side dialog inputs
  */
 export type V2SideDialogConfigInputFromInput = IV2SideDialogConfigInputCheckbox | IV2SideDialogConfigInputText | IV2SideDialogConfigInputSingleDropdown
 | IV2SideDialogConfigInputMultiDropdown | IV2SideDialogConfigInputNumber;
 export type V2SideDialogConfigInput = IV2SideDialogConfigInputDivider | IV2SideDialogConfigInputKeyValue | IV2SideDialogConfigInputHTML
-| V2SideDialogConfigInputFromInput | IV2SideDialogConfigInputLink | IV2SideDialogConfigInputAccordion;
+| V2SideDialogConfigInputFromInput | IV2SideDialogConfigInputLink | IV2SideDialogConfigInputAccordion | IV2SideDialogConfigInputFilterList;
 
 /**
  * Side dialog inputs map
@@ -291,6 +326,7 @@ export interface IV2SideDialog {
 export interface IV2SideDialogHandler {
   // required
   form: NgForm;
+  data: IV2SideDialogData;
   hide: () => void;
   update: {
     inputs: (inputs: V2SideDialogConfigInput[]) => void
