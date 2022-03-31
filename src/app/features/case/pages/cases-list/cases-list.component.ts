@@ -1,5 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
-import { Observable, of, Subscription, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { UserModel } from '../../../../core/models/user.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
@@ -8,7 +8,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ApplyListFilter, Constants } from '../../../../core/models/constants';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
@@ -136,16 +136,12 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
   // provide constants to template
   Constants = Constants;
 
-  // subscribers
-  outbreakSubscriber: Subscription;
-
   /**
    * Constructor
    */
   constructor(
     protected listHelperService: ListHelperService,
     private activatedRoute: ActivatedRoute,
-    private router: Router,
     private caseDataService: CaseDataService,
     private locationDataService: LocationDataService,
     private toastV2Service: ToastV2Service,
@@ -165,12 +161,6 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
-
-    // outbreak subscriber
-    if (this.outbreakSubscriber) {
-      this.outbreakSubscriber.unsubscribe();
-      this.outbreakSubscriber = null;
-    }
   }
 
   /**
@@ -1479,56 +1469,47 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
               finished(data);
             });
         }
-      // }, {
-      //   type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
-      //   field: 'questionnaireAnswers',
-      //   label: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-      //   template: () => this.selectedOutbreak.caseInvestigationTemplate
+      }, {
+        type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
+        field: 'questionnaireAnswers',
+        label: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+        template: () => this.selectedOutbreak.caseInvestigationTemplate
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'pregnancyStatus',
+        label: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
+        options: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        // sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'vaccinesReceived.vaccine',
+        label: 'LNG_CASE_FIELD_LABEL_VACCINE',
+        options: (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'vaccinesReceived.status',
+        label: 'LNG_CASE_FIELD_LABEL_VACCINE_STATUS',
+        options: (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'vaccinesReceived.date',
+        label: 'LNG_CASE_FIELD_LABEL_VACCINE_DATE'
       }
     ];
-    // // set available side filters
-    // this.availableSideFilters = [
-    //   new FilterModel({
-    //     fieldName: 'pregnancyStatus',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
-    //     type: FilterType.MULTISELECT,
-    //     // this.pregnancyStatsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PREGNANCY_STATUS);
-    //     // options$: this.pregnancyStatsList$
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'vaccinesReceived.vaccine',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_VACCINE',
-    //     type: FilterType.MULTISELECT,
-    //     // this.vaccineList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.VACCINES);
-    //     // options$: this.vaccineList$
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'vaccinesReceived.status',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_VACCINE_STATUS',
-    //     type: FilterType.MULTISELECT,
-    //     // this.vaccineStatusList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.VACCINES_STATUS);
-    //     // options$: this.vaccineStatusList$
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'vaccinesReceived.date',
-    //     fieldLabel: 'LNG_CASE_FIELD_LABEL_VACCINE_DATE',
-    //     type: FilterType.RANGE_DATE
-    //   }),
-    // ];
-    //
-    // // allowed to filter by responsible user ?
-    // if (UserModel.canList(this.authUser)) {
-    //   this.availableSideFilters.push(
-    //     new FilterModel({
-    //       fieldName: 'responsibleUserId',
-    //       fieldLabel: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
-    //       type: FilterType.MULTISELECT,
-    //       // options$: this.userList$,
-    //       optionsLabelKey: 'name',
-    //       optionsValueKey: 'id'
-    //     })
-    //   );
-    // }
+
+    // allowed to filter by responsible user ?
+    if (UserModel.canList(this.authUser)) {
+      this.advancedFilters.push({
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'responsibleUserId',
+        label: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
+        options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+      });
+    }
   }
 
   /**
@@ -1718,8 +1699,11 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
         {
           label: 'LNG_PAGE_LIST_CASES_ACTION_IMPORT_CASES_RELATIONSHIPS',
           action: {
-            click: () => {
-              this.goToRelationshipImportPage();
+            link: () => ['/import-export-data', 'relationships', 'import'],
+            linkQueryParams: (): Params => {
+              return {
+                from: Constants.APP_PAGE.CASES.value
+              };
             }
           },
           visible: (): boolean => {
@@ -2354,8 +2338,8 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
   }
 
   /**
-     * Get total number of items, based on the applied filters
-     */
+   * Get total number of items, based on the applied filters
+   */
   refreshListCount(applyHasMoreLimit?: boolean) {
     // reset
     this.pageCount = undefined;
@@ -2397,16 +2381,5 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
       .subscribe((response) => {
         this.pageCount = response;
       });
-  }
-
-  /**
-     * Redirect to import relationship page
-     */
-  goToRelationshipImportPage() {
-    this.router.navigate(['/import-export-data', 'relationships', 'import'], {
-      queryParams: {
-        from: Constants.APP_PAGE.CASES.value
-      }
-    });
   }
 }
