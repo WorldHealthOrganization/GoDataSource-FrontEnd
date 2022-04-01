@@ -957,7 +957,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
         // Export relationships
         {
-          label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_IMPORT_CONTACTS_OF_CONTACTS_RELATIONSHIPS',
+          label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_EXPORT_CONTACTS_OF_CONTACTS_RELATIONSHIPS',
           action: {
             click: () => {
               // construct filter by Contact of contact query builder
