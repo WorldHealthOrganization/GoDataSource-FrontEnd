@@ -6,6 +6,7 @@ import { PERMISSION } from '../../core/models/permission.model';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 import { GenderDataResolver } from '../../core/services/resolvers/data/gender.resolver';
+import { OccupationDataResolver } from '../../core/services/resolvers/data/occupation.resolver';
 import { RiskDataResolver } from '../../core/services/resolvers/data/risk.resolver';
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
@@ -20,7 +21,8 @@ const routes: Routes = [
       risk: RiskDataResolver,
       user: UserDataResolver,
       gender: GenderDataResolver,
-      yesNoAll: YesNoAllDataResolver
+      yesNoAll: YesNoAllDataResolver,
+      occupation: OccupationDataResolver,
     }
   },
   // Create contact of contact

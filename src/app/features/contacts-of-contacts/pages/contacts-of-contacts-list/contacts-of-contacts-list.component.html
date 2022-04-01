@@ -1,3 +1,4 @@
+<!-- TODO: We don't have Constants.APPLY_LIST_FILTER.CONTACTS_OF_CONTACTS_WITHOUT_RELATIONSHIPS -->
 <app-list-table-v2
   [pageTitle]="'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE'"
   [records$]="contactsOfContactsList$"
@@ -15,6 +16,8 @@
   [pageSettingsKey]="UserSettings.CONTACT_OF_CONTACT_FIELDS"
   [sortColumn]="tableSortBy"
   [filtersApplied]="filtersApplied"
+  [advancedFilterType]="Constants.APP_PAGE.CONTACTS_OF_CONTACTS.value"
+  [advancedFilters]="advancedFilters"
   (pageChange)="changePage($event)"
   (sortBy)="sortBy($event, { age: [ 'years', 'months' ] })"
   (filterBy)="filterBy($event)"></app-list-table-v2>
