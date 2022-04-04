@@ -466,7 +466,7 @@ export class ClientApplicationsListComponent
           }
         })
       ],
-      fileExtension: 'png',
+      fileExtension: 'png'
       // exportStart: () => {
       //   this.showLoadingDialog();
       // },

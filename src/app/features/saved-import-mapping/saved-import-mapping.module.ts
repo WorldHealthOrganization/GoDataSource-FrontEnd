@@ -9,10 +9,8 @@ import * as fromPages from './pages';
     SharedModule
   ],
   declarations: [
-    ...fromPages.pageComponents,
+    ...fromPages.pageComponents
   ]
 })
 
-export class SavedImportMappingModule {
-
-}
+export class SavedImportMappingModule {}
