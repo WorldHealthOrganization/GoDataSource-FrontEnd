@@ -304,7 +304,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         user: queryParams.user,
         status: queryParams.status ?
           queryParams.status :
-          null,
+          null
       };
     }
 
