@@ -754,7 +754,7 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
             action: {
               link: (item: CaseModel): string[] => {
                 return ['/cases', item.id, 'modify'];
-              },
+              }
             },
             visible: (item: CaseModel): boolean => {
               return !item.deleted &&
@@ -861,7 +861,7 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
                           this.needsRefreshList(true);
                         });
                     });
-                  },
+                  }
                 },
                 visible: (item: CaseModel): boolean => {
                   return !item.deleted &&

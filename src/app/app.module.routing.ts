@@ -267,7 +267,7 @@ const routes: Routes = [
                   PERMISSION.CONTACT_OF_CONTACT_BULK_CREATE,
                   PERMISSION.CONTACT_OF_CONTACT_BULK_MODIFY,
                   PERMISSION.CONTACT_OF_CONTACT_VIEW_MOVEMENT_MAP,
-                  PERMISSION.CONTACT_OF_CONTACT_VIEW_CHRONOLOGY_CHART,
+                  PERMISSION.CONTACT_OF_CONTACT_VIEW_CHRONOLOGY_CHART
                 ]
               })
             ]
