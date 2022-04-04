@@ -278,7 +278,7 @@ export class LanguagesListComponent
       message: 'LNG_PAGE_LIST_LANGUAGES_ACTION_EXPORT_TOKENS_DIALOG_TITLE',
       url: `languages/${language.id}/language-tokens/export`,
       fileName: language.name,
-      fileType: ExportDataExtension.XLSX,
+      fileType: ExportDataExtension.XLSX
       // exportStart: () => { this.showLoadingDialog(); },
       // exportFinished: () => { this.closeLoadingDialog(); }
     });

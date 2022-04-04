@@ -1509,7 +1509,7 @@ export class ImportDataComponent
                 placeholder: 'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_NAME',
                 description: 'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_NAME_DESCRIPTION',
                 required: true,
-                fieldType: DialogFieldType.TEXT,
+                fieldType: DialogFieldType.TEXT
               }),
               new DialogField({
                 name: 'isPublic',
