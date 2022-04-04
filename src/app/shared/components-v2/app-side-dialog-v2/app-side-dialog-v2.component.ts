@@ -608,6 +608,18 @@ export class AppSideDialogV2Component implements OnDestroy {
   }
 
   /**
+   * Reset filters
+   */
+  resetAdvancedFilter(): void {
+    this.clickedButton({
+      type: IV2SideDialogConfigButtonType.OTHER,
+      key: 'reset',
+      label: 'LNG_COMMON_BUTTON_RESET_FILTERS',
+      color: 'text'
+    });
+  }
+
+  /**
    * Remove advanced filter
    */
   removeAdvancedFilter(

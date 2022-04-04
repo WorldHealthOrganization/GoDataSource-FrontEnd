@@ -63,6 +63,7 @@
       class="gd-list-table-column-filter-input"
       [(ngModel)]="extendedColDef.columnDefinition.filter.value"
       [name]="'filterBy' + extendedColDef.field"
+      neverFloatLabel="true"
       (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-date-range-v2>
 
     <!-- Age range -->
@@ -73,6 +74,7 @@
       [name]="'filterBy' + extendedColDef.field"
       [min]="extendedColDef.columnDefinition.filter.min"
       [max]="extendedColDef.columnDefinition.filter.max"
+      neverFloatLabel="true"
       (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-number-range-v2>
 
     <!-- Address phone number -->
@@ -141,6 +143,7 @@
       [name]="'filterBy' + extendedColDef.field"
       [min]="extendedColDef.columnDefinition.filter.min"
       [max]="extendedColDef.columnDefinition.filter.max"
+      neverFloatLabel="true"
       (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-number-range-v2>
 
     <!-- Deleted -->
