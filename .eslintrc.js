@@ -69,6 +69,7 @@ module.exports = {
         "@angular-eslint/no-outputs-metadata-property": "error",
         "@angular-eslint/use-lifecycle-interface": "error",
         "@angular-eslint/use-pipe-transform-interface": "error",
+        "@typescript-eslint/comma-dangle": "error",
         "@typescript-eslint/consistent-type-definitions": "error",
         "@typescript-eslint/dot-notation": "off",
         "@typescript-eslint/explicit-member-accessibility": [
@@ -115,6 +116,7 @@ module.exports = {
         "@typescript-eslint/unified-signatures": "error",
         "arrow-body-style": "off",
         "brace-style": "off",
+        "comma-dangle": "off",
         "constructor-super": "error",
         "curly": "error",
         "dot-notation": "off",

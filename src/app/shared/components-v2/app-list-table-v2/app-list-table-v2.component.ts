@@ -1647,7 +1647,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         }
 
         // #TODO
-        console.log(data);
+        // console.log(data);
         data.handler.hide();
       });
   }
