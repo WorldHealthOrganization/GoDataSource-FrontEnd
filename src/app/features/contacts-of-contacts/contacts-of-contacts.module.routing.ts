@@ -100,7 +100,7 @@ const routes: Routes = [
         PERMISSION.CONTACT_OF_CONTACT_VIEW_CHRONOLOGY_CHART
       ]
     }
-  },
+  }
 ];
 
 export const routing: ModuleWithProviders<RouterModule> = RouterModule.forChild(routes);

@@ -202,14 +202,14 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
       // case list
       if (CaseModel.canList(this.authUser)) {
         this.breadcrumbs.push(
-          new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
+          new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
         );
       }
     } else if (this.relatedEntityType === EntityType.EVENT) {
       // event list
       if (EventModel.canList(this.authUser)) {
         this.breadcrumbs.push(
-          new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events'),
+          new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events')
         );
       }
     } else {
