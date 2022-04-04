@@ -250,6 +250,14 @@
                   {{'LNG_SIDE_FILTERS_ADD_ANOTHER_FILTER_BUTTON' | translate}}
                 </button>
 
+                <!-- Operator -->
+                <app-form-toggle-v2
+                  [(ngModel)]="input.operatorValue"
+                  [name]="input.name + 'Operator'"
+                  [options]="operatorOptions"
+                  required="true">
+                </app-form-toggle-v2>
+
                 <!-- Reset filters -->
                 <button
                   type="button"

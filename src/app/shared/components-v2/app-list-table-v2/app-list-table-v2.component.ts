@@ -35,7 +35,7 @@ import { AppListTableV2ButtonComponent } from './components/button/app-list-tabl
 import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 import { AppListTableV2SelectionHeaderComponent } from './components/selection-header/app-list-table-v2-selection-header.component';
 import { AppListTableV2ColumnHeaderComponent } from './components/column-header/app-list-table-v2-column-header.component';
-import { RequestQueryBuilder, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
+import { RequestFilterOperator, RequestQueryBuilder, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
 import { AppListTableV2LoadingComponent } from './components/loading/app-list-table-v2-loading.component';
 import { AppListTableV2NoDataComponent } from './components/no-data/app-list-table-v2-no-data.component';
 import { GridApi } from '@ag-grid-community/core/dist/cjs/es5/gridApi';
@@ -1507,6 +1507,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         title: {
           get: () => 'LNG_SIDE_FILTERS_TITLE'
         },
+        dontCloseOnBackdrop: true,
         hideInputFilter: true,
         width: '40rem',
         inputs: [
@@ -1521,7 +1522,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
             type: V2SideDialogConfigInputType.FILTER_LIST,
             name: 'filters',
             options: [],
-            filters: []
+            filters: [],
+            operatorValue: RequestFilterOperator.AND
           }
         ],
         bottomButtons: [{
@@ -1530,7 +1532,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           color: 'primary',
           key: 'apply',
           disabled: (_data, handler): boolean => {
-            return !handler.form || handler.form.invalid;
+            return (handler.data.map.filters as IV2SideDialogConfigInputFilterList).filters.length < 1 || !handler.form || handler.form.invalid;
           }
         }, {
           type: IV2SideDialogConfigButtonType.OTHER,
@@ -1538,7 +1540,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           color: 'secondary',
           key: 'save',
           disabled: (_data, handler): boolean => {
-            return !handler.form || handler.form.invalid;
+            return (handler.data.map.filters as IV2SideDialogConfigInputFilterList).filters.length < 1 || !handler.form || handler.form.invalid;
           }
         }, {
           type: IV2SideDialogConfigButtonType.CANCEL,
@@ -1647,7 +1649,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         }
 
         // #TODO
-        // console.log(data);
+        console.log(data);
         data.handler.hide();
       });
   }

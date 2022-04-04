@@ -23,6 +23,7 @@ import { V2AdvancedFilter, V2AdvancedFilterComparatorOptions, V2AdvancedFilterCo
 import { Constants } from '../../../core/models/constants';
 import { v4 as uuid } from 'uuid';
 import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model';
+import { RequestFilterOperator } from '../../../core/helperClasses/request-query-builder';
 
 /**
  * Component
@@ -207,6 +208,17 @@ export class AppSideDialogV2Component implements OnDestroy {
       [key: string]: string
     }
   } | undefined;
+
+  // operator options
+  operatorOptions: ILabelValuePairModel[] = [
+    {
+      label: 'LNG_SIDE_FILTERS_OPERATOR_LABEL_AND',
+      value: RequestFilterOperator.AND
+    }, {
+      label: 'LNG_SIDE_FILTERS_OPERATOR_LABEL_OR',
+      value: RequestFilterOperator.OR
+    }
+  ];
 
   // questionnaire - which answer
   questionWhichAnswerOptions: ILabelValuePairModel[] = [
