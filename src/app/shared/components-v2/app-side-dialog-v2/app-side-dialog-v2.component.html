@@ -329,6 +329,16 @@
                           autocomplete="off"
                           required="true"></app-form-input-v2>
 
+                        <!-- Number -->
+                        <app-form-number-v2
+                          *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.NUMBER"
+                          [(ngModel)]="filter.value"
+                          [name]="filter.name"
+                          placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_KEYWORD"
+                          autocomplete="off"
+                          required="true">
+                        </app-form-number-v2>
+
                         <!-- Single select -->
                         <app-form-select-single-v2
                           *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.SELECT
@@ -377,6 +387,16 @@
                           required="true">
                         </app-form-date-range-v2>
 
+                        <!-- Date -->
+                        <app-form-date-v2
+                          *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.DATE"
+                          [(ngModel)]="filter.value"
+                          [name]="filter.name"
+                          placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+                          autocomplete="off"
+                          required="true">
+                        </app-form-date-v2>
+
                         <!-- Location - single -->
                         <app-form-select-location-single-v2
                           *ngIf="(
@@ -389,7 +409,8 @@
                           [name]="filter.name"
                           placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION"
                           useOutbreakLocations="true"
-                          required="true">
+                          required="true"
+                          (selectedLocationChanged)="filter.comparator.value !== V2AdvancedFilterComparatorType.WITHIN ? undefined : (filter.extraValues.location = $event)">
                         </app-form-select-location-single-v2>
 
                         <!-- Location - multiple -->
