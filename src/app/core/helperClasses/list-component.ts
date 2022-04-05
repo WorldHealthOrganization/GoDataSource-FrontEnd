@@ -20,10 +20,13 @@ import { ICachedFilter, ICachedFilterItems, ICachedInputsValues, ICachedSortItem
 import { ListAppliedFiltersComponent } from './list-applied-filters-component';
 import { V2FilterType } from '../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { V2AdvancedFilter } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { Directive, ViewChild } from '@angular/core';
+import { AppListTableV2Component } from '../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
 
 /**
  * List component
  */
+@Directive()
 export abstract class ListComponent extends ListAppliedFiltersComponent {
   // handle pop state changes
   private static locationSubscription: SubscriptionLike;
@@ -87,7 +90,8 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
     direction?: RequestSortDirection
   } = {};
 
-
+  // retrieve table handler
+  @ViewChild(AppListTableV2Component, { static: true }) tableV2Component: AppListTableV2Component;
 
 
 
@@ -532,39 +536,52 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
   }
 
   /**
-     * Clear table filters
-     */
+   * Clear table filters
+   */
   clearHeaderFilters() {
-    // // clear header filters
-    // if (this.filterInputs) {
-    //   this.filterInputs.forEach((input: ResetInputOnSideFilterDirective) => {
-    //     input.reset();
-    //   });
-    // }
-    //
-    // // clear location header filters
-    // if (this.filterLocationInputs) {
-    //   this.filterLocationInputs.forEach((input: ResetLocationOnSideFilterDirective) => {
-    //     input.reset();
-    //   });
-    // }
+    // clear header filters
+    this.tableColumns.forEach((column) => {
+      // doesn't have filter, then there is no point in continuing ?
+      if (!column.filter) {
+        return;
+      }
 
-    // refresh of the list is done automatically after debounce time
-    // #
+      // reset value
+      column.filter.value =  column.filter.defaultValue;
+
+      // custom filter ?
+      if (column.filter.search) {
+        // call
+        column.filter.search({
+          columnDefinition: column
+        });
+      }
+    });
+
+    // not rendered yet ?
+    if (!this.tableV2Component) {
+      return;
+    }
+
+    // force redraw
+    this.tableV2Component.updateColumnDefinitions();
   }
 
   /**
-     * Reset table sort columns
-     */
+   * Reset table sort columns
+   */
   clearHeaderSort() {
-    // update table v2 and trigger sortBy to update this.tableSortBy and ..update cached filters
-    // #TODO
+    // not rendered yet ?
+    if (!this.tableV2Component) {
+      return;
+    }
 
-    // if (this.matTableSort) {
-    //   this.matTableSort.sort({
-    //     id: null
-    //   } as MatSortable);
-    // }
+    // update
+    this.tableV2Component.columnSortBy(
+      null,
+      null,
+      null
+    );
 
     // refresh of the list is done automatically after debounce time
     // #
@@ -597,25 +614,22 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
     this.resetFiltersAddDefault();
 
     // retrieve Side filters
-    // let queryBuilder;
-    // if (
-    //   this.sideFilter &&
-    //   (queryBuilder = this.sideFilter.getQueryBuilder())
-    // ) {
-    //   this.queryBuilder.merge(queryBuilder);
-    // }
+    let queryBuilder;
+    if (
+      this.tableV2Component &&
+      (queryBuilder = this.tableV2Component.advancedFiltersQueryBuilder)
+    ) {
+      this.queryBuilder.merge(queryBuilder);
+    }
 
     // apply list filters which is mandatory
     this.mergeListFilterToMainFilter();
 
-    // refresh of the list is done automatically after debounce time
-    // #
-
-    // refresh paginator?
-    if (this.paginatorInitialized) {
-      // refresh total number of items
-      this.triggerListCountRefresh.call(true);
-    }
+    // refresh
+    this.needsRefreshList(
+      true,
+      true
+    );
   }
 
   /**
@@ -632,7 +646,9 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
     this.clearHeaderSort();
 
     // merge query builder with side filters
-    this.queryBuilder.merge(queryBuilder);
+    if (queryBuilder) {
+      this.queryBuilder.merge(queryBuilder);
+    }
 
     // apply list filters which is mandatory
     this.mergeListFilterToMainFilter();

@@ -315,12 +315,14 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
             this.queryBuilder.filter.removeExactCondition(condition);
 
             // add new filter
-            this.filterBySelectField(
-              'classification',
-              values,
-              null,
-              false
-            );
+            if (values) {
+              this.filterBySelectField(
+                'classification',
+                values,
+                null,
+                false
+              );
+            }
           }
         }
       },
@@ -532,6 +534,7 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
         filter: {
           type: V2FilterType.BOOLEAN,
           value: this.notACaseFilter,
+          defaultValue: this.notACaseFilter,
           search: (column) => {
             // update not a case
             this.notACaseFilter = (column.columnDefinition.filter as IV2FilterBoolean).value;
@@ -650,7 +653,8 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
         },
         filter: {
           type: V2FilterType.DELETED,
-          value: false
+          value: false,
+          defaultValue: false
         },
         sortable: true
       },

@@ -36,7 +36,7 @@ import { AppListTableV2ButtonComponent } from './components/button/app-list-tabl
 import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 import { AppListTableV2SelectionHeaderComponent } from './components/selection-header/app-list-table-v2-selection-header.component';
 import { AppListTableV2ColumnHeaderComponent } from './components/column-header/app-list-table-v2-column-header.component';
-import { RequestFilterOperator, RequestQueryBuilder, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
+import { RequestFilterGenerator, RequestFilterOperator, RequestQueryBuilder, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
 import { AppListTableV2LoadingComponent } from './components/loading/app-list-table-v2-loading.component';
 import { AppListTableV2NoDataComponent } from './components/no-data/app-list-table-v2-no-data.component';
 import { GridApi } from '@ag-grid-community/core/dist/cjs/es5/gridApi';
@@ -140,6 +140,14 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   @Input() advancedFilterType: string;
   @Input() advancedFilters: V2AdvancedFilter[];
 
+  // advanced filters query builder
+  private _advancedFiltersQueryBuilder: RequestQueryBuilder;
+  get advancedFiltersQueryBuilder(): RequestQueryBuilder {
+    return this._advancedFiltersQueryBuilder ?
+      _.cloneDeep(this._advancedFiltersQueryBuilder) :
+      null;
+  }
+
   // show header filters ?
   savingHeaderFilterVisibility: boolean = false;
   private _showHeaderFilters: boolean = true;
@@ -212,6 +220,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
   // filter by
   @Output() filterBy = new EventEmitter<IExtendedColDef>();
+  @Output() advancedFilterBy = new EventEmitter<RequestQueryBuilder>();
+
+  // reset header filters
+  @Output() resetHeaderFilters = new EventEmitter<void>();
 
   // saving columns
   savingColumns: boolean = false;
@@ -436,6 +448,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         })
       )
       .subscribe((data) => {
+        // finished
+        this.recordsSubscription = undefined;
+
         // set data & hide loading overlay
         this._agTable.api.setRowData(data);
 
@@ -458,7 +473,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   /**
    * Update column definitions
    */
-  private updateColumnDefinitions(
+  updateColumnDefinitions(
     overwriteVisibleColumns?: string[]
   ): void {
     // ag table not initialized ?
@@ -1660,6 +1675,21 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           return;
         }
 
+        // reset ?
+        if (response.button.key === 'reset') {
+          // set filter query builder
+          this._advancedFiltersQueryBuilder = undefined;
+
+          // emit the Request Query Builder
+          this.advancedFilterBy.emit(this.advancedFiltersQueryBuilder);
+
+          // hide dialog
+          response.handler.hide();
+
+          // finished
+          return;
+        }
+
         // retrieve applied filters
         const input: IV2SideDialogConfigInputFilterList = response.data.map.filters as IV2SideDialogConfigInputFilterList;
         const filterOptions: ILabelValuePairModel[] = input.optionsAsLabelValue;
@@ -2039,216 +2069,212 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
                 const extraComparator: V2AdvancedFilterComparatorType = appliedFilter.extraValues?.comparator?.value;
                 const value: any = appliedFilter.extraValues?.filterValue?.value;
                 const whichAnswerDate: IV2DateRange = appliedFilter.extraValues?.whichAnswerDate?.value;
-console.log(1, question);
-console.log(2, whichAnswer);
-console.log(3, extraComparator);
-console.log(4, value);
-console.log(5, whichAnswerDate);
-                // we don't need to add filter if no filter value was provided
-                // if (
-                //   question && (
-                //     !_.isEmpty(value) ||
-                //     _.isBoolean(value) ||
-                //     !_.isEmpty(whichAnswerDate) ||
-                //     extraComparator === FilterComparator.HAS_VALUE ||
-                //     extraComparator === FilterComparator.DOESNT_HAVE_VALUE
-                //   )
-                // ) {
-                //   // construct answer date query
-                //   let dateQuery;
-                //   let valueQuery;
-                //   if (!_.isEmpty(whichAnswerDate)) {
-                //     dateQuery = RequestFilterGenerator.dateRangeCompare(whichAnswerDate);
-                //   }
-                //
-                  // // take action accordingly to question type
-                  // if (
-                  //   !_.isEmpty(value) ||
-                  //   _.isBoolean(value) ||
-                  //   extraComparator === FilterComparator.HAS_VALUE ||
-                  //   extraComparator === FilterComparator.DOESNT_HAVE_VALUE
-                  // ) {
-                  //   switch (question.answerType) {
-                  //     // Text
-                  //     case Constants.ANSWER_TYPES.FREE_TEXT.value:
-                  //       switch (extraComparator) {
-                  //         case FilterComparator.IS:
-                  //           valueQuery = RequestFilterGenerator.textIs(value);
-                  //           break;
-                  //         case FilterComparator.CONTAINS_TEXT:
-                  //           valueQuery = RequestFilterGenerator.textContains(value);
-                  //           break;
-                  //         case FilterComparator.HAS_VALUE:
-                  //           valueQuery = RequestFilterGenerator.hasValue();
-                  //           break;
-                  //         case FilterComparator.DOESNT_HAVE_VALUE:
-                  //           // doesn't have value if handled bellow
-                  //           // NOTHING TO DO
-                  //           break;
-                  //
-                  //         // FilterComparator.TEXT_STARTS_WITH
-                  //         default:
-                  //           valueQuery = RequestFilterGenerator.textStartWith(value);
-                  //       }
-                  //
-                  //       // finished
-                  //       break;
-                  //
-                  //     // Date
-                  //     case Constants.ANSWER_TYPES.DATE_TIME.value:
-                  //       switch (extraComparator) {
-                  //         case FilterComparator.HAS_VALUE:
-                  //           valueQuery = RequestFilterGenerator.hasValue();
-                  //           break;
-                  //         case FilterComparator.DOESNT_HAVE_VALUE:
-                  //           // doesn't have value if handled bellow
-                  //           // NOTHING TO DO
-                  //           break;
-                  //
-                  //         // FilterComparator.TEXT_STARTS_WITH
-                  //         default:
-                  //           valueQuery = RequestFilterGenerator.dateRangeCompare(value);
-                  //       }
-                  //
-                  //       // finished
-                  //       break;
-                  //
-                  //     // Dropdown
-                  //     case Constants.ANSWER_TYPES.SINGLE_SELECTION.value:
-                  //     case Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value:
-                  //       switch (extraComparator) {
-                  //         case FilterComparator.HAS_VALUE:
-                  //           valueQuery = RequestFilterGenerator.hasValue();
-                  //           break;
-                  //         case FilterComparator.DOESNT_HAVE_VALUE:
-                  //           // doesn't have value if handled bellow
-                  //           // NOTHING TO DO
-                  //           break;
-                  //
-                  //         // FilterComparator.TEXT_STARTS_WITH
-                  //         default:
-                  //           valueQuery = {
-                  //             inq: value
-                  //           };
-                  //       }
-                  //
-                  //       // finished
-                  //       break;
-                  //
-                  //     // Number
-                  //     case Constants.ANSWER_TYPES.NUMERIC.value:
-                  //       switch (extraComparator) {
-                  //         case FilterComparator.HAS_VALUE:
-                  //           valueQuery = RequestFilterGenerator.hasValue();
-                  //           break;
-                  //         case FilterComparator.DOESNT_HAVE_VALUE:
-                  //           // doesn't have value if handled bellow
-                  //           // NOTHING TO DO
-                  //           break;
-                  //
-                  //         // FilterComparator.TEXT_STARTS_WITH
-                  //         default:
-                  //           valueQuery = RequestFilterGenerator.rangeCompare(value);
-                  //       }
-                  //
-                  //       // finished
-                  //       break;
-                  //
-                  //     // File
-                  //     case Constants.ANSWER_TYPES.FILE_UPLOAD.value:
-                  //       // neq: null / $eq null doesn't work due to a mongodb bug ( the issue occurs when trying to filter an element from an array which is this case )
-                  //       switch (extraComparator) {
-                  //         case FilterComparator.HAS_VALUE:
-                  //           valueQuery = RequestFilterGenerator.hasValue();
-                  //           break;
-                  //         case FilterComparator.DOESNT_HAVE_VALUE:
-                  //           // doesn't have value if handled bellow
-                  //           // NOTHING TO DO
-                  //           break;
-                  //       }
-                  //
-                  //       // finished
-                  //       break;
-                  //   }
-                  // }
 
-                //   // search through all answers or just the last one ?
-                //   const query: any = {};
-                //   if (
-                //     !whichAnswer ||
-                //     whichAnswer === QuestionWhichAnswer.LAST_ANSWER
-                //   ) {
-                //     // do we need to attach a value condition as well ?
-                //     if (valueQuery) {
-                //       query[`${fieldName}.${question.variable}.0.value`] = valueQuery;
-                //     } else if (extraComparator === FilterComparator.DOESNT_HAVE_VALUE) {
-                //       // handle no value case
-                //       const condition: any = RequestFilterGenerator.doesntHaveValue(`${fieldName}.${question.variable}.0.value`);
-                //       const key: string = Object.keys(condition)[0];
-                //       query[key] = condition[key];
-                //     }
-                //
-                //     // do we need to attach a date condition as well ?
-                //     if (dateQuery) {
-                //       query[`${fieldName}.${question.variable}.0.date`] = dateQuery;
-                //     }
-                //
-                //     // register query
-                //     qb.filter.where(query);
-                //   } else {
-                //     // do we need to attach a value condition as well ?
-                //     if (valueQuery) {
-                //       query.value = valueQuery;
-                //     } else if (extraComparator === FilterComparator.DOESNT_HAVE_VALUE) {
-                //       // handle no value case
-                //       const condition: any = RequestFilterGenerator.doesntHaveValue(
-                //         'value',
-                //         true
-                //       );
-                //       const key: string = Object.keys(condition)[0];
-                //       query[key] = condition[key];
-                //     }
-                //
-                //     // do we need to attach a date condition as well ?
-                //     if (dateQuery) {
-                //       query.date = dateQuery;
-                //     }
-                //
-                //     // add extra check if date not provided and we need to retrieve all records that don't have a value
-                //     if (
-                //       !dateQuery &&
-                //       extraComparator === FilterComparator.DOESNT_HAVE_VALUE
-                //     ) {
-                //       qb.filter.where({
-                //         or: [
-                //           {
-                //             [`${fieldName}.${question.variable}`]: {
-                //               $elemMatch: query
-                //             }
-                //           }, {
-                //             [`${fieldName}.${question.variable}`]: {
-                //               exists: false
-                //             }
-                //           }, {
-                //             [`${fieldName}.${question.variable}`]: {
-                //               type: 'null'
-                //             }
-                //           }, {
-                //             [`${fieldName}.${question.variable}`]: {
-                //               size: 0
-                //             }
-                //           }
-                //         ]
-                //       });
-                //     } else {
-                //       qb.filter.where({
-                //         [`${fieldName}.${question.variable}`]: {
-                //           $elemMatch: query
-                //         }
-                //       });
-                //     }
-                //   }
-                // }
+                // we don't need to add filter if no filter value was provided
+                if (
+                  question && (
+                    !_.isEmpty(value) ||
+                    _.isBoolean(value) ||
+                    !_.isEmpty(whichAnswerDate) ||
+                    extraComparator === V2AdvancedFilterComparatorType.HAS_VALUE ||
+                    extraComparator === V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE
+                  )
+                ) {
+                  // construct answer date query
+                  let dateQuery;
+                  let valueQuery;
+                  if (!_.isEmpty(whichAnswerDate)) {
+                    dateQuery = RequestFilterGenerator.dateRangeCompare(whichAnswerDate);
+                  }
+
+                  // take action accordingly to question type
+                  if (
+                    !_.isEmpty(value) ||
+                    _.isBoolean(value) ||
+                    extraComparator === V2AdvancedFilterComparatorType.HAS_VALUE ||
+                    extraComparator === V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE
+                  ) {
+                    switch (question.answerType) {
+                      // Text
+                      case Constants.ANSWER_TYPES.FREE_TEXT.value:
+                        switch (extraComparator) {
+                          case V2AdvancedFilterComparatorType.IS:
+                            valueQuery = RequestFilterGenerator.textIs(value);
+                            break;
+                          case V2AdvancedFilterComparatorType.CONTAINS_TEXT:
+                            valueQuery = RequestFilterGenerator.textContains(value);
+                            break;
+                          case V2AdvancedFilterComparatorType.HAS_VALUE:
+                            valueQuery = RequestFilterGenerator.hasValue();
+                            break;
+                          case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
+                            // doesn't have value if handled bellow
+                            // NOTHING TO DO
+                            break;
+
+                          // V2AdvancedFilterComparatorType.TEXT_STARTS_WITH
+                          default:
+                            valueQuery = RequestFilterGenerator.textStartWith(value);
+                        }
+
+                        // finished
+                        break;
+
+                      // Date
+                      case Constants.ANSWER_TYPES.DATE_TIME.value:
+                        switch (extraComparator) {
+                          case V2AdvancedFilterComparatorType.HAS_VALUE:
+                            valueQuery = RequestFilterGenerator.hasValue();
+                            break;
+                          case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
+                            // doesn't have value if handled bellow
+                            // NOTHING TO DO
+                            break;
+
+                          // V2AdvancedFilterComparatorType.TEXT_STARTS_WITH
+                          default:
+                            valueQuery = RequestFilterGenerator.dateRangeCompare(value);
+                        }
+
+                        // finished
+                        break;
+
+                      // Dropdown
+                      case Constants.ANSWER_TYPES.SINGLE_SELECTION.value:
+                      case Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value:
+                        switch (extraComparator) {
+                          case V2AdvancedFilterComparatorType.HAS_VALUE:
+                            valueQuery = RequestFilterGenerator.hasValue();
+                            break;
+                          case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
+                            // doesn't have value if handled bellow
+                            // NOTHING TO DO
+                            break;
+
+                          // V2AdvancedFilterComparatorType.TEXT_STARTS_WITH
+                          default:
+                            valueQuery = {
+                              inq: value
+                            };
+                        }
+
+                        // finished
+                        break;
+
+                      // Number
+                      case Constants.ANSWER_TYPES.NUMERIC.value:
+                        switch (extraComparator) {
+                          case V2AdvancedFilterComparatorType.HAS_VALUE:
+                            valueQuery = RequestFilterGenerator.hasValue();
+                            break;
+                          case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
+                            // doesn't have value if handled bellow
+                            // NOTHING TO DO
+                            break;
+
+                          // V2AdvancedFilterComparatorType.TEXT_STARTS_WITH
+                          default:
+                            valueQuery = RequestFilterGenerator.rangeCompare(value);
+                        }
+
+                        // finished
+                        break;
+
+                      // File
+                      case Constants.ANSWER_TYPES.FILE_UPLOAD.value:
+                        // neq: null / $eq null doesn't work due to a mongodb bug ( the issue occurs when trying to filter an element from an array which is this case )
+                        switch (extraComparator) {
+                          case V2AdvancedFilterComparatorType.HAS_VALUE:
+                            valueQuery = RequestFilterGenerator.hasValue();
+                            break;
+                          case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
+                            // doesn't have value if handled bellow
+                            // NOTHING TO DO
+                            break;
+                        }
+
+                        // finished
+                        break;
+                    }
+                  }
+
+                  // search through all answers or just the last one ?
+                  const query: any = {};
+                  if (
+                    !whichAnswer ||
+                    whichAnswer === V2AdvancedFilterQuestionWhichAnswer.LAST_ANSWER
+                  ) {
+                    // do we need to attach a value condition as well ?
+                    if (valueQuery) {
+                      query[`${filterDefinition.field}.${question.variable}.0.value`] = valueQuery;
+                    } else if (extraComparator === V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE) {
+                      // handle no value case
+                      const condition: any = RequestFilterGenerator.doesntHaveValue(`${filterDefinition.field}.${question.variable}.0.value`);
+                      const key: string = Object.keys(condition)[0];
+                      query[key] = condition[key];
+                    }
+
+                    // do we need to attach a date condition as well ?
+                    if (dateQuery) {
+                      query[`${filterDefinition.field}.${question.variable}.0.date`] = dateQuery;
+                    }
+
+                    // register query
+                    qb.filter.where(query);
+                  } else {
+                    // do we need to attach a value condition as well ?
+                    if (valueQuery) {
+                      query.value = valueQuery;
+                    } else if (extraComparator === V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE) {
+                      // handle no value case
+                      const condition: any = RequestFilterGenerator.doesntHaveValue(
+                        'value',
+                        true
+                      );
+                      const key: string = Object.keys(condition)[0];
+                      query[key] = condition[key];
+                    }
+
+                    // do we need to attach a date condition as well ?
+                    if (dateQuery) {
+                      query.date = dateQuery;
+                    }
+
+                    // add extra check if date not provided and we need to retrieve all records that don't have a value
+                    if (
+                      !dateQuery &&
+                      extraComparator === V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE
+                    ) {
+                      qb.filter.where({
+                        or: [
+                          {
+                            [`${filterDefinition.field}.${question.variable}`]: {
+                              $elemMatch: query
+                            }
+                          }, {
+                            [`${filterDefinition.field}.${question.variable}`]: {
+                              exists: false
+                            }
+                          }, {
+                            [`${filterDefinition.field}.${question.variable}`]: {
+                              type: 'null'
+                            }
+                          }, {
+                            [`${filterDefinition.field}.${question.variable}`]: {
+                              size: 0
+                            }
+                          }
+                        ]
+                      });
+                    } else {
+                      qb.filter.where({
+                        [`${filterDefinition.field}.${question.variable}`]: {
+                          $elemMatch: query
+                        }
+                      });
+                    }
+                  }
+                }
 
                 // finished
                 break;
@@ -2289,20 +2315,18 @@ console.log(5, whichAnswerDate);
         //   }
         // });
         //
-        // // emit the Request Query Builder
-        // this.queryBuilder = queryBuilder;
-        console.log(queryBuilder);
-        // this.filtersApplied.emit(this.getQueryBuilder());
-        //
+
+        // set filter query builder
+        this._advancedFiltersQueryBuilder = queryBuilder;
+
+        // emit the Request Query Builder
+        this.advancedFilterBy.emit(this.advancedFiltersQueryBuilder);
+
         // // send filters
         // this.filtersCollected.emit(appliedFilters);
-        //
-        // // close side nav
-        // this.closeSideNav();
 
-        // #TODO
-        // console.log(data);
-        // data.handler.hide();
+        // finished
+        response.handler.hide();
       });
   }
 
