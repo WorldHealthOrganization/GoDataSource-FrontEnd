@@ -93,11 +93,6 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
   // retrieve table handler
   @ViewChild(AppListTableV2Component, { static: true }) tableV2Component: AppListTableV2Component;
 
-
-
-
-
-
   // refresh only after we finish changing data
   // by default each time we get back to a page we should display loading spinner
   private _triggeredByPageChange: boolean = false;
@@ -333,16 +328,16 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
   protected abstract refreshListFields(): string[];
 
   /**
-     * Refresh list
-     */
+   * Refresh list
+   */
   public abstract refreshList(
     triggeredByPageChange?: boolean
   );
 
   /**
-     * Refresh items count
-     * Note: To be overridden on pages that implement pagination
-     */
+   * Refresh items count
+   * Note: To be overridden on pages that implement pagination
+   */
   public refreshListCount(_applyHasMoreLimit?: boolean) {
     console.error('Component must implement \'refreshListCount\' method');
   }
@@ -432,13 +427,13 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
     this.queryBuilder.sort.clear();
 
     // retrieve Side filters
-    // let queryBuilder;
-    // if (
-    //   this.sideFilter &&
-    //   (queryBuilder = this.sideFilter.getQueryBuilder())
-    // ) {
-    //   this.queryBuilder.sort.merge(queryBuilder.sort);
-    // }
+    let queryBuilder;
+    if (
+      this.tableV2Component &&
+      (queryBuilder = this.tableV2Component.advancedFiltersQueryBuilder)
+    ) {
+      this.queryBuilder.sort.merge(queryBuilder.sort);
+    }
 
     // sort
     if (
@@ -518,15 +513,15 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
   }
 
   /**
-     * Called after query builder is cleared
-     */
+   * Called after query builder is cleared
+   */
   clearedQueryBuilder() {
     // NOTHING
   }
 
   /**
-     * Clear query builder of conditions and sorting criterias
-     */
+   * Clear query builder of conditions and sorting criterias
+   */
   clearQueryBuilder() {
     // clear query filters
     this.queryBuilder.clear();
@@ -595,8 +590,8 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
   }
 
   /**
-     * Clear header filters & sort
-     */
+   * Clear header filters & sort
+   */
   resetFiltersToSideFilters() {
     // clear query builder
     this.clearQueryBuilder();
@@ -655,101 +650,6 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
 
     // refresh list
     this.needsRefreshList(true);
-  }
-
-  /**
-     * Check if list filter applies
-     */
-  protected checkListFilters() {
-    // retrieve query params
-    const queryParams: any = this.listHelperService.route.snapshot.queryParams;
-
-    // reset values
-    this.appliedListFilter = queryParams && queryParams.applyListFilter ? queryParams.applyListFilter : null;
-    this.appliedListFilterQueryBuilder = null;
-
-    // do we need to wait for list filter to be initialized ?
-    this.appliedListFilterLoading = !_.isEmpty(this.appliedListFilter);
-
-    // wait for component initialization, since this method is called from constructor
-    setTimeout(() => {
-      // do we have query params to apply ?
-      if (_.isEmpty(queryParams)) {
-        return;
-      }
-
-      // call function to apply filters - update query builder
-      this.applyListFilters(queryParams);
-    });
-  }
-
-  /**
-   * Update page breadcrumbs based on the applied filter
-   */
-  protected setListFilterBreadcrumbs(
-    _listFilter: string,
-    _listFilterData: any = {}
-  ) {
-    // [Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWUP_LIST]: 'LNG_PAGE_LIST_FILTER_CONTACTS_ON_THE_FOLLOW_UP_LIST',
-    //   [Constants.APPLY_LIST_FILTER.CASES_DECEASED]: 'LNG_PAGE_LIST_FILTER_CASES_DECEASED',
-    //   [Constants.APPLY_LIST_FILTER.CASES_ISOLATED]: 'LNG_PAGE_LIST_FILTER_CASES_ISOLATED',
-    //   [Constants.APPLY_LIST_FILTER.CASES_HOSPITALISED]: 'LNG_PAGE_LIST_FILTER_CASES_HOSPITALISED',
-    //   [Constants.APPLY_LIST_FILTER.CASES_NOT_HOSPITALISED]: 'LNG_PAGE_LIST_FILTER_CASES_NOT_HOSPITALISED',
-    //   [Constants.APPLY_LIST_FILTER.CASES_LESS_CONTACTS]: 'LNG_PAGE_LIST_FILTER_CASES_LESS_CONTACTS',
-    //   [Constants.APPLY_LIST_FILTER.CONTACTS_LOST_TO_FOLLOW_UP]: 'LNG_PAGE_LIST_FILTER_CONTACTS_LOST_TO_FOLLOW_UP',
-    //   [Constants.APPLY_LIST_FILTER.CONTACTS_NOT_SEEN]: 'LNG_PAGE_LIST_FILTER_CONTACTS_NOT_SEEN',
-    //   [Constants.APPLY_LIST_FILTER.CONTACTS_SEEN]: 'LNG_PAGE_LIST_FILTER_CONTACTS_SEEN',
-    //   [Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWED_UP]: 'LNG_PAGE_LIST_FILTER_CONTACTS_FOLLOWED_UP',
-    //   [Constants.APPLY_LIST_FILTER.CASES_IN_THE_TRANSMISSION_CHAINS]: 'LNG_PAGE_LIST_FILTER_CASES_IN_THE_TRANSMISSION_CHAINS',
-    //   [Constants.APPLY_LIST_FILTER.CASES_PREVIOUS_DAYS_CONTACTS]: 'LNG_PAGE_LIST_FILTER_CASES_AMONG_CONTACTS',
-    //   [Constants.APPLY_LIST_FILTER.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS]: 'LNG_PAGE_LIST_FILTER_CASES_NOT_IDENTIFIED_THROUGH_CONTACTS',
-    //   [Constants.APPLY_LIST_FILTER.CASES_PENDING_LAB_RESULT]: 'LNG_PAGE_LIST_FILTER_CASES_PENDING_LAB_RESULT',
-    //   [Constants.APPLY_LIST_FILTER.CASES_REFUSING_TREATMENT]: 'LNG_PAGE_LIST_FILTER_CASES_REFUSING_TREATMENT',
-    //   [Constants.APPLY_LIST_FILTER.CONTACTS_BECOME_CASES]: 'LNG_PAGE_DASHBOARD_NUMBER_OF_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE',
-    //   [Constants.APPLY_LIST_FILTER.NO_OF_ACTIVE_TRANSMISSION_CHAINS]: 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_NUMBER_ACTIVE_CHAINS',
-    //   [Constants.APPLY_LIST_FILTER.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES]: 'LNG_PAGE_DASHBOARD_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES',
-    //   [Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS]: 'LNG_PAGE_DASHBOARD_CASES_WITHOUT_RELATIONSHIPS',
-    //   [Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS]: 'LNG_PAGE_DASHBOARD_EVENTS_WITHOUT_RELATIONSHIPS',
-    //   [Constants.APPLY_LIST_FILTER.CASES_WITHOUT_DATE_OF_ONSET_CHAIN]: 'LNG_PAGE_LIST_FILTER_CASES_WITHOUT_DATE_OF_ONSET_CHAIN',
-    //   [Constants.APPLY_LIST_FILTER.CASES_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN]: 'LNG_PAGE_LIST_FILTER_CASES_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN',
-    //   [Constants.APPLY_LIST_FILTER.CASES_WITHOUT_DATE_OF_REPORTING_CHAIN]: 'LNG_PAGE_LIST_FILTER_CASES_WITHOUT_DATE_OF_REPORTING_CHAIN',
-    //   [Constants.APPLY_LIST_FILTER.CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN]: 'LNG_PAGE_LIST_FILTER_CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN',
-    //   [Constants.APPLY_LIST_FILTER.CONTACTS_WITHOUT_DATE_OF_REPORTING_CHAIN]: 'LNG_PAGE_LIST_FILTER_CONTACTS_WITHOUT_DATE_OF_REPORTING_CHAIN',
-    //   [Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_DATE_CHAIN]: 'LNG_PAGE_LIST_FILTER_EVENTS_WITHOUT_DATE_CHAIN',
-    //   [Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_DATE_OF_REPORTING_CHAIN]: 'LNG_PAGE_LIST_FILTER_EVENTS_WITHOUT_DATE_OF_REPORTING_CHAIN',
-    //   [Constants.APPLY_LIST_FILTER.CONTEXT_SENSITIVE_HELP_ITEMS]: 'LNG_PAGE_LIST_FILTER_HELP_CONTEXT_SENSITIVE',
-    //   [Constants.APPLY_LIST_FILTER.CASE_SUMMARY]: 'LNG_PAGE_DASHBOARD_CASE_SUMMARY',
-    //   [Constants.APPLY_LIST_FILTER.CASES_BY_LOCATION]: 'LNG_PAGE_DASHBOARD_CASE_BY_LOCATION',
-
-    // const breadcrumbToken = Constants.LIST_FILTER_TITLE[listFilter];
-    // if (breadcrumbToken) {
-    //   // get the breadcrumb representing the list page
-    //   const listPageBreadcrumb: BreadcrumbItemModel = _.find(this.breadcrumbs, {active: true});
-    //   if (listPageBreadcrumb) {
-    //     // update the breadcrumb
-    //     const fallbackUrl: string[] | boolean = this.listHelperService.determineFallbackUrl();
-    //     listPageBreadcrumb.active = false;
-    //     listPageBreadcrumb.onClick = () => {
-    //       // redirect to cases list pages ( hack since we can't use navigate for the same component )
-    //       if (fallbackUrl) {
-    //         this.listHelperService.redirectService.to(fallbackUrl as string[]);
-    //       } else {
-    //         // DON'T REDIRECT
-    //       }
-    //     };
-    //   }
-    //
-    //   // add new breadcrumb
-    //   this.breadcrumbs.push(
-    //     new BreadcrumbItemModel(
-    //       breadcrumbToken,
-    //       '.',
-    //       true,
-    //       {},
-    //       listFilterData
-    //     )
-    //   );
-    // }
   }
 
   /**
