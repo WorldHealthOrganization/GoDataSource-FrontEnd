@@ -335,7 +335,8 @@ export interface IV2SideDialogHandler {
   hide: () => void;
   update: {
     inputs: (inputs: V2SideDialogConfigInput[]) => void,
-    refresh: () => void
+    refresh: () => void,
+    addAdvancedFilter: (input: IV2SideDialogConfigInputFilterList) => IV2SideDialogConfigInputFilterListItem
   },
   buttons: {
     click: (buttonKey: string) => void

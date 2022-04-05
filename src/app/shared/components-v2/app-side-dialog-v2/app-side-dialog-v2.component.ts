@@ -60,6 +60,7 @@ export class AppSideDialogV2Component implements OnDestroy {
 
     // update
     update: {
+      // refresh inputs list
       inputs: (inputs) => {
         // already closed ?
         if (!this.sideNav.opened) {
@@ -78,6 +79,11 @@ export class AppSideDialogV2Component implements OnDestroy {
       refresh: () => {
         // refresh inputs
         this.updateInputs();
+      },
+
+      // used to add filters
+      addAdvancedFilter: (input: IV2SideDialogConfigInputFilterList) => {
+        return this.addAdvancedFilter(input);
       }
     },
 
@@ -515,7 +521,7 @@ export class AppSideDialogV2Component implements OnDestroy {
         input.optionsAsLabelValueMap = {};
         input.options.forEach((filterOption) => {
           // option id
-          const id: string = filterOption.id || uuid();
+          const id: string = `${filterOption.field}${filterOption.label}`;
 
           // determine label
           const label: string = filterOption.relationshipLabel ?
@@ -542,9 +548,9 @@ export class AppSideDialogV2Component implements OnDestroy {
   /**
    * Add filter
    */
-  addAdvancedFilter(input: IV2SideDialogConfigInputFilterList): void {
-    // add filter
-    input.filters.push({
+  addAdvancedFilter(input: IV2SideDialogConfigInputFilterList): IV2SideDialogConfigInputFilterListItem {
+    // create filter
+    const advancedFilter: IV2SideDialogConfigInputFilterListItem = {
       type: V2SideDialogConfigInputType.FILTER_LIST_ITEM,
 
       // selected value
@@ -616,7 +622,13 @@ export class AppSideDialogV2Component implements OnDestroy {
           }
         }
       }
-    });
+    };
+
+    // add filter
+    input.filters.push(advancedFilter);
+
+    // finished
+    return advancedFilter;
   }
 
   /**

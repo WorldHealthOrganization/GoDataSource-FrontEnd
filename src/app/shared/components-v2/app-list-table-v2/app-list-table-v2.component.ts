@@ -55,6 +55,7 @@ import { AnswerModel, QuestionModel } from '../../../core/models/question.model'
 import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model';
 import { AddressModel } from '../../../core/models/address.model';
 import { IV2DateRange } from '../../forms-v2/components/app-form-date-range-v2/models/date.model';
+import { SavedFilterData, SavedFilterDataAppliedFilter } from '../../../core/models/saved-filters.model';
 
 /**
  * Component
@@ -141,6 +142,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   @Input() advancedFilters: V2AdvancedFilter[];
 
   // advanced filters query builder
+  private _advancedFiltersApplied: SavedFilterData;
   private _advancedFiltersQueryBuilder: RequestQueryBuilder;
   get advancedFiltersQueryBuilder(): RequestQueryBuilder {
     return this._advancedFiltersQueryBuilder ?
@@ -1608,7 +1610,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
               });
 
               // do we need to retrieve other data ?
-              (handler.data.map.filters as IV2SideDialogConfigInputFilterList).options = [];
+              const filtersList = (handler.data.map.filters as IV2SideDialogConfigInputFilterList);
+              filtersList.options = [];
               const dataToRetrieve: {
                 filter: V2AdvancedFilter
               }[] = [];
@@ -1639,6 +1642,45 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
                 if (dataToRetrieve.length < 1) {
                   // reload inputs data
                   handler.update.refresh();
+
+                  // put back advanced filters
+                  if (
+                    this._advancedFiltersApplied &&
+                    this._advancedFiltersApplied.appliedFilters.length > 0
+                  ) {
+                    // operator
+                    filtersList.operatorValue = this._advancedFiltersApplied.appliedFilterOperator as RequestFilterOperator;
+
+                    // add filters
+                    this._advancedFiltersApplied.appliedFilters.forEach((appliedFilter) => {
+                      // add filter
+                      const advancedFilter = handler.update.addAdvancedFilter(filtersList);
+
+                      // set filter by value
+                      advancedFilter.filterBy.value = appliedFilter.filter.uniqueKey;
+
+                      // trigger filter by change
+                      advancedFilter.filterBy.change(
+                        handler.data,
+                        handler,
+                        advancedFilter as any
+                      );
+
+                      // set comparator value
+                      advancedFilter.comparator.value = appliedFilter.comparator;
+
+                      // trigger comparator change
+                      advancedFilter.comparator.change(
+                        handler.data,
+                        handler,
+                        advancedFilter as any
+                      );
+
+                      // configure
+                      advancedFilter.value = appliedFilter.value;
+                      advancedFilter.extraValues = appliedFilter.extraValues;
+                    });
+                  }
 
                   // hide loading
                   handler.loading.hide();
@@ -1679,6 +1721,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         if (response.button.key === 'reset') {
           // set filter query builder
           this._advancedFiltersQueryBuilder = undefined;
+          this._advancedFiltersApplied = undefined;
 
           // emit the Request Query Builder
           this.advancedFilterBy.emit(this.advancedFiltersQueryBuilder);
@@ -1710,6 +1753,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           filterOptionsMap[filterOption.value] = filterOption.data;
         });
 
+        // init saved filter
+        this._advancedFiltersApplied = new SavedFilterData({});
+        this._advancedFiltersApplied.appliedFilterOperator = operator;
+
         // set conditions
         appliedFilters.forEach((appliedFilter) => {
           // there is no point in adding a condition if no value is provided
@@ -1727,6 +1774,16 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
           // retrieve filter definition
           const filterDefinition: V2AdvancedFilter = filterOptionsMap[appliedFilter.filterBy.value];
+
+          // add to saved filters
+          this._advancedFiltersApplied.appliedFilters.push(new SavedFilterDataAppliedFilter({
+            filter: {
+              uniqueKey: `${filterDefinition.field}${filterDefinition.label}`
+            },
+            comparator: appliedFilter.comparator.value,
+            value: appliedFilter.value,
+            extraValues: appliedFilter.extraValues
+          }));
 
           // do we need to go into a relationship ?
           let qb: RequestQueryBuilder = queryBuilder;
@@ -2410,5 +2467,26 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           question.multiAnswer
         );
       });
+  }
+
+  /**
+   * Convert advanced filters to save data
+   */
+  advancedFiltersToSaveData(): SavedFilterData {
+    // nothing to save ?
+    if (!this._advancedFiltersApplied) {
+      return null;
+    }
+
+    // save data
+    return this._advancedFiltersApplied;
+  }
+
+  /**
+   * Convert saved data to advanced filters
+   */
+  generateFiltersFromFilterData(savedData: SavedFilterData): void {
+    // set data
+    this._advancedFiltersApplied = savedData;
   }
 }
