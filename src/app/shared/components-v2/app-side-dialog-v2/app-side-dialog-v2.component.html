@@ -237,6 +237,14 @@
               fxLayout="column" fxLayoutGap="1.6rem"
               class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-filter-list {{input.cssClasses}}">
 
+              <!-- Operator -->
+              <app-form-toggle-v2
+                [(ngModel)]="input.operatorValue"
+                [name]="input.name + 'Operator'"
+                [options]="operatorOptions"
+                required="true">
+              </app-form-toggle-v2>
+
               <!-- Buttons -->
               <div
                 fxLayout="row" fxLayoutAlign="space-between"
@@ -249,14 +257,6 @@
                   (click)="addAdvancedFilter(input)">
                   {{'LNG_SIDE_FILTERS_ADD_ANOTHER_FILTER_BUTTON' | translate}}
                 </button>
-
-                <!-- Operator -->
-                <app-form-toggle-v2
-                  [(ngModel)]="input.operatorValue"
-                  [name]="input.name + 'Operator'"
-                  [options]="operatorOptions"
-                  required="true">
-                </app-form-toggle-v2>
 
                 <!-- Reset filters -->
                 <button
