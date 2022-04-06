@@ -84,6 +84,15 @@ export class AppSideDialogV2Component implements OnDestroy {
       // used to add filters
       addAdvancedFilter: (input: IV2SideDialogConfigInputFilterList) => {
         return this.addAdvancedFilter(input);
+      },
+      resetQuestionnaireFilter: (
+        filter: IV2SideDialogConfigInputFilterListItem,
+        ...specificProperties: string[]
+      ) => {
+        this.resetQuestionnaireFilter(
+          filter,
+          ...specificProperties
+        );
       }
     },
 

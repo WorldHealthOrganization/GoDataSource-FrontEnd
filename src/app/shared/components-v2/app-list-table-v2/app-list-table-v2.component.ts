@@ -1676,9 +1676,54 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
                         advancedFilter as any
                       );
 
-                      // configure
+                      // filter value
                       advancedFilter.value = appliedFilter.value;
-                      advancedFilter.extraValues = appliedFilter.extraValues;
+
+                      // if questionnaire then we need further process
+                      // - or within address...
+                      if (
+                        filtersList.optionsAsLabelValueMap[advancedFilter.filterBy.value]?.data.type === V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS || (
+                          filtersList.optionsAsLabelValueMap[advancedFilter.filterBy.value]?.data.type === V2AdvancedFilterType.ADDRESS &&
+                          advancedFilter.comparator.value === V2AdvancedFilterComparatorType.WITHIN
+                        )
+                      ) {
+                        // add extra values
+                        if (filtersList.optionsAsLabelValueMap[advancedFilter.filterBy.value]?.data.type === V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS) {
+                          handler.update.resetQuestionnaireFilter(advancedFilter);
+                        }
+
+                        // update extra values...values :)
+                        const valuesToPutBack = {...appliedFilter.extraValues};
+                        Object.keys(advancedFilter.extraValues).forEach((prop) => {
+                          // nothing to do ?
+                          if (valuesToPutBack[prop] === undefined) {
+                            return;
+                          }
+
+                          // put back value
+                          if (prop === 'location') {
+                            advancedFilter.extraValues[prop] = valuesToPutBack[prop];
+                          } else {
+                            advancedFilter.extraValues[prop].value = valuesToPutBack[prop];
+                          }
+
+                          // finished
+                          // - remove so we know this one was handled
+                          delete valuesToPutBack[prop];
+                        });
+
+                        // attach remaining options
+                        Object.keys(valuesToPutBack).forEach((prop) => {
+                          // put back value
+                          if (prop === 'location') {
+                            advancedFilter.extraValues[prop] = valuesToPutBack[prop];
+                          } else {
+                            // SHOULDN'T have this case
+                            // advancedFilter.extraValues[prop].value = valuesToPutBack[prop];
+                          }
+                        });
+                      }
+
                     });
                   }
 
@@ -1782,7 +1827,19 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
             },
             comparator: appliedFilter.comparator.value,
             value: appliedFilter.value,
-            extraValues: appliedFilter.extraValues
+            extraValues: _.isEmpty(appliedFilter.extraValues) ?
+              undefined :
+              _.transform(
+                appliedFilter.extraValues,
+                (acc, value, prop) => {
+                  // there are cases where we need to save the entire object
+                  // e.g. - extraValues.location
+                  acc[prop] = value.name ?
+                    value.value :
+                    value;
+                },
+                {}
+              )
           }));
 
           // do we need to go into a relationship ?
