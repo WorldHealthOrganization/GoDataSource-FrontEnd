@@ -14,7 +14,7 @@ const routes: Routes = [
         PERMISSION.COT_VIEW_BAR_CHART
       ]
     }
-  },
+  }
 ];
 
 export const routing: ModuleWithProviders<RouterModule> = RouterModule.forChild(routes);

@@ -754,7 +754,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOT_NAME',
             required: true,
             type: 'text'
-          })],
+          })]
         }),
         true
       )
@@ -1188,7 +1188,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
     // page dimensions on the server
     const pageSize = {
-      width: 1190,
+      width: 1190
       // height: 840
     };
 

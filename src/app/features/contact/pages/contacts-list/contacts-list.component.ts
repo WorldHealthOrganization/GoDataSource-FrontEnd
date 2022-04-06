@@ -196,7 +196,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
     private dialogService: DialogService,
     private i18nService: I18nService,
     private entityHelperService: EntityHelperService,
-    private userDataService: UserDataService,
+    private userDataService: UserDataService
   ) {
     super(listHelperService);
   }
@@ -486,7 +486,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
       {
         field: 'riskLevel',
         label: 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL',
-        sortable: true,
+        sortable: true
       },
       {
         field: 'dateOfLastContact',
@@ -737,7 +737,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             action: {
               link: (item: ContactModel): string[] => {
                 return ['/contacts', item.id, 'modify'];
-              },
+              }
             },
             visible: (item: ContactModel): boolean => {
               return !item.deleted &&
@@ -787,7 +787,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
 
                         // set message data
                         message.data = {
-                          name: item.name,
+                          name: item.name
                         };
 
                         // determine message label
@@ -835,7 +835,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                           this.needsRefreshList(true);
                         });
                     });
-                  },
+                  }
                 },
                 visible: (item: ContactModel): boolean => {
                   return !item.deleted &&
@@ -1251,7 +1251,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
       {
         type: V2AdvancedFilterType.RANGE_AGE,
         field: 'age',
-        label: 'LNG_CONTACT_FIELD_LABEL_AGE',
+        label: 'LNG_CONTACT_FIELD_LABEL_AGE'
         // sortable: true
       },
       {
@@ -1350,7 +1350,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         type: V2AdvancedFilterType.RANGE_NUMBER,
         field: 'numberOfExposures',
         label: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES'
-      },
+      }
     ];
 
     // allowed to filter by follow-up team ?
@@ -1362,7 +1362,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
           label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
           // TODO: We should use the right resolver, team resolver not implemented
           // options$: this.teamsList$,
-          options: null,
+          options: null
           // TODO: Unkown properties
           // optionsLabelKey: 'name',
           // optionsValueKey: 'id'
@@ -1377,7 +1377,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
           field: 'responsibleUserId',
           label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
           type: V2AdvancedFilterType.MULTISELECT,
-          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<ILabelValuePairModel>).options
           // TODO: Unkown properties
           // optionsLabelKey: 'name',
           // optionsValueKey: 'id'
@@ -1419,7 +1419,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
           options: null,
           relationshipPath: ['followUps'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
-        },
+        }
         // TODO: Needs to be implemented, "questionnaireTemplate" unknown property
         // {
         //   field: 'questionnaireAnswers',
@@ -1440,7 +1440,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
           label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
           type: V2AdvancedFilterType.TEXT,
           relationshipPath: ['relationships', 'people'],
-          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES'
           // extraConditions: caseCondition
         },
         {
@@ -1448,7 +1448,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
           label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
           type: V2AdvancedFilterType.TEXT,
           relationshipPath: ['relationships', 'people'],
-          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES'
           // extraConditions: caseCondition
         },
         {
@@ -1457,7 +1457,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
           type: V2AdvancedFilterType.MULTISELECT,
           options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ILabelValuePairModel>).options,
           relationshipPath: ['relationships', 'people'],
-          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES'
           // extraConditions: caseCondition
         },
         {
@@ -1465,9 +1465,9 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
           label: 'LNG_CASE_FIELD_LABEL_AGE',
           type: V2AdvancedFilterType.RANGE_AGE,
           relationshipPath: ['relationships', 'people'],
-          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES'
           // extraConditions: caseCondition
-        },
+        }
         // {
         // field: 'questionnaireAnswers',
         // label: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
@@ -1609,7 +1609,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
           visible: (): boolean => {
             return (this.exportContactsDailyFollowUpListUrl && ContactModel.canExportDailyFollowUpList(this.authUser)) || (this.exportContactsDailyFollowUpsFormUrl && ContactModel.canExportDailyFollowUpsForm(this.authUser));
           }
-        },
+        }
 
         // Export follow up list
         // TODO: Export follow up list button opens a dialog in the old design, needs to be implemented
@@ -1740,9 +1740,9 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
           },
           linkQueryParams: (selected: string[]): Params => {
             return {
-              contactIds: JSON.stringify(selected),
+              contactIds: JSON.stringify(selected)
             };
-          },
+          }
         },
         visible: (): boolean => {
           return ContactModel.canBulkModify(this.authUser);

@@ -816,7 +816,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
       allowedExportTypes: this.allowedExportTypes,
       anonymizeFields: this.relationshipAnonymizeFields,
       fieldsGroupList: this.fieldsGroupListRelationships,
-      fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired,
+      fieldsGroupListRequired: this.fieldsGroupListRelationshipsRequired
       // exportStart: () => { this.showLoadingDialog(); },
       // exportFinished: () => { this.closeLoadingDialog(); }
     });

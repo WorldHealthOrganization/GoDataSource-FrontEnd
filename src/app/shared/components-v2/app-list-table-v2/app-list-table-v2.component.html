@@ -278,7 +278,8 @@
       <button
         type="button"
         mat-icon-button
-        [matTooltip]="'LNG_COMMON_BUTTON_RESET_FILTERS' | translate">
+        [matTooltip]="'LNG_COMMON_BUTTON_RESET_FILTERS' | translate"
+        (click)="resetHeaderFilters.emit()">
         <mat-icon class="material-icons-outlined">settings_backup_restore</mat-icon>
       </button>
 

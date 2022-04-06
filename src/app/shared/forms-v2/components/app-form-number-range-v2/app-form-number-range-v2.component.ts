@@ -27,6 +27,9 @@ import { IV2NumberRange } from './models/number.model';
 export class AppFormNumberRangeV2Component
   extends AppFormBaseV2<IV2NumberRange> implements OnDestroy {
 
+  // float label
+  @Input() neverFloatLabel: boolean = false;
+
   // min / max
   @Input() min: number;
   @Input() max: number;

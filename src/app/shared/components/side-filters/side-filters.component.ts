@@ -240,7 +240,7 @@ export class SideFiltersComponent {
                 placeholder: 'LNG_SAVED_FILTERS_FIELD_LABEL_NAME',
                 description: 'LNG_SAVED_FILTERS_FIELD_LABEL_NAME_DESCRIPTION',
                 required: true,
-                fieldType: DialogFieldType.TEXT,
+                fieldType: DialogFieldType.TEXT
               }),
               new DialogField({
                 name: 'isPublic',
@@ -367,7 +367,7 @@ export class SideFiltersComponent {
       appliedSort: _.map(
         this.appliedSort,
         (sort: AppliedSortModel) => sort.sanitizeForSave()
-      ),
+      )
     });
   }
 

@@ -59,6 +59,6 @@ export const components: any[] = [
   CasesBasedOnContactStatusDashletComponent,
   C3StackedBarChartComponent,
   C3CombinationStackedBarChartComponent,
-  DashboardCustomMetricDashletComponent,
+  DashboardCustomMetricDashletComponent
 ];
 

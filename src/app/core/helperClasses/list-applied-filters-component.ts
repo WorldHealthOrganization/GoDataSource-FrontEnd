@@ -969,4 +969,30 @@ export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
 
     }
   }
+
+  /**
+   * Check if list filter applies
+   */
+  protected checkListFilters() {
+    // retrieve query params
+    const queryParams: any = this.listHelperService.route.snapshot.queryParams;
+
+    // reset values
+    this.appliedListFilter = queryParams && queryParams.applyListFilter ? queryParams.applyListFilter : null;
+    this.appliedListFilterQueryBuilder = null;
+
+    // do we need to wait for list filter to be initialized ?
+    this.appliedListFilterLoading = !_.isEmpty(this.appliedListFilter);
+
+    // wait for component initialization, since this method is called from constructor
+    setTimeout(() => {
+      // do we have query params to apply ?
+      if (_.isEmpty(queryParams)) {
+        return;
+      }
+
+      // call function to apply filters - update query builder
+      this.applyListFilters(queryParams);
+    });
+  }
 }

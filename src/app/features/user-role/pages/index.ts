@@ -12,5 +12,5 @@ export * from './modify-role/modify-role.component';
 export const pageComponents: any[] = [
   RolesListComponent,
   CreateRoleComponent,
-  ModifyRoleComponent,
+  ModifyRoleComponent
 ];

@@ -1,10 +1,10 @@
 import {
   ChangeDetectionStrategy, ChangeDetectorRef,
-  Component,
+  Component, EventEmitter,
   forwardRef,
   Host,
   OnDestroy, OnInit,
-  Optional,
+  Optional, Output,
   SkipSelf, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -40,6 +40,9 @@ export class AppFormSelectLocationMultipleV2Component
 
   // selected locations
   selectedLocations: ILocation[] = [];
+
+  // selected locations changed
+  @Output() selectedLocationsChanged = new EventEmitter<ILocation[]>();
 
   /**
    * Constructor
@@ -145,5 +148,8 @@ export class AppFormSelectLocationMultipleV2Component
 
     // update selected list
     this.selectedLocations = newSelectedItems;
+
+    // emit event
+    this.selectedLocationsChanged.emit(this.selectedLocations);
   }
 }

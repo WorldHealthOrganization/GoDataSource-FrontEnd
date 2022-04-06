@@ -408,7 +408,7 @@ export class OutbreakTemplatesListComponent
                 required: true,
                 type: 'text',
                 value: this.i18nService.instant('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_CLONE_NAME', {name: outbreakTemplate.name})
-              })],
+              })]
             }),
             true
           )

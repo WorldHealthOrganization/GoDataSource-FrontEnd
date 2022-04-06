@@ -51,14 +51,14 @@ export class AuditLogsService {
           value: {
             property: changedData.field,
             newValue: changedData.newValue,
-            oldValue: changedData.oldValue,
+            oldValue: changedData.oldValue
           }
         } as AuditLogValue;
 
       case FieldValueType.RICH_CONTENT:
         return {
           type: changedValueType,
-          property: changedData.field,
+          property: changedData.field
         } as RichContentValue;
 
       case FieldValueType.OBJECT:

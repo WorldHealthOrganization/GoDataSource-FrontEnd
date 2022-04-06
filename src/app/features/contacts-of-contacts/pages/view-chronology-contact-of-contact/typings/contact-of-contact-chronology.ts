@@ -9,7 +9,7 @@ import { ContactOfContactModel } from '../../../../../core/models/contact-of-con
 export class ContactOfContactChronology {
   static getChronologyEntries(
     contactOfContactData: ContactOfContactModel,
-    relationshipsData?: RelationshipModel[],
+    relationshipsData?: RelationshipModel[]
   ): ChronologyItem[] {
     const chronologyEntries: ChronologyItem[] = [];
     const sourcePersons = [];

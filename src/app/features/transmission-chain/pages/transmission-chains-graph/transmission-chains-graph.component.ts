@@ -232,7 +232,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
           value: 1,
           min: 1,
           max: 15
-        })],
+        })]
       }), true)
       .subscribe((answer) => {
         if (answer.button === DialogAnswerButton.Yes) {

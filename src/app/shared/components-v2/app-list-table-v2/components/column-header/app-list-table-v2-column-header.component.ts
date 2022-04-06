@@ -54,7 +54,10 @@ export class AppListTableV2ColumnHeaderComponent implements IHeaderAngularComp {
   /**
    * Gets called whenever the cell refreshes
    */
-  refresh(_params: IHeaderParams): boolean {
+  refresh(params: IHeaderParams): boolean {
+    // reload
+    this.reload(params);
+
     // re-render
     this.changeDetectorRef.detectChanges();
 
@@ -73,6 +76,14 @@ export class AppListTableV2ColumnHeaderComponent implements IHeaderAngularComp {
    * Cell initialized
    */
   agInit(params: IHeaderParams): void {
+    // reload
+    this.reload(params);
+  }
+
+  /**
+   * Reload data
+   */
+  reload(params: IHeaderParams): void {
     // retrieve extended column definition
     this.extendedColDef = params.column.getUserProvidedColDef() as IExtendedColDef;
     this.component = this.extendedColDef.columnDefinitionData;
