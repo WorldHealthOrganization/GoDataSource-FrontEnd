@@ -359,7 +359,8 @@ export class AppSideDialogV2Component implements OnDestroy {
     }
 
     // send response
-    this.observer$.next({
+    const obs = this.observer$;
+    obs.next({
       // clicked button
       button: {
         type,
@@ -374,8 +375,12 @@ export class AppSideDialogV2Component implements OnDestroy {
     });
 
     // finished
-    this.observer$.complete();
-    this.observer$ = undefined;
+    obs.complete();
+
+    // reset only if not displaying another dialog
+    if (this.observer$ === obs) {
+      this.observer$ = undefined;
+    }
   }
 
   /**
