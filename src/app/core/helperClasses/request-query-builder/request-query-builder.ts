@@ -372,10 +372,7 @@ export class RequestQueryBuilder {
     this.fields(...queryBuilder.fieldsInResponse);
 
     // merge "where" conditions
-    if (this.filter.isEmpty()) {
-      // use the other filter
-      this.filter = queryBuilder.filter;
-    } else if (queryBuilder.filter.isEmpty()) {
+    if (queryBuilder.filter.isEmpty()) {
       // do nothing; there is no filter to merge with
     } else {
       // merge conditions - New
