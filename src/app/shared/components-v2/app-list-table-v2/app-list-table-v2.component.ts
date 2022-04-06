@@ -1787,7 +1787,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
               })
               .subscribe((createResponse) => {
                 // cancelled ?
-                if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+                if (createResponse.button.type === IV2SideDialogConfigButtonType.CANCEL) {
                   return;
                 }
 
