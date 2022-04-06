@@ -25,7 +25,7 @@ import {
   IV2SideDialogConfigInputCheckbox,
   IV2SideDialogConfigInputFilterList,
   IV2SideDialogConfigInputFilterListItem,
-  IV2SideDialogConfigInputSingleDropdown,
+  IV2SideDialogConfigInputSingleDropdown, IV2SideDialogHandler,
   V2SideDialogConfigInput,
   V2SideDialogConfigInputType
 } from '../app-side-dialog-v2/models/side-dialog-config.model';
@@ -55,7 +55,7 @@ import { AnswerModel, QuestionModel } from '../../../core/models/question.model'
 import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model';
 import { AddressModel } from '../../../core/models/address.model';
 import { IV2DateRange } from '../../forms-v2/components/app-form-date-range-v2/models/date.model';
-import { SavedFilterData, SavedFilterDataAppliedFilter } from '../../../core/models/saved-filters.model';
+import { SavedFilterData, SavedFilterDataAppliedFilter, SavedFilterModel } from '../../../core/models/saved-filters.model';
 
 /**
  * Component
@@ -1546,7 +1546,19 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
             name: 'savedFilterList',
             value: undefined,
             options: [],
-            clearable: true
+            clearable: true,
+            change: (_data, handler, item: IV2SideDialogConfigInputSingleDropdown) => {
+              // get data
+              const savedData = item.options.find((option) => option.value === item.value)?.data as SavedFilterModel;
+              if (savedData) {
+                // load saved filters
+                this.loadSavedFilters(
+                  handler,
+                  handler.data.map.filters as IV2SideDialogConfigInputFilterList,
+                  savedData.filterData
+                );
+              }
+            }
           }, {
             type: V2SideDialogConfigInputType.FILTER_LIST,
             name: 'filters',
@@ -1587,7 +1599,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           qb.fields(
             'id',
             'name',
-            'readOnly'
+            'readOnly',
+            'filterData'
           );
 
           // retrieve items specific to our page
@@ -1605,7 +1618,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
               (handler.data.map.savedFilterList as IV2SideDialogConfigInputSingleDropdown).options = savedFilters.map((item) => {
                 return {
                   label: item.name,
-                  value: item.id
+                  value: item.id,
+                  data: item
                 };
               });
 
@@ -1648,83 +1662,12 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
                     this._advancedFiltersApplied &&
                     this._advancedFiltersApplied.appliedFilters.length > 0
                   ) {
-                    // operator
-                    filtersList.operatorValue = this._advancedFiltersApplied.appliedFilterOperator as RequestFilterOperator;
-
-                    // add filters
-                    this._advancedFiltersApplied.appliedFilters.forEach((appliedFilter) => {
-                      // add filter
-                      const advancedFilter = handler.update.addAdvancedFilter(filtersList);
-
-                      // set filter by value
-                      advancedFilter.filterBy.value = appliedFilter.filter.uniqueKey;
-
-                      // trigger filter by change
-                      advancedFilter.filterBy.change(
-                        handler.data,
-                        handler,
-                        advancedFilter as any
-                      );
-
-                      // set comparator value
-                      advancedFilter.comparator.value = appliedFilter.comparator;
-
-                      // trigger comparator change
-                      advancedFilter.comparator.change(
-                        handler.data,
-                        handler,
-                        advancedFilter as any
-                      );
-
-                      // filter value
-                      advancedFilter.value = appliedFilter.value;
-
-                      // if questionnaire then we need further process
-                      // - or within address...
-                      if (
-                        filtersList.optionsAsLabelValueMap[advancedFilter.filterBy.value]?.data.type === V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS || (
-                          filtersList.optionsAsLabelValueMap[advancedFilter.filterBy.value]?.data.type === V2AdvancedFilterType.ADDRESS &&
-                          advancedFilter.comparator.value === V2AdvancedFilterComparatorType.WITHIN
-                        )
-                      ) {
-                        // add extra values
-                        if (filtersList.optionsAsLabelValueMap[advancedFilter.filterBy.value]?.data.type === V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS) {
-                          handler.update.resetQuestionnaireFilter(advancedFilter);
-                        }
-
-                        // update extra values...values :)
-                        const valuesToPutBack = {...appliedFilter.extraValues};
-                        Object.keys(advancedFilter.extraValues).forEach((prop) => {
-                          // nothing to do ?
-                          if (valuesToPutBack[prop] === undefined) {
-                            return;
-                          }
-
-                          // put back value
-                          if (prop === 'location') {
-                            advancedFilter.extraValues[prop] = valuesToPutBack[prop];
-                          } else {
-                            advancedFilter.extraValues[prop].value = valuesToPutBack[prop];
-                          }
-
-                          // finished
-                          // - remove so we know this one was handled
-                          delete valuesToPutBack[prop];
-                        });
-
-                        // attach remaining options
-                        Object.keys(valuesToPutBack).forEach((prop) => {
-                          // put back value
-                          if (prop === 'location') {
-                            advancedFilter.extraValues[prop] = valuesToPutBack[prop];
-                          } else {
-                            // SHOULDN'T have this case
-                            // advancedFilter.extraValues[prop].value = valuesToPutBack[prop];
-                          }
-                        });
-                      }
-
-                    });
+                    // load saved filters
+                    this.loadSavedFilters(
+                      handler,
+                      filtersList,
+                      this._advancedFiltersApplied
+                    );
                   }
 
                   // hide loading
@@ -1796,6 +1739,95 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         // finished
         response.handler.hide();
       });
+  }
+
+  /**
+   * Load saved filters
+   */
+  private loadSavedFilters(
+    handler: IV2SideDialogHandler,
+    filtersList: IV2SideDialogConfigInputFilterList,
+    advancedFiltersApplied: SavedFilterData
+  ): void {
+    // operator
+    filtersList.operatorValue = advancedFiltersApplied.appliedFilterOperator as RequestFilterOperator;
+
+    // reset filters list
+    filtersList.filters = [];
+
+    // add filters
+    advancedFiltersApplied.appliedFilters.forEach((appliedFilter) => {
+      // add filter
+      const advancedFilter = handler.update.addAdvancedFilter(filtersList);
+
+      // set filter by value
+      advancedFilter.filterBy.value = appliedFilter.filter.uniqueKey;
+
+      // trigger filter by change
+      advancedFilter.filterBy.change(
+        handler.data,
+        handler,
+        advancedFilter as any
+      );
+
+      // set comparator value
+      advancedFilter.comparator.value = appliedFilter.comparator;
+
+      // trigger comparator change
+      advancedFilter.comparator.change(
+        handler.data,
+        handler,
+        advancedFilter as any
+      );
+
+      // filter value
+      advancedFilter.value = appliedFilter.value;
+
+      // if questionnaire then we need further process
+      // - or within address...
+      if (
+        filtersList.optionsAsLabelValueMap[advancedFilter.filterBy.value]?.data.type === V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS || (
+          filtersList.optionsAsLabelValueMap[advancedFilter.filterBy.value]?.data.type === V2AdvancedFilterType.ADDRESS &&
+          advancedFilter.comparator.value === V2AdvancedFilterComparatorType.WITHIN
+        )
+      ) {
+        // add extra values
+        if (filtersList.optionsAsLabelValueMap[advancedFilter.filterBy.value]?.data.type === V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS) {
+          handler.update.resetQuestionnaireFilter(advancedFilter);
+        }
+
+        // update extra values...values :)
+        const valuesToPutBack = {...appliedFilter.extraValues};
+        Object.keys(advancedFilter.extraValues).forEach((prop) => {
+          // nothing to do ?
+          if (valuesToPutBack[prop] === undefined) {
+            return;
+          }
+
+          // put back value
+          if (prop === 'location') {
+            advancedFilter.extraValues[prop] = valuesToPutBack[prop];
+          } else {
+            advancedFilter.extraValues[prop].value = valuesToPutBack[prop];
+          }
+
+          // finished
+          // - remove so we know this one was handled
+          delete valuesToPutBack[prop];
+        });
+
+        // attach remaining options
+        Object.keys(valuesToPutBack).forEach((prop) => {
+          // put back value
+          if (prop === 'location') {
+            advancedFilter.extraValues[prop] = valuesToPutBack[prop];
+          } else {
+            // SHOULDN'T have this case
+            // advancedFilter.extraValues[prop].value = valuesToPutBack[prop];
+          }
+        });
+      }
+    });
   }
 
   /**
