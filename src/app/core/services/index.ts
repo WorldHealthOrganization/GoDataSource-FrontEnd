@@ -66,11 +66,13 @@ import { PregnancyStatusDataResolver } from './resolvers/data/pregnancy-status.r
 import { VaccineDataResolver } from './resolvers/data/vaccine.resolver';
 import { VaccineStatusDataResolver } from './resolvers/data/vaccine-status.resolver';
 import { FinalFollowUpStatusDataResolver } from './resolvers/data/final-follow-up-status.resolver';
+import { DailyFollowUpStatusDataResolver } from './resolvers/data/daily-follow-up-status.resolver';
 
 // export the list of services
 export const services: any[] = [
   // resolver services
   ClassificationDataResolver,
+  DailyFollowUpStatusDataResolver,
   FinalFollowUpStatusDataResolver,
   GenderDataResolver,
   LanguageResolver,

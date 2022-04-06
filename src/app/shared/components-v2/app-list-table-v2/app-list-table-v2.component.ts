@@ -2115,7 +2115,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
             // between / from / to
             qb.filter.byAgeRange(
               filterDefinition.field,
-              appliedFilter.value
+              appliedFilter.value,
+              false
             );
 
             // finished
