@@ -18,7 +18,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 export class MyProfileComponent extends ViewModifyComponent implements OnInit {
   // breadcrumbs
   breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel('LNG_PAGE_MY_PROFILE_TITLE'),
+    new BreadcrumbItemModel('LNG_PAGE_MY_PROFILE_TITLE')
   ];
 
   // constants

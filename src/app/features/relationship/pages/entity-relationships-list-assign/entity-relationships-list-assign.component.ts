@@ -426,8 +426,7 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
         type: FilterType.MULTISELECT,
         options$: this.riskLevelsList$,
         sortable: true
-      }),
-
+      })
     ];
   }
 

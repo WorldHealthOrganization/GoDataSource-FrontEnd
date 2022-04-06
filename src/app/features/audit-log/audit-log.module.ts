@@ -18,7 +18,7 @@ import * as fromServices from './services';
   ],
   declarations: [
     ...fromPages.pageComponents,
-    ...fromComponents.components,
+    ...fromComponents.components
   ],
   providers: [
     ...fromServices.services

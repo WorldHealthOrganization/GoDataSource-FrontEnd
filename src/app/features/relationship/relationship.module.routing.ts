@@ -124,7 +124,7 @@ const relationshipTypeChildrenRoutes = [
     canDeactivate: [
       PageChangeConfirmationGuard
     ]
-  },
+  }
 ];
 
 const routes: Routes = [
@@ -134,7 +134,7 @@ const routes: Routes = [
     data: {
       relationshipType: RelationshipType.EXPOSURE
     },
-    children: relationshipTypeChildrenRoutes,
+    children: relationshipTypeChildrenRoutes
   },
   // Entity Contact Relationships
   {

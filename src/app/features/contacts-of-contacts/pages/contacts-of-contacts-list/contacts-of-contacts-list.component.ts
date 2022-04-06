@@ -96,7 +96,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     { label: 'LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT', value: 'dateBecomeContact'},
     // FIXME: LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED shouldn't be with CONTACT_OF_CONTACT?
     { label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED', value: 'transferRefused'},
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ID', value: 'id'},
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ID', value: 'id'}
   ];
   private relationshipAnonymizeFields: LabelValuePair[] = [
     new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_ID', 'id'),
@@ -139,7 +139,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     private locationDataService: LocationDataService,
     private dialogV2Service: DialogV2Service,
     private activatedRoute: ActivatedRoute,
-    private entityHelperService: EntityHelperService,
+    private entityHelperService: EntityHelperService
   ) {
     super(listHelperService);
   }
@@ -169,7 +169,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
   protected initializeTableColumns() {
     // address model used to search by phone number, address line, postal code, city....
     const filterAddressModel: AddressModel = new AddressModel({
-      geoLocationAccurate: '',
+      geoLocationAccurate: ''
     });
 
     this.tableColumns = [
@@ -179,8 +179,8 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         sortable: true,
         filter: {
           type: V2FilterType.TEXT,
-          textType: V2FilterTextType.STARTS_WITH,
-        },
+          textType: V2FilterTextType.STARTS_WITH
+        }
       },
       {
         field: 'middleName',
@@ -190,8 +190,8 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         sortable: true,
         filter: {
           type: V2FilterType.TEXT,
-          textType: V2FilterTextType.STARTS_WITH,
-        },
+          textType: V2FilterTextType.STARTS_WITH
+        }
       },
       {
         field: 'firstName',
@@ -199,8 +199,8 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         sortable: true,
         filter: {
           type: V2FilterType.TEXT,
-          textType: V2FilterTextType.STARTS_WITH,
-        },
+          textType: V2FilterTextType.STARTS_WITH
+        }
       },
       {
         field: 'visualId',
@@ -209,8 +209,8 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         sortable: true,
         filter: {
           type: V2FilterType.TEXT,
-          textType: V2FilterTextType.STARTS_WITH,
-        },
+          textType: V2FilterTextType.STARTS_WITH
+        }
       },
       {
         field: 'statuses',
@@ -259,24 +259,24 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         field: 'location',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_LOCATION',
         format: {
-          type: 'mainAddress.location.name',
+          type: 'mainAddress.location.name'
         },
         filter: {
           type: V2FilterType.ADDRESS_MULTIPLE_LOCATION,
           address: filterAddressModel,
           field: 'addresses',
-          fieldIsArray: true,
+          fieldIsArray: true
         },
         link: (data) => {
           return data.mainAddress?.location?.name
             ? `/locations/${data.mainAddress.location.id}/view`
             : undefined;
-        },
+        }
       },
       {
         field: 'addresses.addressLine1',
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
-        notVisible: true,
+        notVisible: true
       },
       {
         field: 'addresses.city',
@@ -292,7 +292,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
           field: 'addresses',
           fieldIsArray: true
         },
-        sortable: true,
+        sortable: true
       },
       {
         field: 'addresses.emailAddress',
@@ -308,7 +308,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
           field: 'addresses',
           fieldIsArray: true
         },
-        sortable: true,
+        sortable: true
       },
       {
         field: 'addresses.geoLocation.lat',
@@ -340,7 +340,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
           field: 'addresses',
           fieldIsArray: true
         },
-        sortable: true,
+        sortable: true
       },
       {
         field: 'addresses.geoLocationAccurate',
@@ -398,12 +398,12 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
       {
         field: 'riskLevel',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL',
-        sortable: true,
+        sortable: true
       },
       {
         field: 'dateOfLastContact',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
-        sortable: true,
+        sortable: true
       },
       {
         field: 'responsibleUserId',
@@ -464,7 +464,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
           type: V2FilterType.DELETED,
           value: false
         },
-        sortable: true,
+        sortable: true
       },
       {
         field: 'createdBy',
@@ -496,7 +496,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         filter: {
           type: V2FilterType.DATE_RANGE
         },
-        sortable: true,
+        sortable: true
       },
       {
         field: 'updatedBy',
@@ -528,7 +528,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         filter: {
           type: V2FilterType.DATE_RANGE
         },
-        sortable: true,
+        sortable: true
       },
 
       // actions
@@ -566,7 +566,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             action: {
               link: (item: ContactOfContactModel): string[] => {
                 return ['/contacts-of-contacts', item.id, 'modify'];
-              },
+              }
             },
             visible: (item: ContactOfContactModel): boolean => {
               return !item.deleted &&
@@ -616,7 +616,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
                         // set message data
                         message.data = {
-                          name: item.name,
+                          name: item.name
                         };
 
                         // determine message label
@@ -664,7 +664,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                           this.needsRefreshList(true);
                         });
                     });
-                  },
+                  }
                 },
                 visible: (item: ContactOfContactModel): boolean => {
                   return !item.deleted &&
@@ -1030,14 +1030,14 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
             // export
             this.exportContactsOfContacts(qb);
-          },
+          }
         },
         visible: (): boolean => {
           return ContactOfContactModel.canExport(this.authUser);
         },
         disable: (selected: string[]): boolean => {
           return selected.length < 1;
-        },
+        }
       },
       {
         label:
@@ -1054,7 +1054,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             this.dialogV2Service.showExportData({
               title: {
                 get: () =>
-                  'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_DOSSIER_DIALOG_TITLE',
+                  'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_DOSSIER_DIALOG_TITLE'
               },
               export: {
                 url: `outbreaks/${this.selectedOutbreak.id}/contacts-of-contacts/dossier`,
@@ -1065,26 +1065,26 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                 )} - ${moment().format('YYYY-MM-DD HH:mm')}`,
                 extraFormData: {
                   append: {
-                    contactsOfContacts: selected,
-                  },
+                    contactsOfContacts: selected
+                  }
                 },
                 allow: {
                   types: [ExportDataExtension.ZIP],
                   anonymize: {
                     fields: anonymizeFields,
-                    key: 'data',
-                  },
-                },
-              },
+                    key: 'data'
+                  }
+                }
+              }
             });
-          },
+          }
         },
         visible: (): boolean => {
           return ContactOfContactModel.canExportDossier(this.authUser);
         },
         disable: (selected: string[]): boolean => {
           return selected.length < 1;
-        },
+        }
       },
       {
         label:
@@ -1106,14 +1106,14 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
             // export Contact of contact relationships
             this.exportContactsOfContactsRelationships(qb);
-          },
+          }
         },
         visible: (): boolean => {
           return ContactOfContactModel.canExportRelationships(this.authUser);
         },
         disable: (selected: string[]): boolean => {
           return selected.length < 1;
-        },
+        }
       },
       {
         label:
@@ -1124,17 +1124,17 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
           },
           linkQueryParams: (selected: string[]): Params => {
             return {
-              contactOfContactIds: JSON.stringify(selected),
+              contactOfContactIds: JSON.stringify(selected)
             };
-          },
+          }
         },
         visible: (): boolean => {
           return ContactOfContactModel.canBulkModify(this.authUser);
         },
         disable: (selected: string[]): boolean => {
           return selected.length < 1;
-        },
-      },
+        }
+      }
     ];
   }
 

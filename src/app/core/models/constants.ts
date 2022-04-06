@@ -48,7 +48,7 @@ export enum ApplyListFilter {
   EVENTS_WITHOUT_DATE_OF_REPORTING_CHAIN = 'events_without_date_of_reporting_chain',
   CONTEXT_SENSITIVE_HELP_ITEMS = 'context_sensitive_help_items',
   CASE_SUMMARY = 'case-summary',
-  CASES_BY_LOCATION = 'cases-by-location',
+  CASES_BY_LOCATION = 'cases-by-location'
 }
 
 export class Constants {
@@ -482,7 +482,7 @@ export class Constants {
      * Chronology item type
      */
   static CHRONOLOGY_ITEM_TYPE = {
-    FOLLOW_UP: 'LNG_FOLLOW_UP_ITEM',
+    FOLLOW_UP: 'LNG_FOLLOW_UP_ITEM'
   };
 
   /**

@@ -2,17 +2,20 @@ import { ILabelValuePairModel } from '../../../forms-v2/core/label-value-pair.mo
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { QuestionModel } from '../../../../core/models/question.model';
 import { Constants } from '../../../../core/models/constants';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 /**
  * Advanced filter type
  */
 export enum V2AdvancedFilterType {
   TEXT = 'text',
+  NUMBER = 'number',
   SELECT = 'select',
   MULTISELECT = 'multiselect',
   RANGE_NUMBER = 'range_number',
   RANGE_AGE = 'range_age',
   RANGE_DATE = 'range_date',
+  DATE = 'date',
   ADDRESS = 'address',
   LOCATION_SINGLE = 'location_single',
   LOCATION_MULTIPLE = 'location_multiple',
@@ -86,6 +89,18 @@ export const V2AdvancedFilterComparatorOptions: {
     }
   ],
 
+  // number
+  [V2AdvancedFilterType.NUMBER]: [{
+    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_IS',
+    value: V2AdvancedFilterComparatorType.IS
+  }, {
+    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LESS_OR_EQUAL',
+    value: V2AdvancedFilterComparatorType.BEFORE
+  }, {
+    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_GREATER_OR_EQUAL',
+    value: V2AdvancedFilterComparatorType.AFTER
+  }],
+
   // select
   [V2AdvancedFilterType.SELECT]: [{
     label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_SELECT_HAS_AT_LEAST_ONE',
@@ -158,6 +173,12 @@ export const V2AdvancedFilterComparatorOptions: {
     value: V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE
   }],
 
+  // date
+  [V2AdvancedFilterType.DATE]: [{
+    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_DAY_IS',
+    value: V2AdvancedFilterComparatorType.DATE
+  }],
+
   // address
   [V2AdvancedFilterType.ADDRESS]: [{
     label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_CONTAINS',
@@ -217,6 +238,9 @@ interface IV2AdvancedFilterBase {
   id?: string;
   relationshipPath?: string[];
   relationshipLabel?: string;
+  flagIt?: boolean;
+  extraConditions?: RequestQueryBuilder;
+  childQueryBuilderKey?: string;
 
   // never
   optionsLoad?: never;
@@ -229,6 +253,14 @@ interface IV2AdvancedFilterBase {
 interface IV2AdvancedFilterText extends IV2AdvancedFilterBase {
   // required
   type: V2AdvancedFilterType.TEXT;
+}
+
+/**
+ * Advanced filter - Number
+ */
+interface IV2AdvancedFilterNumber extends IV2AdvancedFilterBase {
+  // required
+  type: V2AdvancedFilterType.NUMBER;
 }
 
 /**
@@ -274,7 +306,7 @@ interface IV2AdvancedFilterAgeRange extends IV2AdvancedFilterBase {
 /**
  * Advanced filter - Address
  */
-interface IV2AdvancedFilterAddress extends IV2AdvancedFilterBase {
+export interface IV2AdvancedFilterAddress extends IV2AdvancedFilterBase {
   // required
   type: V2AdvancedFilterType.ADDRESS;
   isArray: boolean;
@@ -283,7 +315,7 @@ interface IV2AdvancedFilterAddress extends IV2AdvancedFilterBase {
 /**
  * Advanced filter - Address phone number
  */
-interface IV2AdvancedFilterAddressPhoneNumber extends IV2AdvancedFilterBase {
+export interface IV2AdvancedFilterAddressPhoneNumber extends IV2AdvancedFilterBase {
   // required
   type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER;
   isArray: boolean;
@@ -314,6 +346,14 @@ interface IV2AdvancedFilterDateRange extends IV2AdvancedFilterBase {
 }
 
 /**
+ * Advanced filter - Date
+ */
+interface IV2AdvancedFilterDate extends IV2AdvancedFilterBase {
+  // required
+  type: V2AdvancedFilterType.DATE;
+}
+
+/**
  * Advanced filter - Number Range
  */
 interface IV2AdvancedFilterNumberRange extends IV2AdvancedFilterBase {
@@ -337,7 +377,7 @@ export interface IV2AdvancedFilterQuestionnaireAnswers extends IV2AdvancedFilter
 }
 
 // advanced filter
-export type V2AdvancedFilter = IV2AdvancedFilterText | IV2AdvancedFilterSingleSelect | IV2AdvancedFilterSingleSelectLoader
+export type V2AdvancedFilter = IV2AdvancedFilterText | IV2AdvancedFilterNumber | IV2AdvancedFilterSingleSelect | IV2AdvancedFilterSingleSelectLoader
 | IV2AdvancedFilterMultipleSelect | IV2AdvancedFilterMultipleSelectLoader | IV2AdvancedFilterAgeRange | IV2AdvancedFilterAddress
-| IV2AdvancedFilterAddressPhoneNumber | IV2AdvancedFilterDateRange | IV2AdvancedFilterNumberRange | IV2AdvancedFilterQuestionnaireAnswers
-| IV2AdvancedFilterSingleLocation | IV2AdvancedFilterMultipleLocation;
+| IV2AdvancedFilterAddressPhoneNumber | IV2AdvancedFilterDateRange | IV2AdvancedFilterDate | IV2AdvancedFilterNumberRange
+| IV2AdvancedFilterQuestionnaireAnswers | IV2AdvancedFilterSingleLocation | IV2AdvancedFilterMultipleLocation;

@@ -104,7 +104,7 @@ export class SystemDevicesComponent extends ListComponent implements OnInit, OnD
           },
           visible: (): boolean => {
             return DeviceModel.canListHistory(this.authUser);
-          },
+          }
         })
       ]
     })

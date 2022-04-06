@@ -3,7 +3,7 @@ import {
   AsyncValidatorFn,
   Validator,
   Validators,
-  ValidatorFn,
+  ValidatorFn
 } from '@angular/forms';
 import { of } from 'rxjs';
 import { map } from 'rxjs/operators';

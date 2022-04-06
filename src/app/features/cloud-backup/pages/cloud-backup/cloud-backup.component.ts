@@ -7,7 +7,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   selector: 'app-cloud-backup',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './cloud-backup.component.html',
-  styleUrls: ['./cloud-backup.component.less'],
+  styleUrls: ['./cloud-backup.component.less']
 })
 
 export class CloudBackupComponent implements OnInit {

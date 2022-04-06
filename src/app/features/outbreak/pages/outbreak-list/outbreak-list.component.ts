@@ -657,7 +657,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
                 required: true,
                 type: 'text',
                 value: this.i18nService.instant('LNG_PAGE_LIST_OUTBREAKS_CLONE_NAME', {name: outbreak.name})
-              })],
+              })]
             }),
             true
           )

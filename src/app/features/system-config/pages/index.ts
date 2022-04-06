@@ -30,5 +30,5 @@ export const pageComponents: any[] = [
   SystemDevicesComponent,
   ModifySystemDeviceComponent,
   ViewHistorySystemDeviceComponent,
-  SystemSyncLogsComponent,
+  SystemSyncLogsComponent
 ];

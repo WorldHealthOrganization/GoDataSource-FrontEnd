@@ -364,8 +364,7 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
         type: FilterType.MULTISELECT,
         options$: this.riskLevelsList$,
         sortable: true
-      }),
-
+      })
     ];
   }
 

@@ -10,10 +10,10 @@ import * as fromPages from './pages';
 @NgModule({
   imports: [
     routing,
-    SharedModule,
+    SharedModule
   ],
   declarations: [
-    ...fromPages.pageComponents,
+    ...fromPages.pageComponents
   ]
 })
 export class OutbreakTemplatesModule {

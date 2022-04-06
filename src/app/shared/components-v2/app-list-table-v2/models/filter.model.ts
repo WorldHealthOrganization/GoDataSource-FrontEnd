@@ -44,53 +44,58 @@ interface IV2FilterBasic {
   max?: never;
   address?: never;
   value?: never;
+  defaultValue?: never;
   addressField?: never;
 }
 
 /**
  * Text
  */
-interface IV2FilterText extends Omit<IV2FilterBasic, 'value'> {
+interface IV2FilterText extends Omit<IV2FilterBasic, 'value' | 'defaultValue'> {
   // required
   type: V2FilterType.TEXT;
   textType: V2FilterTextType;
 
   // optional
   value?: string;
+  defaultValue?: string;
 }
 
 /**
  * Multiple select
  */
-export interface IV2FilterMultipleSelect extends Omit<IV2FilterBasic, 'options' | 'value'> {
+export interface IV2FilterMultipleSelect extends Omit<IV2FilterBasic, 'options' | 'value' | 'defaultValue'> {
   // required
   type: V2FilterType.MULTIPLE_SELECT;
   options: ILabelValuePairModel[];
 
   // optional
   value?: string[];
+  defaultValue?: string[];
 }
 
 /**
  * Date range
  */
-export interface IV2FilterDate extends Omit<IV2FilterBasic, 'value'> {
+export interface IV2FilterDate extends Omit<IV2FilterBasic, 'value' | 'defaultValue'> {
   // required
   type: V2FilterType.DATE_RANGE;
 
   // optional
   value?: IV2DateRange;
+  defaultValue?: IV2DateRange;
 }
 
 /**
  * Age range
  */
-interface IV2FilterAge extends Omit<IV2FilterBasic, 'min' | 'max' | 'value'> {
+interface IV2FilterAge extends Omit<IV2FilterBasic, 'min' | 'max' | 'value' | 'defaultValue'> {
   // required
   type: V2FilterType.AGE_RANGE;
 
   // optional
   value?: IV2NumberRange;
+  defaultValue?: IV2NumberRange;
   min?: number;
   max?: number;
 }
@@ -144,23 +149,25 @@ interface IV2FilterAddressAccurateGeoLocation extends Omit<IV2FilterBasic, 'addr
 /**
  * Boolean
  */
-export interface IV2FilterBoolean extends Omit<IV2FilterBasic, 'value'> {
+export interface IV2FilterBoolean extends Omit<IV2FilterBasic, 'value' | 'defaultValue'> {
   // required
   type: V2FilterType.BOOLEAN;
 
   // optional
   value?: boolean | '';
+  defaultValue?: boolean | '';
 }
 
 /**
  * Number range
  */
-interface IV2FilterNumber extends Omit<IV2FilterBasic, 'min' | 'max' | 'value'> {
+interface IV2FilterNumber extends Omit<IV2FilterBasic, 'min' | 'max' | 'value' | 'defaultValue'> {
   // required
   type: V2FilterType.NUMBER_RANGE;
 
   // optional
   value?: IV2NumberRange;
+  defaultValue?: IV2NumberRange;
   min?: number;
   max?: number;
 }
@@ -168,12 +175,13 @@ interface IV2FilterNumber extends Omit<IV2FilterBasic, 'min' | 'max' | 'value'> 
 /**
  * Deleted
  */
-export interface IV2FilterDeleted extends Omit<IV2FilterBasic, 'value'> {
+export interface IV2FilterDeleted extends Omit<IV2FilterBasic, 'value' | 'defaultValue'> {
   // required
   type: V2FilterType.DELETED;
 
   // optional
   value?: boolean | '';
+  defaultValue?: boolean | '';
 }
 
 /**

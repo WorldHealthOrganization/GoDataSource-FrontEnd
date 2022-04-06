@@ -640,7 +640,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
         fieldName: 'result',
         fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT',
         type: FilterType.SELECT,
-        options$: this.labTestResultsList$,
+        options$: this.labTestResultsList$
       }),
       new FilterModel({
         fieldName: 'dateTesting',

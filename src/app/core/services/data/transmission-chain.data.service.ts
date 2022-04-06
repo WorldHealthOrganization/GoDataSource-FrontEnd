@@ -76,7 +76,7 @@ export class TransmissionChainDataService {
     return this.http
       .get(`outbreaks/${outbreakId}/relationships/independent-transmission-chains?filter=${filter}`)
       .pipe(
-        map(this.mapTransmissionChainDataToModel),
+        map(this.mapTransmissionChainDataToModel)
       );
   }
 
