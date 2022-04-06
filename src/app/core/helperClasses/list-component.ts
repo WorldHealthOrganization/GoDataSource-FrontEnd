@@ -618,6 +618,14 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
       this.queryBuilder.merge(queryBuilder);
     }
 
+    // if no side query builder then clear side filters too
+    if (
+      !queryBuilder &&
+      this.tableV2Component
+    ) {
+      this.tableV2Component.generateFiltersFromFilterData(undefined);
+    }
+
     // apply list filters which is mandatory
     this.mergeListFilterToMainFilter();
 
