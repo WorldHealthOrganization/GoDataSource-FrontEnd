@@ -27,30 +27,23 @@ import { ExportDataExtension } from '../../../../core/services/helper/dialog.ser
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import {
-  ExportDataMethod,
-  IV2ExportDataConfigGroupsRequired,
-} from '../../../../core/services/helper/models/dialog-v2.model';
+import { ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import {
-  IV2BottomDialogConfigButtonType,
-} from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { IV2BreadcrumbAction } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
-import {
-  V2SideDialogConfigInputType,
-} from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 
 @Component({
   selector: 'app-events-list',
-  templateUrl: './events-list.component.html',
+  templateUrl: './events-list.component.html'
 })
 export class EventsListComponent
   extends ListComponent
@@ -88,7 +81,7 @@ export class EventsListComponent
     { label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS', value: 'numberOfContacts' },
     { label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING', value: 'dateOfReporting' },
     { label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', value: 'isDateOfReportingApproximate' },
-    { label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUserId' },
+    { label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUserId' }
   ];
 
   relationshipAnonymizeFields: ILabelValuePairModel[] = [
@@ -177,7 +170,7 @@ export class EventsListComponent
         field: 'date',
         label: 'LNG_EVENT_FIELD_LABEL_DATE',
         format: {
-          type: V2ColumnFormat.DATE,
+          type: V2ColumnFormat.DATE
         },
         sortable: true,
         filter: {
@@ -225,8 +218,8 @@ export class EventsListComponent
           return data.responsibleUserId
             ? `/users/${data.responsibleUserId}/view`
             : undefined;
-        },
-      },
+        }
+      }
     ];
 
     // number of contacts & exposures columns should be visible only on pages where we have relationships
@@ -240,7 +233,7 @@ export class EventsListComponent
           field: 'numberOfContacts',
           label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS',
           format: {
-            type: V2ColumnFormat.BUTTON,
+            type: V2ColumnFormat.BUTTON
           },
           cssCellClass: 'gd-cell-button',
           buttonLabel: (item) =>
@@ -257,14 +250,14 @@ export class EventsListComponent
           },
           disabled: (data) =>
             !RelationshipModel.canList(this.authUser) ||
-            !data.canListRelationshipContacts(this.authUser),
+            !data.canListRelationshipContacts(this.authUser)
         },
         {
           field: 'numberOfExposures',
           label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
           sortable: true,
           format: {
-            type: V2ColumnFormat.BUTTON,
+            type: V2ColumnFormat.BUTTON
           },
           cssCellClass: 'gd-cell-button',
           buttonLabel: (item) =>
@@ -281,7 +274,7 @@ export class EventsListComponent
           },
           disabled: (data) =>
             !RelationshipModel.canList(this.authUser) ||
-            !data.canListRelationshipExposures(this.authUser),
+            !data.canListRelationshipExposures(this.authUser)
         }
       );
     }
@@ -325,7 +318,7 @@ export class EventsListComponent
         sortable: true,
         notVisible: true,
         format: {
-          type: V2ColumnFormat.DATETIME,
+          type: V2ColumnFormat.DATETIME
         },
         filter: {
           type: V2FilterType.DATE_RANGE
@@ -336,7 +329,7 @@ export class EventsListComponent
         label: 'LNG_EVENT_FIELD_LABEL_UPDATED_BY',
         notVisible: true,
         format: {
-          type: 'updatedByUser.name',
+          type: 'updatedByUser.name'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -347,7 +340,7 @@ export class EventsListComponent
         },
         link: (data) => {
           return data.updatedBy ? `/users/${data.updatedBy}/view` : undefined;
-        },
+        }
       },
       {
         field: 'updatedAt',
@@ -358,8 +351,8 @@ export class EventsListComponent
           type: V2FilterType.DATE_RANGE
         },
         format: {
-          type: V2ColumnFormat.DATETIME,
-        },
+          type: V2ColumnFormat.DATETIME
+        }
       },
       {
         field: 'location',
@@ -367,7 +360,7 @@ export class EventsListComponent
         sortable: true,
         notVisible: true,
         format: {
-          type: 'mainAddress.location.name',
+          type: 'mainAddress.location.name'
         },
         filter: {
           type: V2FilterType.ADDRESS_MULTIPLE_LOCATION,
@@ -379,14 +372,14 @@ export class EventsListComponent
           return data.mainAddress?.location?.name
             ? `/locations/${data.mainAddress.location.id}/view`
             : undefined;
-        },
+        }
       },
       {
         field: 'address.addressLine1',
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
         notVisible: true,
         format: {
-          type: 'mainAddress.addressLine1',
+          type: 'mainAddress.addressLine1'
         },
         filter: {
           type: V2FilterType.ADDRESS_FIELD,
@@ -402,7 +395,7 @@ export class EventsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
         notVisible: true,
         format: {
-          type: 'mainAddress.city',
+          type: 'mainAddress.city'
         },
         filter: {
           type: V2FilterType.ADDRESS_FIELD,
@@ -419,7 +412,7 @@ export class EventsListComponent
         sortable: true,
         notVisible: true,
         format: {
-          type: 'mainAddress.geoLocation.lat',
+          type: 'mainAddress.geoLocation.lat'
         }
       },
       {
@@ -428,7 +421,7 @@ export class EventsListComponent
         sortable: true,
         notVisible: true,
         format: {
-          type: 'mainAddress.geoLocation.lng',
+          type: 'mainAddress.geoLocation.lng'
         }
       },
       {
@@ -436,7 +429,7 @@ export class EventsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
         notVisible: true,
         format: {
-          type: 'mainAddress.postalCode',
+          type: 'mainAddress.postalCode'
         },
         filter: {
           type: V2FilterType.ADDRESS_FIELD,
@@ -454,7 +447,7 @@ export class EventsListComponent
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN,
-          field: 'mainAddress.geoLocationAccurate',
+          field: 'mainAddress.geoLocationAccurate'
         },
         filter: {
           type: V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION,
@@ -462,7 +455,7 @@ export class EventsListComponent
           field: 'addresses',
           fieldIsArray: true,
           options: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options
-        },
+        }
       },
 
       // actions
@@ -473,7 +466,7 @@ export class EventsListComponent
         notResizable: true,
         cssCellClass: 'gd-cell-no-focus',
         format: {
-          type: V2ColumnFormat.ACTIONS,
+          type: V2ColumnFormat.ACTIONS
         },
         actions: [
           // View Event
@@ -484,11 +477,11 @@ export class EventsListComponent
             action: {
               link: (data: EventModel): string[] => {
                 return ['/events', data.id, 'view'];
-              },
+              }
             },
             visible: (item: EventModel): boolean => {
               return !item.deleted && EventModel.canView(this.authUser);
-            },
+            }
           },
 
           // Modify Event
@@ -499,7 +492,7 @@ export class EventsListComponent
             action: {
               link: (item: EventModel): string[] => {
                 return ['/events', item.id, 'modify'];
-              },
+              }
             },
             visible: (item: EventModel): boolean => {
               return (
@@ -507,7 +500,7 @@ export class EventsListComponent
                 this.selectedOutbreakIsActive &&
                 EventModel.canModify(this.authUser)
               );
-            },
+            }
           },
 
           // Other actions
@@ -528,7 +521,7 @@ export class EventsListComponent
                         name: string;
                       };
                     } = {
-                      get: '',
+                      get: ''
                     };
 
                     // determine what we need to delete
@@ -538,13 +531,13 @@ export class EventsListComponent
                           title: {
                             get: () => 'LNG_COMMON_LABEL_DELETE',
                             data: () => ({
-                              name: item.name,
-                            }),
+                              name: item.name
+                            })
                           },
                           message: {
                             get: () => message.get,
-                            data: () => message.data,
-                          },
+                            data: () => message.data
+                          }
                         },
                         initialized: (handler) => {
                           // display loading
@@ -552,7 +545,7 @@ export class EventsListComponent
 
                           // set message data
                           message.data = {
-                            name: item.name,
+                            name: item.name
                           };
 
                           // determine message label
@@ -560,7 +553,7 @@ export class EventsListComponent
 
                           // hide loading
                           handler.loading.hide();
-                        },
+                        }
                       })
                       .subscribe((response) => {
                         // canceled ?
@@ -597,7 +590,7 @@ export class EventsListComponent
                             this.needsRefreshList(true);
                           });
                       });
-                  },
+                  }
                 },
                 visible: (item: EventModel): boolean => {
                   return (
@@ -605,7 +598,7 @@ export class EventsListComponent
                     this.selectedOutbreakIsActive &&
                     EventModel.canDelete(this.authUser)
                   );
-                },
+                }
               },
 
               // Divider
@@ -617,7 +610,7 @@ export class EventsListComponent
                     this.selectedOutbreakIsActive &&
                     EventModel.canDelete(this.authUser)
                   );
-                },
+                }
               },
 
               // Add Contact to Event
@@ -630,9 +623,9 @@ export class EventsListComponent
                   linkQueryParams: (item: EventModel): Params => {
                     return {
                       entityType: EntityType.EVENT,
-                      entityId: item.id,
+                      entityId: item.id
                     };
-                  },
+                  }
                 },
                 visible: (item: EventModel): boolean => {
                   return (
@@ -641,7 +634,7 @@ export class EventsListComponent
                     ContactModel.canCreate(this.authUser) &&
                     EventModel.canCreateContact(this.authUser)
                   );
-                },
+                }
               },
 
               // Bulk add contacts to event
@@ -654,9 +647,9 @@ export class EventsListComponent
                   linkQueryParams: (item: EventModel): Params => {
                     return {
                       entityType: EntityType.EVENT,
-                      entityId: item.id,
+                      entityId: item.id
                     };
-                  },
+                  }
                 },
                 visible: (item: EventModel): boolean => {
                   return (
@@ -665,7 +658,7 @@ export class EventsListComponent
                     ContactModel.canBulkCreate(this.authUser) &&
                     EventModel.canBulkCreateContact(this.authUser)
                   );
-                },
+                }
               },
 
               // Divider
@@ -680,7 +673,7 @@ export class EventsListComponent
                       (ContactModel.canBulkCreate(this.authUser) &&
                         EventModel.canBulkCreateContact(this.authUser)))
                   );
-                },
+                }
               },
 
               // See event contacts
@@ -692,9 +685,9 @@ export class EventsListComponent
                       '/relationships',
                       EntityType.EVENT,
                       item.id,
-                      'contacts',
+                      'contacts'
                     ];
-                  },
+                  }
                 },
                 visible: (item: EventModel): boolean => {
                   return (
@@ -702,7 +695,7 @@ export class EventsListComponent
                     RelationshipModel.canList(this.authUser) &&
                     EventModel.canListRelationshipContacts(this.authUser)
                   );
-                },
+                }
               },
 
               // See event exposures
@@ -714,9 +707,9 @@ export class EventsListComponent
                       '/relationships',
                       EntityType.EVENT,
                       item.id,
-                      'exposures',
+                      'exposures'
                     ];
-                  },
+                  }
                 },
                 visible: (item: EventModel): boolean => {
                   return (
@@ -724,7 +717,7 @@ export class EventsListComponent
                     RelationshipModel.canList(this.authUser) &&
                     EventModel.canListRelationshipExposures(this.authUser)
                   );
-                },
+                }
               },
 
               // Restore a deleted event
@@ -739,13 +732,13 @@ export class EventsListComponent
                         config: {
                           title: {
                             get: () => 'LNG_COMMON_LABEL_RESTORE',
-                            data: () => item as any,
+                            data: () => item as any
                           },
                           message: {
                             get: () => 'LNG_DIALOG_CONFIRM_RESTORE_EVENT',
-                            data: () => item as any,
-                          },
-                        },
+                            data: () => item as any
+                          }
+                        }
                       })
                       .subscribe((response) => {
                         // canceled ?
@@ -789,7 +782,7 @@ export class EventsListComponent
                             this.needsRefreshList(true);
                           });
                       });
-                  },
+                  }
                 },
                 visible: (item: EventModel): boolean => {
                   return (
@@ -797,11 +790,11 @@ export class EventsListComponent
                     this.selectedOutbreakIsActive &&
                     EventModel.canRestore(this.authUser)
                   );
-                },
-              },
-            ],
-          },
-        ],
+                }
+              }
+            ]
+          }
+        ]
       }
     );
   }
@@ -820,13 +813,13 @@ export class EventsListComponent
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'date',
-        label: 'LNG_EVENT_FIELD_LABEL_DATE',
+        label: 'LNG_EVENT_FIELD_LABEL_DATE'
         // sortable: true
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'description',
-        label: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION',
+        label: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION'
         // sortable: true
       },
       {
@@ -838,24 +831,24 @@ export class EventsListComponent
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfReporting',
-        label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING',
+        label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING'
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'isDateOfReportingApproximate',
-        label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+        label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE'
         // sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_NUMBER,
         field: 'numberOfContacts',
-        label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS',
+        label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS'
         // sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_NUMBER,
         field: 'numberOfExposures',
-        label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+        label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES'
         // sortable: true
       },
       {
@@ -863,7 +856,7 @@ export class EventsListComponent
         field: 'responsibleUserId',
         label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
         options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
-      },
+      }
 
     ];
   }
@@ -889,7 +882,7 @@ export class EventsListComponent
           label: 'LNG_PAGE_LIST_EVENTS_ACTION_NO_RELATIONSHIPS_BUTTON',
           action: this.redirectService.linkAndQueryParams(['/events'], {
             applyListFilter:
-              Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS,
+              Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS
           }),
           visible: (): boolean => {
             return (
@@ -897,7 +890,7 @@ export class EventsListComponent
               this.appliedListFilter !==
                 Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS
             );
-          },
+          }
         },
 
         // Divider
@@ -908,7 +901,7 @@ export class EventsListComponent
               this.appliedListFilter !==
                 Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS
             );
-          },
+          }
         },
 
         // Export events
@@ -917,25 +910,25 @@ export class EventsListComponent
           action: {
             click: () => {
               this.exportEvents(this.queryBuilder);
-            },
+            }
           },
           visible: (): boolean => {
             return EventModel.canExport(this.authUser);
-          },
+          }
         },
 
         // Import events
         {
           label: 'LNG_PAGE_LIST_EVENTS_IMPORT_BUTTON',
           action: {
-            link: () => ['/import-export-data', 'event-data', 'import'],
+            link: () => ['/import-export-data', 'event-data', 'import']
           },
           visible: (): boolean => {
             return (
               this.selectedOutbreakIsActive &&
               EventModel.canImport(this.authUser)
             );
-          },
+          }
         },
 
         // Divider
@@ -945,7 +938,7 @@ export class EventsListComponent
               EventModel.canExport(this.authUser) ||
               EventModel.canImport(this.authUser)
             );
-          },
+          }
         },
 
         // Export relationships
@@ -974,11 +967,11 @@ export class EventsListComponent
 
               // export
               this.exportEventRelationships(qb);
-            },
+            }
           },
           visible: (): boolean => {
             return EventModel.canExportRelationships(this.authUser);
-          },
+          }
         },
 
         // Import relationships
@@ -988,7 +981,7 @@ export class EventsListComponent
             link: () => ['/import-export-data', 'relationships', 'import'],
             linkQueryParams: (): Params => {
               return {
-                from: Constants.APP_PAGE.EVENTS.value,
+                from: Constants.APP_PAGE.EVENTS.value
               };
             }
           },
@@ -997,9 +990,9 @@ export class EventsListComponent
               OutbreakModel.canImportRelationship(this.authUser) &&
               this.selectedOutbreakIsActive
             );
-          },
-        },
-      ],
+          }
+        }
+      ]
     };
   }
 
@@ -1018,14 +1011,14 @@ export class EventsListComponent
 
             // export
             this.exportEvents(qb);
-          },
+          }
         },
         visible: (): boolean => {
           return EventModel.canExport(this.authUser);
         },
         disable: (selected: string[]): boolean => {
           return selected.length < 1;
-        },
+        }
       },
       {
         label: 'LNG_PAGE_LIST_EVENTS_GROUP_ACTION_EXPORT_SELECTED_EVENTS_RELATIONSHIPS',
@@ -1078,11 +1071,11 @@ export class EventsListComponent
       label: 'LNG_COMMON_BUTTON_ADD',
       icon: 'add_circle_outline',
       action: {
-        link: (): string[] => ['/events', 'create'],
+        link: (): string[] => ['/events', 'create']
       },
       visible: (): boolean => {
         return EventModel.canCreate(this.authUser);
-      },
+      }
     };
   }
 
@@ -1268,7 +1261,7 @@ export class EventsListComponent
       const redirect = this.redirectService.linkAndQueryParams(['/events']);
       eventsAction = {
         link: redirect.link(),
-        linkQueryParams: redirect.linkQueryParams(),
+        linkQueryParams: redirect.linkQueryParams()
       };
     }
 
@@ -1279,13 +1272,13 @@ export class EventsListComponent
         action: {
           link: DashboardModel.canViewDashboard(this.authUser)
             ? ['/dashboard']
-            : ['/version'],
-        },
+            : ['/version']
+        }
       },
       {
         label: 'LNG_PAGE_LIST_EVENTS_TITLE',
-        action: eventsAction,
-      },
+        action: eventsAction
+      }
     ];
 
     // if we have an applied filter then we need to add breadcrumb
@@ -1294,7 +1287,7 @@ export class EventsListComponent
     ) {
       this.breadcrumbs.push({
         label: 'LNG_PAGE_DASHBOARD_EVENTS_WITHOUT_RELATIONSHIPS',
-        action: null,
+        action: null
       });
     }
   }
@@ -1321,7 +1314,7 @@ export class EventsListComponent
       'inconsistencies',
       'relationship',
       'matchedDuplicateRelationships',
-      'responsibleUser',
+      'responsibleUser'
     ];
   }
 

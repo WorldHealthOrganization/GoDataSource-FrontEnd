@@ -377,7 +377,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
               ],
               '/transmission-chains/case-count-map',
               () => this.hasOutbreak.apply(this) // provide context to keep this functionality
-            ),
+            )
           ]
         )
       ]

@@ -288,7 +288,7 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
           // return spreadsheet data
           this.extraContactOfContactData.push({
             id: contactOfContact.id,
-            addresses: contactOfContact.addresses,
+            addresses: contactOfContact.addresses
           });
 
           // finished
@@ -365,7 +365,7 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
         .setProperty('addresses.postalCode'),
       new TextSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER')
-        .setProperty('addresses.phoneNumber'),
+        .setProperty('addresses.phoneNumber')
 
       // Contact Document(s)
       // Can't edit since they are multiple

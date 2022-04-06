@@ -3,6 +3,7 @@ import { ILabelValuePairModel } from '../../../forms-v2/core/label-value-pair.mo
 import { NgForm } from '@angular/forms';
 import { Params } from '@angular/router';
 import { V2AdvancedFilter } from '../../app-list-table-v2/models/advanced-filter.model';
+import { RequestFilterOperator } from '../../../../core/helperClasses/request-query-builder';
 
 /**
  * Side dialog config
@@ -229,6 +230,7 @@ export interface IV2SideDialogConfigInputFilterList extends IV2SideDialogConfigI
   name: string;
   options: V2AdvancedFilter[];
   filters: IV2SideDialogConfigInputFilterListItem[];
+  operatorValue: RequestFilterOperator;
 
   // not used
   placeholder?: never;

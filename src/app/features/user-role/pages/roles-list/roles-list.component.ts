@@ -102,7 +102,7 @@ export class RolesListComponent extends ListComponent implements OnInit, OnDestr
           visible: (): boolean => {
             return UserRoleModel.canClone(this.authUser);
           }
-        }),
+        })
       ]
     })
   ];

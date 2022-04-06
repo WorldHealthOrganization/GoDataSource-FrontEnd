@@ -4,7 +4,7 @@ import { ValueAccessorBase } from './value-accessor-base';
 import {
   AsyncValidatorArray,
   ValidatorArray,
-  validate,
+  validate
 } from './validate';
 import { ErrorMessage } from './error-message';
 import { ElementBaseFailure } from './element-base-failure';

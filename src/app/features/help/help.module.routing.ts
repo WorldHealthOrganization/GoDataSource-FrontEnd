@@ -30,7 +30,7 @@ const routes: Routes = [
     data: {
       permissions: [
         PERMISSION.HELP_CATEGORY_LIST
-      ],
+      ]
     }
   },
   // Create Help Category

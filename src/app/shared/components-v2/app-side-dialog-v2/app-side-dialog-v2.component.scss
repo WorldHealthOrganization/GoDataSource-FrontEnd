@@ -249,6 +249,11 @@
 
           /* Slide-in panel filters */
           .gd-app-side-dialog-v2-content-middle-item-input-filter-list {
+            /* Filters - operator and/or */
+            .gd-form-toggle-v2 {
+              margin-top: -0.8rem;
+            }
+
             /* Filters - top buttons */
             .gd-app-side-dialog-v2-content-middle-item-input-filter-list-buttons {
               position: relative;
@@ -267,7 +272,7 @@
 
             /* Filters - scrollable container with all filters */
             .gd-app-side-dialog-v2-content-middle-item-input-filter-list-container {
-              height: calc(100vh - 27.1rem);
+              height: calc(100vh - 32.1rem);
               margin: 0 -1.6rem;
               overflow-y: overlay;
               padding: 1.6rem;

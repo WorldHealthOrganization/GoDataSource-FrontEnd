@@ -102,7 +102,7 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
         columns: this.chartData,
         type: 'bar',
         types: {
-          [this.lineData]: 'spline',
+          [this.lineData]: 'spline'
         },
         groups: [
           this.chartDataColumns

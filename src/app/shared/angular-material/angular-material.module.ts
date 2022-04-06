@@ -26,11 +26,13 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 @NgModule({
   imports: [
     MatBottomSheetModule,
     MatButtonModule,
+    MatButtonToggleModule,
     MatInputModule,
     MatSliderModule,
     MatMenuModule,
@@ -69,6 +71,7 @@ import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
   exports: [
     MatBottomSheetModule,
     MatButtonModule,
+    MatButtonToggleModule,
     MatInputModule,
     MatSliderModule,
     MatMenuModule,

@@ -32,7 +32,13 @@ export class AppListTableV2SelectionHeaderComponent implements IHeaderAngularCom
   /**
    * Gets called whenever the cell refreshes
    */
-  refresh(_params: IHeaderParams): boolean {
+  refresh(params: IHeaderParams): boolean {
+    // reload
+    this.reload(params);
+
+    // redraw
+    this.changeDetectorRef.detectChanges();
+
     // ignore for now
     return true;
   }
@@ -48,6 +54,14 @@ export class AppListTableV2SelectionHeaderComponent implements IHeaderAngularCom
    * Cell initialized
    */
   agInit(params: IHeaderParams): void {
+    // retrieve extended column definition
+    this.reload(params);
+  }
+
+  /**
+   * Reload data
+   */
+  reload(params: IHeaderParams): void {
     // retrieve extended column definition
     const extendedColDef: IExtendedColDef = params.column.getUserProvidedColDef() as IExtendedColDef;
     this.component = extendedColDef.columnDefinitionData;

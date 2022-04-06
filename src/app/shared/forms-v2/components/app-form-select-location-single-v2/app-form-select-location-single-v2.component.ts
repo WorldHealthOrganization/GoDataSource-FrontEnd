@@ -1,10 +1,10 @@
 import {
   ChangeDetectionStrategy, ChangeDetectorRef,
-  Component,
+  Component, EventEmitter,
   forwardRef,
   Host, Input,
   OnDestroy, OnInit,
-  Optional,
+  Optional, Output,
   SkipSelf, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -40,6 +40,9 @@ export class AppFormSelectLocationSingleV2Component
 
   // clearable ?
   @Input() clearable: boolean = false;
+
+  // selected location changed
+  @Output() selectedLocationChanged = new EventEmitter<ILocation>();
 
   /**
    * Constructor
@@ -107,5 +110,8 @@ export class AppFormSelectLocationSingleV2Component
     this.selectedLocation = this.value && this.locationMap[this.value] ?
       this.locationMap[this.value] :
       this.selectedLocation;
+
+    // emit event
+    this.selectedLocationChanged.emit(this.selectedLocation);
   }
 }

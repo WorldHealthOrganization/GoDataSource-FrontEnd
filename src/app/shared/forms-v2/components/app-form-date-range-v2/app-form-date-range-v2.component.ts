@@ -27,6 +27,9 @@ import { IV2DateRange } from './models/date.model';
 export class AppFormDateRangeV2Component
   extends AppFormBaseV2<IV2DateRange> implements OnDestroy {
 
+  // float label
+  @Input() neverFloatLabel: boolean = false;
+
   // visible
   @Input() fromHidden: boolean;
   @Input() toHidden: boolean;
