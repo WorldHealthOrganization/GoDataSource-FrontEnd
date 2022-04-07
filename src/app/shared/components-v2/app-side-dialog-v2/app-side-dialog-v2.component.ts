@@ -60,6 +60,7 @@ export class AppSideDialogV2Component implements OnDestroy {
 
     // update
     update: {
+      // refresh inputs list
       inputs: (inputs) => {
         // already closed ?
         if (!this.sideNav.opened) {
@@ -78,6 +79,20 @@ export class AppSideDialogV2Component implements OnDestroy {
       refresh: () => {
         // refresh inputs
         this.updateInputs();
+      },
+
+      // used to add filters
+      addAdvancedFilter: (input: IV2SideDialogConfigInputFilterList) => {
+        return this.addAdvancedFilter(input);
+      },
+      resetQuestionnaireFilter: (
+        filter: IV2SideDialogConfigInputFilterListItem,
+        ...specificProperties: string[]
+      ) => {
+        this.resetQuestionnaireFilter(
+          filter,
+          ...specificProperties
+        );
       }
     },
 
@@ -344,7 +359,8 @@ export class AppSideDialogV2Component implements OnDestroy {
     }
 
     // send response
-    this.observer$.next({
+    const obs = this.observer$;
+    obs.next({
       // clicked button
       button: {
         type,
@@ -359,8 +375,12 @@ export class AppSideDialogV2Component implements OnDestroy {
     });
 
     // finished
-    this.observer$.complete();
-    this.observer$ = undefined;
+    obs.complete();
+
+    // reset only if not displaying another dialog
+    if (this.observer$ === obs) {
+      this.observer$ = undefined;
+    }
   }
 
   /**
@@ -515,7 +535,7 @@ export class AppSideDialogV2Component implements OnDestroy {
         input.optionsAsLabelValueMap = {};
         input.options.forEach((filterOption) => {
           // option id
-          const id: string = filterOption.id || uuid();
+          const id: string = `${filterOption.field}${filterOption.label}`;
 
           // determine label
           const label: string = filterOption.relationshipLabel ?
@@ -542,9 +562,9 @@ export class AppSideDialogV2Component implements OnDestroy {
   /**
    * Add filter
    */
-  addAdvancedFilter(input: IV2SideDialogConfigInputFilterList): void {
-    // add filter
-    input.filters.push({
+  addAdvancedFilter(input: IV2SideDialogConfigInputFilterList): IV2SideDialogConfigInputFilterListItem {
+    // create filter
+    const advancedFilter: IV2SideDialogConfigInputFilterListItem = {
       type: V2SideDialogConfigInputType.FILTER_LIST_ITEM,
 
       // selected value
@@ -616,7 +636,13 @@ export class AppSideDialogV2Component implements OnDestroy {
           }
         }
       }
-    });
+    };
+
+    // add filter
+    input.filters.push(advancedFilter);
+
+    // finished
+    return advancedFilter;
   }
 
   /**

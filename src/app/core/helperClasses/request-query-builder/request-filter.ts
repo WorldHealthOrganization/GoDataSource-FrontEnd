@@ -485,17 +485,20 @@ export class RequestFilter {
      */
   byAgeRange(
     property: string,
-    value: any
+    value: any,
+    replace: boolean = true
   ): RequestFilter {
     // remove conditions
-    this.remove(`${property}.months`);
-    this.remove(`${property}.years`);
-    this.removeCondition({
-      or: [
-        { [`${property}.months`]: true },
-        { [`${property}.years`]: true }
-      ]
-    });
+    if (replace) {
+      this.remove(`${property}.months`);
+      this.remove(`${property}.years`);
+      this.removeCondition({
+        or: [
+          {[`${property}.months`]: true},
+          {[`${property}.years`]: true}
+        ]
+      });
+    }
 
     // determine what filters we need to add
     const fromValue: number = _.isNumber(value.from) ? value.from : null;
@@ -528,11 +531,13 @@ export class RequestFilter {
       }
 
       // single condition ( either years or months )
-      this.where({
-        [`${property}.years`]: {
-          [operator]: valueToCompare
-        }},
-      true
+      this.where(
+        {
+          [`${property}.years`]: {
+            [operator]: valueToCompare
+          }
+        },
+        replace
       );
     }
 
