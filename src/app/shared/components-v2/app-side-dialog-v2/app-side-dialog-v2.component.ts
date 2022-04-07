@@ -24,6 +24,8 @@ import { Constants } from '../../../core/models/constants';
 import { v4 as uuid } from 'uuid';
 import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model';
 import { RequestFilterOperator } from '../../../core/helperClasses/request-query-builder';
+import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
+import { IV2BottomDialogConfigButtonType } from '../app-bottom-dialog-v2/models/bottom-dialog-config.model';
 
 /**
  * Component
@@ -280,6 +282,7 @@ export class AppSideDialogV2Component implements OnDestroy {
   constructor(
     protected changeDetectorRef: ChangeDetectorRef,
     protected i18nService: I18nService,
+    protected dialogV2Service: DialogV2Service,
     location: Location
   ) {
     this.locationSubscription = location.subscribe(() => {
@@ -682,14 +685,36 @@ export class AppSideDialogV2Component implements OnDestroy {
     input: IV2SideDialogConfigInputFilterList,
     filter: IV2SideDialogConfigInputFilterListItem
   ): void {
-    // find index
-    const filterIndex: number = input.filters.findIndex((item) => item === filter);
-    if (filterIndex < 0) {
-      return;
-    }
+    // ask for confirmation
+    this.dialogV2Service
+      .showConfirmDialog({
+        config: {
+          title: {
+            get: () => 'LNG_COMMON_BUTTON_DELETE_FILTERS'
+          },
+          message: {
+            get: () => 'LNG_COMMON_BUTTON_DELETE_FILTERS_MSG'
+          }
+        }
+      })
+      .subscribe((response) => {
+        // cancel ?
+        if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+          return;
+        }
 
-    // remove
-    input.filters.splice(filterIndex, 1);
+        // find index
+        const filterIndex: number = input.filters.findIndex((item) => item === filter);
+        if (filterIndex < 0) {
+          return;
+        }
+
+        // remove
+        input.filters.splice(filterIndex, 1);
+
+        // update side dialog
+        this.changeDetectorRef.detectChanges();
+      });
   }
 
   /**
