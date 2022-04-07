@@ -81,6 +81,23 @@ export class AppSideDialogV2Component implements OnDestroy {
         this.updateInputs();
       },
 
+      // change title
+      changeTitle: (title, data?) => {
+        // already closed ?
+        if (!this.sideNav.opened) {
+          return;
+        }
+
+        // update title
+        this.config.title = {
+          get: () => title,
+          data: () => data
+        };
+
+        // update UI
+        this.changeDetectorRef.detectChanges();
+      },
+
       // used to add filters
       addAdvancedFilter: (input: IV2SideDialogConfigInputFilterList) => {
         return this.addAdvancedFilter(input);
