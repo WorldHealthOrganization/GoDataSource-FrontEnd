@@ -576,7 +576,89 @@
                 <!-- Sort tab -->
                 <mat-tab
                   [label]="'LNG_SIDE_FILTERS_SECTION_SORT_TITLE' | translate">
-                  sort todo
+
+                  <!-- Buttons -->
+                  <div
+                    fxLayout="row" fxLayoutAlign="space-between"
+                    class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-buttons">
+
+                    <!-- Add -->
+                    <button
+                      type="button"
+                      mat-flat-button color="primary"
+                      (click)="addAdvancedSort(input)">
+                      {{'LNG_SIDE_FILTERS_ADD_ANOTHER_SORT_BUTTON' | translate}}
+                    </button>
+
+                    <!-- Reset filters -->
+                    <button
+                      type="button"
+                      mat-flat-button color="text"
+                      (click)="resetAdvancedFilter()">
+                      {{'LNG_COMMON_BUTTON_RESET_FILTERS' | translate}}
+                    </button>
+
+                  </div>
+
+                  <!-- Sorts -->
+                  <div
+                    fxLayout="column" fxLayoutGap="0.8rem"
+                    class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-container">
+
+                    <div
+                      *ngFor="let sort of input.sorts"
+                      fxLayout="row" fxLayoutAlign="start start"
+                      class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-item"
+                      [class.gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-no-value]="!sort.sortBy.value">
+
+                      <!-- Left -->
+                      <div
+                        fxFlex
+                        class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-left">
+
+                        <!-- Sort by -->
+                        <app-form-select-single-v2
+                          [(ngModel)]="sort.sortBy.value"
+                          [name]="sort.sortBy.name"
+                          [options]="sort.sortBy.options"
+                          [placeholder]="sort.sortBy.placeholder"
+                          required="true">
+                        </app-form-select-single-v2>
+
+                        <!-- Sort by setup -->
+                        <div
+                          *ngIf="sort.sortBy.value"
+                          class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-left-inner">
+
+                          <!-- Order -->
+                          <app-form-select-single-v2
+                            [(ngModel)]="sort.order.value"
+                            [name]="sort.order.name"
+                            [options]="sort.order.options"
+                            [placeholder]="sort.order.placeholder"
+                            required="true">
+                          </app-form-select-single-v2>
+
+                        </div>
+
+                      </div>
+
+                      <!-- Right -->
+                      <button
+                        fxGrow="0"
+                        class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-right"
+                        type="button"
+                        mat-icon-button
+                        color="warn"
+                        [matTooltip]="'LNG_COMMON_BUTTON_DELETE_SORTS' | translate"
+                        (click)="removeAdvancedSort(input, sort)">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+
+                    </div>
+
+                  </div>
+
                 </mat-tab>
 
               </mat-tab-group>

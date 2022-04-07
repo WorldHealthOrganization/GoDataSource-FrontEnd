@@ -6,7 +6,7 @@ import {
   IV2SideDialogConfigButtonType,
   IV2SideDialogConfigInputAccordionPanel,
   IV2SideDialogConfigInputFilterList,
-  IV2SideDialogConfigInputFilterListFilter,
+  IV2SideDialogConfigInputFilterListFilter, IV2SideDialogConfigInputFilterListSort,
   IV2SideDialogData,
   IV2SideDialogHandler,
   IV2SideDialogResponse,
@@ -23,7 +23,7 @@ import { V2AdvancedFilter, V2AdvancedFilterComparatorOptions, V2AdvancedFilterCo
 import { Constants } from '../../../core/models/constants';
 import { v4 as uuid } from 'uuid';
 import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model';
-import { RequestFilterOperator } from '../../../core/helperClasses/request-query-builder';
+import { RequestFilterOperator, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../app-bottom-dialog-v2/models/bottom-dialog-config.model';
 
@@ -242,6 +242,17 @@ export class AppSideDialogV2Component implements OnDestroy {
       [key: string]: string
     }
   } | undefined;
+
+  // sort order options
+  sortOrderOptions: ILabelValuePairModel[] = [
+    {
+      label: 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER',
+      value: RequestSortDirection.ASC
+    }, {
+      label: 'LNG_SIDE_FILTERS_SORT_BY_DESC_PLACEHOLDER',
+      value: RequestSortDirection.DESC
+    }
+  ];
 
   // operator options
   operatorOptions: ILabelValuePairModel[] = [
@@ -553,6 +564,7 @@ export class AppSideDialogV2Component implements OnDestroy {
       if (input.type === V2SideDialogConfigInputType.FILTER_LIST) {
         // process options
         input.optionsAsLabelValue = [];
+        input.sortableOptionsAsLabelValue = [];
         input.optionsAsLabelValueMap = {};
         input.options.forEach((filterOption) => {
           // option id
@@ -572,6 +584,11 @@ export class AppSideDialogV2Component implements OnDestroy {
 
           // attach option
           input.optionsAsLabelValue.push(option);
+
+          // sortable ?
+          if (filterOption.sortable) {
+            input.sortableOptionsAsLabelValue.push(option);
+          }
 
           // map option
           input.optionsAsLabelValueMap[id] = option;
@@ -756,4 +773,78 @@ export class AppSideDialogV2Component implements OnDestroy {
       });
     }
   }
+
+  /**
+   * Add sort
+   */
+  addAdvancedSort(input: IV2SideDialogConfigInputFilterList): IV2SideDialogConfigInputFilterListSort {
+    // create sort
+    const advancedSort: IV2SideDialogConfigInputFilterListSort = {
+      type: V2SideDialogConfigInputType.FILTER_LIST_SORT,
+
+      // sort by
+      sortBy: {
+        type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+        value: undefined,
+        name: `${input.name}.sorts[${input.filters.length}]`,
+        placeholder: 'LNG_SIDE_FILTERS_SORT_BY_PLACEHOLDER',
+        options: input.sortableOptionsAsLabelValue
+      },
+
+      // order - asc / desc
+      order: {
+        type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+        value: undefined,
+        name: `${input.name}.order[${input.filters.length}]`,
+        placeholder: 'LNG_SIDE_FILTERS_SORT_DIRECTION_LABEL',
+        options: this.sortOrderOptions
+      }
+    };
+
+    // add sort
+    input.sorts.push(advancedSort);
+
+    // finished
+    return advancedSort;
+  }
+
+  /**
+   * Remove advanced sort
+   */
+  removeAdvancedSort(
+    input: IV2SideDialogConfigInputFilterList,
+    sort: IV2SideDialogConfigInputFilterListSort
+  ): void {
+    // ask for confirmation
+    this.dialogV2Service
+      .showConfirmDialog({
+        config: {
+          title: {
+            get: () => 'LNG_COMMON_BUTTON_DELETE_SORTS'
+          },
+          message: {
+            get: () => 'LNG_COMMON_BUTTON_DELETE_SORTS_MSG'
+          }
+        }
+      })
+      .subscribe((response) => {
+        // cancel ?
+        if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+          return;
+        }
+
+        // find index
+        const sortIndex: number = input.sorts.findIndex((item) => item === sort);
+        if (sortIndex < 0) {
+          return;
+        }
+
+        // remove
+        input.sorts.splice(sortIndex, 1);
+
+        // update side dialog
+        this.changeDetectorRef.detectChanges();
+      });
+  }
+
 }

@@ -1568,6 +1568,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
             name: 'filters',
             options: [],
             filters: [],
+            sorts: [],
             operatorValue: RequestFilterOperator.AND
           }
         ],
@@ -1577,7 +1578,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           color: 'primary',
           key: 'apply',
           disabled: (_data, handler): boolean => {
-            return (handler.data.map.filters as IV2SideDialogConfigInputFilterList).filters.length < 1 || !handler.form || handler.form.invalid;
+            const input = handler.data.map.filters as IV2SideDialogConfigInputFilterList;
+            return (input.filters.length < 1 && input.sorts.length < 1) || !handler.form || handler.form.invalid;
           }
         }, {
           type: IV2SideDialogConfigButtonType.OTHER,
@@ -1585,7 +1587,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           color: 'secondary',
           key: 'save',
           disabled: (_data, handler): boolean => {
-            return (handler.data.map.filters as IV2SideDialogConfigInputFilterList).filters.length < 1 || !handler.form || handler.form.invalid;
+            const input = handler.data.map.filters as IV2SideDialogConfigInputFilterList;
+            return (input.filters.length < 1 && input.sorts.length < 1) || !handler.form || handler.form.invalid;
           }
         }, {
           type: IV2SideDialogConfigButtonType.CANCEL,

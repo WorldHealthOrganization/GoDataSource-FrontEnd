@@ -223,6 +223,16 @@ export interface IV2SideDialogConfigInputFilterListFilter extends IV2SideDialogC
 }
 
 /**
+ * Side dialog input - filter list sort
+ */
+export interface IV2SideDialogConfigInputFilterListSort extends IV2SideDialogConfigInputBase {
+  // required
+  type: V2SideDialogConfigInputType.FILTER_LIST_SORT;
+  sortBy: IV2SideDialogConfigInputSingleDropdown;
+  order: IV2SideDialogConfigInputSingleDropdown;
+}
+
+/**
  * Side dialog input - filter list
  */
 export interface IV2SideDialogConfigInputFilterList extends IV2SideDialogConfigInputBase {
@@ -231,11 +241,13 @@ export interface IV2SideDialogConfigInputFilterList extends IV2SideDialogConfigI
   name: string;
   options: V2AdvancedFilter[];
   filters: IV2SideDialogConfigInputFilterListFilter[];
+  sorts: IV2SideDialogConfigInputFilterListSort[];
   operatorValue: RequestFilterOperator;
 
   // not used
   placeholder?: never;
   optionsAsLabelValue?: ILabelValuePairModel[];
+  sortableOptionsAsLabelValue?: ILabelValuePairModel[];
   optionsAsLabelValueMap?: {
     [optionId: string]: ILabelValuePairModel
   };
