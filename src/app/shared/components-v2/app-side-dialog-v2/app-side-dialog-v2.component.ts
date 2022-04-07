@@ -82,7 +82,7 @@ export class AppSideDialogV2Component implements OnDestroy {
       },
 
       // change title
-      changeTitle: (title, data) => {
+      changeTitle: (title, data?) => {
         // update title
         this.config.title = {
           get: () => title,
