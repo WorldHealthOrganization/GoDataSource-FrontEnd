@@ -112,6 +112,11 @@ export class AppSideDialogV2Component implements OnDestroy {
           filter,
           ...specificProperties
         );
+      },
+
+      // used to add sorts
+      addAdvancedSort:  (input: IV2SideDialogConfigInputFilterList) => {
+        return this.addAdvancedSort(input);
       }
     },
 

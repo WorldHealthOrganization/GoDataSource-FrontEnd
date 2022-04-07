@@ -359,7 +359,8 @@ export interface IV2SideDialogHandler {
     resetQuestionnaireFilter: (
       filter: IV2SideDialogConfigInputFilterListFilter,
       ...specificProperties: string[]
-    ) => void
+    ) => void,
+    addAdvancedSort: (input: IV2SideDialogConfigInputFilterList) => IV2SideDialogConfigInputFilterListSort,
   },
   buttons: {
     click: (buttonKey: string) => void
