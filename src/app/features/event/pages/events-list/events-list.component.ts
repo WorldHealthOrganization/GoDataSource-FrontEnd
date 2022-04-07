@@ -819,20 +819,20 @@ export class EventsListComponent
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'name',
-        label: 'LNG_EVENT_FIELD_LABEL_NAME'
-        // sortable: true
+        label: 'LNG_EVENT_FIELD_LABEL_NAME',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'date',
-        label: 'LNG_EVENT_FIELD_LABEL_DATE'
-        // sortable: true
+        label: 'LNG_EVENT_FIELD_LABEL_DATE',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'description',
-        label: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION'
-        // sortable: true
+        label: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.ADDRESS,
@@ -848,20 +848,20 @@ export class EventsListComponent
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'isDateOfReportingApproximate',
-        label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE'
-        // sortable: true
+        label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_NUMBER,
         field: 'numberOfContacts',
-        label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS'
-        // sortable: true
+        label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_NUMBER,
         field: 'numberOfExposures',
-        label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES'
-        // sortable: true
+        label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
