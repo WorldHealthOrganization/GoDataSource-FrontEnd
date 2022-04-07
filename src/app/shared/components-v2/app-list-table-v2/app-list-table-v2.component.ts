@@ -1971,6 +1971,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // reset filters list
     filtersList.filters = [];
+    filtersList.sorts = [];
 
     // add filters
     (advancedFiltersApplied.appliedFilters || []).forEach((appliedFilter) => {
