@@ -1,87 +1,24 @@
-<!-- [pageTitle]="eventsDataExportFileName" -->
 <app-list-table-v2 
-    [pageTitle]="appliedListFilter !== Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS ? 'LNG_PAGE_LIST_EVENTS_TITLE' : 'LNG_PAGE_DASHBOARD_EVENTS_WITHOUT_RELATIONSHIPS'"
-    [records$]="eventsList$"
-    [columns]="tableColumns"
-    [breadcrumbs]="breadcrumbs"
-    [quickActions]="quickActions"
-    [groupActions]="groupActions"
-    [addAction]="addAction"
-    [pageCount]="pageCount"
-    [pageSize]="pageSize"
-    [pageIndex]="pageIndex"
-    [pageSettingsKey]="appliedListFilter !== Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS ? UserSettings.EVENT_FIELDS : UserSettings.EVENT_WITHOUT_RELATIONSHIPS_FIELDS"
-    [sortColumn]="tableSortBy"
-    [filtersApplied]="filtersApplied"
-    [advancedFilterType]="Constants.APP_PAGE.EVENTS.value"
-    [advancedFilters]="advancedFilters"
-    (refreshData)="needsRefreshList(true, false)"
-    (refreshDataCount)="refreshListCount(false)"
-    (pageChange)="changePage($event)"
-    (sortBy)="sortBy($event, { age: [ 'years', 'months' ] })"
-    (filterBy)="filterBy($event)"
-    (resetHeaderFilters)="resetFiltersToSideFilters()"
-    (advancedFilterBy)="applySideFilters($event)"></app-list-table-v2>
-
-
-<!--
-<app-topnav>
-    <ng-container dynamic-section>
-        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
-            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
-
-            <div class="topnav-actions">
-
-                <button
-                    *ngIf="!appliedListFilter && (
-                        (EventModel.canList(authUser) && EventModel.canListPersonsWithoutRelationships(authUser)) ||
-                        (RelationshipModel.canExport(authUser) && EventModel.canExportRelationships(authUser)) ||
-                        (exportEventsUrl && EventModel.canExport(authUser)) ||
-                        EventModel.canImport(authUser)
-                    )"
-                    mat-raised-button
-                    color="accent"
-                    [matMenuTriggerFor]="quickActionsMenu">
-                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
-                </button>
-
-                
-            </div>
-        </div>
-    </ng-container>
-</app-topnav>
--->
-
- <!-- <mat-card class="page-section page-content"> -->
-    <!-- Table top info -->
-    <!-- <div
-        fxLayout="row"> -->
-        <!-- Filters message -->
-        <!-- <div
-            fxFlex fxGrow="0" fxLayoutAlign="start center"
-            class="filters-applied">
-            {{ queryBuilder.isEmptyOnlyFilters() ? '' : ('LNG_COMMON_LABEL_FILTERS_USED' | translate) }}
-        </div> -->
-
-        <!-- Filter buttons -->
-        <!-- <div
-            fxFlex
-            class="reset-filters">
-            <button
-                type="button"
-                mat-raised-button
-                color="accent"
-                (click)="resetFiltersToSideFilters()">
-                {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
-            </button>
-            <button
-                type="button"
-                mat-raised-button
-                color="accent"
-                (click)="needsRefreshList(true)">
-                {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
-            </button>
-        </div> -->
-    <!-- </div> -->
-
-<!-- </mat-card> -->
+  [pageTitle]="appliedListFilter !== Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS ? 'LNG_PAGE_LIST_EVENTS_TITLE' : 'LNG_PAGE_DASHBOARD_EVENTS_WITHOUT_RELATIONSHIPS'"
+  [records$]="eventsList$"
+  [columns]="tableColumns"
+  [breadcrumbs]="breadcrumbs"
+  [quickActions]="quickActions"
+  [groupActions]="groupActions"
+  [addAction]="addAction"
+  [pageCount]="pageCount"
+  [pageSize]="pageSize"
+  [pageIndex]="pageIndex"
+  [pageSettingsKey]="appliedListFilter !== Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS ? UserSettings.EVENT_FIELDS : UserSettings.EVENT_WITHOUT_RELATIONSHIPS_FIELDS"
+  [sortColumn]="tableSortBy"
+  [filtersApplied]="filtersApplied"
+  [advancedFilterType]="Constants.APP_PAGE.EVENTS.value"
+  [advancedFilters]="advancedFilters"
+  (refreshData)="needsRefreshList(true, false)"
+  (refreshDataCount)="refreshListCount(false)"
+  (pageChange)="changePage($event)"
+  (sortBy)="sortBy($event, { age: [ 'years', 'months' ] })"
+  (filterBy)="filterBy($event)"
+  (resetHeaderFilters)="resetFiltersToSideFilters()"
+  (advancedFilterBy)="applySideFilters($event)"
+></app-list-table-v2>

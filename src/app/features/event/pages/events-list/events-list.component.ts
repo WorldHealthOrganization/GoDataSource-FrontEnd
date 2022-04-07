@@ -49,11 +49,6 @@ export class EventsListComponent
   extends ListComponent
   implements OnDestroy
 {
-
-  // field groups
-  eventRelationshipFieldGroups: ILabelValuePairModel[];
-  relationshipFieldGroupsRequires: IV2ExportDataConfigGroupsRequired;
-
   // list of existing events
   eventsList$: Observable<EventModel[]>;
 
@@ -128,7 +123,7 @@ export class EventsListComponent
   }
 
   /**
-   * Release resources
+   * Component destroyed
    */
   ngOnDestroy() {
     // release parent resources
@@ -279,6 +274,7 @@ export class EventsListComponent
       );
     }
 
+    // rest of columns :)
     this.tableColumns.push(
       {
         field: 'deleted',
@@ -1080,7 +1076,7 @@ export class EventsListComponent
   }
 
   /**
-   * Initialize table grouped data
+   * Initialize grouped data
    */
   protected initializeGroupedData(): void {}
 
@@ -1319,15 +1315,20 @@ export class EventsListComponent
   }
 
   /**
-   * Re(load) the Events list
+   * Re(load) the Events list, based on the applied filter, sort criterias
    */
-  refreshList() {
+  refreshList(triggeredByPageChange: boolean) {
     // retrieve created user & modified user information
     this.queryBuilder.include('createdByUser', true);
     this.queryBuilder.include('updatedByUser', true);
 
     // retrieve responsible user information
     this.queryBuilder.include('responsibleUser', true);
+
+    // refresh badges list with applied filter
+    if (!triggeredByPageChange) {
+      this.initializeGroupedData();
+    }
 
     // retrieve the list of Events
     this.eventsList$ = this.eventDataService
@@ -1402,10 +1403,6 @@ export class EventsListComponent
    * Get total number of items, based on the applied filters
    */
   refreshListCount(applyHasMoreLimit?: boolean) {
-    if (!this.selectedOutbreak) {
-      return;
-    }
-
     // reset
     this.pageCount = undefined;
 
