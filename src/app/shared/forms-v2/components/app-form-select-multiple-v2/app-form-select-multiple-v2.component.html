@@ -60,7 +60,10 @@
           [clearSearchInput]="true"
           [disableScrollToActiveOnOptionsChanged]="true"
           [preventHomeEndKeyPropagation]="true"
-          (ngModelChange)="filterOptions($event)">
+          [showToggleAllCheckbox]="true"
+          [toggleAllCheckboxChecked]="toggleAllCheckboxChecked"
+          (ngModelChange)="filterOptions($event); toggleAllCheckboxChecked = false;"
+          (toggleAll)="toggleAll($event)">
         </ngx-mat-select-search>
       </mat-option>
 

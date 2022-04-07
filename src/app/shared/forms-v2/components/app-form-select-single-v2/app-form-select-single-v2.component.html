@@ -69,7 +69,10 @@
           *cdkVirtualFor="let option of filteredOptions; templateCacheSize: 0"
           [value]="option.value"
           [disabled]="option.disabled">
+
+          <!-- Icon & Label -->
           <div
+            fxFlex
             [matTooltip]="optionTooltipKey ? option.data[optionTooltipKey] : undefined">
 
             <!-- Icon -->
@@ -80,6 +83,13 @@
             {{option.label}}
 
           </div>
+
+          <!-- Infos -->
+          <mat-icon
+            *ngFor="let iconB of option.infos"
+            fxGrow="0"
+            [matTooltip]="iconB.label | translate">{{iconB.icon}}</mat-icon>
+
         </mat-option>
 
       </cdk-virtual-scroll-viewport>

@@ -24,7 +24,7 @@ import {
   IV2SideDialogConfigButtonType,
   IV2SideDialogConfigInputCheckbox,
   IV2SideDialogConfigInputFilterList,
-  IV2SideDialogConfigInputFilterListItem,
+  IV2SideDialogConfigInputFilterListFilter, IV2SideDialogConfigInputFilterListSort,
   IV2SideDialogConfigInputSingleDropdown,
   IV2SideDialogConfigInputText,
   IV2SideDialogHandler,
@@ -57,7 +57,7 @@ import { AnswerModel, QuestionModel } from '../../../core/models/question.model'
 import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model';
 import { AddressModel } from '../../../core/models/address.model';
 import { IV2DateRange } from '../../forms-v2/components/app-form-date-range-v2/models/date.model';
-import { SavedFilterData, SavedFilterDataAppliedFilter, SavedFilterModel } from '../../../core/models/saved-filters.model';
+import { SavedFilterData, SavedFilterDataAppliedFilter, SavedFilterDataAppliedSort, SavedFilterModel } from '../../../core/models/saved-filters.model';
 import { IV2BottomDialogConfigButtonType } from '../app-bottom-dialog-v2/models/bottom-dialog-config.model';
 
 /**
@@ -1568,6 +1568,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
             name: 'filters',
             options: [],
             filters: [],
+            sorts: [],
             operatorValue: RequestFilterOperator.AND
           }
         ],
@@ -1577,7 +1578,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           color: 'primary',
           key: 'apply',
           disabled: (_data, handler): boolean => {
-            return (handler.data.map.filters as IV2SideDialogConfigInputFilterList).filters.length < 1 || !handler.form || handler.form.invalid;
+            const input = handler.data.map.filters as IV2SideDialogConfigInputFilterList;
+            return (input.filters.length < 1 && input.sorts.length < 1) || !handler.form || handler.form.invalid;
           }
         }, {
           type: IV2SideDialogConfigButtonType.OTHER,
@@ -1585,7 +1587,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           color: 'secondary',
           key: 'save',
           disabled: (_data, handler): boolean => {
-            return (handler.data.map.filters as IV2SideDialogConfigInputFilterList).filters.length < 1 || !handler.form || handler.form.invalid;
+            const input = handler.data.map.filters as IV2SideDialogConfigInputFilterList;
+            return (input.filters.length < 1 && input.sorts.length < 1) || !handler.form || handler.form.invalid;
           }
         }, {
           type: IV2SideDialogConfigButtonType.CANCEL,
@@ -1605,8 +1608,13 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
             'name',
             'readOnly',
             'filterData',
-            'userId'
+            'userId',
+            'createdBy',
+            'updatedAt'
           );
+
+          // retrieve created user & modified user information
+          qb.include('createdByUser', true);
 
           // retrieve items specific to our page
           qb.filter.where({
@@ -1619,13 +1627,48 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           this.savedFiltersService
             .getSavedFiltersList(qb)
             .subscribe((savedFilters) => {
-              // set saved filters options
-              (handler.data.map.savedFilterList as IV2SideDialogConfigInputSingleDropdown).options = savedFilters.map((item) => {
-                return {
-                  label: `${item.name}${item.readOnly ? ' ' + this.i18nService.instant('LNG_SIDE_FILTERS_LOAD_FILTER_READONLY_LABEL') : ''}`,
+              // configure saved filters dropdown
+              const savedFilterList = handler.data.map.savedFilterList as IV2SideDialogConfigInputSingleDropdown;
+
+              // set saved filters options and other things
+              savedFilterList.options = [];
+              savedFilters.forEach((item) => {
+                // option
+                const option: ILabelValuePairModel = {
+                  label: item.name,
                   value: item.id,
                   data: item
                 };
+                savedFilterList.options.push(option);
+
+                // infos
+                option.infos = [];
+
+                // set info icons - readonly
+                if (item.readOnly) {
+                  option.infos.push({
+                    label: this.i18nService.instant(
+                      'LNG_SIDE_FILTERS_LOAD_FILTER_READONLY_LABEL', {
+                        name: item.createdByUser?.name ?
+                          item.createdByUser?.name :
+                          ''
+                      }
+                    ),
+                    icon: 'edit_off'
+                  });
+                }
+
+                // updated at
+                if (item.updatedAt) {
+                  option.infos.push({
+                    label: this.i18nService.instant(
+                      'LNG_SIDE_FILTERS_LOAD_FILTER_UPDATED_AT_LABEL', {
+                        datetime: moment(item.updatedAt).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT)
+                      }
+                    ),
+                    icon: 'history'
+                  });
+                }
               });
 
               // do we need to retrieve other data ?
@@ -1664,8 +1707,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
                   // put back advanced filters
                   if (
-                    this._advancedFiltersApplied &&
-                    this._advancedFiltersApplied.appliedFilters.length > 0
+                    this._advancedFiltersApplied && (
+                      this._advancedFiltersApplied.appliedFilters.length > 0 ||
+                      this._advancedFiltersApplied.appliedSort.length > 0
+                    )
                   ) {
                     // load saved filters
                     this.loadSavedFilters(
@@ -1731,6 +1776,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         this.generateQueryBuilderFromAdvancedFilters(
           input.optionsAsLabelValue,
           input.filters,
+          input.sorts,
           input.operatorValue,
           input.optionsAsLabelValueMap
         );
@@ -1925,9 +1971,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // reset filters list
     filtersList.filters = [];
+    filtersList.sorts = [];
 
     // add filters
-    advancedFiltersApplied.appliedFilters.forEach((appliedFilter) => {
+    (advancedFiltersApplied.appliedFilters || []).forEach((appliedFilter) => {
       // add filter
       const advancedFilter = handler.update.addAdvancedFilter(filtersList);
 
@@ -1999,6 +2046,16 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         });
       }
     });
+
+    // add orders
+    (advancedFiltersApplied.appliedSort || []).forEach((sortCriteria) => {
+      // add sort
+      const advancedSort = handler.update.addAdvancedSort(filtersList);
+
+      // setup
+      advancedSort.sortBy.value = sortCriteria.sort.uniqueKey;
+      advancedSort.order.value = sortCriteria.direction;
+    });
   }
 
   /**
@@ -2006,7 +2063,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
    */
   private generateQueryBuilderFromAdvancedFilters(
     filterOptions: ILabelValuePairModel[],
-    appliedFilters: IV2SideDialogConfigInputFilterListItem[],
+    appliedFilters: IV2SideDialogConfigInputFilterListFilter[],
+    appliedSorts: IV2SideDialogConfigInputFilterListSort[],
     operator: RequestFilterOperator,
     optionsAsLabelValueMap: {
       [optionId: string]: ILabelValuePairModel
@@ -2625,39 +2683,48 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       }
     });
 
-    //
-    // // apply sort
-    // const sorts = _.filter(
-    //   _.get(fields, 'sortBy.items', []),
-    //   'sort'
-    // );
-    //
-    // // set sort by fields
-    // const objectDetailsSort: {
-    //   [property: string]: string[]
-    // } = {
-    //   age: ['years', 'months']
-    // };
-    // _.each(sorts, (appliedSort: AppliedSortModel) => {
-    //   // add sorting criteria
-    //   if (
-    //     objectDetailsSort &&
-    //     objectDetailsSort[appliedSort.sort.fieldName]
-    //   ) {
-    //     _.each(objectDetailsSort[appliedSort.sort.fieldName], (childProperty: string) => {
-    //       queryBuilder.sort.by(
-    //         `${appliedSort.sort.fieldName}.${childProperty}`,
-    //         appliedSort.direction
-    //       );
-    //     });
-    //   } else {
-    //     queryBuilder.sort.by(
-    //       appliedSort.sort.fieldName,
-    //       appliedSort.direction
-    //     );
-    //   }
-    // });
-    //
+    // set sorts
+    const objectDetailsSort: {
+      [property: string]: string[]
+    } = {
+      age: ['years', 'months']
+    };
+    appliedSorts.forEach((appliedSort) => {
+      // retrieve field
+      // retrieve filter definition
+      const filterDefinition: V2AdvancedFilter = filterOptionsMap[appliedSort.sortBy.value];
+
+      // no field - shouldn't encounter this case...
+      if (!filterDefinition.field) {
+        return;
+      }
+
+      // add to saved filters
+      this._advancedFiltersApplied.appliedSort.push(new SavedFilterDataAppliedSort({
+        sort: {
+          uniqueKey: `${filterDefinition.field}${filterDefinition.label}`
+        },
+        direction: appliedSort.order.value
+      }));
+
+      // add sorting criteria
+      if (
+        objectDetailsSort &&
+        objectDetailsSort[appliedSort.sortBy.value]
+      ) {
+        objectDetailsSort[appliedSort.sortBy.value].forEach((childProperty) => {
+          queryBuilder.sort.by(
+            `${filterDefinition.field}.${childProperty}`,
+            appliedSort.order.value as RequestSortDirection
+          );
+        });
+      } else {
+        queryBuilder.sort.by(
+          filterDefinition.field,
+          appliedSort.order.value as RequestSortDirection
+        );
+      }
+    });
 
     // set filter query builder
     this._advancedFiltersQueryBuilder = queryBuilder;
