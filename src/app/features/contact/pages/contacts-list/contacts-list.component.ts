@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import * as _ from 'lodash';
 import { forkJoin, Observable, of, throwError } from 'rxjs';
@@ -44,7 +44,7 @@ import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
-import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, IV2SideDialogConfigInputText, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { FilterModel } from '../../../../shared/components/side-filters/model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
@@ -54,7 +54,7 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 })
 export class ContactsListComponent
   extends ListComponent
-  implements OnInit, OnDestroy
+  implements OnDestroy
 {
   // list of existing contacts
   contactsList$: Observable<ContactModel[]>;
@@ -261,28 +261,6 @@ export class ContactsListComponent
     private entityHelperService: EntityHelperService
   ) {
     super(listHelperService);
-  }
-
-  /**
-   * Component initialized
-   */
-  ngOnInit() {
-    // TODO: Check this out
-    // dialog fields for daily follow-ups print
-    this.genericDataService
-      .getRangeFollowUpGroupByOptions(true)
-      .subscribe((options) => {
-        this.exportContactsDailyFollowUpListDialogFields = [
-          new DialogField({
-            name: 'groupBy',
-            placeholder:
-              'LNG_PAGE_LIST_CONTACTS_EXPORT_FOLLOW_UPS_GROUP_BY_BUTTON',
-            inputOptions: options,
-            value: Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE.value,
-            required: true
-          })
-        ];
-      });
   }
 
   /**
@@ -2736,15 +2714,14 @@ export class ContactsListComponent
    * Change Contact Followup status for all records matching this.queryBuilder
    */
   changeContactFinalFollowUpStatus(_qb: RequestQueryBuilder) {
-    // TODO: Change dialog not implemented in this.dialogV2Service
     this.dialogV2Service
       .showSideDialog({
         // title
         title: {
-          get: () =>
-            'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS_DIALOG_TITLE',
-          // TODO: Add records.length in title
-          data: null
+          get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS_DIALOG_TITLE',
+          data: () => {
+            return { count: '?' };
+          }
         },
 
         // inputs
@@ -2768,10 +2745,8 @@ export class ContactsListComponent
             type: IV2SideDialogConfigButtonType.OTHER,
             color: 'primary',
             key: 'save',
-            disabled: (_data): boolean => {
-              // TODO: Add disabled condition
-              // return (handler.data.map.filters as IV2SideDialogConfigInputFilterList).filters.length < 1 || !handler.form || handler.form.invalid;
-              return true;
+            disabled: (_data, handler): boolean => {
+              return !handler.form || handler.form.invalid;
             }
           }
         ],
@@ -2801,8 +2776,8 @@ export class ContactsListComponent
             )
           ]).subscribe(
             ([statuses, records]: [LabelValuePair[], ContactModel[]]) => {
-              // eslint-disable-next-line no-console
-              console.log(statuses, records);
+
+              handler.update.changeTitle('LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS_DIALOG_TITLE', { count: records.length.toLocaleString()});
 
               // set drop-down statuses
               (
@@ -2815,47 +2790,11 @@ export class ContactsListComponent
                 };
               });
 
-              // handler.data.map.
+              handler.data.echo.recordsList = records;
 
-              // handler.update.inputs([
-              //   {
-              //     // type: V2SideDialogConfigInputType.ha,
-              //     placeholder: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
-              //     options: [],
-              //     value: undefined,
-              //     name: 'contactRecords',
-              //     validators: {
-              //       required: () => true
-              //     }
-              //   }
-              // ]);
-
-              // set contact records
-              // (
-              //   handler.data.map
-              //     .statusesList as IV2SideDialogConfigInputSingleDropdown
-              // ).options = records.map((item) => {
-              //   return {
-              //     label: item.name,
-              //     value: item.id
-              //   };
-              // });
-
-              // handler.data.map.contactRecords = [];
-              // update inputs
-              // handler.update.inputs([
-              //   {
-              //     type: V2SideDialogConfigInputType.ACCORDION_PANEL,
-              //     name: 'view-main-entity',
-              //     inputs: records
-              //   }
-              // ]);
-              // handler.data.map.contactRecords.options = records;
-              // handler.update.inputs([]);
+              handler.loading.hide();
             }
           );
-
-          handler.loading.hide();
         }
       })
       .subscribe((response) => {
@@ -2864,145 +2803,45 @@ export class ContactsListComponent
           return;
         }
 
-        // // update contacts
-        // const putRecordsData = records.map((contact: ContactModel) => ({
-        //   id: contact.id,
-        //   followUp: Object.assign(
-        //     contact.followUp, {
-        //       status: answer.inputValue.value.followUp.status
-        //     }
-        //   )
-        // }));
+        // update contacts
+        const putRecordsData = response.data.echo.recordsList.map((contact: ContactModel) => ({
+          id: contact.id,
+          followUp: Object.assign(
+            contact.followUp, {
+              // status: answer.inputValue.value.followUp.status
+              status: (response.handler.data.map.statusesList as IV2SideDialogConfigInputText).value
+            }
+          )
+        }));
 
-        // // update statuses
-        // this.contactDataService
-        //   .bulkModifyContacts(
-        //     this.selectedOutbreak.id,
-        //     putRecordsData
-        //   )
-        //   .pipe(
-        //     catchError((err) => {
-        //       // this.closeLoadingDialog();
-        //       this.toastV2Service.error(err);
-        //       return throwError(err);
-        //     })
-        //   )
-        //   .subscribe(() => {
-        //     // success message
-        //     this.toastV2Service.success(
-        //       'LNG_PAGE_BULK_MODIFY_CONTACTS_ACTION_MODIFY_CONTACTS_SUCCESS_MESSAGE', {
-        //         count: records.length.toLocaleString('en')
-        //       }
-        //     );
+        // update statuses
+        this.contactDataService
+          .bulkModifyContacts(
+            this.selectedOutbreak.id,
+            putRecordsData
+          )
+          .pipe(
+            catchError((err) => {
+              // this.closeLoadingDialog();
+              this.toastV2Service.error(err);
+              return throwError(err);
+            })
+          )
+          .subscribe(() => {
+            // success message
+            this.toastV2Service.success(
+              'LNG_PAGE_BULK_MODIFY_CONTACTS_ACTION_MODIFY_CONTACTS_SUCCESS_MESSAGE', {
+                count: response.data.echo.recordsLIst.options.length.toLocaleString('en')
+              }
+            );
 
-        //     // close dialog
-        //     // this.closeLoadingDialog();
 
-        //     // refresh list
-        //     this.needsRefreshList(true);
-        // });
+            // close popup
+            response.handler.hide();
 
-        // close popup
-        response.handler.hide();
+            // refresh list
+            this.needsRefreshList(true);
+          });
       });
-
-    // // to continue we need to make sure we have an outbreak selected
-    // if (
-    //   !this.selectedOutbreak ||
-    //         !this.selectedOutbreak.id
-    // ) {
-    //   return;
-    // }
-
-    // // construct query builder user to count & update contacts
-    // const countQueryBuilder = _.cloneDeep(this.queryBuilder);
-    // countQueryBuilder.paginator.clear();
-    // countQueryBuilder.sort.clear();
-    // countQueryBuilder.fields('id', 'followUp');
-
-    // // display loading while determining how many records will be deleted
-    // // this.showLoadingDialog();
-
-    // // make all requests in parallel
-    // forkJoin([
-    //   // retrieve follow-up statuses
-    //   this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS),
-
-    //   // count contacts
-    //   this.contactDataService.getContactsList(this.selectedOutbreak.id, countQueryBuilder)
-    // ]).subscribe((
-    //   [statuses, records]: [LabelValuePair[], ContactModel[]]
-    // ) => {
-    //   // hide loading
-    //   // this.closeLoadingDialog();
-
-    //   // display change status dialog
-    //   this.dialogService
-    //     .showInput(
-    //       new DialogConfiguration({
-    //         message: 'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS_DIALOG_TITLE',
-    //         translateData: {
-    //           count: records.length
-    //         },
-    //         yesLabel: 'LNG_COMMON_BUTTON_UPDATE',
-    //         fieldsList: [
-    //           new DialogField({
-    //             name: 'followUp.status',
-    //             placeholder: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
-    //             description: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION',
-    //             required: true,
-    //             fieldType: DialogFieldType.SELECT,
-    //             inputOptionsMultiple: false,
-    //             inputOptionsClearable: false,
-    //             inputOptions: statuses
-    //           })
-    //         ]
-    //       })
-    //     )
-    //     .subscribe((answer: DialogAnswer) => {
-    //       if (answer.button === DialogAnswerButton.Yes) {
-    //         // update contacts
-    //         const putRecordsData = records.map((contact: ContactModel) => ({
-    //           id: contact.id,
-    //           followUp: Object.assign(
-    //             contact.followUp, {
-    //               status: answer.inputValue.value.followUp.status
-    //             }
-    //           )
-    //         }));
-
-    //         // display loading while determining how many records will be deleted
-    //         // this.showLoadingDialog();
-
-    //         // update statuses
-    //         this.contactDataService
-    //           .bulkModifyContacts(
-    //             this.selectedOutbreak.id,
-    //             putRecordsData
-    //           )
-    //           .pipe(
-    //             catchError((err) => {
-    //               // this.closeLoadingDialog();
-    //               this.toastV2Service.error(err);
-    //               return throwError(err);
-    //             })
-    //           )
-    //           .subscribe(() => {
-    //             // success message
-    //             this.toastV2Service.success(
-    //               'LNG_PAGE_BULK_MODIFY_CONTACTS_ACTION_MODIFY_CONTACTS_SUCCESS_MESSAGE', {
-    //                 count: records.length.toLocaleString('en')
-    //               }
-    //             );
-
-    //             // close dialog
-    //             // this.closeLoadingDialog();
-
-    //             // refresh list
-    //             this.needsRefreshList(true);
-    //           });
-    //       }
-    //     });
-    // });
   }
 }
