@@ -2,7 +2,6 @@ import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import * as _ from 'lodash';
 import { forkJoin, Observable, of, throwError } from 'rxjs';
-import { Subscription } from 'rxjs/internal/Subscription';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -21,7 +20,7 @@ import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { LocationModel } from '../../../../core/models/location.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategory, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { TeamModel } from '../../../../core/models/team.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
@@ -37,7 +36,6 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import { DialogField } from '../../../../shared/components';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
@@ -45,7 +43,6 @@ import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, IV2SideDialogConfigInputText, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { FilterModel } from '../../../../shared/components/side-filters/model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
@@ -59,45 +56,9 @@ export class ContactsListComponent
   // list of existing contacts
   contactsList$: Observable<ContactModel[]>;
 
-  outbreakSubscriber: Subscription;
-
-  // user list
-  userList$: Observable<UserModel[]>;
-
-  // gender list
-  genderList$: Observable<any[]>;
-
-  // contacts grouped by risk level
-  countedContactsByRiskLevel$: Observable<any[]>;
-
-  // risk level
-  riskLevelRefData$: Observable<ReferenceDataCategoryModel>;
-
-  // teams
-  teamsList$: Observable<TeamModel[]>;
-
-  // final contact follow-up status
-  finalFollowUpStatus$: Observable<any[]>;
-
-  // yes / no / all options
-  yesNoOptionsList$: Observable<any[]>;
-  pregnancyStatusList$: Observable<any[]>;
-
-  // vaccines
-  vaccineList$: Observable<any[]>;
-  vaccineStatusList$: Observable<any[]>;
-
-  // available side filters
-  availableSideFilters: FilterModel[];
-
-  // print daily follow-ups status
-  exportContactsDailyFollowUpListUrl: string;
-  exportContactsDailyFollowUpListDialogFields: DialogField[];
-
-  // print daily follow-ups form
-  exportContactsDailyFollowUpsFormUrl: string;
-
-  exportContactsUrl: string;
+  // constants
+  UserSettings = UserSettings;
+  Constants = Constants;
 
   // anonymize fields
   anonymizeFields: LabelValuePair[] = [
@@ -115,14 +76,8 @@ export class ContactsListComponent
     new LabelValuePair('LNG_CONTACT_FIELD_LABEL_RISK_LEVEL', 'riskLevel'),
     new LabelValuePair('LNG_CONTACT_FIELD_LABEL_RISK_REASON', 'riskReason'),
     new LabelValuePair('LNG_CONTACT_FIELD_LABEL_TYPE', 'type'),
-    new LabelValuePair(
-      'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
-      'dateOfReporting'
-    ),
-    new LabelValuePair(
-      'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
-      'isDateOfReportingApproximate'
-    ),
+    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING', 'dateOfReporting'),
+    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', 'isDateOfReportingApproximate'),
     new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', 'createdAt'),
     new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', 'createdBy'),
     new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', 'updatedAt'),
@@ -134,58 +89,22 @@ export class ContactsListComponent
     new LabelValuePair('LNG_CASE_FIELD_LABEL_CLASSIFICATION', 'classification'),
     new LabelValuePair('LNG_CONTACT_FIELD_LABEL_WAS_CASE', 'wasCase'),
     new LabelValuePair('LNG_CASE_FIELD_LABEL_WAS_CONTACT', 'wasContact'),
-    new LabelValuePair(
-      'LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT',
-      'dateBecomeContact'
-    ),
+    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT', 'dateBecomeContact'),
     new LabelValuePair('LNG_CONTACT_FIELD_LABEL_OUTCOME_ID', 'outcomeId'),
-    new LabelValuePair(
-      'LNG_CONTACT_FIELD_LABEL_DATE_OF_OUTCOME',
-      'dateOfOutcome'
-    ),
-    new LabelValuePair(
-      'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
-      'transferRefused'
-    ),
+    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_OF_OUTCOME', 'dateOfOutcome'),
+    new LabelValuePair('LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED', 'transferRefused'),
     new LabelValuePair('LNG_CONTACT_FIELD_LABEL_SAFE_BURIAL', 'safeBurial'),
-    new LabelValuePair(
-      'LNG_CONTACT_FIELD_LABEL_DATE_OF_BURIAL',
-      'dateOfBurial'
-    ),
+    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_OF_BURIAL', 'dateOfBurial'),
     new LabelValuePair('LNG_CONTACT_FIELD_LABEL_FOLLOW_UP', 'followUp'),
-    new LabelValuePair(
-      'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
-      'dateOfLastContact'
-    ),
-    new LabelValuePair(
-      'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
-      'numberOfExposures'
-    ),
-    new LabelValuePair(
-      'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS',
-      'numberOfContacts'
-    ),
-    new LabelValuePair(
-      'LNG_CONTACT_FIELD_LABEL_VACCINES_RECEIVED',
-      'vaccinesReceived'
-    ),
-    new LabelValuePair(
-      'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
-      'pregnancyStatus'
-    ),
+    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT', 'dateOfLastContact'),
+    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES', 'numberOfExposures'),
+    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS', 'numberOfContacts'),
+    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_VACCINES_RECEIVED', 'vaccinesReceived'),
+    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS', 'pregnancyStatus'),
     new LabelValuePair('LNG_CONTACT_FIELD_LABEL_RELATIONSHIP', 'relationship'),
-    new LabelValuePair(
-      'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
-      'followUpTeamId'
-    ),
-    new LabelValuePair(
-      'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
-      'responsibleUserId'
-    ),
-    new LabelValuePair(
-      'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-      'questionnaireAnswers'
-    )
+    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID', 'followUpTeamId'),
+    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID', 'responsibleUserId'),
+    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers')
   ];
 
   // relationship anonymize fields
@@ -193,42 +112,15 @@ export class ContactsListComponent
     new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_ID', 'id'),
     new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_SOURCE', 'sourcePerson'),
     new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_TARGET', 'targetPerson'),
-    new LabelValuePair(
-      'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT',
-      'dateOfFirstContact'
-    ),
-    new LabelValuePair(
-      'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
-      'contactDate'
-    ),
-    new LabelValuePair(
-      'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED',
-      'contactDateEstimated'
-    ),
-    new LabelValuePair(
-      'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
-      'certaintyLevelId'
-    ),
-    new LabelValuePair(
-      'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
-      'exposureTypeId'
-    ),
-    new LabelValuePair(
-      'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
-      'exposureFrequencyId'
-    ),
-    new LabelValuePair(
-      'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
-      'exposureDurationId'
-    ),
-    new LabelValuePair(
-      'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
-      'socialRelationshipTypeId'
-    ),
-    new LabelValuePair(
-      'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL',
-      'socialRelationshipDetail'
-    ),
+    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT', 'dateOfFirstContact'),
+    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE', 'contactDate'),
+    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED', 'contactDateEstimated'),
+    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL', 'certaintyLevelId'),
+    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE', 'exposureTypeId'),
+    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY', 'exposureFrequencyId'),
+    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION', 'exposureDurationId'),
+    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_RELATION', 'socialRelationshipTypeId'),
+    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL', 'socialRelationshipDetail'),
     new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER', 'clusterId'),
     new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_COMMENT', 'comment'),
     new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', 'createdAt'),
@@ -239,10 +131,6 @@ export class ContactsListComponent
     new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', 'deletedAt'),
     new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', 'createdOn')
   ];
-
-  // constants
-  UserSettings = UserSettings;
-  Constants = Constants;
 
   /**
    * Constructor
@@ -269,12 +157,6 @@ export class ContactsListComponent
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
-
-    // outbreak subscriber
-    if (this.outbreakSubscriber) {
-      this.outbreakSubscriber.unsubscribe();
-      this.outbreakSubscriber = null;
-    }
   }
 
   /**
@@ -440,10 +322,7 @@ export class ContactsListComponent
           address: filterAddressModel,
           field: 'addresses',
           fieldIsArray: true,
-          options: (
-            this.activatedRoute.snapshot.data
-              .yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>
-          ).options
+          options: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options
         },
         sortable: true
       },
@@ -466,10 +345,7 @@ export class ContactsListComponent
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (
-            this.activatedRoute.snapshot.data
-              .gender as IResolverV2ResponseModel<ReferenceDataEntryModel>
-          ).options
+          options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
         }
       },
       {
@@ -558,10 +434,7 @@ export class ContactsListComponent
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (
-            this.activatedRoute.snapshot.data
-              .user as IResolverV2ResponseModel<UserModel>
-          ).options
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
         },
         exclude: (): boolean => {
           return !UserModel.canList(this.authUser);
@@ -585,8 +458,7 @@ export class ContactsListComponent
         sortable: true,
         notVisible: true,
         cssCellClass: 'gd-cell-button',
-        buttonLabel: (item) =>
-          (item.numberOfContacts || '').toLocaleString('en'),
+        buttonLabel: (item) => (item.numberOfContacts || '').toLocaleString('en'),
         color: 'text',
         click: (item) => {
           // if we do not have contacts return
@@ -614,8 +486,7 @@ export class ContactsListComponent
         sortable: true,
         notVisible: true,
         cssCellClass: 'gd-cell-button',
-        buttonLabel: (item) =>
-          (item.numberOfExposures || '').toLocaleString('en'),
+        buttonLabel: (item) => (item.numberOfExposures || '').toLocaleString('en'),
         color: 'text',
         click: (item) => {
           // if we do not have exposures return
@@ -639,7 +510,8 @@ export class ContactsListComponent
         },
         filter: {
           type: V2FilterType.DELETED,
-          value: false
+          value: false,
+          defaultValue: false
         },
         sortable: true
       },
@@ -652,10 +524,7 @@ export class ContactsListComponent
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (
-            this.activatedRoute.snapshot.data
-              .user as IResolverV2ResponseModel<UserModel>
-          ).options
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
         },
         exclude: (): boolean => {
           return !UserModel.canView(this.authUser);
@@ -685,10 +554,7 @@ export class ContactsListComponent
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (
-            this.activatedRoute.snapshot.data
-              .user as IResolverV2ResponseModel<UserModel>
-          ).options
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
         },
         exclude: (): boolean => {
           return !UserModel.canView(this.authUser);
@@ -1293,7 +1159,7 @@ export class ContactsListComponent
   }
 
   /**
-   * Initialize Table Advanced Filters
+   * Initialize advanced filters
    */
   protected initializeTableAdvancedFilters(): void {
     this.advancedFilters = [
@@ -1314,10 +1180,7 @@ export class ContactsListComponent
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'occupation',
         label: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
-        options: (
-          this.activatedRoute.snapshot.data
-            .occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>
-        ).options
+        options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
         // sortable: true
       },
       {
@@ -1421,10 +1284,7 @@ export class ContactsListComponent
         type: V2AdvancedFilterType.SELECT,
         field: 'wasCase',
         label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE',
-        options: (
-          this.activatedRoute.snapshot.data
-            .yesNo as IResolverV2ResponseModel<ILabelValuePairModel>
-        ).options
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
         // sortable: true
       },
       {
@@ -1445,10 +1305,7 @@ export class ContactsListComponent
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'followUpTeamId',
         label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
-        options: (
-          this.activatedRoute.snapshot.data
-            .followUp as IResolverV2ResponseModel<ReferenceDataEntryModel>
-        ).options
+        options: (this.activatedRoute.snapshot.data.followUp as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
       });
     }
 
@@ -1458,10 +1315,7 @@ export class ContactsListComponent
         field: 'responsibleUserId',
         label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
         type: V2AdvancedFilterType.MULTISELECT,
-        options: (
-          this.activatedRoute.snapshot.data
-            .user as IResolverV2ResponseModel<ILabelValuePairModel>
-        ).options
+        options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<ILabelValuePairModel>).options
       });
     }
 
@@ -1486,10 +1340,7 @@ export class ContactsListComponent
           field: 'targeted',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
           type: V2AdvancedFilterType.SELECT,
-          options: (
-            this.activatedRoute.snapshot.data
-              .yesNo as IResolverV2ResponseModel<ILabelValuePairModel>
-          ).options,
+          options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
           relationshipPath: ['followUps'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
         },
@@ -1497,10 +1348,7 @@ export class ContactsListComponent
           field: 'statusId',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
           type: V2AdvancedFilterType.SELECT,
-          options: (
-            this.activatedRoute.snapshot.data
-              .dailyFollowUp as IResolverV2ResponseModel<ReferenceDataEntryModel>
-          ).options,
+          options: (this.activatedRoute.snapshot.data.dailyFollowUp as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           relationshipPath: ['followUps'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
         },
@@ -1540,10 +1388,7 @@ export class ContactsListComponent
           field: 'gender',
           label: 'LNG_CASE_FIELD_LABEL_GENDER',
           type: V2AdvancedFilterType.MULTISELECT,
-          options: (
-            this.activatedRoute.snapshot.data
-              .gender as IResolverV2ResponseModel<ILabelValuePairModel>
-          ).options,
+          options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ILabelValuePairModel>).options,
           relationshipPath: ['relationships', 'people'],
           relationshipLabel:
             'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES'
@@ -1557,16 +1402,15 @@ export class ContactsListComponent
           relationshipLabel:
             'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES'
           // extraConditions: caseCondition
+        },
+        {
+          field: 'questionnaireAnswers',
+          label: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+          type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
+          template: () => this.selectedOutbreak.caseInvestigationTemplate,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES'
         }
-        // {
-        // field: 'questionnaireAnswers',
-        // label: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-        // type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
-        // questionnaireTemplate: this.selectedOutbreak.caseInvestigationTemplate,
-        // relationshipPath: ['relationships', 'people'],
-        // relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
-        // extraConditions: caseCondition
-        // }
       );
     }
   }
@@ -1582,13 +1426,11 @@ export class ContactsListComponent
         return (
           !this.appliedListFilter &&
           (ContactModel.canModify(this.authUser) ||
-            (this.exportContactsUrl && ContactModel.canExport(this.authUser)) ||
+            ContactModel.canExport(this.authUser) ||
             ContactModel.canImport(this.authUser) ||
             ContactModel.canExportRelationships(this.authUser) ||
-            (this.exportContactsDailyFollowUpListUrl &&
-              ContactModel.canExportDailyFollowUpList(this.authUser)) ||
-            (this.exportContactsDailyFollowUpsFormUrl &&
-              ContactModel.canExportDailyFollowUpsForm(this.authUser)))
+            ContactModel.canExportDailyFollowUpList(this.authUser) ||
+            ContactModel.canExportDailyFollowUpsForm(this.authUser))
         );
       },
       menuOptions: [
@@ -1598,7 +1440,7 @@ export class ContactsListComponent
             'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS',
           action: {
             click: () => {
-              this.changeContactFinalFollowUpStatus(this.queryBuilder);
+              this.changeContactFinalFollowUpStatus();
             }
           },
           visible: (): boolean => {
@@ -1699,10 +1541,8 @@ export class ContactsListComponent
         {
           visible: (): boolean => {
             return (
-              (this.exportContactsDailyFollowUpListUrl &&
-                ContactModel.canExportDailyFollowUpList(this.authUser)) ||
-              (this.exportContactsDailyFollowUpsFormUrl &&
-                ContactModel.canExportDailyFollowUpsForm(this.authUser))
+              ContactModel.canExportDailyFollowUpList(this.authUser) ||
+              ContactModel.canExportDailyFollowUpsForm(this.authUser)
             );
           }
         },
@@ -1946,7 +1786,7 @@ export class ContactsListComponent
   }
 
   /**
-   * Initialize table grouped data
+   * Initialize grouped data
    */
   protected initializeGroupedData(): void {
     this.groupedData = {
@@ -2068,264 +1908,6 @@ export class ContactsListComponent
   }
 
   /**
-   * Initialize Side Filters
-   */
-  initializeSideFilters() {
-    // const occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
-    // const dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
-    // // case condition
-    // const caseCondition = new RequestQueryBuilder();
-    // caseCondition.filter.byEquality(
-    //   'type',
-    //   EntityType.CASE
-    // );
-    // // set available side filters
-    // this.availableSideFilters = [
-    //   // Contact
-    //   new FilterModel({
-    //     fieldName: 'firstName',
-    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
-    //     type: FilterType.TEXT,
-    //     sortable: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'lastName',
-    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
-    //     type: FilterType.TEXT,
-    //     sortable: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'occupation',
-    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
-    //     type: FilterType.MULTISELECT,
-    //     options$: occupationsList$,
-    //     sortable: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'age',
-    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_AGE',
-    //     type: FilterType.RANGE_AGE,
-    //     sortable: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'dateOfReporting',
-    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
-    //     type: FilterType.RANGE_DATE,
-    //     sortable: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'dob',
-    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
-    //     type: FilterType.RANGE_DATE,
-    //     sortable: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'visualId',
-    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
-    //     type: FilterType.TEXT
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'addresses',
-    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_ADDRESSES',
-    //     type: FilterType.ADDRESS,
-    //     addressFieldIsArray: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'addresses',
-    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER',
-    //     type: FilterType.ADDRESS_PHONE_NUMBER,
-    //     addressFieldIsArray: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'followUp.status',
-    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
-    //     type: FilterType.MULTISELECT,
-    //     options$: this.finalFollowUpStatus$,
-    //     sortable: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'followUp.endDate',
-    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_END_DATE',
-    //     type: FilterType.RANGE_DATE,
-    //     sortable: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'dateOfLastContact',
-    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
-    //     type: FilterType.RANGE_DATE,
-    //     sortable: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'questionnaireAnswers',
-    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-    //     type: FilterType.QUESTIONNAIRE_ANSWERS,
-    //     questionnaireTemplate: this.selectedOutbreak.contactInvestigationTemplate
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'pregnancyStatus',
-    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
-    //     type: FilterType.SELECT,
-    //     options$: this.pregnancyStatusList$
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'vaccinesReceived.vaccine',
-    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_VACCINE',
-    //     type: FilterType.MULTISELECT,
-    //     options$: this.vaccineList$
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'vaccinesReceived.status',
-    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_VACCINE_STATUS',
-    //     type: FilterType.MULTISELECT,
-    //     options$: this.vaccineStatusList$
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'vaccinesReceived.date',
-    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_VACCINE_DATE',
-    //     type: FilterType.RANGE_DATE
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'wasCase',
-    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE',
-    //     type: FilterType.SELECT,
-    //     options$: this.yesNoOptionsList$
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'numberOfContacts',
-    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS',
-    //     type: FilterType.RANGE_NUMBER
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'numberOfExposures',
-    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
-    //     type: FilterType.RANGE_NUMBER
-    //   })
-    // ];
-    // // allowed to filter by follow-up team ?
-    // if (TeamModel.canList(this.authUser)) {
-    //   this.availableSideFilters.push(
-    //     new FilterModel({
-    //       fieldName: 'followUpTeamId',
-    //       fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
-    //       type: FilterType.MULTISELECT,
-    //       options$: this.teamsList$,
-    //       optionsLabelKey: 'name',
-    //       optionsValueKey: 'id'
-    //     })
-    //   );
-    // }
-    // // allowed to filter by follow-up user ?
-    // if (UserModel.canList(this.authUser)) {
-    //   this.availableSideFilters.push(
-    //     new FilterModel({
-    //       fieldName: 'responsibleUserId',
-    //       fieldLabel: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
-    //       type: FilterType.MULTISELECT,
-    //       options$: this.userList$,
-    //       optionsLabelKey: 'name',
-    //       optionsValueKey: 'id'
-    //     })
-    //   );
-    // }
-    // // Relation - Follow-up
-    // if (FollowUpModel.canList(this.authUser)) {
-    //   this.availableSideFilters = [
-    //     ...this.availableSideFilters,
-    //     ...[
-    //       new FilterModel({
-    //         fieldName: 'date',
-    //         fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
-    //         type: FilterType.RANGE_DATE,
-    //         relationshipPath: ['followUps'],
-    //         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
-    //       }),
-    //       new FilterModel({
-    //         fieldName: 'index',
-    //         fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP',
-    //         type: FilterType.NUMBER,
-    //         relationshipPath: ['followUps'],
-    //         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
-    //       }),
-    //       new FilterModel({
-    //         fieldName: 'targeted',
-    //         fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
-    //         type: FilterType.SELECT,
-    //         options$: this.yesNoOptionsList$,
-    //         relationshipPath: ['followUps'],
-    //         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
-    //       }),
-    //       new FilterModel({
-    //         fieldName: 'statusId',
-    //         fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
-    //         type: FilterType.SELECT,
-    //         options$: dailyStatusTypeOptions$,
-    //         relationshipPath: ['followUps'],
-    //         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
-    //       }),
-    //       new FilterModel({
-    //         fieldName: 'questionnaireAnswers',
-    //         fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-    //         type: FilterType.QUESTIONNAIRE_ANSWERS,
-    //         questionnaireTemplate: this.selectedOutbreak.contactFollowUpTemplate,
-    //         relationshipPath: ['followUps'],
-    //         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
-    //       })
-    //     ]
-    //   ];
-    // }
-    // // Relation - Cases
-    // if (CaseModel.canList(this.authUser)) {
-    //   this.availableSideFilters = [
-    //     ...this.availableSideFilters,
-    //     ...[
-    //       new FilterModel({
-    //         fieldName: 'firstName',
-    //         fieldLabel: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
-    //         type: FilterType.TEXT,
-    //         relationshipPath: ['relationships', 'people'],
-    //         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
-    //         extraConditions: caseCondition
-    //       }),
-    //       new FilterModel({
-    //         fieldName: 'lastName',
-    //         fieldLabel: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
-    //         type: FilterType.TEXT,
-    //         relationshipPath: ['relationships', 'people'],
-    //         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
-    //         extraConditions: caseCondition
-    //       }),
-    //       new FilterModel({
-    //         fieldName: 'gender',
-    //         fieldLabel: 'LNG_CASE_FIELD_LABEL_GENDER',
-    //         type: FilterType.MULTISELECT,
-    //         options$: this.genderList$,
-    //         relationshipPath: ['relationships', 'people'],
-    //         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
-    //         extraConditions: caseCondition
-    //       }),
-    //       new FilterModel({
-    //         fieldName: 'age',
-    //         fieldLabel: 'LNG_CASE_FIELD_LABEL_AGE',
-    //         type: FilterType.RANGE_AGE,
-    //         relationshipPath: ['relationships', 'people'],
-    //         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
-    //         extraConditions: caseCondition
-    //       }),
-    //       new FilterModel({
-    //         fieldName: 'questionnaireAnswers',
-    //         fieldLabel: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-    //         type: FilterType.QUESTIONNAIRE_ANSWERS,
-    //         questionnaireTemplate: this.selectedOutbreak.caseInvestigationTemplate,
-    //         relationshipPath: ['relationships', 'people'],
-    //         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
-    //         extraConditions: caseCondition
-    //       })
-    //     ]
-    //   ];
-    // }
-  }
-
-  /**
    * Initialize breadcrumbs
    */
   protected initializeBreadcrumbs(): void {
@@ -2375,175 +1957,9 @@ export class ContactsListComponent
   }
 
   /**
-   * Re(load) the Contacts list
-   */
-  refreshList(triggeredByPageChange: boolean) {
-    // retrieve created user & modified user information
-    this.queryBuilder.include('createdByUser', true);
-    this.queryBuilder.include('updatedByUser', true);
-
-    // retrieve responsible user information
-    this.queryBuilder.include('responsibleUser', true);
-
-    // retrieve location list
-    this.queryBuilder.include('locations', true);
-
-    // refresh list of contacts grouped by risk level
-    if (!triggeredByPageChange) {
-      this.initializeGroupedData();
-    }
-
-    // retrieve the list of Contacts
-    this.contactsList$ = this.contactDataService
-      .getContactsList(this.selectedOutbreak.id, this.queryBuilder)
-      .pipe(
-        switchMap((data) => {
-          // determine locations that we need to retrieve
-          const locationsIdsMap: {
-            [locationId: string]: true;
-          } = {};
-          data.forEach((item) => {
-            (item.addresses || []).forEach((address) => {
-              // nothing to add ?
-              if (!address?.locationId) {
-                return;
-              }
-
-              // add location to list
-              locationsIdsMap[address.locationId] = true;
-            });
-          });
-
-          // determine ids
-          const locationIds: string[] = Object.keys(locationsIdsMap);
-
-          // nothing to retrieve ?
-          if (locationIds.length < 1) {
-            return of(data);
-          }
-
-          // construct location query builder
-          const qb = new RequestQueryBuilder();
-          qb.filter.bySelect('id', locationIds, false, null);
-
-          // retrieve locations
-          return this.locationDataService.getLocationsList(qb).pipe(
-            map((locations) => {
-              // map locations
-              const locationsMap: {
-                [locationId: string]: LocationModel;
-              } = {};
-              locations.forEach((location) => {
-                locationsMap[location.id] = location;
-              });
-
-              // set locations
-              data.forEach((item) => {
-                (item.addresses || []).forEach((address) => {
-                  address.location =
-                    address.locationId && locationsMap[address.locationId]
-                      ? locationsMap[address.locationId]
-                      : address.location;
-                });
-              });
-
-              // finished
-              return data;
-            })
-          );
-        })
-      )
-      .pipe(
-        // should be the last pipe
-        takeUntil(this.destroyed$)
-      );
-  }
-
-  /**
-   * Get total number of items, based on the applied filters
-   */
-  refreshListCount(applyHasMoreLimit?: boolean) {
-    // reset
-    this.pageCount = undefined;
-
-    // set apply value
-    if (applyHasMoreLimit !== undefined) {
-      this.applyHasMoreLimit = applyHasMoreLimit;
-    }
-
-    // remove paginator from query builder
-    const countQueryBuilder = _.cloneDeep(this.queryBuilder);
-    countQueryBuilder.paginator.clear();
-    countQueryBuilder.sort.clear();
-
-    // apply has more limit
-    if (this.applyHasMoreLimit) {
-      countQueryBuilder.flag('applyHasMoreLimit', true);
-    }
-
-    // count
-    this.contactDataService
-      .getContactsCount(this.selectedOutbreak.id, countQueryBuilder)
-      .pipe(
-        catchError((err) => {
-          this.toastV2Service.error(err);
-          return throwError(err);
-        }),
-
-        // should be the last pipe
-        takeUntil(this.destroyed$)
-      )
-      .subscribe((response) => {
-        this.pageCount = response;
-      });
-  }
-
-  /**
-   * Get contacts grouped by risk level
-   */
-  getContactsGroupedByRiskLevel() {
-    // if (this.selectedOutbreak) {
-    //   // clone query builder to clear it
-    //   const clonedQueryBuilder = _.cloneDeep(this.queryBuilder);
-    //   clonedQueryBuilder.paginator.clear();
-    //   clonedQueryBuilder.sort.clear();
-    //   // ugly hack so we don't have to change API in many place and test the entire project again ( if we changed api to replace regex to $regex many API request would be affected )
-    //   // #TODO - we need to address this issue later by changing all API requests that use convertLoopbackFilterToMongo ( WGD-2854 )
-    //   const addressPhoneCondition = clonedQueryBuilder.filter.get('addresses.phoneNumber');
-    //   if (addressPhoneCondition) {
-    //     const newCondition = JSON.parse(JSON.stringify(addressPhoneCondition).replace(/"regex"/gi, '"$regex"'));
-    //     clonedQueryBuilder.filter.where(newCondition, true);
-    //   }
-    //   // retrieve data
-    //   this.countedContactsByRiskLevel$ = this.riskLevelRefData$
-    //     .pipe(
-    //       mergeMap((refRiskLevel: ReferenceDataCategoryModel) => {
-    //         return this.contactDataService
-    //           .getContactsGroupedByRiskLevel(this.selectedOutbreak.id, clonedQueryBuilder)
-    //           .pipe(
-    //             map((data: RiskLevelGroupModel) => {
-    //               return _.map(data ? data.riskLevels : [], (item: RiskLevelModel, itemId) => {
-    //                 const refItem: ReferenceDataEntryModel = _.find(refRiskLevel.entries, {id: itemId}) as ReferenceDataEntryModel;
-    //                 return new CountedItemsListItem(
-    //                   item.count,
-    //                   itemId as any,
-    //                   null,
-    //                   refItem ?
-    //                     refItem.getColorCode() :
-    //                     Constants.DEFAULT_COLOR_REF_DATA
-    //                 );
-    //               });
-    //             })
-    //           );
-    //       })
-    //     );
-    // }
-  }
-
-  /**
    * Export selected records
    */
-  exportContacts(qb: RequestQueryBuilder): void {
+  private exportContacts(qb: RequestQueryBuilder): void {
     this.dialogV2Service.showExportDataAfterLoadingData({
       title: {
         get: () => 'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE'
@@ -2635,7 +2051,7 @@ export class ContactsListComponent
   /**
    * Export relationships for selected contacts
    */
-  exportContactsRelationship(qb: RequestQueryBuilder) {
+  private exportContactsRelationship(qb: RequestQueryBuilder) {
     this.dialogV2Service.showExportDataAfterLoadingData({
       title: {
         get: () => 'LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIPS_TITLE'
@@ -2713,7 +2129,7 @@ export class ContactsListComponent
   /**
    * Change Contact Followup status for all records matching this.queryBuilder
    */
-  changeContactFinalFollowUpStatus(_qb: RequestQueryBuilder) {
+  private changeContactFinalFollowUpStatus() {
     this.dialogV2Service
       .showSideDialog({
         // title
@@ -2842,6 +2258,130 @@ export class ContactsListComponent
             // refresh list
             this.needsRefreshList(true);
           });
+      });
+  }
+
+  /**
+   * Re(load) the Contacts list
+   */
+  refreshList(triggeredByPageChange: boolean) {
+    // retrieve created user & modified user information
+    this.queryBuilder.include('createdByUser', true);
+    this.queryBuilder.include('updatedByUser', true);
+
+    // retrieve responsible user information
+    this.queryBuilder.include('responsibleUser', true);
+
+    // retrieve location list
+    this.queryBuilder.include('locations', true);
+
+    // refresh list of contacts grouped by risk level
+    if (!triggeredByPageChange) {
+      this.initializeGroupedData();
+    }
+
+    // retrieve the list of Contacts
+    this.contactsList$ = this.contactDataService
+      .getContactsList(this.selectedOutbreak.id, this.queryBuilder)
+      .pipe(
+        switchMap((data) => {
+          // determine locations that we need to retrieve
+          const locationsIdsMap: {
+            [locationId: string]: true;
+          } = {};
+          data.forEach((item) => {
+            (item.addresses || []).forEach((address) => {
+              // nothing to add ?
+              if (!address?.locationId) {
+                return;
+              }
+
+              // add location to list
+              locationsIdsMap[address.locationId] = true;
+            });
+          });
+
+          // determine ids
+          const locationIds: string[] = Object.keys(locationsIdsMap);
+
+          // nothing to retrieve ?
+          if (locationIds.length < 1) {
+            return of(data);
+          }
+
+          // construct location query builder
+          const qb = new RequestQueryBuilder();
+          qb.filter.bySelect('id', locationIds, false, null);
+
+          // retrieve locations
+          return this.locationDataService.getLocationsList(qb).pipe(
+            map((locations) => {
+              // map locations
+              const locationsMap: {
+                [locationId: string]: LocationModel;
+              } = {};
+              locations.forEach((location) => {
+                locationsMap[location.id] = location;
+              });
+
+              // set locations
+              data.forEach((item) => {
+                (item.addresses || []).forEach((address) => {
+                  address.location =
+                    address.locationId && locationsMap[address.locationId]
+                      ? locationsMap[address.locationId]
+                      : address.location;
+                });
+              });
+
+              // finished
+              return data;
+            })
+          );
+        })
+      )
+      .pipe(
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      );
+  }
+
+  /**
+   * Get total number of items, based on the applied filters
+   */
+  refreshListCount(applyHasMoreLimit?: boolean) {
+    // reset
+    this.pageCount = undefined;
+
+    // set apply value
+    if (applyHasMoreLimit !== undefined) {
+      this.applyHasMoreLimit = applyHasMoreLimit;
+    }
+
+    // remove paginator from query builder
+    const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+    countQueryBuilder.paginator.clear();
+    countQueryBuilder.sort.clear();
+
+    // apply has more limit
+    if (this.applyHasMoreLimit) {
+      countQueryBuilder.flag('applyHasMoreLimit', true);
+    }
+
+    // count
+    this.contactDataService
+      .getContactsCount(this.selectedOutbreak.id, countQueryBuilder)
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        }),
+
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      )
+      .subscribe((response) => {
+        this.pageCount = response;
       });
   }
 }
