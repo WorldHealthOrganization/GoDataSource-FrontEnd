@@ -83,6 +83,11 @@ export class AppSideDialogV2Component implements OnDestroy {
 
       // change title
       changeTitle: (title, data?) => {
+        // already closed ?
+        if (!this.sideNav.opened) {
+          return;
+        }
+
         // update title
         this.config.title = {
           get: () => title,
