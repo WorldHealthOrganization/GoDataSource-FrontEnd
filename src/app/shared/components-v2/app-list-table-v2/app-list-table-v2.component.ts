@@ -1605,8 +1605,13 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
             'name',
             'readOnly',
             'filterData',
-            'userId'
+            'userId',
+            'createdBy',
+            'updatedAt'
           );
+
+          // retrieve created user & modified user information
+          qb.include('createdByUser', true);
 
           // retrieve items specific to our page
           qb.filter.where({
@@ -1619,13 +1624,48 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           this.savedFiltersService
             .getSavedFiltersList(qb)
             .subscribe((savedFilters) => {
-              // set saved filters options
-              (handler.data.map.savedFilterList as IV2SideDialogConfigInputSingleDropdown).options = savedFilters.map((item) => {
-                return {
-                  label: `${item.name}${item.readOnly ? ' ' + this.i18nService.instant('LNG_SIDE_FILTERS_LOAD_FILTER_READONLY_LABEL') : ''}`,
+              // configure saved filters dropdown
+              const savedFilterList = handler.data.map.savedFilterList as IV2SideDialogConfigInputSingleDropdown;
+
+              // set saved filters options and other things
+              savedFilterList.options = [];
+              savedFilters.forEach((item) => {
+                // option
+                const option: ILabelValuePairModel = {
+                  label: item.name,
                   value: item.id,
                   data: item
                 };
+                savedFilterList.options.push(option);
+
+                // infos
+                option.infos = [];
+
+                // set info icons - readonly
+                if (item.readOnly) {
+                  option.infos.push({
+                    label: this.i18nService.instant(
+                      'LNG_SIDE_FILTERS_LOAD_FILTER_READONLY_LABEL', {
+                        name: item.createdByUser?.name ?
+                          item.createdByUser?.name :
+                          ''
+                      }
+                    ),
+                    icon: 'edit_off'
+                  });
+                }
+
+                // updated at
+                if (item.updatedAt) {
+                  option.infos.push({
+                    label: this.i18nService.instant(
+                      'LNG_SIDE_FILTERS_LOAD_FILTER_UPDATED_AT_LABEL', {
+                        datetime: moment(item.updatedAt).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT)
+                      }
+                    ),
+                    icon: 'history'
+                  });
+                }
               });
 
               // do we need to retrieve other data ?
