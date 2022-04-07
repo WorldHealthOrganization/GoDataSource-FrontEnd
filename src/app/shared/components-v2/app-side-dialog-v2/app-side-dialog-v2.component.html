@@ -237,331 +237,349 @@
               fxLayout="column" fxLayoutGap="1.6rem"
               class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-filter-list {{input.cssClasses}}">
 
-              <!-- Operator -->
-              <app-form-toggle-v2
-                [(ngModel)]="input.operatorValue"
-                [name]="input.name + 'Operator'"
-                [options]="operatorOptions"
-                required="true">
-              </app-form-toggle-v2>
+              <!-- Filter & Sort tabs -->
+              <mat-tab-group
+                mat-align-tabs="center">
 
-              <!-- Buttons -->
-              <div
-                fxLayout="row" fxLayoutAlign="space-between"
-                class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-buttons">
+                <!-- Filter tab -->
+                <mat-tab
+                  [label]="'LNG_SIDE_FILTERS_SECTION_FILTER_TITLE' | translate">
 
-                <!-- Add -->
-                <button
-                  type="button"
-                  mat-flat-button color="primary"
-                  (click)="addAdvancedFilter(input)">
-                  {{'LNG_SIDE_FILTERS_ADD_ANOTHER_FILTER_BUTTON' | translate}}
-                </button>
+                  <!-- Operator -->
+                  <app-form-toggle-v2
+                    [(ngModel)]="input.operatorValue"
+                    [name]="input.name + 'Operator'"
+                    [options]="operatorOptions"
+                    required="true">
+                  </app-form-toggle-v2>
 
-                <!-- Reset filters -->
-                <button
-                  type="button"
-                  mat-flat-button color="text"
-                  (click)="resetAdvancedFilter()">
-                  {{'LNG_COMMON_BUTTON_RESET_FILTERS' | translate}}
-                </button>
-
-              </div>
-
-              <!-- Filters -->
-              <div
-                fxLayout="column" fxLayoutGap="0.8rem"
-                class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-container">
-
-                <div
-                  *ngFor="let filter of input.filters"
-                  fxLayout="row" fxLayoutAlign="start start"
-                  class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-item"
-                  [class.gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-no-value]="!filter.filterBy.value">
-
-                  <!-- Left -->
+                  <!-- Buttons -->
                   <div
-                    fxFlex
-                    class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-left">
+                    fxLayout="row" fxLayoutAlign="space-between"
+                    class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-buttons">
 
-                    <!-- Filter Type -->
-                    <app-form-select-single-v2
-                      [(ngModel)]="filter.filterBy.value"
-                      [name]="filter.filterBy.name"
-                      [options]="filter.filterBy.options"
-                      [placeholder]="filter.filterBy.placeholder"
-                      (ngModelChange)="filter.filterBy.change(dialogHandler.data, dialogHandler, filter)"
-                      required="true">
-                    </app-form-select-single-v2>
+                    <!-- Add -->
+                    <button
+                      type="button"
+                      mat-flat-button color="primary"
+                      (click)="addAdvancedFilter(input)">
+                      {{'LNG_SIDE_FILTERS_ADD_ANOTHER_FILTER_BUTTON' | translate}}
+                    </button>
 
-                    <!-- Filter setup -->
+                    <!-- Reset filters -->
+                    <button
+                      type="button"
+                      mat-flat-button color="text"
+                      (click)="resetAdvancedFilter()">
+                      {{'LNG_COMMON_BUTTON_RESET_FILTERS' | translate}}
+                    </button>
+
+                  </div>
+
+                  <!-- Filters -->
+                  <div
+                    fxLayout="column" fxLayoutGap="0.8rem"
+                    class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-container">
+
                     <div
-                      *ngIf="filter.filterBy.value"
-                      class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-left-inner">
+                      *ngFor="let filter of input.filters"
+                      fxLayout="row" fxLayoutAlign="start start"
+                      class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-item"
+                      [class.gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-no-value]="!filter.filterBy.value">
 
-                      <!-- Filter Comparator -->
-                      <app-form-select-single-v2
-                        *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type !== V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS"
-                        [(ngModel)]="filter.comparator.value"
-                        [name]="filter.comparator.name"
-                        [options]="filter.comparator.options"
-                        [placeholder]="filter.comparator.placeholder"
-                        (ngModelChange)="filter.comparator.change(dialogHandler.data, dialogHandler, filter)"
-                        required="true">
-                      </app-form-select-single-v2>
+                      <!-- Left -->
+                      <div
+                        fxFlex
+                        class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-left">
 
-                      <!-- Filter Value -->
-                      <ng-container
-                        *ngIf="filter.comparator.value || input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS">
-
-                        <!-- Text / Address phone number -->
-                        <app-form-input-v2
-                          *ngIf="(
-                            input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.TEXT ||
-                            input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.ADDRESS_PHONE_NUMBER || (
-                                input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.ADDRESS &&
-                                filter.comparator.value === V2AdvancedFilterComparatorType.CONTAINS
-                            )
-                          ) && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
-                          [(ngModel)]="filter.value"
-                          [name]="filter.name"
-                          placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_KEYWORD"
-                          autocomplete="off"
-                          required="true"></app-form-input-v2>
-
-                        <!-- Number -->
-                        <app-form-number-v2
-                          *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.NUMBER"
-                          [(ngModel)]="filter.value"
-                          [name]="filter.name"
-                          placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_KEYWORD"
-                          autocomplete="off"
-                          required="true">
-                        </app-form-number-v2>
-
-                        <!-- Single select -->
+                        <!-- Filter Type -->
                         <app-form-select-single-v2
-                          *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.SELECT
-                            && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
-                          [(ngModel)]="filter.value"
-                          [name]="filter.name"
-                          placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
-                          [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.options"
+                          [(ngModel)]="filter.filterBy.value"
+                          [name]="filter.filterBy.name"
+                          [options]="filter.filterBy.options"
+                          [placeholder]="filter.filterBy.placeholder"
+                          (ngModelChange)="filter.filterBy.change(dialogHandler.data, dialogHandler, filter)"
                           required="true">
                         </app-form-select-single-v2>
 
-                        <!-- Multiple select -->
-                        <app-form-select-multiple-v2
-                          *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.MULTISELECT
-                            && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
-                          [(ngModel)]="filter.value"
-                          [name]="filter.name"
-                          placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
-                          [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.options"
-                          required="true">
-                        </app-form-select-multiple-v2>
+                        <!-- Filter setup -->
+                        <div
+                          *ngIf="filter.filterBy.value"
+                          class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-left-inner">
 
-                        <!-- Number / Age range -->
-                        <app-form-number-range-v2
-                          *ngIf="(
-                            input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.RANGE_AGE ||
-                            input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.RANGE_NUMBER
-                          ) && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
-                          [(ngModel)]="filter.value"
-                          [name]="filter.name"
-                          [min]="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.RANGE_AGE ? 0 : undefined"
-                          [max]="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.RANGE_AGE ? Constants.DEFAULT_AGE_MAX_YEARS : undefined"
-                          [fromHidden]="filter.comparator.value === V2AdvancedFilterComparatorType.BEFORE"
-                          [toHidden]="filter.comparator.value === V2AdvancedFilterComparatorType.AFTER"
-                          required="true">
-                        </app-form-number-range-v2>
-
-                        <!-- Date range -->
-                        <app-form-date-range-v2
-                          *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.RANGE_DATE
-                            && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
-                          [(ngModel)]="filter.value"
-                          [name]="filter.name"
-                          [fromHidden]="filter.comparator.value === V2AdvancedFilterComparatorType.BEFORE"
-                          [toHidden]="filter.comparator.value === V2AdvancedFilterComparatorType.AFTER"
-                          required="true">
-                        </app-form-date-range-v2>
-
-                        <!-- Date -->
-                        <app-form-date-v2
-                          *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.DATE"
-                          [(ngModel)]="filter.value"
-                          [name]="filter.name"
-                          placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
-                          autocomplete="off"
-                          required="true">
-                        </app-form-date-v2>
-
-                        <!-- Location - single -->
-                        <app-form-select-location-single-v2
-                          *ngIf="(
-                            input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.LOCATION_SINGLE || (
-                              input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.ADDRESS &&
-                              filter.comparator.value === V2AdvancedFilterComparatorType.WITHIN
-                            )
-                          ) && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
-                          [(ngModel)]="filter.value"
-                          [name]="filter.name"
-                          placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION"
-                          useOutbreakLocations="true"
-                          required="true"
-                          (selectedLocationChanged)="filter.comparator.value !== V2AdvancedFilterComparatorType.WITHIN ? undefined : (filter.extraValues.location = $event)">
-                        </app-form-select-location-single-v2>
-
-                        <!-- Location - multiple -->
-                        <app-form-select-location-multiple-v2
-                          *ngIf="(
-                            input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.LOCATION_MULTIPLE || (
-                              input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.ADDRESS &&
-                              filter.comparator.value === V2AdvancedFilterComparatorType.LOCATION
-                            )
-                          ) && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
-                          [(ngModel)]="filter.value"
-                          [name]="filter.name"
-                          placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION"
-                          useOutbreakLocations="true"
-                          required="true">
-                        </app-form-select-location-multiple-v2>
-
-                        <!-- Address Within Radius -->
-                        <app-form-number-v2
-                          *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.ADDRESS &&
-                            filter.comparator.value === V2AdvancedFilterComparatorType.WITHIN"
-                          [(ngModel)]="filter.extraValues.radius.value"
-                          [name]="filter.extraValues.radius.name"
-                          placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN_MAX_DISTANCE"
-                          autocomplete="off"
-                          required="true">
-                        </app-form-number-v2>
-
-                        <!-- Questionnaire answers -->
-                        <ng-container
-                          *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS">
-                          <!-- Question -->
+                          <!-- Filter Comparator -->
                           <app-form-select-single-v2
-                            [(ngModel)]="filter.value"
-                            [name]="filter.name"
-                            placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION"
-                            [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptions"
-                            optionTooltipKey="label"
-                            sortDisabled="true"
-                            (ngModelChange)="resetQuestionnaireFilter(filter)"
+                            *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type !== V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS"
+                            [(ngModel)]="filter.comparator.value"
+                            [name]="filter.comparator.name"
+                            [options]="filter.comparator.options"
+                            [placeholder]="filter.comparator.placeholder"
+                            (ngModelChange)="filter.comparator.change(dialogHandler.data, dialogHandler, filter)"
                             required="true">
                           </app-form-select-single-v2>
 
-                          <!-- Filter details -->
+                          <!-- Filter Value -->
                           <ng-container
-                            *ngIf="filter.value">
-                            <!-- Last answer or any of them -->
-                            <app-form-select-single-v2
-                              *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.multiAnswerParent"
-                              [(ngModel)]="filter.extraValues.whichAnswer.value"
-                              [name]="filter.extraValues.whichAnswer.name"
-                              [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER' | translate"
-                              [options]="questionWhichAnswerOptions"
-                              required="true">
-                            </app-form-select-single-v2>
+                            *ngIf="filter.comparator.value || input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS">
 
-                            <!-- Which Answer Date -->
-                            <app-form-date-range-v2
-                              *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.multiAnswerParent"
-                              [(ngModel)]="filter.extraValues.whichAnswerDate.value"
-                              [name]="filter.extraValues.whichAnswerDate.name"
-                              required="true">
-                            </app-form-date-range-v2>
-
-                            <!-- Comparator used accordingly to field type -->
-                            <app-form-select-single-v2
-                              *ngIf="V2AdvancedFilterQuestionComparators[input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType] &&
-                                V2AdvancedFilterComparatorOptions[V2AdvancedFilterQuestionComparators[input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType]] &&
-                                V2AdvancedFilterComparatorOptions[V2AdvancedFilterQuestionComparators[input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType]].length > 1"
-                              [(ngModel)]="filter.extraValues.comparator.value"
-                              [name]="filter.extraValues.comparator.name"
-                              [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL' | translate"
-                              [options]="V2AdvancedFilterComparatorOptions[V2AdvancedFilterQuestionComparators[input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType]]"
-                              (ngModelChange)="resetQuestionnaireFilter(filter, 'filterValue')"
-                              required="true">
-                            </app-form-select-single-v2>
-
-                            <!-- TEXT Filter -->
+                            <!-- Text / Address phone number -->
                             <app-form-input-v2
-                              *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType === Constants.ANSWER_TYPES.FREE_TEXT.value &&
-                                filter.extraValues.comparator.value && filter.extraValues.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.extraValues.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
-                              [(ngModel)]="filter.extraValues.filterValue.value"
-                              [name]="filter.extraValues.filterValue.name"
+                              *ngIf="(
+                                input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.TEXT ||
+                                input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.ADDRESS_PHONE_NUMBER || (
+                                    input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.ADDRESS &&
+                                    filter.comparator.value === V2AdvancedFilterComparatorType.CONTAINS
+                                )
+                              ) && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                              [(ngModel)]="filter.value"
+                              [name]="filter.name"
+                              placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_KEYWORD"
+                              autocomplete="off"
+                              required="true"></app-form-input-v2>
+
+                            <!-- Number -->
+                            <app-form-number-v2
+                              *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.NUMBER"
+                              [(ngModel)]="filter.value"
+                              [name]="filter.name"
                               placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_KEYWORD"
                               autocomplete="off"
                               required="true">
-                            </app-form-input-v2>
+                            </app-form-number-v2>
 
-                            <!-- DATE RANGE Filter -->
-                            <app-form-date-range-v2
-                              *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType === Constants.ANSWER_TYPES.DATE_TIME.value &&
-                                filter.extraValues.comparator.value && filter.extraValues.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.extraValues.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
-                              [(ngModel)]="filter.extraValues.filterValue.value"
-                              [name]="filter.extraValues.filterValue.name"
-                              [fromHidden]="filter.extraValues.comparator.value === V2AdvancedFilterComparatorType.BEFORE"
-                              [toHidden]="filter.extraValues.comparator.value === V2AdvancedFilterComparatorType.AFTER"
-                              required="true">
-                            </app-form-date-range-v2>
-
-                            <!-- SELECT Filter -->
-                            <app-form-select-multiple-v2
-                              *ngIf="(
-                                input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value ||
-                                input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value
-                               ) && filter.extraValues.comparator.value && filter.extraValues.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.extraValues.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
-                              [(ngModel)]="filter.extraValues.filterValue.value"
-                              [name]="filter.extraValues.filterValue.name"
+                            <!-- Single select -->
+                            <app-form-select-single-v2
+                              *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.SELECT
+                                && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                              [(ngModel)]="filter.value"
+                              [name]="filter.name"
                               placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
-                              [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answers"
+                              [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.options"
+                              required="true">
+                            </app-form-select-single-v2>
+
+                            <!-- Multiple select -->
+                            <app-form-select-multiple-v2
+                              *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.MULTISELECT
+                                && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                              [(ngModel)]="filter.value"
+                              [name]="filter.name"
+                              placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+                              [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.options"
                               required="true">
                             </app-form-select-multiple-v2>
 
-                            <!-- NUMBER Filter -->
+                            <!-- Number / Age range -->
                             <app-form-number-range-v2
-                              *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType === Constants.ANSWER_TYPES.NUMERIC.value &&
-                                filter.extraValues.comparator.value && filter.extraValues.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.extraValues.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
-                              [(ngModel)]="filter.extraValues.filterValue.value"
-                              [name]="filter.extraValues.filterValue.name"
-                              [fromHidden]="filter.extraValues.comparator.value === V2AdvancedFilterComparatorType.BEFORE"
-                              [toHidden]="filter.extraValues.comparator.value === V2AdvancedFilterComparatorType.AFTER"
+                              *ngIf="(
+                                input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.RANGE_AGE ||
+                                input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.RANGE_NUMBER
+                              ) && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                              [(ngModel)]="filter.value"
+                              [name]="filter.name"
+                              [min]="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.RANGE_AGE ? 0 : undefined"
+                              [max]="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.RANGE_AGE ? Constants.DEFAULT_AGE_MAX_YEARS : undefined"
+                              [fromHidden]="filter.comparator.value === V2AdvancedFilterComparatorType.BEFORE"
+                              [toHidden]="filter.comparator.value === V2AdvancedFilterComparatorType.AFTER"
                               required="true">
                             </app-form-number-range-v2>
 
-                            <!-- File Filter -->
-                            <!-- Handled by comparator -->
-                            <!-- NOTHING TO DO HERE -->
+                            <!-- Date range -->
+                            <app-form-date-range-v2
+                              *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.RANGE_DATE
+                                && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                              [(ngModel)]="filter.value"
+                              [name]="filter.name"
+                              [fromHidden]="filter.comparator.value === V2AdvancedFilterComparatorType.BEFORE"
+                              [toHidden]="filter.comparator.value === V2AdvancedFilterComparatorType.AFTER"
+                              required="true">
+                            </app-form-date-range-v2>
+
+                            <!-- Date -->
+                            <app-form-date-v2
+                              *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.DATE"
+                              [(ngModel)]="filter.value"
+                              [name]="filter.name"
+                              placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+                              autocomplete="off"
+                              required="true">
+                            </app-form-date-v2>
+
+                            <!-- Location - single -->
+                            <app-form-select-location-single-v2
+                              *ngIf="(
+                                input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.LOCATION_SINGLE || (
+                                  input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.ADDRESS &&
+                                  filter.comparator.value === V2AdvancedFilterComparatorType.WITHIN
+                                )
+                              ) && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                              [(ngModel)]="filter.value"
+                              [name]="filter.name"
+                              placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION"
+                              useOutbreakLocations="true"
+                              required="true"
+                              (selectedLocationChanged)="filter.comparator.value !== V2AdvancedFilterComparatorType.WITHIN ? undefined : (filter.extraValues.location = $event)">
+                            </app-form-select-location-single-v2>
+
+                            <!-- Location - multiple -->
+                            <app-form-select-location-multiple-v2
+                              *ngIf="(
+                                input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.LOCATION_MULTIPLE || (
+                                  input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.ADDRESS &&
+                                  filter.comparator.value === V2AdvancedFilterComparatorType.LOCATION
+                                )
+                              ) && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                              [(ngModel)]="filter.value"
+                              [name]="filter.name"
+                              placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION"
+                              useOutbreakLocations="true"
+                              required="true">
+                            </app-form-select-location-multiple-v2>
+
+                            <!-- Address Within Radius -->
+                            <app-form-number-v2
+                              *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.ADDRESS &&
+                                filter.comparator.value === V2AdvancedFilterComparatorType.WITHIN"
+                              [(ngModel)]="filter.extraValues.radius.value"
+                              [name]="filter.extraValues.radius.name"
+                              placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN_MAX_DISTANCE"
+                              autocomplete="off"
+                              required="true">
+                            </app-form-number-v2>
+
+                            <!-- Questionnaire answers -->
+                            <ng-container
+                              *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS">
+                              <!-- Question -->
+                              <app-form-select-single-v2
+                                [(ngModel)]="filter.value"
+                                [name]="filter.name"
+                                placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION"
+                                [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptions"
+                                optionTooltipKey="label"
+                                sortDisabled="true"
+                                (ngModelChange)="resetQuestionnaireFilter(filter)"
+                                required="true">
+                              </app-form-select-single-v2>
+
+                              <!-- Filter details -->
+                              <ng-container
+                                *ngIf="filter.value">
+                                <!-- Last answer or any of them -->
+                                <app-form-select-single-v2
+                                  *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.multiAnswerParent"
+                                  [(ngModel)]="filter.extraValues.whichAnswer.value"
+                                  [name]="filter.extraValues.whichAnswer.name"
+                                  [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER' | translate"
+                                  [options]="questionWhichAnswerOptions"
+                                  required="true">
+                                </app-form-select-single-v2>
+
+                                <!-- Which Answer Date -->
+                                <app-form-date-range-v2
+                                  *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.multiAnswerParent"
+                                  [(ngModel)]="filter.extraValues.whichAnswerDate.value"
+                                  [name]="filter.extraValues.whichAnswerDate.name"
+                                  required="true">
+                                </app-form-date-range-v2>
+
+                                <!-- Comparator used accordingly to field type -->
+                                <app-form-select-single-v2
+                                  *ngIf="V2AdvancedFilterQuestionComparators[input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType] &&
+                                    V2AdvancedFilterComparatorOptions[V2AdvancedFilterQuestionComparators[input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType]] &&
+                                    V2AdvancedFilterComparatorOptions[V2AdvancedFilterQuestionComparators[input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType]].length > 1"
+                                  [(ngModel)]="filter.extraValues.comparator.value"
+                                  [name]="filter.extraValues.comparator.name"
+                                  [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL' | translate"
+                                  [options]="V2AdvancedFilterComparatorOptions[V2AdvancedFilterQuestionComparators[input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType]]"
+                                  (ngModelChange)="resetQuestionnaireFilter(filter, 'filterValue')"
+                                  required="true">
+                                </app-form-select-single-v2>
+
+                                <!-- TEXT Filter -->
+                                <app-form-input-v2
+                                  *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType === Constants.ANSWER_TYPES.FREE_TEXT.value &&
+                                    filter.extraValues.comparator.value && filter.extraValues.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.extraValues.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                                  [(ngModel)]="filter.extraValues.filterValue.value"
+                                  [name]="filter.extraValues.filterValue.name"
+                                  placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_KEYWORD"
+                                  autocomplete="off"
+                                  required="true">
+                                </app-form-input-v2>
+
+                                <!-- DATE RANGE Filter -->
+                                <app-form-date-range-v2
+                                  *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType === Constants.ANSWER_TYPES.DATE_TIME.value &&
+                                    filter.extraValues.comparator.value && filter.extraValues.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.extraValues.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                                  [(ngModel)]="filter.extraValues.filterValue.value"
+                                  [name]="filter.extraValues.filterValue.name"
+                                  [fromHidden]="filter.extraValues.comparator.value === V2AdvancedFilterComparatorType.BEFORE"
+                                  [toHidden]="filter.extraValues.comparator.value === V2AdvancedFilterComparatorType.AFTER"
+                                  required="true">
+                                </app-form-date-range-v2>
+
+                                <!-- SELECT Filter -->
+                                <app-form-select-multiple-v2
+                                  *ngIf="(
+                                    input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value ||
+                                    input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value
+                                  ) && filter.extraValues.comparator.value && filter.extraValues.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.extraValues.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                                  [(ngModel)]="filter.extraValues.filterValue.value"
+                                  [name]="filter.extraValues.filterValue.name"
+                                  placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+                                  [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answers"
+                                  required="true">
+                                </app-form-select-multiple-v2>
+
+                                <!-- NUMBER Filter -->
+                                <app-form-number-range-v2
+                                  *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType === Constants.ANSWER_TYPES.NUMERIC.value &&
+                                    filter.extraValues.comparator.value && filter.extraValues.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.extraValues.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                                  [(ngModel)]="filter.extraValues.filterValue.value"
+                                  [name]="filter.extraValues.filterValue.name"
+                                  [fromHidden]="filter.extraValues.comparator.value === V2AdvancedFilterComparatorType.BEFORE"
+                                  [toHidden]="filter.extraValues.comparator.value === V2AdvancedFilterComparatorType.AFTER"
+                                  required="true">
+                                </app-form-number-range-v2>
+
+                                <!-- File Filter -->
+                                <!-- Handled by comparator -->
+                                <!-- NOTHING TO DO HERE -->
+
+                              </ng-container>
+                            </ng-container>
 
                           </ng-container>
-                        </ng-container>
 
-                      </ng-container>
+                        </div>
+
+                      </div>
+
+                      <!-- Right -->
+                      <button
+                        fxGrow="0"
+                        class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-right"
+                        type="button"
+                        mat-icon-button
+                        color="warn"
+                        [matTooltip]="'LNG_COMMON_BUTTON_DELETE_FILTERS' | translate"
+                        (click)="removeAdvancedFilter(input, filter)">
+                        <mat-icon>delete</mat-icon>
+                      </button>
 
                     </div>
 
                   </div>
 
-                  <!-- Right -->
-                  <button
-                    fxGrow="0"
-                    class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-right"
-                    type="button"
-                    mat-icon-button
-                    color="warn"
-                    [matTooltip]="'LNG_COMMON_BUTTON_DELETE_FILTERS' | translate"
-                    (click)="removeAdvancedFilter(input, filter)">
-                    <mat-icon>delete</mat-icon>
-                  </button>
+                </mat-tab>
 
-                </div>
+                <!-- Sort tab -->
+                <mat-tab
+                  [label]="'LNG_SIDE_FILTERS_SECTION_SORT_TITLE' | translate">
+                  sort todo
+                </mat-tab>
 
-              </div>
+              </mat-tab-group>
 
             </div>
 

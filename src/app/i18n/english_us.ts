@@ -31,7 +31,8 @@ export const EnglishUsLang = {
     'LNG_SIDE_FILTERS_LOAD_FILTER_UPDATED_AT_LABEL': 'Updated on {{datetime}}',
     'LNG_DIALOG_SAVE_FILTERS_UPDATE_OR_CREATE_DIALOG_TITLE': 'Update / Create',
     'LNG_COMMON_BUTTON_DELETE_FILTERS': 'Remove filter',
-    'LNG_COMMON_BUTTON_DELETE_FILTERS_MSG': 'Are you sure you want to remove this filter?'
+    'LNG_COMMON_BUTTON_DELETE_FILTERS_MSG': 'Are you sure you want to remove this filter?',
+    'LNG_SIDE_FILTERS_SECTION_FILTER_TITLE': 'Filter'
 
 
 
