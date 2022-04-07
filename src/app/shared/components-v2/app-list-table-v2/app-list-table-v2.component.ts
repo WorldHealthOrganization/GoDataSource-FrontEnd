@@ -24,7 +24,7 @@ import {
   IV2SideDialogConfigButtonType,
   IV2SideDialogConfigInputCheckbox,
   IV2SideDialogConfigInputFilterList,
-  IV2SideDialogConfigInputFilterListItem,
+  IV2SideDialogConfigInputFilterListFilter,
   IV2SideDialogConfigInputSingleDropdown,
   IV2SideDialogConfigInputText,
   IV2SideDialogHandler,
@@ -2046,7 +2046,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
    */
   private generateQueryBuilderFromAdvancedFilters(
     filterOptions: ILabelValuePairModel[],
-    appliedFilters: IV2SideDialogConfigInputFilterListItem[],
+    appliedFilters: IV2SideDialogConfigInputFilterListFilter[],
     operator: RequestFilterOperator,
     optionsAsLabelValueMap: {
       [optionId: string]: ILabelValuePairModel

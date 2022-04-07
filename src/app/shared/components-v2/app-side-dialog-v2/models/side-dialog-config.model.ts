@@ -29,7 +29,8 @@ export enum V2SideDialogConfigInputType {
   KEY_VALUE,
   HTML,
   FILTER_LIST,
-  FILTER_LIST_ITEM
+  FILTER_LIST_FILTER,
+  FILTER_LIST_SORT
 }
 
 /**
@@ -206,11 +207,11 @@ export interface IV2SideDialogConfigInputAccordion extends IV2SideDialogConfigIn
 }
 
 /**
- * Side dialog input - filter list item
+ * Side dialog input - filter list filter
  */
-export interface IV2SideDialogConfigInputFilterListItem extends IV2SideDialogConfigInputBase {
+export interface IV2SideDialogConfigInputFilterListFilter extends IV2SideDialogConfigInputBase {
   // required
-  type: V2SideDialogConfigInputType.FILTER_LIST_ITEM;
+  type: V2SideDialogConfigInputType.FILTER_LIST_FILTER;
   filterBy: IV2SideDialogConfigInputSingleDropdown;
   comparator: IV2SideDialogConfigInputSingleDropdown;
 
@@ -229,7 +230,7 @@ export interface IV2SideDialogConfigInputFilterList extends IV2SideDialogConfigI
   type: V2SideDialogConfigInputType.FILTER_LIST;
   name: string;
   options: V2AdvancedFilter[];
-  filters: IV2SideDialogConfigInputFilterListItem[];
+  filters: IV2SideDialogConfigInputFilterListFilter[];
   operatorValue: RequestFilterOperator;
 
   // not used
@@ -342,9 +343,9 @@ export interface IV2SideDialogHandler {
         [key: string]: string
       }
     ) => void,
-    addAdvancedFilter: (input: IV2SideDialogConfigInputFilterList) => IV2SideDialogConfigInputFilterListItem,
+    addAdvancedFilter: (input: IV2SideDialogConfigInputFilterList) => IV2SideDialogConfigInputFilterListFilter,
     resetQuestionnaireFilter: (
-      filter: IV2SideDialogConfigInputFilterListItem,
+      filter: IV2SideDialogConfigInputFilterListFilter,
       ...specificProperties: string[]
     ) => void
   },

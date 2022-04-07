@@ -6,7 +6,7 @@ import {
   IV2SideDialogConfigButtonType,
   IV2SideDialogConfigInputAccordionPanel,
   IV2SideDialogConfigInputFilterList,
-  IV2SideDialogConfigInputFilterListItem,
+  IV2SideDialogConfigInputFilterListFilter,
   IV2SideDialogData,
   IV2SideDialogHandler,
   IV2SideDialogResponse,
@@ -105,7 +105,7 @@ export class AppSideDialogV2Component implements OnDestroy {
         return this.addAdvancedFilter(input);
       },
       resetQuestionnaireFilter: (
-        filter: IV2SideDialogConfigInputFilterListItem,
+        filter: IV2SideDialogConfigInputFilterListFilter,
         ...specificProperties: string[]
       ) => {
         this.resetQuestionnaireFilter(
@@ -583,10 +583,10 @@ export class AppSideDialogV2Component implements OnDestroy {
   /**
    * Add filter
    */
-  addAdvancedFilter(input: IV2SideDialogConfigInputFilterList): IV2SideDialogConfigInputFilterListItem {
+  addAdvancedFilter(input: IV2SideDialogConfigInputFilterList): IV2SideDialogConfigInputFilterListFilter {
     // create filter
-    const advancedFilter: IV2SideDialogConfigInputFilterListItem = {
-      type: V2SideDialogConfigInputType.FILTER_LIST_ITEM,
+    const advancedFilter: IV2SideDialogConfigInputFilterListFilter = {
+      type: V2SideDialogConfigInputType.FILTER_LIST_FILTER,
 
       // selected value
       value: undefined,
@@ -601,7 +601,7 @@ export class AppSideDialogV2Component implements OnDestroy {
         options: input.optionsAsLabelValue,
         change: (data, _handler, filter) => {
           // get filter
-          const filterItem = filter as unknown as IV2SideDialogConfigInputFilterListItem;
+          const filterItem = filter as unknown as IV2SideDialogConfigInputFilterListFilter;
           const filterOption: V2AdvancedFilter = filterItem.filterBy.value ?
             (data.map.filters as IV2SideDialogConfigInputFilterList).optionsAsLabelValueMap[filterItem.filterBy.value].data as V2AdvancedFilter :
             undefined;
@@ -634,7 +634,7 @@ export class AppSideDialogV2Component implements OnDestroy {
         options: [],
         change: (data, _handler, filter) => {
           // reset comparator selected value
-          const filterItem = filter as unknown as IV2SideDialogConfigInputFilterListItem;
+          const filterItem = filter as unknown as IV2SideDialogConfigInputFilterListFilter;
           filterItem.value = undefined;
 
           // reset extra value
@@ -683,7 +683,7 @@ export class AppSideDialogV2Component implements OnDestroy {
    */
   removeAdvancedFilter(
     input: IV2SideDialogConfigInputFilterList,
-    filter: IV2SideDialogConfigInputFilterListItem
+    filter: IV2SideDialogConfigInputFilterListFilter
   ): void {
     // ask for confirmation
     this.dialogV2Service
@@ -721,7 +721,7 @@ export class AppSideDialogV2Component implements OnDestroy {
    * Reset extra values for questionnaire
    */
   resetQuestionnaireFilter(
-    filter: IV2SideDialogConfigInputFilterListItem,
+    filter: IV2SideDialogConfigInputFilterListFilter,
     ...specificProperties: string[]
   ): void {
     // reset everything ?
