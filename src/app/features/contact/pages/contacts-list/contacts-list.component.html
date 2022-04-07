@@ -1,9 +1,6 @@
-<!-- TODO:  [pageSettingsKey] should get what? We do not have "contacts"_WITHOUT_RELATIONSHIPS-->
 <app-list-table-v2
   [pageTitle]="'LNG_PAGE_LIST_CONTACTS_TITLE'"
   [records$]="contactsList$"
-  (refreshData)="needsRefreshList(true, false)"
-  (refreshDataCount)="refreshListCount(false)"
   [columns]="tableColumns"
   [breadcrumbs]="breadcrumbs"
   [quickActions]="quickActions"
@@ -13,15 +10,19 @@
   [pageCount]="pageCount"
   [pageSize]="pageSize"
   [pageIndex]="pageIndex"
-  [pageSettingsKey]="appliedListFilter !== Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS ? UserSettings.CASE_FIELDS : UserSettings.CASE_WITHOUT_RELATIONSHIPS_FIELDS"
+  [pageSettingsKey]="UserSettings.CONTACT_FIELDS"
   [sortColumn]="tableSortBy"
   [infos]="null"
   [filtersApplied]="filtersApplied"
   [advancedFilterType]="Constants.APP_PAGE.CONTACTS.value"
   [advancedFilters]="advancedFilters"
+  (refreshData)="needsRefreshList(true, false)"
+  (refreshDataCount)="refreshListCount(false)"
   (pageChange)="changePage($event)"
   (sortBy)="sortBy($event, { age: [ 'years', 'months' ] })"
-  (filterBy)="filterBy($event)"></app-list-table-v2>
+  (filterBy)="filterBy($event)"
+  (resetHeaderFilters)="resetFiltersToSideFilters()"
+  (advancedFilterBy)="applySideFilters($event)"></app-list-table-v2>
 
 <!--
 <app-topnav>

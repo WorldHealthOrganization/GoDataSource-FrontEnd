@@ -5,6 +5,8 @@ import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-
 import { PERMISSION } from '../../core/models/permission.model';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
+import { DailyFollowUpStatusDataResolver } from '../../core/services/resolvers/data/daily-follow-up-status.resolver';
+import { FinalFollowUpStatusDataResolver } from '../../core/services/resolvers/data/final-follow-up-status.resolver';
 import { GenderDataResolver } from '../../core/services/resolvers/data/gender.resolver';
 import { OccupationDataResolver } from '../../core/services/resolvers/data/occupation.resolver';
 import { PregnancyStatusDataResolver } from '../../core/services/resolvers/data/pregnancy-status.resolver';
@@ -36,7 +38,9 @@ const routes: Routes = [
       user: UserDataResolver,
       occupation: OccupationDataResolver,
       vaccine: VaccineDataResolver,
-      vaccineStatus: VaccineStatusDataResolver
+      vaccineStatus: VaccineStatusDataResolver,
+      followUp: FinalFollowUpStatusDataResolver,
+      dailyFollowUp: DailyFollowUpStatusDataResolver
     }
   },
   // Create Contact

@@ -1,10 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import * as _ from 'lodash';
-import { Observable, of, throwError } from 'rxjs';
-import { forkJoin } from 'rxjs/internal/observable/forkJoin';
+import { forkJoin, Observable, of, throwError } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { catchError, map, mergeMap, share, switchMap, takeUntil } from 'rxjs/operators';
+import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
@@ -23,8 +22,6 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { LocationModel } from '../../../../core/models/location.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.model';
-import { RiskLevelModel } from '../../../../core/models/risk-level.model';
 import { TeamModel } from '../../../../core/models/team.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
@@ -32,26 +29,23 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
+import { ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import { DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components';
+import { DialogField } from '../../../../shared/components';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
-import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
-import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { FilterModel } from '../../../../shared/components/side-filters/model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
@@ -95,7 +89,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
 
   // print daily follow-ups status
   exportContactsDailyFollowUpListUrl: string;
-  exportContactsDailyFollowUpListFileName: string;
   exportContactsDailyFollowUpListDialogFields: DialogField[];
 
   // print daily follow-ups form
@@ -193,10 +186,8 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
     private dialogV2Service: DialogV2Service,
     private genericDataService: GenericDataService,
     private referenceDataDataService: ReferenceDataDataService,
-    private dialogService: DialogService,
     private i18nService: I18nService,
-    private entityHelperService: EntityHelperService,
-    private userDataService: UserDataService
+    private entityHelperService: EntityHelperService
   ) {
     super(listHelperService);
   }
@@ -205,13 +196,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
      * Component initialized
      */
   ngOnInit() {
-    // retrieve users
-    this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
-
-    this.pregnancyStatusList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PREGNANCY_STATUS);
-    this.vaccineList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.VACCINES);
-    this.vaccineStatusList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.VACCINES_STATUS);
-
+    // TODO: Check this out
     // dialog fields for daily follow-ups print
     this.genericDataService
       .getRangeFollowUpGroupByOptions(true)
@@ -226,44 +211,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
           })
         ];
       });
-
-    this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
-    this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);
-    this.riskLevelRefData$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL).pipe(share());
-
-    // yes / no
-    this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
-
-    // subscribe to the Selected Outbreak
-    this.outbreakSubscriber = this.outbreakDataService
-      .getSelectedOutbreakSubject()
-      .subscribe((selectedOutbreak: OutbreakModel) => {
-        this.selectedOutbreak = selectedOutbreak;
-
-        // export contacts url
-        this.exportContactsUrl = null;
-        this.exportContactsDailyFollowUpListUrl = null;
-        this.exportContactsDailyFollowUpsFormUrl = null;
-        if (
-          this.selectedOutbreak &&
-                    this.selectedOutbreak.id
-        ) {
-          this.exportContactsUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/export`;
-          this.exportContactsDailyFollowUpListUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/daily-list/export`;
-          this.exportContactsDailyFollowUpsFormUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/export-daily-follow-up-form`;
-
-          // initialize side filters
-          this.initializeSideFilters();
-        }
-
-        // initialize pagination
-        this.initPaginator();
-        // ...and re-load the list when the Selected Outbreak is changed
-        this.needsRefreshList(true);
-      });
-
-    // initialize Side Table Columns
-    this.initializeTableColumns();
   }
 
   /**
@@ -1288,8 +1235,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'followUp.status',
         label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
-        // TODO: We should use the right resolver, follow-up resolver not implemented
-        options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        options: (this.activatedRoute.snapshot.data.followUp as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
         // sortable: true
       },
       {
@@ -1360,12 +1306,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'followUpTeamId',
           label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
-          // TODO: We should use the right resolver, team resolver not implemented
-          // options$: this.teamsList$,
-          options: null
-          // TODO: Unkown properties
-          // optionsLabelKey: 'name',
-          // optionsValueKey: 'id'
+          options: (this.activatedRoute.snapshot.data.followUp as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
         }
       );
     }
@@ -1378,9 +1319,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
           label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
           type: V2AdvancedFilterType.MULTISELECT,
           options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<ILabelValuePairModel>).options
-          // TODO: Unkown properties
-          // optionsLabelKey: 'name',
-          // optionsValueKey: 'id'
         }
       );
     }
@@ -1414,21 +1352,18 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
           field: 'statusId',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
           type: V2AdvancedFilterType.SELECT,
-          // TODO: We should use the right resolver, daily-status resolver not implemented
-          // options$: dailyStatusTypeOptions$,
-          options: null,
+          options: (this.activatedRoute.snapshot.data.dailyFollowUp as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          relationshipPath: ['followUps'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        },
+        {
+          field: 'questionnaireAnswers',
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+          type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
+          template: () => this.selectedOutbreak.contactFollowUpTemplate,
           relationshipPath: ['followUps'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
         }
-        // TODO: Needs to be implemented, "questionnaireTemplate" unknown property
-        // {
-        //   field: 'questionnaireAnswers',
-        //   label: 'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-        //   type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
-        //   questionnaireTemplate: this.selectedOutbreak.contactFollowUpTemplate,
-        //   relationshipPath: ['followUps'],
-        //   relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
-        // }
       );
     }
 
@@ -1503,8 +1438,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
           label: 'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS',
           action: {
             click: () => {
-              // TODO: Check if this works
-              this.changeContactFinalFollowUpStatus();
+              this.changeContactFinalFollowUpStatus(this.queryBuilder);
             }
           },
           visible: (): boolean => {
@@ -1609,13 +1543,77 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
           visible: (): boolean => {
             return (this.exportContactsDailyFollowUpListUrl && ContactModel.canExportDailyFollowUpList(this.authUser)) || (this.exportContactsDailyFollowUpsFormUrl && ContactModel.canExportDailyFollowUpsForm(this.authUser));
           }
-        }
+        },
 
         // Export follow up list
-        // TODO: Export follow up list button opens a dialog in the old design, needs to be implemented
+        {
+          label: 'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_BUTTON',
+          action: {
+            click: () => {
+              this.dialogV2Service.showExportData({
+                title: {
+                  get: () => 'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_TITLE'
+                },
+                export: {
+                  url: `/outbreaks/${this.selectedOutbreak.id}/contacts/daily-list/export`,
+                  async: false,
+                  method: ExportDataMethod.GET,
+                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
+                  allow: {
+                    types: [
+                      ExportDataExtension.PDF
+                    ]
+                  },
+                  inputs: {
+                    append: [
+                      {
+                        // TODO: We need to add Group By drop-down
+                        type: V2SideDialogConfigInputType.NUMBER,
+                        placeholder: 'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS_FIELD_COPIES',
+                        name: 'copies',
+                        value: 5,
+                        validators: {
+                          required: () => true
+                        }
+                      }
+                    ]
+                  }
+                }
+              });
+            }
+          },
+          visible: (): boolean => {
+            return ContactModel.canExportDailyFollowUpList(this.authUser);
+          }
+        },
 
         // Export daily follow up
-        // TODO: Export daily follow up button opens a dialog in the old design, needs to be implemented
+        {
+          label: 'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_BUTTON',
+          action: {
+            click: () => {
+              this.dialogV2Service.showExportData({
+                title: {
+                  get: () => 'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_TITLE'
+                },
+                export: {
+                  url: `/outbreaks/${this.selectedOutbreak.id}/contacts/export-daily-follow-up-form`,
+                  async: false,
+                  method: ExportDataMethod.GET,
+                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
+                  allow: {
+                    types: [
+                      ExportDataExtension.PDF
+                    ]
+                  }
+                }
+              });
+            }
+          },
+          visible: (): boolean => {
+            return ContactModel.canExportDailyFollowUpsForm(this.authUser);
+          }
+        }
       ]
     };
   }
@@ -1897,264 +1895,264 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
      * Initialize Side Filters
      */
   initializeSideFilters() {
-    const occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
-    const dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
+    // const occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
+    // const dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
 
-    // case condition
-    const caseCondition = new RequestQueryBuilder();
-    caseCondition.filter.byEquality(
-      'type',
-      EntityType.CASE
-    );
+    // // case condition
+    // const caseCondition = new RequestQueryBuilder();
+    // caseCondition.filter.byEquality(
+    //   'type',
+    //   EntityType.CASE
+    // );
 
-    // set available side filters
-    this.availableSideFilters = [
-      // Contact
-      new FilterModel({
-        fieldName: 'firstName',
-        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
-        type: FilterType.TEXT,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'lastName',
-        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
-        type: FilterType.TEXT,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'occupation',
-        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
-        type: FilterType.MULTISELECT,
-        options$: occupationsList$,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'age',
-        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_AGE',
-        type: FilterType.RANGE_AGE,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'dateOfReporting',
-        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
-        type: FilterType.RANGE_DATE,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'dob',
-        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
-        type: FilterType.RANGE_DATE,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'visualId',
-        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
-        type: FilterType.TEXT
-      }),
-      new FilterModel({
-        fieldName: 'addresses',
-        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_ADDRESSES',
-        type: FilterType.ADDRESS,
-        addressFieldIsArray: true
-      }),
-      new FilterModel({
-        fieldName: 'addresses',
-        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER',
-        type: FilterType.ADDRESS_PHONE_NUMBER,
-        addressFieldIsArray: true
-      }),
-      new FilterModel({
-        fieldName: 'followUp.status',
-        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
-        type: FilterType.MULTISELECT,
-        options$: this.finalFollowUpStatus$,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'followUp.endDate',
-        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_END_DATE',
-        type: FilterType.RANGE_DATE,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'dateOfLastContact',
-        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
-        type: FilterType.RANGE_DATE,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'questionnaireAnswers',
-        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-        type: FilterType.QUESTIONNAIRE_ANSWERS,
-        questionnaireTemplate: this.selectedOutbreak.contactInvestigationTemplate
-      }),
-      new FilterModel({
-        fieldName: 'pregnancyStatus',
-        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
-        type: FilterType.SELECT,
-        options$: this.pregnancyStatusList$
-      }),
-      new FilterModel({
-        fieldName: 'vaccinesReceived.vaccine',
-        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_VACCINE',
-        type: FilterType.MULTISELECT,
-        options$: this.vaccineList$
-      }),
-      new FilterModel({
-        fieldName: 'vaccinesReceived.status',
-        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_VACCINE_STATUS',
-        type: FilterType.MULTISELECT,
-        options$: this.vaccineStatusList$
-      }),
-      new FilterModel({
-        fieldName: 'vaccinesReceived.date',
-        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_VACCINE_DATE',
-        type: FilterType.RANGE_DATE
-      }),
-      new FilterModel({
-        fieldName: 'wasCase',
-        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE',
-        type: FilterType.SELECT,
-        options$: this.yesNoOptionsList$
-      }),
-      new FilterModel({
-        fieldName: 'numberOfContacts',
-        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS',
-        type: FilterType.RANGE_NUMBER
-      }),
-      new FilterModel({
-        fieldName: 'numberOfExposures',
-        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
-        type: FilterType.RANGE_NUMBER
-      })
-    ];
+    // // set available side filters
+    // this.availableSideFilters = [
+    //   // Contact
+    //   new FilterModel({
+    //     fieldName: 'firstName',
+    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
+    //     type: FilterType.TEXT,
+    //     sortable: true
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'lastName',
+    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
+    //     type: FilterType.TEXT,
+    //     sortable: true
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'occupation',
+    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
+    //     type: FilterType.MULTISELECT,
+    //     options$: occupationsList$,
+    //     sortable: true
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'age',
+    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_AGE',
+    //     type: FilterType.RANGE_AGE,
+    //     sortable: true
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'dateOfReporting',
+    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
+    //     type: FilterType.RANGE_DATE,
+    //     sortable: true
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'dob',
+    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
+    //     type: FilterType.RANGE_DATE,
+    //     sortable: true
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'visualId',
+    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
+    //     type: FilterType.TEXT
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'addresses',
+    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_ADDRESSES',
+    //     type: FilterType.ADDRESS,
+    //     addressFieldIsArray: true
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'addresses',
+    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER',
+    //     type: FilterType.ADDRESS_PHONE_NUMBER,
+    //     addressFieldIsArray: true
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'followUp.status',
+    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
+    //     type: FilterType.MULTISELECT,
+    //     options$: this.finalFollowUpStatus$,
+    //     sortable: true
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'followUp.endDate',
+    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_END_DATE',
+    //     type: FilterType.RANGE_DATE,
+    //     sortable: true
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'dateOfLastContact',
+    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
+    //     type: FilterType.RANGE_DATE,
+    //     sortable: true
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'questionnaireAnswers',
+    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+    //     type: FilterType.QUESTIONNAIRE_ANSWERS,
+    //     questionnaireTemplate: this.selectedOutbreak.contactInvestigationTemplate
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'pregnancyStatus',
+    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
+    //     type: FilterType.SELECT,
+    //     options$: this.pregnancyStatusList$
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'vaccinesReceived.vaccine',
+    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_VACCINE',
+    //     type: FilterType.MULTISELECT,
+    //     options$: this.vaccineList$
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'vaccinesReceived.status',
+    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_VACCINE_STATUS',
+    //     type: FilterType.MULTISELECT,
+    //     options$: this.vaccineStatusList$
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'vaccinesReceived.date',
+    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_VACCINE_DATE',
+    //     type: FilterType.RANGE_DATE
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'wasCase',
+    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE',
+    //     type: FilterType.SELECT,
+    //     options$: this.yesNoOptionsList$
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'numberOfContacts',
+    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS',
+    //     type: FilterType.RANGE_NUMBER
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'numberOfExposures',
+    //     fieldLabel: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+    //     type: FilterType.RANGE_NUMBER
+    //   })
+    // ];
 
-    // allowed to filter by follow-up team ?
-    if (TeamModel.canList(this.authUser)) {
-      this.availableSideFilters.push(
-        new FilterModel({
-          fieldName: 'followUpTeamId',
-          fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
-          type: FilterType.MULTISELECT,
-          options$: this.teamsList$,
-          optionsLabelKey: 'name',
-          optionsValueKey: 'id'
-        })
-      );
-    }
+    // // allowed to filter by follow-up team ?
+    // if (TeamModel.canList(this.authUser)) {
+    //   this.availableSideFilters.push(
+    //     new FilterModel({
+    //       fieldName: 'followUpTeamId',
+    //       fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
+    //       type: FilterType.MULTISELECT,
+    //       options$: this.teamsList$,
+    //       optionsLabelKey: 'name',
+    //       optionsValueKey: 'id'
+    //     })
+    //   );
+    // }
 
-    // allowed to filter by follow-up user ?
-    if (UserModel.canList(this.authUser)) {
-      this.availableSideFilters.push(
-        new FilterModel({
-          fieldName: 'responsibleUserId',
-          fieldLabel: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
-          type: FilterType.MULTISELECT,
-          options$: this.userList$,
-          optionsLabelKey: 'name',
-          optionsValueKey: 'id'
-        })
-      );
-    }
+    // // allowed to filter by follow-up user ?
+    // if (UserModel.canList(this.authUser)) {
+    //   this.availableSideFilters.push(
+    //     new FilterModel({
+    //       fieldName: 'responsibleUserId',
+    //       fieldLabel: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+    //       type: FilterType.MULTISELECT,
+    //       options$: this.userList$,
+    //       optionsLabelKey: 'name',
+    //       optionsValueKey: 'id'
+    //     })
+    //   );
+    // }
 
-    // Relation - Follow-up
-    if (FollowUpModel.canList(this.authUser)) {
-      this.availableSideFilters = [
-        ...this.availableSideFilters,
-        ...[
-          new FilterModel({
-            fieldName: 'date',
-            fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
-            type: FilterType.RANGE_DATE,
-            relationshipPath: ['followUps'],
-            relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
-          }),
-          new FilterModel({
-            fieldName: 'index',
-            fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP',
-            type: FilterType.NUMBER,
-            relationshipPath: ['followUps'],
-            relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
-          }),
-          new FilterModel({
-            fieldName: 'targeted',
-            fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
-            type: FilterType.SELECT,
-            options$: this.yesNoOptionsList$,
-            relationshipPath: ['followUps'],
-            relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
-          }),
-          new FilterModel({
-            fieldName: 'statusId',
-            fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
-            type: FilterType.SELECT,
-            options$: dailyStatusTypeOptions$,
-            relationshipPath: ['followUps'],
-            relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
-          }),
-          new FilterModel({
-            fieldName: 'questionnaireAnswers',
-            fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-            type: FilterType.QUESTIONNAIRE_ANSWERS,
-            questionnaireTemplate: this.selectedOutbreak.contactFollowUpTemplate,
-            relationshipPath: ['followUps'],
-            relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
-          })
-        ]
-      ];
-    }
+    // // Relation - Follow-up
+    // if (FollowUpModel.canList(this.authUser)) {
+    //   this.availableSideFilters = [
+    //     ...this.availableSideFilters,
+    //     ...[
+    //       new FilterModel({
+    //         fieldName: 'date',
+    //         fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
+    //         type: FilterType.RANGE_DATE,
+    //         relationshipPath: ['followUps'],
+    //         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+    //       }),
+    //       new FilterModel({
+    //         fieldName: 'index',
+    //         fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP',
+    //         type: FilterType.NUMBER,
+    //         relationshipPath: ['followUps'],
+    //         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+    //       }),
+    //       new FilterModel({
+    //         fieldName: 'targeted',
+    //         fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
+    //         type: FilterType.SELECT,
+    //         options$: this.yesNoOptionsList$,
+    //         relationshipPath: ['followUps'],
+    //         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+    //       }),
+    //       new FilterModel({
+    //         fieldName: 'statusId',
+    //         fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
+    //         type: FilterType.SELECT,
+    //         options$: dailyStatusTypeOptions$,
+    //         relationshipPath: ['followUps'],
+    //         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+    //       }),
+    //       new FilterModel({
+    //         fieldName: 'questionnaireAnswers',
+    //         fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+    //         type: FilterType.QUESTIONNAIRE_ANSWERS,
+    //         questionnaireTemplate: this.selectedOutbreak.contactFollowUpTemplate,
+    //         relationshipPath: ['followUps'],
+    //         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+    //       })
+    //     ]
+    //   ];
+    // }
 
-    // Relation - Cases
-    if (CaseModel.canList(this.authUser)) {
-      this.availableSideFilters = [
-        ...this.availableSideFilters,
-        ...[
-          new FilterModel({
-            fieldName: 'firstName',
-            fieldLabel: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
-            type: FilterType.TEXT,
-            relationshipPath: ['relationships', 'people'],
-            relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
-            extraConditions: caseCondition
-          }),
-          new FilterModel({
-            fieldName: 'lastName',
-            fieldLabel: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
-            type: FilterType.TEXT,
-            relationshipPath: ['relationships', 'people'],
-            relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
-            extraConditions: caseCondition
-          }),
-          new FilterModel({
-            fieldName: 'gender',
-            fieldLabel: 'LNG_CASE_FIELD_LABEL_GENDER',
-            type: FilterType.MULTISELECT,
-            options$: this.genderList$,
-            relationshipPath: ['relationships', 'people'],
-            relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
-            extraConditions: caseCondition
-          }),
-          new FilterModel({
-            fieldName: 'age',
-            fieldLabel: 'LNG_CASE_FIELD_LABEL_AGE',
-            type: FilterType.RANGE_AGE,
-            relationshipPath: ['relationships', 'people'],
-            relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
-            extraConditions: caseCondition
-          }),
-          new FilterModel({
-            fieldName: 'questionnaireAnswers',
-            fieldLabel: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-            type: FilterType.QUESTIONNAIRE_ANSWERS,
-            questionnaireTemplate: this.selectedOutbreak.caseInvestigationTemplate,
-            relationshipPath: ['relationships', 'people'],
-            relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
-            extraConditions: caseCondition
-          })
-        ]
-      ];
-    }
+    // // Relation - Cases
+    // if (CaseModel.canList(this.authUser)) {
+    //   this.availableSideFilters = [
+    //     ...this.availableSideFilters,
+    //     ...[
+    //       new FilterModel({
+    //         fieldName: 'firstName',
+    //         fieldLabel: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
+    //         type: FilterType.TEXT,
+    //         relationshipPath: ['relationships', 'people'],
+    //         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+    //         extraConditions: caseCondition
+    //       }),
+    //       new FilterModel({
+    //         fieldName: 'lastName',
+    //         fieldLabel: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
+    //         type: FilterType.TEXT,
+    //         relationshipPath: ['relationships', 'people'],
+    //         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+    //         extraConditions: caseCondition
+    //       }),
+    //       new FilterModel({
+    //         fieldName: 'gender',
+    //         fieldLabel: 'LNG_CASE_FIELD_LABEL_GENDER',
+    //         type: FilterType.MULTISELECT,
+    //         options$: this.genderList$,
+    //         relationshipPath: ['relationships', 'people'],
+    //         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+    //         extraConditions: caseCondition
+    //       }),
+    //       new FilterModel({
+    //         fieldName: 'age',
+    //         fieldLabel: 'LNG_CASE_FIELD_LABEL_AGE',
+    //         type: FilterType.RANGE_AGE,
+    //         relationshipPath: ['relationships', 'people'],
+    //         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+    //         extraConditions: caseCondition
+    //       }),
+    //       new FilterModel({
+    //         fieldName: 'questionnaireAnswers',
+    //         fieldLabel: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+    //         type: FilterType.QUESTIONNAIRE_ANSWERS,
+    //         questionnaireTemplate: this.selectedOutbreak.caseInvestigationTemplate,
+    //         relationshipPath: ['relationships', 'people'],
+    //         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+    //         extraConditions: caseCondition
+    //       })
+    //     ]
+    //   ];
+    // }
   }
 
   /**
@@ -2181,7 +2179,28 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
    * Fields retrieved from api to reduce payload size
    */
   protected refreshListFields(): string[] {
-    return [];
+    return [
+      'id',
+      'lastName',
+      'firstName',
+      'visualId',
+      'addresses',
+      'age',
+      'gender',
+      'riskLevel',
+      'dateOfLastContact',
+      'followUpTeamId',
+      'followUp',
+      'wasCase',
+      'responsibleUserId',
+      'numberOfContacts',
+      'numberOfExposures',
+      'deleted',
+      'createdBy',
+      'createdAt',
+      'updatedBy',
+      'updatedAt'
+    ];
   }
 
   /**
@@ -2190,12 +2209,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
   refreshList(
     triggeredByPageChange: boolean
   ) {
-    // refresh list of contacts grouped by risk level
-    if (!triggeredByPageChange) {
-      // TODO: Should next line be changed with this.initializeGroupedData(); ?
-      this.getContactsGroupedByRiskLevel();
-    }
-
     // retrieve created user & modified user information
     this.queryBuilder.include('createdByUser', true);
     this.queryBuilder.include('updatedByUser', true);
@@ -2205,6 +2218,11 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
 
     // retrieve location list
     this.queryBuilder.include('locations', true);
+
+    // refresh list of contacts grouped by risk level
+    if (!triggeredByPageChange) {
+      this.initializeGroupedData();
+    }
 
     // retrieve the list of Contacts
     this.contactsList$ = this.contactDataService
@@ -2324,121 +2342,44 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
      * Get contacts grouped by risk level
      */
   getContactsGroupedByRiskLevel() {
-    if (this.selectedOutbreak) {
-      // clone query builder to clear it
-      const clonedQueryBuilder = _.cloneDeep(this.queryBuilder);
-      clonedQueryBuilder.paginator.clear();
-      clonedQueryBuilder.sort.clear();
+    // if (this.selectedOutbreak) {
+    //   // clone query builder to clear it
+    //   const clonedQueryBuilder = _.cloneDeep(this.queryBuilder);
+    //   clonedQueryBuilder.paginator.clear();
+    //   clonedQueryBuilder.sort.clear();
 
-      // ugly hack so we don't have to change API in many place and test the entire project again ( if we changed api to replace regex to $regex many API request would be affected )
-      // #TODO - we need to address this issue later by changing all API requests that use convertLoopbackFilterToMongo ( WGD-2854 )
-      const addressPhoneCondition = clonedQueryBuilder.filter.get('addresses.phoneNumber');
-      if (addressPhoneCondition) {
-        const newCondition = JSON.parse(JSON.stringify(addressPhoneCondition).replace(/"regex"/gi, '"$regex"'));
-        clonedQueryBuilder.filter.where(newCondition, true);
-      }
+    //   // ugly hack so we don't have to change API in many place and test the entire project again ( if we changed api to replace regex to $regex many API request would be affected )
+    //   // #TODO - we need to address this issue later by changing all API requests that use convertLoopbackFilterToMongo ( WGD-2854 )
+    //   const addressPhoneCondition = clonedQueryBuilder.filter.get('addresses.phoneNumber');
+    //   if (addressPhoneCondition) {
+    //     const newCondition = JSON.parse(JSON.stringify(addressPhoneCondition).replace(/"regex"/gi, '"$regex"'));
+    //     clonedQueryBuilder.filter.where(newCondition, true);
+    //   }
 
-      // retrieve data
-      this.countedContactsByRiskLevel$ = this.riskLevelRefData$
-        .pipe(
-          mergeMap((refRiskLevel: ReferenceDataCategoryModel) => {
-            return this.contactDataService
-              .getContactsGroupedByRiskLevel(this.selectedOutbreak.id, clonedQueryBuilder)
-              .pipe(
-                map((data: RiskLevelGroupModel) => {
-                  return _.map(data ? data.riskLevels : [], (item: RiskLevelModel, itemId) => {
-                    const refItem: ReferenceDataEntryModel = _.find(refRiskLevel.entries, {id: itemId}) as ReferenceDataEntryModel;
-                    return new CountedItemsListItem(
-                      item.count,
-                      itemId as any,
-                      null,
-                      refItem ?
-                        refItem.getColorCode() :
-                        Constants.DEFAULT_COLOR_REF_DATA
-                    );
-                  });
-                })
-              );
-          })
-        );
-    }
-  }
-
-  /**
-     * Delete specific contact that belongs to the selected outbreak
-     */
-  deleteContact(contact: ContactModel) {
-    // show confirm dialog to confirm the action
-    this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_CONTACT', contact)
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          // delete contact
-          this.contactDataService
-            .deleteContact(this.selectedOutbreak.id, contact.id)
-            .pipe(
-              catchError((err) => {
-                this.toastV2Service.error(err);
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE');
-
-              // reload data
-              this.needsRefreshList(true);
-            });
-        }
-      });
-  }
-
-  /**
-     * Restore contact
-     */
-  restoreContact(contact: ContactModel) {
-    // show confirm dialog to confirm the action
-    this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_CONTACT', new ContactModel(contact))
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          this.contactDataService
-            .restoreContact(this.selectedOutbreak.id, contact.id)
-            .pipe(
-              catchError((err) => {
-                this.toastV2Service.error(err);
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_SUCCESS_MESSAGE');
-              // reload data
-              this.needsRefreshList(true);
-            });
-        }
-      });
-  }
-
-  /**
-     * Convert a case to a contact
-     * @param contactModel
-     */
-  convertContactToCase(contactModel: ContactModel) {
-    this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_CONVERT_CONTACT_TO_CASE', contactModel)
-      .subscribe((answer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          this.contactDataService
-            .convertContactToCase(this.selectedOutbreak.id, contactModel.id)
-            .pipe(
-              catchError((err) => {
-                this.toastV2Service.error(err);
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_TO_CASE_SUCCESS_MESSAGE');
-              // reload data
-              this.needsRefreshList(true);
-            });
-        }
-      });
+    //   // retrieve data
+    //   this.countedContactsByRiskLevel$ = this.riskLevelRefData$
+    //     .pipe(
+    //       mergeMap((refRiskLevel: ReferenceDataCategoryModel) => {
+    //         return this.contactDataService
+    //           .getContactsGroupedByRiskLevel(this.selectedOutbreak.id, clonedQueryBuilder)
+    //           .pipe(
+    //             map((data: RiskLevelGroupModel) => {
+    //               return _.map(data ? data.riskLevels : [], (item: RiskLevelModel, itemId) => {
+    //                 const refItem: ReferenceDataEntryModel = _.find(refRiskLevel.entries, {id: itemId}) as ReferenceDataEntryModel;
+    //                 return new CountedItemsListItem(
+    //                   item.count,
+    //                   itemId as any,
+    //                   null,
+    //                   refItem ?
+    //                     refItem.getColorCode() :
+    //                     Constants.DEFAULT_COLOR_REF_DATA
+    //                 );
+    //               });
+    //             })
+    //           );
+    //       })
+    //     );
+    // }
   }
 
   /**
@@ -2606,136 +2547,262 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
   /**
      * Change Contact Followup status for all records matching this.queryBuilder
      */
-  changeContactFinalFollowUpStatus() {
-    // to continue we need to make sure we have an outbreak selected
-    if (
-      !this.selectedOutbreak ||
-            !this.selectedOutbreak.id
-    ) {
-      return;
-    }
+  changeContactFinalFollowUpStatus(_qb: RequestQueryBuilder) {
+    // TODO: Change dialog not implemented in this.dialogV2Service
+    this.dialogV2Service.showSideDialog({
+      // title
+      title: {
+        get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS_DIALOG_TITLE',
+        // TODO: Add records.length in title
+        data : null
+      },
 
-    // construct query builder user to count & update contacts
-    const countQueryBuilder = _.cloneDeep(this.queryBuilder);
-    countQueryBuilder.paginator.clear();
-    countQueryBuilder.sort.clear();
-    countQueryBuilder.fields('id', 'followUp');
+      // inputs
+      inputs: [{
+        type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+        placeholder: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
+        options: [],
+        value: undefined,
+        name: 'statusesList',
+        validators: {
+          required: () => true
+        }
+      }],
 
-    // display loading while determining how many records will be deleted
-    // this.showLoadingDialog();
+      // buttons
+      bottomButtons: [{
+        label: 'LNG_COMMON_BUTTON_UPDATE',
+        type: IV2SideDialogConfigButtonType.OTHER,
+        color: 'primary',
+        key: 'save',
+        disabled: (_data): boolean => {
+          // TODO: Add disabled condition
+          // return (handler.data.map.filters as IV2SideDialogConfigInputFilterList).filters.length < 1 || !handler.form || handler.form.invalid;
+          return true;
+        }
+      }],
 
-    // make all requests in parallel
-    forkJoin([
-      // retrieve follow-up statuses
-      this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS),
+      initialized: (handler) => {
+        // display loading
+        handler.loading.show();
 
-      // count contacts
-      this.contactDataService.getContactsList(this.selectedOutbreak.id, countQueryBuilder)
-    ]).subscribe((
-      [statuses, records]: [LabelValuePair[], ContactModel[]]
-    ) => {
-      // hide loading
-      // this.closeLoadingDialog();
+        // construct query for saved filter
+        const qb = _.cloneDeep(this.queryBuilder);
 
-      // display change status dialog
-      this.dialogService
-        .showInput(
-          new DialogConfiguration({
-            message: 'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS_DIALOG_TITLE',
-            translateData: {
-              count: records.length
-            },
-            yesLabel: 'LNG_COMMON_BUTTON_UPDATE',
-            fieldsList: [
-              new DialogField({
-                name: 'followUp.status',
-                placeholder: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
-                description: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION',
-                required: true,
-                fieldType: DialogFieldType.SELECT,
-                inputOptionsMultiple: false,
-                inputOptionsClearable: false,
-                inputOptions: statuses
-              })
-            ]
-          })
-        )
-        .subscribe((answer: DialogAnswer) => {
-          if (answer.button === DialogAnswerButton.Yes) {
-            // update contacts
-            const putRecordsData = records.map((contact: ContactModel) => ({
-              id: contact.id,
-              followUp: Object.assign(
-                contact.followUp, {
-                  status: answer.inputValue.value.followUp.status
-                }
-              )
-            }));
+        qb.sort.clear();
+        qb.paginator.clear();
+        qb.fields('id', 'followUp');
 
-            // display loading while determining how many records will be deleted
-            // this.showLoadingDialog();
+        // make all requests in parallel
+        forkJoin([
+          // retrieve follow-up statuses
+          this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(
+            ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS
+          ),
 
-            // update statuses
-            this.contactDataService
-              .bulkModifyContacts(
-                this.selectedOutbreak.id,
-                putRecordsData
-              )
-              .pipe(
-                catchError((err) => {
-                  // this.closeLoadingDialog();
-                  this.toastV2Service.error(err);
-                  return throwError(err);
-                })
-              )
-              .subscribe(() => {
-                // success message
-                this.toastV2Service.success(
-                  'LNG_PAGE_BULK_MODIFY_CONTACTS_ACTION_MODIFY_CONTACTS_SUCCESS_MESSAGE', {
-                    count: records.length.toLocaleString('en')
-                  }
-                );
+          // count contacts
+          this.contactDataService.getContactsList(this.selectedOutbreak.id, qb)
+        ]).subscribe(([statuses, records]: [LabelValuePair[], ContactModel[]]) => {
+          // eslint-disable-next-line no-console
+          console.log(statuses, records);
 
-                // close dialog
-                // this.closeLoadingDialog();
+          // set drop-down statuses
+          (handler.data.map.statusesList as IV2SideDialogConfigInputSingleDropdown).options = statuses.map((item) => {
+            return {
+              label: item.label,
+              value: item.value
+            };
+          });
 
-                // refresh list
-                this.needsRefreshList(true);
-              });
-          }
+
+          handler.update.inputs([{
+            type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+            placeholder: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
+            options: [],
+            value: undefined,
+            name: 'contactRecords',
+            validators: {
+              required: () => true
+            }
+          }]);
+
+
+          // set contact records
+          (handler.data.map.statusesList as IV2SideDialogConfigInputSingleDropdown).options = records.map((item) => {
+            return {
+              label: item.name,
+              value: item.id
+            };
+          });
+
+          // handler.data.map.contactRecords = [];
+          // update inputs
+          // handler.update.inputs([
+          //   {
+          //     type: V2SideDialogConfigInputType.ACCORDION_PANEL,
+          //     name: 'view-main-entity',
+          //     inputs: records
+          //   }
+          // ]);
+          // handler.data.map.contactRecords.options = records;
+          // handler.update.inputs([]);
         });
+
+
+        handler.loading.hide();
+      }
+    }).subscribe((response) => {
+      // cancelled ?
+      if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+        return;
+      }
+
+      // // update contacts
+      // const putRecordsData = records.map((contact: ContactModel) => ({
+      //   id: contact.id,
+      //   followUp: Object.assign(
+      //     contact.followUp, {
+      //       status: answer.inputValue.value.followUp.status
+      //     }
+      //   )
+      // }));
+
+      // // update statuses
+      // this.contactDataService
+      //   .bulkModifyContacts(
+      //     this.selectedOutbreak.id,
+      //     putRecordsData
+      //   )
+      //   .pipe(
+      //     catchError((err) => {
+      //       // this.closeLoadingDialog();
+      //       this.toastV2Service.error(err);
+      //       return throwError(err);
+      //     })
+      //   )
+      //   .subscribe(() => {
+      //     // success message
+      //     this.toastV2Service.success(
+      //       'LNG_PAGE_BULK_MODIFY_CONTACTS_ACTION_MODIFY_CONTACTS_SUCCESS_MESSAGE', {
+      //         count: records.length.toLocaleString('en')
+      //       }
+      //     );
+
+      //     // close dialog
+      //     // this.closeLoadingDialog();
+
+      //     // refresh list
+      //     this.needsRefreshList(true);
+      // });
+
+      // close popup
+      response.handler.hide();
     });
-  }
 
-  /**
-     * Display contacts popup
-     */
-  displayContacts(entity: ContactModel) {
-    // if we do not have contacts return
-    if (entity.numberOfContacts < 1) {
-      return;
-    }
 
-    // display dialog
-    // this.entityHelperService.displayContacts(
-    //   this.selectedOutbreak.id,
-    //   entity
-    // );
-  }
 
-  /**
-     * Display exposures popup
-     */
-  displayExposures(entity: ContactModel) {
-    // if we do not have any exposure return
-    if (entity.numberOfExposures < 1) {
-      return;
-    }
 
-    // display dialog
-    // this.entityHelperService.displayExposures(
-    //   this.selectedOutbreak.id,
-    //   entity
-    // );
+
+
+
+
+    // // to continue we need to make sure we have an outbreak selected
+    // if (
+    //   !this.selectedOutbreak ||
+    //         !this.selectedOutbreak.id
+    // ) {
+    //   return;
+    // }
+
+    // // construct query builder user to count & update contacts
+    // const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+    // countQueryBuilder.paginator.clear();
+    // countQueryBuilder.sort.clear();
+    // countQueryBuilder.fields('id', 'followUp');
+
+    // // display loading while determining how many records will be deleted
+    // // this.showLoadingDialog();
+
+    // // make all requests in parallel
+    // forkJoin([
+    //   // retrieve follow-up statuses
+    //   this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS),
+
+    //   // count contacts
+    //   this.contactDataService.getContactsList(this.selectedOutbreak.id, countQueryBuilder)
+    // ]).subscribe((
+    //   [statuses, records]: [LabelValuePair[], ContactModel[]]
+    // ) => {
+    //   // hide loading
+    //   // this.closeLoadingDialog();
+
+    //   // display change status dialog
+    //   this.dialogService
+    //     .showInput(
+    //       new DialogConfiguration({
+    //         message: 'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS_DIALOG_TITLE',
+    //         translateData: {
+    //           count: records.length
+    //         },
+    //         yesLabel: 'LNG_COMMON_BUTTON_UPDATE',
+    //         fieldsList: [
+    //           new DialogField({
+    //             name: 'followUp.status',
+    //             placeholder: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
+    //             description: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION',
+    //             required: true,
+    //             fieldType: DialogFieldType.SELECT,
+    //             inputOptionsMultiple: false,
+    //             inputOptionsClearable: false,
+    //             inputOptions: statuses
+    //           })
+    //         ]
+    //       })
+    //     )
+    //     .subscribe((answer: DialogAnswer) => {
+    //       if (answer.button === DialogAnswerButton.Yes) {
+    //         // update contacts
+    //         const putRecordsData = records.map((contact: ContactModel) => ({
+    //           id: contact.id,
+    //           followUp: Object.assign(
+    //             contact.followUp, {
+    //               status: answer.inputValue.value.followUp.status
+    //             }
+    //           )
+    //         }));
+
+    //         // display loading while determining how many records will be deleted
+    //         // this.showLoadingDialog();
+
+    //         // update statuses
+    //         this.contactDataService
+    //           .bulkModifyContacts(
+    //             this.selectedOutbreak.id,
+    //             putRecordsData
+    //           )
+    //           .pipe(
+    //             catchError((err) => {
+    //               // this.closeLoadingDialog();
+    //               this.toastV2Service.error(err);
+    //               return throwError(err);
+    //             })
+    //           )
+    //           .subscribe(() => {
+    //             // success message
+    //             this.toastV2Service.success(
+    //               'LNG_PAGE_BULK_MODIFY_CONTACTS_ACTION_MODIFY_CONTACTS_SUCCESS_MESSAGE', {
+    //                 count: records.length.toLocaleString('en')
+    //               }
+    //             );
+
+    //             // close dialog
+    //             // this.closeLoadingDialog();
+
+    //             // refresh list
+    //             this.needsRefreshList(true);
+    //           });
+    //       }
+    //     });
+    // });
   }
 }
