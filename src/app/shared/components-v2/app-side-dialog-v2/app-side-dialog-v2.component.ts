@@ -791,7 +791,7 @@ export class AppSideDialogV2Component implements OnDestroy {
       sortBy: {
         type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
         value: undefined,
-        name: `${input.name}.sorts[${input.filters.length}]`,
+        name: `${input.name}.sorts[${input.sorts.length}]`,
         placeholder: 'LNG_SIDE_FILTERS_SORT_BY_PLACEHOLDER',
         options: input.sortableOptionsAsLabelValue
       },
@@ -800,7 +800,7 @@ export class AppSideDialogV2Component implements OnDestroy {
       order: {
         type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
         value: undefined,
-        name: `${input.name}.order[${input.filters.length}]`,
+        name: `${input.name}.order[${input.sorts.length}]`,
         placeholder: 'LNG_SIDE_FILTERS_SORT_DIRECTION_LABEL',
         options: this.sortOrderOptions
       }
