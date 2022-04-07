@@ -182,6 +182,9 @@ export class EventsListComponent
         label: 'LNG_EVENT_FIELD_LABEL_PHONE_NUMBER',
         notVisible: true,
         sortable: true,
+        format: {
+          type: 'mainAddress.phoneNumber'
+        },
         filter: {
           type: V2FilterType.ADDRESS_PHONE_NUMBER,
           address: filterAddressModel,
@@ -193,6 +196,9 @@ export class EventsListComponent
         field: 'address.emailAddress',
         label: 'LNG_EVENT_FIELD_LABEL_EMAIL',
         notVisible: true,
+        format: {
+          type: 'mainAddress.emailAddress'
+        },
         filter: {
           type: V2FilterType.ADDRESS_FIELD,
           address: filterAddressModel,
@@ -206,6 +212,13 @@ export class EventsListComponent
         field: 'responsibleUserId',
         label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
         notVisible: true,
+        format: {
+          type: 'responsibleUser.name'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+        },
         exclude: (): boolean => {
           return !UserModel.canList(this.authUser);
         },
@@ -230,6 +243,10 @@ export class EventsListComponent
           format: {
             type: V2ColumnFormat.BUTTON
           },
+          filter: {
+            type: V2FilterType.NUMBER_RANGE,
+            min: 0
+          },
           cssCellClass: 'gd-cell-button',
           buttonLabel: (item) =>
             (item.numberOfContacts || '').toLocaleString('en'),
@@ -243,17 +260,19 @@ export class EventsListComponent
             // display dialog
             this.entityHelperService.contacts(this.selectedOutbreak, item);
           },
-          disabled: (data) =>
-            !RelationshipModel.canList(this.authUser) ||
-            !data.canListRelationshipContacts(this.authUser)
+          disabled: (data) => !RelationshipModel.canList(this.authUser) || !data.canListRelationshipContacts(this.authUser)
         },
         {
           field: 'numberOfExposures',
           label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
-          sortable: true,
           format: {
             type: V2ColumnFormat.BUTTON
           },
+          filter: {
+            type: V2FilterType.NUMBER_RANGE,
+            min: 0
+          },
+          sortable: true,
           cssCellClass: 'gd-cell-button',
           buttonLabel: (item) =>
             (item.numberOfExposures || '').toLocaleString('en'),
@@ -267,9 +286,7 @@ export class EventsListComponent
             // display dialog
             this.entityHelperService.exposures(this.selectedOutbreak, item);
           },
-          disabled: (data) =>
-            !RelationshipModel.canList(this.authUser) ||
-            !data.canListRelationshipExposures(this.authUser)
+          disabled: (data) => !RelationshipModel.canList(this.authUser) || !data.canListRelationshipExposures(this.authUser)
         }
       );
     }
@@ -311,14 +328,14 @@ export class EventsListComponent
       {
         field: 'createdAt',
         label: 'LNG_EVENT_FIELD_LABEL_CREATED_AT',
-        sortable: true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME
         },
         filter: {
           type: V2FilterType.DATE_RANGE
-        }
+        },
+        sortable: true
       },
       {
         field: 'updatedBy',
@@ -341,19 +358,18 @@ export class EventsListComponent
       {
         field: 'updatedAt',
         label: 'LNG_EVENT_FIELD_LABEL_UPDATED_AT',
-        sortable: true,
         notVisible: true,
         filter: {
           type: V2FilterType.DATE_RANGE
         },
         format: {
           type: V2ColumnFormat.DATETIME
-        }
+        },
+        sortable: true
       },
       {
         field: 'location',
         label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
-        sortable: true,
         notVisible: true,
         format: {
           type: 'mainAddress.location.name'
@@ -439,7 +455,6 @@ export class EventsListComponent
       {
         field: 'addresses.geoLocationAccurate',
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
-        sortable: true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN,
@@ -451,7 +466,8 @@ export class EventsListComponent
           field: 'addresses',
           fieldIsArray: true,
           options: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options
-        }
+        },
+        sortable: true
       },
 
       // actions
