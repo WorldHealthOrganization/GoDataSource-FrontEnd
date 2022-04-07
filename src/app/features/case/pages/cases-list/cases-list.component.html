@@ -24,29 +24,3 @@
   (resetHeaderFilters)="resetFiltersToSideFilters()"
   (advancedFilterBy)="applySideFilters($event)">
 </app-list-table-v2>
-
-<!--
-<app-side-filters
-    [filterOptions]="availableSideFilters"
-    (filtersApplied)="applySideFilters($event)"
-    [savedFiltersType]="savedFiltersType">
-</app-side-filters>
-
-<mat-card class="page-section page-content">
-
-    <div
-        fxLayout="row">
-        <div
-            fxFlex
-            class="reset-filters">
-            <button
-                type="button"
-                mat-raised-button
-                color="accent"
-                (click)="resetFiltersToSideFilters()">
-                {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
-            </button>
-        </div>
-    </div>
-</mat-card>
--->

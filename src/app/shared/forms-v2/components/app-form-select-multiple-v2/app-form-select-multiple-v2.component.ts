@@ -83,6 +83,9 @@ export class AppFormSelectMultipleV2Component
     return this.allOptions;
   }
 
+  // toggle all
+  toggleAllCheckboxChecked: boolean = false;
+
   // vscroll handler
   @ViewChild('cdkVirtualScrollViewport', {static: true}) cdkVirtualScrollViewport: CdkVirtualScrollViewport;
 
@@ -157,6 +160,46 @@ export class AppFormSelectMultipleV2Component
           this.cdkVirtualScrollViewport.scrollToIndex(index);
         }
       }
+    }
+  }
+
+  /**
+   * Toggle all checkbox
+   */
+  toggleAll(checked: boolean): void {
+    // map filtered items
+    const filteredOptionsMap: {
+      [value: string]: true
+    } = {};
+    this.filteredOptions.forEach((option) => {
+      filteredOptionsMap[option.value] = true;
+    });
+
+    // value not initialized ?
+    if (!this.value) {
+      this.value = [];
+    }
+
+    // set check stats
+    this.toggleAllCheckboxChecked = checked;
+
+    // go through visible search items and check or uncheck them
+    if (checked) {
+      // remove already checked options
+      this.value.forEach((value) => {
+        delete filteredOptionsMap[value];
+      });
+
+      // append unchecked items
+      Object.keys(filteredOptionsMap).forEach((value) => {
+        this.value.push(value);
+      });
+
+      // trigger change
+      this.onChange(this.value);
+    } else {
+      // change already triggered by setter
+      this.value = this.value.filter((value) => !filteredOptionsMap[value]);
     }
   }
 }

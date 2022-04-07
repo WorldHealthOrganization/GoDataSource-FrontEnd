@@ -26,6 +26,8 @@ import {
   IV2SideDialogConfigInputFilterList,
   IV2SideDialogConfigInputFilterListItem,
   IV2SideDialogConfigInputSingleDropdown,
+  IV2SideDialogConfigInputText,
+  IV2SideDialogHandler,
   V2SideDialogConfigInput,
   V2SideDialogConfigInputType
 } from '../app-side-dialog-v2/models/side-dialog-config.model';
@@ -55,7 +57,8 @@ import { AnswerModel, QuestionModel } from '../../../core/models/question.model'
 import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model';
 import { AddressModel } from '../../../core/models/address.model';
 import { IV2DateRange } from '../../forms-v2/components/app-form-date-range-v2/models/date.model';
-import { SavedFilterData, SavedFilterDataAppliedFilter } from '../../../core/models/saved-filters.model';
+import { SavedFilterData, SavedFilterDataAppliedFilter, SavedFilterModel } from '../../../core/models/saved-filters.model';
+import { IV2BottomDialogConfigButtonType } from '../app-bottom-dialog-v2/models/bottom-dialog-config.model';
 
 /**
  * Component
@@ -74,6 +77,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   private static readonly STANDARD_SHAPE_PADDING: number = 12;
   private static readonly STANDARD_HEADER_HEIGHT: number = 40;
   private static readonly STANDARD_HEADER_WITH_FILTER_HEIGHT: number = 88;
+  private static readonly STANDARD_ADVANCED_FILTER_DIALOG_WIDTH: string = '40rem';
 
   // records
   recordsSubscription: Subscription;
@@ -1538,7 +1542,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         },
         dontCloseOnBackdrop: true,
         hideInputFilter: true,
-        width: '40rem',
+        width: AppListTableV2Component.STANDARD_ADVANCED_FILTER_DIALOG_WIDTH,
         inputs: [
           {
             type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
@@ -1546,7 +1550,19 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
             name: 'savedFilterList',
             value: undefined,
             options: [],
-            clearable: true
+            clearable: true,
+            change: (_data, handler, item: IV2SideDialogConfigInputSingleDropdown) => {
+              // get data
+              const savedData = item.options.find((option) => option.value === item.value)?.data as SavedFilterModel;
+              if (savedData) {
+                // load saved filters
+                this.loadSavedFilters(
+                  handler,
+                  handler.data.map.filters as IV2SideDialogConfigInputFilterList,
+                  savedData.filterData
+                );
+              }
+            }
           }, {
             type: V2SideDialogConfigInputType.FILTER_LIST,
             name: 'filters',
@@ -1587,7 +1603,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           qb.fields(
             'id',
             'name',
-            'readOnly'
+            'readOnly',
+            'filterData',
+            'userId'
           );
 
           // retrieve items specific to our page
@@ -1604,8 +1622,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
               // set saved filters options
               (handler.data.map.savedFilterList as IV2SideDialogConfigInputSingleDropdown).options = savedFilters.map((item) => {
                 return {
-                  label: item.name,
-                  value: item.id
+                  label: `${item.name}${item.readOnly ? ' ' + this.i18nService.instant('LNG_SIDE_FILTERS_LOAD_FILTER_READONLY_LABEL') : ''}`,
+                  value: item.id,
+                  data: item
                 };
               });
 
@@ -1648,83 +1667,12 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
                     this._advancedFiltersApplied &&
                     this._advancedFiltersApplied.appliedFilters.length > 0
                   ) {
-                    // operator
-                    filtersList.operatorValue = this._advancedFiltersApplied.appliedFilterOperator as RequestFilterOperator;
-
-                    // add filters
-                    this._advancedFiltersApplied.appliedFilters.forEach((appliedFilter) => {
-                      // add filter
-                      const advancedFilter = handler.update.addAdvancedFilter(filtersList);
-
-                      // set filter by value
-                      advancedFilter.filterBy.value = appliedFilter.filter.uniqueKey;
-
-                      // trigger filter by change
-                      advancedFilter.filterBy.change(
-                        handler.data,
-                        handler,
-                        advancedFilter as any
-                      );
-
-                      // set comparator value
-                      advancedFilter.comparator.value = appliedFilter.comparator;
-
-                      // trigger comparator change
-                      advancedFilter.comparator.change(
-                        handler.data,
-                        handler,
-                        advancedFilter as any
-                      );
-
-                      // filter value
-                      advancedFilter.value = appliedFilter.value;
-
-                      // if questionnaire then we need further process
-                      // - or within address...
-                      if (
-                        filtersList.optionsAsLabelValueMap[advancedFilter.filterBy.value]?.data.type === V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS || (
-                          filtersList.optionsAsLabelValueMap[advancedFilter.filterBy.value]?.data.type === V2AdvancedFilterType.ADDRESS &&
-                          advancedFilter.comparator.value === V2AdvancedFilterComparatorType.WITHIN
-                        )
-                      ) {
-                        // add extra values
-                        if (filtersList.optionsAsLabelValueMap[advancedFilter.filterBy.value]?.data.type === V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS) {
-                          handler.update.resetQuestionnaireFilter(advancedFilter);
-                        }
-
-                        // update extra values...values :)
-                        const valuesToPutBack = {...appliedFilter.extraValues};
-                        Object.keys(advancedFilter.extraValues).forEach((prop) => {
-                          // nothing to do ?
-                          if (valuesToPutBack[prop] === undefined) {
-                            return;
-                          }
-
-                          // put back value
-                          if (prop === 'location') {
-                            advancedFilter.extraValues[prop] = valuesToPutBack[prop];
-                          } else {
-                            advancedFilter.extraValues[prop].value = valuesToPutBack[prop];
-                          }
-
-                          // finished
-                          // - remove so we know this one was handled
-                          delete valuesToPutBack[prop];
-                        });
-
-                        // attach remaining options
-                        Object.keys(valuesToPutBack).forEach((prop) => {
-                          // put back value
-                          if (prop === 'location') {
-                            advancedFilter.extraValues[prop] = valuesToPutBack[prop];
-                          } else {
-                            // SHOULDN'T have this case
-                            // advancedFilter.extraValues[prop].value = valuesToPutBack[prop];
-                          }
-                        });
-                      }
-
-                    });
+                    // load saved filters
+                    this.loadSavedFilters(
+                      handler,
+                      filtersList,
+                      this._advancedFiltersApplied
+                    );
                   }
 
                   // hide loading
@@ -1790,12 +1738,267 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         // emit the Request Query Builder
         this.advancedFilterBy.emit(this.advancedFiltersQueryBuilder);
 
-        // // send filters
-        // this.filtersCollected.emit(appliedFilters);
-
         // finished
         response.handler.hide();
+
+        // after apply - save ?
+        if (response.button.key === 'save') {
+          // create
+          const createFilter = () => {
+            this.dialogV2Service
+              .showSideDialog({
+                title: {
+                  get: () => 'LNG_DIALOG_SAVE_FILTERS_TITLE'
+                },
+                dontCloseOnBackdrop: true,
+                hideInputFilter: true,
+                width: AppListTableV2Component.STANDARD_ADVANCED_FILTER_DIALOG_WIDTH,
+                inputs: [
+                  {
+                    type: V2SideDialogConfigInputType.TEXT,
+                    name: 'filterName',
+                    placeholder: 'LNG_SAVED_FILTERS_FIELD_LABEL_NAME',
+                    validators: {
+                      required: () => true
+                    },
+                    value: ''
+                  }, {
+                    type: V2SideDialogConfigInputType.CHECKBOX,
+                    name: 'isPublic',
+                    placeholder: 'LNG_SAVED_FILTERS_FIELD_LABEL_PUBLIC',
+                    checked: false
+                  }
+                ],
+                bottomButtons: [
+                  {
+                    type: IV2SideDialogConfigButtonType.OTHER,
+                    label: 'LNG_SIDE_FILTERS_SAVE_FILTER_BUTTON',
+                    color: 'primary',
+                    key: 'save',
+                    disabled: (_data, handler): boolean => {
+                      return !handler.form || handler.form.invalid;
+                    }
+                  }, {
+                    type: IV2SideDialogConfigButtonType.CANCEL,
+                    label: 'LNG_COMMON_BUTTON_CANCEL',
+                    color: 'text'
+                  }
+                ]
+              })
+              .subscribe((createResponse) => {
+                // cancelled ?
+                if (createResponse.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+                  return;
+                }
+
+                // show loading
+                createResponse.handler.loading.show();
+
+                // save
+                this.savedFiltersService
+                  .createFilter(
+                    new SavedFilterModel({
+                      name: (createResponse.data.map.filterName as IV2SideDialogConfigInputText).value,
+                      isPublic: !!(createResponse.data.map.isPublic as IV2SideDialogConfigInputCheckbox).checked,
+                      filterKey: this.advancedFilterType,
+                      filterData: this._advancedFiltersApplied
+                    })
+                  )
+                  .pipe(
+                    catchError((err) => {
+                      this.toastV2Service.error(err);
+                      return throwError(err);
+                    })
+                  )
+                  .subscribe(() => {
+                    // display message
+                    this.toastV2Service.success('LNG_SIDE_FILTERS_SAVE_FILTER_SUCCESS_MESSAGE');
+
+                    // finished
+                    createResponse.handler.hide();
+                  });
+              });
+          };
+
+          // update or create ?
+          const savedFilterList: IV2SideDialogConfigInputSingleDropdown = response.data.map.savedFilterList as IV2SideDialogConfigInputSingleDropdown;
+          const authUser: UserModel = this.authDataService.getAuthenticatedUser();
+          if (
+            savedFilterList.value &&
+            SavedFilterModel.canModify(authUser)
+          ) {
+            // find option
+            const loadedData: SavedFilterModel = savedFilterList.options.find((item) => item.value === savedFilterList.value)?.data;
+            if (!loadedData.readOnly) {
+              // ask if we should update existing or create a new one
+              this.dialogV2Service
+                .showBottomDialog({
+                  config: {
+                    title: {
+                      get: () => 'LNG_DIALOG_SAVE_FILTERS_UPDATE_OR_CREATE_DIALOG_TITLE'
+                    },
+                    message: {
+                      get: () => 'LNG_DIALOG_SAVE_FILTERS_UPDATE_OR_CREATE_TITLE',
+                      data: () => ({
+                        filter: loadedData.name
+                      })
+                    }
+                  },
+                  dontCloseOnBackdrop: true,
+                  bottomButtons: [
+                    {
+                      type: IV2BottomDialogConfigButtonType.OTHER,
+                      label: 'LNG_COMMON_BUTTON_UPDATE',
+                      key: 'update',
+                      color: 'primary'
+                    }, {
+                      type: IV2BottomDialogConfigButtonType.OTHER,
+                      label: 'LNG_COMMON_BUTTON_CREATE',
+                      key: 'create',
+                      color: 'primary'
+                    }, {
+                      type: IV2BottomDialogConfigButtonType.CANCEL,
+                      label: 'LNG_DIALOG_CONFIRM_BUTTON_CANCEL',
+                      color: 'text'
+                    }
+                  ]
+                })
+                .subscribe((bottomResponse) => {
+                  // cancel ?
+                  if (bottomResponse.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                    // finished
+                    return;
+                  }
+
+                  // update / create
+                  if (bottomResponse.button.key === 'create') {
+                    // create filter
+                    createFilter();
+                  } else if (bottomResponse.button.key === 'update') {
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
+
+                    // update
+                    this.savedFiltersService
+                      .modifyFilter(
+                        savedFilterList.value, {
+                          filterData: this._advancedFiltersApplied
+                        }
+                      )
+                      .pipe(
+                        catchError((err) => {
+                          this.toastV2Service.error(err);
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // display message
+                        this.toastV2Service.success('LNG_SIDE_FILTERS_MODIFY_FILTER_SUCCESS_MESSAGE');
+
+                        // finished
+                        loading.close();
+                      });
+                  }
+                });
+            } else {
+              // create filter
+              createFilter();
+            }
+          } else {
+            // create filter
+            createFilter();
+          }
+        }
       });
+  }
+
+  /**
+   * Load saved filters
+   */
+  private loadSavedFilters(
+    handler: IV2SideDialogHandler,
+    filtersList: IV2SideDialogConfigInputFilterList,
+    advancedFiltersApplied: SavedFilterData
+  ): void {
+    // operator
+    filtersList.operatorValue = advancedFiltersApplied.appliedFilterOperator as RequestFilterOperator;
+
+    // reset filters list
+    filtersList.filters = [];
+
+    // add filters
+    advancedFiltersApplied.appliedFilters.forEach((appliedFilter) => {
+      // add filter
+      const advancedFilter = handler.update.addAdvancedFilter(filtersList);
+
+      // set filter by value
+      advancedFilter.filterBy.value = appliedFilter.filter.uniqueKey;
+
+      // trigger filter by change
+      advancedFilter.filterBy.change(
+        handler.data,
+        handler,
+        advancedFilter as any
+      );
+
+      // set comparator value
+      advancedFilter.comparator.value = appliedFilter.comparator;
+
+      // trigger comparator change
+      advancedFilter.comparator.change(
+        handler.data,
+        handler,
+        advancedFilter as any
+      );
+
+      // filter value
+      advancedFilter.value = appliedFilter.value;
+
+      // if questionnaire then we need further process
+      // - or within address...
+      if (
+        filtersList.optionsAsLabelValueMap[advancedFilter.filterBy.value]?.data.type === V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS || (
+          filtersList.optionsAsLabelValueMap[advancedFilter.filterBy.value]?.data.type === V2AdvancedFilterType.ADDRESS &&
+          advancedFilter.comparator.value === V2AdvancedFilterComparatorType.WITHIN
+        )
+      ) {
+        // add extra values
+        if (filtersList.optionsAsLabelValueMap[advancedFilter.filterBy.value]?.data.type === V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS) {
+          handler.update.resetQuestionnaireFilter(advancedFilter);
+        }
+
+        // update extra values...values :)
+        const valuesToPutBack = {...appliedFilter.extraValues};
+        Object.keys(advancedFilter.extraValues).forEach((prop) => {
+          // nothing to do ?
+          if (valuesToPutBack[prop] === undefined) {
+            return;
+          }
+
+          // put back value
+          if (prop === 'location') {
+            advancedFilter.extraValues[prop] = valuesToPutBack[prop];
+          } else {
+            advancedFilter.extraValues[prop].value = valuesToPutBack[prop];
+          }
+
+          // finished
+          // - remove so we know this one was handled
+          delete valuesToPutBack[prop];
+        });
+
+        // attach remaining options
+        Object.keys(valuesToPutBack).forEach((prop) => {
+          // put back value
+          if (prop === 'location') {
+            advancedFilter.extraValues[prop] = valuesToPutBack[prop];
+          } else {
+            // SHOULDN'T have this case
+            // advancedFilter.extraValues[prop].value = valuesToPutBack[prop];
+          }
+        });
+      }
+    });
   }
 
   /**
