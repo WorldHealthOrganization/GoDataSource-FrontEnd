@@ -522,7 +522,8 @@ export class AppSideDialogV2Component implements OnDestroy {
     // map inputs
     this.dialogHandler.data = {
       inputs: this.config.inputs,
-      map: {}
+      map: {},
+      echo: {}
     };
     this.config.inputs.forEach((input) => {
       // map input

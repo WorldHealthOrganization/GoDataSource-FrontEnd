@@ -370,6 +370,9 @@ export interface IV2SideDialogData {
   // required
   inputs: V2SideDialogConfigInput[];
   map: IV2SideDialogConfigInputMap;
+  echo: {
+    [prop: string]: any
+  };
 }
 
 /**
