@@ -12,7 +12,7 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { Constants } from '../../../../core/models/constants';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
+import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ExportFieldsGroupModelNameEnum } from '../../../../core/models/export-fields-group.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
@@ -39,7 +39,7 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, IV2SideDialogConfigInputText, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
@@ -403,6 +403,71 @@ export class ContactsListComponent
           type: V2FilterType.DATE_RANGE
         },
         sortable: true
+      },
+      {
+        field: 'statuses',
+        label: 'LNG_COMMON_LABEL_STATUSES',
+        format: {
+          type: V2ColumnFormat.STATUS
+        },
+        notResizable: true,
+        pinned: true,
+        legends: [
+          // risk
+          {
+            title: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+            items: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).list.map((item) => {
+              return {
+                form: {
+                  type: IV2ColumnStatusFormType.SQUARE,
+                  color: item.getColorCode()
+                },
+                label: item.id
+              };
+            })
+          },
+
+          // alerted
+          {
+            title: 'LNG_COMMON_LABEL_STATUSES_ALERTED',
+            items: [{
+              form: {
+                type: IV2ColumnStatusFormType.STAR,
+                color: 'var(--gd-danger)'
+              },
+              label: ' '
+            }]
+          }
+        ],
+        forms: (_column, data: ContactModel): V2ColumnStatusForm[] => {
+          // construct list of forms that we need to display
+          const forms: V2ColumnStatusForm[] = [];
+
+          // risk
+          const risk = this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>;
+          if (
+            data.riskLevel &&
+            risk.map[data.riskLevel]
+          ) {
+            forms.push({
+              type: IV2ColumnStatusFormType.SQUARE,
+              color: risk.map[data.riskLevel].getColorCode(),
+              tooltip: this.i18nService.instant(data.riskLevel)
+            });
+          }
+
+          // alerted
+          if (data.alerted) {
+            forms.push({
+              type: IV2ColumnStatusFormType.STAR,
+              color: 'var(--gd-danger)',
+              tooltip: this.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+            });
+          }
+
+          // finished
+          return forms;
+        }
       },
       {
         field: 'followUp.status',
@@ -1948,6 +2013,7 @@ export class ContactsListComponent
       'responsibleUserId',
       'numberOfContacts',
       'numberOfExposures',
+      'questionnaireAnswers',
       'deleted',
       'createdBy',
       'createdAt',
@@ -2341,6 +2407,14 @@ export class ContactsListComponent
         })
       )
       .pipe(
+        // process data
+        map((contact: ContactModel[]) => {
+          return EntityModel.determineAlertness<ContactModel>(
+            this.selectedOutbreak.contactInvestigationTemplate,
+            contact
+          );
+        }),
+
         // should be the last pipe
         takeUntil(this.destroyed$)
       );
