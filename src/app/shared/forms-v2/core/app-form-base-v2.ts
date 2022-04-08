@@ -56,7 +56,7 @@ export abstract class AppFormBaseV2<T> implements ControlValueAccessor {
 
     // finished
     return control;
-  };
+  }
 
   // display error message?
   errMatcher = new AppFormBaseErrorStateMatcherV2(this);

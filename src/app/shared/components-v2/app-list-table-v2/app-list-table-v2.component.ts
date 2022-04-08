@@ -88,7 +88,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // retrieve data
     this.retrieveData();
-  };
+  }
 
   // columns
   private _columns: IV2Column[];
@@ -98,7 +98,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // update columns definitions
     this.updateColumnDefinitions();
-  };
+  }
 
   /**
    * Ag table api handlers
@@ -248,7 +248,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // update columns definitions
     this.updateColumnDefinitions();
-  };
+  }
 
   // info values - used to display additional information relevant for this page
   private _infos: string[];
