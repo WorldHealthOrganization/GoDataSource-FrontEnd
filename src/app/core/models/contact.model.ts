@@ -100,6 +100,8 @@ export class ContactModel
   };
 
   inconsistencies: InconsistencyModel[];
+
+  alerted: boolean = false;
   relationship: any;
 
   matchedDuplicateRelationships: EntityMatchedRelationshipModel[];
