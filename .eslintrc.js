@@ -79,6 +79,7 @@ module.exports = {
             "accessibility": "explicit"
           }
         ],
+        "@typescript-eslint/func-call-spacing": ["error"],
         "@typescript-eslint/indent": [
           "error",
           2
@@ -127,6 +128,7 @@ module.exports = {
           "error",
           "smart"
         ],
+        "func-call-spacing": "off",
         "guard-for-in": "off",
         "id-denylist": "off",
         "id-match": "off",
