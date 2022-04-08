@@ -261,6 +261,18 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
                 label: item.id
               };
             })
+          },
+
+          // alerted
+          {
+            title: 'LNG_COMMON_LABEL_STATUSES_ALERTED',
+            items: [{
+              form: {
+                type: IV2ColumnStatusFormType.STAR,
+                color: 'var(--gd-danger)'
+              },
+              label: ' '
+            }]
           }
         ],
         forms: (_column, data: CaseModel): V2ColumnStatusForm[] => {
@@ -275,7 +287,8 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
           ) {
             forms.push({
               type: IV2ColumnStatusFormType.CIRCLE,
-              color: classification.map[data.classification].getColorCode()
+              color: classification.map[data.classification].getColorCode(),
+              tooltip: this.i18nService.instant(data.classification)
             });
           }
 
@@ -287,7 +300,17 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
           ) {
             forms.push({
               type: IV2ColumnStatusFormType.TRIANGLE,
-              color: outcome.map[data.outcomeId].getColorCode()
+              color: outcome.map[data.outcomeId].getColorCode(),
+              tooltip: this.i18nService.instant(data.outcomeId)
+            });
+          }
+
+          // alerted
+          if (data.alerted) {
+            forms.push({
+              type: IV2ColumnStatusFormType.STAR,
+              color: 'var(--gd-danger)',
+              tooltip: this.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
             });
           }
 
@@ -2232,6 +2255,7 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
       'responsibleUserId',
       'numberOfContacts',
       'numberOfExposures',
+      'questionnaireAnswers',
       'deleted',
       'createdBy',
       'createdAt',
@@ -2330,7 +2354,7 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
       .pipe(
         // process data
         map((cases: CaseModel[]) => {
-          return EntityModel.determineAlertness(
+          return EntityModel.determineAlertness<CaseModel>(
             this.selectedOutbreak.caseInvestigationTemplate,
             cases
           );

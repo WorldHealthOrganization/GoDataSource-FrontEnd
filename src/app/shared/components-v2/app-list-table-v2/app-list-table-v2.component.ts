@@ -74,7 +74,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   private static readonly STANDARD_SELECT_COLUMN_WIDTH: number = 42;
   private static readonly STANDARD_SHAPE_SIZE: number = 12;
   private static readonly STANDARD_SHAPE_GAP: number = 6;
-  private static readonly STANDARD_SHAPE_PADDING: number = 12;
+  private static readonly STANDARD_SHAPE_PADDING: number = 14;
   private static readonly STANDARD_HEADER_HEIGHT: number = 40;
   private static readonly STANDARD_HEADER_WITH_FILTER_HEIGHT: number = 88;
   private static readonly STANDARD_ADVANCED_FILTER_DIALOG_WIDTH: string = '40rem';
@@ -828,6 +828,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       case IV2ColumnStatusFormType.CIRCLE:
         statusHtml += `
           <svg width="${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" viewBox="0 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}" xmlns="http://www.w3.org/2000/svg">
+            ${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
             <circle fill="${form.color}" cx="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}" cy="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}" r="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}" />
           </svg>
         `;
@@ -838,6 +839,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       case IV2ColumnStatusFormType.SQUARE:
         statusHtml += `
           <svg width="${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" viewBox="0 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}" xmlns="http://www.w3.org/2000/svg">
+            ${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
             <rect fill="${form.color}" width="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" />
           </svg>
         `;
@@ -848,7 +850,19 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       case IV2ColumnStatusFormType.TRIANGLE:
         statusHtml += `
           <svg width="${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" viewBox="0 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}" xmlns="http://www.w3.org/2000/svg">
+            ${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
             <polygon fill="${form.color}" points="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2} 0, 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE}, ${AppListTableV2Component.STANDARD_SHAPE_SIZE} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}"/>
+          </svg>
+        `;
+
+        // finished
+        break;
+
+      case IV2ColumnStatusFormType.STAR:
+        statusHtml += `
+          <svg width="${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" viewBox="0 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}" xmlns="http://www.w3.org/2000/svg">
+            ${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
+            <polygon fill="${form.color}" points="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2},0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.2},${AppListTableV2Component.STANDARD_SHAPE_SIZE} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.95},${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.4} 0,${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.4} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.8},${AppListTableV2Component.STANDARD_SHAPE_SIZE}" />
           </svg>
         `;
 
@@ -1578,8 +1592,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           color: 'primary',
           key: 'apply',
           disabled: (_data, handler): boolean => {
-            const input = handler.data.map.filters as IV2SideDialogConfigInputFilterList;
-            return (input.filters.length < 1 && input.sorts.length < 1) || !handler.form || handler.form.invalid;
+            return !handler.form || handler.form.invalid;
           }
         }, {
           type: IV2SideDialogConfigButtonType.OTHER,
