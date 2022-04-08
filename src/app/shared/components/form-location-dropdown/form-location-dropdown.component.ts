@@ -5,7 +5,7 @@ import { LocationDataService } from '../../../core/services/data/location.data.s
 import { HierarchicalLocationModel } from '../../../core/models/hierarchical-location.model';
 import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
-import { Subject ,  Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { ErrorMessage } from '../../xt-forms/core/error-message';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';

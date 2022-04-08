@@ -480,7 +480,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         new HoverRowAction({
           menuOptionLabel: 'LNG_PAGE_MODIFY_CONTACT_TAB_QUESTIONNAIRE_TITLE',
           click: (item: ContactModel) => {
-            this.router.navigate(['/contacts', item.id , 'view-questionnaire']);
+            this.router.navigate(['/contacts', item.id, 'view-questionnaire']);
           },
           visible: (item: ContactModel): boolean => {
             return !item.deleted &&
