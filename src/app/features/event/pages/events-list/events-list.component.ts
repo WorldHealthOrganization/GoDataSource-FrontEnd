@@ -1,12 +1,12 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import * as _ from 'lodash';
+import * as moment from 'moment';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { AddressModel } from '../../../../core/models/address.model';
 import { ApplyListFilter, Constants } from '../../../../core/models/constants';
 import { ContactModel } from '../../../../core/models/contact.model';
@@ -18,7 +18,7 @@ import { ExportFieldsGroupModelNameEnum } from '../../../../core/models/export-f
 import { LocationModel } from '../../../../core/models/location.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { UserModel, UserSettings } from '../../../../core/models/user.model';
+import { UserModel } from '../../../../core/models/user.model';
 import { EventDataService } from '../../../../core/services/data/event.data.service';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -55,8 +55,6 @@ export class EventsListComponent
   // provide constants to template
   Constants = Constants;
 
-  UserSettings = UserSettings;
-
   // event anonymize fields
   private eventAnonymizeFields: ILabelValuePairModel[] = [
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_ID', value: 'id' },
@@ -79,6 +77,7 @@ export class EventsListComponent
     { label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUserId' }
   ];
 
+  // relationship anonymize fields
   relationshipAnonymizeFields: ILabelValuePairModel[] = [
     { label: 'LNG_RELATIONSHIP_FIELD_LABEL_ID', value: 'id' },
     { label: 'LNG_RELATIONSHIP_FIELD_LABEL_SOURCE', value: 'sourcePerson' },
@@ -175,7 +174,11 @@ export class EventsListComponent
       {
         field: 'description',
         label: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION',
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
       },
       {
         field: 'phoneNumber',
@@ -188,8 +191,8 @@ export class EventsListComponent
         filter: {
           type: V2FilterType.ADDRESS_PHONE_NUMBER,
           address: filterAddressModel,
-          field: 'addresses',
-          fieldIsArray: true
+          field: 'address',
+          fieldIsArray: false
         }
       },
       {
@@ -203,8 +206,8 @@ export class EventsListComponent
           type: V2FilterType.ADDRESS_FIELD,
           address: filterAddressModel,
           addressField: 'emailAddress',
-          field: 'addresses',
-          fieldIsArray: true
+          field: 'address',
+          fieldIsArray: false
         },
         sortable: true
       },
@@ -377,8 +380,8 @@ export class EventsListComponent
         filter: {
           type: V2FilterType.ADDRESS_MULTIPLE_LOCATION,
           address: filterAddressModel,
-          field: 'addresses',
-          fieldIsArray: true
+          field: 'address',
+          fieldIsArray: false
         },
         link: (data) => {
           return data.mainAddress?.location?.name
@@ -397,8 +400,8 @@ export class EventsListComponent
           type: V2FilterType.ADDRESS_FIELD,
           address: filterAddressModel,
           addressField: 'addressLine1',
-          field: 'addresses',
-          fieldIsArray: true
+          field: 'address',
+          fieldIsArray: false
         },
         sortable: true
       },
@@ -413,13 +416,13 @@ export class EventsListComponent
           type: V2FilterType.ADDRESS_FIELD,
           address: filterAddressModel,
           addressField: 'city',
-          field: 'addresses',
-          fieldIsArray: true
+          field: 'address',
+          fieldIsArray: false
         },
         sortable: true
       },
       {
-        field: 'addresses.geoLocation.lat',
+        field: 'address.geoLocation.lat',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
         sortable: true,
         notVisible: true,
@@ -428,7 +431,7 @@ export class EventsListComponent
         }
       },
       {
-        field: 'addresses.geoLocation.lng',
+        field: 'address.geoLocation.lng',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
         sortable: true,
         notVisible: true,
@@ -437,7 +440,7 @@ export class EventsListComponent
         }
       },
       {
-        field: 'addresses.postalCode',
+        field: 'address.postalCode',
         label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
         notVisible: true,
         format: {
@@ -447,13 +450,13 @@ export class EventsListComponent
           type: V2FilterType.ADDRESS_FIELD,
           address: filterAddressModel,
           addressField: 'postalCode',
-          field: 'addresses',
-          fieldIsArray: true
+          field: 'address',
+          fieldIsArray: false
         },
         sortable: true
       },
       {
-        field: 'addresses.geoLocationAccurate',
+        field: 'address.geoLocationAccurate',
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
         notVisible: true,
         format: {
@@ -463,8 +466,8 @@ export class EventsListComponent
         filter: {
           type: V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION,
           address: filterAddressModel,
-          field: 'addresses',
-          fieldIsArray: true,
+          field: 'address',
+          fieldIsArray: false,
           options: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options
         },
         sortable: true
@@ -526,16 +529,6 @@ export class EventsListComponent
                 cssClasses: 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: EventModel): void => {
-                    // data
-                    const message: {
-                      get: string;
-                      data?: {
-                        name: string;
-                      };
-                    } = {
-                      get: ''
-                    };
-
                     // determine what we need to delete
                     this.dialogV2Service
                       .showConfirmDialog({
@@ -547,32 +540,16 @@ export class EventsListComponent
                             })
                           },
                           message: {
-                            get: () => message.get,
-                            data: () => message.data
+                            get: () => 'LNG_DIALOG_CONFIRM_DELETE_EVENT',
+                            data: () => ({
+                              name: item.name
+                            })
                           }
-                        },
-                        initialized: (handler) => {
-                          // display loading
-                          handler.loading.show();
-
-                          // set message data
-                          message.data = {
-                            name: item.name
-                          };
-
-                          // determine message label
-                          message.get = 'LNG_DIALOG_CONFIRM_DELETE_EVENT';
-
-                          // hide loading
-                          handler.loading.hide();
                         }
                       })
                       .subscribe((response) => {
                         // canceled ?
-                        if (
-                          response.button.type ===
-                          IV2BottomDialogConfigButtonType.CANCEL
-                        ) {
+                        if ( response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
                           // finished
                           return;
                         }
@@ -838,7 +815,7 @@ export class EventsListComponent
         type: V2AdvancedFilterType.ADDRESS,
         field: 'address',
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
-        isArray: true
+        isArray: false
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
@@ -1321,12 +1298,7 @@ export class EventsListComponent
       'createdBy',
       'createdAt',
       'updatedBy',
-      'updatedAt',
-      'outbreakId',
-      'inconsistencies',
-      'relationship',
-      'matchedDuplicateRelationships',
-      'responsibleUser'
+      'updatedAt'
     ];
   }
 
