@@ -24,11 +24,18 @@ export const EnglishUsLang = {
     'LNG_COMMON_LABEL_NOTIFICATION_HISTORY': 'There are {{length}} error(s). Click here to see details',
     'LNG_COMMON_LABEL_HISTORY_TITLE': 'Errors',
     'LNG_COMMON_LABEL_STATUSES': 'Status',
+    'LNG_COMMON_LABEL_STATUSES_ALERTED': 'Alerted',
     'LNG_COMMON_LABEL_HEADER_FILTER_SHOW': 'Show header filters',
     'LNG_COMMON_LABEL_HEADER_FILTER_HIDE': 'Hide header filters',
     'LNG_MULTIPLE_SNACKBAR_BUTTON_CLOSE_ALL': 'Clear all',
-    'LNG_SIDE_FILTERS_LOAD_FILTER_READONLY_LABEL': ' [readonly]',
-    'LNG_DIALOG_SAVE_FILTERS_UPDATE_OR_CREATE_DIALOG_TITLE': 'Update / Create'
+    'LNG_SIDE_FILTERS_LOAD_FILTER_READONLY_LABEL': 'Readonly ({{name}})',
+    'LNG_SIDE_FILTERS_LOAD_FILTER_UPDATED_AT_LABEL': 'Updated on {{datetime}}',
+    'LNG_DIALOG_SAVE_FILTERS_UPDATE_OR_CREATE_DIALOG_TITLE': 'Update / Create',
+    'LNG_COMMON_BUTTON_DELETE_FILTERS': 'Remove filter',
+    'LNG_COMMON_BUTTON_DELETE_FILTERS_MSG': 'Are you sure you want to remove this filter?',
+    'LNG_COMMON_BUTTON_DELETE_SORTS': 'Remove sort',
+    'LNG_COMMON_BUTTON_DELETE_SORTS_MSG': 'Are you sure you want to remove this sort?',
+    'LNG_SIDE_FILTERS_SECTION_FILTER_TITLE': 'Filter'
 
 
 

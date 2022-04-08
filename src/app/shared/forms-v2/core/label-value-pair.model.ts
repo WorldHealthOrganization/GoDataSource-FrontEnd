@@ -1,3 +1,5 @@
+import { IInfoIcon } from './info-icon.model';
+
 export interface ILabelValuePairModel {
   // required
   label: string;
@@ -7,4 +9,5 @@ export interface ILabelValuePairModel {
   data?: any;
   disabled?: boolean;
   icon?: string;
+  infos?: IInfoIcon[];
 }

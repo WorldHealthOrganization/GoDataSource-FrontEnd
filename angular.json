@@ -58,7 +58,8 @@
               "clone-deep",
               "xml-utils/find-tags-by-name",
               "lru-cache",
-              "pbf"
+              "pbf",
+              "xml-utils"
             ],
             "vendorChunk": true,
             "extractLicenses": false,

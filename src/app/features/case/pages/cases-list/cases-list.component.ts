@@ -261,6 +261,18 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
                 label: item.id
               };
             })
+          },
+
+          // alerted
+          {
+            title: 'LNG_COMMON_LABEL_STATUSES_ALERTED',
+            items: [{
+              form: {
+                type: IV2ColumnStatusFormType.STAR,
+                color: 'var(--gd-danger)'
+              },
+              label: ' '
+            }]
           }
         ],
         forms: (_column, data: CaseModel): V2ColumnStatusForm[] => {
@@ -275,7 +287,8 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
           ) {
             forms.push({
               type: IV2ColumnStatusFormType.CIRCLE,
-              color: classification.map[data.classification].getColorCode()
+              color: classification.map[data.classification].getColorCode(),
+              tooltip: this.i18nService.instant(data.classification)
             });
           }
 
@@ -287,7 +300,17 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
           ) {
             forms.push({
               type: IV2ColumnStatusFormType.TRIANGLE,
-              color: outcome.map[data.outcomeId].getColorCode()
+              color: outcome.map[data.outcomeId].getColorCode(),
+              tooltip: this.i18nService.instant(data.outcomeId)
+            });
+          }
+
+          // alerted
+          if (data.alerted) {
+            forms.push({
+              type: IV2ColumnStatusFormType.STAR,
+              color: 'var(--gd-danger)',
+              tooltip: this.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
             });
           }
 
@@ -1287,24 +1310,24 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'firstName',
-        label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME'
-        // sortable: true
+        label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
+        sortable: true
       }, {
         type: V2AdvancedFilterType.TEXT,
         field: 'middleName',
-        label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME'
-        // sortable: true
+        label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
+        sortable: true
       }, {
         type: V2AdvancedFilterType.TEXT,
         field: 'lastName',
-        label: 'LNG_CASE_FIELD_LABEL_LAST_NAME'
-        // sortable: true
+        label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
+        sortable: true
       }, {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'gender',
         label: 'LNG_CASE_FIELD_LABEL_GENDER',
-        options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
-        // sortable: true
+        options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_AGE,
@@ -1326,8 +1349,8 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dob',
-        label: 'LNG_CASE_FIELD_LABEL_DOB'
-        // sortable: true
+        label: 'LNG_CASE_FIELD_LABEL_DOB',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
@@ -1344,14 +1367,14 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'riskReason',
-        label: 'LNG_CASE_FIELD_LABEL_RISK_REASON'
-        // sortable: true
+        label: 'LNG_CASE_FIELD_LABEL_RISK_REASON',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'visualId',
-        label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID'
-        // sortable: true
+        label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
@@ -1362,60 +1385,60 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfInfection',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION'
-        // sortable: true
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfOnset',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET'
-        // sortable: true
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfOutcome',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME'
-        // sortable: true
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateBecomeCase',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE'
-        // sortable: true
+        label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.SELECT,
         field: 'safeBurial',
         label: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
-        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
-        // sortable: true
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.SELECT,
         field: 'isDateOfOnsetApproximate',
         label: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
-        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
-        // sortable: true
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfReporting',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING'
-        // sortable: true
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.SELECT,
         field: 'isDateOfReportingApproximate',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
-        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
-        // sortable: true
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.SELECT,
         field: 'transferRefused',
         label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
-        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
-        // sortable: true
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
@@ -1427,20 +1450,20 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
         type: V2AdvancedFilterType.SELECT,
         field: 'wasContact',
         label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
-        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
-        // sortable: true
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_NUMBER,
         field: 'numberOfContacts',
-        label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS'
-        // sortable: true
+        label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_NUMBER,
         field: 'numberOfExposures',
-        label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES'
-        // sortable: true
+        label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
@@ -1483,8 +1506,8 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'pregnancyStatus',
         label: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
-        options: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
-        // sortable: true
+        options: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
@@ -2232,6 +2255,7 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
       'responsibleUserId',
       'numberOfContacts',
       'numberOfExposures',
+      'questionnaireAnswers',
       'deleted',
       'createdBy',
       'createdAt',

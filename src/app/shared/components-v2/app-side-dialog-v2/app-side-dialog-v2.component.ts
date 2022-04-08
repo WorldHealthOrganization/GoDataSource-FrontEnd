@@ -6,7 +6,7 @@ import {
   IV2SideDialogConfigButtonType,
   IV2SideDialogConfigInputAccordionPanel,
   IV2SideDialogConfigInputFilterList,
-  IV2SideDialogConfigInputFilterListItem,
+  IV2SideDialogConfigInputFilterListFilter, IV2SideDialogConfigInputFilterListSort,
   IV2SideDialogData,
   IV2SideDialogHandler,
   IV2SideDialogResponse,
@@ -23,7 +23,9 @@ import { V2AdvancedFilter, V2AdvancedFilterComparatorOptions, V2AdvancedFilterCo
 import { Constants } from '../../../core/models/constants';
 import { v4 as uuid } from 'uuid';
 import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model';
-import { RequestFilterOperator } from '../../../core/helperClasses/request-query-builder';
+import { RequestFilterOperator, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
+import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
+import { IV2BottomDialogConfigButtonType } from '../app-bottom-dialog-v2/models/bottom-dialog-config.model';
 
 /**
  * Component
@@ -103,13 +105,18 @@ export class AppSideDialogV2Component implements OnDestroy {
         return this.addAdvancedFilter(input);
       },
       resetQuestionnaireFilter: (
-        filter: IV2SideDialogConfigInputFilterListItem,
+        filter: IV2SideDialogConfigInputFilterListFilter,
         ...specificProperties: string[]
       ) => {
         this.resetQuestionnaireFilter(
           filter,
           ...specificProperties
         );
+      },
+
+      // used to add sorts
+      addAdvancedSort:  (input: IV2SideDialogConfigInputFilterList) => {
+        return this.addAdvancedSort(input);
       }
     },
 
@@ -241,6 +248,17 @@ export class AppSideDialogV2Component implements OnDestroy {
     }
   } | undefined;
 
+  // sort order options
+  sortOrderOptions: ILabelValuePairModel[] = [
+    {
+      label: 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER',
+      value: RequestSortDirection.ASC
+    }, {
+      label: 'LNG_SIDE_FILTERS_SORT_BY_DESC_PLACEHOLDER',
+      value: RequestSortDirection.DESC
+    }
+  ];
+
   // operator options
   operatorOptions: ILabelValuePairModel[] = [
     {
@@ -280,6 +298,7 @@ export class AppSideDialogV2Component implements OnDestroy {
   constructor(
     protected changeDetectorRef: ChangeDetectorRef,
     protected i18nService: I18nService,
+    protected dialogV2Service: DialogV2Service,
     location: Location
   ) {
     this.locationSubscription = location.subscribe(() => {
@@ -550,6 +569,7 @@ export class AppSideDialogV2Component implements OnDestroy {
       if (input.type === V2SideDialogConfigInputType.FILTER_LIST) {
         // process options
         input.optionsAsLabelValue = [];
+        input.sortableOptionsAsLabelValue = [];
         input.optionsAsLabelValueMap = {};
         input.options.forEach((filterOption) => {
           // option id
@@ -570,6 +590,11 @@ export class AppSideDialogV2Component implements OnDestroy {
           // attach option
           input.optionsAsLabelValue.push(option);
 
+          // sortable ?
+          if (filterOption.sortable) {
+            input.sortableOptionsAsLabelValue.push(option);
+          }
+
           // map option
           input.optionsAsLabelValueMap[id] = option;
         });
@@ -580,10 +605,10 @@ export class AppSideDialogV2Component implements OnDestroy {
   /**
    * Add filter
    */
-  addAdvancedFilter(input: IV2SideDialogConfigInputFilterList): IV2SideDialogConfigInputFilterListItem {
+  addAdvancedFilter(input: IV2SideDialogConfigInputFilterList): IV2SideDialogConfigInputFilterListFilter {
     // create filter
-    const advancedFilter: IV2SideDialogConfigInputFilterListItem = {
-      type: V2SideDialogConfigInputType.FILTER_LIST_ITEM,
+    const advancedFilter: IV2SideDialogConfigInputFilterListFilter = {
+      type: V2SideDialogConfigInputType.FILTER_LIST_FILTER,
 
       // selected value
       value: undefined,
@@ -598,7 +623,7 @@ export class AppSideDialogV2Component implements OnDestroy {
         options: input.optionsAsLabelValue,
         change: (data, _handler, filter) => {
           // get filter
-          const filterItem = filter as unknown as IV2SideDialogConfigInputFilterListItem;
+          const filterItem = filter as unknown as IV2SideDialogConfigInputFilterListFilter;
           const filterOption: V2AdvancedFilter = filterItem.filterBy.value ?
             (data.map.filters as IV2SideDialogConfigInputFilterList).optionsAsLabelValueMap[filterItem.filterBy.value].data as V2AdvancedFilter :
             undefined;
@@ -631,7 +656,7 @@ export class AppSideDialogV2Component implements OnDestroy {
         options: [],
         change: (data, _handler, filter) => {
           // reset comparator selected value
-          const filterItem = filter as unknown as IV2SideDialogConfigInputFilterListItem;
+          const filterItem = filter as unknown as IV2SideDialogConfigInputFilterListFilter;
           filterItem.value = undefined;
 
           // reset extra value
@@ -680,23 +705,45 @@ export class AppSideDialogV2Component implements OnDestroy {
    */
   removeAdvancedFilter(
     input: IV2SideDialogConfigInputFilterList,
-    filter: IV2SideDialogConfigInputFilterListItem
+    filter: IV2SideDialogConfigInputFilterListFilter
   ): void {
-    // find index
-    const filterIndex: number = input.filters.findIndex((item) => item === filter);
-    if (filterIndex < 0) {
-      return;
-    }
+    // ask for confirmation
+    this.dialogV2Service
+      .showConfirmDialog({
+        config: {
+          title: {
+            get: () => 'LNG_COMMON_BUTTON_DELETE_FILTERS'
+          },
+          message: {
+            get: () => 'LNG_COMMON_BUTTON_DELETE_FILTERS_MSG'
+          }
+        }
+      })
+      .subscribe((response) => {
+        // cancel ?
+        if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+          return;
+        }
 
-    // remove
-    input.filters.splice(filterIndex, 1);
+        // find index
+        const filterIndex: number = input.filters.findIndex((item) => item === filter);
+        if (filterIndex < 0) {
+          return;
+        }
+
+        // remove
+        input.filters.splice(filterIndex, 1);
+
+        // update side dialog
+        this.changeDetectorRef.detectChanges();
+      });
   }
 
   /**
    * Reset extra values for questionnaire
    */
   resetQuestionnaireFilter(
-    filter: IV2SideDialogConfigInputFilterListItem,
+    filter: IV2SideDialogConfigInputFilterListFilter,
     ...specificProperties: string[]
   ): void {
     // reset everything ?
@@ -731,4 +778,78 @@ export class AppSideDialogV2Component implements OnDestroy {
       });
     }
   }
+
+  /**
+   * Add sort
+   */
+  addAdvancedSort(input: IV2SideDialogConfigInputFilterList): IV2SideDialogConfigInputFilterListSort {
+    // create sort
+    const advancedSort: IV2SideDialogConfigInputFilterListSort = {
+      type: V2SideDialogConfigInputType.FILTER_LIST_SORT,
+
+      // sort by
+      sortBy: {
+        type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+        value: undefined,
+        name: `${input.name}.sorts[${input.sorts.length}]`,
+        placeholder: 'LNG_SIDE_FILTERS_SORT_BY_PLACEHOLDER',
+        options: input.sortableOptionsAsLabelValue
+      },
+
+      // order - asc / desc
+      order: {
+        type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+        value: undefined,
+        name: `${input.name}.order[${input.sorts.length}]`,
+        placeholder: 'LNG_SIDE_FILTERS_SORT_DIRECTION_LABEL',
+        options: this.sortOrderOptions
+      }
+    };
+
+    // add sort
+    input.sorts.push(advancedSort);
+
+    // finished
+    return advancedSort;
+  }
+
+  /**
+   * Remove advanced sort
+   */
+  removeAdvancedSort(
+    input: IV2SideDialogConfigInputFilterList,
+    sort: IV2SideDialogConfigInputFilterListSort
+  ): void {
+    // ask for confirmation
+    this.dialogV2Service
+      .showConfirmDialog({
+        config: {
+          title: {
+            get: () => 'LNG_COMMON_BUTTON_DELETE_SORTS'
+          },
+          message: {
+            get: () => 'LNG_COMMON_BUTTON_DELETE_SORTS_MSG'
+          }
+        }
+      })
+      .subscribe((response) => {
+        // cancel ?
+        if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+          return;
+        }
+
+        // find index
+        const sortIndex: number = input.sorts.findIndex((item) => item === sort);
+        if (sortIndex < 0) {
+          return;
+        }
+
+        // remove
+        input.sorts.splice(sortIndex, 1);
+
+        // update side dialog
+        this.changeDetectorRef.detectChanges();
+      });
+  }
+
 }
