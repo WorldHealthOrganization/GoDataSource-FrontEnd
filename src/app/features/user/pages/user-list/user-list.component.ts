@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { UserModel, UserRoleModel, PhoneNumberType, UserSettings } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
@@ -11,7 +11,6 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import * as _ from 'lodash';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { catchError, share, tap } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';

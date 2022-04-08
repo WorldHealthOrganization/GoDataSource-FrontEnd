@@ -8,7 +8,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import * as _ from 'lodash';
 import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
@@ -16,7 +16,6 @@ import { DialogAnswer } from '../../../../shared/components/dialog/dialog.compon
 import { DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { FormLocationDropdownComponent } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 

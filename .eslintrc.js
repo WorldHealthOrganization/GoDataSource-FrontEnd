@@ -100,6 +100,7 @@ module.exports = {
         "@typescript-eslint/naming-convention": "off",
         "@typescript-eslint/no-empty-function": "off",
         "@typescript-eslint/no-empty-interface": "error",
+        "@typescript-eslint/no-duplicate-imports": ["error"],
         "@typescript-eslint/no-inferrable-types": "off",
         "@typescript-eslint/no-misused-new": "error",
         "@typescript-eslint/no-non-null-assertion": "error",
@@ -168,6 +169,7 @@ module.exports = {
           }
         ],
         "no-debugger": "error",
+        "no-duplicate-imports": "off",
         "no-empty": "off",
         "no-empty-function": "off",
         "no-eval": "error",

@@ -5,7 +5,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { DashboardDashlet, DashboardKpiGroup } from '../../../../core/enums/dashboard.enum';
 import * as _ from 'lodash';
 import { DashletSettingsModel, UserSettingsDashboardModel } from '../../../../core/models/user-settings-dashboard.model';
-import { Observable,  Subscription } from 'rxjs';
+import { Observable,  Subscription, throwError } from 'rxjs';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -20,7 +20,6 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { Constants } from '../../../../core/models/constants';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { catchError, map, share } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';

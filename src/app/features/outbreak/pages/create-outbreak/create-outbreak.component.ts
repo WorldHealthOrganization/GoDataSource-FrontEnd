@@ -5,7 +5,7 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as _ from 'lodash';
@@ -15,7 +15,6 @@ import { OutbreakTemplateDataService } from '../../../../core/services/data/outb
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { catchError, map, switchMap } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { UserModel } from '../../../../core/models/user.model';

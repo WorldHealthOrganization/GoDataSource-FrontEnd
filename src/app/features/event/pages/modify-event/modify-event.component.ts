@@ -16,12 +16,11 @@ import {
   catchError,
   share
 } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
-import { Observable } from 'rxjs/index';
+import { Observable, throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({

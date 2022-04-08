@@ -5,7 +5,7 @@ import {
   DialogComponent,
   DialogConfiguration, DialogField, DialogFieldType
 } from '../../../shared/components/dialog/dialog.component';
-import { Observable, Subscriber } from 'rxjs';
+import { Observable, Subscriber, throwError } from 'rxjs';
 import * as _ from 'lodash';
 import { LabelValuePair } from '../../models/label-value-pair';
 import { ImportExportDataService } from '../data/import-export.data.service';
@@ -13,7 +13,6 @@ import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import * as FileSaver from 'file-saver';
 import { LoadingDialogComponent, LoadingDialogDataModel, LoadingDialogModel } from '../../../shared/components/loading-dialog/loading-dialog.component';
 import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { IExportFieldsGroupRequired } from '../../../core/models/export-fields-group.model';
 import { ExportLogDataService } from '../data/export-log.data.service';
 import { Constants, ExportStatusStep } from '../../models/constants';
