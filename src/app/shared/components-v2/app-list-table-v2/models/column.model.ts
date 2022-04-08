@@ -158,7 +158,8 @@ export interface IV2ColumnAction {
 export enum IV2ColumnStatusFormType {
   CIRCLE,
   SQUARE,
-  TRIANGLE
+  TRIANGLE,
+  STAR
 }
 
 /**
@@ -166,7 +167,7 @@ export enum IV2ColumnStatusFormType {
  */
 interface IV2ColumnStatusFormShape {
   // required
-  type: IV2ColumnStatusFormType.CIRCLE | IV2ColumnStatusFormType.SQUARE | IV2ColumnStatusFormType.TRIANGLE;
+  type: IV2ColumnStatusFormType.CIRCLE | IV2ColumnStatusFormType.SQUARE | IV2ColumnStatusFormType.TRIANGLE | IV2ColumnStatusFormType.STAR;
   color: string;
 }
 

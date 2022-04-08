@@ -261,6 +261,18 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
                 label: item.id
               };
             })
+          },
+
+          // alerted
+          {
+            title: 'LNG_COMMON_LABEL_STATUSES_ALERTED',
+            items: [{
+              form: {
+                type: IV2ColumnStatusFormType.STAR,
+                color: 'red'
+              },
+              label: ' '
+            }]
           }
         ],
         forms: (_column, data: CaseModel): V2ColumnStatusForm[] => {
@@ -288,6 +300,14 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
             forms.push({
               type: IV2ColumnStatusFormType.TRIANGLE,
               color: outcome.map[data.outcomeId].getColorCode()
+            });
+          }
+
+          // alerted
+          if (data.alerted) {
+            forms.push({
+              type: IV2ColumnStatusFormType.STAR,
+              color: 'red'
             });
           }
 
@@ -2232,6 +2252,7 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
       'responsibleUserId',
       'numberOfContacts',
       'numberOfExposures',
+      'questionnaireAnswers',
       'deleted',
       'createdBy',
       'createdAt',
