@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import { Observable, throwError, of } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ModelHelperService } from '../helper/model-helper.service';
@@ -18,7 +18,6 @@ import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validat
 import { MetricCasesCountStratifiedOutcome } from '../../models/metrics/metric-cases-count-stratified-outcome.model';
 import { MetricCasesBasedOnContactStatusModel } from '../../models/metrics/metric-cases-based-on-contact-status.model';
 import { catchError, map } from 'rxjs/operators';
-import { throwError, of } from 'rxjs';
 import { moment } from '../../helperClasses/x-moment';
 import { IBasicCount } from '../../models/basic-count.interface';
 import { ICasesHospitalizedCount } from '../../models/cases-hospitalized-count.interface';
