@@ -269,7 +269,7 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
             items: [{
               form: {
                 type: IV2ColumnStatusFormType.STAR,
-                color: 'red'
+                color: 'var(--gd-danger)'
               },
               label: ' '
             }]
@@ -307,7 +307,7 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
           if (data.alerted) {
             forms.push({
               type: IV2ColumnStatusFormType.STAR,
-              color: 'red'
+              color: 'var(--gd-danger)'
             });
           }
 
