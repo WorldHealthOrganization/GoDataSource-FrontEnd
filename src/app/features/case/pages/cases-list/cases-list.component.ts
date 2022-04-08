@@ -15,7 +15,6 @@ import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
@@ -42,6 +41,7 @@ import { IV2FilterBoolean, IV2FilterMultipleSelect, V2FilterTextType, V2FilterTy
 import { IExtendedColDef } from '../../../../shared/components-v2/app-list-table-v2/models/extended-column.model';
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-cases-list',
