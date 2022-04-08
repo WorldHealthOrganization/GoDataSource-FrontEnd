@@ -2354,7 +2354,7 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
       .pipe(
         // process data
         map((cases: CaseModel[]) => {
-          return EntityModel.determineAlertness(
+          return EntityModel.determineAlertness<CaseModel>(
             this.selectedOutbreak.caseInvestigationTemplate,
             cases
           );
