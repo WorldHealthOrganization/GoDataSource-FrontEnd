@@ -70,6 +70,7 @@ module.exports = {
         "@angular-eslint/use-lifecycle-interface": "error",
         "@angular-eslint/use-pipe-transform-interface": "error",
         "@typescript-eslint/comma-dangle": "error",
+        "@typescript-eslint/comma-spacing": ["error"],
         "@typescript-eslint/consistent-type-definitions": "error",
         "@typescript-eslint/dot-notation": "off",
         "@typescript-eslint/explicit-member-accessibility": [
@@ -117,6 +118,7 @@ module.exports = {
         "arrow-body-style": "off",
         "brace-style": "off",
         "comma-dangle": "off",
+        "comma-spacing": "off",
         "constructor-super": "error",
         "curly": "error",
         "dot-notation": "off",

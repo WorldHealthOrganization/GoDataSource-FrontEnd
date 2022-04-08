@@ -1138,7 +1138,7 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
                 label: 'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE',
                 action: {
                   link: (item: CaseModel): string[] => {
-                    return ['/cases', item.id , 'view-questionnaire'];
+                    return ['/cases', item.id, 'view-questionnaire'];
                   }
                 },
                 visible: (item: CaseModel): boolean => {
