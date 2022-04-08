@@ -169,6 +169,9 @@ interface IV2ColumnStatusFormShape {
   // required
   type: IV2ColumnStatusFormType.CIRCLE | IV2ColumnStatusFormType.SQUARE | IV2ColumnStatusFormType.TRIANGLE | IV2ColumnStatusFormType.STAR;
   color: string;
+
+  // optional
+  tooltip?: string;
 }
 
 /**

@@ -397,12 +397,12 @@ export class EntityModel {
   }
 
   /**
-     * Determine alertness
-     */
-  static determineAlertness(
+   * Determine alertness
+   */
+  static determineAlertness<T extends CaseModel | ContactModel>(
     template: QuestionModel[],
-    entities: CaseModel[]
-  ): CaseModel[] {
+    entities: T[]
+  ): T[] {
     // map alert question answers to object for easy find
     const alertQuestionAnswers: {
       [question_variable: string]: {
@@ -411,10 +411,10 @@ export class EntityModel {
     } = QuestionModel.determineAlertAnswers(template);
 
     // map alert value to cases
-    return _.map(entities, (caseData: CaseModel) => {
+    return _.map(entities, (itemData: T) => {
       // check if we need to mark case as alerted because of questionnaire answers
-      caseData.alerted = false;
-      _.each(caseData.questionnaireAnswers, (
+      itemData.alerted = false;
+      _.each(itemData.questionnaireAnswers, (
         answers: IAnswerData[],
         questionVariable: string
       ) => {
@@ -426,7 +426,7 @@ export class EntityModel {
         // there is no point in checking the value if there isn't one
         if (
           _.isEmpty(answerKey) &&
-                    !_.isNumber(answerKey)
+          !_.isNumber(answerKey)
         ) {
           return;
         }
@@ -437,7 +437,7 @@ export class EntityModel {
           _.each(answerKey, (childAnswerKey: string) => {
             if (_.get(alertQuestionAnswers, `[${questionVariable}][${childAnswerKey}]`)) {
               // alerted
-              caseData.alerted = true;
+              itemData.alerted = true;
 
               // stop each
               return false;
@@ -445,14 +445,14 @@ export class EntityModel {
           });
 
           // stop ?
-          if (caseData.alerted) {
+          if (itemData.alerted) {
             // stop each
             return false;
           }
         } else {
           if (_.get(alertQuestionAnswers, `[${questionVariable}][${answerKey}]`)) {
             // alerted
-            caseData.alerted = true;
+            itemData.alerted = true;
 
             // stop each
             return false;
@@ -461,7 +461,7 @@ export class EntityModel {
       });
 
       // finished
-      return caseData;
+      return itemData;
     });
   }
 
