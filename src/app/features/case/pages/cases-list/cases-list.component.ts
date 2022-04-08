@@ -287,7 +287,8 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
           ) {
             forms.push({
               type: IV2ColumnStatusFormType.CIRCLE,
-              color: classification.map[data.classification].getColorCode()
+              color: classification.map[data.classification].getColorCode(),
+              tooltip: this.i18nService.instant(data.classification)
             });
           }
 
@@ -299,7 +300,8 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
           ) {
             forms.push({
               type: IV2ColumnStatusFormType.TRIANGLE,
-              color: outcome.map[data.outcomeId].getColorCode()
+              color: outcome.map[data.outcomeId].getColorCode(),
+              tooltip: this.i18nService.instant(data.outcomeId)
             });
           }
 
@@ -307,7 +309,8 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
           if (data.alerted) {
             forms.push({
               type: IV2ColumnStatusFormType.STAR,
-              color: 'var(--gd-danger)'
+              color: 'var(--gd-danger)',
+              tooltip: this.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
             });
           }
 
