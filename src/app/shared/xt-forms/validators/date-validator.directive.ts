@@ -190,7 +190,7 @@ export class DateValidatorDirective implements Validator {
           element &&
                     element.invalid !== (invalid ? true : false)
         ) {
-          (function (localElement: ElementBase<any>) {
+          (function(localElement: ElementBase<any>) {
             setTimeout(() => {
               // trigger validation
               localElement.control.updateValueAndValidity();

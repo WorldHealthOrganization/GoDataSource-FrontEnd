@@ -156,7 +156,7 @@ export abstract class AppFormLocationBaseV2<T>
         createdAt: moment(),
         executeObserver$: executeObserver$,
         data: null,
-        observer$: new Observable<HierarchicalLocationModel[]>((function (
+        observer$: new Observable<HierarchicalLocationModel[]>((function(
           localCache,
           localMethodKey: string,
           localCacheKey: string

@@ -165,7 +165,7 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
       legend: {
         item: {
           // disable click on legend
-          onclick: function () {
+          onclick: function() {
             return false;
           }
         }

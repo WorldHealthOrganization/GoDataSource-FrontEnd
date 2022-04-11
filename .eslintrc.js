@@ -116,6 +116,7 @@ module.exports = {
           "error",
           "always"
         ],
+        "@typescript-eslint/space-before-function-paren": ["error", "never"],
         "@typescript-eslint/space-infix-ops": ["error"],
         "@typescript-eslint/type-annotation-spacing": "error",
         "@typescript-eslint/unified-signatures": "error",
@@ -197,6 +198,7 @@ module.exports = {
         ],
         "radix": "error",
         "semi": "error",
+        "space-before-function-paren": "off",
         "space-infix-ops": "off",
         "spaced-comment": [
           "error",

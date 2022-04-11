@@ -41,7 +41,7 @@ export class TimerCache {
         createdAt: moment(),
         executeObserver$: executeObserver$,
         data: null,
-        observer$: new Observable<any>((function (
+        observer$: new Observable<any>((function(
           localCache,
           localCacheKey: string
         ) {
