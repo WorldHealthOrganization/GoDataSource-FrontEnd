@@ -344,7 +344,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
       },
       {
         field: 'addresses.geoLocationAccurate',
-        label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
+        label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN,
@@ -355,7 +355,8 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
           address: filterAddressModel,
           field: 'addresses',
           fieldIsArray: true,
-          options: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options
+          options: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          defaultValue: ''
         },
         sortable: true
       },
@@ -462,7 +463,8 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         },
         filter: {
           type: V2FilterType.DELETED,
-          value: false
+          value: false,
+          defaultValue: false
         },
         sortable: true
       },
