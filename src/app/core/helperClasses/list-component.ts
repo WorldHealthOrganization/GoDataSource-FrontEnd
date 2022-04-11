@@ -543,7 +543,34 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
       }
 
       // reset value
-      column.filter.value =  column.filter.defaultValue;
+      switch (column.filter.type) {
+        case V2FilterType.ADDRESS_PHONE_NUMBER:
+          column.filter.address.phoneNumber = column.filter.defaultValue;
+
+          // finished
+          break;
+
+        case V2FilterType.ADDRESS_MULTIPLE_LOCATION:
+          column.filter.address.filterLocationIds = column.filter.defaultValue;
+
+          // finished
+          break;
+
+        case V2FilterType.ADDRESS_FIELD:
+          column.filter.address[column.filter.addressField] = column.filter.defaultValue;
+
+          // finished
+          break;
+
+        case V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION:
+          column.filter.address.geoLocationAccurate = column.filter.defaultValue as any;
+
+          // finished
+          break;
+
+        default:
+          column.filter.value =  column.filter.defaultValue;
+      }
 
       // custom filter ?
       if (column.filter.search) {

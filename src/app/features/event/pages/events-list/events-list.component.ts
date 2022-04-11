@@ -4,7 +4,6 @@ import * as _ from 'lodash';
 import * as moment from 'moment';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
-
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 import { AddressModel } from '../../../../core/models/address.model';
@@ -303,7 +302,8 @@ export class EventsListComponent
         },
         filter: {
           type: V2FilterType.DELETED,
-          value: false
+          value: false,
+          defaultValue: false
         },
         sortable: true
       },
@@ -456,7 +456,7 @@ export class EventsListComponent
       },
       {
         field: 'address.geoLocationAccurate',
-        label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
+        label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN,
@@ -467,7 +467,8 @@ export class EventsListComponent
           address: filterAddressModel,
           field: 'address',
           fieldIsArray: false,
-          options: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options
+          options: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          defaultValue: ''
         },
         sortable: true
       },

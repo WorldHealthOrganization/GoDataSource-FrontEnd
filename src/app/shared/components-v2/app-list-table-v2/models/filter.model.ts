@@ -103,47 +103,59 @@ interface IV2FilterAge extends Omit<IV2FilterBasic, 'min' | 'max' | 'value' | 'd
 /**
  * Address phone number
  */
-interface IV2FilterAddressPhoneNumber extends Omit<IV2FilterBasic, 'address'> {
+interface IV2FilterAddressPhoneNumber extends Omit<IV2FilterBasic, 'address' | 'defaultValue'> {
   // required
   type: V2FilterType.ADDRESS_PHONE_NUMBER;
   address: AddressModel;
   field: string;
   fieldIsArray: boolean;
+
+  // optional
+  defaultValue?: string;
 }
 
 /**
  * Address location
  */
-interface IV2FilterAddressMultipleLocation extends Omit<IV2FilterBasic, 'address'> {
+interface IV2FilterAddressMultipleLocation extends Omit<IV2FilterBasic, 'address' | 'defaultValue'> {
   // required
   type: V2FilterType.ADDRESS_MULTIPLE_LOCATION;
   address: AddressModel;
   field: string;
   fieldIsArray: boolean;
+
+  // optional
+  defaultValue?: string[];
 }
 
 /**
  * Simple address field
  */
-interface IV2FilterAddressField extends Omit<IV2FilterBasic, 'address' | 'addressField'> {
+interface IV2FilterAddressField extends Omit<IV2FilterBasic, 'address' | 'addressField' | 'defaultValue'> {
   // required
   type: V2FilterType.ADDRESS_FIELD;
   address: AddressModel;
   addressField: string;
   field: string;
   fieldIsArray: boolean;
+
+  // optional
+  defaultValue?: any;
 }
 
 /**
  * Simple address field
  */
-interface IV2FilterAddressAccurateGeoLocation extends Omit<IV2FilterBasic, 'address' | 'options'> {
+interface IV2FilterAddressAccurateGeoLocation extends Omit<IV2FilterBasic, 'address' | 'options' | 'defaultValue'> {
   // required
   type: V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION;
   address: AddressModel;
   field: string;
   fieldIsArray: boolean;
   options: ILabelValuePairModel[];
+
+  // optional
+  defaultValue?: boolean | '';
 }
 
 /**
