@@ -1,16 +1,29 @@
-import { RouterModule, Routes } from '@angular/router';
-import * as fromPages from './pages';
 import { ModuleWithProviders } from '@angular/core';
-import { AuthGuard } from '../../core/services/guards/auth-guard.service';
-import { PERMISSION } from '../../core/models/permission.model';
-import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
+import { RouterModule, Routes } from '@angular/router';
+
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
+import { PERMISSION } from '../../core/models/permission.model';
+import { AuthGuard } from '../../core/services/guards/auth-guard.service';
+import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
+import { GenderDataResolver } from '../../core/services/resolvers/data/gender.resolver';
+import { OccupationDataResolver } from '../../core/services/resolvers/data/occupation.resolver';
+import { RiskDataResolver } from '../../core/services/resolvers/data/risk.resolver';
+import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
+import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
+import * as fromPages from './pages';
 
 const routes: Routes = [
   // Contacts of contacts list
   {
     path: '',
-    component: fromPages.ContactsOfContactsListComponent
+    component: fromPages.ContactsOfContactsListComponent,
+    resolve: {
+      risk: RiskDataResolver,
+      user: UserDataResolver,
+      gender: GenderDataResolver,
+      yesNoAll: YesNoAllDataResolver,
+      occupation: OccupationDataResolver,
+    }
   },
   // Create contact of contact
   {
