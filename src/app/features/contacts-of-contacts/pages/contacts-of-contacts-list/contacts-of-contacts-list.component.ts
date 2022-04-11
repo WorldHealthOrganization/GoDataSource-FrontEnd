@@ -36,7 +36,6 @@ import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-
 import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
-import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { FilterModel } from '../../../../shared/components/side-filters/model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
@@ -1331,19 +1330,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                   },
                   dbColumns: true,
                   dbValues: true,
-                  jsonReplaceUndefinedWithNull: true,
-                  questionnaireVariables: true
-                },
-                inputs: {
-                  append: [
-                    {
-                      type: V2SideDialogConfigInputType.CHECKBOX,
-                      placeholder: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_CONTACT_INFORMATION',
-                      tooltip: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_CONTACT_INFORMATION_DESCRIPTION',
-                      name: 'includeContactFields',
-                      checked: false
-                    }
-                  ]
+                  jsonReplaceUndefinedWithNull: true
                 }
               }
             });
