@@ -29,7 +29,7 @@ import { ContactOfContactModel } from '../../../../core/models/contact-of-contac
   templateUrl: './available-entities-for-switch-list.component.html'
 })
 export class AvailableEntitiesForSwitchListComponent extends RelationshipsListComponent implements OnInit, OnDestroy {
-  entitiesList$: Observable<(CaseModel|ContactModel|EventModel|ContactOfContactModel)[]>;
+  entitiesList$: Observable<(CaseModel | ContactModel | EventModel | ContactOfContactModel)[]>;
   entitiesListCount$: Observable<IBasicCount>;
   entityType: EntityType;
 

@@ -30,7 +30,7 @@ import { ContactOfContactModel } from '../../../../core/models/contact-of-contac
 })
 export class AvailableEntitiesListComponent extends RelationshipsListComponent implements OnInit, OnDestroy {
   // entities list relationships
-  entitiesList$: Observable<(CaseModel|ContactModel|EventModel|ContactOfContactModel)[]>;
+  entitiesList$: Observable<(CaseModel | ContactModel | EventModel | ContactOfContactModel)[]>;
   entitiesListCount$: Observable<IBasicCount>;
 
   // available side filters

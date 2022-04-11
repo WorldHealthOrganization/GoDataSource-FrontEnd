@@ -322,7 +322,7 @@ export class CreateContactComponent
                   return throwError(err);
                 })
               )
-              .subscribe((relatedEntityData: CaseModel|EventModel) => {
+              .subscribe((relatedEntityData: CaseModel | EventModel) => {
                 // initialize Case/Event
                 this.relatedEntityData = relatedEntityData;
 

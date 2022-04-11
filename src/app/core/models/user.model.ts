@@ -15,7 +15,7 @@ export enum UserSettings {
   CONTACT_OF_CONTACT_FIELDS = 'contactOfContactFields',
   EVENT_FIELDS = 'eventFields',
   EVENT_WITHOUT_RELATIONSHIPS_FIELDS = 'eventWithoutRelationshipsFields',
-  LOCATION_FIELDS= 'locationFields',
+  LOCATION_FIELDS = 'locationFields',
   LAB_RESULTS_FIELDS = 'labResults',
   RELATIONSHIP_FIELDS = 'relationshipFields',
   OUTBREAK_FIELDS = 'outbreakFields',

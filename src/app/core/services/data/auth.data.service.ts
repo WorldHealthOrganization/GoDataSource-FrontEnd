@@ -174,7 +174,7 @@ export class AuthDataService {
      * Get Authentication Data from local storage (if user is authenticated)
      * @returns {AuthModel | null}
      */
-  getAuthData(): AuthModel|null {
+  getAuthData(): AuthModel | null {
     try {
       // get auth data from cache
       return <AuthModel>this.storageService.get(StorageKey.AUTH_DATA);
@@ -187,7 +187,7 @@ export class AuthDataService {
      * Get the API Authentication Token from local storage (if user is authenticated)
      * @returns {string | null}
      */
-  getAuthToken(): string|null {
+  getAuthToken(): string | null {
     const authData = this.getAuthData();
     return _.get(authData, 'token');
   }
