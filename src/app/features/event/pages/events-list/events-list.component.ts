@@ -248,6 +248,7 @@ export class EventsListComponent
             type: V2FilterType.NUMBER_RANGE,
             min: 0
           },
+          sortable: true,
           cssCellClass: 'gd-cell-button',
           buttonLabel: (item) =>
             (item.numberOfContacts || '').toLocaleString('en'),
