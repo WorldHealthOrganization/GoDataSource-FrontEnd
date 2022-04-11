@@ -29,38 +29,19 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import {
-  ExportButtonKey,
-  ExportDataExtension,
-  ExportDataMethod,
-  IV2ExportDataConfigGroupsRequired,
-} from '../../../../core/services/helper/models/dialog-v2.model';
+import { ExportButtonKey, ExportDataExtension, ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import {
-  IV2BottomDialogConfigButtonType,
-} from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { IV2BreadcrumbAction } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
-import {
-  IV2ColumnPinned,
-  IV2ColumnStatusFormType,
-  V2ColumnFormat,
-  V2ColumnStatusForm,
-} from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IExtendedColDef } from '../../../../shared/components-v2/app-list-table-v2/models/extended-column.model';
-import {
-  IV2FilterBoolean,
-  IV2FilterMultipleSelect,
-  V2FilterTextType,
-  V2FilterType,
-} from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { IV2FilterBoolean, IV2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
-import {
-  V2SideDialogConfigInputType,
-} from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
@@ -281,6 +262,18 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
                 label: item.id
               };
             })
+          },
+
+          // alerted
+          {
+            title: 'LNG_COMMON_LABEL_STATUSES_ALERTED',
+            items: [{
+              form: {
+                type: IV2ColumnStatusFormType.STAR,
+                color: 'var(--gd-danger)'
+              },
+              label: ' '
+            }]
           }
         ],
         forms: (_column, data: CaseModel): V2ColumnStatusForm[] => {
@@ -295,7 +288,8 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
           ) {
             forms.push({
               type: IV2ColumnStatusFormType.CIRCLE,
-              color: classification.map[data.classification].getColorCode()
+              color: classification.map[data.classification].getColorCode(),
+              tooltip: this.i18nService.instant(data.classification)
             });
           }
 
@@ -307,7 +301,17 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
           ) {
             forms.push({
               type: IV2ColumnStatusFormType.TRIANGLE,
-              color: outcome.map[data.outcomeId].getColorCode()
+              color: outcome.map[data.outcomeId].getColorCode(),
+              tooltip: this.i18nService.instant(data.outcomeId)
+            });
+          }
+
+          // alerted
+          if (data.alerted) {
+            forms.push({
+              type: IV2ColumnStatusFormType.STAR,
+              color: 'var(--gd-danger)',
+              tooltip: this.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
             });
           }
 
@@ -1135,7 +1139,7 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
                 label: 'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE',
                 action: {
                   link: (item: CaseModel): string[] => {
-                    return ['/cases', item.id , 'view-questionnaire'];
+                    return ['/cases', item.id, 'view-questionnaire'];
                   }
                 },
                 visible: (item: CaseModel): boolean => {
@@ -1307,24 +1311,24 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'firstName',
-        label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME'
-        // sortable: true
+        label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
+        sortable: true
       }, {
         type: V2AdvancedFilterType.TEXT,
         field: 'middleName',
-        label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME'
-        // sortable: true
+        label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
+        sortable: true
       }, {
         type: V2AdvancedFilterType.TEXT,
         field: 'lastName',
-        label: 'LNG_CASE_FIELD_LABEL_LAST_NAME'
-        // sortable: true
+        label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
+        sortable: true
       }, {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'gender',
         label: 'LNG_CASE_FIELD_LABEL_GENDER',
-        options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
-        // sortable: true
+        options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_AGE,
@@ -1346,8 +1350,8 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dob',
-        label: 'LNG_CASE_FIELD_LABEL_DOB'
-        // sortable: true
+        label: 'LNG_CASE_FIELD_LABEL_DOB',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
@@ -1364,14 +1368,14 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'riskReason',
-        label: 'LNG_CASE_FIELD_LABEL_RISK_REASON'
-        // sortable: true
+        label: 'LNG_CASE_FIELD_LABEL_RISK_REASON',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'visualId',
-        label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID'
-        // sortable: true
+        label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
@@ -1382,60 +1386,60 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfInfection',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION'
-        // sortable: true
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfOnset',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET'
-        // sortable: true
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfOutcome',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME'
-        // sortable: true
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateBecomeCase',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE'
-        // sortable: true
+        label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.SELECT,
         field: 'safeBurial',
         label: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
-        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
-        // sortable: true
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.SELECT,
         field: 'isDateOfOnsetApproximate',
         label: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
-        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
-        // sortable: true
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfReporting',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING'
-        // sortable: true
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.SELECT,
         field: 'isDateOfReportingApproximate',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
-        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
-        // sortable: true
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.SELECT,
         field: 'transferRefused',
         label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
-        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
-        // sortable: true
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
@@ -1447,20 +1451,20 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
         type: V2AdvancedFilterType.SELECT,
         field: 'wasContact',
         label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
-        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
-        // sortable: true
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_NUMBER,
         field: 'numberOfContacts',
-        label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS'
-        // sortable: true
+        label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_NUMBER,
         field: 'numberOfExposures',
-        label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES'
-        // sortable: true
+        label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
@@ -1503,8 +1507,8 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'pregnancyStatus',
         label: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
-        options: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
-        // sortable: true
+        options: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
@@ -2252,6 +2256,7 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
       'responsibleUserId',
       'numberOfContacts',
       'numberOfExposures',
+      'questionnaireAnswers',
       'deleted',
       'createdBy',
       'createdAt',
@@ -2350,7 +2355,7 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
       .pipe(
         // process data
         map((cases: CaseModel[]) => {
-          return EntityModel.determineAlertness(
+          return EntityModel.determineAlertness<CaseModel>(
             this.selectedOutbreak.caseInvestigationTemplate,
             cases
           );

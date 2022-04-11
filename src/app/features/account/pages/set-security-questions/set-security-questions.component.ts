@@ -6,10 +6,9 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SecurityQuestionModel } from '../../../../core/models/securityQuestion.model';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { catchError, share } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({

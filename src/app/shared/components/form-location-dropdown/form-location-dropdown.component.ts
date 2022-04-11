@@ -5,13 +5,12 @@ import { LocationDataService } from '../../../core/services/data/location.data.s
 import { HierarchicalLocationModel } from '../../../core/models/hierarchical-location.model';
 import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
-import { Subject ,  Subscription } from 'rxjs';
+import { Subject, Subscription, throwError } from 'rxjs';
 import { ErrorMessage } from '../../xt-forms/core/error-message';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
 import { NgOption, NgSelectComponent } from '@ng-select/ng-select';
 import { catchError, debounceTime, share } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { Moment } from 'moment';
 import * as moment from 'moment';
 import { Observable } from 'rxjs/internal/Observable';

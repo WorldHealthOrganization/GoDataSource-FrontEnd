@@ -241,6 +241,7 @@ interface IV2AdvancedFilterBase {
   flagIt?: boolean;
   extraConditions?: RequestQueryBuilder;
   childQueryBuilderKey?: string;
+  sortable?: boolean;
 
   // never
   optionsLoad?: never;

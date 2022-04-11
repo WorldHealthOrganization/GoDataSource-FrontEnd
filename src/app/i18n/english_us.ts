@@ -24,9 +24,18 @@ export const EnglishUsLang = {
     'LNG_COMMON_LABEL_NOTIFICATION_HISTORY': 'There are {{length}} error(s). Click here to see details',
     'LNG_COMMON_LABEL_HISTORY_TITLE': 'Errors',
     'LNG_COMMON_LABEL_STATUSES': 'Status',
+    'LNG_COMMON_LABEL_STATUSES_ALERTED': 'Alerted',
     'LNG_COMMON_LABEL_HEADER_FILTER_SHOW': 'Show header filters',
     'LNG_COMMON_LABEL_HEADER_FILTER_HIDE': 'Hide header filters',
-    'LNG_MULTIPLE_SNACKBAR_BUTTON_CLOSE_ALL': 'Clear all'
+    'LNG_MULTIPLE_SNACKBAR_BUTTON_CLOSE_ALL': 'Clear all',
+    'LNG_SIDE_FILTERS_LOAD_FILTER_READONLY_LABEL': 'Readonly ({{name}})',
+    'LNG_SIDE_FILTERS_LOAD_FILTER_UPDATED_AT_LABEL': 'Updated on {{datetime}}',
+    'LNG_DIALOG_SAVE_FILTERS_UPDATE_OR_CREATE_DIALOG_TITLE': 'Update / Create',
+    'LNG_COMMON_BUTTON_DELETE_FILTERS': 'Remove filter',
+    'LNG_COMMON_BUTTON_DELETE_FILTERS_MSG': 'Are you sure you want to remove this filter?',
+    'LNG_COMMON_BUTTON_DELETE_SORTS': 'Remove sort',
+    'LNG_COMMON_BUTTON_DELETE_SORTS_MSG': 'Are you sure you want to remove this sort?',
+    'LNG_SIDE_FILTERS_SECTION_FILTER_TITLE': 'Filter'
 
 
 
@@ -40,5 +49,6 @@ export const EnglishUsLang = {
     // LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_TOOLTIP
     // LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER_DATE_FROM
     // LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER_DATE_TO
+    // LNG_SAVED_FILTERS_FIELD_LABEL_NAME_DESCRIPTION
   }
 };

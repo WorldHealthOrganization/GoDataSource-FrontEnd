@@ -1,0 +1,78 @@
+/* Tabs */
+.mat-tab-group {
+  font-family: $gd-font-family;
+
+  .mat-tab-header {
+    border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.5);
+
+    .mat-tab-label-container {
+      .mat-tab-list {
+        .mat-tab-labels {
+          .mat-tab-label {
+            color: var(--gd-secondary);
+            font-family: $gd-font-family;
+            font-size: $gd-font-size;
+            height: auto;
+            line-height: $gd-line-height;
+            min-width: 0;
+            @include opacity(1);
+            padding: 0.8rem 1.6rem;
+
+            &.mat-tab-label-active {
+              color: var(--gd-primary);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .mat-tab-body-wrapper {
+    .mat-tab-body {
+      &.mat-tab-body-active {
+        overflow: hidden;
+      }
+
+      .mat-tab-body-content {
+        height: auto;
+        overflow: hidden;
+      }
+    }
+  }
+
+  &.mat-primary {
+    .mat-tab-header {
+      .mat-tab-label-container {
+        .mat-tab-list {
+          .mat-ink-bar {
+            background-color: var(--gd-primary);
+          }
+        }
+      }
+    }
+  }
+
+  &.mat-accent {
+    .mat-tab-header {
+      .mat-tab-label-container {
+        .mat-tab-list {
+          .mat-ink-bar {
+            background-color: var(--gd-success);
+          }
+        }
+      }
+    }
+  }
+
+  &.mat-warn {
+    .mat-tab-header {
+      .mat-tab-label-container {
+        .mat-tab-list {
+          .mat-ink-bar {
+            background-color: var(--gd-danger);
+          }
+        }
+      }
+    }
+  }
+}

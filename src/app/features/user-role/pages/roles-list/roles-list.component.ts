@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { UserModel, UserRoleModel, UserSettings } from '../../../../core/models/user.model';
 import { PermissionModel } from '../../../../core/models/permission.model';
@@ -8,7 +8,6 @@ import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../..
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { catchError, share } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { UserDataService } from '../../../../core/services/data/user.data.service';

@@ -3,7 +3,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { ActivatedRoute } from '@angular/router';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import * as _ from 'lodash';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
@@ -16,7 +16,6 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { catchError, map } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 

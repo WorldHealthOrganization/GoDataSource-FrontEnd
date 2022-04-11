@@ -22,6 +22,7 @@ import { V2FilterType } from '../../shared/components-v2/app-list-table-v2/model
 import { V2AdvancedFilter } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { Directive, ViewChild } from '@angular/core';
 import { AppListTableV2Component } from '../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
+import { SavedFilterData } from '../models/saved-filters.model';
 
 /**
  * List component
@@ -617,6 +618,14 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
       this.queryBuilder.merge(queryBuilder);
     }
 
+    // if no side query builder then clear side filters too
+    if (
+      !queryBuilder &&
+      this.tableV2Component
+    ) {
+      this.tableV2Component.generateFiltersFromFilterData(undefined);
+    }
+
     // apply list filters which is mandatory
     this.mergeListFilterToMainFilter();
 
@@ -865,9 +874,9 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
       queryBuilder: this.queryBuilder.serialize(),
       inputs: this.getInputsValuesForCache(),
       sort: this.getTableSortForCache(),
-      sideFilters: null // this.sideFilter ?
-      //   this.sideFilter.toSaveData() :
-      //   null
+      sideFilters: this.tableV2Component ?
+        this.tableV2Component.advancedFiltersToSaveData() :
+        null
     };
 
     // update the new filter
@@ -881,32 +890,6 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
     // save to url if possible
     this.saveCacheToUrl(currentUserCache[this.getCachedFilterPageKey()]);
   }
-
-  // /**
-  //  * Visible columns
-  //  */
-  // applySideColumnsChanged(visibleColumns: string[]) {
-  //   // apply side columns
-  //   this.visibleTableColumns = visibleColumns;
-  //
-  //   // disabled saved filters for current user ?
-  //   const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
-  //   if (
-  //     authUser.dontCacheFilters ||
-  //     this._disableFilterCaching
-  //   ) {
-  //     return;
-  //   }
-  //
-  //   // reload data into columns from cached filters
-  //   // load saved filters
-  //   const currentUserCache: ICachedFilter = this.getCachedFilters(true);
-  //   const currentUserCacheForCurrentPath: ICachedFilterItems = currentUserCache[this.getCachedFilterPageKey()];
-  //   if (currentUserCacheForCurrentPath) {
-  //     // load saved input values
-  //     this.loadCachedInputValues(currentUserCacheForCurrentPath);
-  //   }
-  // }
 
   /**
    * Load cached input values
@@ -996,22 +979,19 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
   }
 
   /**
-     * Load side filters
-     */
-  private loadSideFilters(_currentUserCacheForCurrentPath: ICachedFilterItems): void {
-    // // wait for inputs to be rendered
-    // setTimeout(() => {
-    //   // no side filters ?
-    //   if (
-    //     !currentUserCacheForCurrentPath.sideFilters ||
-    //     !this.sideFilter
-    //   ) {
-    //     return;
-    //   }
-    //
-    //   // load side filters
-    //   this.sideFilter.generateFiltersFromFilterData(new SavedFilterData(currentUserCacheForCurrentPath.sideFilters));
-    // });
+   * Load side filters
+   */
+  private loadSideFilters(currentUserCacheForCurrentPath: ICachedFilterItems): void {
+    // no side filters ?
+    if (
+      !currentUserCacheForCurrentPath.sideFilters ||
+      !this.tableV2Component
+    ) {
+      return;
+    }
+
+    // load side filters
+    this.tableV2Component.generateFiltersFromFilterData(new SavedFilterData(currentUserCacheForCurrentPath.sideFilters));
   }
 
   /**
@@ -1022,8 +1002,8 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
   }
 
   /**
-     * Check if we need to load cached filters if necessary depending if we already loaded for this route or not
-     */
+   * Check if we need to load cached filters if necessary depending if we already loaded for this route or not
+   */
   private loadCachedFiltersIfNecessary(): void {
     // if we loaded cached filters for this page then we don't need to load it again
     if (this._loadedCachedFilterPage === this.getCachedFilterPageKey()) {
@@ -1035,8 +1015,8 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
   }
 
   /**
-     * Load cached filters
-     */
+   * Load cached filters
+   */
   private loadCachedFilters(): void {
     // disabled saved filters for current user ?
     const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
@@ -1098,14 +1078,14 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
   }
 
   /**
-     * Update page index
-     */
+   * Update page index
+   */
   private updatePageIndex(): void {
     // set paginator page
     if (this.queryBuilder.paginator) {
       if (
         this.queryBuilder.paginator.skip &&
-                this.queryBuilder.paginator.limit
+        this.queryBuilder.paginator.limit
       ) {
         this.pageIndex = this.queryBuilder.paginator.skip / this.queryBuilder.paginator.limit;
       } else {

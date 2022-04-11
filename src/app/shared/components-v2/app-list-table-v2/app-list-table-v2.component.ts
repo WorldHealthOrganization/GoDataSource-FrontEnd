@@ -24,8 +24,10 @@ import {
   IV2SideDialogConfigButtonType,
   IV2SideDialogConfigInputCheckbox,
   IV2SideDialogConfigInputFilterList,
-  IV2SideDialogConfigInputFilterListItem,
+  IV2SideDialogConfigInputFilterListFilter, IV2SideDialogConfigInputFilterListSort,
   IV2SideDialogConfigInputSingleDropdown,
+  IV2SideDialogConfigInputText,
+  IV2SideDialogHandler,
   V2SideDialogConfigInput,
   V2SideDialogConfigInputType
 } from '../app-side-dialog-v2/models/side-dialog-config.model';
@@ -55,6 +57,8 @@ import { AnswerModel, QuestionModel } from '../../../core/models/question.model'
 import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model';
 import { AddressModel } from '../../../core/models/address.model';
 import { IV2DateRange } from '../../forms-v2/components/app-form-date-range-v2/models/date.model';
+import { SavedFilterData, SavedFilterDataAppliedFilter, SavedFilterDataAppliedSort, SavedFilterModel } from '../../../core/models/saved-filters.model';
+import { IV2BottomDialogConfigButtonType } from '../app-bottom-dialog-v2/models/bottom-dialog-config.model';
 
 /**
  * Component
@@ -70,9 +74,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   private static readonly STANDARD_SELECT_COLUMN_WIDTH: number = 42;
   private static readonly STANDARD_SHAPE_SIZE: number = 12;
   private static readonly STANDARD_SHAPE_GAP: number = 6;
-  private static readonly STANDARD_SHAPE_PADDING: number = 12;
+  private static readonly STANDARD_SHAPE_PADDING: number = 14;
   private static readonly STANDARD_HEADER_HEIGHT: number = 40;
   private static readonly STANDARD_HEADER_WITH_FILTER_HEIGHT: number = 88;
+  private static readonly STANDARD_ADVANCED_FILTER_DIALOG_WIDTH: string = '40rem';
 
   // records
   recordsSubscription: Subscription;
@@ -83,7 +88,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // retrieve data
     this.retrieveData();
-  };
+  }
 
   // columns
   private _columns: IV2Column[];
@@ -93,7 +98,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // update columns definitions
     this.updateColumnDefinitions();
-  };
+  }
 
   /**
    * Ag table api handlers
@@ -141,6 +146,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   @Input() advancedFilters: V2AdvancedFilter[];
 
   // advanced filters query builder
+  private _advancedFiltersApplied: SavedFilterData;
   private _advancedFiltersQueryBuilder: RequestQueryBuilder;
   get advancedFiltersQueryBuilder(): RequestQueryBuilder {
     return this._advancedFiltersQueryBuilder ?
@@ -242,7 +248,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // update columns definitions
     this.updateColumnDefinitions();
-  };
+  }
 
   // info values - used to display additional information relevant for this page
   private _infos: string[];
@@ -822,6 +828,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       case IV2ColumnStatusFormType.CIRCLE:
         statusHtml += `
           <svg width="${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" viewBox="0 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}" xmlns="http://www.w3.org/2000/svg">
+            ${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
             <circle fill="${form.color}" cx="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}" cy="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}" r="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}" />
           </svg>
         `;
@@ -832,6 +839,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       case IV2ColumnStatusFormType.SQUARE:
         statusHtml += `
           <svg width="${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" viewBox="0 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}" xmlns="http://www.w3.org/2000/svg">
+            ${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
             <rect fill="${form.color}" width="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" />
           </svg>
         `;
@@ -842,7 +850,19 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       case IV2ColumnStatusFormType.TRIANGLE:
         statusHtml += `
           <svg width="${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" viewBox="0 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}" xmlns="http://www.w3.org/2000/svg">
+            ${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
             <polygon fill="${form.color}" points="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2} 0, 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE}, ${AppListTableV2Component.STANDARD_SHAPE_SIZE} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}"/>
+          </svg>
+        `;
+
+        // finished
+        break;
+
+      case IV2ColumnStatusFormType.STAR:
+        statusHtml += `
+          <svg width="${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" viewBox="0 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}" xmlns="http://www.w3.org/2000/svg">
+            ${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
+            <polygon fill="${form.color}" points="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2},0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.2},${AppListTableV2Component.STANDARD_SHAPE_SIZE} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.95},${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.4} 0,${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.4} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.8},${AppListTableV2Component.STANDARD_SHAPE_SIZE}" />
           </svg>
         `;
 
@@ -1536,7 +1556,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         },
         dontCloseOnBackdrop: true,
         hideInputFilter: true,
-        width: '40rem',
+        width: AppListTableV2Component.STANDARD_ADVANCED_FILTER_DIALOG_WIDTH,
         inputs: [
           {
             type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
@@ -1544,12 +1564,25 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
             name: 'savedFilterList',
             value: undefined,
             options: [],
-            clearable: true
+            clearable: true,
+            change: (_data, handler, item: IV2SideDialogConfigInputSingleDropdown) => {
+              // get data
+              const savedData = item.options.find((option) => option.value === item.value)?.data as SavedFilterModel;
+              if (savedData) {
+                // load saved filters
+                this.loadSavedFilters(
+                  handler,
+                  handler.data.map.filters as IV2SideDialogConfigInputFilterList,
+                  savedData.filterData
+                );
+              }
+            }
           }, {
             type: V2SideDialogConfigInputType.FILTER_LIST,
             name: 'filters',
             options: [],
             filters: [],
+            sorts: [],
             operatorValue: RequestFilterOperator.AND
           }
         ],
@@ -1559,7 +1592,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           color: 'primary',
           key: 'apply',
           disabled: (_data, handler): boolean => {
-            return (handler.data.map.filters as IV2SideDialogConfigInputFilterList).filters.length < 1 || !handler.form || handler.form.invalid;
+            return !handler.form || handler.form.invalid;
           }
         }, {
           type: IV2SideDialogConfigButtonType.OTHER,
@@ -1567,7 +1600,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           color: 'secondary',
           key: 'save',
           disabled: (_data, handler): boolean => {
-            return (handler.data.map.filters as IV2SideDialogConfigInputFilterList).filters.length < 1 || !handler.form || handler.form.invalid;
+            const input = handler.data.map.filters as IV2SideDialogConfigInputFilterList;
+            return (input.filters.length < 1 && input.sorts.length < 1) || !handler.form || handler.form.invalid;
           }
         }, {
           type: IV2SideDialogConfigButtonType.CANCEL,
@@ -1585,8 +1619,15 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           qb.fields(
             'id',
             'name',
-            'readOnly'
+            'readOnly',
+            'filterData',
+            'userId',
+            'createdBy',
+            'updatedAt'
           );
+
+          // retrieve created user & modified user information
+          qb.include('createdByUser', true);
 
           // retrieve items specific to our page
           qb.filter.where({
@@ -1599,16 +1640,53 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           this.savedFiltersService
             .getSavedFiltersList(qb)
             .subscribe((savedFilters) => {
-              // set saved filters options
-              (handler.data.map.savedFilterList as IV2SideDialogConfigInputSingleDropdown).options = savedFilters.map((item) => {
-                return {
+              // configure saved filters dropdown
+              const savedFilterList = handler.data.map.savedFilterList as IV2SideDialogConfigInputSingleDropdown;
+
+              // set saved filters options and other things
+              savedFilterList.options = [];
+              savedFilters.forEach((item) => {
+                // option
+                const option: ILabelValuePairModel = {
                   label: item.name,
-                  value: item.id
+                  value: item.id,
+                  data: item
                 };
+                savedFilterList.options.push(option);
+
+                // infos
+                option.infos = [];
+
+                // set info icons - readonly
+                if (item.readOnly) {
+                  option.infos.push({
+                    label: this.i18nService.instant(
+                      'LNG_SIDE_FILTERS_LOAD_FILTER_READONLY_LABEL', {
+                        name: item.createdByUser?.name ?
+                          item.createdByUser?.name :
+                          ''
+                      }
+                    ),
+                    icon: 'edit_off'
+                  });
+                }
+
+                // updated at
+                if (item.updatedAt) {
+                  option.infos.push({
+                    label: this.i18nService.instant(
+                      'LNG_SIDE_FILTERS_LOAD_FILTER_UPDATED_AT_LABEL', {
+                        datetime: moment(item.updatedAt).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT)
+                      }
+                    ),
+                    icon: 'history'
+                  });
+                }
               });
 
               // do we need to retrieve other data ?
-              (handler.data.map.filters as IV2SideDialogConfigInputFilterList).options = [];
+              const filtersList = (handler.data.map.filters as IV2SideDialogConfigInputFilterList);
+              filtersList.options = [];
               const dataToRetrieve: {
                 filter: V2AdvancedFilter
               }[] = [];
@@ -1639,6 +1717,21 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
                 if (dataToRetrieve.length < 1) {
                   // reload inputs data
                   handler.update.refresh();
+
+                  // put back advanced filters
+                  if (
+                    this._advancedFiltersApplied && (
+                      this._advancedFiltersApplied.appliedFilters.length > 0 ||
+                      this._advancedFiltersApplied.appliedSort.length > 0
+                    )
+                  ) {
+                    // load saved filters
+                    this.loadSavedFilters(
+                      handler,
+                      filtersList,
+                      this._advancedFiltersApplied
+                    );
+                  }
 
                   // hide loading
                   handler.loading.hide();
@@ -1679,6 +1772,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         if (response.button.key === 'reset') {
           // set filter query builder
           this._advancedFiltersQueryBuilder = undefined;
+          this._advancedFiltersApplied = undefined;
 
           // emit the Request Query Builder
           this.advancedFilterBy.emit(this.advancedFiltersQueryBuilder);
@@ -1690,644 +1784,963 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           return;
         }
 
-        // retrieve applied filters
+        // generate query builder from advanced filters
         const input: IV2SideDialogConfigInputFilterList = response.data.map.filters as IV2SideDialogConfigInputFilterList;
-        const filterOptions: ILabelValuePairModel[] = input.optionsAsLabelValue;
-        const appliedFilters: IV2SideDialogConfigInputFilterListItem[] = input.filters;
-        const operator: RequestFilterOperator = input.operatorValue;
+        this.generateQueryBuilderFromAdvancedFilters(
+          input.optionsAsLabelValue,
+          input.filters,
+          input.sorts,
+          input.operatorValue,
+          input.optionsAsLabelValueMap
+        );
 
-        // create a new Request Query Builder
-        const queryBuilder = new RequestQueryBuilder();
+        // emit the Request Query Builder
+        this.advancedFilterBy.emit(this.advancedFiltersQueryBuilder);
 
-        // set operator
-        queryBuilder.filter.setOperator(operator);
+        // finished
+        response.handler.hide();
 
-        // map filter definition options
-        const filterOptionsMap: {
-          [value: string]: V2AdvancedFilter
-        } = {};
-        filterOptions.forEach((filterOption) => {
-          filterOptionsMap[filterOption.value] = filterOption.data;
-        });
+        // after apply - save ?
+        if (response.button.key === 'save') {
+          // create
+          const createFilter = () => {
+            this.dialogV2Service
+              .showSideDialog({
+                title: {
+                  get: () => 'LNG_DIALOG_SAVE_FILTERS_TITLE'
+                },
+                dontCloseOnBackdrop: true,
+                hideInputFilter: true,
+                width: AppListTableV2Component.STANDARD_ADVANCED_FILTER_DIALOG_WIDTH,
+                inputs: [
+                  {
+                    type: V2SideDialogConfigInputType.TEXT,
+                    name: 'filterName',
+                    placeholder: 'LNG_SAVED_FILTERS_FIELD_LABEL_NAME',
+                    validators: {
+                      required: () => true
+                    },
+                    value: ''
+                  }, {
+                    type: V2SideDialogConfigInputType.CHECKBOX,
+                    name: 'isPublic',
+                    placeholder: 'LNG_SAVED_FILTERS_FIELD_LABEL_PUBLIC',
+                    checked: false
+                  }
+                ],
+                bottomButtons: [
+                  {
+                    type: IV2SideDialogConfigButtonType.OTHER,
+                    label: 'LNG_SIDE_FILTERS_SAVE_FILTER_BUTTON',
+                    color: 'primary',
+                    key: 'save',
+                    disabled: (_data, handler): boolean => {
+                      return !handler.form || handler.form.invalid;
+                    }
+                  }, {
+                    type: IV2SideDialogConfigButtonType.CANCEL,
+                    label: 'LNG_COMMON_BUTTON_CANCEL',
+                    color: 'text'
+                  }
+                ]
+              })
+              .subscribe((createResponse) => {
+                // cancelled ?
+                if (createResponse.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+                  return;
+                }
 
-        // set conditions
-        appliedFilters.forEach((appliedFilter) => {
-          // there is no point in adding a condition if no value is provided
+                // show loading
+                createResponse.handler.loading.show();
+
+                // save
+                this.savedFiltersService
+                  .createFilter(
+                    new SavedFilterModel({
+                      name: (createResponse.data.map.filterName as IV2SideDialogConfigInputText).value,
+                      isPublic: !!(createResponse.data.map.isPublic as IV2SideDialogConfigInputCheckbox).checked,
+                      filterKey: this.advancedFilterType,
+                      filterData: this._advancedFiltersApplied
+                    })
+                  )
+                  .pipe(
+                    catchError((err) => {
+                      this.toastV2Service.error(err);
+                      return throwError(err);
+                    })
+                  )
+                  .subscribe(() => {
+                    // display message
+                    this.toastV2Service.success('LNG_SIDE_FILTERS_SAVE_FILTER_SUCCESS_MESSAGE');
+
+                    // finished
+                    createResponse.handler.hide();
+                  });
+              });
+          };
+
+          // update or create ?
+          const savedFilterList: IV2SideDialogConfigInputSingleDropdown = response.data.map.savedFilterList as IV2SideDialogConfigInputSingleDropdown;
+          const authUser: UserModel = this.authDataService.getAuthenticatedUser();
           if (
-            (
-              appliedFilter.value === undefined ||
-              appliedFilter.value === null
-            ) && (
-              appliedFilter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE &&
-              appliedFilter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE
-            )
+            savedFilterList.value &&
+            SavedFilterModel.canModify(authUser)
           ) {
+            // find option
+            const loadedData: SavedFilterModel = savedFilterList.options.find((item) => item.value === savedFilterList.value)?.data;
+            if (!loadedData.readOnly) {
+              // ask if we should update existing or create a new one
+              this.dialogV2Service
+                .showBottomDialog({
+                  config: {
+                    title: {
+                      get: () => 'LNG_DIALOG_SAVE_FILTERS_UPDATE_OR_CREATE_DIALOG_TITLE'
+                    },
+                    message: {
+                      get: () => 'LNG_DIALOG_SAVE_FILTERS_UPDATE_OR_CREATE_TITLE',
+                      data: () => ({
+                        filter: loadedData.name
+                      })
+                    }
+                  },
+                  dontCloseOnBackdrop: true,
+                  bottomButtons: [
+                    {
+                      type: IV2BottomDialogConfigButtonType.OTHER,
+                      label: 'LNG_COMMON_BUTTON_UPDATE',
+                      key: 'update',
+                      color: 'primary'
+                    }, {
+                      type: IV2BottomDialogConfigButtonType.OTHER,
+                      label: 'LNG_COMMON_BUTTON_CREATE',
+                      key: 'create',
+                      color: 'primary'
+                    }, {
+                      type: IV2BottomDialogConfigButtonType.CANCEL,
+                      label: 'LNG_DIALOG_CONFIRM_BUTTON_CANCEL',
+                      color: 'text'
+                    }
+                  ]
+                })
+                .subscribe((bottomResponse) => {
+                  // cancel ?
+                  if (bottomResponse.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                    // finished
+                    return;
+                  }
+
+                  // update / create
+                  if (bottomResponse.button.key === 'create') {
+                    // create filter
+                    createFilter();
+                  } else if (bottomResponse.button.key === 'update') {
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
+
+                    // update
+                    this.savedFiltersService
+                      .modifyFilter(
+                        savedFilterList.value, {
+                          filterData: this._advancedFiltersApplied
+                        }
+                      )
+                      .pipe(
+                        catchError((err) => {
+                          this.toastV2Service.error(err);
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // display message
+                        this.toastV2Service.success('LNG_SIDE_FILTERS_MODIFY_FILTER_SUCCESS_MESSAGE');
+
+                        // finished
+                        loading.close();
+                      });
+                  }
+                });
+            } else {
+              // create filter
+              createFilter();
+            }
+          } else {
+            // create filter
+            createFilter();
+          }
+        }
+      });
+  }
+
+  /**
+   * Load saved filters
+   */
+  private loadSavedFilters(
+    handler: IV2SideDialogHandler,
+    filtersList: IV2SideDialogConfigInputFilterList,
+    advancedFiltersApplied: SavedFilterData
+  ): void {
+    // operator
+    filtersList.operatorValue = advancedFiltersApplied.appliedFilterOperator as RequestFilterOperator;
+
+    // reset filters list
+    filtersList.filters = [];
+    filtersList.sorts = [];
+
+    // add filters
+    (advancedFiltersApplied.appliedFilters || []).forEach((appliedFilter) => {
+      // add filter
+      const advancedFilter = handler.update.addAdvancedFilter(filtersList);
+
+      // set filter by value
+      advancedFilter.filterBy.value = appliedFilter.filter.uniqueKey;
+
+      // trigger filter by change
+      advancedFilter.filterBy.change(
+        handler.data,
+        handler,
+        advancedFilter as any
+      );
+
+      // set comparator value
+      advancedFilter.comparator.value = appliedFilter.comparator;
+
+      // trigger comparator change
+      advancedFilter.comparator.change(
+        handler.data,
+        handler,
+        advancedFilter as any
+      );
+
+      // filter value
+      advancedFilter.value = appliedFilter.value;
+
+      // if questionnaire then we need further process
+      // - or within address...
+      if (
+        filtersList.optionsAsLabelValueMap[advancedFilter.filterBy.value]?.data.type === V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS || (
+          filtersList.optionsAsLabelValueMap[advancedFilter.filterBy.value]?.data.type === V2AdvancedFilterType.ADDRESS &&
+          advancedFilter.comparator.value === V2AdvancedFilterComparatorType.WITHIN
+        )
+      ) {
+        // add extra values
+        if (filtersList.optionsAsLabelValueMap[advancedFilter.filterBy.value]?.data.type === V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS) {
+          handler.update.resetQuestionnaireFilter(advancedFilter);
+        }
+
+        // update extra values...values :)
+        const valuesToPutBack = {...appliedFilter.extraValues};
+        Object.keys(advancedFilter.extraValues).forEach((prop) => {
+          // nothing to do ?
+          if (valuesToPutBack[prop] === undefined) {
             return;
           }
 
-          // retrieve filter definition
-          const filterDefinition: V2AdvancedFilter = filterOptionsMap[appliedFilter.filterBy.value];
-
-          // do we need to go into a relationship ?
-          let qb: RequestQueryBuilder = queryBuilder;
-          if (
-            filterDefinition.relationshipPath &&
-            filterDefinition.relationshipPath.length > 0
-          ) {
-            _.each(filterDefinition.relationshipPath, (relation) => {
-              qb = qb.include(relation).queryBuilder;
-            });
-          }
-
-          // children query builders
-          if (filterDefinition.childQueryBuilderKey) {
-            qb = qb.addChildQueryBuilder(
-              filterDefinition.childQueryBuilderKey,
-              false
-            );
-          }
-
-          // do we need to merge extra conditions ?
-          if (filterDefinition.extraConditions) {
-            qb.merge(_.cloneDeep(filterDefinition.extraConditions));
-          }
-
-          // check if we need to flag value
-          if (filterDefinition.flagIt) {
-            // value ?
-            let value;
-            switch (filterDefinition.type) {
-              case V2AdvancedFilterType.NUMBER:
-                value = appliedFilter.value && appliedFilter.value !== 0 && typeof appliedFilter.value === 'string' ? parseFloat(appliedFilter.value) : appliedFilter.value;
-                break;
-
-              default:
-                value = appliedFilter.value;
-            }
-
-            // add flag
-            if (value !== undefined) {
-              qb.filter.flag(
-                filterDefinition.field,
-                value
-              );
-            }
+          // put back value
+          if (prop === 'location') {
+            advancedFilter.extraValues[prop] = valuesToPutBack[prop];
           } else {
-            // filter
-            let searchQb: RequestQueryBuilder;
-            switch (filterDefinition.type) {
-              case V2AdvancedFilterType.TEXT:
-                switch (appliedFilter.comparator.value) {
-                  case V2AdvancedFilterComparatorType.IS:
-                    // filter
-                    qb.filter.byEquality(
-                      filterDefinition.field,
-                      appliedFilter.value,
-                      false,
-                      true
-                    );
+            advancedFilter.extraValues[prop].value = valuesToPutBack[prop];
+          }
 
-                    // finished
-                    break;
+          // finished
+          // - remove so we know this one was handled
+          delete valuesToPutBack[prop];
+        });
 
-                  case V2AdvancedFilterComparatorType.CONTAINS_TEXT:
-                    // filter
-                    qb.filter.byContainingText(
-                      filterDefinition.field,
-                      appliedFilter.value,
-                      false
-                    );
+        // attach remaining options
+        Object.keys(valuesToPutBack).forEach((prop) => {
+          // put back value
+          if (prop === 'location') {
+            advancedFilter.extraValues[prop] = valuesToPutBack[prop];
+          } else {
+            // SHOULDN'T have this case
+            // advancedFilter.extraValues[prop].value = valuesToPutBack[prop];
+          }
+        });
+      }
+    });
 
-                    // finished
-                    break;
+    // add orders
+    (advancedFiltersApplied.appliedSort || []).forEach((sortCriteria) => {
+      // add sort
+      const advancedSort = handler.update.addAdvancedSort(filtersList);
 
-                  case V2AdvancedFilterComparatorType.HAS_VALUE:
-                    // filter
-                    qb.filter.byHasValue(filterDefinition.field);
+      // setup
+      advancedSort.sortBy.value = sortCriteria.sort.uniqueKey;
+      advancedSort.order.value = sortCriteria.direction;
+    });
+  }
 
-                    // finished
-                    break;
+  /**
+   * Generate query builder from advanced filters
+   */
+  private generateQueryBuilderFromAdvancedFilters(
+    filterOptions: ILabelValuePairModel[],
+    appliedFilters: IV2SideDialogConfigInputFilterListFilter[],
+    appliedSorts: IV2SideDialogConfigInputFilterListSort[],
+    operator: RequestFilterOperator,
+    optionsAsLabelValueMap: {
+      [optionId: string]: ILabelValuePairModel
+    }
+  ): void {
+    // create a new Request Query Builder
+    const queryBuilder = new RequestQueryBuilder();
 
-                  case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
-                    // filter
-                    qb.filter.byNotHavingValue(filterDefinition.field);
+    // set operator
+    queryBuilder.filter.setOperator(operator);
 
-                    // finished
-                    break;
+    // map filter definition options
+    const filterOptionsMap: {
+      [value: string]: V2AdvancedFilter
+    } = {};
+    filterOptions.forEach((filterOption) => {
+      filterOptionsMap[filterOption.value] = filterOption.data;
+    });
 
-                  // V2AdvancedFilterComparatorType.TEXT_STARTS_WITH
-                  default:
-                    qb.filter.byText(
-                      filterDefinition.field,
-                      appliedFilter.value,
-                      false
-                    );
-                }
+    // init saved filter
+    this._advancedFiltersApplied = new SavedFilterData({});
+    this._advancedFiltersApplied.appliedFilterOperator = operator;
 
-                // finished
-                break;
+    // set conditions
+    appliedFilters.forEach((appliedFilter) => {
+      // there is no point in adding a condition if no value is provided
+      if (
+        (
+          appliedFilter.value === undefined ||
+          appliedFilter.value === null
+        ) && (
+          appliedFilter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE &&
+          appliedFilter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE
+        )
+      ) {
+        return;
+      }
 
-              case V2AdvancedFilterType.NUMBER:
-                switch (appliedFilter.comparator.value) {
-                  case V2AdvancedFilterComparatorType.BEFORE:
-                    // filter
-                    qb.filter.where({
-                      [filterDefinition.field]: {
-                        lte: _.isString(appliedFilter.value) ? parseFloat(appliedFilter.value) : appliedFilter.value
-                      }
-                    });
+      // retrieve filter definition
+      const filterDefinition: V2AdvancedFilter = filterOptionsMap[appliedFilter.filterBy.value];
 
-                    // finished
-                    break;
+      // add to saved filters
+      this._advancedFiltersApplied.appliedFilters.push(new SavedFilterDataAppliedFilter({
+        filter: {
+          uniqueKey: `${filterDefinition.field}${filterDefinition.label}`
+        },
+        comparator: appliedFilter.comparator.value,
+        value: appliedFilter.value,
+        extraValues: _.isEmpty(appliedFilter.extraValues) ?
+          undefined :
+          _.transform(
+            appliedFilter.extraValues,
+            (acc, value, prop) => {
+              // there are cases where we need to save the entire object
+              // e.g. - extraValues.location
+              acc[prop] = value.name ?
+                value.value :
+                value;
+            },
+            {}
+          )
+      }));
 
-                  case V2AdvancedFilterComparatorType.AFTER:
-                    // filter
-                    qb.filter.where({
-                      [filterDefinition.field]: {
-                        gte: _.isString(appliedFilter.value) ? parseFloat(appliedFilter.value) : appliedFilter.value
-                      }
-                    });
+      // do we need to go into a relationship ?
+      let qb: RequestQueryBuilder = queryBuilder;
+      if (
+        filterDefinition.relationshipPath &&
+        filterDefinition.relationshipPath.length > 0
+      ) {
+        _.each(filterDefinition.relationshipPath, (relation) => {
+          qb = qb.include(relation).queryBuilder;
+        });
+      }
 
-                    // finished
-                    break;
+      // children query builders
+      if (filterDefinition.childQueryBuilderKey) {
+        qb = qb.addChildQueryBuilder(
+          filterDefinition.childQueryBuilderKey,
+          false
+        );
+      }
 
-                  // case FilterComparator.IS:
-                  default:
-                    qb.filter.byEquality(
-                      filterDefinition.field,
-                      _.isString(appliedFilter.value) ? parseFloat(appliedFilter.value) : appliedFilter.value
-                    );
-                }
+      // do we need to merge extra conditions ?
+      if (filterDefinition.extraConditions) {
+        qb.merge(_.cloneDeep(filterDefinition.extraConditions));
+      }
 
-                // finished
-                break;
+      // check if we need to flag value
+      if (filterDefinition.flagIt) {
+        // value ?
+        let value;
+        switch (filterDefinition.type) {
+          case V2AdvancedFilterType.NUMBER:
+            value = appliedFilter.value && appliedFilter.value !== 0 && typeof appliedFilter.value === 'string' ? parseFloat(appliedFilter.value) : appliedFilter.value;
+            break;
 
-              case V2AdvancedFilterType.ADDRESS:
-              case V2AdvancedFilterType.LOCATION_SINGLE:
-              case V2AdvancedFilterType.LOCATION_MULTIPLE:
-                // contains / within
-                switch (appliedFilter.comparator.value) {
-                  case V2AdvancedFilterComparatorType.LOCATION:
-                    qb.filter.where({
-                      [`${filterDefinition.field}.parentLocationIdFilter`]: {
-                        inq: appliedFilter.value
-                      }
-                    });
-                    break;
+          default:
+            value = appliedFilter.value;
+        }
 
-                  case V2AdvancedFilterComparatorType.WITHIN:
-                    // retrieve location lat & lng
-                    const geoLocation = _.get(appliedFilter.extraValues, 'location.geoLocation', null);
-                    const lat: number = geoLocation && (geoLocation.lat || geoLocation.lat === 0) ? parseFloat(geoLocation.lat) : null;
-                    const lng: number = geoLocation && (geoLocation.lng || geoLocation.lng === 0) ? parseFloat(geoLocation.lng) : null;
-                    if (
-                      lat === null ||
-                      lng === null
-                    ) {
-                      break;
-                    }
-
-                    // construct near query
-                    const nearQuery = {
-                      near: {
-                        lat: lat,
-                        lng: lng
-                      }
-                    };
-
-                    // add max distance if provided
-                    const maxDistance: number = _.get(appliedFilter.extraValues, 'radius.value', null);
-                    if (maxDistance !== null) {
-                      // convert miles to meters
-                      (nearQuery as any).maxDistance = Math.round(maxDistance * 1609.34);
-                    }
-
-                    // add filter
-                    qb.filter.where({
-                      [`${filterDefinition.field}.geoLocation`]: nearQuery
-                    });
-                    break;
-
-                  // V2AdvancedFilterComparatorType.CONTAINS
-                  default:
-                    // construct address search qb
-                    searchQb = AddressModel.buildSearchFilter(
-                      appliedFilter.value,
-                      filterDefinition.field,
-                      (filterDefinition as IV2AdvancedFilterAddress).isArray
-                    );
-
-                    // add condition if we were able to create it
-                    if (searchQb) {
-                      qb.merge(searchQb);
-                    }
-                }
-
-                // finished
-                break;
-
-              // filter by phone number
-              case V2AdvancedFilterType.ADDRESS_PHONE_NUMBER:
-                // construct address phone number search qb
-                searchQb = AddressModel.buildPhoneSearchFilter(
-                  appliedFilter.value,
-                  filterDefinition.field,
-                  (filterDefinition as IV2AdvancedFilterAddressPhoneNumber).isArray
-                );
-
-                // add condition if we were able to create it
-                if (searchQb) {
-                  qb.merge(searchQb);
-                }
-
-                // finished
-                break;
-
-              case V2AdvancedFilterType.RANGE_NUMBER:
-                switch (appliedFilter.comparator.value) {
-                  case V2AdvancedFilterComparatorType.HAS_VALUE:
-                    // filter
-                    qb.filter.byHasValue(filterDefinition.field);
-
-                    // finished
-                    break;
-
-                  case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
-                    // filter
-                    qb.filter.byNotHavingValue(filterDefinition.field);
-
-                    // finished
-                    break;
-
-                  // others...
-                  default:
-                    // between / from / to
-                    qb.filter.byRange(
-                      filterDefinition.field,
-                      appliedFilter.value,
-                      false
-                    );
-                }
-
-                // finished
-                break;
-
-              case V2AdvancedFilterType.RANGE_AGE:
-                // between / from / to
-                qb.filter.byAgeRange(
-                  filterDefinition.field,
-                  appliedFilter.value
-                );
-
-                // finished
-                break;
-
-              case V2AdvancedFilterType.RANGE_DATE:
-                switch (appliedFilter.comparator.value) {
-                  case V2AdvancedFilterComparatorType.HAS_VALUE:
-                    // filter
-                    qb.filter.byHasValue(filterDefinition.field);
-
-                    // finished
-                    break;
-
-                  case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
-                    // filter
-                    qb.filter.byNotHavingValue(filterDefinition.field);
-
-                    // finished
-                    break;
-
-                  // others...
-                  default:
-                    // between / before / after
-                    qb.filter.byDateRange(
-                      filterDefinition.field,
-                      appliedFilter.value,
-                      false
-                    );
-                }
-
-                // finished
-                break;
-
-              case V2AdvancedFilterType.DATE:
-                // between
-                const date = appliedFilter.value ?
-                  null :
-                  moment(appliedFilter.value);
-
+        // add flag
+        if (value !== undefined) {
+          qb.filter.flag(
+            filterDefinition.field,
+            value
+          );
+        }
+      } else {
+        // filter
+        let searchQb: RequestQueryBuilder;
+        switch (filterDefinition.type) {
+          case V2AdvancedFilterType.TEXT:
+            switch (appliedFilter.comparator.value) {
+              case V2AdvancedFilterComparatorType.IS:
                 // filter
-                qb.filter.byDateRange(
+                qb.filter.byEquality(
                   filterDefinition.field,
-                  date && date.isValid() ?
-                    {
-                      startDate: date.startOf('day'),
-                      endDate: date.endOf('day')
-                    } :
-                    null,
+                  appliedFilter.value,
+                  false,
+                  true
+                );
+
+                // finished
+                break;
+
+              case V2AdvancedFilterComparatorType.CONTAINS_TEXT:
+                // filter
+                qb.filter.byContainingText(
+                  filterDefinition.field,
+                  appliedFilter.value,
                   false
                 );
 
                 // finished
                 break;
 
-              case V2AdvancedFilterType.SELECT:
-              case V2AdvancedFilterType.MULTISELECT:
-                switch (appliedFilter.comparator.value) {
-                  case V2AdvancedFilterComparatorType.HAS_VALUE:
-                    // filter
-                    qb.filter.byHasValue(filterDefinition.field);
-
-                    // finished
-                    break;
-
-                  case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
-                    // filter
-                    qb.filter.byNotHavingValue(filterDefinition.field);
-
-                    // finished
-                    break;
-
-                  // FilterComparator.NONE
-                  default:
-                    qb.filter.bySelect(
-                      filterDefinition.field,
-                      appliedFilter.value,
-                      false,
-                      null
-                    );
-                }
+              case V2AdvancedFilterComparatorType.HAS_VALUE:
+                // filter
+                qb.filter.byHasValue(filterDefinition.field);
 
                 // finished
                 break;
 
-              case V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS:
-                // get data
-                const question: QuestionModel = input.optionsAsLabelValueMap[appliedFilter.filterBy.value]?.data.templateOptionsMap[appliedFilter.value]?.data.question;
-                const whichAnswer: V2AdvancedFilterQuestionWhichAnswer = appliedFilter.extraValues?.whichAnswer?.value;
-                const extraComparator: V2AdvancedFilterComparatorType = appliedFilter.extraValues?.comparator?.value;
-                const value: any = appliedFilter.extraValues?.filterValue?.value;
-                const whichAnswerDate: IV2DateRange = appliedFilter.extraValues?.whichAnswerDate?.value;
+              case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
+                // filter
+                qb.filter.byNotHavingValue(filterDefinition.field);
 
-                // we don't need to add filter if no filter value was provided
+                // finished
+                break;
+
+              // V2AdvancedFilterComparatorType.TEXT_STARTS_WITH
+              default:
+                qb.filter.byText(
+                  filterDefinition.field,
+                  appliedFilter.value,
+                  false
+                );
+            }
+
+            // finished
+            break;
+
+          case V2AdvancedFilterType.NUMBER:
+            switch (appliedFilter.comparator.value) {
+              case V2AdvancedFilterComparatorType.BEFORE:
+                // filter
+                qb.filter.where({
+                  [filterDefinition.field]: {
+                    lte: _.isString(appliedFilter.value) ? parseFloat(appliedFilter.value) : appliedFilter.value
+                  }
+                });
+
+                // finished
+                break;
+
+              case V2AdvancedFilterComparatorType.AFTER:
+                // filter
+                qb.filter.where({
+                  [filterDefinition.field]: {
+                    gte: _.isString(appliedFilter.value) ? parseFloat(appliedFilter.value) : appliedFilter.value
+                  }
+                });
+
+                // finished
+                break;
+
+              // case FilterComparator.IS:
+              default:
+                qb.filter.byEquality(
+                  filterDefinition.field,
+                  _.isString(appliedFilter.value) ? parseFloat(appliedFilter.value) : appliedFilter.value
+                );
+            }
+
+            // finished
+            break;
+
+          case V2AdvancedFilterType.ADDRESS:
+          case V2AdvancedFilterType.LOCATION_SINGLE:
+          case V2AdvancedFilterType.LOCATION_MULTIPLE:
+            // contains / within
+            switch (appliedFilter.comparator.value) {
+              case V2AdvancedFilterComparatorType.LOCATION:
+                qb.filter.where({
+                  [`${filterDefinition.field}.parentLocationIdFilter`]: {
+                    inq: appliedFilter.value
+                  }
+                });
+                break;
+
+              case V2AdvancedFilterComparatorType.WITHIN:
+                // retrieve location lat & lng
+                const geoLocation = _.get(appliedFilter.extraValues, 'location.geoLocation', null);
+                const lat: number = geoLocation && (geoLocation.lat || geoLocation.lat === 0) ? parseFloat(geoLocation.lat) : null;
+                const lng: number = geoLocation && (geoLocation.lng || geoLocation.lng === 0) ? parseFloat(geoLocation.lng) : null;
                 if (
-                  question && (
-                    !_.isEmpty(value) ||
-                    _.isBoolean(value) ||
-                    !_.isEmpty(whichAnswerDate) ||
-                    extraComparator === V2AdvancedFilterComparatorType.HAS_VALUE ||
-                    extraComparator === V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE
-                  )
+                  lat === null ||
+                  lng === null
                 ) {
-                  // construct answer date query
-                  let dateQuery;
-                  let valueQuery;
-                  if (!_.isEmpty(whichAnswerDate)) {
-                    dateQuery = RequestFilterGenerator.dateRangeCompare(whichAnswerDate);
+                  break;
+                }
+
+                // construct near query
+                const nearQuery = {
+                  near: {
+                    lat: lat,
+                    lng: lng
                   }
+                };
 
-                  // take action accordingly to question type
-                  if (
-                    !_.isEmpty(value) ||
-                    _.isBoolean(value) ||
-                    extraComparator === V2AdvancedFilterComparatorType.HAS_VALUE ||
-                    extraComparator === V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE
-                  ) {
-                    switch (question.answerType) {
-                      // Text
-                      case Constants.ANSWER_TYPES.FREE_TEXT.value:
-                        switch (extraComparator) {
-                          case V2AdvancedFilterComparatorType.IS:
-                            valueQuery = RequestFilterGenerator.textIs(value);
-                            break;
-                          case V2AdvancedFilterComparatorType.CONTAINS_TEXT:
-                            valueQuery = RequestFilterGenerator.textContains(value);
-                            break;
-                          case V2AdvancedFilterComparatorType.HAS_VALUE:
-                            valueQuery = RequestFilterGenerator.hasValue();
-                            break;
-                          case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
-                            // doesn't have value if handled bellow
-                            // NOTHING TO DO
-                            break;
+                // add max distance if provided
+                const maxDistance: number = _.get(appliedFilter.extraValues, 'radius.value', null);
+                if (maxDistance !== null) {
+                  // convert miles to meters
+                  (nearQuery as any).maxDistance = Math.round(maxDistance * 1609.34);
+                }
 
-                          // V2AdvancedFilterComparatorType.TEXT_STARTS_WITH
-                          default:
-                            valueQuery = RequestFilterGenerator.textStartWith(value);
-                        }
+                // add filter
+                qb.filter.where({
+                  [`${filterDefinition.field}.geoLocation`]: nearQuery
+                });
+                break;
 
-                        // finished
+              // V2AdvancedFilterComparatorType.CONTAINS
+              default:
+                // construct address search qb
+                searchQb = AddressModel.buildSearchFilter(
+                  appliedFilter.value,
+                  filterDefinition.field,
+                  (filterDefinition as IV2AdvancedFilterAddress).isArray
+                );
+
+                // add condition if we were able to create it
+                if (searchQb) {
+                  qb.merge(searchQb);
+                }
+            }
+
+            // finished
+            break;
+
+          // filter by phone number
+          case V2AdvancedFilterType.ADDRESS_PHONE_NUMBER:
+            // construct address phone number search qb
+            searchQb = AddressModel.buildPhoneSearchFilter(
+              appliedFilter.value,
+              filterDefinition.field,
+              (filterDefinition as IV2AdvancedFilterAddressPhoneNumber).isArray
+            );
+
+            // add condition if we were able to create it
+            if (searchQb) {
+              qb.merge(searchQb);
+            }
+
+            // finished
+            break;
+
+          case V2AdvancedFilterType.RANGE_NUMBER:
+            switch (appliedFilter.comparator.value) {
+              case V2AdvancedFilterComparatorType.HAS_VALUE:
+                // filter
+                qb.filter.byHasValue(filterDefinition.field);
+
+                // finished
+                break;
+
+              case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
+                // filter
+                qb.filter.byNotHavingValue(filterDefinition.field);
+
+                // finished
+                break;
+
+              // others...
+              default:
+                // between / from / to
+                qb.filter.byRange(
+                  filterDefinition.field,
+                  appliedFilter.value,
+                  false
+                );
+            }
+
+            // finished
+            break;
+
+          case V2AdvancedFilterType.RANGE_AGE:
+            // between / from / to
+            qb.filter.byAgeRange(
+              filterDefinition.field,
+              appliedFilter.value,
+              false
+            );
+
+            // finished
+            break;
+
+          case V2AdvancedFilterType.RANGE_DATE:
+            switch (appliedFilter.comparator.value) {
+              case V2AdvancedFilterComparatorType.HAS_VALUE:
+                // filter
+                qb.filter.byHasValue(filterDefinition.field);
+
+                // finished
+                break;
+
+              case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
+                // filter
+                qb.filter.byNotHavingValue(filterDefinition.field);
+
+                // finished
+                break;
+
+              // others...
+              default:
+                // between / before / after
+                qb.filter.byDateRange(
+                  filterDefinition.field,
+                  appliedFilter.value,
+                  false
+                );
+            }
+
+            // finished
+            break;
+
+          case V2AdvancedFilterType.DATE:
+            // between
+            const date = appliedFilter.value ?
+              null :
+              moment(appliedFilter.value);
+
+            // filter
+            qb.filter.byDateRange(
+              filterDefinition.field,
+              date && date.isValid() ?
+                {
+                  startDate: date.startOf('day'),
+                  endDate: date.endOf('day')
+                } :
+                null,
+              false
+            );
+
+            // finished
+            break;
+
+          case V2AdvancedFilterType.SELECT:
+          case V2AdvancedFilterType.MULTISELECT:
+            switch (appliedFilter.comparator.value) {
+              case V2AdvancedFilterComparatorType.HAS_VALUE:
+                // filter
+                qb.filter.byHasValue(filterDefinition.field);
+
+                // finished
+                break;
+
+              case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
+                // filter
+                qb.filter.byNotHavingValue(filterDefinition.field);
+
+                // finished
+                break;
+
+              // FilterComparator.NONE
+              default:
+                qb.filter.bySelect(
+                  filterDefinition.field,
+                  appliedFilter.value,
+                  false,
+                  null
+                );
+            }
+
+            // finished
+            break;
+
+          case V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS:
+            // get data
+            const question: QuestionModel = optionsAsLabelValueMap[appliedFilter.filterBy.value]?.data.templateOptionsMap[appliedFilter.value]?.data.question;
+            const whichAnswer: V2AdvancedFilterQuestionWhichAnswer = appliedFilter.extraValues?.whichAnswer?.value;
+            const extraComparator: V2AdvancedFilterComparatorType = appliedFilter.extraValues?.comparator?.value;
+            const value: any = appliedFilter.extraValues?.filterValue?.value;
+            const whichAnswerDate: IV2DateRange = appliedFilter.extraValues?.whichAnswerDate?.value;
+
+            // we don't need to add filter if no filter value was provided
+            if (
+              question && (
+                !_.isEmpty(value) ||
+                _.isBoolean(value) ||
+                !_.isEmpty(whichAnswerDate) ||
+                extraComparator === V2AdvancedFilterComparatorType.HAS_VALUE ||
+                extraComparator === V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE
+              )
+            ) {
+              // construct answer date query
+              let dateQuery;
+              let valueQuery;
+              if (!_.isEmpty(whichAnswerDate)) {
+                dateQuery = RequestFilterGenerator.dateRangeCompare(whichAnswerDate);
+              }
+
+              // take action accordingly to question type
+              if (
+                !_.isEmpty(value) ||
+                _.isBoolean(value) ||
+                extraComparator === V2AdvancedFilterComparatorType.HAS_VALUE ||
+                extraComparator === V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE
+              ) {
+                switch (question.answerType) {
+                  // Text
+                  case Constants.ANSWER_TYPES.FREE_TEXT.value:
+                    switch (extraComparator) {
+                      case V2AdvancedFilterComparatorType.IS:
+                        valueQuery = RequestFilterGenerator.textIs(value);
+                        break;
+                      case V2AdvancedFilterComparatorType.CONTAINS_TEXT:
+                        valueQuery = RequestFilterGenerator.textContains(value);
+                        break;
+                      case V2AdvancedFilterComparatorType.HAS_VALUE:
+                        valueQuery = RequestFilterGenerator.hasValue();
+                        break;
+                      case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
+                        // doesn't have value if handled bellow
+                        // NOTHING TO DO
                         break;
 
-                      // Date
-                      case Constants.ANSWER_TYPES.DATE_TIME.value:
-                        switch (extraComparator) {
-                          case V2AdvancedFilterComparatorType.HAS_VALUE:
-                            valueQuery = RequestFilterGenerator.hasValue();
-                            break;
-                          case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
-                            // doesn't have value if handled bellow
-                            // NOTHING TO DO
-                            break;
+                      // V2AdvancedFilterComparatorType.TEXT_STARTS_WITH
+                      default:
+                        valueQuery = RequestFilterGenerator.textStartWith(value);
+                    }
 
-                          // V2AdvancedFilterComparatorType.TEXT_STARTS_WITH
-                          default:
-                            valueQuery = RequestFilterGenerator.dateRangeCompare(value);
-                        }
+                    // finished
+                    break;
 
-                        // finished
+                  // Date
+                  case Constants.ANSWER_TYPES.DATE_TIME.value:
+                    switch (extraComparator) {
+                      case V2AdvancedFilterComparatorType.HAS_VALUE:
+                        valueQuery = RequestFilterGenerator.hasValue();
+                        break;
+                      case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
+                        // doesn't have value if handled bellow
+                        // NOTHING TO DO
                         break;
 
-                      // Dropdown
-                      case Constants.ANSWER_TYPES.SINGLE_SELECTION.value:
-                      case Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value:
-                        switch (extraComparator) {
-                          case V2AdvancedFilterComparatorType.HAS_VALUE:
-                            valueQuery = RequestFilterGenerator.hasValue();
-                            break;
-                          case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
-                            // doesn't have value if handled bellow
-                            // NOTHING TO DO
-                            break;
+                      // V2AdvancedFilterComparatorType.TEXT_STARTS_WITH
+                      default:
+                        valueQuery = RequestFilterGenerator.dateRangeCompare(value);
+                    }
 
-                          // V2AdvancedFilterComparatorType.TEXT_STARTS_WITH
-                          default:
-                            valueQuery = {
-                              inq: value
-                            };
-                        }
+                    // finished
+                    break;
 
-                        // finished
+                  // Dropdown
+                  case Constants.ANSWER_TYPES.SINGLE_SELECTION.value:
+                  case Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value:
+                    switch (extraComparator) {
+                      case V2AdvancedFilterComparatorType.HAS_VALUE:
+                        valueQuery = RequestFilterGenerator.hasValue();
+                        break;
+                      case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
+                        // doesn't have value if handled bellow
+                        // NOTHING TO DO
                         break;
 
-                      // Number
-                      case Constants.ANSWER_TYPES.NUMERIC.value:
-                        switch (extraComparator) {
-                          case V2AdvancedFilterComparatorType.HAS_VALUE:
-                            valueQuery = RequestFilterGenerator.hasValue();
-                            break;
-                          case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
-                            // doesn't have value if handled bellow
-                            // NOTHING TO DO
-                            break;
+                      // V2AdvancedFilterComparatorType.TEXT_STARTS_WITH
+                      default:
+                        valueQuery = {
+                          inq: value
+                        };
+                    }
 
-                          // V2AdvancedFilterComparatorType.TEXT_STARTS_WITH
-                          default:
-                            valueQuery = RequestFilterGenerator.rangeCompare(value);
-                        }
+                    // finished
+                    break;
 
-                        // finished
+                  // Number
+                  case Constants.ANSWER_TYPES.NUMERIC.value:
+                    switch (extraComparator) {
+                      case V2AdvancedFilterComparatorType.HAS_VALUE:
+                        valueQuery = RequestFilterGenerator.hasValue();
+                        break;
+                      case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
+                        // doesn't have value if handled bellow
+                        // NOTHING TO DO
                         break;
 
-                      // File
-                      case Constants.ANSWER_TYPES.FILE_UPLOAD.value:
-                        // neq: null / $eq null doesn't work due to a mongodb bug ( the issue occurs when trying to filter an element from an array which is this case )
-                        switch (extraComparator) {
-                          case V2AdvancedFilterComparatorType.HAS_VALUE:
-                            valueQuery = RequestFilterGenerator.hasValue();
-                            break;
-                          case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
-                            // doesn't have value if handled bellow
-                            // NOTHING TO DO
-                            break;
-                        }
+                      // V2AdvancedFilterComparatorType.TEXT_STARTS_WITH
+                      default:
+                        valueQuery = RequestFilterGenerator.rangeCompare(value);
+                    }
 
-                        // finished
+                    // finished
+                    break;
+
+                  // File
+                  case Constants.ANSWER_TYPES.FILE_UPLOAD.value:
+                    // neq: null / $eq null doesn't work due to a mongodb bug ( the issue occurs when trying to filter an element from an array which is this case )
+                    switch (extraComparator) {
+                      case V2AdvancedFilterComparatorType.HAS_VALUE:
+                        valueQuery = RequestFilterGenerator.hasValue();
+                        break;
+                      case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
+                        // doesn't have value if handled bellow
+                        // NOTHING TO DO
                         break;
                     }
-                  }
 
-                  // search through all answers or just the last one ?
-                  const query: any = {};
-                  if (
-                    !whichAnswer ||
-                    whichAnswer === V2AdvancedFilterQuestionWhichAnswer.LAST_ANSWER
-                  ) {
-                    // do we need to attach a value condition as well ?
-                    if (valueQuery) {
-                      query[`${filterDefinition.field}.${question.variable}.0.value`] = valueQuery;
-                    } else if (extraComparator === V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE) {
-                      // handle no value case
-                      const condition: any = RequestFilterGenerator.doesntHaveValue(`${filterDefinition.field}.${question.variable}.0.value`);
-                      const key: string = Object.keys(condition)[0];
-                      query[key] = condition[key];
-                    }
+                    // finished
+                    break;
+                }
+              }
 
-                    // do we need to attach a date condition as well ?
-                    if (dateQuery) {
-                      query[`${filterDefinition.field}.${question.variable}.0.date`] = dateQuery;
-                    }
+              // search through all answers or just the last one ?
+              const query: any = {};
+              if (
+                !whichAnswer ||
+                whichAnswer === V2AdvancedFilterQuestionWhichAnswer.LAST_ANSWER
+              ) {
+                // do we need to attach a value condition as well ?
+                if (valueQuery) {
+                  query[`${filterDefinition.field}.${question.variable}.0.value`] = valueQuery;
+                } else if (extraComparator === V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE) {
+                  // handle no value case
+                  const condition: any = RequestFilterGenerator.doesntHaveValue(`${filterDefinition.field}.${question.variable}.0.value`);
+                  const key: string = Object.keys(condition)[0];
+                  query[key] = condition[key];
+                }
 
-                    // register query
-                    qb.filter.where(query);
-                  } else {
-                    // do we need to attach a value condition as well ?
-                    if (valueQuery) {
-                      query.value = valueQuery;
-                    } else if (extraComparator === V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE) {
-                      // handle no value case
-                      const condition: any = RequestFilterGenerator.doesntHaveValue(
-                        'value',
-                        true
-                      );
-                      const key: string = Object.keys(condition)[0];
-                      query[key] = condition[key];
-                    }
+                // do we need to attach a date condition as well ?
+                if (dateQuery) {
+                  query[`${filterDefinition.field}.${question.variable}.0.date`] = dateQuery;
+                }
 
-                    // do we need to attach a date condition as well ?
-                    if (dateQuery) {
-                      query.date = dateQuery;
-                    }
+                // register query
+                qb.filter.where(query);
+              } else {
+                // do we need to attach a value condition as well ?
+                if (valueQuery) {
+                  query.value = valueQuery;
+                } else if (extraComparator === V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE) {
+                  // handle no value case
+                  const condition: any = RequestFilterGenerator.doesntHaveValue(
+                    'value',
+                    true
+                  );
+                  const key: string = Object.keys(condition)[0];
+                  query[key] = condition[key];
+                }
 
-                    // add extra check if date not provided and we need to retrieve all records that don't have a value
-                    if (
-                      !dateQuery &&
-                      extraComparator === V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE
-                    ) {
-                      qb.filter.where({
-                        or: [
-                          {
-                            [`${filterDefinition.field}.${question.variable}`]: {
-                              $elemMatch: query
-                            }
-                          }, {
-                            [`${filterDefinition.field}.${question.variable}`]: {
-                              exists: false
-                            }
-                          }, {
-                            [`${filterDefinition.field}.${question.variable}`]: {
-                              type: 'null'
-                            }
-                          }, {
-                            [`${filterDefinition.field}.${question.variable}`]: {
-                              size: 0
-                            }
-                          }
-                        ]
-                      });
-                    } else {
-                      qb.filter.where({
+                // do we need to attach a date condition as well ?
+                if (dateQuery) {
+                  query.date = dateQuery;
+                }
+
+                // add extra check if date not provided and we need to retrieve all records that don't have a value
+                if (
+                  !dateQuery &&
+                  extraComparator === V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE
+                ) {
+                  qb.filter.where({
+                    or: [
+                      {
                         [`${filterDefinition.field}.${question.variable}`]: {
                           $elemMatch: query
                         }
-                      });
+                      }, {
+                        [`${filterDefinition.field}.${question.variable}`]: {
+                          exists: false
+                        }
+                      }, {
+                        [`${filterDefinition.field}.${question.variable}`]: {
+                          type: 'null'
+                        }
+                      }, {
+                        [`${filterDefinition.field}.${question.variable}`]: {
+                          size: 0
+                        }
+                      }
+                    ]
+                  });
+                } else {
+                  qb.filter.where({
+                    [`${filterDefinition.field}.${question.variable}`]: {
+                      $elemMatch: query
                     }
-                  }
+                  });
                 }
-
-                // finished
-                break;
+              }
             }
-          }
+
+            // finished
+            break;
+        }
+      }
+    });
+
+    // set sorts
+    const objectDetailsSort: {
+      [property: string]: string[]
+    } = {
+      age: ['years', 'months']
+    };
+    appliedSorts.forEach((appliedSort) => {
+      // retrieve field
+      // retrieve filter definition
+      const filterDefinition: V2AdvancedFilter = filterOptionsMap[appliedSort.sortBy.value];
+
+      // no field - shouldn't encounter this case...
+      if (!filterDefinition.field) {
+        return;
+      }
+
+      // add to saved filters
+      this._advancedFiltersApplied.appliedSort.push(new SavedFilterDataAppliedSort({
+        sort: {
+          uniqueKey: `${filterDefinition.field}${filterDefinition.label}`
+        },
+        direction: appliedSort.order.value
+      }));
+
+      // add sorting criteria
+      if (
+        objectDetailsSort &&
+        objectDetailsSort[appliedSort.sortBy.value]
+      ) {
+        objectDetailsSort[appliedSort.sortBy.value].forEach((childProperty) => {
+          queryBuilder.sort.by(
+            `${filterDefinition.field}.${childProperty}`,
+            appliedSort.order.value as RequestSortDirection
+          );
         });
+      } else {
+        queryBuilder.sort.by(
+          filterDefinition.field,
+          appliedSort.order.value as RequestSortDirection
+        );
+      }
+    });
 
-        //
-        // // apply sort
-        // const sorts = _.filter(
-        //   _.get(fields, 'sortBy.items', []),
-        //   'sort'
-        // );
-        //
-        // // set sort by fields
-        // const objectDetailsSort: {
-        //   [property: string]: string[]
-        // } = {
-        //   age: ['years', 'months']
-        // };
-        // _.each(sorts, (appliedSort: AppliedSortModel) => {
-        //   // add sorting criteria
-        //   if (
-        //     objectDetailsSort &&
-        //     objectDetailsSort[appliedSort.sort.fieldName]
-        //   ) {
-        //     _.each(objectDetailsSort[appliedSort.sort.fieldName], (childProperty: string) => {
-        //       queryBuilder.sort.by(
-        //         `${appliedSort.sort.fieldName}.${childProperty}`,
-        //         appliedSort.direction
-        //       );
-        //     });
-        //   } else {
-        //     queryBuilder.sort.by(
-        //       appliedSort.sort.fieldName,
-        //       appliedSort.direction
-        //     );
-        //   }
-        // });
-        //
-
-        // set filter query builder
-        this._advancedFiltersQueryBuilder = queryBuilder;
-
-        // emit the Request Query Builder
-        this.advancedFilterBy.emit(this.advancedFiltersQueryBuilder);
-
-        // // send filters
-        // this.filtersCollected.emit(appliedFilters);
-
-        // finished
-        response.handler.hide();
-      });
+    // set filter query builder
+    this._advancedFiltersQueryBuilder = queryBuilder;
   }
 
   /**
@@ -2410,5 +2823,26 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           question.multiAnswer
         );
       });
+  }
+
+  /**
+   * Convert advanced filters to save data
+   */
+  advancedFiltersToSaveData(): SavedFilterData {
+    // nothing to save ?
+    if (!this._advancedFiltersApplied) {
+      return null;
+    }
+
+    // save data
+    return this._advancedFiltersApplied;
+  }
+
+  /**
+   * Convert saved data to advanced filters
+   */
+  generateFiltersFromFilterData(savedData: SavedFilterData): void {
+    // set data
+    this._advancedFiltersApplied = savedData;
   }
 }

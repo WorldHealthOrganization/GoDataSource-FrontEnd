@@ -5,12 +5,11 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { IconModel } from '../../../../core/models/icon.model';
 import { IconDataService } from '../../../../core/services/data/icon.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { catchError, map, switchMap } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';

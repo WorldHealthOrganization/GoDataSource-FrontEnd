@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserSettings } from '../../../../core/models/user.model';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
@@ -10,7 +10,6 @@ import { DialogAnswer, DialogAnswerButton, DialogConfiguration, DialogField } fr
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
 import { catchError, map, share, switchMap } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
