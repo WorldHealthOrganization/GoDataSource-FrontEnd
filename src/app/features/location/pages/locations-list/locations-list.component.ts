@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LocationModel } from '../../../../core/models/location.model';
@@ -12,7 +12,6 @@ import { DialogService, ExportDataExtension } from '../../../../core/services/he
 import * as _ from 'lodash';
 import { ErrorCodes } from '../../../../core/enums/error-codes.enum';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { FormLocationDropdownComponent, LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
 import { catchError, share } from 'rxjs/operators';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
@@ -22,6 +21,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { AppFormLocationBaseV2 } from '../../../../shared/forms-v2/core/app-form-location-base-v2';
 
 @Component({
   selector: 'app-locations-list',
@@ -57,7 +57,7 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
   // authenticated user
   UserSettings = UserSettings;
 
-  @ViewChild('locationFilter', { static: true }) locationFilter: FormLocationDropdownComponent;
+  // @ViewChild('locationFilter', { static: true }) locationFilter: FormLocationDropdownComponent;
 
   // export
   hierarchicalLocationsDataExportFileName: string = moment().format('YYYY-MM-DD');
@@ -378,7 +378,7 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
               this.toastV2Service.success('LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_SUCCESS_MESSAGE');
 
               // reset location cache after deleting a location
-              FormLocationDropdownComponent.CACHE = {};
+              AppFormLocationBaseV2.CACHE = {};
 
               // hide loading
               // this.closeLoadingDialog();
@@ -394,16 +394,16 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
      * Search location changed
      * @param data
      */
-  searchLocationChanged(data: LocationAutoItem) {
-    if (
-      data &&
-            data.id
-    ) {
-      // redirect
-      this.locationFilter.clear();
-      this.router.navigate(['/locations', data.id, 'children']);
-    }
-  }
+  // searchLocationChanged(data: LocationAutoItem) {
+  //   if (
+  //     data &&
+  //           data.id
+  //   ) {
+  //     // redirect
+  //     this.locationFilter.clear();
+  //     this.router.navigate(['/locations', data.id, 'children']);
+  //   }
+  // }
 
   filterByIdentifierCode(value: string) {
     // remove previous condition

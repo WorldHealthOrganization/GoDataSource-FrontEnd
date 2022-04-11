@@ -16,8 +16,8 @@ import { DialogAnswer } from '../../../../shared/components/dialog/dialog.compon
 import { DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
-import { FormLocationDropdownComponent } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { AppFormLocationBaseV2 } from '../../../../shared/forms-v2/core/app-form-location-base-v2';
 
 @Component({
   selector: 'app-modify-team',
@@ -136,7 +136,7 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
 
     // if we've changed the location of the team, reset all location cache
     if (dirtyFields.locationIds) {
-      FormLocationDropdownComponent.CACHE = {};
+      AppFormLocationBaseV2.CACHE = {};
     }
 
     // show loading

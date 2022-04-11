@@ -14,7 +14,6 @@ import { YesNoLabelComponent } from './yes-no-label/yes-no-label.component';
 import { FormFillQuestionnaireComponent } from './form-fill-questionnaire/form-fill-questionnaire.component';
 import { ReferenceDataLabelComponent } from './reference-data-label/reference-data-label.component';
 import { FormInputListComponent } from './form-input-list/form-input-list.component';
-import { FormLocationDropdownComponent } from './form-location-dropdown/form-location-dropdown.component';
 import { ChronologyComponent } from './chronology/chronology.component';
 import { ExportButtonComponent } from './export-button/export-button.component';
 import { LocationBreadcrumbsComponent } from './location-breadcrumbs/location-breadcrumbs.component';
@@ -83,7 +82,6 @@ export const components: any[] = [
   FormRelationshipComponent,
   FormInputListComponent,
   FormNameUrlListComponent,
-  FormLocationDropdownComponent,
   FormModifyQuestionnaireComponent,
   FormFillQuestionnaireComponent,
   FormAgeComponent,

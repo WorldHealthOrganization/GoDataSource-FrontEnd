@@ -115,18 +115,18 @@
 
             <div fxLayout="row" fxLayoutGap="20px">
                 <div fxFlex fxLayout="row" fxLayoutGap="5px">
-                    <app-form-location-dropdown
-                        fxFlex
-                        [name]="name + '[locationId]'"
-                        [(ngModel)]="address.locationId"
-                        [placeholder]="'LNG_ADDRESS_FIELD_LABEL_LOCATION' | translate"
-                        tooltip="LNG_ADDRESS_FIELD_LABEL_LOCATION_DESCRIPTION"
-                        [disabled]="disabled"
-                        [required]="required"
-                        [useOutbreakLocations]="true"
-                        (changed)="onChange()"
-                        (itemChanged)="locationChanged($event)">
-                    </app-form-location-dropdown>
+<!--                    <app-form-location-dropdown-->
+<!--                        fxFlex-->
+<!--                        [name]="name + '[locationId]'"-->
+<!--                        [(ngModel)]="address.locationId"-->
+<!--                        [placeholder]="'LNG_ADDRESS_FIELD_LABEL_LOCATION' | translate"-->
+<!--                        tooltip="LNG_ADDRESS_FIELD_LABEL_LOCATION_DESCRIPTION"-->
+<!--                        [disabled]="disabled"-->
+<!--                        [required]="required"-->
+<!--                        [useOutbreakLocations]="true"-->
+<!--                        (changed)="onChange()"-->
+<!--                        (itemChanged)="locationChanged($event)">-->
+<!--                    </app-form-location-dropdown>-->
                     <div
                         *ngIf="displayCopyField"
                         fxFlex="40px"

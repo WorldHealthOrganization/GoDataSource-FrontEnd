@@ -191,15 +191,15 @@
                                     </app-form-daterange>
 
                                     <!-- Address Location / Location -->
-                                    <app-form-location-dropdown
-                                        *ngIf="(filter.filter?.type === FilterType.ADDRESS || filter.filter?.type === FilterType.LOCATION) && filter.comparator === FilterComparator.LOCATION"
-                                        [name]="'filter[filters][' + i + '][value]'"
-                                        [ngModel]="filter.value"
-                                        [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION' | translate"
-                                        [multiple]="filter.filter?.multipleOptions"
-                                        [useOutbreakLocations]="true"
-                                        (changed)="filter.value = $event;">
-                                    </app-form-location-dropdown>
+<!--                                    <app-form-location-dropdown-->
+<!--                                        *ngIf="(filter.filter?.type === FilterType.ADDRESS || filter.filter?.type === FilterType.LOCATION) && filter.comparator === FilterComparator.LOCATION"-->
+<!--                                        [name]="'filter[filters][' + i + '][value]'"-->
+<!--                                        [ngModel]="filter.value"-->
+<!--                                        [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION' | translate"-->
+<!--                                        [multiple]="filter.filter?.multipleOptions"-->
+<!--                                        [useOutbreakLocations]="true"-->
+<!--                                        (changed)="filter.value = $event;">-->
+<!--                                    </app-form-location-dropdown>-->
 
                                     <!-- Address Within Radius -->
                                     <ng-container
@@ -210,15 +210,15 @@
                                             [ngModel]="filter.extraValues.location"
                                             type="hidden"/>
 
-                                        <app-form-location-dropdown
-                                            [name]="'filter[filters][' + i + '][value]'"
-                                            [ngModel]="filter.value"
-                                            [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION' | translate"
-                                            [multiple]="false"
-                                            [useOutbreakLocations]="true"
-                                            (changed)="filter.value = $event;"
-                                            (itemChanged)="filter.extraValues.location = $event;">
-                                        </app-form-location-dropdown>
+<!--                                        <app-form-location-dropdown-->
+<!--                                            [name]="'filter[filters][' + i + '][value]'"-->
+<!--                                            [ngModel]="filter.value"-->
+<!--                                            [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION' | translate"-->
+<!--                                            [multiple]="false"-->
+<!--                                            [useOutbreakLocations]="true"-->
+<!--                                            (changed)="filter.value = $event;"-->
+<!--                                            (itemChanged)="filter.extraValues.location = $event;">-->
+<!--                                        </app-form-location-dropdown>-->
 
                                         <app-form-input
                                             [name]="'filter[filters][' + i + '][extraValues][radius]'"

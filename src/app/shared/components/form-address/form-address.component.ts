@@ -4,9 +4,6 @@ import { GroupBase, GroupFilteredValue } from '../../xt-forms/core';
 import { AddressModel } from '../../../core/models/address.model';
 import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
-import { LocationAutoItem } from '../form-location-dropdown/form-location-dropdown.component';
-import { DialogService } from '../../../core/services/helper/dialog.service';
-import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 import * as _ from 'lodash';
 import { Observable } from 'rxjs';
 import { moment, Moment } from '../../../core/helperClasses/x-moment';
@@ -40,8 +37,7 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
   @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
     @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
     @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
-    private referenceDataDataService: ReferenceDataDataService,
-    private dialogService: DialogService
+    private referenceDataDataService: ReferenceDataDataService
   ) {
     super(controlContainer, validators, asyncValidators);
   }
@@ -85,22 +81,22 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
      * Location Changed
      * @param data
      */
-  locationChanged(data: LocationAutoItem) {
-    if (
-      data &&
-            data.geoLocation &&
-            data.geoLocation.lat &&
-            data.geoLocation.lng
-    ) {
-      this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_REPLACE_GEOLOCATION')
-        .subscribe((answer: DialogAnswer) => {
-          if (answer.button === DialogAnswerButton.Yes) {
-            this.address.geoLocation.lat = data.geoLocation.lat;
-            this.address.geoLocation.lng = data.geoLocation.lng;
-          }
-        });
-    }
-  }
+  // locationChanged(data: LocationAutoItem) {
+  //   if (
+  //     data &&
+  //           data.geoLocation &&
+  //           data.geoLocation.lat &&
+  //           data.geoLocation.lng
+  //   ) {
+  //     this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_REPLACE_GEOLOCATION')
+  //       .subscribe((answer: DialogAnswer) => {
+  //         if (answer.button === DialogAnswerButton.Yes) {
+  //           this.address.geoLocation.lat = data.geoLocation.lat;
+  //           this.address.geoLocation.lng = data.geoLocation.lng;
+  //         }
+  //       });
+  //   }
+  // }
 
   /**
      * Update Lat Lng

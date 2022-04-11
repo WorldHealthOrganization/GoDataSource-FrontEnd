@@ -29,7 +29,6 @@
     "@angular/platform-browser-dynamic": "13.3.2",
     "@angular/router": "13.3.2",
     "@handsontable/angular": "11.1.0",
-    "@ng-select/ng-select": "8.1.1",
     "@ngx-translate/core": "14.0.0",
     "@popperjs/core": "2.11.5",
     "@swimlane/ngx-charts": "20.1.0",
