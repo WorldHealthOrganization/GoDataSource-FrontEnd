@@ -17,12 +17,11 @@ import { ExportFieldsGroupModelNameEnum } from '../../../../core/models/export-f
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { LocationModel } from '../../../../core/models/location.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { ReferenceDataCategory, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
@@ -38,7 +37,7 @@ import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatu
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
+import { FilterModel } from '../../../../shared/components/side-filters/model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
@@ -51,6 +50,11 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
   // available side filters
   availableSideFilters: FilterModel[];
+
+  // constants
+  Constants = Constants;
+  UserSettings = UserSettings;
+
 
   // anonymize fields
   private contactsOfContactsAnonymizeFields: ILabelValuePairModel[] = [
@@ -72,8 +76,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID', value: 'visualId'},
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_TYPE', value: 'type'},
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES', value: 'numberOfExposures'},
-    // FIXME: LNG_CASE_FIELD_LABEL_ADDRESSES shouldn't be with CONTACT_OF_CONTACT?
-    { label: 'LNG_CASE_FIELD_LABEL_ADDRESSES', value: 'addresses'},
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES', value: 'addresses'},
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_IS_DATE_OF_REPORTING_APPROXIMATE', value: 'isDateOfReportingApproximate'},
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_SAFE_BURIAL', value: 'safeBurial'},
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_BURIAL', value: 'dateOfBurial'},
@@ -87,15 +90,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted'},
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt'},
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn'},
-    // FIXME: LNG_CASE_FIELD_LABEL_CLASSIFICATION shouldn't be with CONTACT_OF_CONTACT?
-    { label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION', value: 'classification'},
-    // FIXME: LNG_CONTACT_FIELD_LABEL_WAS_CASE shouldn't be with CONTACT_OF_CONTACT?
-    { label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE', value: 'wasCase'},
-    // FIXME: LNG_CASE_FIELD_LABEL_WAS_CONTACT shouldn't be with CONTACT_OF_CONTACT?
-    { label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT', value: 'wasContact'},
     { label: 'LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT', value: 'dateBecomeContact'},
-    // FIXME: LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED shouldn't be with CONTACT_OF_CONTACT?
-    { label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED', value: 'transferRefused'},
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ID', value: 'id'}
   ];
   private relationshipAnonymizeFields: LabelValuePair[] = [
@@ -122,10 +117,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', 'createdOn')
   ];
 
-  // constants
-  Constants = Constants;
-  UserSettings = UserSettings;
-
   /**
      * Constructor
      */
@@ -134,7 +125,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     private contactsOfContactsDataService: ContactsOfContactsDataService,
     private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
-    private referenceDataDataService: ReferenceDataDataService,
     private i18nService: I18nService,
     private locationDataService: LocationDataService,
     private dialogV2Service: DialogV2Service,
@@ -247,7 +237,8 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
           ) {
             forms.push({
               type: IV2ColumnStatusFormType.TRIANGLE,
-              color: risk.map[data.id].getColorCode()
+              color: risk.map[data.id].getColorCode(),
+              tooltip: this.i18nService.instant(data.riskLevel)
             });
           }
 
@@ -276,7 +267,17 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
       {
         field: 'addresses.addressLine1',
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
-        notVisible: true
+        notVisible: true,
+        format: {
+          type: 'mainAddress.addressLine1'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          address: filterAddressModel,
+          addressField: 'addressLine1',
+          field: 'addresses',
+          fieldIsArray: true
+        }
       },
       {
         field: 'addresses.city',
@@ -355,7 +356,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
           address: filterAddressModel,
           field: 'addresses',
           fieldIsArray: true,
-          options: this.activatedRoute.snapshot.data.yesNoAll
+          options: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options
         },
         sortable: true
       },
@@ -833,45 +834,45 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'firstName',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME'
-        // sortable: true
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'lastName',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME'
-        // sortable: true
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'occupation',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION',
-        options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
-        // sortable: true
+        options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_AGE,
         field: 'age',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE'
-        // sortable: true
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfReporting',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING'
-        // sortable: true
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dob',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_BIRTH'
-        // sortable: true
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'visualId',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID'
-        // sortable: true
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.ADDRESS,
@@ -888,14 +889,14 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfLastContact',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
-        // sortable: true
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_NUMBER,
         field: 'numberOfExposures',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES'
-        // sortable: true
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+        sortable: true
       }
     ];
 
@@ -1141,11 +1142,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
   /**
    * Initialize add action
    */
-  protected initializeAddAction (): void
-  {
-    // NOTE: On the old design it was no Add button
-    // throw new Error( 'Method not implemented.' );
-  }
+  protected initializeAddAction (): void {}
 
   /**
    * Initialize grouped data
@@ -1431,97 +1428,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
   }
 
   /**
-     * Initialize Side Filters
-     */
-  initializeSideFilters() {
-    const occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
-
-    // set available side filters
-    this.availableSideFilters = [
-      // Contact
-      new FilterModel({
-        fieldName: 'firstName',
-        fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME',
-        type: FilterType.TEXT,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'lastName',
-        fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME',
-        type: FilterType.TEXT,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'occupation',
-        fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION',
-        type: FilterType.MULTISELECT,
-        options$: occupationsList$,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'age',
-        fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE',
-        type: FilterType.RANGE_AGE,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'dateOfReporting',
-        fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
-        type: FilterType.RANGE_DATE,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'dob',
-        fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
-        type: FilterType.RANGE_DATE,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'visualId',
-        fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID',
-        type: FilterType.TEXT
-      }),
-      new FilterModel({
-        fieldName: 'addresses',
-        fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_LOCATION',
-        type: FilterType.ADDRESS,
-        addressFieldIsArray: true
-      }),
-      new FilterModel({
-        fieldName: 'addresses',
-        fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PHONE_NUMBER',
-        type: FilterType.ADDRESS_PHONE_NUMBER,
-        addressFieldIsArray: true
-      }),
-      new FilterModel({
-        fieldName: 'dateOfLastContact',
-        fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
-        type: FilterType.RANGE_DATE,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'numberOfExposures',
-        fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
-        type: FilterType.RANGE_NUMBER
-      })
-    ];
-
-    // allowed to filter by responsible user ?
-    if (UserModel.canList(this.authUser)) {
-      this.availableSideFilters.push(
-        new FilterModel({
-          fieldName: 'responsibleUserId',
-          fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
-          type: FilterType.MULTISELECT,
-          // options$: this.userList$,
-          optionsLabelKey: 'name',
-          optionsValueKey: 'id'
-        })
-      );
-    }
-  }
-
-  /**
    * Initialize breadcrumbs
    */
   protected initializeBreadcrumbs(): void {
@@ -1545,7 +1451,25 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
    * Fields retrieved from api to reduce payload size
    */
   protected refreshListFields(): string[] {
-    return [];
+    return [
+      'id',
+      'lastName',
+      'middleName',
+      'firstName',
+      'visualId',
+      'addresses',
+      'age',
+      'gender',
+      'riskLevel',
+      'dateOfLastContact',
+      'responsibleUserId',
+      'numberOfExposures',
+      'deleted',
+      'createdBy',
+      'createdAt',
+      'updatedBy',
+      'updatedAt'
+    ];
   }
 
   /**
