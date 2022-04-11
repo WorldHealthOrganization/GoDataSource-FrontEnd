@@ -77,7 +77,7 @@ export class ModifyQuestionnaireLabResultComponent extends ViewModifyComponent i
 
     // retrieve queryParams data
     this.route.queryParams
-      .subscribe((params: {fromLabResultsList}) => {
+      .subscribe((params: { fromLabResultsList }) => {
         this.fromLabResultsList = params && params.fromLabResultsList ?
           JSON.parse(params.fromLabResultsList) :
           false;

@@ -202,7 +202,7 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
         .getPNGBase64(ganttChartName, '#tempCanvas')
         .subscribe((pngBase64) => {
           this.importExportDataService
-            .exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
+            .exportImageToPdf({ image: pngBase64, responseType: 'blob', splitFactor: 1 })
             .pipe(
               catchError((err) => {
                 this.toastV2Service.error(err);

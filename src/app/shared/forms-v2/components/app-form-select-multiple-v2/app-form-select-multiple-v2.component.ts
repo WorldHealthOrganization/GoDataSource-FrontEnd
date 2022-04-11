@@ -87,7 +87,7 @@ export class AppFormSelectMultipleV2Component
   toggleAllCheckboxChecked: boolean = false;
 
   // vscroll handler
-  @ViewChild('cdkVirtualScrollViewport', {static: true}) cdkVirtualScrollViewport: CdkVirtualScrollViewport;
+  @ViewChild('cdkVirtualScrollViewport', { static: true }) cdkVirtualScrollViewport: CdkVirtualScrollViewport;
 
   /**
    * Constructor

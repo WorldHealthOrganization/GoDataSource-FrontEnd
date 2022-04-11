@@ -99,7 +99,7 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
     this.refdataSubscriber = this.referenceDataDataService
       .getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE)
       .subscribe((personTypes) => {
-        const casePersonType = _.find(personTypes.entries, {value: EntityType.CASE});
+        const casePersonType = _.find(personTypes.entries, { value: EntityType.CASE });
         if (casePersonType) {
           this.caseRefDataColor = casePersonType.colorCode;
         }
@@ -164,7 +164,7 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
 
     // push to chart
     _.forEach(chainsSize, (value, key) => {
-      this.histogramResults.push({name: key, value: value});
+      this.histogramResults.push({ name: key, value: value });
     });
   }
 
@@ -222,7 +222,7 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
 
     // do we need to include global filters ?
     if (_.isEmpty(global)) {
-      this.router.navigate(['/transmission-chains'], {queryParams: otherParams});
+      this.router.navigate(['/transmission-chains'], { queryParams: otherParams });
     } else {
       this.router.navigate(['/transmission-chains'], {
         queryParams: {

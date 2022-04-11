@@ -235,7 +235,7 @@ export class CreateContactComponent
 
     // retrieve query params
     this.route.queryParams
-      .subscribe((params: {entityType, entityId}) => {
+      .subscribe((params: { entityType, entityId }) => {
         this.entityType = _.get(params, 'entityType');
         this.entityId = _.get(params, 'entityId');
 

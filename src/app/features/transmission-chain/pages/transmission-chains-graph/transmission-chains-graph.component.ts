@@ -256,7 +256,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
           pngBase64 = pngBase64.replace('data:image/png;base64,', '');
 
           // call the api for the pdf
-          this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: Number(splitFactor)})
+          this.importExportDataService.exportImageToPdf({ image: pngBase64, responseType: 'blob', splitFactor: Number(splitFactor) })
             .pipe(
               catchError((err) => {
                 this.toastV2Service.error(err);
@@ -529,7 +529,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   }
 
   deleteSelectedPerson(person: (CaseModel | ContactModel | EventModel)) {
-    this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_CASE', {name: person.name})
+    this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_CASE', { name: person.name })
       .subscribe((answer: DialogAnswer) => {
         if (answer.button === DialogAnswerButton.Yes) {
           // delete person

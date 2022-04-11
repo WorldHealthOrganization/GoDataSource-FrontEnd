@@ -287,7 +287,7 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
      * Get translation token from language
      */
   getModuleTranslation(module: string) {
-    const moduleItem: LabelValuePair = _.find(this.moduleList, {value: module}) as LabelValuePair;
+    const moduleItem: LabelValuePair = _.find(this.moduleList, { value: module }) as LabelValuePair;
     return moduleItem ?
       moduleItem.label :
       '';
@@ -522,7 +522,7 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
      */
   configureAutomaticBackupSettings() {
     // keep the existing configuration
-    const currentSettings = {...this.settings.dataBackup};
+    const currentSettings = { ...this.settings.dataBackup };
     forkJoin([
       this.genericDataService.getFilterYesNoOptions(),
       this.genericDataService.getAutomaticBackupTypesList()
@@ -669,13 +669,13 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
                 return !fieldsData.disabled;
               }
             })
-          ]})
+          ] })
         )
         .subscribe((answer: DialogAnswer) => {
           if (answer.button === DialogAnswerButton.Yes) {
             // if the automatic backup is off do not change the rest of the settings
             if (answer.inputValue.value.disabled) {
-              answer.inputValue.value = {...currentSettings};
+              answer.inputValue.value = { ...currentSettings };
               answer.inputValue.value.disabled = true;
             }
 

@@ -2161,8 +2161,8 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
    */
   private addClassificationConditions() {
     // create classification condition
-    const trueCondition = {classification: {eq: Constants.CASE_CLASSIFICATION.NOT_A_CASE}};
-    const falseCondition = {classification: {neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE}};
+    const trueCondition = { classification: { eq: Constants.CASE_CLASSIFICATION.NOT_A_CASE } };
+    const falseCondition = { classification: { neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE } };
 
     // remove existing filter
     this.queryBuilder.filter.removeExactCondition(trueCondition);

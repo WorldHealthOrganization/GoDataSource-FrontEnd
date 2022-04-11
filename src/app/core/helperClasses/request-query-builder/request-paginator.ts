@@ -47,7 +47,7 @@ export class RequestPaginator {
      * @returns {RequestPaginator}
      */
   setPage(
-    page: (PageEvent | {pageSize: number, pageIndex: number}),
+    page: (PageEvent | { pageSize: number, pageIndex: number }),
     disableOnChange: boolean = false
   ): RequestPaginator {
     // limit

@@ -32,7 +32,7 @@ export class UserSettingsDashboardModel {
      * @param name
      */
   getDashlet(name: string): DashletSettingsModel {
-    return _.find(this.dashlets, {name: name});
+    return _.find(this.dashlets, { name: name });
   }
 
   /**
@@ -47,7 +47,7 @@ export class UserSettingsDashboardModel {
       // add order if missing
       if (!_.isNumber(dashlet.order)) {
         // find the next index for the same KPI Groupo
-        dashlet.order = _.filter(this.dashlets, {kpiGroup: dashlet.kpiGroup}).length;
+        dashlet.order = _.filter(this.dashlets, { kpiGroup: dashlet.kpiGroup }).length;
       }
 
       // add new dashlet
@@ -60,7 +60,7 @@ export class UserSettingsDashboardModel {
      * @param name
      */
   hideDashlet(name: string) {
-    const dashletObj: DashletSettingsModel = _.find(this.dashlets, {name: name});
+    const dashletObj: DashletSettingsModel = _.find(this.dashlets, { name: name });
 
     if (dashletObj) {
       // get the group that the dashlet belongs to
@@ -81,7 +81,7 @@ export class UserSettingsDashboardModel {
       });
 
       // update the order of the hidden dashlet (move it last in the list)
-      dashletObj.order = _.filter(this.dashlets, {kpiGroup: kpiGroup}).length - 1;
+      dashletObj.order = _.filter(this.dashlets, { kpiGroup: kpiGroup }).length - 1;
     }
   }
 
@@ -100,11 +100,11 @@ export class UserSettingsDashboardModel {
   }
 
   moveDashletAfter(name: string) {
-    const dashletObj: DashletSettingsModel = _.find(this.dashlets, {name: name});
+    const dashletObj: DashletSettingsModel = _.find(this.dashlets, { name: name });
 
     if (dashletObj) {
       // get the next dashlet from the same group (by order)
-      const nextDashletObj: DashletSettingsModel = _.find(this.dashlets, {order: dashletObj.order + 1, kpiGroup: dashletObj.kpiGroup, visible: true});
+      const nextDashletObj: DashletSettingsModel = _.find(this.dashlets, { order: dashletObj.order + 1, kpiGroup: dashletObj.kpiGroup, visible: true });
 
       if (nextDashletObj) {
         // switch orders
@@ -115,11 +115,11 @@ export class UserSettingsDashboardModel {
   }
 
   moveDashletBefore(name: string) {
-    const dashletObj: DashletSettingsModel = _.find(this.dashlets, {name: name});
+    const dashletObj: DashletSettingsModel = _.find(this.dashlets, { name: name });
 
     if (dashletObj) {
       // get the previous dashlet from the same group (by order)
-      const previousDashletObj: DashletSettingsModel = _.find(this.dashlets, {order: dashletObj.order - 1, kpiGroup: dashletObj.kpiGroup, visible: true});
+      const previousDashletObj: DashletSettingsModel = _.find(this.dashlets, { order: dashletObj.order - 1, kpiGroup: dashletObj.kpiGroup, visible: true });
 
       if (previousDashletObj) {
         // switch orders

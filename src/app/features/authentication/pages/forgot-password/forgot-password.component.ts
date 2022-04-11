@@ -113,7 +113,7 @@ export class ForgotPasswordComponent implements OnInit {
         .subscribe(() => {
           this.toastV2Service.success(
             'LNG_PAGE_FORGOT_PASSWORD_ACTION_SEND_EMAIL_SUCCESS_MESSAGE',
-            {email: dirtyFields.email}
+            { email: dirtyFields.email }
           );
 
           // hide loading

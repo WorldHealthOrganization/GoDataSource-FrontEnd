@@ -497,7 +497,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     const maps: {
       [uuid: string]: string
     } = {};
-    this.questionVariables = {...this.extraQuestionVariables};
+    this.questionVariables = { ...this.extraQuestionVariables };
 
     // add variables to array of variables
     const getQuestionVariables = (questions: QuestionModel[]) => {

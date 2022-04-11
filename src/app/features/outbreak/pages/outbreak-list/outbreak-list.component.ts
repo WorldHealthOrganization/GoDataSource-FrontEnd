@@ -547,7 +547,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
     this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_MAKE_OUTBREAK_ACTIVE')
       .subscribe((answer: DialogAnswer) => {
         if (answer.button === DialogAnswerButton.Yes) {
-          const userData = {'activeOutbreakId': outbreak.id};
+          const userData = { 'activeOutbreakId': outbreak.id };
           const userId = this.authUser.id;
           this.userDataService
             .modifyUser(userId, userData)
@@ -655,7 +655,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
                 placeholder: 'LNG_DIALOG_FIELD_PLACEHOLDER_CLONED_OUTBREAK_NAME',
                 required: true,
                 type: 'text',
-                value: this.i18nService.instant('LNG_PAGE_LIST_OUTBREAKS_CLONE_NAME', {name: outbreak.name})
+                value: this.i18nService.instant('LNG_PAGE_LIST_OUTBREAKS_CLONE_NAME', { name: outbreak.name })
               })]
             }),
             true

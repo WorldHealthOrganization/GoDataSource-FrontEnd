@@ -80,7 +80,7 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
     this.showLoadingDialog(false);
 
     // get the route params
-    this.route.params.subscribe((params: {userId}) => {
+    this.route.params.subscribe((params: { userId }) => {
       // get the ID of the User being modified
       this.userId = params.userId;
 

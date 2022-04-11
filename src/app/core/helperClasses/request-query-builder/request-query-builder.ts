@@ -391,7 +391,7 @@ export class RequestQueryBuilder {
     }
 
     // merge "order" criterias
-    this.sort.criterias = {...this.sort.criterias, ...queryBuilder.sort.criterias};
+    this.sort.criterias = { ...this.sort.criterias, ...queryBuilder.sort.criterias };
 
     // update the "limit" if necessary
     this.limitResultsNumber = queryBuilder.limitResultsNumber || this.limitResultsNumber;
@@ -595,14 +595,14 @@ export class RequestQueryBuilder {
       fieldsInResponse: this.fieldsInResponse,
       includedRelations: _.transform(
         this.includedRelations,
-        (result: {[relationName: string]: ISerializedQueryBuilderRelation}, value: RequestRelationBuilder, key: string) => {
+        (result: { [relationName: string]: ISerializedQueryBuilderRelation }, value: RequestRelationBuilder, key: string) => {
           result[key] = value.serialize();
         },
         {}
       ),
       childrenQueryBuilders: _.transform(
         this.childrenQueryBuilders,
-        (result: {[qbFilterKey: string]: ISerializedQueryBuilder}, value: RequestQueryBuilder, key: string) => {
+        (result: { [qbFilterKey: string]: ISerializedQueryBuilder }, value: RequestQueryBuilder, key: string) => {
           result[key] = value.serialize();
         },
         {}
@@ -636,7 +636,7 @@ export class RequestQueryBuilder {
     this.fieldsInResponse = serializedValueObject.fieldsInResponse;
     this.includedRelations = _.transform(
       serializedValueObject.includedRelations,
-      (result: {[relationName: string]: RequestRelationBuilder}, value: ISerializedQueryBuilderRelation, key: string) => {
+      (result: { [relationName: string]: RequestRelationBuilder }, value: ISerializedQueryBuilderRelation, key: string) => {
         // create new relationship if necessary
         result[key] = new RequestRelationBuilder(
           key,
@@ -653,7 +653,7 @@ export class RequestQueryBuilder {
     );
     this.childrenQueryBuilders = _.transform(
       serializedValueObject.childrenQueryBuilders,
-      (result: {[qbFilterKey: string]: RequestQueryBuilder}, value: ISerializedQueryBuilder, key: string) => {
+      (result: { [qbFilterKey: string]: RequestQueryBuilder }, value: ISerializedQueryBuilder, key: string) => {
         // create new relationship if necessary
         result[key] = new RequestQueryBuilder(
           () => {

@@ -221,7 +221,7 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
      * @param {boolean} isPublic
      */
   setPublicItem(savedImportMappingId: string, isPublic: boolean) {
-    this.savedImportMappingService.modifyImportMapping(savedImportMappingId, {isPublic : isPublic})
+    this.savedImportMappingService.modifyImportMapping(savedImportMappingId, { isPublic : isPublic })
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);

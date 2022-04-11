@@ -406,7 +406,7 @@ export class OutbreakTemplatesListComponent
                 placeholder: 'LNG_DIALOG_FIELD_PLACEHOLDER_CLONED_OUTBREAK_TEMPLATE_NAME',
                 required: true,
                 type: 'text',
-                value: this.i18nService.instant('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_CLONE_NAME', {name: outbreakTemplate.name})
+                value: this.i18nService.instant('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_CLONE_NAME', { name: outbreakTemplate.name })
               })]
             }),
             true

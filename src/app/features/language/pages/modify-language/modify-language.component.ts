@@ -60,7 +60,7 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
     this.showLoadingDialog(false);
 
     this.route.params
-      .subscribe((params: {languageId}) => {
+      .subscribe((params: { languageId }) => {
         // get language
         this.languageId = params.languageId;
         this.languageDataService

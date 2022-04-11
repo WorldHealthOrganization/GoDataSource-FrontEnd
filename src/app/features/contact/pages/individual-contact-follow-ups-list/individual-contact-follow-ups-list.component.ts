@@ -587,7 +587,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
         fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_WEEK_NUMBER',
         type: FilterType.NUMBER,
         allowedComparators: [
-          _.find(AppliedFilterModel.allowedComparators[FilterType.NUMBER], {value: FilterComparator.IS})
+          _.find(AppliedFilterModel.allowedComparators[FilterType.NUMBER], { value: FilterComparator.IS })
         ],
         flagIt: true
       }),
@@ -596,7 +596,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
         fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_TIME_FILTER',
         type: FilterType.DATE,
         allowedComparators: [
-          _.find(AppliedFilterModel.allowedComparators[FilterType.DATE], {value: FilterComparator.IS})
+          _.find(AppliedFilterModel.allowedComparators[FilterType.DATE], { value: FilterComparator.IS })
         ],
         flagIt: true
       }),

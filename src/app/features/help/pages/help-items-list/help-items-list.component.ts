@@ -297,7 +297,7 @@ export class HelpItemsListComponent extends ListComponent implements OnInit, OnD
      */
   deleteHelpItem(item: HelpItemModel) {
     // show confirm dialog
-    const translatedData = {title: this.i18nService.instant(item.title)};
+    const translatedData = { title: this.i18nService.instant(item.title) };
     this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_HELP_ITEM', translatedData)
       .subscribe((answer: DialogAnswer) => {
         if (answer.button === DialogAnswerButton.Yes) {
@@ -329,7 +329,7 @@ export class HelpItemsListComponent extends ListComponent implements OnInit, OnD
      */
   approveHelpItem(item: HelpItemModel) {
     // show confirm dialog
-    const translatedData = {title: this.i18nService.instant(item.title)};
+    const translatedData = { title: this.i18nService.instant(item.title) };
     this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_APPROVE_HELP_ITEM', translatedData)
       .subscribe((answer: DialogAnswer) => {
         if (answer.button === DialogAnswerButton.Yes) {

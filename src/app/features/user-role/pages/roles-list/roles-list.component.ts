@@ -261,7 +261,7 @@ export class RolesListComponent extends ListComponent implements OnInit, OnDestr
             .deleteRole(userRole.id)
             .pipe(
               catchError((err) => {
-                this.toastV2Service.error(err, {userRoleName : userRole.name});
+                this.toastV2Service.error(err, { userRoleName : userRole.name });
                 return throwError(err);
               })
             )

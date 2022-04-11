@@ -102,7 +102,7 @@ export class ReferenceDataDataService {
       .pipe(
         map((entries) => {
           // find the category
-          return _.find(entries, {id: categoryId});
+          return _.find(entries, { id: categoryId });
         })
       );
   }
