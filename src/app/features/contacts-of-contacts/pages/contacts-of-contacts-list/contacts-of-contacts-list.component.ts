@@ -57,40 +57,40 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
   // anonymize fields
   private contactsOfContactsAnonymizeFields: ILabelValuePairModel[] = [
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME', value: 'firstName'},
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RELATIONSHIP', value: 'relationship'},
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME', value: 'middleName'},
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME', value: 'lastName'},
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER', value: 'gender'},
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION', value: 'occupation'},
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE', value: 'age'},
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOB', value: 'dob'},
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOCUMENTS', value: 'documents'},
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING', value: 'dateOfReporting'},
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT', value: 'dateOfLastContact'},
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL', value: 'riskLevel'},
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON', value: 'riskReason'},
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OUTCOME_ID', value: 'outcomeId'},
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_OUTCOME', value: 'dateOfOutcome'},
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID', value: 'visualId'},
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_TYPE', value: 'type'},
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES', value: 'numberOfExposures'},
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES', value: 'addresses'},
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_IS_DATE_OF_REPORTING_APPROXIMATE', value: 'isDateOfReportingApproximate'},
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_SAFE_BURIAL', value: 'safeBurial'},
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_BURIAL', value: 'dateOfBurial'},
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VACCINES_RECEIVED', value: 'vaccinesReceived'},
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS', value: 'pregnancyStatus'},
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUserId'},
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt'},
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy'},
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt'},
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy'},
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted'},
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt'},
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn'},
-    { label: 'LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT', value: 'dateBecomeContact'},
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ID', value: 'id'}
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME', value: 'firstName' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RELATIONSHIP', value: 'relationship' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME', value: 'middleName' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME', value: 'lastName' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER', value: 'gender' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION', value: 'occupation' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE', value: 'age' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOB', value: 'dob' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOCUMENTS', value: 'documents' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING', value: 'dateOfReporting' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT', value: 'dateOfLastContact' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL', value: 'riskLevel' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON', value: 'riskReason' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OUTCOME_ID', value: 'outcomeId' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_OUTCOME', value: 'dateOfOutcome' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID', value: 'visualId' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_TYPE', value: 'type' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES', value: 'numberOfExposures' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES', value: 'addresses' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_IS_DATE_OF_REPORTING_APPROXIMATE', value: 'isDateOfReportingApproximate' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_SAFE_BURIAL', value: 'safeBurial' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_BURIAL', value: 'dateOfBurial' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VACCINES_RECEIVED', value: 'vaccinesReceived' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS', value: 'pregnancyStatus' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUserId' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT', value: 'dateBecomeContact' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ID', value: 'id' }
   ];
   private relationshipAnonymizeFields: LabelValuePair[] = [
     new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_ID', 'id'),
@@ -1141,7 +1141,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
   /**
    * Initialize add action
    */
-  protected initializeAddAction (): void {}
+  protected initializeAddAction(): void {}
 
   /**
    * Initialize grouped data

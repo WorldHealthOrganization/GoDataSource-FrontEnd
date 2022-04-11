@@ -63,7 +63,7 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
     // show loading
     this.showLoadingDialog(false);
 
-    this.route.params.subscribe((params: {roleId}) => {
+    this.route.params.subscribe((params: { roleId }) => {
       // get the ID of the Role being modified
       this.userRoleId = params.roleId;
 

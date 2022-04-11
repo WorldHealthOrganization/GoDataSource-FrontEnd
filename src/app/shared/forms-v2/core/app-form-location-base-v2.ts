@@ -108,7 +108,7 @@ export abstract class AppFormLocationBaseV2<T>
   };
 
   // vscroll handler
-  @ViewChild('cdkVirtualScrollViewport', {static: true}) cdkVirtualScrollViewport: CdkVirtualScrollViewport;
+  @ViewChild('cdkVirtualScrollViewport', { static: true }) cdkVirtualScrollViewport: CdkVirtualScrollViewport;
 
   /**
    * Do a request or retrieve it from cache if it didn't expire
@@ -156,7 +156,7 @@ export abstract class AppFormLocationBaseV2<T>
         createdAt: moment(),
         executeObserver$: executeObserver$,
         data: null,
-        observer$: new Observable<HierarchicalLocationModel[]>((function (
+        observer$: new Observable<HierarchicalLocationModel[]>((function(
           localCache,
           localMethodKey: string,
           localCacheKey: string

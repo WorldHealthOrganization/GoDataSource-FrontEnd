@@ -298,7 +298,7 @@ export class CreateCaseComponent
     // current page breadcrumb
     if (this.caseUID) {
       this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_CREATE_CASE_WITH_UID_TITLE', '.', true, {}, {uid: this.caseUID})
+        new BreadcrumbItemModel('LNG_PAGE_CREATE_CASE_WITH_UID_TITLE', '.', true, {}, { uid: this.caseUID })
       );
     } else {
       this.breadcrumbs.push(

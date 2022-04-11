@@ -326,7 +326,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
             .deleteEntry(entry.id)
             .pipe(
               catchError((err) => {
-                this.toastV2Service.error(err, {entryValue: entry.value});
+                this.toastV2Service.error(err, { entryValue: entry.value });
                 return throwError(err);
               }),
               switchMap(() => {

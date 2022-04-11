@@ -489,7 +489,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
      */
   setTargetedItem(followUp: FollowUpModel, targeted: boolean) {
     this.followUpsDataService
-      .modifyFollowUp(this.selectedOutbreak.id, followUp.personId, followUp.id, {targeted: targeted})
+      .modifyFollowUp(this.selectedOutbreak.id, followUp.personId, followUp.id, { targeted: targeted })
       .pipe(
         catchError((err) => {
           this.listHelperService.toastV2Service.error(err);

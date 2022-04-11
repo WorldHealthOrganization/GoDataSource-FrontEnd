@@ -107,6 +107,7 @@ module.exports = {
         "@typescript-eslint/no-non-null-assertion": "error",
         "@typescript-eslint/no-shadow": "error",
         "@typescript-eslint/no-unused-expressions": "error",
+        "@typescript-eslint/object-curly-spacing": ["error", "always"],
         "@typescript-eslint/prefer-function-type": "error",
         "@typescript-eslint/quotes": [
           "error",
@@ -116,6 +117,8 @@ module.exports = {
           "error",
           "always"
         ],
+        "@typescript-eslint/space-before-function-paren": ["error", "never"],
+        "@typescript-eslint/space-infix-ops": ["error"],
         "@typescript-eslint/type-annotation-spacing": "error",
         "@typescript-eslint/unified-signatures": "error",
         "arrow-body-style": "off",
@@ -189,6 +192,7 @@ module.exports = {
         "no-unused-expressions": "error",
         "no-unused-labels": "error",
         "no-var": "error",
+        "object-curly-spacing": "off",
         "prefer-const": "error",
         "quotes": [
           1,
@@ -196,6 +200,8 @@ module.exports = {
         ],
         "radix": "error",
         "semi": "error",
+        "space-before-function-paren": "off",
+        "space-infix-ops": "off",
         "spaced-comment": [
           "error",
           "always",

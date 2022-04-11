@@ -233,7 +233,7 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
      */
   deleteHelpCategory(category: HelpCategoryModel) {
     // show confirm dialog
-    const translatedData = {name: this.i18nService.instant(category.name)};
+    const translatedData = { name: this.i18nService.instant(category.name) };
     this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_HELP_CATEGORY', translatedData)
       .subscribe((answer: DialogAnswer) => {
         if (answer.button === DialogAnswerButton.Yes) {

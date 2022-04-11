@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 
 // modules
-import {routing} from './saved-filters.module.routing';
+import { routing } from './saved-filters.module.routing';
 import { SharedModule } from '../../shared/shared.module';
 
 // components

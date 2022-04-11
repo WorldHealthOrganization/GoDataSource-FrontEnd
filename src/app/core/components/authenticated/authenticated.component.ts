@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { UserModel } from '../../models/user.model';
 import { AuthDataService } from '../../services/data/auth.data.service';
 import { OutbreakModel } from '../../models/outbreak.model';
@@ -11,6 +11,7 @@ import { IV2LoadingDialogHandler } from '../../../shared/components-v2/app-loadi
 import { NavigationEnd, NavigationStart, RouteConfigLoadStart, Router } from '@angular/router';
 import { DashboardModel } from '../../models/dashboard.model';
 import { ConfirmOnFormChanges, PageChangeConfirmationGuard } from '../../services/guards/page-change-confirmation-guard.service';
+import { determineRenderMode, RenderMode } from '../../enums/render-mode.enum';
 
 @Component({
   selector: 'app-authenticated',
@@ -35,6 +36,10 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
 
   // expand menu
   expandMenu: boolean = false;
+  hoveringMenu: boolean = false;
+
+  // render mode
+  renderMode: RenderMode = RenderMode.FULL;
 
   //
   // // display popup when less then 2 minutes
@@ -59,10 +64,11 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
   //
   // // help items for search
   // contextSearchHelpItems: string[];
-  //
-  // // constants
+
+  // constants
+  RenderMode = RenderMode;
   // Constants = Constants;
-  //
+
   // menu loading dialog
   private menuLoadingDialog: IV2LoadingDialogHandler;
   //
@@ -134,11 +140,14 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
         this.hideLoading();
       }
     });
+
+    // update render mode
+    this.updateRenderMode();
   }
 
   /**
-     * Component initialized
-     */
+   * Component initialized
+   */
   ngOnInit(): void {
     // get the authenticated user
     this.authUser = this.authDataService.getAuthenticatedUser();
@@ -215,6 +224,9 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
       if (navStart.url === '/') {
         return redirectRootToLandingPage();
       }
+
+      // collapse hovering menu on page change
+      this.hoveringMenu = false;
 
       // // check for context help
       // if (
@@ -539,5 +551,22 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       PageChangeConfirmationGuard.closeVisibleDirtyDialog();
     });
+  }
+
+  /**
+   * Update website render mode
+   */
+  @HostListener('window:resize')
+  private updateRenderMode(): void {
+    // determine render mode
+    this.renderMode = determineRenderMode();
+
+    // do extra stuff depending of render mode
+    if (this.renderMode !== RenderMode.FULL) {
+      this.expandMenu = false;
+    } else {
+      // full
+      this.hoveringMenu = false;
+    }
   }
 }

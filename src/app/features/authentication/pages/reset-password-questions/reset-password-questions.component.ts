@@ -32,7 +32,7 @@ export class ResetPasswordQuestionsComponent implements OnInit {
   dataModel = {
     captcha: '',
     email: null,
-    questions: [{question: null, answer: null}, {question: null, answer: null}]
+    questions: [{ question: null, answer: null }, { question: null, answer: null }]
   };
   securityQuestionsList$: Observable<SecurityQuestionModel[]>;
 

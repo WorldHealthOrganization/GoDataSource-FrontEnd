@@ -89,7 +89,7 @@ export class AppFormSelectSingleV2Component
   }
 
   // vscroll handler
-  @ViewChild('cdkVirtualScrollViewport', {static: true}) cdkVirtualScrollViewport: CdkVirtualScrollViewport;
+  @ViewChild('cdkVirtualScrollViewport', { static: true }) cdkVirtualScrollViewport: CdkVirtualScrollViewport;
 
   /**
    * Constructor

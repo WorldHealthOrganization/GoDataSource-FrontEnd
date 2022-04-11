@@ -92,7 +92,7 @@ export class CreateReferenceDataEntryComponent
 
     // get the route params
     this.route.params
-      .subscribe((params: {categoryId}) => {
+      .subscribe((params: { categoryId }) => {
         this.categoryId = params.categoryId;
 
         // retrieve Reference Data Category info

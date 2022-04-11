@@ -422,7 +422,7 @@ export class ContactModel
      */
   get mainAddress(): AddressModel {
     // get main address
-    const mainAddress = _.find(this.addresses, {'typeId': AddressType.CURRENT_ADDRESS});
+    const mainAddress = _.find(this.addresses, { 'typeId': AddressType.CURRENT_ADDRESS });
     // do we have main address? Otherwise use any address
     const address = mainAddress ? mainAddress : this.addresses[0];
 

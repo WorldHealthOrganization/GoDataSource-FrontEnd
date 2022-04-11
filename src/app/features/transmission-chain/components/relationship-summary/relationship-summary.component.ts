@@ -156,7 +156,7 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
       .subscribe((answer: DialogAnswer) => {
         if (answer.button === DialogAnswerButton.Yes) {
           const relationshipPersons = {
-            sourceId: _.find(this.relationship.persons, {target: true}).id,
+            sourceId: _.find(this.relationship.persons, { target: true }).id,
             targetId: this.relationship.sourcePerson.id
           };
           this.relationshipDataService

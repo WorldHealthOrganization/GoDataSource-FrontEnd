@@ -833,7 +833,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
       .subscribe((answer: DialogAnswer) => {
         if (answer.button === DialogAnswerButton.Yes) {
           this.caseDataService
-            .modifyCase(this.selectedOutbreak.id, this.entityData.id, {classification: classificationOption.value})
+            .modifyCase(this.selectedOutbreak.id, this.entityData.id, { classification: classificationOption.value })
             .pipe(
               catchError((err) => {
                 this.toastV2Service.error(err);

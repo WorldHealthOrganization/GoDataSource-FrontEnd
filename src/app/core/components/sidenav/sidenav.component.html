@@ -50,7 +50,7 @@
           *ngIf="menuOption.visible">
 
           <!-- Menu without children - link -->
-          <div
+          <a
             *ngIf="menuOption.link; else childrenPanel"
             class="gd-main-menu-option gd-main-menu-option-link"
             [routerLink]="menuOption.link"
@@ -62,7 +62,7 @@
                 [ngTemplateOutlet]="commonPart"
                 [ngTemplateOutletContext]="{ option: menuOption }"></ng-template>
             </div>
-          </div>
+          </a>
 
           <!-- Menu with children -->
           <ng-template
@@ -92,7 +92,7 @@
                     *ngIf="menuOptionChild.visible">
 
                     <!-- Child Menu link -->
-                    <div
+                    <a
                       class="gd-main-menu-option gd-main-menu-option-link"
                       [routerLink]="menuOptionChild.link"
                       routerLinkActive="gd-main-menu-option-active"
@@ -103,7 +103,7 @@
                           [ngTemplateOutlet]="commonPart"
                           [ngTemplateOutletContext]="{ option: menuOptionChild }"></ng-template>
                       </div>
-                    </div>
+                    </a>
 
                   </ng-container>
                 </ng-container>
@@ -154,7 +154,7 @@
                       *ngIf="menuOptionChild.visible">
 
                       <!-- Child Menu link -->
-                      <button
+                      <a
                         class="gd-main-menu-option-header-button"
                         mat-menu-item
                         [routerLink]="menuOptionChild.link"
@@ -163,7 +163,7 @@
                         <ng-template
                           [ngTemplateOutlet]="commonPart"
                           [ngTemplateOutletContext]="{ option: menuOptionChild }"></ng-template>
-                      </button>
+                      </a>
 
                     </ng-container>
                   </ng-container>

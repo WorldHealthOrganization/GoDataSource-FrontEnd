@@ -195,7 +195,7 @@ export class SavedFiltersComponent extends ListComponent implements OnInit, OnDe
      * @param isPublic
      */
   setPublicItem(savedFilterId: string, isPublic: boolean) {
-    this.savedFiltersService.modifyFilter(savedFilterId, {isPublic : isPublic})
+    this.savedFiltersService.modifyFilter(savedFilterId, { isPublic : isPublic })
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);

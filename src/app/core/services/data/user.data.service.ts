@@ -127,7 +127,7 @@ export class UserDataService {
           });
 
           // save settings
-          return this.modifyUser(userId, {settings: userData.settings});
+          return this.modifyUser(userId, { settings: userData.settings });
         })
       );
   }

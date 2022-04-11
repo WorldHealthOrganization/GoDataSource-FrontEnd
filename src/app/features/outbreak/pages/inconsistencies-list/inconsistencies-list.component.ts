@@ -253,7 +253,7 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
      * @param {string} action
      * @returns {string}
      */
-  getItemRouterLink (item: CaseModel | ContactModel | EventModel, action: string) {
+  getItemRouterLink(item: CaseModel | ContactModel | EventModel, action: string) {
     switch (item.type) {
       case EntityType.CASE:
         return `/cases/${item.id}/${action === 'view' ? 'view' : 'modify'}`;

@@ -110,7 +110,7 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
             position: 'outer-middle'
           },
           tick: {
-            format: function (d) {
+            format: function(d) {
               return d % 1 === 0 ? String(d) : '';
             }
           }
@@ -119,7 +119,7 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
       legend: {
         item: {
           // disable click on legend
-          onclick: function () {
+          onclick: function() {
             return false;
           }
         }

@@ -4,7 +4,6 @@ import * as _ from 'lodash';
 import * as moment from 'moment';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
-
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 import { AddressModel } from '../../../../core/models/address.model';
@@ -37,7 +36,6 @@ import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
-import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 
@@ -250,6 +248,7 @@ export class EventsListComponent
             type: V2FilterType.NUMBER_RANGE,
             min: 0
           },
+          sortable: true,
           cssCellClass: 'gd-cell-button',
           buttonLabel: (item) =>
             (item.numberOfContacts || '').toLocaleString('en'),
@@ -304,7 +303,8 @@ export class EventsListComponent
         },
         filter: {
           type: V2FilterType.DELETED,
-          value: false
+          value: false,
+          defaultValue: false
         },
         sortable: true
       },
@@ -457,7 +457,7 @@ export class EventsListComponent
       },
       {
         field: 'address.geoLocationAccurate',
-        label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
+        label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN,
@@ -468,7 +468,8 @@ export class EventsListComponent
           address: filterAddressModel,
           field: 'address',
           fieldIsArray: false,
-          options: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options
+          options: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          defaultValue: ''
         },
         sortable: true
       },
@@ -1139,19 +1140,7 @@ export class EventsListComponent
                     },
                     dbColumns: true,
                     dbValues: true,
-                    jsonReplaceUndefinedWithNull: true,
-                    questionnaireVariables: true
-                  },
-                  inputs: {
-                    append: [
-                      {
-                        type: V2SideDialogConfigInputType.CHECKBOX,
-                        placeholder: 'LNG_PAGE_LIST_EVENTS_EXPORT_CONTACT_INFORMATION',
-                        tooltip: 'LNG_PAGE_LIST_EVENTS_EXPORT_CONTACT_INFORMATION_DESCRIPTION',
-                        name: 'includeContactFields',
-                        checked: false
-                      }
-                    ]
+                    jsonReplaceUndefinedWithNull: true
                   }
                 }
               });

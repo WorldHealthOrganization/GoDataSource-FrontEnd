@@ -1258,7 +1258,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
               .pipe(
                 map((data: RiskLevelGroupModel) => {
                   return _.map(data ? data.riskLevels : [], (item: RiskLevelModel, itemId) => {
-                    const refItem: ReferenceDataEntryModel = _.find(refRiskLevel.entries, {id: itemId}) as ReferenceDataEntryModel;
+                    const refItem: ReferenceDataEntryModel = _.find(refRiskLevel.entries, { id: itemId }) as ReferenceDataEntryModel;
                     return new CountedItemsListItem(
                       item.count,
                       itemId as any,

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostListener, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { IAppFormIconButtonV2 } from '../../../shared/forms-v2/core/app-form-icon-button-v2';
 import { UserModel } from '../../models/user.model';
 import { AuthDataService } from '../../services/data/auth.data.service';
@@ -10,9 +10,15 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { ILabelValuePairModel } from '../../../shared/forms-v2/core/label-value-pair.model';
 import { ToastV2Service } from '../../services/helper/toast-v2.service';
 import { DialogV2Service } from '../../services/helper/dialog-v2.service';
-import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputAccordion, V2SideDialogConfigInputType } from '../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import {
+  IV2SideDialogConfigButtonType,
+  IV2SideDialogConfigInputAccordion,
+  IV2SideDialogConfigInputSingleDropdown, IV2SideDialogConfigInputText,
+  V2SideDialogConfigInputType
+} from '../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { v4 as uuid } from 'uuid';
 import { IV2LoadingDialogHandler } from '../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
+import { determineRenderMode, RenderMode } from '../../enums/render-mode.enum';
 
 @Component({
   selector: 'app-topnav',
@@ -36,6 +42,7 @@ export class TopnavComponent implements OnInit, OnDestroy {
   // constants
   OutbreakModel = OutbreakModel;
   ToastV2Service = ToastV2Service;
+  RenderMode = RenderMode;
 
   // authenticated user
   authUser: UserModel;
@@ -53,6 +60,12 @@ export class TopnavComponent implements OnInit, OnDestroy {
   // loading handler
   private loadingHandler: IV2LoadingDialogHandler;
 
+  // render mode
+  renderMode: RenderMode = RenderMode.FULL;
+
+  // show main menu
+  @Output() showHoverMenu = new EventEmitter<void>();
+
   /**
    * Constructor
    */
@@ -62,7 +75,10 @@ export class TopnavComponent implements OnInit, OnDestroy {
     private toastV2Service: ToastV2Service,
     private dialogV2Service: DialogV2Service,
     private changeDetectorRef: ChangeDetectorRef
-  ) {}
+  ) {
+    // update render mode
+    this.updateRenderMode();
+  }
 
   /**
    * Component initialized
@@ -303,5 +319,130 @@ export class TopnavComponent implements OnInit, OnDestroy {
         // close popup
         response.handler.hide();
       });
+  }
+
+  /**
+   * Update website render mode
+   */
+  @HostListener('window:resize')
+  private updateRenderMode(): void {
+    // determine render mode
+    const renderMode = determineRenderMode();
+
+    // same as before ?
+    if (renderMode === this.renderMode) {
+      return;
+    }
+
+    // must update
+    this.renderMode = renderMode;
+  }
+
+  /**
+   * Change outbreak
+   */
+  mobileChangeOutbreak(): void {
+    this.dialogV2Service
+      .showSideDialog({
+        title: {
+          get: () => 'LNG_LAYOUT_SELECTED_OUTBREAK_LABEL'
+        },
+        width: '38rem',
+        hideInputFilter: true,
+        inputs: [{
+          type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+          name: 'selectedOutbreak',
+          placeholder: 'LNG_LAYOUT_SELECTED_OUTBREAK_LABEL',
+          options: this.outbreakListOptions,
+          value: this.selectedOutbreak?.id,
+          validators: {
+            required: () => true
+          }
+        }],
+        bottomButtons: [{
+          type: IV2SideDialogConfigButtonType.OTHER,
+          label: 'LNG_COMMON_BUTTON_APPLY',
+          color: 'primary',
+          key: 'apply',
+          disabled: (data, handler): boolean => {
+            return !handler.form || handler.form.invalid ||
+              (data.map.selectedOutbreak as IV2SideDialogConfigInputSingleDropdown).value === this.selectedOutbreak?.id;
+          }
+        }, {
+          type: IV2SideDialogConfigButtonType.CANCEL,
+          label: 'LNG_COMMON_BUTTON_CANCEL',
+          color: 'text'
+        }]
+      })
+      .subscribe((response) => {
+        // cancelled ?
+        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+          // finished
+          return;
+        }
+
+        // change outbreak
+        this.selectOutbreak((response.data.map.selectedOutbreak as IV2SideDialogConfigInputSingleDropdown).value);
+
+        // close dialog
+        response.handler.hide();
+      });
+  }
+
+  /**
+   * Global search
+   */
+  mobileGlobalSearch(): void {
+    this.dialogV2Service
+      .showSideDialog({
+        title: {
+          get: () => 'LNG_COMMON_LABEL_SEARCH'
+        },
+        width: '38rem',
+        hideInputFilter: true,
+        inputs: [{
+          type: V2SideDialogConfigInputType.TEXT,
+          name: 'search',
+          placeholder: 'LNG_COMMON_LABEL_SEARCH',
+          value: this.globalSearchValue,
+          validators: {
+            required: () => true
+          }
+        }],
+        bottomButtons: [{
+          type: IV2SideDialogConfigButtonType.OTHER,
+          label: 'LNG_COMMON_BUTTON_APPLY',
+          color: 'primary',
+          key: 'apply',
+          disabled: (_data, handler): boolean => {
+            return !handler.form || handler.form.invalid;
+          }
+        }, {
+          type: IV2SideDialogConfigButtonType.CANCEL,
+          label: 'LNG_COMMON_BUTTON_CANCEL',
+          color: 'text'
+        }]
+      })
+      .subscribe((response) => {
+        // cancelled ?
+        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+          // finished
+          return;
+        }
+
+        // search
+        this.globalSearchValue = (response.data.map.search as IV2SideDialogConfigInputText).value;
+        this.globalSearch();
+
+        // close dialog
+        response.handler.hide();
+      });
+  }
+
+  /**
+   * Show main menu
+   */
+  showMainMenu(): void {
+    this.showHoverMenu.emit();
   }
 }

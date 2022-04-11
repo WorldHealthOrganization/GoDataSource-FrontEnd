@@ -87,7 +87,7 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
     }
 
     this.route.params
-      .subscribe((params: {eventId}) => {
+      .subscribe((params: { eventId }) => {
         this.eventId = params.eventId;
 
         // get current outbreak

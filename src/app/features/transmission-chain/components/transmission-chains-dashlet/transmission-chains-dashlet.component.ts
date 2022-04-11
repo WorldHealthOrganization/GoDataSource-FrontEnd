@@ -374,7 +374,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           // using 200 px as it looks fine
           posX = (nodeIndex) * 200;
         }
-        return {x: posX, y: posY};
+        return { x: posX, y: posY };
       }
     }
   };
@@ -1210,9 +1210,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
             || this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
             || this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value) {
-      png64 = this.cy.png({bg: 'white', full: true});
+      png64 = this.cy.png({ bg: 'white', full: true });
     } else {
-      png64 = this.cy.png({bg: 'white', scale: scale});
+      png64 = this.cy.png({ bg: 'white', scale: scale });
     }
 
     // finished

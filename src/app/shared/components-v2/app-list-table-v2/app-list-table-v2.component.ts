@@ -2028,7 +2028,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         }
 
         // update extra values...values :)
-        const valuesToPutBack = {...appliedFilter.extraValues};
+        const valuesToPutBack = { ...appliedFilter.extraValues };
         Object.keys(advancedFilter.extraValues).forEach((prop) => {
           // nothing to do ?
           if (valuesToPutBack[prop] === undefined) {

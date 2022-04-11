@@ -579,7 +579,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
         // export
         this.importExportDataService
-          .exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
+          .exportImageToPdf({ image: pngBase64, responseType: 'blob', splitFactor: 1 })
           .pipe(
             catchError((err) => {
               this.toastV2Service.error(err);
@@ -619,7 +619,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
 
           this.importExportDataService
-            .exportImageToPdf({image: dataBase64, responseType: 'blob', splitFactor: 1})
+            .exportImageToPdf({ image: dataBase64, responseType: 'blob', splitFactor: 1 })
             .pipe(
               catchError((err) => {
                 this.toastV2Service.error(err);

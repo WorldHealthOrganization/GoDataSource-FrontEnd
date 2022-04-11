@@ -92,7 +92,7 @@ export class HelpDataService {
      * @returns {Observable<HelpItemModel[]>}
      */
   getHelpItemsList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<HelpItemModel[]> {
-    queryBuilder.filter.where({approved: true}, true);
+    queryBuilder.filter.where({ approved: true }, true);
     const filter = queryBuilder.buildQuery();
     return this.modelHelper.mapObservableListToModel(
       this.http.get(`help-items?filter=${filter}`),
@@ -224,7 +224,7 @@ export class HelpDataService {
         observer.complete();
       } else {
         const qB = new RequestQueryBuilder();
-        qB.filter.where({approved: true});
+        qB.filter.where({ approved: true });
         this.getHelpItemsList(qB).subscribe((items) => {
           // cache the list
           this.cacheService.set(CacheKey.HELP_ITEMS, items);
