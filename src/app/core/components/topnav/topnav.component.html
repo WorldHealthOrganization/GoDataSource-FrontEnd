@@ -7,8 +7,18 @@
     fxGrow="0"
     class="gd-top-left">
 
+    <!-- Show Menu -->
+    <button
+      *ngIf="renderMode !== RenderMode.FULL"
+      type="button"
+      mat-icon-button
+      color="primary">
+      <mat-icon>menu</mat-icon>
+    </button>
+
     <!-- Search -->
     <app-form-input-v2
+      *ngIf="renderMode !== RenderMode.SMALL"
       placeholder="LNG_COMMON_LABEL_SEARCH"
       [(ngModel)]="globalSearchValue"
       [suffixIconButtons]="globalSearchSuffixButtons"
@@ -48,13 +58,36 @@
 
     <!-- Outbreaks -->
     <app-form-select-single-v2
-      *ngIf="OutbreakModel.canView(authUser)"
+      *ngIf="renderMode !== RenderMode.SMALL && OutbreakModel.canView(authUser)"
       placeholder="LNG_LAYOUT_SELECTED_OUTBREAK_LABEL"
       [ngModel]="selectedOutbreak.id"
       (ngModelChange)="selectOutbreak($event)"
       [options]="outbreakListOptions"
       optionTooltipKey="details">
     </app-form-select-single-v2>
+
+    <!-- Mobile responsive buttons -->
+    <ng-container
+      *ngIf="renderMode === RenderMode.SMALL">
+
+      <!-- Outbreaks -->
+      <button
+        *ngIf="OutbreakModel.canView(authUser) && outbreakListOptions?.length > 0"
+        type="button"
+        mat-icon-button
+        (click)="mobileChangeOutbreak()">
+        <mat-icon>bug_report</mat-icon>
+      </button>
+
+      <!-- Search -->
+      <button
+        type="button"
+        mat-icon-button
+        (click)="mobileGlobalSearch()">
+        <mat-icon>search</mat-icon>
+      </button>
+
+    </ng-container>
 
     <!-- Help -->
     <button

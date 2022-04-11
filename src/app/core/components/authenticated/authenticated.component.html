@@ -1,5 +1,8 @@
 <mat-sidenav-container
-  class="gd-body-content">
+  class="gd-body-content"
+  [class.gd-body-content-full]="renderMode === RenderMode.FULL"
+  [class.gd-body-content-medium]="renderMode === RenderMode.MEDIUM"
+  [class.gd-body-content-small]="renderMode === RenderMode.SMALL">
 
   <!-- Left Side - Logo & Main Menu -->
   <mat-sidenav
@@ -32,6 +35,7 @@
 
     <!-- Expand / Collapse button -->
     <button
+      *ngIf="renderMode === RenderMode.FULL"
       type="button"
       mat-icon-button
       (click)="expandMenu = !expandMenu"
