@@ -37,7 +37,6 @@ import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
-import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 
@@ -1139,19 +1138,7 @@ export class EventsListComponent
                     },
                     dbColumns: true,
                     dbValues: true,
-                    jsonReplaceUndefinedWithNull: true,
-                    questionnaireVariables: true
-                  },
-                  inputs: {
-                    append: [
-                      {
-                        type: V2SideDialogConfigInputType.CHECKBOX,
-                        placeholder: 'LNG_PAGE_LIST_EVENTS_EXPORT_CONTACT_INFORMATION',
-                        tooltip: 'LNG_PAGE_LIST_EVENTS_EXPORT_CONTACT_INFORMATION_DESCRIPTION',
-                        name: 'includeContactFields',
-                        checked: false
-                      }
-                    ]
+                    jsonReplaceUndefinedWithNull: true
                   }
                 }
               });
