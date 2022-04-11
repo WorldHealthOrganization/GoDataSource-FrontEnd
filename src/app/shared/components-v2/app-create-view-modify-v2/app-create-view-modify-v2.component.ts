@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CreateViewModifyV2Action } from './models/action.model';
 
@@ -10,7 +10,7 @@ import { CreateViewModifyV2Action } from './models/action.model';
   templateUrl: './app-create-view-modify-v2.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
+export class AppCreateViewModifyV2Component {
   // page type
   action: CreateViewModifyV2Action;
 
@@ -23,20 +23,5 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   ) {
     // retrieve basic data
     this.action = this.activatedRoute.snapshot.data.action;
-  }
-
-  /**
-   * Initialize resources
-   */
-  ngOnInit(): void {
-    // #TODO
-    console.log(this.action);
-  }
-
-  /**
-   * Release resources
-   */
-  ngOnDestroy(): void {
-    // #TODO
   }
 }

@@ -3,7 +3,6 @@ import { ActivatedRoute, Params } from '@angular/router';
 import * as _ from 'lodash';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
-
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { moment } from '../../../../core/helperClasses/x-moment';
@@ -53,7 +52,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
   // constants
   Constants = Constants;
   UserSettings = UserSettings;
-
 
   // anonymize fields
   private contactsOfContactsAnonymizeFields: ILabelValuePairModel[] = [
@@ -997,8 +995,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
   protected initializeGroupActions(): void {
     this.groupActions = [
       {
-        label:
-          'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS',
+        label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS',
         action: {
           click: (selected: string[]) => {
             // construct query builder
@@ -1017,8 +1014,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         }
       },
       {
-        label:
-          'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_DOSSIER',
+        label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_DOSSIER',
         action: {
           click: (selected: string[]) => {
             // remove id from list
@@ -1030,8 +1026,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             // export dossier
             this.dialogV2Service.showExportData({
               title: {
-                get: () =>
-                  'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_DOSSIER_DIALOG_TITLE'
+                get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_DOSSIER_DIALOG_TITLE'
               },
               export: {
                 url: `outbreaks/${this.selectedOutbreak.id}/contacts-of-contacts/dossier`,
@@ -1064,8 +1059,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         }
       },
       {
-        label:
-          'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_RELATIONSHIPS',
+        label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_RELATIONSHIPS',
         action: {
           click: (selected: string[]) => {
             // construct query builder
@@ -1093,8 +1087,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         }
       },
       {
-        label:
-          'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_MODIFY_CONTACTS_OF_CONTACTS',
+        label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_MODIFY_CONTACTS_OF_CONTACTS',
         action: {
           link: (): string[] => {
             return ['/contacts-of-contacts', 'modify-bulk'];

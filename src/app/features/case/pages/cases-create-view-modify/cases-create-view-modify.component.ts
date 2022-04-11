@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 /**
  * Component
@@ -7,18 +7,5 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
   selector: 'app-cases-create-view-modify',
   templateUrl: './cases-create-view-modify.component.html'
 })
-export class CasesCreateViewModifyComponent implements OnInit, OnDestroy {
-  /**
-   * Initialize resources
-   */
-  ngOnInit(): void {
-    // #TODO
-  }
-
-  /**
-   * Release resources
-   */
-  ngOnDestroy(): void {
-    // #TODO
-  }
+export class CasesCreateViewModifyComponent {
 }

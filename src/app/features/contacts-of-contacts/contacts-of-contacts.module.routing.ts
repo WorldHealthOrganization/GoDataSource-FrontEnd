@@ -1,6 +1,5 @@
 import { ModuleWithProviders } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PERMISSION } from '../../core/models/permission.model';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
@@ -22,7 +21,7 @@ const routes: Routes = [
       user: UserDataResolver,
       gender: GenderDataResolver,
       yesNoAll: YesNoAllDataResolver,
-      occupation: OccupationDataResolver,
+      occupation: OccupationDataResolver
     }
   },
   // Create contact of contact
@@ -117,4 +116,3 @@ const routes: Routes = [
 ];
 
 export const routing: ModuleWithProviders<RouterModule> = RouterModule.forChild(routes);
-
