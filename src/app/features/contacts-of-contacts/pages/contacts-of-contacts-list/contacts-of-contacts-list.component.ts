@@ -229,12 +229,12 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
           // risk
           const risk = this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>;
           if (
-            data.id &&
-            risk.map[data.id]
+            data.riskLevel &&
+            risk.map[data.riskLevel]
           ) {
             forms.push({
               type: IV2ColumnStatusFormType.TRIANGLE,
-              color: risk.map[data.id].getColorCode(),
+              color: risk.map[data.riskLevel].getColorCode(),
               tooltip: this.i18nService.instant(data.riskLevel)
             });
           }
