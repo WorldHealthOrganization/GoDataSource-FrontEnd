@@ -79,7 +79,7 @@ export class ChangePasswordComponent {
           if (this.authUser.passwordChange) {
             // update user details so next time it's not required to change its password again
             this.userDataService
-              .modifyUser(this.authUser.id, {passwordChange: false})
+              .modifyUser(this.authUser.id, { passwordChange: false })
               .subscribe(() => {
                 // refresh user data
                 refreshUserAndShowMessage();

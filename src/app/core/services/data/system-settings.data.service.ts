@@ -1,13 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { SystemSettingsModel } from '../../models/system-settings.model';
 import { SystemSettingsVersionModel } from '../../models/system-settings-version.model';
 import { CacheKey, CacheService } from '../helper/cache.service';
 import { tap } from 'rxjs/operators';
 import * as _ from 'lodash';
-import { of } from 'rxjs';
 
 @Injectable()
 export class SystemSettingsDataService {

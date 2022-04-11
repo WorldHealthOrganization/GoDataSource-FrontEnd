@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { UserModel } from '../../../../core/models/user.model';
 import * as _ from 'lodash';
 import { TeamModel } from '../../../../core/models/team.model';
@@ -13,7 +13,6 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { catchError, share } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';

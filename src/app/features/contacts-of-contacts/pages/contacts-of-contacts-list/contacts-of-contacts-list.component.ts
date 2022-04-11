@@ -32,7 +32,7 @@ import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.mo
 import { RiskLevelModel } from '../../../../core/models/risk-level.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import {IBasicCount} from '../../../../core/models/basic-count.interface';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { AddressModel } from '../../../../core/models/address.model';
 import {
   IExportFieldsGroupRequired,
@@ -745,7 +745,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
               .pipe(
                 map((data: RiskLevelGroupModel) => {
                   return _.map(data ? data.riskLevels : [], (item: RiskLevelModel, itemId) => {
-                    const refItem: ReferenceDataEntryModel = _.find(refRiskLevel.entries, {id: itemId}) as ReferenceDataEntryModel;
+                    const refItem: ReferenceDataEntryModel = _.find(refRiskLevel.entries, { id: itemId }) as ReferenceDataEntryModel;
                     return new CountedItemsListItem(
                       item.count,
                       itemId as any,

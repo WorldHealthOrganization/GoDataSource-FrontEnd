@@ -171,7 +171,7 @@ export class I18nService {
 
     // finished
     return this.userDataService
-      .modifyUser(authUser.id, {languageId: languageId})
+      .modifyUser(authUser.id, { languageId: languageId })
       .pipe(
         mergeMap(() => {
           return this.authDataService.reloadAndPersistAuthUser();

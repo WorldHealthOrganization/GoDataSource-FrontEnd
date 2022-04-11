@@ -3,7 +3,7 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { UserModel } from '../../../../core/models/user.model';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
@@ -13,7 +13,6 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 

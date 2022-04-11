@@ -845,7 +845,7 @@ implements OnInit, OnDestroy {
       )
       .on(
         'mouseover',
-        function () {
+        function() {
           // animate
           self.mouseIn(
             (this as any).__data__,
@@ -855,14 +855,14 @@ implements OnInit, OnDestroy {
       )
       .on(
         'mouseout',
-        function () {
+        function() {
           // animate
           self.mouseOut();
         }
       )
       .on(
         'click',
-        function () {
+        function() {
           // trigger click event
           self.clickItem.emit((this as any).__data__.details);
         }

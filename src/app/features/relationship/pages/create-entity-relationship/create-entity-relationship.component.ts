@@ -13,7 +13,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
-import { Observable } from 'rxjs';
+import { Observable, throwError, forkJoin } from 'rxjs';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
@@ -24,7 +24,6 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { catchError, share } from 'rxjs/operators';
-import { throwError, forkJoin } from 'rxjs';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';

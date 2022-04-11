@@ -9,7 +9,7 @@ import { SVGGantt } from 'gantt';
 import { MetricCasesDelayBetweenOnsetLabTestModel } from '../../../../core/models/metrics/metric-cases-delay-between-onset-lab-test.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import * as _ from 'lodash';
-import { Subscription ,  Subscriber } from 'rxjs';
+import { Subscription,  Subscriber } from 'rxjs';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { Moment } from '../../../../core/helperClasses/x-moment';
@@ -97,7 +97,7 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit, OnDestroy {
     this.refdataSubscriber = this.referenceDataDataService
       .getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE)
       .subscribe((personTypes) => {
-        const casePersonType = _.find(personTypes.entries, {value: EntityType.CASE});
+        const casePersonType = _.find(personTypes.entries, { value: EntityType.CASE });
         if (casePersonType) {
           // set case color
           if (casePersonType.colorCode) {

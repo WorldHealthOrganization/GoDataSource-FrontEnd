@@ -82,7 +82,7 @@ export class FormHelperService {
 
     _.forEach(forms, (form: NgForm) => {
       // get the dirty fields of each form
-      dirtyFields = {...dirtyFields, ...this.getDirtyFields(form)};
+      dirtyFields = { ...dirtyFields, ...this.getDirtyFields(form) };
     });
 
     return dirtyFields;
@@ -100,7 +100,7 @@ export class FormHelperService {
       // get the fields of each form
       const formFields = this.getFields(form);
 
-      fields = {...fields, ...formFields};
+      fields = { ...fields, ...formFields };
     });
 
     return fields;
@@ -154,7 +154,7 @@ export class FormHelperService {
             // determine directive
             let directives = (controlsForm as any)._directives;
             directives = directives ? Array.from(directives) : directives;
-            const directive = _.find(directives, {name: name}) as any;
+            const directive = _.find(directives, { name: name }) as any;
             if (
               directive &&
                             directive.valueAccessor

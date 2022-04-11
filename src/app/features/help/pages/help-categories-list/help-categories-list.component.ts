@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { UserSettings } from '../../../../core/models/user.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
@@ -11,7 +11,6 @@ import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { catchError, share } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import * as _ from 'lodash';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
@@ -234,7 +233,7 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
      */
   deleteHelpCategory(category: HelpCategoryModel) {
     // show confirm dialog
-    const translatedData = {name: this.i18nService.instant(category.name)};
+    const translatedData = { name: this.i18nService.instant(category.name) };
     this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_HELP_CATEGORY', translatedData)
       .subscribe((answer: DialogAnswer) => {
         if (answer.button === DialogAnswerButton.Yes) {

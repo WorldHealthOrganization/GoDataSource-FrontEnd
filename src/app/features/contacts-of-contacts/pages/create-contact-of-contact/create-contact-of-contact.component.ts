@@ -130,7 +130,7 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
 
     // retrieve query params
     this.route.queryParams
-      .subscribe((params: {entityId}) => {
+      .subscribe((params: { entityId }) => {
         this.entityId = _.get(params, 'entityId');
 
         // check if we have proper value ( case or event ID )

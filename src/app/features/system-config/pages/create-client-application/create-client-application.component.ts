@@ -8,7 +8,7 @@ import { SystemSettingsModel } from '../../../../core/models/system-settings.mod
 import * as _ from 'lodash';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { SystemClientApplicationModel } from '../../../../core/models/system-client-application.model';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
@@ -17,7 +17,6 @@ import { Constants } from '../../../../core/models/constants';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 

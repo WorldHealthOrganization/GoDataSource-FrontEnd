@@ -25,7 +25,7 @@ import {
 } from 'rxjs/operators';
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import {DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components/dialog/dialog.component';
+import { DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components/dialog/dialog.component';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
@@ -124,7 +124,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
     }
 
     this.route.params
-      .subscribe((params: {contactOfContactId}) => {
+      .subscribe((params: { contactOfContactId }) => {
         this.contactOfContactId = params.contactOfContactId;
 
         // get current outbreak

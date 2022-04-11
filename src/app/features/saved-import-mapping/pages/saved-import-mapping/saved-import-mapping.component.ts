@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SavedImportMappingService } from '../../../../core/services/data/saved-import-mapping.data.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { SavedImportMappingModel } from '../../../../core/models/saved-import-mapping.model';
 import { catchError, share } from 'rxjs/operators';
 import * as _ from 'lodash';
@@ -10,7 +10,6 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { Constants } from '../../../../core/models/constants';
-import { throwError } from 'rxjs';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
@@ -222,7 +221,7 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
      * @param {boolean} isPublic
      */
   setPublicItem(savedImportMappingId: string, isPublic: boolean) {
-    this.savedImportMappingService.modifyImportMapping(savedImportMappingId, {isPublic : isPublic})
+    this.savedImportMappingService.modifyImportMapping(savedImportMappingId, { isPublic : isPublic })
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);

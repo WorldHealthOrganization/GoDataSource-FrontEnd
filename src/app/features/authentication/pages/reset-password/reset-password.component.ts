@@ -37,7 +37,7 @@ export class ResetPasswordComponent implements OnInit {
   ) {
     // get the route params
     this.route.queryParams
-      .subscribe((queryParams: {token}) => {
+      .subscribe((queryParams: { token }) => {
         // get the ID of the User being modified
         this.passwordResetToken = queryParams.token;
       });

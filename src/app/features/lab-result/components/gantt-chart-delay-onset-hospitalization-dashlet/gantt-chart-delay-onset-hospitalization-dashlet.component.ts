@@ -8,7 +8,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { SVGGantt } from 'gantt';
 import { EntityType } from '../../../../core/models/entity-type';
 import * as _ from 'lodash';
-import { Subscription ,  Subscriber } from 'rxjs';
+import { Subscription,  Subscriber } from 'rxjs';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/index';
 import { MetricCasesDelayBetweenOnsetHospitalizationModel } from '../../../../core/models/metrics/metric-cases-delay-between-onset-hospitalization.model';
@@ -96,7 +96,7 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
     this.refdataSubscriber = this.referenceDataDataService
       .getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE)
       .subscribe((personTypes) => {
-        const casePersonType = _.find(personTypes.entries, {value: EntityType.CASE});
+        const casePersonType = _.find(personTypes.entries, { value: EntityType.CASE });
         if (casePersonType) {
           // set case color
           if (casePersonType.colorCode) {

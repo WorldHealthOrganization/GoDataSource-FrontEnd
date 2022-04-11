@@ -12,9 +12,8 @@ import { TeamModel } from '../../../core/models/team.model';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { Directive, OnDestroy, OnInit } from '@angular/core';
 import { I18nService } from '../../../core/services/helper/i18n.service';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { TeamDataService } from '../../../core/services/data/team.data.service';
-import { throwError } from 'rxjs';
 import { catchError, share } from 'rxjs/operators';
 import { moment } from '../../../core/helperClasses/x-moment';
 import { ListHelperService } from '../../../core/services/helper/list-helper.service';
@@ -490,7 +489,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
      */
   setTargetedItem(followUp: FollowUpModel, targeted: boolean) {
     this.followUpsDataService
-      .modifyFollowUp(this.selectedOutbreak.id, followUp.personId, followUp.id, {targeted: targeted})
+      .modifyFollowUp(this.selectedOutbreak.id, followUp.personId, followUp.id, { targeted: targeted })
       .pipe(
         catchError((err) => {
           this.listHelperService.toastV2Service.error(err);

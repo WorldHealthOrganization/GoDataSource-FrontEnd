@@ -14,14 +14,13 @@ import {
   catchError,
   share
 } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
-import { Observable } from 'rxjs/index';
+import { Observable, throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({

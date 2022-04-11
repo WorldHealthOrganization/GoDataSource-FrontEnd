@@ -380,8 +380,8 @@ export class RequestFilter {
         // filter
         this.where({
           or: [
-            {[property]: false},
-            {[property]: {eq: null}}
+            { [property]: false },
+            { [property]: { eq: null } }
           ]
         });
       }
@@ -494,8 +494,8 @@ export class RequestFilter {
       this.remove(`${property}.years`);
       this.removeCondition({
         or: [
-          {[`${property}.months`]: true},
-          {[`${property}.years`]: true}
+          { [`${property}.months`]: true },
+          { [`${property}.years`]: true }
         ]
       });
     }
@@ -621,7 +621,7 @@ export class RequestFilter {
       } else {
         // remove only conditions with exact operator
         this.removeExactCondition({
-          [property]: {inq: []}
+          [property]: { inq: [] }
         });
       }
     } else {

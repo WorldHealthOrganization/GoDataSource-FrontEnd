@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
@@ -14,7 +14,6 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
@@ -81,7 +80,7 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
     this.showLoadingDialog(false);
 
     // get the route params
-    this.route.params.subscribe((params: {userId}) => {
+    this.route.params.subscribe((params: { userId }) => {
       // get the ID of the User being modified
       this.userId = params.userId;
 

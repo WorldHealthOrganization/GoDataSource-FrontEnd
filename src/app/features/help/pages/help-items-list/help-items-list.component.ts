@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { UserSettings } from '../../../../core/models/user.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
@@ -13,7 +13,6 @@ import { HelpItemModel } from '../../../../core/models/help-item.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { catchError, share } from 'rxjs/operators';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
-import { throwError } from 'rxjs';
 import * as _ from 'lodash';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
@@ -298,7 +297,7 @@ export class HelpItemsListComponent extends ListComponent implements OnInit, OnD
      */
   deleteHelpItem(item: HelpItemModel) {
     // show confirm dialog
-    const translatedData = {title: this.i18nService.instant(item.title)};
+    const translatedData = { title: this.i18nService.instant(item.title) };
     this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_HELP_ITEM', translatedData)
       .subscribe((answer: DialogAnswer) => {
         if (answer.button === DialogAnswerButton.Yes) {
@@ -330,7 +329,7 @@ export class HelpItemsListComponent extends ListComponent implements OnInit, OnD
      */
   approveHelpItem(item: HelpItemModel) {
     // show confirm dialog
-    const translatedData = {title: this.i18nService.instant(item.title)};
+    const translatedData = { title: this.i18nService.instant(item.title) };
     this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_APPROVE_HELP_ITEM', translatedData)
       .subscribe((answer: DialogAnswer) => {
         if (answer.button === DialogAnswerButton.Yes) {

@@ -19,7 +19,6 @@ import { catchError, share, tap } from 'rxjs/operators';
 import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 import { HoverRowActionsDirective } from '../../../../shared/directives/hover-row-actions/hover-row-actions.directive';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { LocationModel } from '../../../../core/models/location.model';
 import { RequestFilterGenerator, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
@@ -3130,61 +3129,61 @@ export class ImportDataComponent
   /**
      * Mapped field option location changed handler
      */
-  mappedOptionsLocationChanged(
-    mappedOpt: IMappedOption,
-    locationAutoItem: LocationAutoItem
-  ): void {
-    // nothing selected ?
-    if (!locationAutoItem) {
-      // reset value
-      mappedOpt.destinationOption = null;
-
-      // prepare data
-      this.validateData();
-
-      // finished
-      return;
-    }
-
-    // cache location if necessary
-    if (
-      !this.locationCache[locationAutoItem.id] ||
-            !this.locationCache[locationAutoItem.id].parentsLoaded
-    ) {
-      // retrieve parents labels
-      let parentNames: string = '';
-      let parentLocation = locationAutoItem.parent();
-      while (parentLocation) {
-        // add name
-        parentNames = `${parentLocation.label}${parentNames ? ' => ' + parentNames : ''}`;
-
-        // next parent
-        parentLocation = parentLocation.parent();
-      }
-
-      // cache location
-      this.locationCache[locationAutoItem.id] = {
-        label: `${parentNames ? parentNames + ' => ' : ''}${locationAutoItem.label}`,
-        parentsLoaded: true,
-        shortLabel: locationAutoItem.label,
-        parentId: locationAutoItem.parent() ?
-          locationAutoItem.parent().id :
-          null
-      };
-
-      // index it
-      this.indexLocation(
-        locationAutoItem.label,
-        locationAutoItem.id
-      );
-    }
-
-    // set option value
-    mappedOpt.destinationOption = locationAutoItem.id;
-
-    // prepare data
-    this.validateData();
-  }
+  // mappedOptionsLocationChanged(
+  //   mappedOpt: IMappedOption,
+  //   locationAutoItem: LocationAutoItem
+  // ): void {
+  //   // nothing selected ?
+  //   if (!locationAutoItem) {
+  //     // reset value
+  //     mappedOpt.destinationOption = null;
+  //
+  //     // prepare data
+  //     this.validateData();
+  //
+  //     // finished
+  //     return;
+  //   }
+  //
+  //   // cache location if necessary
+  //   if (
+  //     !this.locationCache[locationAutoItem.id] ||
+  //           !this.locationCache[locationAutoItem.id].parentsLoaded
+  //   ) {
+  //     // retrieve parents labels
+  //     let parentNames: string = '';
+  //     let parentLocation = locationAutoItem.parent();
+  //     while (parentLocation) {
+  //       // add name
+  //       parentNames = `${parentLocation.label}${parentNames ? ' => ' + parentNames : ''}`;
+  //
+  //       // next parent
+  //       parentLocation = parentLocation.parent();
+  //     }
+  //
+  //     // cache location
+  //     this.locationCache[locationAutoItem.id] = {
+  //       label: `${parentNames ? parentNames + ' => ' : ''}${locationAutoItem.label}`,
+  //       parentsLoaded: true,
+  //       shortLabel: locationAutoItem.label,
+  //       parentId: locationAutoItem.parent() ?
+  //         locationAutoItem.parent().id :
+  //         null
+  //     };
+  //
+  //     // index it
+  //     this.indexLocation(
+  //       locationAutoItem.label,
+  //       locationAutoItem.id
+  //     );
+  //   }
+  //
+  //   // set option value
+  //   mappedOpt.destinationOption = locationAutoItem.id;
+  //
+  //   // prepare data
+  //   this.validateData();
+  // }
 
   /**
      * Determine & retrieve map option height

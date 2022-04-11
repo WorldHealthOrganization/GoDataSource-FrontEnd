@@ -18,7 +18,7 @@ export class CaseCenterDateRangeModel {
     this.centerName = _.get(data, 'centerName');
     this.locationId = _.get(data, 'locationId');
     // find the location
-    const location = _.find(locationsList, {id: this.locationId});
+    const location = _.find(locationsList, { id: this.locationId });
     this.location = new LocationModel(location);
     this.comments = _.get(data, 'comments');
   }

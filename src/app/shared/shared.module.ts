@@ -6,7 +6,6 @@ import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { XtFormsModule } from './xt-forms/xt-forms.module';
 import { AngularMaterialModule } from './angular-material/angular-material.module';
-import { NgSelectModule } from '@ng-select/ng-select';
 import { FileUploadModule } from 'ng2-file-upload';
 import { NgxWigModule } from 'ngx-wig';
 import { HotTableModule } from '@handsontable/angular';
@@ -29,7 +28,6 @@ import { ToastrModule } from 'ngx-toastr';
     CommonModule,
     DragDropModule,
     RouterModule,
-    NgSelectModule,
     FormsModule,
     FlexLayoutModule,
     XtFormsModule,
@@ -66,7 +64,6 @@ import { ToastrModule } from 'ngx-toastr';
     CommonModule,
     DragDropModule,
     RouterModule,
-    NgSelectModule,
     FormsModule,
     FlexLayoutModule,
     TranslateModule,

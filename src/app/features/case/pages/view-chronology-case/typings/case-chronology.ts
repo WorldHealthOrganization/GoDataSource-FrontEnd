@@ -58,7 +58,7 @@ export class CaseChronology {
           chronologyEntries.push(new ChronologyItem({
             date: relationship.contactDate,
             label: 'LNG_CASE_FIELD_LABEL_DATE_OF_EXPOSURE',
-            translateData: {exposureName: sourcePerson ? sourcePerson.name : ''}
+            translateData: { exposureName: sourcePerson ? sourcePerson.name : '' }
           }));
         }
       });
@@ -108,7 +108,7 @@ export class CaseChronology {
           const typeLabel = i18nService.instant(dateRange.typeId);
           // create the ChronologyItem
           return new ChronologyItem({
-            label: i18nService.instant('LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_DATE_RANGE_START_DATE', {type: typeLabel}),
+            label: i18nService.instant('LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_DATE_RANGE_START_DATE', { type: typeLabel }),
             date: dateRange.startDate
           });
         })
@@ -126,7 +126,7 @@ export class CaseChronology {
           const typeLabel = i18nService.instant(dateRange.typeId);
           // create the ChronologyItem
           return new ChronologyItem({
-            label: i18nService.instant('LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_DATE_RANGE_END_DATE', {type: typeLabel}),
+            label: i18nService.instant('LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_DATE_RANGE_END_DATE', { type: typeLabel }),
             date: dateRange.endDate
           });
         })

@@ -5,9 +5,8 @@ import { NgForm } from '@angular/forms';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import * as _ from 'lodash';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { SecurityQuestionModel } from '../../../../core/models/securityQuestion.model';
-import { throwError } from 'rxjs';
 import { catchError, share } from 'rxjs/operators';
 import { SafeHtml } from '@angular/platform-browser';
 import { CaptchaDataFor, CaptchaDataService } from '../../../../core/services/data/captcha.data.service';
@@ -33,7 +32,7 @@ export class ResetPasswordQuestionsComponent implements OnInit {
   dataModel = {
     captcha: '',
     email: null,
-    questions: [{question: null, answer: null}, {question: null, answer: null}]
+    questions: [{ question: null, answer: null }, { question: null, answer: null }]
   };
   securityQuestionsList$: Observable<SecurityQuestionModel[]>;
 

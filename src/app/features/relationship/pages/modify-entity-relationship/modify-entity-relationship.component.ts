@@ -366,7 +366,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
       .subscribe((answer: DialogAnswer) => {
         if (answer.button === DialogAnswerButton.Yes) {
           const relationshipPersons = {
-            sourceId: _.find(this.relationship.persons, {target: true}).id,
+            sourceId: _.find(this.relationship.persons, { target: true }).id,
             targetId: this.relationship.sourcePerson.id
           };
           this.relationshipDataService
@@ -377,7 +377,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
               relationshipPersons.targetId
             )
             .subscribe((relationshipData: RelationshipModel) => {
-              const sourcePerson = _.find(relationshipData.persons, {source: true});
+              const sourcePerson = _.find(relationshipData.persons, { source: true });
               this.router.navigate([`/relationships/${sourcePerson.type}/${sourcePerson.id}/${this.relationshipTypeRoutePath}/${relationshipData.id}/modify`]);
             });
         }

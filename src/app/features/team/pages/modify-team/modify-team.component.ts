@@ -8,7 +8,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import * as _ from 'lodash';
 import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
@@ -16,9 +16,8 @@ import { DialogAnswer } from '../../../../shared/components/dialog/dialog.compon
 import { DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
-import { FormLocationDropdownComponent } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { AppFormLocationBaseV2 } from '../../../../shared/forms-v2/core/app-form-location-base-v2';
 
 @Component({
   selector: 'app-modify-team',
@@ -137,7 +136,7 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
 
     // if we've changed the location of the team, reset all location cache
     if (dirtyFields.locationIds) {
-      FormLocationDropdownComponent.CACHE = {};
+      AppFormLocationBaseV2.CACHE = {};
     }
 
     // show loading
@@ -227,7 +226,7 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
 
         if (teamsNames.length > 0) {
           this.dialogService
-            .showConfirm('LNG_DIALOG_CONFIRM_ADD_USER_TEAM', {teamNames: teamsNames.join()})
+            .showConfirm('LNG_DIALOG_CONFIRM_ADD_USER_TEAM', { teamNames: teamsNames.join() })
             .subscribe((answer: DialogAnswer) => {
               if (answer.button === DialogAnswerButton.Cancel) {
                 // update userIds to remove the user from the dropdown
@@ -271,7 +270,7 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
         .subscribe((teamsList: TeamModel[]) => {
           if (teamsList.length > 0) {
             const teamNames = _.map(teamsList, (team) => team.name);
-            this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_SAVE_SAME_LOCATIONS_TEAM', {teamNames: teamNames.join(', ')})
+            this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_SAVE_SAME_LOCATIONS_TEAM', { teamNames: teamNames.join(', ') })
               .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                   // user accepts the action

@@ -8,7 +8,7 @@ import { Constants } from '../../../../core/models/constants';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { forkJoin, Observable, Subscription } from 'rxjs';
+import { forkJoin, Observable, Subscription, throwError } from 'rxjs';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
@@ -23,7 +23,6 @@ import { ActivatedRoute } from '@angular/router';
 import { ITransmissionChainGroupPageModel, TransmissionChainGroupModel, TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 import { TransmissionChainFilters } from '../transmission-chains-filters/transmission-chains-filters.component';
 import { catchError, tap } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { WorldMapMarker, WorldMapPath, WorldMapMarkerLayer, WorldMapPoint, WorldMapMarkerType, WorldMapComponent, WorldMapPathType } from '../../../../common-modules/world-map/components/world-map/world-map.component';
 import { UserModel } from '../../../../core/models/user.model';
@@ -375,7 +374,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           // using 200 px as it looks fine
           posX = (nodeIndex) * 200;
         }
-        return {x: posX, y: posY};
+        return { x: posX, y: posY };
       }
     }
   };
@@ -1211,9 +1210,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
             || this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
             || this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value) {
-      png64 = this.cy.png({bg: 'white', full: true});
+      png64 = this.cy.png({ bg: 'white', full: true });
     } else {
-      png64 = this.cy.png({bg: 'white', scale: scale});
+      png64 = this.cy.png({ bg: 'white', scale: scale });
     }
 
     // finished

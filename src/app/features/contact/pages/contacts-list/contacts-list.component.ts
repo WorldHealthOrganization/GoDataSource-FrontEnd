@@ -480,7 +480,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         new HoverRowAction({
           menuOptionLabel: 'LNG_PAGE_MODIFY_CONTACT_TAB_QUESTIONNAIRE_TITLE',
           click: (item: ContactModel) => {
-            this.router.navigate(['/contacts', item.id , 'view-questionnaire']);
+            this.router.navigate(['/contacts', item.id, 'view-questionnaire']);
           },
           visible: (item: ContactModel): boolean => {
             return !item.deleted &&
@@ -1258,7 +1258,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
               .pipe(
                 map((data: RiskLevelGroupModel) => {
                   return _.map(data ? data.riskLevels : [], (item: RiskLevelModel, itemId) => {
-                    const refItem: ReferenceDataEntryModel = _.find(refRiskLevel.entries, {id: itemId}) as ReferenceDataEntryModel;
+                    const refItem: ReferenceDataEntryModel = _.find(refRiskLevel.entries, { id: itemId }) as ReferenceDataEntryModel;
                     return new CountedItemsListItem(
                       item.count,
                       itemId as any,

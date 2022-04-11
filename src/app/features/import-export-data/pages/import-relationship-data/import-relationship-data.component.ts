@@ -1,18 +1,18 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import {BreadcrumbItemModel} from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import {CaseModel} from '../../../../core/models/case.model';
-import {OutbreakModel} from '../../../../core/models/outbreak.model';
-import {AuthDataService} from '../../../../core/services/data/auth.data.service';
-import {UserModel} from '../../../../core/models/user.model';
-import {ImportDataExtension} from '../../components/import-data/model';
-import {ActivatedRoute, Router} from '@angular/router';
-import {OutbreakDataService} from '../../../../core/services/data/outbreak.data.service';
-import {RedirectService} from '../../../../core/services/helper/redirect.service';
-import {ImportServerModelNames} from '../../components/import-data/import-data.component';
-import {Constants} from '../../../../core/models/constants';
-import {Subscription} from 'rxjs';
-import {ContactModel} from '../../../../core/models/contact.model';
-import {EventModel} from '../../../../core/models/event.model';
+import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
+import { CaseModel } from '../../../../core/models/case.model';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { UserModel } from '../../../../core/models/user.model';
+import { ImportDataExtension } from '../../components/import-data/model';
+import { ActivatedRoute, Router } from '@angular/router';
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ImportServerModelNames } from '../../components/import-data/import-data.component';
+import { Constants } from '../../../../core/models/constants';
+import { Subscription } from 'rxjs';
+import { ContactModel } from '../../../../core/models/contact.model';
+import { EventModel } from '../../../../core/models/event.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
@@ -81,7 +81,7 @@ export class ImportRelationshipDataComponent implements OnInit, OnDestroy {
     this.authUser = this.authDataService.getAuthenticatedUser();
 
     this.route.queryParams
-      .subscribe((queryParams: {from: string}) => {
+      .subscribe((queryParams: { from: string }) => {
         // set the page that redirected to import relationship
         this.fromPage = queryParams.from;
 

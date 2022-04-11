@@ -4,12 +4,11 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { ReferenceDataCategoryModel } from '../../../../core/models/reference-data.model';
 import { IconDataService } from '../../../../core/services/data/icon.data.service';
 import { IconModel } from '../../../../core/models/icon.model';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DialogAnswer, DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError, share } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import * as _ from 'lodash';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
