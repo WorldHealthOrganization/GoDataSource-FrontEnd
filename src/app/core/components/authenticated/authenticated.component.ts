@@ -225,6 +225,9 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
         return redirectRootToLandingPage();
       }
 
+      // collapse hovering menu on page change
+      this.hoveringMenu = false;
+
       // // check for context help
       // if (
       //   this.router.url &&
