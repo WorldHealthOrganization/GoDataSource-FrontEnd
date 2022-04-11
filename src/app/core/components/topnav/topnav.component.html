@@ -12,7 +12,8 @@
       *ngIf="renderMode !== RenderMode.FULL"
       type="button"
       mat-icon-button
-      color="primary">
+      color="primary"
+      (click)="showMainMenu()">
       <mat-icon>menu</mat-icon>
     </button>
 
@@ -75,6 +76,7 @@
         *ngIf="OutbreakModel.canView(authUser) && outbreakListOptions?.length > 0"
         type="button"
         mat-icon-button
+        [matTooltip]="'LNG_LAYOUT_SELECTED_OUTBREAK_LABEL' | translate"
         (click)="mobileChangeOutbreak()">
         <mat-icon>bug_report</mat-icon>
       </button>
@@ -83,6 +85,7 @@
       <button
         type="button"
         mat-icon-button
+        [matTooltip]="'LNG_COMMON_LABEL_SEARCH' | translate"
         (click)="mobileGlobalSearch()">
         <mat-icon>search</mat-icon>
       </button>

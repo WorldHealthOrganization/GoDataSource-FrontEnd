@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostListener, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { IAppFormIconButtonV2 } from '../../../shared/forms-v2/core/app-form-icon-button-v2';
 import { UserModel } from '../../models/user.model';
 import { AuthDataService } from '../../services/data/auth.data.service';
@@ -62,6 +62,9 @@ export class TopnavComponent implements OnInit, OnDestroy {
 
   // render mode
   renderMode: RenderMode = RenderMode.FULL;
+
+  // show main menu
+  @Output() showHoverMenu = new EventEmitter<void>();
 
   /**
    * Constructor
@@ -434,5 +437,12 @@ export class TopnavComponent implements OnInit, OnDestroy {
         // close dialog
         response.handler.hide();
       });
+  }
+
+  /**
+   * Show main menu
+   */
+  showMainMenu(): void {
+    this.showHoverMenu.emit();
   }
 }

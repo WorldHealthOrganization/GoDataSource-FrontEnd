@@ -146,8 +146,8 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Component initialized
-     */
+   * Component initialized
+   */
   ngOnInit(): void {
     // get the authenticated user
     this.authUser = this.authDataService.getAuthenticatedUser();
