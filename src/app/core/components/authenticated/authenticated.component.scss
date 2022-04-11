@@ -74,7 +74,8 @@ mat-sidenav-container {
       }
 
       /* Left side expanded */
-      &.gd-body-content-left-expanded {
+      &.gd-body-content-left-expanded,
+      &.gd-body-content-left-hovering {
         width: var(--gd-menu-width-expanded);
 
         .gd-body-content-left-content {

@@ -36,6 +36,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
 
   // expand menu
   expandMenu: boolean = false;
+  hoveringMenu: boolean = false;
 
   // render mode
   renderMode: RenderMode = RenderMode.FULL;
@@ -560,6 +561,9 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
     // do extra stuff depending of render mode
     if (this.renderMode !== RenderMode.FULL) {
       this.expandMenu = false;
+    } else {
+      // full
+      this.hoveringMenu = false;
     }
   }
 }

@@ -2,14 +2,16 @@
   class="gd-body-content"
   [class.gd-body-content-full]="renderMode === RenderMode.FULL"
   [class.gd-body-content-medium]="renderMode === RenderMode.MEDIUM"
-  [class.gd-body-content-small]="renderMode === RenderMode.SMALL">
+  [class.gd-body-content-small]="renderMode === RenderMode.SMALL"
+  hasBackdrop="false">
 
   <!-- Left Side - Logo & Main Menu -->
   <mat-sidenav
     class="gd-body-content-left"
     [class.gd-body-content-left-expanded]="expandMenu"
+    [class.gd-body-content-left-hovering]="hoveringMenu"
     opened="true"
-    mode="side"
+    [mode]="renderMode === RenderMode.FULL ? 'side' : 'over'"
     fixedInViewport="true">
 
     <!-- Content -->
@@ -28,7 +30,7 @@
       <div
         class="gd-body-content-left-content-menu">
         <app-sidenav
-          [expanded]="expandMenu"></app-sidenav>
+          [expanded]="expandMenu || hoveringMenu"></app-sidenav>
       </div>
 
     </div>
