@@ -8,6 +8,7 @@
 
   <!-- Left Side - Logo & Main Menu -->
   <mat-sidenav
+    *ngIf="hoveringMenu || renderMode !== RenderMode.SMALL"
     class="gd-body-content-left"
     [class.gd-body-content-left-expanded]="expandMenu"
     [class.gd-body-content-left-hovering]="hoveringMenu"
