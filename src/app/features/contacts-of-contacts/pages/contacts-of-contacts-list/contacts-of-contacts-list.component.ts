@@ -588,16 +588,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                 cssClasses: 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: ContactOfContactModel): void => {
-                    // data
-                    const message: {
-                      get: string,
-                      data?: {
-                        name: string,
-                      }
-                    } = {
-                      get: ''
-                    };
-
                     // determine what we need to delete
                     this.dialogV2Service.showConfirmDialog({
                       config: {
@@ -608,24 +598,9 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                           })
                         },
                         message: {
-                          get: () => message.get,
-                          data: () => message.data
+                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_CONTACT_OF_CONTACT',
+                          data: () => ({ name: item.name })
                         }
-                      },
-                      initialized: (handler) => {
-                        // display loading
-                        handler.loading.show();
-
-                        // set message data
-                        message.data = {
-                          name: item.name
-                        };
-
-                        // determine message label
-                        message.get = 'LNG_DIALOG_CONFIRM_DELETE_CONTACT_OF_CONTACT';
-
-                        // hide loading
-                        handler.loading.hide();
                       }
                     }).subscribe((response) => {
                       // canceled ?
@@ -1467,101 +1442,95 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
   refreshList(
     triggeredByPageChange: boolean
   ) {
-    if (this.selectedOutbreak) {
-      // retrieve created user & modified user information
-      this.queryBuilder.include('createdByUser', true);
-      this.queryBuilder.include('updatedByUser', true);
+    // retrieve created user & modified user information
+    this.queryBuilder.include('createdByUser', true);
+    this.queryBuilder.include('updatedByUser', true);
 
-      // retrieve responsible user information
-      this.queryBuilder.include('responsibleUser', true);
+    // retrieve responsible user information
+    this.queryBuilder.include('responsibleUser', true);
 
-      // refresh badges list with applied filter
-      if (!triggeredByPageChange) {
-        this.initializeGroupedData();
-      }
-
-      // retrieve the list of Contacts
-      this.contactsOfContactsList$ = this.contactsOfContactsDataService
-        .getContactsOfContactsList(this.selectedOutbreak.id, this.queryBuilder)
-        .pipe(
-          switchMap((data) => {
-            // determine locations that we need to retrieve
-            const locationsIdsMap: {
-              [locationId: string]: true
-            } = {};
-            data.forEach((item) => {
-              (item.addresses || []).forEach((address) => {
-                // nothing to add ?
-                if (!address?.locationId) {
-                  return;
-                }
-
-                // add location to list
-                locationsIdsMap[address.locationId] = true;
-              });
-            });
-
-            // determine ids
-            const locationIds: string[] = Object.keys(locationsIdsMap);
-
-            // nothing to retrieve ?
-            if (locationIds.length < 1) {
-              return of(data);
-            }
-
-            // construct location query builder
-            const qb = new RequestQueryBuilder();
-            qb.filter.bySelect(
-              'id',
-              locationIds,
-              false,
-              null
-            );
-
-            // retrieve locations
-            return this.locationDataService
-              .getLocationsList(qb)
-              .pipe(
-                map((locations) => {
-                  // map locations
-                  const locationsMap: {
-                    [locationId: string]: LocationModel
-                  } = {};
-                  locations.forEach((location) => {
-                    locationsMap[location.id] = location;
-                  });
-
-                  // set locations
-                  data.forEach((item) => {
-                    (item.addresses || []).forEach((address) => {
-                      address.location = address.locationId && locationsMap[address.locationId] ?
-                        locationsMap[address.locationId] :
-                        address.location;
-                    });
-                  });
-
-                  // finished
-                  return data;
-                })
-              );
-          })
-        )
-        .pipe(
-
-          // should be the last pipe
-          takeUntil(this.destroyed$)
-        );
+    // refresh badges list with applied filter
+    if (!triggeredByPageChange) {
+      this.initializeGroupedData();
     }
+
+    // retrieve the list of Contacts
+    this.contactsOfContactsList$ = this.contactsOfContactsDataService
+      .getContactsOfContactsList(this.selectedOutbreak.id, this.queryBuilder)
+      .pipe(
+        switchMap((data) => {
+          // determine locations that we need to retrieve
+          const locationsIdsMap: {
+            [locationId: string]: true
+          } = {};
+          data.forEach((item) => {
+            (item.addresses || []).forEach((address) => {
+              // nothing to add ?
+              if (!address?.locationId) {
+                return;
+              }
+
+              // add location to list
+              locationsIdsMap[address.locationId] = true;
+            });
+          });
+
+          // determine ids
+          const locationIds: string[] = Object.keys(locationsIdsMap);
+
+          // nothing to retrieve ?
+          if (locationIds.length < 1) {
+            return of(data);
+          }
+
+          // construct location query builder
+          const qb = new RequestQueryBuilder();
+          qb.filter.bySelect(
+            'id',
+            locationIds,
+            false,
+            null
+          );
+
+          // retrieve locations
+          return this.locationDataService
+            .getLocationsList(qb)
+            .pipe(
+              map((locations) => {
+                // map locations
+                const locationsMap: {
+                  [locationId: string]: LocationModel
+                } = {};
+                locations.forEach((location) => {
+                  locationsMap[location.id] = location;
+                });
+
+                // set locations
+                data.forEach((item) => {
+                  (item.addresses || []).forEach((address) => {
+                    address.location = address.locationId && locationsMap[address.locationId] ?
+                      locationsMap[address.locationId] :
+                      address.location;
+                  });
+                });
+
+                // finished
+                return data;
+              })
+            );
+        })
+      )
+      .pipe(
+
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      );
   }
 
   /**
      * Get total number of items, based on the applied filters
      */
   refreshListCount(applyHasMoreLimit?: boolean) {
-    if (!this.selectedOutbreak) {
-      return;
-    }
-
     // reset
     this.pageCount = undefined;
 
