@@ -3,7 +3,6 @@ import { ActivatedRoute, Params } from '@angular/router';
 import * as _ from 'lodash';
 import { forkJoin, Observable, of, throwError } from 'rxjs';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
-
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { moment } from '../../../../core/helperClasses/x-moment';
@@ -366,7 +365,11 @@ export class ContactsListComponent
       {
         field: 'riskLevel',
         label: 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL',
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        }
       },
       {
         field: 'dateOfLastContact',
@@ -384,6 +387,10 @@ export class ContactsListComponent
         field: 'followUpTeamId',
         label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
         notVisible: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        },
         exclude: (): boolean => {
           return !TeamModel.canList(this.authUser);
         },
@@ -442,7 +449,7 @@ export class ContactsListComponent
 
           // followed
           {
-            title: 'LNG_COMMON_LABEL_STATUS_FOLLOWED_UP',
+            title: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_FOLLOWED_UP',
             items: [{
               form: {
                 type: IV2ColumnStatusFormType.SQUARE,
@@ -454,7 +461,7 @@ export class ContactsListComponent
 
           // not followed
           {
-            title: 'LNG_COMMON_LABEL_STATUS_NOT_FOLLOWED_UP',
+            title: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_FOLLOWED_UP',
             items: [{
               form: {
                 type: IV2ColumnStatusFormType.SQUARE,
@@ -495,14 +502,14 @@ export class ContactsListComponent
             forms.push({
               type: IV2ColumnStatusFormType.SQUARE,
               color: 'purple',
-              tooltip: this.i18nService.instant('LNG_COMMON_LABEL_STATUS_FOLLOWED_UP')
+              tooltip: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_FOLLOWED_UP')
             });
           }
           else {
             forms.push({
               type: IV2ColumnStatusFormType.SQUARE,
               color: 'gray',
-              tooltip: this.i18nService.instant('LNG_COMMON_LABEL_STATUS_NOT_FOLLOWED_UP')
+              tooltip: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_FOLLOWED_UP')
             });
           }
 
