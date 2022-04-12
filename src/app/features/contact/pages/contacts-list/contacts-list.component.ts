@@ -416,11 +416,11 @@ export class ContactsListComponent
         legends: [
           // risk
           {
-            title: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+            title: 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL',
             items: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).list.map((item) => {
               return {
                 form: {
-                  type: IV2ColumnStatusFormType.SQUARE,
+                  type: IV2ColumnStatusFormType.TRIANGLE,
                   color: item.getColorCode()
                 },
                 label: item.id
@@ -438,6 +438,30 @@ export class ContactsListComponent
               },
               label: ' '
             }]
+          },
+
+          // followed
+          {
+            title: 'LNG_COMMON_LABEL_STATUS_FOLLOWED_UP',
+            items: [{
+              form: {
+                type: IV2ColumnStatusFormType.SQUARE,
+                color: 'purple'
+              },
+              label: ' '
+            }]
+          },
+
+          // not followed
+          {
+            title: 'LNG_COMMON_LABEL_STATUS_NOT_FOLLOWED_UP',
+            items: [{
+              form: {
+                type: IV2ColumnStatusFormType.SQUARE,
+                color: 'gray'
+              },
+              label: ' '
+            }]
           }
         ],
         forms: (_column, data: ContactModel): V2ColumnStatusForm[] => {
@@ -451,7 +475,7 @@ export class ContactsListComponent
             risk.map[data.riskLevel]
           ) {
             forms.push({
-              type: IV2ColumnStatusFormType.SQUARE,
+              type: IV2ColumnStatusFormType.TRIANGLE,
               color: risk.map[data.riskLevel].getColorCode(),
               tooltip: this.i18nService.instant(data.riskLevel)
             });
@@ -463,6 +487,22 @@ export class ContactsListComponent
               type: IV2ColumnStatusFormType.STAR,
               color: 'var(--gd-danger)',
               tooltip: this.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+            });
+          }
+
+          // follow up
+          if (data.followUp && data.followUp.startDate && data.followUp.endDate && moment().isBetween(data.followUp.startDate, data.followUp.endDate) ) {
+            forms.push({
+              type: IV2ColumnStatusFormType.SQUARE,
+              color: 'purple',
+              tooltip: this.i18nService.instant('LNG_COMMON_LABEL_STATUS_FOLLOWED_UP')
+            });
+          }
+          else {
+            forms.push({
+              type: IV2ColumnStatusFormType.SQUARE,
+              color: 'gray',
+              tooltip: this.i18nService.instant('LNG_COMMON_LABEL_STATUS_NOT_FOLLOWED_UP')
             });
           }
 
@@ -697,7 +737,7 @@ export class ContactsListComponent
                 label: 'LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_CONTACT',
                 cssClasses: 'gd-list-table-actions-action-menu-warning',
                 action: {
-                  click: (item: CaseModel): void => {
+                  click: (item: ContactModel): void => {
                     // determine what we need to delete
                     this.dialogV2Service
                       .showConfirmDialog({
@@ -707,7 +747,7 @@ export class ContactsListComponent
                             data: () => ({ name: item.name })
                           },
                           message: {
-                            get: () => 'LNG_DIALOG_CONFIRM_DELETE_CASE',
+                            get: () => 'LNG_DIALOG_CONFIRM_DELETE_CONTACT',
                             data: () => ({ name: item.name })
                           }
                         }
@@ -726,7 +766,7 @@ export class ContactsListComponent
                         const loading =
                           this.dialogV2Service.showLoadingDialog();
 
-                        // delete case
+                        // delete contact
                         this.contactDataService
                           .deleteContact(this.selectedOutbreak.id, item.id)
                           .pipe(
@@ -777,7 +817,7 @@ export class ContactsListComponent
                 }
               },
 
-              // Convert Contact to Case
+              // Convert Contact to Contact
               {
                 label: 'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CASE',
                 cssClasses: 'gd-list-table-actions-action-menu-warning',
@@ -988,7 +1028,7 @@ export class ContactsListComponent
               {
                 label: 'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM',
                 action: {
-                  link: (item: CaseModel): string[] => {
+                  link: (item: ContactModel): string[] => {
                     return [
                       '/relationships',
                       EntityType.CONTACT,
@@ -997,7 +1037,7 @@ export class ContactsListComponent
                     ];
                   }
                 },
-                visible: (item: CaseModel): boolean => {
+                visible: (item: ContactModel): boolean => {
                   return (
                     !item.deleted &&
                     this.selectedOutbreakIsActive &&
@@ -1030,7 +1070,7 @@ export class ContactsListComponent
                     ];
                   }
                 },
-                visible: (item: CaseModel): boolean => {
+                visible: (item: ContactModel): boolean => {
                   return !item.deleted;
                 }
               },
@@ -1090,11 +1130,11 @@ export class ContactsListComponent
               {
                 label: 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_MOVEMENT',
                 action: {
-                  link: (item: CaseModel): string[] => {
+                  link: (item: ContactModel): string[] => {
                     return ['/contacts', item.id, 'movement'];
                   }
                 },
-                visible: (item: CaseModel): boolean => {
+                visible: (item: ContactModel): boolean => {
                   return (
                     !item.deleted &&
                     ContactModel.canViewMovementMap(this.authUser)
@@ -1170,7 +1210,7 @@ export class ContactsListComponent
                           .subscribe(() => {
                             // success
                             this.toastV2Service.success(
-                              'LNG_PAGE_LIST_CASES_ACTION_RESTORE_SUCCESS_MESSAGE'
+                              'LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_SUCCESS_MESSAGE'
                             );
 
                             // hide loading
@@ -1202,7 +1242,7 @@ export class ContactsListComponent
    */
   protected initializeTableAdvancedFilters(): void {
     this.advancedFilters = [
-      // Case
+      // Contact
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'firstName',
@@ -1503,7 +1543,7 @@ export class ContactsListComponent
             }
           },
           visible: (): boolean => {
-            return CaseModel.canExport(this.authUser);
+            return ContactModel.canExport(this.authUser);
           }
         },
         // Import contacts
@@ -1532,7 +1572,7 @@ export class ContactsListComponent
           label: 'LNG_PAGE_LIST_CONTACTS_ACTION_EXPORT_CONTACTS_RELATIONSHIPS',
           action: {
             click: () => {
-              // construct filter by case query builder
+              // construct filter by contact query builder
               const qb = new RequestQueryBuilder();
 
               // retrieve only relationships that have at least one persons as desired type
@@ -1547,11 +1587,11 @@ export class ContactsListComponent
 
               // attach condition only if not empty
               if (!personsQb.filter.isEmpty()) {
-                // filter only cases
+                // filter only cotnacts
                 personsQb.filter.byEquality('type', EntityType.CONTACT);
               }
 
-              // export case relationships
+              // export contact relationships
               this.exportContactsRelationship(qb);
             }
           },
@@ -1705,14 +1745,14 @@ export class ContactsListComponent
           }
         },
         visible: (): boolean => {
-          return CaseModel.canExport(this.authUser);
+          return ContactModel.canExport(this.authUser);
         },
         disable: (selected: string[]): boolean => {
           return selected.length < 1;
         }
       },
       {
-        label: 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER',
+        label: 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_DOSSIER',
         action: {
           click: (selected: string[]) => {
             // remove id from list
@@ -1735,7 +1775,7 @@ export class ContactsListComponent
                 )} - ${moment().format('YYYY-MM-DD HH:mm')}`,
                 extraFormData: {
                   append: {
-                    cases: selected
+                    contacts: selected
                   }
                 },
                 allow: {
@@ -1774,7 +1814,7 @@ export class ContactsListComponent
             // type
             personsQb.filter.byEquality('type', EntityType.CONTACT);
 
-            // export case relationships
+            // export contact relationships
             this.exportContactsRelationship(qb);
           }
         },
