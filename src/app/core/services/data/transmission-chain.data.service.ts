@@ -782,7 +782,7 @@ export class TransmissionChainDataService {
               minTimelineDate = nodeData.dateTimeline;
             }
           }
-          graphData.nodes.push({data: nodeData});
+          graphData.nodes.push({ data: nodeData });
           selectedNodeIds[nodeData.id] = true;
         }
       });
@@ -801,7 +801,7 @@ export class TransmissionChainDataService {
           name: counterDateFormatted,
           nodeType: 'checkpoint'
         });
-        graphData.nodes.push({data: checkpointNode});
+        graphData.nodes.push({ data: checkpointNode });
       }
     }
 
@@ -924,7 +924,7 @@ export class TransmissionChainDataService {
       }
 
       // add edge
-      graphData.edges.push({data: graphEdge});
+      graphData.edges.push({ data: graphEdge });
     });
 
     // finished

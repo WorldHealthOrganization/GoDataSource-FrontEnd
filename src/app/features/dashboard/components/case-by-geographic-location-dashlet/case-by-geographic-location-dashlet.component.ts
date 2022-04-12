@@ -3,7 +3,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import * as _ from 'lodash';
-import { Subscription ,  Subscriber } from 'rxjs';
+import { Subscription,  Subscriber } from 'rxjs';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { Router } from '@angular/router';

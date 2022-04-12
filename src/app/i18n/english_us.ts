@@ -35,6 +35,7 @@ export const EnglishUsLang = {
     'LNG_COMMON_BUTTON_DELETE_FILTERS_MSG': 'Are you sure you want to remove this filter?',
     'LNG_COMMON_BUTTON_DELETE_SORTS': 'Remove sort',
     'LNG_COMMON_BUTTON_DELETE_SORTS_MSG': 'Are you sure you want to remove this sort?',
+    'LNG_COMMON_BUTTON_APPLY': 'Apply',
     'LNG_SIDE_FILTERS_SECTION_FILTER_TITLE': 'Filter'
 
 

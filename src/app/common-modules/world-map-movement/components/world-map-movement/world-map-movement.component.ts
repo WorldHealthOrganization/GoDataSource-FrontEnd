@@ -85,7 +85,7 @@ export class WorldMapMovementComponent {
   /**
      * Constructor
      */
-  constructor (
+  constructor(
     private dialogService: DialogService,
     private i18nService: I18nService
   ) {}

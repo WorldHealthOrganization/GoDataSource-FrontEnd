@@ -118,7 +118,7 @@ export class ModifyLabResultComponent extends ViewModifyComponent implements OnI
     this.sequenceResultOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_SEQUENCE_RESULT);
 
     this.route.queryParams.
-      subscribe((queryParams: {fromLabResultsList}) => {
+      subscribe((queryParams: { fromLabResultsList }) => {
         if (!_.isEmpty(queryParams)) {
           this.fromLabResultsList = JSON.parse(queryParams.fromLabResultsList);
         }

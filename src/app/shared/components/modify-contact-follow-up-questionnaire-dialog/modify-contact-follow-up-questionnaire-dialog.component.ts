@@ -8,9 +8,8 @@ import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../core/services/helper/form-helper.service';
 import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
-import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 

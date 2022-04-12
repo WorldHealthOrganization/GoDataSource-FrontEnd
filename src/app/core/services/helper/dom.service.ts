@@ -13,7 +13,7 @@ export class DomService {
     selector,
     block: string = 'end'
   ) {
-    setTimeout(function () {
+    setTimeout(function() {
       const item = document.querySelector(selector);
       if (
         item &&
@@ -84,9 +84,9 @@ export class DomService {
       const context = canvas.getContext('2d');
       const DOMURL: any = self.URL || self;
       const img = new Image();
-      const svg = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
+      const svg = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
       const url = DOMURL.createObjectURL(svg);
-      img.onload = function () {
+      img.onload = function() {
         context.drawImage(img, 0, 0, render.width, render.height);
         const png = canvas.toDataURL('image/png');
         DOMURL.revokeObjectURL(png);

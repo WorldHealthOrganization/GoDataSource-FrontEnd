@@ -159,7 +159,7 @@ export class ViewHelpDialogComponent extends ListComponent implements OnDestroy 
       this.queryBuilder.filter.where({
         id: {
           inq: this.data.helpItemsIds
-        }}, true);
+        } }, true);
     } else {
       this.queryBuilder.filter.remove('id');
     }

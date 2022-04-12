@@ -15,7 +15,6 @@ import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
@@ -42,6 +41,7 @@ import { IV2FilterBoolean, IV2FilterMultipleSelect, V2FilterTextType, V2FilterTy
 import { IExtendedColDef } from '../../../../shared/components-v2/app-list-table-v2/models/extended-column.model';
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-cases-list',
@@ -506,7 +506,7 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
       },
       {
         field: 'addresses.geoLocationAccurate',
-        label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
+        label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN,
@@ -517,7 +517,8 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
           address: filterAddressModel,
           field: 'addresses',
           fieldIsArray: true,
-          options: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options
+          options: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          defaultValue: ''
         },
         sortable: true
       },
@@ -1138,7 +1139,7 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
                 label: 'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE',
                 action: {
                   link: (item: CaseModel): string[] => {
-                    return ['/cases', item.id , 'view-questionnaire'];
+                    return ['/cases', item.id, 'view-questionnaire'];
                   }
                 },
                 visible: (item: CaseModel): boolean => {
@@ -2161,8 +2162,8 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
    */
   private addClassificationConditions() {
     // create classification condition
-    const trueCondition = {classification: {eq: Constants.CASE_CLASSIFICATION.NOT_A_CASE}};
-    const falseCondition = {classification: {neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE}};
+    const trueCondition = { classification: { eq: Constants.CASE_CLASSIFICATION.NOT_A_CASE } };
+    const falseCondition = { classification: { neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE } };
 
     // remove existing filter
     this.queryBuilder.filter.removeExactCondition(trueCondition);

@@ -262,7 +262,7 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
   /**
      * Get the link to redirect to view page depending on item type and action
      */
-  getItemRouterLink (item, action: string): string {
+  getItemRouterLink(item, action: string): string {
     switch (item.type) {
       case EntityType.CASE:
         return `/cases/${item.id}/${action === 'view' ? 'view' : 'modify'}`;

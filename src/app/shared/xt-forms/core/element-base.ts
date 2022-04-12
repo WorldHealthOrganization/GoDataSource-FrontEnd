@@ -64,9 +64,7 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
     setTimeout(() => {
       // wait for the next tick so angular can update the form control value
       // before we run the validations
-      validate
-      (this.validators, this.asyncValidators)
-      (this.control)
+      validate(this.validators, this.asyncValidators)(this.control)
         .subscribe((res) => {
           // cache the result
           this.validationResult = res;

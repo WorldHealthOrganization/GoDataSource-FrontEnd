@@ -288,7 +288,7 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
     } else {
       // do not fetch any item
       this.entityListCount$ = new Observable((observer) => {
-        observer.next({count: 0});
+        observer.next({ count: 0 });
         observer.complete();
         return;
       });

@@ -2259,7 +2259,7 @@ export class ContactsListComponent
           ]).subscribe(
             ([statuses, records]: [LabelValuePair[], ContactModel[]]) => {
 
-              handler.update.changeTitle('LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS_DIALOG_TITLE', { count: records.length.toLocaleString()});
+              handler.update.changeTitle('LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS_DIALOG_TITLE', { count: records.length.toLocaleString() });
 
               // set drop-down statuses
               (

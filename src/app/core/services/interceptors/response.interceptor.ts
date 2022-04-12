@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpResponse, HttpErrorResponse } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import * as _ from 'lodash';
 import { LoggerService } from '../helper/logger.service';
 import { Router } from '@angular/router';
 import { StorageKey, StorageService } from '../helper/storage.service';
 import { catchError, tap } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { AuthDataService } from '../data/auth.data.service';
 import { AppMessages } from '../../enums/app-messages.enum';
 import { ToastV2Service } from '../helper/toast-v2.service';

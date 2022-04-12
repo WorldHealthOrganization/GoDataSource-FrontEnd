@@ -9,10 +9,12 @@ import { AppListTableV2SelectionHeaderComponent } from './app-list-table-v2/comp
 import { AppListTableV2ColumnHeaderComponent } from './app-list-table-v2/components/column-header/app-list-table-v2-column-header.component';
 import { AppListTableV2LoadingComponent } from './app-list-table-v2/components/loading/app-list-table-v2-loading.component';
 import { AppListTableV2NoDataComponent } from './app-list-table-v2/components/no-data/app-list-table-v2-no-data.component';
+import { AppCreateViewModifyV2Component } from './app-create-view-modify-v2/app-create-view-modify-v2.component';
 
 export const components: any[] = [
   AppBottomDialogV2Component,
   AppBreadcrumbV2Component,
+  AppCreateViewModifyV2Component,
   AppListTableV2ActionsComponent,
   AppListTableV2ButtonComponent,
   AppListTableV2Component,

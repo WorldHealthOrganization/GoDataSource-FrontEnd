@@ -86,7 +86,7 @@ export class UsageDetailsItem {
 export class UsageDetails {
   items: UsageDetailsItem[] = [];
 
-  constructor (
+  constructor(
     data: LocationUsageModel,
     outbreaks: {
       [ id: string ]: OutbreakModel

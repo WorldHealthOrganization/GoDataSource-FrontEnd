@@ -10,11 +10,10 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { TransmissionChainBarsDataService } from '../../services/transmission-chain-bars.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { Subscription } from 'rxjs';
+import { Subscription, throwError } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { throwError } from 'rxjs';
 import { catchError, share } from 'rxjs/operators';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
@@ -258,7 +257,7 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
           const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
 
           this.importExportDataService
-            .exportImageToPdf({image: dataBase64, responseType: 'blob', splitFactor: 1})
+            .exportImageToPdf({ image: dataBase64, responseType: 'blob', splitFactor: 1 })
             .pipe(
               catchError((err) => {
                 this.toastV2Service.error(err);

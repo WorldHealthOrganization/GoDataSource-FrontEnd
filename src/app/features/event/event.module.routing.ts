@@ -1,11 +1,12 @@
 import { ModuleWithProviders } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { AuthGuard } from '../../core/services/guards/auth-guard.service';
-import { PERMISSION } from '../../core/models/permission.model';
-
-import * as fromPages from './pages';
+import { RouterModule, Routes } from '@angular/router';
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
+import { PERMISSION } from '../../core/models/permission.model';
+import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
+import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
+import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
+import * as fromPages from './pages';
 
 const routes: Routes = [
   // Events list
@@ -18,6 +19,10 @@ const routes: Routes = [
         PERMISSION.OUTBREAK_VIEW,
         PERMISSION.EVENT_LIST
       ]
+    },
+    resolve: {
+      user: UserDataResolver,
+      yesNoAll: YesNoAllDataResolver
     }
   },
   // Create Event

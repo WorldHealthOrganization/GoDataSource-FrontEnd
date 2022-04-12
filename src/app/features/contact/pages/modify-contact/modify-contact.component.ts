@@ -248,7 +248,7 @@ export class ModifyContactComponent
     this.showLoadingDialog(false);
 
     this.route.params
-      .subscribe((params: {contactId}) => {
+      .subscribe((params: { contactId }) => {
         this.contactId = params.contactId;
 
         // get current outbreak

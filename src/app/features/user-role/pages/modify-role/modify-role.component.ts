@@ -3,7 +3,7 @@ import { NgForm } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { IPermissionChildModel, PermissionModel } from '../../../../core/models/permission.model';
@@ -11,7 +11,6 @@ import { UserModel, UserRoleModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError, share } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { IGroupEventData, IGroupOptionEventData, ISelectGroupMap, ISelectGroupOptionFormatResponse, ISelectGroupOptionMap } from '../../../../shared/xt-forms/components/form-select-groups/form-select-groups.component';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -64,7 +63,7 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
     // show loading
     this.showLoadingDialog(false);
 
-    this.route.params.subscribe((params: {roleId}) => {
+    this.route.params.subscribe((params: { roleId }) => {
       // get the ID of the Role being modified
       this.userRoleId = params.roleId;
 

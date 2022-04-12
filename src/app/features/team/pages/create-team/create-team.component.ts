@@ -164,7 +164,7 @@ export class CreateTeamComponent
       });
 
       if (teamsNames.length > 0) {
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_ADD_USER_TEAM', {teamNames: teamsNames.join()})
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_ADD_USER_TEAM', { teamNames: teamsNames.join() })
           .subscribe((answer: DialogAnswer) => {
             if (answer.button === DialogAnswerButton.Cancel) {
               // update userIds to remove the user from the dropdown
@@ -199,7 +199,7 @@ export class CreateTeamComponent
         .subscribe((teamsList) => {
           if (teamsList.length > 0) {
             const teamNames = _.map(teamsList, (team) => team.name);
-            this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_SAVE_SAME_LOCATIONS_TEAM', {teamNames: teamNames.join(', ')})
+            this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_SAVE_SAME_LOCATIONS_TEAM', { teamNames: teamNames.join(', ') })
               .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                   // user accepts the action

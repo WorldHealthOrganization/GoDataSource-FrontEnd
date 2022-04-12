@@ -249,13 +249,42 @@
 
           /* Slide-in panel filters */
           .gd-app-side-dialog-v2-content-middle-item-input-filter-list {
-            /* Filters - operator and/or */
+            margin-top: -0.8rem;
+
+            /* Filters - tabs */
+            .mat-tab-group {
+              margin: 0 -1.6rem;
+              max-width: calc(100% + 3.2rem);
+
+              .mat-tab-header {
+                border-bottom-color: rgba(var(--gd-secondary-rgb), 0.25);
+                margin-bottom: 1.6rem;
+                padding: 0 1.6rem;
+              }
+
+              .mat-tab-body-wrapper {
+                .mat-tab-body {
+                  .mat-tab-body-content {
+                    padding: 0 1.6rem;
+                  }
+
+                  + .mat-tab-body-active {
+                    .gd-app-side-dialog-v2-content-middle-item-input-filter-list-container {
+                      height: calc(100vh - 31.7rem);
+                    }
+                  }
+                }
+              }
+            }
+
+            /* Filters - and/or operator */
             .gd-form-toggle-v2 {
-              margin-top: -0.8rem;
+              margin-bottom: 1.6rem;
             }
 
             /* Filters - top buttons */
             .gd-app-side-dialog-v2-content-middle-item-input-filter-list-buttons {
+              margin-bottom: 1.6rem;
               position: relative;
 
               &:after {
@@ -272,7 +301,7 @@
 
             /* Filters - scrollable container with all filters */
             .gd-app-side-dialog-v2-content-middle-item-input-filter-list-container {
-              height: calc(100vh - 32.1rem);
+              height: calc(100vh - 37.6rem);
               margin: 0 -1.6rem;
               overflow-y: overlay;
               padding: 1.6rem;

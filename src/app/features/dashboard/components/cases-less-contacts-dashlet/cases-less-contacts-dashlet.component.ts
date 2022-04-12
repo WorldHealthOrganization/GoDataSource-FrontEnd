@@ -6,7 +6,7 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import * as _ from 'lodash';
-import { Subscription ,  Subscriber } from 'rxjs';
+import { Subscription,  Subscriber } from 'rxjs';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { CaseModel } from '../../../../core/models/case.model';

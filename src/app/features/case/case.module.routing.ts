@@ -16,6 +16,7 @@ import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.res
 import { PregnancyStatusDataResolver } from '../../core/services/resolvers/data/pregnancy-status.resolver';
 import { VaccineDataResolver } from '../../core/services/resolvers/data/vaccine.resolver';
 import { VaccineStatusDataResolver } from '../../core/services/resolvers/data/vaccine-status.resolver';
+import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 
 const routes: Routes = [
   // Cases list
@@ -45,12 +46,13 @@ const routes: Routes = [
   // Create Case
   {
     path: 'create',
-    component: fromPages.CreateCaseComponent,
+    component: fromPages.CasesCreateViewModifyComponent,
     canActivate: [AuthGuard],
     data: {
       permissions: [
         PERMISSION.CASE_CREATE
-      ]
+      ],
+      action: CreateViewModifyV2Action.CREATE
     },
     canDeactivate: [
       PageChangeConfirmationGuard
@@ -59,25 +61,25 @@ const routes: Routes = [
   // View Case
   {
     path: ':caseId/view',
-    component: fromPages.ModifyCaseComponent,
+    component: fromPages.CasesCreateViewModifyComponent,
     canActivate: [AuthGuard],
     data: {
       permissions: [
         PERMISSION.CASE_VIEW
       ],
-      action: ViewModifyComponentAction.VIEW
+      action: CreateViewModifyV2Action.VIEW
     }
   },
   // Modify Case
   {
     path: ':caseId/modify',
-    component: fromPages.ModifyCaseComponent,
+    component: fromPages.CasesCreateViewModifyComponent,
     canActivate: [AuthGuard],
     data: {
       permissions: [
         PERMISSION.CASE_MODIFY
       ],
-      action: ViewModifyComponentAction.MODIFY
+      action: CreateViewModifyV2Action.MODIFY
     },
     canDeactivate: [
       PageChangeConfirmationGuard

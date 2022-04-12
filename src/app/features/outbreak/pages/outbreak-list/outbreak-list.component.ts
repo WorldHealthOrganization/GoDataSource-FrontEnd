@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
@@ -19,7 +19,6 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { Router } from '@angular/router';
 import { catchError, map, share, switchMap } from 'rxjs/operators';
 import { AnswerModel, QuestionModel } from '../../../../core/models/question.model';
-import { throwError } from 'rxjs';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
@@ -548,7 +547,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
     this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_MAKE_OUTBREAK_ACTIVE')
       .subscribe((answer: DialogAnswer) => {
         if (answer.button === DialogAnswerButton.Yes) {
-          const userData = {'activeOutbreakId': outbreak.id};
+          const userData = { 'activeOutbreakId': outbreak.id };
           const userId = this.authUser.id;
           this.userDataService
             .modifyUser(userId, userData)
@@ -656,7 +655,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
                 placeholder: 'LNG_DIALOG_FIELD_PLACEHOLDER_CLONED_OUTBREAK_NAME',
                 required: true,
                 type: 'text',
-                value: this.i18nService.instant('LNG_PAGE_LIST_OUTBREAKS_CLONE_NAME', {name: outbreak.name})
+                value: this.i18nService.instant('LNG_PAGE_LIST_OUTBREAKS_CLONE_NAME', { name: outbreak.name })
               })]
             }),
             true

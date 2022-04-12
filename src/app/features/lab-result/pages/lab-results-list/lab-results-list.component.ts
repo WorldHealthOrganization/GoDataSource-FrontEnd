@@ -241,7 +241,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
         new HoverRowAction({
           menuOptionLabel: 'LNG_PAGE_MODIFY_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE',
           click: (item: LabResultModel) => {
-            this.router.navigate(['/lab-results', item.id , 'view-questionnaire']);
+            this.router.navigate(['/lab-results', item.id, 'view-questionnaire']);
           },
           visible: (item: LabResultModel): boolean => {
             return !item.deleted &&

@@ -1,13 +1,21 @@
 <mat-sidenav-container
-  class="gd-body-content">
+  class="gd-body-content"
+  [class.gd-body-content-full]="renderMode === RenderMode.FULL"
+  [class.gd-body-content-medium]="renderMode === RenderMode.MEDIUM"
+  [class.gd-body-content-small]="renderMode === RenderMode.SMALL"
+  [hasBackdrop]="hoveringMenu"
+  (backdropClick)="hoveringMenu = false">
 
   <!-- Left Side - Logo & Main Menu -->
   <mat-sidenav
+    *ngIf="hoveringMenu || renderMode !== RenderMode.SMALL"
     class="gd-body-content-left"
     [class.gd-body-content-left-expanded]="expandMenu"
+    [class.gd-body-content-left-hovering]="hoveringMenu"
     opened="true"
-    mode="side"
-    fixedInViewport="true">
+    [mode]="renderMode === RenderMode.FULL ? 'side' : 'over'"
+    fixedInViewport="true"
+    disableClose="true">
 
     <!-- Content -->
     <div
@@ -25,13 +33,14 @@
       <div
         class="gd-body-content-left-content-menu">
         <app-sidenav
-          [expanded]="expandMenu"></app-sidenav>
+          [expanded]="expandMenu || hoveringMenu"></app-sidenav>
       </div>
 
     </div>
 
     <!-- Expand / Collapse button -->
     <button
+      *ngIf="renderMode === RenderMode.FULL"
       type="button"
       mat-icon-button
       (click)="expandMenu = !expandMenu"
@@ -49,7 +58,8 @@
     <!-- Top bar -->
     <div
       class="gd-body-content-right-top">
-      <app-topnav></app-topnav>
+      <app-topnav
+        (showHoverMenu)="hoveringMenu = true"></app-topnav>
     </div>
 
     <!-- Bottom part - page content -->

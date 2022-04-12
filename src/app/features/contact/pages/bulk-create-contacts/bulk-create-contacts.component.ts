@@ -3,7 +3,7 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { ActivatedRoute, Router } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -20,7 +20,6 @@ import { Constants } from '../../../../core/models/constants';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { throwError } from 'rxjs';
 import { catchError, map, share } from 'rxjs/operators';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { moment } from '../../../../core/helperClasses/x-moment';

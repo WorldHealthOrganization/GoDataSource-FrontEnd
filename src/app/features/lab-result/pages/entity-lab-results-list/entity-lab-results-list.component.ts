@@ -231,7 +231,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
         new HoverRowAction({
           menuOptionLabel: 'LNG_PAGE_MODIFY_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE',
           click: (item: LabResultModel) => {
-            this.router.navigate(['/lab-results', item.id , 'view-questionnaire']);
+            this.router.navigate(['/lab-results', item.id, 'view-questionnaire']);
           },
           visible: (item: LabResultModel): boolean => {
             return !item.deleted &&
@@ -833,7 +833,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
       .subscribe((answer: DialogAnswer) => {
         if (answer.button === DialogAnswerButton.Yes) {
           this.caseDataService
-            .modifyCase(this.selectedOutbreak.id, this.entityData.id, {classification: classificationOption.value})
+            .modifyCase(this.selectedOutbreak.id, this.entityData.id, { classification: classificationOption.value })
             .pipe(
               catchError((err) => {
                 this.toastV2Service.error(err);

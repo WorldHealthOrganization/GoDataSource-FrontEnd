@@ -8,12 +8,11 @@ import { DialogAnswer, DialogAnswerButton, DialogField, DialogFieldType, HoverRo
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { SystemClientApplicationModel } from '../../../../core/models/system-client-application.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { Observable, Subscriber } from 'rxjs';
+import { Observable, Subscriber, throwError, of, forkJoin } from 'rxjs';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { environment } from '../../../../../environments/environment';
 import { catchError } from 'rxjs/operators';
-import { throwError, of, forkJoin } from 'rxjs';
 import { HoverRowActionsDirective } from '../../../../shared/directives/hover-row-actions/hover-row-actions.directive';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';

@@ -88,7 +88,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // retrieve data
     this.retrieveData();
-  };
+  }
 
   // columns
   private _columns: IV2Column[];
@@ -98,7 +98,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // update columns definitions
     this.updateColumnDefinitions();
-  };
+  }
 
   /**
    * Ag table api handlers
@@ -248,7 +248,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // update columns definitions
     this.updateColumnDefinitions();
-  };
+  }
 
   // info values - used to display additional information relevant for this page
   private _infos: string[];
@@ -2028,7 +2028,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         }
 
         // update extra values...values :)
-        const valuesToPutBack = {...appliedFilter.extraValues};
+        const valuesToPutBack = { ...appliedFilter.extraValues };
         Object.keys(advancedFilter.extraValues).forEach((prop) => {
           // nothing to do ?
           if (valuesToPutBack[prop] === undefined) {

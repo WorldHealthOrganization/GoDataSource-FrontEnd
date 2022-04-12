@@ -139,7 +139,7 @@ export class HelpSearchComponent extends ListComponent implements OnInit, OnDest
    * Re(load) the items list
    */
   refreshList() {
-    this.queryBuilder.filter.where({approved: true}, true);
+    this.queryBuilder.filter.where({ approved: true }, true);
     // retrieve the list of items
     if (_.isEmpty(this.searchedTerm)) {
       this.queryBuilder.filter.remove('token');

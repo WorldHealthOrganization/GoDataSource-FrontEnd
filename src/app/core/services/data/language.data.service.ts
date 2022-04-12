@@ -80,7 +80,7 @@ export class LanguageDataService {
     return this.getLanguagesList()
       .pipe(
         map((languages: LanguageModel[]) => {
-          return _.find(languages, {id: languageId});
+          return _.find(languages, { id: languageId });
         })
       );
   }

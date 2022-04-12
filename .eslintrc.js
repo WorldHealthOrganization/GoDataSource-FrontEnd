@@ -70,6 +70,7 @@ module.exports = {
         "@angular-eslint/use-lifecycle-interface": "error",
         "@angular-eslint/use-pipe-transform-interface": "error",
         "@typescript-eslint/comma-dangle": "error",
+        "@typescript-eslint/comma-spacing": ["error"],
         "@typescript-eslint/consistent-type-definitions": "error",
         "@typescript-eslint/dot-notation": "off",
         "@typescript-eslint/explicit-member-accessibility": [
@@ -78,6 +79,7 @@ module.exports = {
             "accessibility": "explicit"
           }
         ],
+        "@typescript-eslint/func-call-spacing": ["error"],
         "@typescript-eslint/indent": [
           "error",
           2
@@ -98,11 +100,14 @@ module.exports = {
         "@typescript-eslint/naming-convention": "off",
         "@typescript-eslint/no-empty-function": "off",
         "@typescript-eslint/no-empty-interface": "error",
+        "@typescript-eslint/no-duplicate-imports": ["error"],
+        "@typescript-eslint/no-extra-semi": ["error"],
         "@typescript-eslint/no-inferrable-types": "off",
         "@typescript-eslint/no-misused-new": "error",
         "@typescript-eslint/no-non-null-assertion": "error",
         "@typescript-eslint/no-shadow": "error",
         "@typescript-eslint/no-unused-expressions": "error",
+        "@typescript-eslint/object-curly-spacing": ["error", "always"],
         "@typescript-eslint/prefer-function-type": "error",
         "@typescript-eslint/quotes": [
           "error",
@@ -112,11 +117,14 @@ module.exports = {
           "error",
           "always"
         ],
+        "@typescript-eslint/space-before-function-paren": ["error", "never"],
+        "@typescript-eslint/space-infix-ops": ["error"],
         "@typescript-eslint/type-annotation-spacing": "error",
         "@typescript-eslint/unified-signatures": "error",
         "arrow-body-style": "off",
         "brace-style": "off",
         "comma-dangle": "off",
+        "comma-spacing": "off",
         "constructor-super": "error",
         "curly": "error",
         "dot-notation": "off",
@@ -125,6 +133,7 @@ module.exports = {
           "error",
           "smart"
         ],
+        "func-call-spacing": "off",
         "guard-for-in": "off",
         "id-denylist": "off",
         "id-match": "off",
@@ -164,8 +173,10 @@ module.exports = {
           }
         ],
         "no-debugger": "error",
+        "no-duplicate-imports": "off",
         "no-empty": "off",
         "no-empty-function": "off",
+        "no-extra-semi": "off",
         "no-eval": "error",
         "no-fallthrough": "error",
         "no-new-wrappers": "error",
@@ -181,6 +192,7 @@ module.exports = {
         "no-unused-expressions": "error",
         "no-unused-labels": "error",
         "no-var": "error",
+        "object-curly-spacing": "off",
         "prefer-const": "error",
         "quotes": [
           1,
@@ -188,6 +200,8 @@ module.exports = {
         ],
         "radix": "error",
         "semi": "error",
+        "space-before-function-paren": "off",
+        "space-infix-ops": "off",
         "spaced-comment": [
           "error",
           "always",

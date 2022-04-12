@@ -10,10 +10,9 @@ import * as FileSaver from 'file-saver';
 import { LoadingDialogModel } from '../../../../shared/components/index';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { GanttChartDelayOnsetDashletComponent } from '../../components/gantt-chart-delay-onset-dashlet/gantt-chart-delay-onset-dashlet.component';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { Constants } from '../../../../core/models/constants';
-import { throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
@@ -203,7 +202,7 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
         .getPNGBase64(ganttChartName, '#tempCanvas')
         .subscribe((pngBase64) => {
           this.importExportDataService
-            .exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
+            .exportImageToPdf({ image: pngBase64, responseType: 'blob', splitFactor: 1 })
             .pipe(
               catchError((err) => {
                 this.toastV2Service.error(err);

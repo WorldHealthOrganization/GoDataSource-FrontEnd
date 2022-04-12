@@ -61,7 +61,7 @@ export class ContactChronology {
           chronologyEntries.push(new ChronologyItem({
             date: relationship.contactDate,
             label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_EXPOSURE',
-            translateData: {exposureName: sourcePerson ? sourcePerson.name : ''}
+            translateData: { exposureName: sourcePerson ? sourcePerson.name : '' }
           }));
         }
       });
