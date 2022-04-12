@@ -262,7 +262,7 @@ export class AddressModel {
       // check for locations
       if (
         addressParentLocationIds &&
-                addressParentLocationIds.length > 0
+        addressParentLocationIds.length > 0
       ) {
         query.parentLocationIdFilter = {
           $in: addressParentLocationIds

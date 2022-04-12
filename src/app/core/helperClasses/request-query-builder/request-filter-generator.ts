@@ -20,13 +20,13 @@ export class RequestFilterGenerator {
   static textIs(value: string): any {
     return {
       regexp: '/^' +
-                RequestFilterGenerator.escapeStringForRegex(value)
-                  .replace(/%/g, '.*')
-                  .replace(/\\\?/g, '.')
-                  .replace(/&/g, '%26')
-                  .replace(/#/g, '%23')
-                  .replace(/\+/g, '%2B') +
-                '$/i'
+        RequestFilterGenerator.escapeStringForRegex(value)
+          .replace(/%/g, '.*')
+          .replace(/\\\?/g, '.')
+          .replace(/&/g, '%26')
+          .replace(/#/g, '%23')
+          .replace(/\+/g, '%2B') +
+        '$/i'
     };
   }
 
@@ -61,8 +61,8 @@ export class RequestFilterGenerator {
   }
 
   /**
-     * Text starts with provided value ( case insensitive )
-     */
+   * Text starts with provided value ( case insensitive )
+   */
   static textStartWith(
     value: string,
     useLike?: boolean
@@ -70,22 +70,22 @@ export class RequestFilterGenerator {
     return useLike ?
       {
         like: '^' +
-                    RequestFilterGenerator.escapeStringForRegex(value)
-                      .replace(/%/g, '.*')
-                      .replace(/\\\?/g, '.')
-                      .replace(/&/g, '%26')
-                      .replace(/#/g, '%23')
-                      .replace(/\+/g, '%2B'),
+          RequestFilterGenerator.escapeStringForRegex(value)
+            .replace(/%/g, '.*')
+            .replace(/\\\?/g, '.')
+            .replace(/&/g, '%26')
+            .replace(/#/g, '%23')
+            .replace(/\+/g, '%2B'),
         options: 'i'
       } : {
         regexp: '/^' +
-                    RequestFilterGenerator.escapeStringForRegex(value)
-                      .replace(/%/g, '.*')
-                      .replace(/\\\?/g, '.')
-                      .replace(/&/g, '%26')
-                      .replace(/#/g, '%23')
-                      .replace(/\+/g, '%2B') +
-                    '/i'
+          RequestFilterGenerator.escapeStringForRegex(value)
+            .replace(/%/g, '.*')
+            .replace(/\\\?/g, '.')
+            .replace(/&/g, '%26')
+            .replace(/#/g, '%23')
+            .replace(/\+/g, '%2B') +
+          '/i'
       };
   }
 

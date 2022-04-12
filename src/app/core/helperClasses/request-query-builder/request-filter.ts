@@ -152,13 +152,13 @@ export class RequestFilter {
   }
 
   /**
-     * Filter by a text field
-     * @param {string} property
-     * @param {string} value
-     * @param {boolean} replace
-     * @param {boolean} useLike
-     * @returns {RequestFilter}
-     */
+   * Filter by a text field
+   * @param {string} property
+   * @param {string} value
+   * @param {boolean} replace
+   * @param {boolean} useLike
+   * @returns {RequestFilter}
+   */
   byText(
     property: string,
     value: string,
