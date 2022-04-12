@@ -41,9 +41,8 @@ export class RequestFilter {
   private changesListener: () => void;
 
   /**
-     * Escape string
-     * @param value
-     */
+   * Escape string
+   */
   static escapeStringForRegex(value: string) {
     return RequestFilterGenerator.escapeStringForRegex(value);
   }

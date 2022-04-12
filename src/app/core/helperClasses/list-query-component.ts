@@ -430,7 +430,8 @@ export abstract class ListQueryComponent {
           column.columnDefinition.filter.field,
           column.columnDefinition.filter.fieldIsArray,
           column.columnDefinition.filter.address,
-          column.columnDefinition.filter.address.filterLocationIds
+          column.columnDefinition.filter.address.filterLocationIds,
+          (column.columnDefinition.filter as any).useLike
         );
 
         // finished

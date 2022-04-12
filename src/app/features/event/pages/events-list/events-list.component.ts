@@ -205,7 +205,8 @@ export class EventsListComponent
           address: filterAddressModel,
           addressField: 'emailAddress',
           field: 'address',
-          fieldIsArray: false
+          fieldIsArray: false,
+          useLike: true
         },
         sortable: true
       },
@@ -401,7 +402,8 @@ export class EventsListComponent
           address: filterAddressModel,
           addressField: 'addressLine1',
           field: 'address',
-          fieldIsArray: false
+          fieldIsArray: false,
+          useLike: true
         },
         sortable: true
       },
@@ -417,7 +419,8 @@ export class EventsListComponent
           address: filterAddressModel,
           addressField: 'city',
           field: 'address',
-          fieldIsArray: false
+          fieldIsArray: false,
+          useLike: true
         },
         sortable: true
       },
@@ -451,7 +454,8 @@ export class EventsListComponent
           address: filterAddressModel,
           addressField: 'postalCode',
           field: 'address',
-          fieldIsArray: false
+          fieldIsArray: false,
+          useLike: true
         },
         sortable: true
       },

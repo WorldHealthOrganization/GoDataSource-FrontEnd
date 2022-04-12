@@ -141,6 +141,7 @@ interface IV2FilterAddressField extends Omit<IV2FilterBasic, 'address' | 'addres
 
   // optional
   defaultValue?: any;
+  useLike?: boolean;
 }
 
 /**
