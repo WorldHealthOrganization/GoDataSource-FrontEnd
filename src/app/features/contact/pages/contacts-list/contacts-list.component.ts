@@ -311,7 +311,7 @@ export class ContactsListComponent
       },
       {
         field: 'addresses.geoLocationAccurate',
-        label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
+        label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN,
@@ -322,7 +322,8 @@ export class ContactsListComponent
           address: filterAddressModel,
           field: 'addresses',
           fieldIsArray: true,
-          options: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options
+          options: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          defaultValue: ''
         },
         sortable: true
       },
@@ -697,45 +698,18 @@ export class ContactsListComponent
                 cssClasses: 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: CaseModel): void => {
-                    // data
-                    const message: {
-                      get: string;
-                      data?: {
-                        name: string;
-                      };
-                    } = {
-                      get: ''
-                    };
-
                     // determine what we need to delete
                     this.dialogV2Service
                       .showConfirmDialog({
                         config: {
                           title: {
                             get: () => 'LNG_COMMON_LABEL_DELETE',
-                            data: () => ({
-                              name: item.name
-                            })
+                            data: () => ({ name: item.name })
                           },
                           message: {
-                            get: () => message.get,
-                            data: () => message.data
+                            get: () => 'LNG_DIALOG_CONFIRM_DELETE_CASE',
+                            data: () => ({ name: item.name })
                           }
-                        },
-                        initialized: (handler) => {
-                          // display loading
-                          handler.loading.show();
-
-                          // set message data
-                          message.data = {
-                            name: item.name
-                          };
-
-                          // determine message label
-                          message.get = 'LNG_DIALOG_CONFIRM_DELETE_CASE';
-
-                          // hide loading
-                          handler.loading.hide();
                         }
                       })
                       .subscribe((response) => {
