@@ -427,7 +427,6 @@ export class EventsListComponent
       {
         field: 'address.geoLocation.lat',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
-        sortable: true,
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lat'
@@ -436,7 +435,6 @@ export class EventsListComponent
       {
         field: 'address.geoLocation.lng',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
-        sortable: true,
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lng'
