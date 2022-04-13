@@ -71,6 +71,7 @@ import { DiseaseDataResolver } from './resolvers/data/disease.resolver';
 import { FollowUpGenerationTeamAssignmentAlgorithmDataResolver } from './resolvers/data/follow-up-generation-team-assignment-algorithm.resolver';
 import { LocationGeographicalLevelDataResolver } from './resolvers/data/location-geographical-level.resolver';
 import { CountryDataResolver } from './resolvers/data/country.resolver';
+import { TeamDataResolver } from './resolvers/data/team.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -88,6 +89,7 @@ export const services: any[] = [
   OutcomeDataResolver,
   PregnancyStatusDataResolver,
   RiskDataResolver,
+  TeamDataResolver,
   UserDataResolver,
   YesNoAllDataResolver,
   YesNoDataResolver,
