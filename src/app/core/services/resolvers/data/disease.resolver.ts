@@ -38,6 +38,7 @@ export class DiseaseDataResolver implements IMapResolverV2<ReferenceDataEntryMod
             response.options.push({
               label: item.value,
               value: item.id,
+              iconUrl: item.iconUrl,
               data: item
             });
           });

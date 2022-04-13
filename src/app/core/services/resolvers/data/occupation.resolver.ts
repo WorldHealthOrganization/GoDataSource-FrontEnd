@@ -38,6 +38,7 @@ export class OccupationDataResolver implements IMapResolverV2<ReferenceDataEntry
             response.options.push({
               label: item.value,
               value: item.id,
+              iconUrl: item.iconUrl,
               data: item
             });
           });

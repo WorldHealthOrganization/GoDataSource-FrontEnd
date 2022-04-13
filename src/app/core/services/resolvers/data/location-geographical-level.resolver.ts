@@ -38,6 +38,7 @@ export class LocationGeographicalLevelDataResolver implements IMapResolverV2<Ref
             response.options.push({
               label: item.value,
               value: item.id,
+              iconUrl: item.iconUrl,
               data: item
             });
           });

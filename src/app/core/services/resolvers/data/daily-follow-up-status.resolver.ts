@@ -38,6 +38,7 @@ export class DailyFollowUpStatusDataResolver implements IMapResolverV2<Reference
             response.options.push({
               label: item.value,
               value: item.id,
+              iconUrl: item.iconUrl,
               data: item
             });
           });

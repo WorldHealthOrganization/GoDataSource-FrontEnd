@@ -38,6 +38,7 @@ export class FollowUpGenerationTeamAssignmentAlgorithmDataResolver implements IM
             response.options.push({
               label: item.value,
               value: item.id,
+              iconUrl: item.iconUrl,
               data: item
             });
           });

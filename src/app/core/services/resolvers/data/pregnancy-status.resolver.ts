@@ -38,6 +38,7 @@ export class PregnancyStatusDataResolver implements IMapResolverV2<ReferenceData
             response.options.push({
               label: item.value,
               value: item.id,
+              iconUrl: item.iconUrl,
               data: item
             });
           });
