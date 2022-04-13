@@ -174,7 +174,7 @@ export class RequestFilter {
           value,
           useLike
         )
-      }, replace);
+      }, replace, false);
     }
 
     // trigger change
@@ -210,7 +210,7 @@ export class RequestFilter {
       this.removeCondition(condition);
     } else {
       // filter with 'startsWith' criteria
-      this.where(condition, replace);
+      this.where(condition, replace, false);
     }
 
     // trigger change
@@ -244,7 +244,7 @@ export class RequestFilter {
           value,
           useLike
         )
-      }, replace);
+      }, replace, false);
     }
 
     // trigger change
@@ -279,14 +279,14 @@ export class RequestFilter {
         // filter by invalid value
         this.where({
           [property]: 'INVALID PHONE'
-        }, replace);
+        }, replace, false);
       } else {
         // search by phone number
         this.where({
           [property]: {
             [regexMethod]: phonePattern
           }
-        }, replace);
+        }, replace, false);
       }
     }
 
@@ -321,14 +321,14 @@ export class RequestFilter {
       if (caseInsensitive) {
         this.where({
           [property]: RequestFilterGenerator.textIs(value as string)
-        }, replace);
+        }, replace, false);
       } else {
         // case sensitive search
         // we don't use "regex" ( ? and % ) special characters in this case
         // !!! changing this to regex breaks a few things !!!
         this.where({
           [property]: value
-        }, replace);
+        }, replace, false);
       }
     }
 
@@ -374,7 +374,7 @@ export class RequestFilter {
         // filter
         this.where({
           [property]: true
-        });
+        }, false, false);
       } else {
         // filter
         this.where({
@@ -382,7 +382,7 @@ export class RequestFilter {
             { [property]: false },
             { [property]: { eq: null } }
           ]
-        });
+        }, false, false);
       }
     }
 
@@ -425,13 +425,13 @@ export class RequestFilter {
 
     // apply filter
     if (value === false) {
-      this.where(orCondition);
+      this.where(orCondition, false, false);
     } else if (value === true) {
       this.where({
         [property]: {
           eq: true
         }
-      });
+      }, false, false);
     }
 
     // trigger change
@@ -466,7 +466,7 @@ export class RequestFilter {
       // filter by range (from / to)
       this.where({
         [property]: RequestFilterGenerator.rangeCompare(value)
-      }, replace);
+      }, replace, false);
     }
 
     // trigger change
@@ -536,7 +536,8 @@ export class RequestFilter {
             [operator]: valueToCompare
           }
         },
-        replace
+        replace,
+        false
       );
     }
 
@@ -629,7 +630,7 @@ export class RequestFilter {
         [property]: {
           inq: values
         }
-      }, replace);
+      }, replace, false);
     }
 
     // trigger change
@@ -649,7 +650,7 @@ export class RequestFilter {
     // filter no values
     this.where({
       [property]: RequestFilterGenerator.hasValue()
-    });
+    }, false, false);
 
     // trigger change
     this.triggerChangeListener();
@@ -667,7 +668,9 @@ export class RequestFilter {
   ): RequestFilter {
     // filter no values
     this.where(
-      RequestFilterGenerator.doesntHaveValue(property)
+      RequestFilterGenerator.doesntHaveValue(property),
+      false,
+      false
     );
 
     // trigger change
@@ -705,7 +708,8 @@ export class RequestFilter {
      */
   where(
     condition: any,
-    replace: boolean = false
+    replace: boolean = false,
+    triggerChangeListener: boolean = true
   ): RequestFilter {
     // where condition
     if (replace) {
@@ -717,7 +721,9 @@ export class RequestFilter {
     this.conditions.push(condition);
 
     // trigger change
-    this.triggerChangeListener();
+    if (triggerChangeListener) {
+      this.triggerChangeListener();
+    }
 
     // finished
     return this;

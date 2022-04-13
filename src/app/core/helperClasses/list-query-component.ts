@@ -407,7 +407,7 @@ export abstract class ListQueryComponent {
             [column.columnDefinition.field]: {
               eq: null
             }
-          });
+          }, true);
         } else if (
           hasNoValueIncluded
         ) {
@@ -422,7 +422,7 @@ export abstract class ListQueryComponent {
                 [column.columnDefinition.field]: { inq: column.columnDefinition.filter.value }
               }
             ]
-          });
+          }, true);
         } else if (
           column.columnDefinition.filter.value &&
           column.columnDefinition.filter.value.length > 0
@@ -430,7 +430,7 @@ export abstract class ListQueryComponent {
           // only other values
           this.queryBuilder.filter.where({
             [column.columnDefinition.field]: { inq: column.columnDefinition.filter.value }
-          });
+          }, true);
         }
 
         // refresh list
