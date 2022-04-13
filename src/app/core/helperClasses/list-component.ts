@@ -536,7 +536,7 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
    */
   clearHeaderFilters() {
     // clear header filters
-    this.tableColumns.forEach((column) => {
+    (this.tableColumns || []).forEach((column) => {
       // doesn't have filter, then there is no point in continuing ?
       if (!column.filter) {
         return;
