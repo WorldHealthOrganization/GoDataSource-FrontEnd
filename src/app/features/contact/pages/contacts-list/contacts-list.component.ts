@@ -463,14 +463,14 @@ export class ContactsListComponent
             items: [{
               form: {
                 type: IV2ColumnStatusFormType.SQUARE,
-                color: 'purple'
+                color: 'var(--gd-followed-status)'
               },
               label: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_FOLLOWED_UP'
             },
             {
               form: {
                 type: IV2ColumnStatusFormType.SQUARE,
-                color: 'gray'
+                color: 'var(--gd-not-followed-status)'
               },
               label: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_FOLLOWED_UP'
             }]
@@ -506,14 +506,14 @@ export class ContactsListComponent
           if (data.followUp && data.followUp.startDate && data.followUp.endDate && moment().isBetween(data.dateOfLastContact, data.followUp.endDate, undefined, '[]') ) {
             forms.push({
               type: IV2ColumnStatusFormType.SQUARE,
-              color: 'purple',
+              color: 'var(--gd-followed-status)',
               tooltip: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_FOLLOWED_UP')
             });
           }
           else {
             forms.push({
               type: IV2ColumnStatusFormType.SQUARE,
-              color: 'gray',
+              color: 'var(--gd-not-followed-status)',
               tooltip: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_FOLLOWED_UP')
             });
           }
