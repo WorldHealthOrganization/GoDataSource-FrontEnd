@@ -404,9 +404,17 @@ export abstract class ListQueryComponent {
         ) {
           // only has no value
           this.queryBuilder.filter.where({
-            [column.columnDefinition.field]: {
-              eq: null
-            }
+            or: [
+              {
+                [column.columnDefinition.field]: {
+                  eq: null
+                }
+              }, {
+                [column.columnDefinition.field]: {
+                  exists: false
+                }
+              }
+            ]
           }, true);
         } else if (
           hasNoValueIncluded
@@ -419,7 +427,11 @@ export abstract class ListQueryComponent {
                   eq: null
                 }
               }, {
-                [column.columnDefinition.field]: { inq: column.columnDefinition.filter.value }
+                [column.columnDefinition.field]: {
+                  exists: false
+                }
+              }, {
+                [column.columnDefinition.field]: { inq: column.columnDefinition.filter.value.filter((value) => value !== AppFormSelectMultipleV2Component.HAS_NO_VALUE) }
               }
             ]
           }, true);
@@ -429,7 +441,7 @@ export abstract class ListQueryComponent {
         ) {
           // only other values
           this.queryBuilder.filter.where({
-            [column.columnDefinition.field]: { inq: column.columnDefinition.filter.value }
+            [column.columnDefinition.field]: { inq: column.columnDefinition.filter.value.filter((value) => value !== AppFormSelectMultipleV2Component.HAS_NO_VALUE) }
           }, true);
         }
 
