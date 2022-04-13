@@ -388,16 +388,16 @@ export class ContactsListComponent
         label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
         notVisible: true,
         filter: {
-          type: V2FilterType.TEXT,
-          textType: V2FilterTextType.STARTS_WITH
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: []
         },
         exclude: (): boolean => {
           return !TeamModel.canList(this.authUser);
         },
         link: (data) => {
-          return data.followUpTeamId
-            ? `/teams/${data.followUpTeamId}/view`
-            : undefined;
+          return data.followUpTeamId ?
+            `/teams/${data.followUpTeamId}/view` :
+            undefined;
         }
       },
       {
