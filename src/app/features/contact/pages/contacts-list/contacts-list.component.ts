@@ -449,25 +449,20 @@ export class ContactsListComponent
 
           // followed
           {
-            title: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_FOLLOWED_UP',
+            title: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_TITLE',
             items: [{
               form: {
                 type: IV2ColumnStatusFormType.SQUARE,
                 color: 'purple'
               },
-              label: ' '
-            }]
-          },
-
-          // not followed
-          {
-            title: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_FOLLOWED_UP',
-            items: [{
+              label: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_FOLLOWED_UP'
+            },
+            {
               form: {
                 type: IV2ColumnStatusFormType.SQUARE,
                 color: 'gray'
               },
-              label: ' '
+              label: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_FOLLOWED_UP'
             }]
           }
         ],
