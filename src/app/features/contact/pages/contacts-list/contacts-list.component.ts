@@ -522,8 +522,8 @@ export class ContactsListComponent
         label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
         sortable: true,
         filter: {
-          type: V2FilterType.TEXT,
-          textType: V2FilterTextType.STARTS_WITH
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.followUp as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
         }
       },
       {
