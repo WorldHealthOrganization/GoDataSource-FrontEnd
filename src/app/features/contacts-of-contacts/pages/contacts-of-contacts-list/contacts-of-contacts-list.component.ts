@@ -423,7 +423,8 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
         },
         exclude: (): boolean => {
           return !UserModel.canList(this.authUser);
@@ -485,7 +486,8 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
         },
         exclude: (): boolean => {
           return !UserModel.canView(this.authUser);
@@ -517,7 +519,8 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
         },
         exclude: (): boolean => {
           return !UserModel.canView(this.authUser);
@@ -819,6 +822,12 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         type: V2AdvancedFilterType.TEXT,
         field: 'firstName',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'middleName',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME',
         sortable: true
       },
       {

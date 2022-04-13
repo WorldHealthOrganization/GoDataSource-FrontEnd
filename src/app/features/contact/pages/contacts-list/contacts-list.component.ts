@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import * as _ from 'lodash';
-import { forkJoin, Observable, of, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
@@ -19,14 +19,13 @@ import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { LocationModel } from '../../../../core/models/location.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { ReferenceDataCategory, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { TeamModel } from '../../../../core/models/team.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
@@ -143,7 +142,6 @@ export class ContactsListComponent
     private outbreakDataService: OutbreakDataService,
     private dialogV2Service: DialogV2Service,
     private genericDataService: GenericDataService,
-    private referenceDataDataService: ReferenceDataDataService,
     private i18nService: I18nService,
     private entityHelperService: EntityHelperService
   ) {
@@ -191,6 +189,17 @@ export class ContactsListComponent
         }
       },
       {
+        field: 'middleName',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME',
+        notVisible: true,
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
         field: 'firstName',
         label: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
         pinned: IV2ColumnPinned.LEFT,
@@ -223,9 +232,9 @@ export class ContactsListComponent
           fieldIsArray: true
         },
         link: (data) => {
-          return data.mainAddress?.location?.name
-            ? `/locations/${data.mainAddress.location.id}/view`
-            : undefined;
+          return data.mainAddress?.location?.name ?
+            `/locations/${ data.mainAddress.location.id }/view` :
+            undefined;
         }
       },
       {
@@ -493,7 +502,7 @@ export class ContactsListComponent
           }
 
           // follow up
-          if (data.followUp && data.followUp.startDate && data.followUp.endDate && moment().isBetween(data.followUp.startDate, data.followUp.endDate) ) {
+          if (data.followUp && data.followUp.startDate && data.followUp.endDate && moment().isBetween(data.dateOfLastContact, data.followUp.endDate, undefined, '[]') ) {
             forms.push({
               type: IV2ColumnStatusFormType.SQUARE,
               color: 'purple',
@@ -529,7 +538,9 @@ export class ContactsListComponent
           type: V2ColumnFormat.BOOLEAN
         },
         filter: {
-          type: V2FilterType.BOOLEAN
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
         },
         sortable: true
       },
@@ -542,15 +553,16 @@ export class ContactsListComponent
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
         },
         exclude: (): boolean => {
           return !UserModel.canList(this.authUser);
         },
         link: (data) => {
-          return data.responsibleUserId
-            ? `/users/${data.responsibleUserId}/view`
-            : undefined;
+          return data.responsibleUserId ?
+            `/users/${ data.responsibleUserId }/view` :
+            undefined;
         }
       },
       {
@@ -632,7 +644,8 @@ export class ContactsListComponent
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
         },
         exclude: (): boolean => {
           return !UserModel.canView(this.authUser);
@@ -662,7 +675,8 @@ export class ContactsListComponent
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
         },
         exclude: (): boolean => {
           return !UserModel.canView(this.authUser);
@@ -756,17 +770,13 @@ export class ContactsListComponent
                       })
                       .subscribe((response) => {
                         // canceled ?
-                        if (
-                          response.button.type ===
-                          IV2BottomDialogConfigButtonType.CANCEL
-                        ) {
+                        if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
                           // finished
                           return;
                         }
 
                         // show loading
-                        const loading =
-                          this.dialogV2Service.showLoadingDialog();
+                        const loading = this.dialogV2Service.showLoadingDialog();
 
                         // delete contact
                         this.contactDataService
@@ -785,9 +795,7 @@ export class ContactsListComponent
                           )
                           .subscribe(() => {
                             // success
-                            this.toastV2Service.success(
-                              'LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE'
-                            );
+                            this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                             // hide loading
                             loading.close();
@@ -799,11 +807,9 @@ export class ContactsListComponent
                   }
                 },
                 visible: (item: ContactModel): boolean => {
-                  return (
-                    !item.deleted &&
+                  return !item.deleted &&
                     this.selectedOutbreakIsActive &&
-                    ContactModel.canDelete(this.authUser)
-                  );
+                    ContactModel.canDelete(this.authUser);
                 }
               },
 
@@ -811,11 +817,9 @@ export class ContactsListComponent
               {
                 visible: (item: ContactModel): boolean => {
                   // visible only if at least one of the first two items is visible
-                  return (
-                    !item.deleted &&
+                  return !item.deleted &&
                     this.selectedOutbreakIsActive &&
-                    ContactModel.canDelete(this.authUser)
-                  );
+                    ContactModel.canDelete(this.authUser);
                 }
               },
 
@@ -837,32 +841,24 @@ export class ContactsListComponent
                             })
                           },
                           message: {
-                            get: () =>
-                              'LNG_DIALOG_CONFIRM_CONVERT_CONTACT_TO_CASE',
+                            get: () => 'LNG_DIALOG_CONFIRM_CONVERT_CONTACT_TO_CASE',
                             data: () => item as any
                           }
                         }
                       })
                       .subscribe((response) => {
                         // canceled ?
-                        if (
-                          response.button.type ===
-                          IV2BottomDialogConfigButtonType.CANCEL
-                        ) {
+                        if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
                           // finished
                           return;
                         }
 
                         // show loading
-                        const loading =
-                          this.dialogV2Service.showLoadingDialog();
+                        const loading = this.dialogV2Service.showLoadingDialog();
 
                         // convert
                         this.contactDataService
-                          .convertContactToCase(
-                            this.selectedOutbreak.id,
-                            item.id
-                          )
+                          .convertContactToCase(this.selectedOutbreak.id, item.id)
                           .pipe(
                             catchError((err) => {
                               // show error
@@ -877,9 +873,7 @@ export class ContactsListComponent
                           )
                           .subscribe(() => {
                             // success
-                            this.toastV2Service.success(
-                              'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_TO_CASE_SUCCESS_MESSAGE'
-                            );
+                            this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_TO_CASE_SUCCESS_MESSAGE');
 
                             // hide loading
                             loading.close();
@@ -891,11 +885,9 @@ export class ContactsListComponent
                   }
                 },
                 visible: (item: ContactModel): boolean => {
-                  return (
-                    !item.deleted &&
+                  return !item.deleted &&
                     this.selectedOutbreakIsActive &&
-                    ContactModel.canConvertToCase(this.authUser)
-                  );
+                    ContactModel.canConvertToCase(this.authUser);
                 }
               },
 
@@ -903,11 +895,9 @@ export class ContactsListComponent
               {
                 visible: (item: ContactModel): boolean => {
                   // visible only if at least one of the first two items is visible
-                  return (
-                    !item.deleted &&
+                  return !item.deleted &&
                     this.selectedOutbreakIsActive &&
-                    ContactModel.canConvertToCase(this.authUser)
-                  );
+                    ContactModel.canConvertToCase(this.authUser);
                 }
               },
 
@@ -926,12 +916,10 @@ export class ContactsListComponent
                   }
                 },
                 visible: (item: ContactModel): boolean => {
-                  return (
-                    !item.deleted &&
+                  return !item.deleted &&
                     this.selectedOutbreakIsActive &&
                     ContactModel.canCreate(this.authUser) &&
-                    ContactModel.canCreateContactOfContact(this.authUser)
-                  );
+                    ContactModel.canCreateContactOfContact(this.authUser);
                 }
               },
 
@@ -950,12 +938,10 @@ export class ContactsListComponent
                   }
                 },
                 visible: (item: ContactModel): boolean => {
-                  return (
-                    !item.deleted &&
+                  return !item.deleted &&
                     this.selectedOutbreakIsActive &&
                     ContactModel.canBulkCreate(this.authUser) &&
-                    ContactModel.canBulkCreateContactOfContact(this.authUser)
-                  );
+                    ContactModel.canBulkCreateContactOfContact(this.authUser);
                 }
               },
 
@@ -963,15 +949,15 @@ export class ContactsListComponent
               {
                 visible: (item: ContactModel): boolean => {
                   // visible only if at least one of the previous two items is visible
-                  return (
-                    !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    ((ContactModel.canCreate(this.authUser) &&
-                      ContactModel.canCreateContactOfContact(this.authUser)) ||
-                      (ContactModel.canBulkCreate(this.authUser) &&
-                        ContactModel.canBulkCreateContactOfContact(
-                          this.authUser
-                        )))
+                  return !item.deleted &&
+                    this.selectedOutbreakIsActive && (
+                    (
+                      ContactModel.canCreate(this.authUser) &&
+                      ContactModel.canCreateContactOfContact(this.authUser)
+                    ) || (
+                      ContactModel.canBulkCreate(this.authUser) &&
+                      ContactModel.canBulkCreateContactOfContact(this.authUser)
+                    )
                   );
                 }
               },
@@ -985,11 +971,9 @@ export class ContactsListComponent
                   }
                 },
                 visible: (item: ContactModel): boolean => {
-                  return (
-                    !item.deleted &&
+                  return !item.deleted &&
                     this.selectedOutbreakIsActive &&
-                    FollowUpModel.canCreate(this.authUser)
-                  );
+                    FollowUpModel.canCreate(this.authUser);
                 }
               },
 
@@ -997,11 +981,9 @@ export class ContactsListComponent
               {
                 visible: (item: ContactModel): boolean => {
                   // visible only if at least one of the previous two items is visible
-                  return (
-                    !item.deleted &&
+                  return !item.deleted &&
                     this.selectedOutbreakIsActive &&
-                    FollowUpModel.canCreate(this.authUser)
-                  );
+                    FollowUpModel.canCreate(this.authUser);
                 }
               },
 
@@ -1019,10 +1001,8 @@ export class ContactsListComponent
                   }
                 },
                 visible: (item: ContactModel): boolean => {
-                  return (
-                    !item.deleted &&
-                    ContactModel.canListRelationshipExposures(this.authUser)
-                  );
+                  return !item.deleted &&
+                    ContactModel.canListRelationshipExposures(this.authUser);
                 }
               },
 
@@ -1031,20 +1011,13 @@ export class ContactsListComponent
                 label: 'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM',
                 action: {
                   link: (item: ContactModel): string[] => {
-                    return [
-                      '/relationships',
-                      EntityType.CONTACT,
-                      item.id,
-                      'contacts'
-                    ];
+                    return ['/relationships', EntityType.CONTACT, item.id, 'contacts'];
                   }
                 },
                 visible: (item: ContactModel): boolean => {
-                  return (
-                    !item.deleted &&
+                  return !item.deleted &&
                     this.selectedOutbreakIsActive &&
-                    ContactModel.canListRelationshipContacts(this.authUser)
-                  );
+                    ContactModel.canListRelationshipContacts(this.authUser);
                 }
               },
 
@@ -1052,10 +1025,8 @@ export class ContactsListComponent
               {
                 visible: (item: ContactModel): boolean => {
                   // visible only if at least one of the previous two items is visible
-                  return (
-                    !item.deleted &&
-                    ContactModel.canListRelationshipExposures(this.authUser)
-                  );
+                  return !item.deleted &&
+                    ContactModel.canListRelationshipExposures(this.authUser);
                 }
               },
 
@@ -1065,11 +1036,7 @@ export class ContactsListComponent
                   'LNG_PAGE_LIST_CONTACTS_ACTION_SEE_RECORDS_NOT_DUPLICATES',
                 action: {
                   link: (item: ContactModel): string[] => {
-                    return [
-                      '/duplicated-records/contacts',
-                      item.id,
-                      'marked-not-duplicates'
-                    ];
+                    return ['/duplicated-records/contacts', item.id, 'marked-not-duplicates'];
                   }
                 },
                 visible: (item: ContactModel): boolean => {
@@ -1086,12 +1053,10 @@ export class ContactsListComponent
                   }
                 },
                 visible: (item: ContactModel): boolean => {
-                  return (
-                    !item.deleted &&
+                  return !item.deleted &&
                     this.selectedOutbreakIsActive &&
                     LabResultModel.canList(this.authUser) &&
-                    ContactModel.canListLabResult(this.authUser)
-                  );
+                    ContactModel.canListLabResult(this.authUser);
                 }
               },
 
@@ -1137,10 +1102,8 @@ export class ContactsListComponent
                   }
                 },
                 visible: (item: ContactModel): boolean => {
-                  return (
-                    !item.deleted &&
-                    ContactModel.canViewMovementMap(this.authUser)
-                  );
+                  return !item.deleted &&
+                    ContactModel.canViewMovementMap(this.authUser);
                 }
               },
 
@@ -1153,10 +1116,8 @@ export class ContactsListComponent
                   }
                 },
                 visible: (item: ContactModel): boolean => {
-                  return (
-                    !item.deleted &&
-                    ContactModel.canViewChronologyChart(this.authUser)
-                  );
+                  return !item.deleted &&
+                    ContactModel.canViewChronologyChart(this.authUser);
                 }
               },
 
@@ -1182,17 +1143,13 @@ export class ContactsListComponent
                       })
                       .subscribe((response) => {
                         // canceled ?
-                        if (
-                          response.button.type ===
-                          IV2BottomDialogConfigButtonType.CANCEL
-                        ) {
+                        if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
                           // finished
                           return;
                         }
 
                         // show loading
-                        const loading =
-                          this.dialogV2Service.showLoadingDialog();
+                        const loading = this.dialogV2Service.showLoadingDialog();
 
                         // convert
                         this.contactDataService
@@ -1211,9 +1168,7 @@ export class ContactsListComponent
                           )
                           .subscribe(() => {
                             // success
-                            this.toastV2Service.success(
-                              'LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_SUCCESS_MESSAGE'
-                            );
+                            this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_SUCCESS_MESSAGE');
 
                             // hide loading
                             loading.close();
@@ -1225,11 +1180,9 @@ export class ContactsListComponent
                   }
                 },
                 visible: (item: ContactModel): boolean => {
-                  return (
-                    item.deleted &&
+                  return item.deleted &&
                     this.selectedOutbreakIsActive &&
-                    ContactModel.canRestore(this.authUser)
-                  );
+                    ContactModel.canRestore(this.authUser);
                 }
               }
             ]
@@ -1248,45 +1201,51 @@ export class ContactsListComponent
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'firstName',
-        label: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME'
-        // sortable: true
+        label: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'middleName',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'lastName',
-        label: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME'
-        // sortable: true
+        label: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'occupation',
         label: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
-        options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
-        // sortable: true
+        options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_AGE,
         field: 'age',
-        label: 'LNG_CONTACT_FIELD_LABEL_AGE'
-        // sortable: true
+        label: 'LNG_CONTACT_FIELD_LABEL_AGE',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfReporting',
-        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING'
-        // sortable: true
+        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dob',
-        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH'
-        // sortable: true
+        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'visualId',
-        label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID'
-        // sortable: true
+        label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.ADDRESS,
@@ -1304,23 +1263,20 @@ export class ContactsListComponent
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'followUp.status',
         label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
-        options: (
-          this.activatedRoute.snapshot.data
-            .followUp as IResolverV2ResponseModel<ReferenceDataEntryModel>
-        ).options
-        // sortable: true
+        options: (this.activatedRoute.snapshot.data.followUp as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'followUp.endDate',
-        label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_END_DATE'
-        // sortable: true
+        label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_END_DATE',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfLastContact',
-        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
-        // sortable: true
+        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
@@ -1332,29 +1288,20 @@ export class ContactsListComponent
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'pregnancyStatus',
         label: 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
-        options: (
-          this.activatedRoute.snapshot.data
-            .pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>
-        ).options
-        // sortable: true
+        options: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'vaccinesReceived.vaccine',
         label: 'LNG_CONTACT_FIELD_LABEL_VACCINE',
-        options: (
-          this.activatedRoute.snapshot.data
-            .vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>
-        ).options
+        options: (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'vaccinesReceived.status',
         label: 'LNG_CONTACT_FIELD_LABEL_VACCINE_STATUS',
-        options: (
-          this.activatedRoute.snapshot.data
-            .vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>
-        ).options
+        options: (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
@@ -1365,18 +1312,20 @@ export class ContactsListComponent
         type: V2AdvancedFilterType.SELECT,
         field: 'wasCase',
         label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE',
-        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
-        // sortable: true
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_NUMBER,
         field: 'numberOfContacts',
-        label: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS'
+        label: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_NUMBER,
         field: 'numberOfExposures',
-        label: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES'
+        label: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+        sortable: true
       }
     ];
 
@@ -1444,6 +1393,13 @@ export class ContactsListComponent
       );
     }
 
+    // case condition
+    const caseCondition = new RequestQueryBuilder();
+    caseCondition.filter.byEquality(
+      'type',
+      EntityType.CASE
+    );
+
     // Relation - Cases
     if (CaseModel.canList(this.authUser)) {
       this.advancedFilters.push(
@@ -1453,8 +1409,8 @@ export class ContactsListComponent
           type: V2AdvancedFilterType.TEXT,
           relationshipPath: ['relationships', 'people'],
           relationshipLabel:
-            'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES'
-          // extraConditions: caseCondition
+            'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
         },
         {
           field: 'lastName',
@@ -1462,8 +1418,8 @@ export class ContactsListComponent
           type: V2AdvancedFilterType.TEXT,
           relationshipPath: ['relationships', 'people'],
           relationshipLabel:
-            'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES'
-          // extraConditions: caseCondition
+            'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
         },
         {
           field: 'gender',
@@ -1472,8 +1428,8 @@ export class ContactsListComponent
           options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ILabelValuePairModel>).options,
           relationshipPath: ['relationships', 'people'],
           relationshipLabel:
-            'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES'
-          // extraConditions: caseCondition
+            'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
         },
         {
           field: 'age',
@@ -1481,8 +1437,8 @@ export class ContactsListComponent
           type: V2AdvancedFilterType.RANGE_AGE,
           relationshipPath: ['relationships', 'people'],
           relationshipLabel:
-            'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES'
-          // extraConditions: caseCondition
+            'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
         },
         {
           field: 'questionnaireAnswers',
@@ -1490,7 +1446,8 @@ export class ContactsListComponent
           type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
           template: () => this.selectedOutbreak.caseInvestigationTemplate,
           relationshipPath: ['relationships', 'people'],
-          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES'
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
         }
       );
     }
@@ -1647,10 +1604,7 @@ export class ContactsListComponent
                     .getRangeFollowUpGroupByOptions(true)
                     .subscribe((options) => {
                       // options should be assigned to groupBy
-                      (
-                        handler.data.map
-                          .groupBy as IV2SideDialogConfigInputSingleDropdown
-                      ).options = options.map((option) => {
+                      (handler.data.map.groupBy as IV2SideDialogConfigInputSingleDropdown).options = options.map((option) => {
                         return {
                           label: option.label,
                           value: option.value
@@ -1665,9 +1619,7 @@ export class ContactsListComponent
                   url: `/outbreaks/${this.selectedOutbreak.id}/contacts/daily-list/export`,
                   async: false,
                   method: ExportDataMethod.GET,
-                  fileName: `${this.i18nService.instant(
-                    'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_TITLE'
-                  )} - ${moment().format('YYYY-MM-DD')}`,
+                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
                   queryBuilder: this.queryBuilder,
                   allow: {
                     types: [ExportDataExtension.PDF]
@@ -1711,9 +1663,7 @@ export class ContactsListComponent
                   url: `/outbreaks/${this.selectedOutbreak.id}/contacts/export-daily-follow-up-form`,
                   async: false,
                   method: ExportDataMethod.GET,
-                  fileName: `${this.i18nService.instant(
-                    'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_TITLE'
-                  )} - ${moment().format('YYYY-MM-DD')}`,
+                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
                   allow: {
                     types: [ExportDataExtension.PDF]
                   }
@@ -1772,9 +1722,7 @@ export class ContactsListComponent
                 url: `outbreaks/${this.selectedOutbreak.id}/contacts/dossier`,
                 async: false,
                 method: ExportDataMethod.POST,
-                fileName: `${this.i18nService.instant(
-                  'LNG_PAGE_LIST_CONTACTS_TITLE'
-                )} - ${moment().format('YYYY-MM-DD HH:mm')}`,
+                fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
                 extraFormData: {
                   append: {
                     contacts: selected
@@ -1921,8 +1869,7 @@ export class ContactsListComponent
             )
             .subscribe((countResponse) => {
               // group data
-              const risk = this.activatedRoute.snapshot.data
-                .risk as IResolverV2ResponseModel<ReferenceDataEntryModel>;
+              const risk = this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>;
 
               let values: {
                 label: string;
@@ -1997,9 +1944,9 @@ export class ContactsListComponent
       {
         label: 'LNG_COMMON_LABEL_HOME',
         action: {
-          link: DashboardModel.canViewDashboard(this.authUser)
-            ? ['/dashboard']
-            : ['/version']
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/version']
         }
       },
       {
@@ -2084,9 +2031,7 @@ export class ContactsListComponent
                 url: `/outbreaks/${this.selectedOutbreak.id}/contacts/export`,
                 async: true,
                 method: ExportDataMethod.POST,
-                fileName: `${this.i18nService.instant(
-                  'LNG_PAGE_LIST_CONTACTS_TITLE'
-                )} - ${moment().format('YYYY-MM-DD HH:mm')}`,
+                fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
                 queryBuilder: qb,
                 allow: {
                   types: [
@@ -2116,8 +2061,7 @@ export class ContactsListComponent
                       type: V2SideDialogConfigInputType.CHECKBOX,
                       placeholder:
                         'LNG_PAGE_LIST_CONTACTS_EXPORT_CASE_INFORMATION',
-                      tooltip:
-                        'LNG_PAGE_LIST_CONTACTS_EXPORT_CASE_INFORMATION_DESCRIPTION',
+                      tooltip: 'LNG_PAGE_LIST_CONTACTS_EXPORT_CASE_INFORMATION_DESCRIPTION',
                       name: 'includeCaseFields',
                       checked: false
                     }
@@ -2176,9 +2120,7 @@ export class ContactsListComponent
                 url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
                 async: true,
                 method: ExportDataMethod.POST,
-                fileName: `${this.i18nService.instant(
-                  'LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME'
-                )} - ${moment().format('YYYY-MM-DD')}`,
+                fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME')} - ${moment().format('YYYY-MM-DD')}`,
                 queryBuilder: qb,
                 allow: {
                   types: [
@@ -2227,7 +2169,7 @@ export class ContactsListComponent
           {
             type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
             placeholder: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
-            options: [],
+            options: (this.activatedRoute.snapshot.data.followUp as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             value: undefined,
             name: 'statusesList',
             validators: {
@@ -2260,33 +2202,11 @@ export class ContactsListComponent
           qb.paginator.clear();
           qb.fields('id', 'followUp');
 
-          // make all requests in parallel
-          forkJoin([
-            // retrieve follow-up statuses
-            this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(
-              ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS
-            ),
-
-            // count contacts
-            this.contactDataService.getContactsList(
-              this.selectedOutbreak.id,
-              qb
-            )
-          ]).subscribe(
-            ([statuses, records]: [LabelValuePair[], ContactModel[]]) => {
+          // count contacts
+          this.contactDataService.getContactsList(this.selectedOutbreak.id, qb).subscribe(
+            (records: ContactModel[]) => {
 
               handler.update.changeTitle('LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS_DIALOG_TITLE', { count: records.length.toLocaleString() });
-
-              // set drop-down statuses
-              (
-                handler.data.map
-                  .statusesList as IV2SideDialogConfigInputSingleDropdown
-              ).options = statuses.map((item) => {
-                return {
-                  label: item.label,
-                  value: item.value
-                };
-              });
 
               handler.data.echo.recordsList = records;
 
@@ -2333,7 +2253,6 @@ export class ContactsListComponent
               }
             );
 
-
             // close popup
             response.handler.hide();
 
@@ -2353,9 +2272,6 @@ export class ContactsListComponent
 
     // retrieve responsible user information
     this.queryBuilder.include('responsibleUser', true);
-
-    // retrieve location list
-    this.queryBuilder.include('locations', true);
 
     // refresh list of contacts grouped by risk level
     if (!triggeredByPageChange) {
