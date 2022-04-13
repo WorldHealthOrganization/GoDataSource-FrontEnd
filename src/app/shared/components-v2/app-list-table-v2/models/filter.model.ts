@@ -46,6 +46,7 @@ interface IV2FilterBasic {
   value?: never;
   defaultValue?: never;
   addressField?: never;
+  includeNoValue?: never;
 }
 
 /**
@@ -64,7 +65,7 @@ interface IV2FilterText extends Omit<IV2FilterBasic, 'value' | 'defaultValue'> {
 /**
  * Multiple select
  */
-export interface IV2FilterMultipleSelect extends Omit<IV2FilterBasic, 'options' | 'value' | 'defaultValue'> {
+export interface IV2FilterMultipleSelect extends Omit<IV2FilterBasic, 'options' | 'value' | 'defaultValue' | 'includeNoValue'> {
   // required
   type: V2FilterType.MULTIPLE_SELECT;
   options: ILabelValuePairModel[];
@@ -72,6 +73,7 @@ export interface IV2FilterMultipleSelect extends Omit<IV2FilterBasic, 'options' 
   // optional
   value?: string[];
   defaultValue?: string[];
+  includeNoValue?: boolean;
 }
 
 /**

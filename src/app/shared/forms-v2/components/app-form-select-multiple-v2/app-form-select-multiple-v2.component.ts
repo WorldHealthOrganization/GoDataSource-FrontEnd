@@ -36,12 +36,56 @@ import { MAT_SELECT_CONFIG } from '@angular/material/select';
 })
 export class AppFormSelectMultipleV2Component
   extends AppFormBaseV2<string[]> implements OnDestroy {
+  // has no value
+  static readonly HAS_NO_VALUE: string = '---has-no-value---';
 
   // float label
   @Input() neverFloatLabel: boolean = false;
 
   // tooltip
   @Input() optionTooltipKey: string;
+
+  // include no value ?
+  private _includeNoValue: boolean;
+  @Input() set includeNoValue(includeNoValue: boolean) {
+    // set data
+    this._includeNoValue = includeNoValue;
+
+    // has options ?
+    if (
+      this.allOptions &&
+      this._includeNoValue
+    ) {
+      // determine if we need to add has no value
+      let hasNoValue: boolean = false;
+      this.allOptions.forEach((item) => {
+        // already included no value ?
+        if (item.value === null) {
+          hasNoValue = true;
+        }
+      });
+
+      // add no value if missing
+      if (!hasNoValue) {
+        // add to all options
+        const item = {
+          label: this.translateService.instant('LNG_COMMON_LABEL_NONE'),
+          value: AppFormSelectMultipleV2Component.HAS_NO_VALUE
+        };
+        this.allOptions.splice(
+          0,
+          0,
+          item
+        );
+
+        // map it
+        this.allOptionsMap[item.value] = item;
+      }
+    }
+  }
+  get includeNoValue(): boolean {
+    return this._includeNoValue;
+  }
 
   // options
   filteredOptions: ILabelValuePairModel[];
@@ -56,11 +100,18 @@ export class AppFormSelectMultipleV2Component
     // translate options and sort
     if (this.allOptions) {
       // translate
+      let hasNoValue: boolean = false;
       this.allOptions
         .forEach((item) => {
+          // translate
           item.label = item.label ?
             this.translateService.instant(item.label) :
             item.label;
+
+          // already included no value ?
+          if (item.value === null) {
+            hasNoValue = true;
+          }
         });
 
       // sort
@@ -68,6 +119,21 @@ export class AppFormSelectMultipleV2Component
         .sort((item1, item2) => {
           return item1.label.toLowerCase().localeCompare(item2.label.toLowerCase());
         });
+
+      // add no value if missing
+      if (
+        this.includeNoValue &&
+        !hasNoValue
+      ) {
+        this.allOptions.splice(
+          0,
+          0,
+          {
+            label: this.translateService.instant('LNG_COMMON_LABEL_NONE'),
+            value: AppFormSelectMultipleV2Component.HAS_NO_VALUE
+          }
+        );
+      }
     }
 
     // map for easy access
