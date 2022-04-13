@@ -7,6 +7,8 @@ import { V2FilterType } from '../../models/filter.model';
 import { ActivatedRoute } from '@angular/router';
 import { ILabelValuePairModel } from '../../../../forms-v2/core/label-value-pair.model';
 import { IResolverV2ResponseModel } from '../../../../../core/services/resolvers/data/models/resolver-response.model';
+import { IV2Column } from '../../models/column.model';
+import * as _ from 'lodash';
 
 /**
  * Component
@@ -31,7 +33,8 @@ export class AppListTableV2ColumnHeaderComponent implements IHeaderAngularComp {
     sortByColumn: IExtendedColDef,
     sortByDirection: RequestSortDirection | null,
     showHeaderFilters: boolean,
-    columnFilterBy: (column: IExtendedColDef) => void
+    columnFilterBy: (column: IExtendedColDef) => void,
+    columns: IV2Column[]
   };
 
   // options
@@ -59,7 +62,7 @@ export class AppListTableV2ColumnHeaderComponent implements IHeaderAngularComp {
     this.reload(params);
 
     // re-render
-    this.changeDetectorRef.detectChanges();
+    this.detectChanges();
 
     // finished
     return true;
@@ -85,8 +88,14 @@ export class AppListTableV2ColumnHeaderComponent implements IHeaderAngularComp {
    */
   reload(params: IHeaderParams): void {
     // retrieve extended column definition
-    this.extendedColDef = params.column.getUserProvidedColDef() as IExtendedColDef;
+    this.extendedColDef = params.column.getColDef() as IExtendedColDef;
     this.component = this.extendedColDef.columnDefinitionData;
+
+    // BUG / HACK FIX: get the actual object since getUserProvidedColDef doesn't work properly
+    const properColumnDefinition: IV2Column = this.component.columns.find((col) => col.field === this.extendedColDef.field && _.isEqual(this.extendedColDef.columnDefinition, col));
+    if (properColumnDefinition) {
+      this.extendedColDef.columnDefinition = properColumnDefinition;
+    }
   }
 
   /**

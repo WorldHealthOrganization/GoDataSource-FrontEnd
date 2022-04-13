@@ -99,6 +99,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // update columns definitions
     this.updateColumnDefinitions();
   }
+  get columns(): IV2Column[] {
+    return this._columns;
+  }
 
   /**
    * Ag table api handlers
