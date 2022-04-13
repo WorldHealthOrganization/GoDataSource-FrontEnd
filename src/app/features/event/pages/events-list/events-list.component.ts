@@ -205,7 +205,8 @@ export class EventsListComponent
           address: filterAddressModel,
           addressField: 'emailAddress',
           field: 'address',
-          fieldIsArray: false
+          fieldIsArray: false,
+          useLike: true
         },
         sortable: true
       },
@@ -401,7 +402,8 @@ export class EventsListComponent
           address: filterAddressModel,
           addressField: 'addressLine1',
           field: 'address',
-          fieldIsArray: false
+          fieldIsArray: false,
+          useLike: true
         },
         sortable: true
       },
@@ -417,14 +419,14 @@ export class EventsListComponent
           address: filterAddressModel,
           addressField: 'city',
           field: 'address',
-          fieldIsArray: false
+          fieldIsArray: false,
+          useLike: true
         },
         sortable: true
       },
       {
         field: 'address.geoLocation.lat',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
-        sortable: true,
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lat'
@@ -433,7 +435,6 @@ export class EventsListComponent
       {
         field: 'address.geoLocation.lng',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
-        sortable: true,
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lng'
@@ -451,7 +452,8 @@ export class EventsListComponent
           address: filterAddressModel,
           addressField: 'postalCode',
           field: 'address',
-          fieldIsArray: false
+          fieldIsArray: false,
+          useLike: true
         },
         sortable: true
       },

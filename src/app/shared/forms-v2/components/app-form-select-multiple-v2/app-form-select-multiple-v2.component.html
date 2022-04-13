@@ -43,6 +43,11 @@
             <mat-icon
               *ngIf="allOptionsMap[selectedValue]?.icon">{{allOptionsMap[selectedValue].icon}}</mat-icon>
 
+            <!-- Image -->
+            <img
+              *ngIf="allOptionsMap[selectedValue]?.iconUrl"
+              [src]="allOptionsMap[selectedValue]?.iconUrl"/>
+
             <!-- Label -->
             {{allOptionsMap[selectedValue]?.label}}
 
@@ -87,6 +92,11 @@
             <mat-icon
               *ngIf="option.icon">{{option.icon}}</mat-icon>
 
+            <!-- Image -->
+            <img
+              *ngIf="option.iconUrl"
+              [src]="option.iconUrl"/>
+
             <!-- Label -->
             {{option.label}}
 
@@ -108,6 +118,11 @@
           <!-- Icon -->
           <mat-icon
             *ngIf="allOptionsMap[selectedValue]?.icon">{{allOptionsMap[selectedValue].icon}}</mat-icon>
+
+          <!-- Image -->
+          <img
+            *ngIf="allOptionsMap[selectedValue]?.iconUrl"
+            [src]="allOptionsMap[selectedValue]?.iconUrl"/>
 
           <!-- Label -->
           {{allOptionsMap[selectedValue]?.label}}

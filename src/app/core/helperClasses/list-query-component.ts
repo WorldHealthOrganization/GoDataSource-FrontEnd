@@ -6,6 +6,7 @@ import { IV2DateRange } from '../../shared/forms-v2/components/app-form-date-ran
 import { AddressModel } from '../models/address.model';
 import { IExtendedColDef } from '../../shared/components-v2/app-list-table-v2/models/extended-column.model';
 import { V2FilterTextType, V2FilterType } from '../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { AppFormSelectMultipleV2Component } from '../../shared/forms-v2/components/app-form-select-multiple-v2/app-form-select-multiple-v2.component';
 
 /**
  * Applied filters
@@ -387,13 +388,53 @@ export abstract class ListQueryComponent {
 
       // multiple select
       case V2FilterType.MULTIPLE_SELECT:
-        // filter
-        this.filterBySelectField(
-          column.columnDefinition.field,
-          column.columnDefinition.filter.value,
-          null,
-          true
-        );
+        // replace previous conditions
+        this.queryBuilder.filter.removePathCondition(column.columnDefinition.field);
+        this.queryBuilder.filter.removePathCondition(`or.${column.columnDefinition.field}`);
+
+        // do we need to retrieve empty
+        const hasNoValueIncluded: boolean = column.columnDefinition.filter.value ?
+          column.columnDefinition.filter.value.indexOf(AppFormSelectMultipleV2Component.HAS_NO_VALUE) > -1 :
+          false;
+
+        // has no value ?
+        if (
+          hasNoValueIncluded &&
+          column.columnDefinition.filter.value.length === 1
+        ) {
+          // only has no value
+          this.queryBuilder.filter.where({
+            [column.columnDefinition.field]: {
+              eq: null
+            }
+          }, true);
+        } else if (
+          hasNoValueIncluded
+        ) {
+          // has no value and others...
+          this.queryBuilder.filter.where({
+            or: [
+              {
+                [column.columnDefinition.field]: {
+                  eq: null
+                }
+              }, {
+                [column.columnDefinition.field]: { inq: column.columnDefinition.filter.value }
+              }
+            ]
+          }, true);
+        } else if (
+          column.columnDefinition.filter.value &&
+          column.columnDefinition.filter.value.length > 0
+        ) {
+          // only other values
+          this.queryBuilder.filter.where({
+            [column.columnDefinition.field]: { inq: column.columnDefinition.filter.value }
+          }, true);
+        }
+
+        // refresh list
+        this.refreshCall();
 
         // finished
         break;
@@ -430,7 +471,8 @@ export abstract class ListQueryComponent {
           column.columnDefinition.filter.field,
           column.columnDefinition.filter.fieldIsArray,
           column.columnDefinition.filter.address,
-          column.columnDefinition.filter.address.filterLocationIds
+          column.columnDefinition.filter.address.filterLocationIds,
+          (column.columnDefinition.filter as any).useLike
         );
 
         // finished

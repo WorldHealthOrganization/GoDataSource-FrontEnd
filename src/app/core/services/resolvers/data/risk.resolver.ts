@@ -38,6 +38,7 @@ export class RiskDataResolver implements IMapResolverV2<ReferenceDataEntryModel>
             response.options.push({
               label: item.value,
               value: item.id,
+              iconUrl: item.iconUrl,
               data: item
             });
           });

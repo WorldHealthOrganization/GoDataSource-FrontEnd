@@ -9,5 +9,6 @@ export interface ILabelValuePairModel {
   data?: any;
   disabled?: boolean;
   icon?: string;
+  iconUrl?: string;
   infos?: IInfoIcon[];
 }

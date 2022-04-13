@@ -215,7 +215,10 @@ export class AddressModel {
       if (addressModel.addressLine1) {
         query.addressLine1 = {
           // text start with
-          $regex: '^' + RequestFilter.escapeStringForRegex(addressModel.addressLine1),
+          $regex: '^' +
+            RequestFilter.escapeStringForRegex(addressModel.addressLine1)
+              .replace(/%/g, '.*')
+              .replace(/\\\?/g, '.'),
           $options: 'i'
         };
       }
@@ -224,7 +227,10 @@ export class AddressModel {
       if (addressModel.city) {
         query.city = {
           // text start with
-          $regex: '^' + RequestFilter.escapeStringForRegex(addressModel.city),
+          $regex: '^' +
+            RequestFilter.escapeStringForRegex(addressModel.city)
+              .replace(/%/g, '.*')
+              .replace(/\\\?/g, '.'),
           $options: 'i'
         };
       }
@@ -233,7 +239,10 @@ export class AddressModel {
       if (addressModel.emailAddress) {
         query.emailAddress = {
           // text start with
-          $regex: '^' + RequestFilter.escapeStringForRegex(addressModel.emailAddress),
+          $regex: '^' +
+            RequestFilter.escapeStringForRegex(addressModel.emailAddress)
+              .replace(/%/g, '.*')
+              .replace(/\\\?/g, '.'),
           $options: 'i'
         };
       }
@@ -242,7 +251,10 @@ export class AddressModel {
       if (addressModel.postalCode) {
         query.postalCode = {
           // text start with
-          $regex: '^' + RequestFilter.escapeStringForRegex(addressModel.postalCode),
+          $regex: '^' +
+            RequestFilter.escapeStringForRegex(addressModel.postalCode)
+              .replace(/%/g, '.*')
+              .replace(/\\\?/g, '.'),
           $options: 'i'
         };
       }
@@ -251,7 +263,6 @@ export class AddressModel {
       if (addressModel.phoneNumber) {
         // build number pattern condition
         const phonePattern = RequestFilter.getPhoneNumberPattern(addressModel.phoneNumber);
-
         query.phoneNumber = !phonePattern ?
           'INVALID PHONE' :
           {
@@ -262,7 +273,7 @@ export class AddressModel {
       // check for locations
       if (
         addressParentLocationIds &&
-                addressParentLocationIds.length > 0
+        addressParentLocationIds.length > 0
       ) {
         query.parentLocationIdFilter = {
           $in: addressParentLocationIds
@@ -324,7 +335,7 @@ export class AddressModel {
       // check for locations
       if (
         addressParentLocationIds &&
-                addressParentLocationIds.length > 0
+        addressParentLocationIds.length > 0
       ) {
         query[`${property}.parentLocationIdFilter`] = {
           inq: addressParentLocationIds

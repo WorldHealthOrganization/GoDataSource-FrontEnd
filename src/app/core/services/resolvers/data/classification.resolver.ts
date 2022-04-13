@@ -38,6 +38,7 @@ export class ClassificationDataResolver implements IMapResolverV2<ReferenceDataE
             response.options.push({
               label: item.value,
               value: item.id,
+              iconUrl: item.iconUrl,
               data: item
             });
           });

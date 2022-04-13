@@ -67,19 +67,29 @@ import { VaccineDataResolver } from './resolvers/data/vaccine.resolver';
 import { VaccineStatusDataResolver } from './resolvers/data/vaccine-status.resolver';
 import { FinalFollowUpStatusDataResolver } from './resolvers/data/final-follow-up-status.resolver';
 import { DailyFollowUpStatusDataResolver } from './resolvers/data/daily-follow-up-status.resolver';
+import { DiseaseDataResolver } from './resolvers/data/disease.resolver';
+import { FollowUpGenerationTeamAssignmentAlgorithmDataResolver } from './resolvers/data/follow-up-generation-team-assignment-algorithm.resolver';
+import { LocationGeographicalLevelDataResolver } from './resolvers/data/location-geographical-level.resolver';
+import { CountryDataResolver } from './resolvers/data/country.resolver';
+import { TeamDataResolver } from './resolvers/data/team.resolver';
 
 // export the list of services
 export const services: any[] = [
   // resolver services
   ClassificationDataResolver,
+  CountryDataResolver,
   DailyFollowUpStatusDataResolver,
+  DiseaseDataResolver,
   FinalFollowUpStatusDataResolver,
+  FollowUpGenerationTeamAssignmentAlgorithmDataResolver,
   GenderDataResolver,
   LanguageResolver,
+  LocationGeographicalLevelDataResolver,
   OccupationDataResolver,
   OutcomeDataResolver,
   PregnancyStatusDataResolver,
   RiskDataResolver,
+  TeamDataResolver,
   UserDataResolver,
   YesNoAllDataResolver,
   YesNoDataResolver,

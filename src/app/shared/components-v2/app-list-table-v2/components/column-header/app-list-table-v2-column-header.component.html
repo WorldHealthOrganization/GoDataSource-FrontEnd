@@ -54,6 +54,7 @@
       [name]="'filterBy' + extendedColDef.field"
       placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
       neverFloatLabel="true"
+      [includeNoValue]="extendedColDef.columnDefinition.filter.includeNoValue"
       [options]="extendedColDef.columnDefinition.filter.options"
       (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-select-multiple-v2>
 

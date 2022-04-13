@@ -38,6 +38,7 @@ export class GenderDataResolver implements IMapResolverV2<ReferenceDataEntryMode
             response.options.push({
               label: item.value,
               value: item.id,
+              iconUrl: item.iconUrl,
               data: item
             });
           });

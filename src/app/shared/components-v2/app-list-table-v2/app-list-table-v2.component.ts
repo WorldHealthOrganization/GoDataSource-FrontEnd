@@ -381,7 +381,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // update filter visibility
     const authUser: UserModel = this.authDataService.getAuthenticatedUser();
     const filterVisibility: boolean | undefined = authUser.getSettings(this._pageSettingsKeyHeaderFilter);
-    this.showHeaderFilters = filterVisibility === undefined || filterVisibility;
+    this._showHeaderFilters = filterVisibility === undefined || filterVisibility;
   }
 
   /**

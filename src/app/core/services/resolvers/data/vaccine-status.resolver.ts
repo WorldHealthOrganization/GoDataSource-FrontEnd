@@ -38,6 +38,7 @@ export class VaccineStatusDataResolver implements IMapResolverV2<ReferenceDataEn
             response.options.push({
               label: item.value,
               value: item.id,
+              iconUrl: item.iconUrl,
               data: item
             });
           });
