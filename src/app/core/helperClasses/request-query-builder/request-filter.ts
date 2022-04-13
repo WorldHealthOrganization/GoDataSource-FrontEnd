@@ -865,7 +865,7 @@ export class RequestFilter {
         // not our condition that we need to remove ?
         if (
           conditionKey !== pathElements[localPathElementIndex] &&
-                    !conditionKey.startsWith(`${pathElements[localPathElementIndex]}.`)
+          !conditionKey.startsWith(`${pathElements[localPathElementIndex]}.`)
         ) {
           return;
         }
