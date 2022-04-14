@@ -397,9 +397,18 @@ export class ContactsListComponent
         field: 'followUpTeamId',
         label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
         notVisible: true,
+        format: {
+          type: (contact) => {
+            return contact.followUpTeamId &&
+              (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).map[contact.followUpTeamId] ?
+              (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).map[contact.followUpTeamId].name :
+              '';
+          }
+        },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: []
+          options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          includeNoValue: true
         },
         exclude: (): boolean => {
           return !TeamModel.canList(this.authUser);

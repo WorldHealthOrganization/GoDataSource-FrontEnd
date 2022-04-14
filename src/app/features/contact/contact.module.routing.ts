@@ -10,6 +10,7 @@ import { GenderDataResolver } from '../../core/services/resolvers/data/gender.re
 import { OccupationDataResolver } from '../../core/services/resolvers/data/occupation.resolver';
 import { PregnancyStatusDataResolver } from '../../core/services/resolvers/data/pregnancy-status.resolver';
 import { RiskDataResolver } from '../../core/services/resolvers/data/risk.resolver';
+import { TeamDataResolver } from '../../core/services/resolvers/data/team.resolver';
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.resolver';
@@ -39,7 +40,8 @@ const routes: Routes = [
       vaccine: VaccineDataResolver,
       vaccineStatus: VaccineStatusDataResolver,
       followUp: FinalFollowUpStatusDataResolver,
-      dailyFollowUp: DailyFollowUpStatusDataResolver
+      dailyFollowUp: DailyFollowUpStatusDataResolver,
+      team: TeamDataResolver
     }
   },
   // Create Contact
