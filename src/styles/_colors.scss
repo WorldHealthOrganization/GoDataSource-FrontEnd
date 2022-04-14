@@ -6,53 +6,53 @@
 /* THEME LIGHT */
 :root {
   /* HEX */
-  --gd-primary:     #2F7977;
-  --gd-primary-alt: #004E6F;
-  --gd-secondary:   #999EA3;
-  --gd-text:        #333333;
-  --gd-background:  #FFFFFF;
-  --gd-danger:      #D72631;
-  --gd-warning:     #FDA322;
-  --gd-success:     #1D741B;
-  --gd-followed-status: #564D99;
+  --gd-primary:             #2F7977;
+  --gd-primary-alt:         #004E6F;
+  --gd-secondary:           #999EA3;
+  --gd-text:                #333333;
+  --gd-background:          #FFFFFF;
+  --gd-danger:              #D72631;
+  --gd-warning:             #FDA322;
+  --gd-success:             #1D741B;
+  --gd-followed-status:     #564D99;
   --gd-not-followed-status: #E8E8E9;
 
   /* RGB */
-  --gd-primary-rgb:     #{hexToRGB(#2F7977)};
-  --gd-primary-alt-rgb: #{hexToRGB(#004E6F)};
-  --gd-secondary-rgb:   #{hexToRGB(#999EA3)};
-  --gd-text-rgb:        #{hexToRGB(#333333)};
-  --gd-background-rgb:  #{hexToRGB(#FFFFFF)};
-  --gd-danger-rgb:      #{hexToRGB(#D72631)};
-  --gd-warning-rgb:     #{hexToRGB(#FDA322)};
-  --gd-success-rgb:     #{hexToRGB(#1D741B)};
-  --gd-followed-status-rgb: #{hexToRGB(#564D99)};
+  --gd-primary-rgb:             #{hexToRGB(#2F7977)};
+  --gd-primary-alt-rgb:         #{hexToRGB(#004E6F)};
+  --gd-secondary-rgb:           #{hexToRGB(#999EA3)};
+  --gd-text-rgb:                #{hexToRGB(#333333)};
+  --gd-background-rgb:          #{hexToRGB(#FFFFFF)};
+  --gd-danger-rgb:              #{hexToRGB(#D72631)};
+  --gd-warning-rgb:             #{hexToRGB(#FDA322)};
+  --gd-success-rgb:             #{hexToRGB(#1D741B)};
+  --gd-followed-status-rgb:     #{hexToRGB(#564D99)};
   --gd-not-followed-status-rgb: #{hexToRGB(#E8E8E9)};
 }
 
 /* THEME DARK */
 .theme-dark {
   /* HEX */
-  --gd-primary:     #2F7977;
-  --gd-primary-alt: #7BD3F7;
-  --gd-secondary:   #B0B3BB;
-  --gd-text:        #F5F5F5;
-  --gd-background:  #242526;
-  --gd-error:       #FE463C;
-  --gd-warning:     #FFC740;
-  --gd-success:     #39DA8A;
+  --gd-primary:             #2F7977;
+  --gd-primary-alt:         #7BD3F7;
+  --gd-secondary:           #B0B3BB;
+  --gd-text:                #F5F5F5;
+  --gd-background:          #242526;
+  --gd-error:               #FE463C;
+  --gd-warning:             #FFC740;
+  --gd-success:             #39DA8A;
   --gd-followed-status:     #9F97DD;
   --gd-not-followed-status: #2F3039;
 
   /* RGB */
-  --gd-primary-rgb:     #{hexToRGB(#2F7977)};
-  --gd-primary-alt-rgb: #{hexToRGB(#7BD3F7)};
-  --gd-secondary-rgb:   #{hexToRGB(#B0B3BB)};
-  --gd-text-rgb:        #{hexToRGB(#F5F5F5)};
-  --gd-background-rgb:  #{hexToRGB(#242526)};
-  --gd-error-rgb:       #{hexToRGB(#FE463C)};
-  --gd-warning-rgb:     #{hexToRGB(#FFC740)};
-  --gd-success-rgb:     #{hexToRGB(#39DA8A)};
+  --gd-primary-rgb:             #{hexToRGB(#2F7977)};
+  --gd-primary-alt-rgb:         #{hexToRGB(#7BD3F7)};
+  --gd-secondary-rgb:           #{hexToRGB(#B0B3BB)};
+  --gd-text-rgb:                #{hexToRGB(#F5F5F5)};
+  --gd-background-rgb:          #{hexToRGB(#242526)};
+  --gd-error-rgb:               #{hexToRGB(#FE463C)};
+  --gd-warning-rgb:             #{hexToRGB(#FFC740)};
+  --gd-success-rgb:             #{hexToRGB(#39DA8A)};
   --gd-followed-status-rgb:     #{hexToRGB(#9F97DD)};
   --gd-not-followed-status-rgb: #{hexToRGB(#2F3039)};
 }

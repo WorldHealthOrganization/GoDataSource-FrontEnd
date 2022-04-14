@@ -32,7 +32,7 @@
         <div
           fxLayout="row wrap"
           class="gd-form-select-multiple-v2-panel-inner">
-          <div
+          <ng-container
             *ngFor="let selectedValue of value; let selectedIndex = index">
 
             <!-- separator -->
@@ -51,7 +51,7 @@
             <!-- Label -->
             {{allOptionsMap[selectedValue]?.label}}
 
-          </div>
+          </ng-container>
         </div>
 
       </mat-select-trigger>

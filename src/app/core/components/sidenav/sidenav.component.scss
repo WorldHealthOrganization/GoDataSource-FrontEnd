@@ -47,6 +47,10 @@ app-sidenav {
       }
 
       .gd-main-menu-option-header-button {
+        .gd-main-menu-option-label-text {
+          color: var(--gd-text);
+        }
+
         &:hover {
           background: rgba(var(--gd-primary-rgb), 0.1);
         }
@@ -129,6 +133,7 @@ app-sidenav {
 
   /* Menu item */
   .gd-main-menu-option {
+    color: var(--gd-text);
     cursor: pointer;
 
     + .gd-main-menu-option {
