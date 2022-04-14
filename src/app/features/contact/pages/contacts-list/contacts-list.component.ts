@@ -512,7 +512,7 @@ export class ContactsListComponent
           }
 
           // follow up
-          if (data.followUp && data.followUp.startDate && data.followUp.endDate && moment().isBetween(data.dateOfLastContact, data.followUp.endDate, undefined, '[]') ) {
+          if (data.dateOfLastContact && data.followUp?.endDate && moment().isBetween(data.dateOfLastContact, data.followUp.endDate, undefined, '[]') ) {
             forms.push({
               type: IV2ColumnStatusFormType.SQUARE,
               color: 'var(--gd-followed-status)',
@@ -537,7 +537,7 @@ export class ContactsListComponent
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.followUp as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+          options: (this.activatedRoute.snapshot.data.followUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
         }
       },
       {
@@ -960,15 +960,16 @@ export class ContactsListComponent
                 visible: (item: ContactModel): boolean => {
                   // visible only if at least one of the previous two items is visible
                   return !item.deleted &&
-                    this.selectedOutbreakIsActive && (
+                    this.selectedOutbreakIsActive &&
                     (
-                      ContactModel.canCreate(this.authUser) &&
-                      ContactModel.canCreateContactOfContact(this.authUser)
-                    ) || (
-                      ContactModel.canBulkCreate(this.authUser) &&
-                      ContactModel.canBulkCreateContactOfContact(this.authUser)
-                    )
-                  );
+                      (
+                        ContactModel.canCreate(this.authUser) &&
+                        ContactModel.canCreateContactOfContact(this.authUser)
+                      ) || (
+                        ContactModel.canBulkCreate(this.authUser) &&
+                        ContactModel.canBulkCreateContactOfContact(this.authUser)
+                      )
+                    );
                 }
               },
 
@@ -1273,7 +1274,7 @@ export class ContactsListComponent
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'followUp.status',
         label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
-        options: (this.activatedRoute.snapshot.data.followUp as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        options: (this.activatedRoute.snapshot.data.followUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         sortable: true
       },
       {
@@ -1298,7 +1299,7 @@ export class ContactsListComponent
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'pregnancyStatus',
         label: 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
-        options: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        options: (this.activatedRoute.snapshot.data.pregnancyStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         sortable: true
       },
       {
@@ -1345,7 +1346,7 @@ export class ContactsListComponent
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'followUpTeamId',
         label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
-        options: (this.activatedRoute.snapshot.data.followUp as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
       });
     }
 
@@ -1388,7 +1389,7 @@ export class ContactsListComponent
           field: 'statusId',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
           type: V2AdvancedFilterType.SELECT,
-          options: (this.activatedRoute.snapshot.data.dailyFollowUp as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          options: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           relationshipPath: ['followUps'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
         },
@@ -2179,7 +2180,7 @@ export class ContactsListComponent
           {
             type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
             placeholder: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
-            options: (this.activatedRoute.snapshot.data.followUp as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            options: (this.activatedRoute.snapshot.data.followUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             value: undefined,
             name: 'statusesList',
             validators: {

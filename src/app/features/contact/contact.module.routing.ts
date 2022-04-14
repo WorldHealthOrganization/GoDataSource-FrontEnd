@@ -30,7 +30,7 @@ const routes: Routes = [
       ]
     },
     resolve: {
-      pregnancy: PregnancyStatusDataResolver,
+      pregnancyStatus: PregnancyStatusDataResolver,
       gender: GenderDataResolver,
       risk: RiskDataResolver,
       yesNoAll: YesNoAllDataResolver,
@@ -39,8 +39,8 @@ const routes: Routes = [
       occupation: OccupationDataResolver,
       vaccine: VaccineDataResolver,
       vaccineStatus: VaccineStatusDataResolver,
-      followUp: FinalFollowUpStatusDataResolver,
-      dailyFollowUp: DailyFollowUpStatusDataResolver,
+      followUpStatus: FinalFollowUpStatusDataResolver,
+      dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
       team: TeamDataResolver
     }
   },
