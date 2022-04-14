@@ -195,7 +195,12 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               name: 'type',
               placeholder: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE',
               description: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE_DESCRIPTION',
-              options: []
+              options: [],
+              value: {
+                // #TODO
+                get: () => null,
+                set: () => {}
+              }
             }]
           }]
         }
