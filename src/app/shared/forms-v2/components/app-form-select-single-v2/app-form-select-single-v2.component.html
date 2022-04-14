@@ -11,6 +11,12 @@
       {{ placeholder | translate }}
     </mat-label>
 
+    <!-- Left - Icon buttons -->
+    <mat-icon
+      *ngIf="tooltipButton"
+      matPrefix
+      [matTooltip]="tooltipButton.tooltip">{{tooltipButton.icon}}</mat-icon>
+
     <!-- Select -->
     <mat-select
       [(ngModel)]="value"

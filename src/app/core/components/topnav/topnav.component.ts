@@ -28,6 +28,19 @@ import { determineRenderMode, RenderMode } from '../../enums/render-mode.enum';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TopnavComponent implements OnInit, OnDestroy {
+  // selected outbreak dropdown disabled ?
+  private static _UPDATE_CALLBACK: () => void;
+  private static _SELECTED_OUTBREAK_DROPDOWN_DISABLED: boolean = false;
+  static set SELECTED_OUTBREAK_DROPDOWN_DISABLED(disabled: boolean) {
+    // set value
+    TopnavComponent._SELECTED_OUTBREAK_DROPDOWN_DISABLED = disabled;
+
+    // trigger update
+    if (TopnavComponent._UPDATE_CALLBACK) {
+      TopnavComponent._UPDATE_CALLBACK();
+    }
+  }
+
   // global search
   globalSearchValue: string;
   globalSearchSuffixButtons: IAppFormIconButtonV2[] = [
@@ -49,6 +62,9 @@ export class TopnavComponent implements OnInit, OnDestroy {
 
   // selected Outbreak
   selectedOutbreak: OutbreakModel = new OutbreakModel();
+  get selectedOutbreakDisabled(): boolean {
+    return TopnavComponent._SELECTED_OUTBREAK_DROPDOWN_DISABLED;
+  }
 
   // subscriptions
   getSelectedOutbreakSubject: Subscription;
@@ -78,6 +94,11 @@ export class TopnavComponent implements OnInit, OnDestroy {
   ) {
     // update render mode
     this.updateRenderMode();
+
+    // set update callback
+    TopnavComponent._UPDATE_CALLBACK = () => {
+      this.changeDetectorRef.detectChanges();
+    };
   }
 
   /**
