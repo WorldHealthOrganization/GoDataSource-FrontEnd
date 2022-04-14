@@ -68,6 +68,7 @@
           [placeholder]="input.placeholder"
           [tooltip]="input.description"
           [disabled]="input.disabled ? input.disabled(input) : undefined"
+          autocomplete="off"
           (ngModelChange)="input.value.set($event)"></app-form-input-v2>
 
         <!-- Dropdown - single -->
@@ -84,7 +85,37 @@
         <!-- List -->
         <div
           *ngSwitchCase="CreateViewModifyV2TabInputType.LIST">
-          list of inputs
+
+          <!-- List Items -->
+          <div>
+            <div
+              *ngFor="let item of input.items">
+
+              <!-- Remove button -->
+              <div
+                fxLayoutAlign="end">
+                remove
+              </div>
+
+              <!-- Inputs -->
+              <div
+                fxLayout="row wrap" fxLayoutGap="1.6rem">
+                <div
+                  *ngFor="let inputDef of input.definition.inputs">
+                  <ng-template
+                    [ngTemplateOutlet]="inputRender"
+                    [ngTemplateOutletContext]="{ input: inputDef }"></ng-template>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Add -->
+          <div>
+            add button
+          </div>
+
         </div>
 
       </div>

@@ -18,6 +18,7 @@ import { VaccineDataResolver } from '../../core/services/resolvers/data/vaccine.
 import { VaccineStatusDataResolver } from '../../core/services/resolvers/data/vaccine-status.resolver';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { SelectedOutbreakDataResolver } from '../../core/services/resolvers/data/selected-outbreak.resolver';
+import { DocumentTypeDataResolver } from '../../core/services/resolvers/data/document-type.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
@@ -26,7 +27,8 @@ const createViewModifyFoundation: Route = {
   resolve: {
     outbreak: SelectedOutbreakDataResolver,
     gender: GenderDataResolver,
-    pregnancyStatus: PregnancyStatusDataResolver
+    pregnancyStatus: PregnancyStatusDataResolver,
+    documentType: DocumentTypeDataResolver
   }
 };
 

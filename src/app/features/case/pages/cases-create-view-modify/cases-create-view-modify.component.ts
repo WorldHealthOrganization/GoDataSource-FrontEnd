@@ -226,18 +226,39 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           label: 'LNG_CASE_FIELD_LABEL_DOCUMENTS',
           inputs: [{
             type: CreateViewModifyV2TabInputType.LIST,
-            inputs: [{
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'type',
-              placeholder: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE',
-              description: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE_DESCRIPTION',
-              options: [],
-              value: {
-                // #TODO
-                get: () => null,
-                set: () => {}
-              }
-            }]
+            name: 'documents',
+            items: [1, 2, 3],
+            definition: {
+              add: {
+                label: '',
+                click: () => {}
+              },
+              remove: {
+                label: ''
+              },
+              inputs: [{
+                type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+                name: 'type',
+                placeholder: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE',
+                description: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE_DESCRIPTION',
+                options: (this.activatedRoute.snapshot.data.documentType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                value: {
+                  // #TODO
+                  get: () => null,
+                  set: () => {}
+                }
+              }, {
+                type: CreateViewModifyV2TabInputType.TEXT,
+                name: 'number',
+                placeholder: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER',
+                description: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER_DESCRIPTION',
+                value: {
+                  // #TODO
+                  get: () => null,
+                  set: () => {}
+                }
+              }]
+            }
           }]
         }
       ]
