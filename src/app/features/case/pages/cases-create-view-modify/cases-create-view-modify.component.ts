@@ -9,6 +9,9 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { TranslateService } from '@ngx-translate/core';
 import { CreateViewModifyV2TabInputType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { Constants } from '../../../../core/models/constants';
 
 /**
  * Component
@@ -180,6 +183,39 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               set: (value) => {
                 this.itemData.lastName = value;
               }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'gender',
+            placeholder: 'LNG_CASE_FIELD_LABEL_GENDER',
+            description: 'LNG_CASE_FIELD_LABEL_GENDER_DESCRIPTION',
+            options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: {
+              get: () => this.itemData.gender,
+              set: (value) => {
+                // set gender
+                this.itemData.gender = value;
+
+                // reset pregnancy ?
+                if (this.itemData.gender === Constants.GENDER_MALE) {
+                  this.itemData.pregnancyStatus = undefined;
+                }
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'pregnancyStatus',
+            placeholder: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
+            description: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION',
+            options: (this.activatedRoute.snapshot.data.pregnancyStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: {
+              get: () => this.itemData.pregnancyStatus,
+              set: (value) => {
+                this.itemData.pregnancyStatus = value;
+              }
+            },
+            disabled: () => {
+              return this.itemData.gender === Constants.GENDER_MALE;
             }
           }]
         },

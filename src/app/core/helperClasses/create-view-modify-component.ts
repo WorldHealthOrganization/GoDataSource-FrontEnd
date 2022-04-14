@@ -95,14 +95,17 @@ export abstract class CreateViewModifyComponent<T extends BaseModel> {
     // create ?
     this.loadingItemData = true;
     if (this.isCreate) {
-      // initialize item
-      this.itemData = this.createNewItem();
+      // create
+      setTimeout(() => {
+        // initialize item
+        this.itemData = this.createNewItem();
 
-      // initialize other things
-      initialize();
+        // initialize other things
+        initialize();
 
-      // not loading anymore
-      this.loadingItemData = false;
+        // not loading anymore
+        this.loadingItemData = false;
+      });
     } else {
       // view / modify
       // retrieve item data

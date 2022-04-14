@@ -35,6 +35,7 @@ interface CreateViewModifyV2TabInputBase {
 
   // optional
   description?: string;
+  disabled?: (item: CreateViewModifyV2TabInput) => boolean;
 
   // never
   value: never;
