@@ -219,7 +219,8 @@ export class EventsListComponent
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
         },
         exclude: (): boolean => {
           return !UserModel.canList(this.authUser);
@@ -318,7 +319,8 @@ export class EventsListComponent
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
         },
         exclude: (): boolean => {
           return !UserModel.canView(this.authUser);
@@ -350,7 +352,8 @@ export class EventsListComponent
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
         },
         exclude: (): boolean => {
           return !UserModel.canView(this.authUser);

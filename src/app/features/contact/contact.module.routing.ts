@@ -1,10 +1,22 @@
 import { ModuleWithProviders } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import * as fromPages from './pages';
+import { RouterModule, Routes } from '@angular/router';
+import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PERMISSION } from '../../core/models/permission.model';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
-import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
+import { DailyFollowUpStatusDataResolver } from '../../core/services/resolvers/data/daily-follow-up-status.resolver';
+import { FinalFollowUpStatusDataResolver } from '../../core/services/resolvers/data/final-follow-up-status.resolver';
+import { GenderDataResolver } from '../../core/services/resolvers/data/gender.resolver';
+import { OccupationDataResolver } from '../../core/services/resolvers/data/occupation.resolver';
+import { PregnancyStatusDataResolver } from '../../core/services/resolvers/data/pregnancy-status.resolver';
+import { RiskDataResolver } from '../../core/services/resolvers/data/risk.resolver';
+import { TeamDataResolver } from '../../core/services/resolvers/data/team.resolver';
+import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
+import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
+import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.resolver';
+import { VaccineStatusDataResolver } from './../../core/services/resolvers/data/vaccine-status.resolver';
+import { VaccineDataResolver } from './../../core/services/resolvers/data/vaccine.resolver';
+import * as fromPages from './pages';
 
 const routes: Routes = [
   // Contact list
@@ -16,6 +28,20 @@ const routes: Routes = [
       permissions: [
         PERMISSION.CONTACT_LIST
       ]
+    },
+    resolve: {
+      pregnancy: PregnancyStatusDataResolver,
+      gender: GenderDataResolver,
+      risk: RiskDataResolver,
+      yesNoAll: YesNoAllDataResolver,
+      yesNo: YesNoDataResolver,
+      user: UserDataResolver,
+      occupation: OccupationDataResolver,
+      vaccine: VaccineDataResolver,
+      vaccineStatus: VaccineStatusDataResolver,
+      followUp: FinalFollowUpStatusDataResolver,
+      dailyFollowUp: DailyFollowUpStatusDataResolver,
+      team: TeamDataResolver
     }
   },
   // Create Contact
