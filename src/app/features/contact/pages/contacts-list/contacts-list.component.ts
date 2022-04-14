@@ -454,18 +454,6 @@ export class ContactsListComponent
             })
           },
 
-          // alerted
-          {
-            title: 'LNG_COMMON_LABEL_STATUSES_ALERTED',
-            items: [{
-              form: {
-                type: IV2ColumnStatusFormType.STAR,
-                color: 'var(--gd-danger)'
-              },
-              label: ' '
-            }]
-          },
-
           // followed
           {
             title: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_TITLE',
@@ -482,6 +470,18 @@ export class ContactsListComponent
                 color: 'var(--gd-not-followed-status)'
               },
               label: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_FOLLOWED_UP'
+            }]
+          },
+
+          // alerted
+          {
+            title: 'LNG_COMMON_LABEL_STATUSES_ALERTED',
+            items: [{
+              form: {
+                type: IV2ColumnStatusFormType.STAR,
+                color: 'var(--gd-danger)'
+              },
+              label: ' '
             }]
           }
         ],
@@ -502,15 +502,6 @@ export class ContactsListComponent
             });
           }
 
-          // alerted
-          if (data.alerted) {
-            forms.push({
-              type: IV2ColumnStatusFormType.STAR,
-              color: 'var(--gd-danger)',
-              tooltip: this.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
-            });
-          }
-
           // follow up
           if (data.dateOfLastContact && data.followUp?.endDate && moment().isBetween(data.dateOfLastContact, data.followUp.endDate, undefined, '[]') ) {
             forms.push({
@@ -524,6 +515,15 @@ export class ContactsListComponent
               type: IV2ColumnStatusFormType.SQUARE,
               color: 'var(--gd-not-followed-status)',
               tooltip: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_FOLLOWED_UP')
+            });
+          }
+
+          // alerted
+          if (data.alerted) {
+            forms.push({
+              type: IV2ColumnStatusFormType.STAR,
+              color: 'var(--gd-danger)',
+              tooltip: this.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
             });
           }
 
