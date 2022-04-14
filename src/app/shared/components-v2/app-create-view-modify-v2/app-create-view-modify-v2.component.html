@@ -51,7 +51,101 @@
   <!-- Bottom -->
   <div
     class="gd-create-view-modify-bottom">
-    bottom
+
+    <!-- Input render -->
+    <ng-template
+      #inputRender
+      let-input="input">
+      <div
+        class="gd-create-view-modify-bottom-section-content-input"
+        [ngSwitch]="input.type">
+
+        <!-- Text -->
+        <app-form-input-v2
+          *ngSwitchCase="CreateViewModifyV2TabInputType.TEXT"
+          ngModel
+          [name]="input.name"
+          [placeholder]="input.placeholder"
+          [tooltip]="input.description"></app-form-input-v2>
+
+        <!-- Dropdown - single -->
+        <!-- #TODO: - tooltip dropdown ca la input -->
+        <app-form-select-single-v2
+          *ngSwitchCase="CreateViewModifyV2TabInputType.SELECT_SINGLE"
+          ngModel
+          [name]="input.name"
+          [placeholder]="input.placeholder"
+          [options]="input.options"></app-form-select-single-v2>
+
+        <!-- List -->
+        <div
+          *ngSwitchCase="CreateViewModifyV2TabInputType.LIST">
+          list of inputs
+        </div>
+
+      </div>
+    </ng-template>
+
+
+
+    <!-- Section render -->
+    <ng-template
+      #sectionsRender
+      let-tab="tab">
+      <div
+        *ngFor="let section of tab.sections"
+        class="gd-create-view-modify-bottom-section">
+        <!-- Section title -->
+        <div
+          class="gd-create-view-modify-bottom-section-title">
+          {{section.label | translate}}
+        </div>
+
+        <!-- Section content -->
+        <div
+          class="gd-create-view-modify-bottom-section-content">
+
+          <!-- Input render -->
+          <div
+            *ngFor="let input of section.inputs">
+            <ng-template
+              [ngTemplateOutlet]="inputRender"
+              [ngTemplateOutletContext]="{ input }"></ng-template>
+          </div>
+
+        </div>
+      </div>
+    </ng-template>
+
+
+
+    <!-- Render tabs - Create layout -->
+    <mat-horizontal-stepper
+      *ngIf="isCreate; else viewModify"
+      linear>
+      <mat-step
+        *ngFor="let tab of tabs"
+        [label]="tab.label | translate">
+        <ng-template
+          [ngTemplateOutlet]="sectionsRender"
+          [ngTemplateOutletContext]="{ tab }"></ng-template>
+      </mat-step>
+    </mat-horizontal-stepper>
+
+    <!-- Render tabs - View / Modify layout -->
+    <ng-template
+      #viewModify>
+      <mat-tab-group>
+        <mat-tab
+          *ngFor="let tab of tabs"
+          [label]="tab.label | translate">
+          <ng-template
+            [ngTemplateOutlet]="sectionsRender"
+            [ngTemplateOutletContext]="{ tab }"></ng-template>
+        </mat-tab>
+      </mat-tab-group>
+    </ng-template>
+
   </div>
 
 </ng-template>

@@ -8,6 +8,7 @@ import { Observable } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { TranslateService } from '@ngx-translate/core';
+import { CreateViewModifyV2TabInputType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 
 /**
  * Component
@@ -39,6 +40,13 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    */
   ngOnDestroy(): void {
     super.onDestroy();
+  }
+
+  /**
+   * Create new item model if needed
+   */
+  protected createNewItem(): CaseModel {
+    return new CaseModel();
   }
 
   /**
@@ -132,6 +140,66 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    * Initialize tabs
    */
   protected initializeTabs(): void {
-    this.tabs = [];
+    this.tabs = [{
+      type: CreateViewModifyV2TabInputType.TAB,
+      label: 'LNG_PAGE_CREATE_CASE_TAB_PERSONAL_TITLE',
+      sections: [
+        // Details
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_CASE_FIELD_LABEL_DETAILS',
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.TEXT,
+            name: 'firstName',
+            placeholder: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
+            description: 'LNG_CASE_FIELD_LABEL_FIRST_NAME_DESCRIPTION',
+            value: {
+              get: () => this.itemData.firstName,
+              set: (value) => {
+                this.itemData.firstName = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.TEXT,
+            name: 'middleName',
+            placeholder: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
+            description: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION',
+            value: {
+              get: () => this.itemData.middleName,
+              set: (value) => {
+                this.itemData.middleName = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.TEXT,
+            name: 'lastName',
+            placeholder: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
+            description: 'LNG_CASE_FIELD_LABEL_LAST_NAME_DESCRIPTION',
+            value: {
+              get: () => this.itemData.lastName,
+              set: (value) => {
+                this.itemData.lastName = value;
+              }
+            }
+          }]
+        },
+
+        // Documents
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_CASE_FIELD_LABEL_DOCUMENTS',
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.LIST,
+            inputs: [{
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'type',
+              placeholder: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE',
+              description: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE_DESCRIPTION',
+              options: []
+            }]
+          }]
+        }
+      ]
+    }];
   }
 }

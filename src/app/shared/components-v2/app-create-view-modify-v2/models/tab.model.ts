@@ -1,9 +1,12 @@
+import { ILabelValuePairModel } from '../../../forms-v2/core/label-value-pair.model';
+
 /**
  * Input type
  */
 export enum CreateViewModifyV2TabInputType {
   // inputs
   TEXT,
+  SELECT_SINGLE,
 
   // input groups
   LIST,
@@ -11,6 +14,14 @@ export enum CreateViewModifyV2TabInputType {
   // layout
   TAB,
   SECTION
+}
+
+/**
+ * Input - base value
+ */
+interface CreateViewModifyV2TabInputValue<T> {
+  get: () => T;
+  set: (value: T) => void;
 }
 
 /**
@@ -22,6 +33,9 @@ interface CreateViewModifyV2TabInputBase {
   name: string;
   placeholder: string;
 
+  // optional
+  description?: string;
+
   // never
   value: never;
 }
@@ -32,9 +46,17 @@ interface CreateViewModifyV2TabInputBase {
 interface CreateViewModifyV2TabInputText extends Omit<CreateViewModifyV2TabInputBase, 'value'> {
   // required
   type: CreateViewModifyV2TabInputType.TEXT;
+  value: CreateViewModifyV2TabInputValue<string>;
+}
 
-  // optional
-  value?: string;
+/**
+ * Input - select single
+ */
+interface CreateViewModifyV2TabInputSingleSelect extends Omit<CreateViewModifyV2TabInputBase, 'value'> {
+  // required
+  type: CreateViewModifyV2TabInputType.SELECT_SINGLE;
+  options: ILabelValuePairModel[];
+  value: CreateViewModifyV2TabInputValue<string>;
 }
 
 /**
@@ -49,7 +71,7 @@ interface CreateViewModifyV2TabInputList {
 /**
  * Input
  */
-type CreateViewModifyV2TabInput = CreateViewModifyV2TabInputText | CreateViewModifyV2TabInputList;
+type CreateViewModifyV2TabInput = CreateViewModifyV2TabInputText | CreateViewModifyV2TabInputSingleSelect | CreateViewModifyV2TabInputList;
 
 /**
  * Tab section

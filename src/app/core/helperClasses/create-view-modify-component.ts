@@ -34,7 +34,7 @@ export abstract class CreateViewModifyComponent<T extends BaseModel> {
 
   // item data
   itemData: T;
-  loadingItemData: boolean = false;
+  loadingItemData: boolean = true;
 
   // check if selected outbreak is the active one
   get selectedOutbreakIsActive(): boolean {
@@ -93,13 +93,19 @@ export abstract class CreateViewModifyComponent<T extends BaseModel> {
     };
 
     // create ?
+    this.loadingItemData = true;
     if (this.isCreate) {
-      // initialize
+      // initialize item
+      this.itemData = this.createNewItem();
+
+      // initialize other things
       initialize();
+
+      // not loading anymore
+      this.loadingItemData = false;
     } else {
       // view / modify
       // retrieve item data
-      this.loadingItemData = true;
       setTimeout(() => {
         this.retrieveItem()
           .pipe(
@@ -118,11 +124,11 @@ export abstract class CreateViewModifyComponent<T extends BaseModel> {
             // set data
             this.itemData = data;
 
-            // not loading anymore
-            this.loadingItemData = false;
-
             // initialize
             initialize();
+
+            // not loading anymore
+            this.loadingItemData = false;
           });
       });
     }
@@ -132,6 +138,11 @@ export abstract class CreateViewModifyComponent<T extends BaseModel> {
    * On destroy handler
    */
   abstract ngOnDestroy(): void;
+
+  /**
+   * Initialize new item
+   */
+  protected abstract createNewItem(): T;
 
   /**
    * Initialize page title

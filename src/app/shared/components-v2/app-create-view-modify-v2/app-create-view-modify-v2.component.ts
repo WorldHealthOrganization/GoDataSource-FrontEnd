@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input } from '@angular/core';
 import { CreateViewModifyV2Action } from './models/action.model';
-import { CreateViewModifyV2Tab } from './models/tab.model';
+import { CreateViewModifyV2Tab, CreateViewModifyV2TabInputType } from './models/tab.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
 
 /**
@@ -39,6 +39,9 @@ export class AppCreateViewModifyV2Component {
 
   // tabs to render
   @Input() tabs: CreateViewModifyV2Tab[];
+
+  // constants
+  CreateViewModifyV2TabInputType = CreateViewModifyV2TabInputType;
 
   /**
    * Constructor
