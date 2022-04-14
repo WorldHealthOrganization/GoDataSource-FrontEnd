@@ -17,6 +17,7 @@ import { PregnancyStatusDataResolver } from '../../core/services/resolvers/data/
 import { VaccineDataResolver } from '../../core/services/resolvers/data/vaccine.resolver';
 import { VaccineStatusDataResolver } from '../../core/services/resolvers/data/vaccine-status.resolver';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
+import { SelectedOutbreakDataResolver } from '../../core/services/resolvers/data/selected-outbreak.resolver';
 
 const routes: Routes = [
   // Cases list
@@ -54,6 +55,9 @@ const routes: Routes = [
       ],
       action: CreateViewModifyV2Action.CREATE
     },
+    resolve: {
+      outbreak: SelectedOutbreakDataResolver
+    },
     canDeactivate: [
       PageChangeConfirmationGuard
     ]
@@ -68,6 +72,9 @@ const routes: Routes = [
         PERMISSION.CASE_VIEW
       ],
       action: CreateViewModifyV2Action.VIEW
+    },
+    resolve: {
+      outbreak: SelectedOutbreakDataResolver
     }
   },
   // Modify Case
@@ -80,6 +87,9 @@ const routes: Routes = [
         PERMISSION.CASE_MODIFY
       ],
       action: CreateViewModifyV2Action.MODIFY
+    },
+    resolve: {
+      outbreak: SelectedOutbreakDataResolver
     },
     canDeactivate: [
       PageChangeConfirmationGuard

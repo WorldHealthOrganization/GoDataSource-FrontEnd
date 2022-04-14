@@ -64,7 +64,8 @@
       [ngModel]="selectedOutbreak.id"
       (ngModelChange)="selectOutbreak($event)"
       [options]="outbreakListOptions"
-      optionTooltipKey="details">
+      optionTooltipKey="details"
+      [disabled]="selectedOutbreakDisabled">
     </app-form-select-single-v2>
 
     <!-- Mobile responsive buttons -->
@@ -77,6 +78,7 @@
         type="button"
         mat-icon-button
         [matTooltip]="'LNG_LAYOUT_SELECTED_OUTBREAK_LABEL' | translate"
+        [disabled]="selectedOutbreakDisabled"
         (click)="mobileChangeOutbreak()">
         <mat-icon>bug_report</mat-icon>
       </button>

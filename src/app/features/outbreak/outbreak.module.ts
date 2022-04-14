@@ -7,8 +7,6 @@ import { SharedModule } from '../../shared/shared.module';
 import * as fromPages from './pages';
 // services
 
-import * as fromServices from './services';
-
 @NgModule({
   imports: [
     routing,
@@ -17,10 +15,6 @@ import * as fromServices from './services';
   ],
   declarations: [
     ...fromPages.pageComponents
-  ],
-  providers: [
-    ...fromServices.services
   ]
 })
-export class OutbreakModule {
-}
+export class OutbreakModule {}

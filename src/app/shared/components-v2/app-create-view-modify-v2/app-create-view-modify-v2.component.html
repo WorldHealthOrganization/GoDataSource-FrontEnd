@@ -1,1 +1,57 @@
-test
+<!-- Loading data -->
+<div
+  *ngIf="loadingItemData; else dataLoaded"
+  class="gd-create-view-modify-loading-data">
+
+  <!-- Spinner -->
+  <mat-progress-spinner
+    class="gd-create-view-modify-loading-data-spinner"
+    diameter="48"
+    mode="indeterminate"></mat-progress-spinner>
+
+</div>
+
+<!-- Loaded data -->
+<ng-template
+  #dataLoaded>
+
+  <!-- Top -->
+  <div
+    class="gd-create-view-modify-top">
+
+    <!-- Breadcrumbs -->
+    <app-breadcrumb-v2
+      [breadcrumbs]="breadcrumbs"
+      (detectChanges)="resizeTable()"></app-breadcrumb-v2>
+
+    <!-- Title & buttons -->
+    <div
+      fxLayout="row"
+      class="gd-create-view-modify-top-title-buttons">
+
+      <!-- Title -->
+      <div
+        fxFlex
+        class="gd-create-view-modify-top-title-buttons-title">
+        {{pageTitle | translate:pageTitleData}}
+      </div>
+
+      <!-- Buttons -->
+      <div
+        fxFlex fxLayoutAlign="end" fxLayoutGap="0.8rem"
+        class="gd-create-view-modify-top-title-buttons-buttons">
+
+        buttons...
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom -->
+  <div
+    class="gd-create-view-modify-bottom">
+    bottom
+  </div>
+
+</ng-template>
