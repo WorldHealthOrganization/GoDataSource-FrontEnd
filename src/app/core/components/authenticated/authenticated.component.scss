@@ -123,7 +123,7 @@ mat-sidenav-container {
 
     /* Right side */
     .gd-body-content-right {
-      margin: 0 0 0 var(--gd-menu-width-collapsed);
+      margin: 0 0 0 var(--gd-menu-width-collapsed) !important;
       @include transition(all 0.24s ease-in-out 0s);
       width: calc(100% - var(--gd-menu-width-collapsed));
 

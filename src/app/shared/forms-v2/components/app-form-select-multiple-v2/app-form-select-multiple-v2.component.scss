@@ -154,15 +154,31 @@
               height: auto;
 
               .mat-select-trigger {
+                height: auto;
                 width: calc(100% + 1rem);
 
                 .mat-select-value {
+                  overflow: initial;
+                  text-overflow: initial;
+                  white-space: normal;
+
                   .mat-select-value-text {
+                    overflow: initial;
+                    text-overflow: initial;
+                    white-space: normal;
+
                     .gd-form-select-multiple-v2-panel-inner {
                       height: auto;
                       max-height: 7.2rem;
                       overflow-y: auto;
                       padding-right: 3rem;
+
+                      > img {
+                        display: inline-block;
+                        height: 2.4rem;
+                        margin-right: 0.4rem;
+                        vertical-align: middle;
+                      }
                     }
                   }
                 }

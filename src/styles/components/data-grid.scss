@@ -173,28 +173,41 @@
                   .mat-form-field-infix {
                     width: 20rem;
 
-                    .mat-select-multiple {
-                      .mat-select-trigger {
-                        width: auto;
+                    .mat-select.mat-select-multiple {
+                      height: 2.4rem;
 
+                      .mat-select-trigger {
                         .mat-select-value {
+                          overflow: hidden;
+                          text-overflow: ellipsis;
+                          white-space: nowrap;
+                          width: calc(100% - 2.4rem);
+
                           .mat-select-value-text {
-                            @include flex(flex);
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+
+                            > mat-select-trigger {
+                              overflow: hidden;
+                              text-overflow: ellipsis;
+                              white-space: nowrap;
+                            }
 
                             .gd-form-select-multiple-v2-panel-inner {
-                              flex-flow: row nowrap !important;
+                              display: inline-block !important;
                               height: 2.4rem;
                               max-height: 2.4rem;
                               overflow: hidden;
                               padding-right: 0;
+                              text-overflow: ellipsis;
+                              white-space: nowrap;
                             }
                           }
                         }
 
                         .mat-select-arrow-wrapper {
-                          display: table-cell;
-                          position: relative;
-                          right: 0;
+                          right: 0.8rem;
                         }
                       }
                     }
@@ -384,24 +397,28 @@
 }
 
 /* List table legend */
-.gd-list-table-bottom-left-legend {
-  .gd-list-table-bottom-left-legend-title {
-    color: var(--gd-secondary);
-    font-size: 1.2rem;
-    margin-left: 0.8rem;
-    min-width: 9.5rem;
-    text-transform: uppercase;
-  }
+.gd-list-table-bottom-left {
+  padding: 0.4rem 0;
 
-  .gd-list-table-bottom-left-legend-item {
-    @include flex_align_items(center);
-    @include flex(flex);
-    @include flex_direction(row);
-    font-size: 1.2rem;
-    margin-left: 0.8rem;
-
-    svg {
-      margin-right: 0.4rem;
+  .gd-list-table-bottom-left-legend {
+    .gd-list-table-bottom-left-legend-title {
+      color: var(--gd-secondary);
+      font-size: 1.2rem;
+      margin-left: 0.8rem;
+      min-width: 11rem;
+      text-transform: uppercase;
+    }
+  
+    .gd-list-table-bottom-left-legend-item {
+      @include flex_align_items(center);
+      @include flex(flex);
+      @include flex_direction(row);
+      font-size: 1.2rem;
+      margin-left: 0.8rem;
+  
+      svg {
+        margin-right: 0.4rem;
+      }
     }
   }
 }
