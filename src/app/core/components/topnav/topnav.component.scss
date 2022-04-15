@@ -9,10 +9,28 @@
   .gd-top-left {
     padding-left: 4rem;
 
+    @include breakpoint('lg') {
+      @include flex_align_items(center);
+      @include flex(flex);
+      @include flex-direction(row);
+      padding-left: 1.6rem;
+    }
+
+    /* Mobile Menu Trigger */
+    > button.mat-icon-button {
+      @include breakpoint('lg') {
+        margin-right: 1.6rem;
+      }
+    }
+
     /* Search */
     .gd-form-input-v2 {
       .mat-form-field {
         min-width: 38rem;
+
+        @include breakpoint('lg') {
+          min-width: 25rem;
+        }
 
         .mat-form-field-wrapper {
           background: rgba(var(--gd-secondary-rgb), 0.15);
@@ -63,6 +81,10 @@
     .gd-form-select-single-v2 {
       .mat-form-field {
         min-width: 38rem;
+
+        @include breakpoint('lg') {
+          min-width: 25rem;
+        }
 
         .mat-form-field-wrapper {
           padding-bottom: 0;

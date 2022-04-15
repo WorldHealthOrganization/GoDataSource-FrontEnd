@@ -123,13 +123,17 @@ mat-sidenav-container {
 
     /* Right side */
     .gd-body-content-right {
-      margin: 0 0 0 var(--gd-menu-width-collapsed) !important;
-      @include transition(all 0.24s ease-in-out 0s);
-      width: calc(100% - var(--gd-menu-width-collapsed));
+      @include breakpoint('gt-md') {
+        margin: 0 0 0 var(--gd-menu-width-collapsed) !important;
+        @include transition(all 0.24s ease-in-out 0s);
+        width: calc(100% - var(--gd-menu-width-collapsed));
+      }
 
       &.gd-body-content-right-expanded {
-        margin-left: var(--gd-menu-width-expanded) !important;
-        width: calc(100% - var(--gd-menu-width-expanded));
+        @include breakpoint('gt-md') {
+          margin-left: var(--gd-menu-width-expanded) !important;
+          width: calc(100% - var(--gd-menu-width-expanded));
+        }
       }
 
       /* Top bar */
