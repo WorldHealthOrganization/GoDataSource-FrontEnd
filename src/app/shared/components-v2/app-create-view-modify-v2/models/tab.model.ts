@@ -63,7 +63,7 @@ interface CreateViewModifyV2TabInputSingleSelect extends Omit<CreateViewModifyV2
 /**
 * Input - list
 */
-interface CreateViewModifyV2TabInputList {
+export interface CreateViewModifyV2TabInputList {
   // required
   type: CreateViewModifyV2TabInputType.LIST;
   name: string;
@@ -72,10 +72,11 @@ interface CreateViewModifyV2TabInputList {
     inputs: CreateViewModifyV2TabInput[],
     add: {
       label: string,
-      click: () => void
+      newItem: () => any
     },
     remove: {
-      label: string
+      label: string,
+      confirmLabel: string
     }
   };
 }

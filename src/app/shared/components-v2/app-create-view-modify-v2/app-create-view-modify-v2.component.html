@@ -89,12 +89,19 @@
           <!-- List Items -->
           <div>
             <div
-              *ngFor="let item of input.items">
+              *ngFor="let item of input.items; let itemIndex = index">
 
               <!-- Remove button -->
               <div
                 fxLayoutAlign="end">
-                remove
+                <button
+                  type="button"
+                  mat-icon-button
+                  color="warn"
+                  [matTooltip]="input.definition.remove.label | translate"
+                  (click)="removeListItem(input, itemIndex)">
+                  <mat-icon>delete</mat-icon>
+                </button>
               </div>
 
               <!-- Inputs -->
@@ -113,7 +120,19 @@
 
           <!-- Add -->
           <div>
-            add button
+            <button
+              type="button"
+              mat-flat-button color="text"
+              (click)="addListItem(input)">
+
+              <!-- + Icon -->
+              <mat-icon>add</mat-icon>
+
+              <!-- Label -->
+              <span>
+                {{input.definition.add.label | translate}}
+              </span>
+            </button>
           </div>
 
         </div>

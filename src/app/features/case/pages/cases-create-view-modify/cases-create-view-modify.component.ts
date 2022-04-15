@@ -227,14 +227,15 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           inputs: [{
             type: CreateViewModifyV2TabInputType.LIST,
             name: 'documents',
-            items: [1, 2, 3],
+            items: [],
             definition: {
               add: {
-                label: '',
-                click: () => {}
+                label: 'LNG_DOCUMENT_LABEL_ADD_NEW_DOCUMENT',
+                newItem: () => new CaseModel()
               },
               remove: {
-                label: ''
+                label: 'LNG_COMMON_BUTTON_DELETE',
+                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_DOCUMENT'
               },
               inputs: [{
                 type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
