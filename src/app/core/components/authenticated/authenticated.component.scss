@@ -25,10 +25,27 @@ mat-sidenav-container {
       @include transition(all 0.24s ease-in-out 0s);
       width: var(--gd-menu-width-collapsed);
 
+      @include breakpoint('lt-md') {
+        width: 0;
+      }
+
       /* Left content */
       .gd-body-content-left-content {
         height: 100%;
         overflow: hidden;
+
+        /* Logo on mobile */
+        .gd-body-content-left-content-header {
+          @include flex_align_items(center);
+          @include flex(flex);
+          @include flex-direction(row);
+          @include flex_justify(space-between);
+
+          /* Mobile Menu Close Trigger */
+          > button.mat-icon-button {
+            margin: 0 2.4rem;
+          }
+        }
 
         /* Logo */
         .gd-body-content-left-content-logo {
@@ -38,7 +55,10 @@ mat-sidenav-container {
           overflow: hidden;
           padding: 1.6rem 0.8rem;
           @include transition(all 0.24s ease-in-out 0s);
-          width: 100%;
+
+          @include breakpoint('gt-md') {
+            width: 100%;
+          }
 
           img {
             height: 3.8rem;
@@ -123,13 +143,17 @@ mat-sidenav-container {
 
     /* Right side */
     .gd-body-content-right {
-      margin: 0 0 0 var(--gd-menu-width-collapsed) !important;
-      @include transition(all 0.24s ease-in-out 0s);
-      width: calc(100% - var(--gd-menu-width-collapsed));
+      @include breakpoint('gt-md') {
+        margin: 0 0 0 var(--gd-menu-width-collapsed) !important;
+        @include transition(all 0.24s ease-in-out 0s);
+        width: calc(100% - var(--gd-menu-width-collapsed));
+      }
 
       &.gd-body-content-right-expanded {
-        margin-left: var(--gd-menu-width-expanded) !important;
-        width: calc(100% - var(--gd-menu-width-expanded));
+        @include breakpoint('gt-md') {
+          margin-left: var(--gd-menu-width-expanded) !important;
+          width: calc(100% - var(--gd-menu-width-expanded));
+        }
       }
 
       /* Top bar */
@@ -150,6 +174,10 @@ mat-sidenav-container {
         padding: 1.2rem 4rem 4rem;
         overflow-x: hidden;
         overflow-y: overlay;
+
+        @include breakpoint('lt-md') {
+          padding: 1.2rem 2rem 2rem;
+        }
       }
     }
   }

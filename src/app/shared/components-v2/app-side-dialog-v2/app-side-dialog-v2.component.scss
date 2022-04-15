@@ -35,6 +35,11 @@
       min-width: 33rem;
       position: relative;
 
+      @include breakpoint('xs') {
+        max-width: 90vw;
+        min-width: 30rem;
+      }
+
       /* Slide-in panel header */
       .gd-app-side-dialog-v2-content-top {
         .gd-app-side-dialog-v2-content-tb {
