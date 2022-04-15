@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { TranslateService } from '@ngx-translate/core';
-import { CreateViewModifyV2TabInputType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import { CreateViewModifyV2Tab, CreateViewModifyV2TabInputType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { Constants } from '../../../../core/models/constants';
@@ -143,7 +143,20 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    * Initialize tabs
    */
   protected initializeTabs(): void {
-    this.tabs = [{
+    this.tabs = [
+      // Personal
+      this.initializeTabsPersonal(),
+
+      // Epidemiology
+      this.initializeTabsEpidemiology()
+    ];
+  }
+
+  /**
+   * Initialize tabs - Personal
+   */
+  private initializeTabsPersonal(): CreateViewModifyV2Tab {
+    return {
       type: CreateViewModifyV2TabInputType.TAB,
       label: 'LNG_PAGE_CREATE_CASE_TAB_PERSONAL_TITLE',
       sections: [
@@ -263,6 +276,36 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }]
         }
       ]
-    }];
+    };
+  }
+
+  /**
+   * Initialize tabs - Epidemiology
+   */
+  private initializeTabsEpidemiology(): CreateViewModifyV2Tab {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB,
+      label: 'LNG_PAGE_CREATE_CASE_TAB_INFECTION_TITLE',
+      sections: [
+        // Details
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_CASE_FIELD_LABEL_DETAILS',
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'classification',
+            placeholder: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+            description: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION_DESCRIPTION',
+            options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: {
+              get: () => this.itemData.classification,
+              set: (value) => {
+                this.itemData.classification = value;
+              }
+            }
+          }]
+        }
+      ]
+    };
   }
 }
