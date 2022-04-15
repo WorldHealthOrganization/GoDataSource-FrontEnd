@@ -20,12 +20,15 @@
     <div
       class="gd-body-content-left-content">
 
-      <!-- Logo -->
-      <div
-        class="gd-body-content-left-content-logo"
-        [routerLink]="['/']"
-        tabindex="-1">
-        <img src="../../../../assets/images/gd-logo.svg" alt="Go.Data Logo" />
+      <!-- Logo and Close button -->
+      <div>
+        <!-- Logo -->
+        <div
+          class="gd-body-content-left-content-logo"
+          [routerLink]="['/']"
+          tabindex="-1">
+          <img src="../../../../assets/images/gd-logo.svg" alt="Go.Data Logo" />
+        </div>
 
         <!-- Close button -->
         <button
@@ -35,7 +38,6 @@
           (click)="hoveringMenu = false">
           <mat-icon>close</mat-icon>
         </button>
-
       </div>
 
       <!-- Main Menu -->

@@ -7,6 +7,15 @@
     fxGrow="0"
     class="gd-top-left">
 
+    <!-- Logo -->
+    <div
+      *ngIf="renderMode === RenderMode.SMALL"
+      class="gd-top-left-logo"
+      [routerLink]="['/']"
+      tabindex="-1">
+      <img src="../../../../assets/images/gd-logo.svg" alt="Go.Data Logo" />
+    </div>
+
     <!-- Show Menu -->
     <button
       *ngIf="renderMode !== RenderMode.FULL"
