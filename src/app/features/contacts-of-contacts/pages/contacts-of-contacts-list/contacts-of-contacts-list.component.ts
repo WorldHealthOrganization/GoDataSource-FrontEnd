@@ -5,7 +5,6 @@ import { Observable, of, throwError } from 'rxjs';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { AddressModel } from '../../../../core/models/address.model';
 import { Constants } from '../../../../core/models/constants';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
@@ -37,6 +36,7 @@ import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import { FilterModel } from '../../../../shared/components/side-filters/model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-contacts-of-contacts-list',
