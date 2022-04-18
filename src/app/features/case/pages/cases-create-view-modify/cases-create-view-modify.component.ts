@@ -164,76 +164,78 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         {
           type: CreateViewModifyV2TabInputType.SECTION,
           label: 'LNG_CASE_FIELD_LABEL_DETAILS',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.TEXT,
-            name: 'firstName',
-            placeholder: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
-            description: 'LNG_CASE_FIELD_LABEL_FIRST_NAME_DESCRIPTION',
-            value: {
-              get: () => this.itemData.firstName,
-              set: (value) => {
-                this.itemData.firstName = value;
+          inputs: [
+            {
+              type: CreateViewModifyV2TabInputType.TEXT,
+              name: 'firstName',
+              placeholder: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
+              description: 'LNG_CASE_FIELD_LABEL_FIRST_NAME_DESCRIPTION',
+              value: {
+                get: () => this.itemData.firstName,
+                set: (value) => {
+                  this.itemData.firstName = value;
+                }
+              },
+              validators: {
+                required: () => true
               }
-            },
-            validators: {
-              required: () => true
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TEXT,
-            name: 'middleName',
-            placeholder: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
-            description: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION',
-            value: {
-              get: () => this.itemData.middleName,
-              set: (value) => {
-                this.itemData.middleName = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TEXT,
-            name: 'lastName',
-            placeholder: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
-            description: 'LNG_CASE_FIELD_LABEL_LAST_NAME_DESCRIPTION',
-            value: {
-              get: () => this.itemData.lastName,
-              set: (value) => {
-                this.itemData.lastName = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'gender',
-            placeholder: 'LNG_CASE_FIELD_LABEL_GENDER',
-            description: 'LNG_CASE_FIELD_LABEL_GENDER_DESCRIPTION',
-            options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            value: {
-              get: () => this.itemData.gender,
-              set: (value) => {
-                // set gender
-                this.itemData.gender = value;
-
-                // reset pregnancy ?
-                if (this.itemData.gender === Constants.GENDER_MALE) {
-                  this.itemData.pregnancyStatus = undefined;
+            }, {
+              type: CreateViewModifyV2TabInputType.TEXT,
+              name: 'middleName',
+              placeholder: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
+              description: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION',
+              value: {
+                get: () => this.itemData.middleName,
+                set: (value) => {
+                  this.itemData.middleName = value;
                 }
               }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'pregnancyStatus',
-            placeholder: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
-            description: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION',
-            options: (this.activatedRoute.snapshot.data.pregnancyStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            value: {
-              get: () => this.itemData.pregnancyStatus,
-              set: (value) => {
-                this.itemData.pregnancyStatus = value;
+            }, {
+              type: CreateViewModifyV2TabInputType.TEXT,
+              name: 'lastName',
+              placeholder: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
+              description: 'LNG_CASE_FIELD_LABEL_LAST_NAME_DESCRIPTION',
+              value: {
+                get: () => this.itemData.lastName,
+                set: (value) => {
+                  this.itemData.lastName = value;
+                }
               }
-            },
-            disabled: () => {
-              return this.itemData.gender === Constants.GENDER_MALE;
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'gender',
+              placeholder: 'LNG_CASE_FIELD_LABEL_GENDER',
+              description: 'LNG_CASE_FIELD_LABEL_GENDER_DESCRIPTION',
+              options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              value: {
+                get: () => this.itemData.gender,
+                set: (value) => {
+                  // set gender
+                  this.itemData.gender = value;
+
+                  // reset pregnancy ?
+                  if (this.itemData.gender === Constants.GENDER_MALE) {
+                    this.itemData.pregnancyStatus = undefined;
+                  }
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'pregnancyStatus',
+              placeholder: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
+              description: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION',
+              options: (this.activatedRoute.snapshot.data.pregnancyStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              value: {
+                get: () => this.itemData.pregnancyStatus,
+                set: (value) => {
+                  this.itemData.pregnancyStatus = value;
+                }
+              },
+              disabled: () => {
+                return this.itemData.gender === Constants.GENDER_MALE;
+              }
             }
-          }]
+          ]
         },
 
         // Documents
