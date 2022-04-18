@@ -1,1 +1,208 @@
-test
+<!-- Loading data -->
+<div
+  *ngIf="loadingItemData; else dataLoaded"
+  class="gd-create-view-modify-loading-data">
+
+  <!-- Spinner -->
+  <mat-progress-spinner
+    class="gd-create-view-modify-loading-data-spinner"
+    diameter="48"
+    mode="indeterminate"></mat-progress-spinner>
+
+</div>
+
+<!-- Loaded data -->
+<ng-template
+  #dataLoaded>
+
+  <!-- Top -->
+  <div
+    class="gd-create-view-modify-top">
+
+    <!-- Breadcrumbs -->
+    <app-breadcrumb-v2
+      [breadcrumbs]="breadcrumbs"
+      (detectChanges)="resizeTable()"></app-breadcrumb-v2>
+
+    <!-- Title & buttons -->
+    <div
+      fxLayout="row"
+      class="gd-create-view-modify-top-title-buttons">
+
+      <!-- Title -->
+      <div
+        fxFlex
+        class="gd-create-view-modify-top-title-buttons-title">
+        {{pageTitle | translate:pageTitleData}}
+      </div>
+
+      <!-- Buttons -->
+      <div
+        fxFlex fxLayoutAlign="end" fxLayoutGap="0.8rem"
+        class="gd-create-view-modify-top-title-buttons-buttons">
+
+        buttons...
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom -->
+  <div
+    class="gd-create-view-modify-bottom">
+
+    <!-- Section render -->
+    <ng-template
+      #sectionsRender
+      let-tab="tab">
+      <form>
+
+        <!-- Input Template -->
+        <ng-template
+          #inputRender
+          let-input="input"
+          let-parentName="parentName">
+          <div
+            class="gd-create-view-modify-bottom-section-content-input"
+            [ngSwitch]="input.type">
+
+            <!-- Text -->
+            <app-form-input-v2
+              *ngSwitchCase="CreateViewModifyV2TabInputType.TEXT"
+              [ngModel]="input.value.get()"
+              [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+              [placeholder]="input.placeholder"
+              [tooltip]="input.description"
+              [disabled]="input.disabled ? input.disabled(input) : undefined"
+              autocomplete="off"
+              (ngModelChange)="input.value.set($event)"></app-form-input-v2>
+
+            <!-- Dropdown - single -->
+            <app-form-select-single-v2
+              *ngSwitchCase="CreateViewModifyV2TabInputType.SELECT_SINGLE"
+              [ngModel]="input.value.get()"
+              [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+              [placeholder]="input.placeholder"
+              [tooltip]="input.description"
+              [options]="input.options"
+              [disabled]="input.disabled ? input.disabled(input) : undefined"
+              (ngModelChange)="input.value.set($event)"></app-form-select-single-v2>
+
+            <!-- List -->
+            <div
+              *ngSwitchCase="CreateViewModifyV2TabInputType.LIST">
+
+              <!-- List Items -->
+              <div>
+                <div
+                  *ngFor="let item of input.items; let itemIndex = index">
+
+                  <!-- Remove button -->
+                  <div
+                    fxLayoutAlign="end">
+                    <button
+                      type="button"
+                      mat-icon-button
+                      color="warn"
+                      [matTooltip]="input.definition.remove.label | translate"
+                      (click)="removeListItem(input, itemIndex)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+
+                  <!-- Inputs -->
+                  <div
+                    fxLayout="row wrap" fxLayoutGap="1.6rem">
+                    <div
+                      *ngFor="let inputDef of input.definition.inputs">
+                      <ng-container
+                        *ngTemplateOutlet="inputRender; context: { input: inputDef, parentName: input.name + '[' + itemIndex + ']' }"></ng-container>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- Add -->
+              <div>
+                <button
+                  type="button"
+                  mat-flat-button color="text"
+                  (click)="addListItem(input)">
+
+                  <!-- + Icon -->
+                  <mat-icon>add</mat-icon>
+
+                  <!-- Label -->
+                  <span>
+                {{input.definition.add.label | translate}}
+              </span>
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+        </ng-template>
+
+
+
+        <!-- Render Section -->
+        <div
+          *ngFor="let section of tab.sections"
+          class="gd-create-view-modify-bottom-section">
+          <!-- Section title -->
+          <div
+            class="gd-create-view-modify-bottom-section-title">
+            {{section.label | translate}}
+          </div>
+
+          <!-- Section content -->
+          <div
+            class="gd-create-view-modify-bottom-section-content"
+            fxLayout="row wrap" fxLayoutGap="1.6rem">
+
+            <!-- Input render -->
+            <div
+              *ngFor="let input of section.inputs"
+              fxFlex>
+              <ng-container
+                *ngTemplateOutlet="inputRender; context: { input, parentName: '' }"></ng-container>
+            </div>
+
+          </div>
+        </div>
+      </form>
+    </ng-template>
+
+
+
+    <!-- Render tabs - Create layout -->
+    <mat-horizontal-stepper
+      *ngIf="isCreate; else viewModify"
+      linear>
+      <mat-step
+        *ngFor="let tab of tabs"
+        [label]="tab.label | translate">
+        <ng-container
+          *ngTemplateOutlet="sectionsRender; context: { tab }"></ng-container>
+      </mat-step>
+    </mat-horizontal-stepper>
+
+    <!-- Render tabs - View / Modify layout -->
+    <ng-template
+      #viewModify>
+      <mat-tab-group>
+        <mat-tab
+          *ngFor="let tab of tabs"
+          [label]="tab.label | translate">
+          <ng-container
+            *ngTemplateOutlet="sectionsRender; context: { tab }"></ng-container>
+        </mat-tab>
+      </mat-tab-group>
+    </ng-template>
+
+  </div>
+
+</ng-template>

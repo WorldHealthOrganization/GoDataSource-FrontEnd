@@ -243,10 +243,9 @@ export class OutbreakDataService {
   }
 
   /**
-     * Get the Outbreak that is Active for the authenticated user
-     * Otherwise, use the first outbreak in the list
-     * @returns {OutbreakModel}
-     */
+   * Get the Outbreak that is Active for the authenticated user
+   * Otherwise, use the first outbreak in the list
+   */
   determineSelectedOutbreak(): Observable<OutbreakModel> {
     // check if user has selected any Outbreak (get it from local storage)
     const selectedOutbreakId = this.storageService.get(StorageKey.SELECTED_OUTBREAK_ID);

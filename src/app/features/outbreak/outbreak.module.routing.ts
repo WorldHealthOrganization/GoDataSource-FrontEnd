@@ -5,7 +5,6 @@ import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
-import { OutbreakResolver } from './services/outbreak-resolver';
 import { OutbreakQestionnaireTypeEnum } from '../../core/enums/outbreak-qestionnaire-type.enum';
 import { PermissionExpression } from '../../core/models/user.model';
 import { DiseaseDataResolver } from '../../core/services/resolvers/data/disease.resolver';
@@ -57,9 +56,13 @@ const routes: Routes = [
   {
     path: ':outbreakId/view',
     component: fromPages.ModifyOutbreakComponent,
-    resolve: {
-      outbreak: OutbreakResolver
-    },
+    // resolve: {
+    //      outbreak: OutbreakResolver - the outbreak provided in url and not the selected one
+    // },
+    // return this.outbreakDataService.getOutbreak(
+    //   route.paramMap.get('outbreakId'),
+    //   true
+    // );
     canActivate: [AuthGuard],
     data: {
       permissions: [
@@ -72,9 +75,13 @@ const routes: Routes = [
   {
     path: ':outbreakId/modify',
     component: fromPages.ModifyOutbreakComponent,
-    resolve: {
-      outbreak: OutbreakResolver
-    },
+    // resolve: {
+    //   outbreak: OutbreakResolver - the outbreak provided in url and not the selected one
+    // },
+    // return this.outbreakDataService.getOutbreak(
+    //   route.paramMap.get('outbreakId'),
+    //   true
+    // );
     canActivate: [AuthGuard],
     data: {
       permissions: [

@@ -7,6 +7,15 @@
     fxGrow="0"
     class="gd-top-left">
 
+    <!-- Logo -->
+    <div
+      *ngIf="renderMode === RenderMode.SMALL"
+      class="gd-top-left-logo"
+      [routerLink]="['/']"
+      tabindex="-1">
+      <img src="../../../../assets/images/gd-logomark.svg" alt="Go.Data Logo" />
+    </div>
+
     <!-- Show Menu -->
     <button
       *ngIf="renderMode !== RenderMode.FULL"
@@ -54,7 +63,7 @@
 
   <!-- Right -->
   <div
-    fxGrow="0" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="1.6rem"
+    fxGrow="0" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="1.6rem" fxLayoutGap.xs="0.8rem"
     class="gd-top-right">
 
     <!-- Outbreaks -->
@@ -64,7 +73,8 @@
       [ngModel]="selectedOutbreak.id"
       (ngModelChange)="selectOutbreak($event)"
       [options]="outbreakListOptions"
-      optionTooltipKey="details">
+      optionTooltipKey="details"
+      [disabled]="selectedOutbreakDisabled">
     </app-form-select-single-v2>
 
     <!-- Mobile responsive buttons -->
@@ -77,6 +87,7 @@
         type="button"
         mat-icon-button
         [matTooltip]="'LNG_LAYOUT_SELECTED_OUTBREAK_LABEL' | translate"
+        [disabled]="selectedOutbreakDisabled"
         (click)="mobileChangeOutbreak()">
         <mat-icon>bug_report</mat-icon>
       </button>

@@ -114,6 +114,11 @@
                   mat-select-trigger {
                     @include flex(flex);
                     @include flex_align_items(center);
+
+                    > img {
+                      height: 2.4rem;
+                      margin-right: 0.4rem;
+                    }
                   }
 
                   .mat-icon {

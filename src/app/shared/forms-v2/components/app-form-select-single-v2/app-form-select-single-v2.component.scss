@@ -112,16 +112,23 @@
 
                 .mat-select-value-text {
                   mat-select-trigger {
-                    @include flex(flex);
-                    @include flex_align_items(center);
+                    > img {
+                      display: inline-block;
+                      height: 2.4rem;
+                      margin-right: 0.4rem;
+                      vertical-align: middle;
+                    }
                   }
 
-                  .mat-icon {
-                    color: var(--gd-primary);
-                    font-size: 2.4rem;
-                    height: 2.4rem;
-                    margin-right: 1.6rem;
-                    width: 2.4rem;
+                  .gd-form-select-single-v2-panel-with-icon {
+                    .mat-icon {
+                      color: var(--gd-primary);
+                      font-size: 2.4rem;
+                      height: 2.4rem;
+                      margin-right: 0.8rem;
+                      vertical-align: middle;
+                      width: 2.4rem;
+                    }
                   }
                 }
               }

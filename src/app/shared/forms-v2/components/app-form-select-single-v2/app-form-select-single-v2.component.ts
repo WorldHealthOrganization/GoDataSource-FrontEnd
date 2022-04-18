@@ -13,6 +13,7 @@ import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { ILabelValuePairModel } from '../../core/label-value-pair.model';
 import { MAT_SELECT_CONFIG } from '@angular/material/select';
+import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
 
 @Component({
   selector: 'app-form-select-single-v2',
@@ -45,6 +46,30 @@ export class AppFormSelectSingleV2Component
 
   // sort disabled
   @Input() sortDisabled: boolean;
+
+  // tooltip
+  tooltipButton: IAppFormIconButtonV2;
+  private _tooltip: string;
+  tooltipTranslated: string;
+  @Input() set tooltip(tooltip: string) {
+    // set data
+    this._tooltip = tooltip;
+
+    // translate tooltip
+    this.tooltipTranslated = this._tooltip ?
+      this.translateService.instant(this._tooltip) :
+      this._tooltip;
+
+    // add / remove tooltip icon
+    this.tooltipButton = !this.tooltipTranslated ?
+      undefined : {
+        icon: 'help',
+        tooltip: this.tooltipTranslated
+      };
+  }
+  get tooltip(): string {
+    return this._tooltip;
+  }
 
   // options
   filteredOptions: ILabelValuePairModel[];

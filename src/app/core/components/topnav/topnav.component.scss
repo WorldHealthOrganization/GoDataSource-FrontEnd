@@ -9,10 +9,44 @@
   .gd-top-left {
     padding-left: 4rem;
 
+    @include breakpoint('lt-lg') {
+      @include flex_align_items(center);
+      @include flex(flex);
+      @include flex-direction(row);
+      padding-left: 0;
+    }
+
+    /* Mobile Header Logo */
+    .gd-top-left-logo {
+      padding: 1.6rem 0 1.6rem 0.8rem;
+
+      img {
+        cursor: pointer;
+        display: block;
+        height: 3.55rem;
+        width: auto;
+      }
+    }
+
+    /* Mobile Menu Trigger */
+    > button.mat-icon-button {
+      @include breakpoint('lg') {
+        margin-right: 1.6rem;
+      }
+
+      @include breakpoint('lt-lg') {
+        margin-left: 1.6rem;
+      }
+    }
+
     /* Search */
     .gd-form-input-v2 {
       .mat-form-field {
         min-width: 38rem;
+
+        @include breakpoint('lg') {
+          min-width: 25rem;
+        }
 
         .mat-form-field-wrapper {
           background: rgba(var(--gd-secondary-rgb), 0.15);
@@ -59,10 +93,18 @@
   .gd-top-right {
     padding-right: 4rem;
 
+    @include breakpoint('lt-md') {
+      padding-right: 2rem;
+    }
+
     /* Selected outbreak */
     .gd-form-select-single-v2 {
       .mat-form-field {
         min-width: 38rem;
+
+        @include breakpoint('lg') {
+          min-width: 25rem;
+        }
 
         .mat-form-field-wrapper {
           padding-bottom: 0;

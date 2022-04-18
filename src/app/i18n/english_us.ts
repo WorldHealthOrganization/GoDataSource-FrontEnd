@@ -36,7 +36,11 @@ export const EnglishUsLang = {
     'LNG_COMMON_BUTTON_DELETE_SORTS': 'Remove sort',
     'LNG_COMMON_BUTTON_DELETE_SORTS_MSG': 'Are you sure you want to remove this sort?',
     'LNG_COMMON_BUTTON_APPLY': 'Apply',
-    'LNG_SIDE_FILTERS_SECTION_FILTER_TITLE': 'Filter'
+    'LNG_SIDE_FILTERS_SECTION_FILTER_TITLE': 'Filter',
+    'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_FOLLOWED_UP': 'Followed up',
+    'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_FOLLOWED_UP': 'Not followed up',
+    'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_TITLE': 'Followup status',
+    'LNG_CASE_FIELD_LABEL_DETAILS': 'Details'
 
 
 

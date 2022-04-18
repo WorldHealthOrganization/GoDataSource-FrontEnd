@@ -1,5 +1,5 @@
 import { ModuleWithProviders } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { Routes, RouterModule, Route } from '@angular/router';
 import * as fromPages from './pages';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
@@ -17,7 +17,23 @@ import { PregnancyStatusDataResolver } from '../../core/services/resolvers/data/
 import { VaccineDataResolver } from '../../core/services/resolvers/data/vaccine.resolver';
 import { VaccineStatusDataResolver } from '../../core/services/resolvers/data/vaccine-status.resolver';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
+import { SelectedOutbreakDataResolver } from '../../core/services/resolvers/data/selected-outbreak.resolver';
+import { DocumentTypeDataResolver } from '../../core/services/resolvers/data/document-type.resolver';
 
+// common base - create / view / modify
+const createViewModifyFoundation: Route = {
+  component: fromPages.CasesCreateViewModifyComponent,
+  canActivate: [AuthGuard],
+  resolve: {
+    outbreak: SelectedOutbreakDataResolver,
+    gender: GenderDataResolver,
+    pregnancyStatus: PregnancyStatusDataResolver,
+    documentType: DocumentTypeDataResolver,
+    classification: ClassificationDataResolver
+  }
+};
+
+// routes
 const routes: Routes = [
   // Cases list
   {
@@ -46,8 +62,7 @@ const routes: Routes = [
   // Create Case
   {
     path: 'create',
-    component: fromPages.CasesCreateViewModifyComponent,
-    canActivate: [AuthGuard],
+    ...createViewModifyFoundation,
     data: {
       permissions: [
         PERMISSION.CASE_CREATE
@@ -61,8 +76,7 @@ const routes: Routes = [
   // View Case
   {
     path: ':caseId/view',
-    component: fromPages.CasesCreateViewModifyComponent,
-    canActivate: [AuthGuard],
+    ...createViewModifyFoundation,
     data: {
       permissions: [
         PERMISSION.CASE_VIEW
@@ -73,8 +87,7 @@ const routes: Routes = [
   // Modify Case
   {
     path: ':caseId/modify',
-    component: fromPages.CasesCreateViewModifyComponent,
-    canActivate: [AuthGuard],
+    ...createViewModifyFoundation,
     data: {
       permissions: [
         PERMISSION.CASE_MODIFY
@@ -85,6 +98,9 @@ const routes: Routes = [
       PageChangeConfirmationGuard
     ]
   },
+
+
+
   // Modify Case Questionnaire
   {
     path: ':caseId/view-questionnaire',

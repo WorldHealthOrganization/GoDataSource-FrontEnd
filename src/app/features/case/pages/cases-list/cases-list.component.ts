@@ -567,8 +567,7 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
             // refresh
             this.needsRefreshList();
           }
-        },
-        sortable: true
+        }
       },
       {
         field: 'wasContact',

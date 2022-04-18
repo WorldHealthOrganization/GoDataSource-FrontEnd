@@ -72,6 +72,8 @@ import { FollowUpGenerationTeamAssignmentAlgorithmDataResolver } from './resolve
 import { LocationGeographicalLevelDataResolver } from './resolvers/data/location-geographical-level.resolver';
 import { CountryDataResolver } from './resolvers/data/country.resolver';
 import { TeamDataResolver } from './resolvers/data/team.resolver';
+import { SelectedOutbreakDataResolver } from './resolvers/data/selected-outbreak.resolver';
+import { DocumentTypeDataResolver } from './resolvers/data/document-type.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -80,6 +82,7 @@ export const services: any[] = [
   CountryDataResolver,
   DailyFollowUpStatusDataResolver,
   DiseaseDataResolver,
+  DocumentTypeDataResolver,
   FinalFollowUpStatusDataResolver,
   FollowUpGenerationTeamAssignmentAlgorithmDataResolver,
   GenderDataResolver,
@@ -89,6 +92,7 @@ export const services: any[] = [
   OutcomeDataResolver,
   PregnancyStatusDataResolver,
   RiskDataResolver,
+  SelectedOutbreakDataResolver,
   TeamDataResolver,
   UserDataResolver,
   YesNoAllDataResolver,

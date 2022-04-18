@@ -11,6 +11,8 @@ import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { IV2DateRange } from './models/date.model';
+import * as momentOriginal from 'moment';
+import { Moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
   selector: 'app-form-date-range-v2',
@@ -72,5 +74,22 @@ export class AppFormDateRangeV2Component
 
     // write
     super.writeValue(value);
+  }
+
+  /**
+   * Handle start / end of day
+   */
+  onChangeDate(): void {
+    // must update dates ?
+    if (
+      this.value?.endDate &&
+      this.value?.endDate instanceof momentOriginal
+    ) {
+      // mutable
+      (this.value?.endDate as Moment).endOf('day');
+    }
+
+    // parent
+    this.onChange(this.value);
   }
 }

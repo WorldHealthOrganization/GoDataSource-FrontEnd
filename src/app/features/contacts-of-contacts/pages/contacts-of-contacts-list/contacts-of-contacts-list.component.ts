@@ -5,7 +5,6 @@ import { Observable, of, throwError } from 'rxjs';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { AddressModel } from '../../../../core/models/address.model';
 import { Constants } from '../../../../core/models/constants';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
@@ -37,6 +36,7 @@ import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import { FilterModel } from '../../../../shared/components/side-filters/model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-contacts-of-contacts-list',
@@ -397,11 +397,22 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
       {
         field: 'riskLevel',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL',
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          includeNoValue: true
+        }
       },
       {
         field: 'dateOfLastContact',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
         sortable: true
       },
       {
@@ -413,7 +424,8 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
         },
         exclude: (): boolean => {
           return !UserModel.canList(this.authUser);
@@ -475,7 +487,8 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
         },
         exclude: (): boolean => {
           return !UserModel.canView(this.authUser);
@@ -507,7 +520,8 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
         },
         exclude: (): boolean => {
           return !UserModel.canView(this.authUser);
@@ -809,6 +823,12 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         type: V2AdvancedFilterType.TEXT,
         field: 'firstName',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'middleName',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME',
         sortable: true
       },
       {

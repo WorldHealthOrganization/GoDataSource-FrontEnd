@@ -11,6 +11,12 @@
       {{ placeholder | translate }}
     </mat-label>
 
+    <!-- Left - Icon buttons -->
+    <mat-icon
+      *ngIf="tooltipButton"
+      matPrefix
+      [matTooltip]="tooltipButton.tooltip">{{tooltipButton.icon}}</mat-icon>
+
     <!-- Select -->
     <mat-select
       [(ngModel)]="value"
@@ -25,7 +31,8 @@
 
       <!-- Selected value -->
       <mat-select-trigger
-        *ngIf="value">
+        *ngIf="value"
+        [class.gd-form-select-single-v2-panel-with-icon]="allOptionsMap[value]?.icon">
 
         <!-- Icon -->
         <mat-icon

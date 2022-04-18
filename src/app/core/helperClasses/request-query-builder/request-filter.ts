@@ -48,9 +48,9 @@ export class RequestFilter {
   }
 
   /**
-     * Construct phone regex pattern used by queries
-     * @param phoneNumber
-     */
+   * Construct phone regex pattern used by queries
+   * @param phoneNumber
+   */
   static getPhoneNumberPattern(
     phoneNumber: string
   ): string {
@@ -63,7 +63,7 @@ export class RequestFilter {
     const digits: string[] = phoneNumber.match(/[0-9]/g);
     if (
       !digits ||
-            digits.length < 1
+      digits.length < 1
     ) {
       return null;
     }
@@ -76,15 +76,15 @@ export class RequestFilter {
   }
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(listener?: () => void) {
     this.changesListener = listener;
   }
 
   /**
-     * Trigger change listener
-     */
+   * Trigger change listener
+   */
   private triggerChangeListener(): void {
     // do we have a change listener ?
     if (!this.changesListener) {
@@ -166,7 +166,11 @@ export class RequestFilter {
   ): RequestFilter {
     // do we need to remove condition ?
     if (_.isEmpty(value)) {
-      this.remove(property);
+      this.remove(
+        property,
+        null,
+        false
+      );
     } else {
       // filter with 'startsWith' criteria
       this.where({
@@ -207,7 +211,10 @@ export class RequestFilter {
 
     // do we need to remove condition ?
     if (_.isEmpty(value)) {
-      this.removeCondition(condition);
+      this.removeCondition(
+        condition,
+        false
+      );
     } else {
       // filter with 'startsWith' criteria
       this.where(condition, replace, false);
@@ -236,7 +243,11 @@ export class RequestFilter {
   ): RequestFilter {
     // do we need to remove condition ?
     if (_.isEmpty(value)) {
-      this.remove(property);
+      this.remove(
+        property,
+        null,
+        false
+      );
     } else {
       // filter with 'contain' criteria
       this.where({
@@ -269,7 +280,11 @@ export class RequestFilter {
   ): RequestFilter {
     // do we need to remove condition ?
     if (_.isEmpty(value)) {
-      this.remove(property);
+      this.remove(
+        property,
+        null,
+        false
+      );
     } else {
       // build number pattern condition
       const phonePattern = RequestFilter.getPhoneNumberPattern(value);
@@ -315,7 +330,11 @@ export class RequestFilter {
       !_.isNumber(value)
     ) {
       // remove filter
-      this.remove(property);
+      this.remove(
+        property,
+        null,
+        false
+      );
     } else {
       // use regexp for case insensitive compare
       if (caseInsensitive) {
@@ -354,10 +373,18 @@ export class RequestFilter {
     // handle property removal
     const removeCondition = () => {
       // remove filter
-      this.remove(property);
+      this.remove(
+        property,
+        null,
+        false
+      );
 
       // remove OR condition
-      this.removeOperation(RequestFilterOperator.OR, [property, property]);
+      this.removeOperation(
+        RequestFilterOperator.OR,
+        [property, property],
+        false
+      );
     };
 
     // nothing to filter ?
@@ -420,8 +447,15 @@ export class RequestFilter {
     };
 
     // remove existing property and condition
-    this.remove(property);
-    this.removeCondition(orCondition);
+    this.remove(
+      property,
+      null,
+      false
+    );
+    this.removeCondition(
+      orCondition,
+      false
+    );
 
     // apply filter
     if (value === false) {
@@ -461,7 +495,11 @@ export class RequestFilter {
 
     if (fromValueIsEmpty && toValueIsEmpty) {
       // remove filter
-      this.remove(property);
+      this.remove(
+        property,
+        null,
+        false
+      );
     } else {
       // filter by range (from / to)
       this.where({
@@ -489,14 +527,22 @@ export class RequestFilter {
   ): RequestFilter {
     // remove conditions
     if (replace) {
-      this.remove(`${property}.months`);
-      this.remove(`${property}.years`);
+      this.remove(
+        `${property}.months`,
+        null,
+        false
+      );
+      this.remove(
+        `${property}.years`,
+        null,
+        false
+      );
       this.removeCondition({
         or: [
           { [`${property}.months`]: true },
           { [`${property}.years`]: true }
         ]
-      });
+      }, false);
     }
 
     // determine what filters we need to add
@@ -506,7 +552,7 @@ export class RequestFilter {
     // do we need to add any conditions ?
     if (
       fromValue !== null ||
-            toValue !== null
+      toValue !== null
     ) {
       // construct array of conditions
       let operator;
@@ -515,7 +561,7 @@ export class RequestFilter {
       // between
       if (
         fromValue !== null &&
-                toValue !== null
+        toValue !== null
       ) {
         operator = 'between';
         valueToCompare = [fromValue, toValue];
@@ -617,12 +663,16 @@ export class RequestFilter {
     if (_.isEmpty(values)) {
       if (replace) {
         // remove filter
-        this.remove(property);
+        this.remove(
+          property,
+          null,
+          false
+        );
       } else {
         // remove only conditions with exact operator
         this.removeExactCondition({
           [property]: { inq: [] }
-        });
+        }, false);
       }
     } else {
       // filter with 'inq' criteria (aka "where in")
@@ -699,13 +749,10 @@ export class RequestFilter {
   }
 
   /**
-     * Adds a "where" condition
-     * Note: If 'replace' is set to 'false', it could add multiple conditions on the same property
-     * Note: If 'replace' is set to 'true', if there is already another condition on the same property, it will be replaced
-     * @param condition Loopback condition on a property
-     * @param {boolean} replace
-     * @returns {RequestFilter}
-     */
+   * Adds a "where" condition
+   * Note: If 'replace' is set to 'false', it could add multiple conditions on the same property
+   * Note: If 'replace' is set to 'true', if there is already another condition on the same property, it will be replaced
+   */
   where(
     condition: any,
     replace: boolean = false,
@@ -714,7 +761,10 @@ export class RequestFilter {
     // where condition
     if (replace) {
       // if there is already a condition on the same property, remove it
-      this.removeCondition(condition);
+      this.removeCondition(
+        condition,
+        false
+      );
     }
 
     // add new condition
@@ -730,13 +780,12 @@ export class RequestFilter {
   }
 
   /**
-     * Remove condition(s) on a specific property
-     * @param {string} property
-     * @returns {RequestFilter}
-     */
+   * Remove condition(s) on a specific property
+   */
   remove(
     property: string,
-    operator: string = null
+    operator: string = null,
+    triggerChangeListener: boolean = true
   ): RequestFilter {
     // remove conditions
     this.conditions = _.filter(this.conditions, (condition) => {
@@ -744,11 +793,12 @@ export class RequestFilter {
 
       if (
         prop.length > 0 &&
-                // remove only some conditions with a given operator?
-                operator !== null &&
 
-                // do we have data on this property ?
-                condition[property] !== undefined
+        // remove only some conditions with a given operator?
+        operator !== null &&
+
+        // do we have data on this property ?
+        condition[property] !== undefined
       ) {
         // get the operator
         const op = Object.keys(condition[property])[0];
@@ -760,29 +810,34 @@ export class RequestFilter {
     });
 
     // trigger change
-    this.triggerChangeListener();
+    if (triggerChangeListener) {
+      this.triggerChangeListener();
+    }
 
     // finished
     return this;
   }
 
   /**
-     * Remove a given condition
-     * Note: This method could be applied on simple property conditions and on combined conditions with AND / OR operators
-     * @param condition
-     * @returns {RequestFilter}
-     */
+   * Remove a given condition
+   * Note: This method could be applied on simple property conditions and on combined conditions with AND / OR operators
+   */
   removeCondition(
-    condition: any
+    condition: any,
+    triggerChangeListener: boolean = true
   ): RequestFilter {
     // get the property that the condition applies to
     const property = Object.keys(condition)[0];
     if (
       property !== RequestFilterOperator.AND &&
-            property !== RequestFilterOperator.OR
+      property !== RequestFilterOperator.OR
     ) {
       // remove condition(s) on the property
-      this.remove(property);
+      this.remove(
+        property,
+        null,
+        false
+      );
     } else {
       // it is an AND/OR operation
       const operator = property;
@@ -792,24 +847,29 @@ export class RequestFilter {
       });
 
       // remove condition
-      this.removeOperation(operator, properties);
+      this.removeOperation(
+        operator,
+        properties,
+        false
+      );
     }
 
     // trigger change
-    this.triggerChangeListener();
+    if (triggerChangeListener) {
+      this.triggerChangeListener();
+    }
 
     // finished
     return this;
   }
 
   /**
-     * Remove a specific condition with a specific operator on a property
-     * Note: Currently, This method could be applied on simple properties only
-     * @param condition
-     * @returns {RequestFilter}
-     */
+   * Remove a specific condition with a specific operator on a property
+   * Note: Currently, This method could be applied on simple properties only
+   */
   removeExactCondition(
-    condition: any
+    condition: any,
+    triggerChangeListener: boolean = true
   ): RequestFilter {
     // sanitize condition
     condition = condition || {};
@@ -821,25 +881,32 @@ export class RequestFilter {
       const operator = Object.keys(condition[property])[0];
 
       if (operator) {
-        this.remove(property, operator);
+        this.remove(
+          property,
+          operator,
+          false
+        );
       }
     }
 
     // trigger change
-    this.triggerChangeListener();
+    if (triggerChangeListener) {
+      this.triggerChangeListener();
+    }
 
     // finished
     return this;
   }
 
   /**
-     * Remove child conditions that match path (path may or not contain the index from an array, if it does it will remove only that item index if it matches, if it doesn't it will remove all items that match)
-     * Usages:
-     * - path = 'and.and.address' | 'and.and.addresses'
-     * - path = 'and.and.0.address' | 'and.and.0.addresses'
-     */
+   * Remove child conditions that match path (path may or not contain the index from an array, if it does it will remove only that item index if it matches, if it doesn't it will remove all items that match)
+   * Usages:
+   * - path = 'and.and.address' | 'and.and.addresses'
+   * - path = 'and.and.0.address' | 'and.and.0.addresses'
+   */
   removePathCondition(
-    path: string
+    path: string,
+    triggerChangeListener: boolean = true
   ): RequestFilter {
     // if path empty we have nothing to remove
     if (!path) {
@@ -947,7 +1014,9 @@ export class RequestFilter {
     this.conditions = [...this.conditions].filter((childCondition) => !_.isEmpty(childCondition));
 
     // trigger change
-    this.triggerChangeListener();
+    if (triggerChangeListener) {
+      this.triggerChangeListener();
+    }
 
     // finished
     return this;
@@ -974,14 +1043,12 @@ export class RequestFilter {
   }
 
   /**
-     * Remove all operations of a given type on a list of properties
-     * @param {RequestFilterOperator} operator
-     * @param {string[]} properties
-     * @returns {RequestFilter}
-     */
+   * Remove all operations of a given type on a list of properties
+   */
   removeOperation(
     operator: RequestFilterOperator,
-    properties: string[]
+    properties: string[],
+    triggerChangeListener: boolean = true
   ): RequestFilter {
     // remove operation
     this.conditions = _.filter(this.conditions, (condition) => {
@@ -999,7 +1066,9 @@ export class RequestFilter {
     });
 
     // trigger change
-    this.triggerChangeListener();
+    if (triggerChangeListener) {
+      this.triggerChangeListener();
+    }
 
     // finished
     return this;
