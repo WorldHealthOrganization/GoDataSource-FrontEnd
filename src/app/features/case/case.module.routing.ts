@@ -29,7 +29,8 @@ const createViewModifyFoundation: Route = {
     gender: GenderDataResolver,
     pregnancyStatus: PregnancyStatusDataResolver,
     documentType: DocumentTypeDataResolver,
-    classification: ClassificationDataResolver
+    classification: ClassificationDataResolver,
+    occupation: OccupationDataResolver
   }
 };
 

@@ -29,6 +29,7 @@ import { determineRenderMode, RenderMode } from '../../enums/render-mode.enum';
 })
 export class TopnavComponent implements OnInit, OnDestroy {
   // selected outbreak dropdown disabled ?
+  private static _REFRESH_CALLBACK: () => void;
   private static _UPDATE_CALLBACK: () => void;
   private static _SELECTED_OUTBREAK_DROPDOWN_DISABLED: boolean = false;
   static set SELECTED_OUTBREAK_DROPDOWN_DISABLED(disabled: boolean) {
@@ -72,6 +73,7 @@ export class TopnavComponent implements OnInit, OnDestroy {
 
   // outbreak list
   outbreakListOptions: ILabelValuePairModel[] = [];
+  outbreakListOptionsLoading: boolean = false;
 
   // loading handler
   private loadingHandler: IV2LoadingDialogHandler;
@@ -81,6 +83,16 @@ export class TopnavComponent implements OnInit, OnDestroy {
 
   // show main menu
   @Output() showHoverMenu = new EventEmitter<void>();
+
+  /**
+   * Refresh outbreak list
+   */
+  static REFRESH_OUTBREAK_LIST() {
+    // trigger update
+    if (TopnavComponent._REFRESH_CALLBACK) {
+      TopnavComponent._REFRESH_CALLBACK();
+    }
+  }
 
   /**
    * Constructor
@@ -98,6 +110,11 @@ export class TopnavComponent implements OnInit, OnDestroy {
     // set update callback
     TopnavComponent._UPDATE_CALLBACK = () => {
       this.changeDetectorRef.detectChanges();
+    };
+
+    // set refresh outbreak callback
+    TopnavComponent._REFRESH_CALLBACK = () => {
+      this.refreshOutbreaksList();
     };
   }
 
@@ -162,6 +179,10 @@ export class TopnavComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // display loading while retrieving outbreaks
+    this.outbreakListOptionsLoading = true;
+    this.changeDetectorRef.detectChanges();
+
     // outbreak data
     this.outbreakDataService
       .getOutbreaksListReduced()
@@ -186,6 +207,9 @@ export class TopnavComponent implements OnInit, OnDestroy {
             data: outbreak
           });
         });
+
+        // finished
+        this.outbreakListOptionsLoading = false;
 
         // update ui
         this.changeDetectorRef.detectChanges();

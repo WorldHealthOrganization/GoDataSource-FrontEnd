@@ -47,6 +47,9 @@ export class AppFormSelectSingleV2Component
   // sort disabled
   @Input() sortDisabled: boolean;
 
+  // loading
+  @Input() loading: boolean;
+
   // tooltip
   tooltipButton: IAppFormIconButtonV2;
   private _tooltip: string;

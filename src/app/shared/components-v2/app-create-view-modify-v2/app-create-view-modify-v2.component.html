@@ -56,7 +56,10 @@
     <ng-template
       #sectionsRender
       let-tab="tab">
-      <form>
+      <form
+        #form="ngForm">
+        <!-- Hack to set form :) -->
+        {{ updateForm(tab, form) }}
 
         <!-- Input Template -->
         <ng-template
@@ -76,6 +79,7 @@
               [tooltip]="input.description"
               [disabled]="input.disabled ? input.disabled(input) : undefined"
               autocomplete="off"
+              [required]="input.validators?.required ? input.validators?.required() : undefined"
               (ngModelChange)="input.value.set($event)"></app-form-input-v2>
 
             <!-- Dropdown - single -->
@@ -86,7 +90,9 @@
               [placeholder]="input.placeholder"
               [tooltip]="input.description"
               [options]="input.options"
+              [clearable]="true"
               [disabled]="input.disabled ? input.disabled(input) : undefined"
+              [required]="input.validators?.required ? input.validators?.required() : undefined"
               (ngModelChange)="input.value.set($event)"></app-form-select-single-v2>
 
             <!-- List -->
@@ -115,7 +121,8 @@
                   <div
                     fxLayout="row wrap" fxLayoutGap="1.6rem">
                     <div
-                      *ngFor="let inputDef of input.definition.inputs">
+                      *ngFor="let inputDef of input.definition.inputs"
+                      fxFlex>
                       <ng-container
                         *ngTemplateOutlet="inputRender; context: { input: inputDef, parentName: input.name + '[' + itemIndex + ']' }"></ng-container>
                     </div>
@@ -195,8 +202,22 @@
       #viewModify>
       <mat-tab-group>
         <mat-tab
-          *ngFor="let tab of tabs"
-          [label]="tab.label | translate">
+          *ngFor="let tab of tabs">
+
+          <!-- Label & valid -->
+          <ng-template
+            mat-tab-label>
+
+            <!-- Label -->
+            <span>{{tab.label | translate}}</span>
+
+            <!-- Invalid -->
+            <mat-icon
+              *ngIf="isModify && tab.form?.touched && tab.form?.invalid"
+              color="warn">warning</mat-icon>
+          </ng-template>
+
+          <!-- Content -->
           <ng-container
             *ngTemplateOutlet="sectionsRender; context: { tab }"></ng-container>
         </mat-tab>

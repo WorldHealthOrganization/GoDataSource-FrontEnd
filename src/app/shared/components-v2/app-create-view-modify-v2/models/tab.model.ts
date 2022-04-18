@@ -1,4 +1,5 @@
 import { ILabelValuePairModel } from '../../../forms-v2/core/label-value-pair.model';
+import { NgForm } from '@angular/forms';
 
 /**
  * Input type
@@ -48,6 +49,11 @@ interface CreateViewModifyV2TabInputText extends Omit<CreateViewModifyV2TabInput
   // required
   type: CreateViewModifyV2TabInputType.TEXT;
   value: CreateViewModifyV2TabInputValue<string>;
+
+  // optional
+  validators?: {
+    required?: () => boolean
+  }
 }
 
 /**
@@ -58,6 +64,11 @@ interface CreateViewModifyV2TabInputSingleSelect extends Omit<CreateViewModifyV2
   type: CreateViewModifyV2TabInputType.SELECT_SINGLE;
   options: ILabelValuePairModel[];
   value: CreateViewModifyV2TabInputValue<string>;
+
+  // optional
+  validators?: {
+    required?: () => boolean
+  }
 }
 
 /**
@@ -104,4 +115,7 @@ export interface CreateViewModifyV2Tab {
   type: CreateViewModifyV2TabInputType.TAB;
   sections: CreateViewModifyV2Section[];
   label: string;
+
+  // optional
+  form?: NgForm;
 }

@@ -163,6 +163,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
       {
         field: 'lastName',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME',
+        pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
           type: V2FilterType.TEXT,
@@ -183,6 +184,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
       {
         field: 'firstName',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME',
+        pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
           type: V2FilterType.TEXT,
