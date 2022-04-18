@@ -56,6 +56,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
   ) {
     super(listHelperService);
   }
+
   ngOnInit(): void {
     // initialize pagination
     this.initPaginator();
