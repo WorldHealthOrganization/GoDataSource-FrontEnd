@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -32,7 +32,7 @@ import { TopnavComponent } from '../../../../core/components/topnav/topnav.compo
   selector: 'app-outbreak-list',
   templateUrl: './outbreak-list.component.html'
 })
-export class OutbreakListComponent extends ListComponent implements OnDestroy {
+export class OutbreakListComponent extends ListComponent implements OnInit, OnDestroy {
   // list of existing outbreaks
   outbreaksList$: Observable<OutbreakModel[]>;
 
@@ -55,15 +55,13 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
     private dialogV2Service: DialogV2Service
   ) {
     super(listHelperService);
-
-    setTimeout(() => {
+  }
+  ngOnInit(): void {
     // initialize pagination
-      this.initPaginator();
+    this.initPaginator();
 
-      // ...and re-load the list when the Selected Outbreak is changed
-      this.needsRefreshList(true);
-    });
-
+    // ...and re-load the list when the Selected Outbreak is changed
+    this.needsRefreshList(true);
   }
 
   /**
@@ -427,9 +425,13 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
                   const loading = this.dialogV2Service.showLoadingDialog();
 
                   // modify outbreak
-                  const userId = this.authUser.id;
                   this.userDataService
-                    .modifyUser(userId, { 'activeOutbreakId': item.id })
+                    .modifyUser(
+                      this.authUser.id,
+                      {
+                        activeOutbreakId: item.id
+                      }
+                    )
                     .pipe(
                       catchError((err) => {
                         this.toastV2Service.error(err);
@@ -444,6 +446,7 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
                           this.authUser = authenticatedUser.user;
                           this.outbreakDataService.checkActiveSelectedOutbreak();
 
+                          // refresh list of top nav outbreaks
                           TopnavComponent.REFRESH_OUTBREAK_LIST();
 
                           // success
