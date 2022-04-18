@@ -191,6 +191,9 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
 
       // load saved filters
       this.loadCachedFilters();
+
+      // component initialized
+      this.initialized();
     });
 
     // listen for outbreak selection
@@ -317,6 +320,11 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
    * Selected outbreak changed
    */
   protected selectedOutbreakChanged(): void {}
+
+  /**
+   * Component initialized
+   */
+  protected initialized(): void {}
 
   /**
    * Initialize breadcrumbs

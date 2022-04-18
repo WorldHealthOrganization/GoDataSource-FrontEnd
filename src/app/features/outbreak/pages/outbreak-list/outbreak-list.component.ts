@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -32,7 +32,7 @@ import { TopnavComponent } from '../../../../core/components/topnav/topnav.compo
   selector: 'app-outbreak-list',
   templateUrl: './outbreak-list.component.html'
 })
-export class OutbreakListComponent extends ListComponent implements OnInit, OnDestroy {
+export class OutbreakListComponent extends ListComponent implements OnDestroy {
   // list of existing outbreaks
   outbreaksList$: Observable<OutbreakModel[]>;
 
@@ -57,7 +57,18 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
     super(listHelperService);
   }
 
-  ngOnInit(): void {
+  /**
+   * Component destroyed
+   */
+  ngOnDestroy() {
+    // release parent resources
+    super.onDestroy();
+  }
+
+  /**
+   * Component initialized
+   */
+  initialized(): void {
     // initialize pagination
     this.initPaginator();
 
@@ -66,16 +77,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
   }
 
   /**
-     * Component destroyed
-     */
-  ngOnDestroy() {
-    // release parent resources
-    super.onDestroy();
-  }
-
-  /**
-     * Initialize Side Table Columns
-     */
+   * Initialize Side Table Columns
+   */
   protected initializeTableColumns()
   {
     // default table columns
@@ -1071,8 +1074,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
   }
 
   /**
-     * Get total number of items, based on the applied filters
-     */
+   * Get total number of items, based on the applied filters
+   */
   refreshListCount(applyHasMoreLimit?: boolean) {
     // reset
     this.pageCount = undefined;
@@ -1108,9 +1111,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
 
         // should be the last pipe
         takeUntil(this.destroyed$)
-      ).
-      subscribe( ( response ) =>
-      {
+      )
+      .subscribe( ( response ) => {
         this.pageCount = response;
       });
   }
