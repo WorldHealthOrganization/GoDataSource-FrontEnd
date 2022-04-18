@@ -454,7 +454,7 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
                           TopnavComponent.REFRESH_OUTBREAK_LIST();
 
                           // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_SUCCESS_MESSAGE');
+                          this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE_SUCCESS_MESSAGE');
 
                           // hide loading
                           loading.close();
