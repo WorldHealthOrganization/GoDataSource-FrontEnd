@@ -234,6 +234,18 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               disabled: () => {
                 return this.itemData.gender === Constants.GENDER_MALE;
               }
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'occupation',
+              placeholder: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
+              description: 'LNG_CASE_FIELD_LABEL_OCCUPATION_DESCRIPTION',
+              options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              value: {
+                get: () => this.itemData.occupation,
+                set: (value) => {
+                  this.itemData.occupation = value;
+                }
+              }
             }
           ]
         },
