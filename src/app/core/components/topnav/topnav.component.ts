@@ -122,10 +122,6 @@ export class TopnavComponent implements OnInit, OnDestroy {
    * Component initialized
    */
   ngOnInit(): void {
-    // get the authenticated user
-    // we need to reload data - since component isn't re-rendered
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     // get the outbreaks list
     this.refreshOutbreaksList();
 
@@ -174,6 +170,10 @@ export class TopnavComponent implements OnInit, OnDestroy {
    * Refresh outbreak list
    */
   refreshOutbreaksList() {
+    // get the authenticated user
+    // we need to reload data - since component isn't re-rendered
+    this.authUser = this.authDataService.getAuthenticatedUser();
+
     // we don't have access to outbreaks ?
     if (!OutbreakModel.canView(this.authUser)) {
       return;
