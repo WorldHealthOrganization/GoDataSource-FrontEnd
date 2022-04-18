@@ -1975,6 +1975,7 @@ export class ContactsListComponent
       'id',
       'lastName',
       'firstName',
+      'middleName',
       'visualId',
       'addresses',
       'age',
