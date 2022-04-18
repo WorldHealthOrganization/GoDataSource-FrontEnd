@@ -29,12 +29,13 @@
       [autocomplete]="autocomplete">
 
     <!-- Spinner -->
-    <mat-spinner
+    <mat-progress-spinner
       *ngIf="control?.pending"
       matSuffix
-      [diameter]="16"
-      color="accent">
-    </mat-spinner>
+      diameter="16"
+      mode="indeterminate"
+      color="primary">
+    </mat-progress-spinner>
 
     <!-- Right - Icon buttons -->
     <button
