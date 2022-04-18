@@ -5,7 +5,6 @@ import { Observable, of, throwError } from 'rxjs';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { AddressModel } from '../../../../core/models/address.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { Constants } from '../../../../core/models/constants';
@@ -42,6 +41,7 @@ import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, IV2SideDialogConfigInputText, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-contacts-list',
