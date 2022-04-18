@@ -7,6 +7,13 @@ import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 import { OutbreakQestionnaireTypeEnum } from '../../core/enums/outbreak-qestionnaire-type.enum';
 import { PermissionExpression } from '../../core/models/user.model';
+import { DiseaseDataResolver } from '../../core/services/resolvers/data/disease.resolver';
+import { CountryDataResolver } from '../../core/services/resolvers/data/country.resolver';
+import { LocationGeographicalLevelDataResolver } from '../../core/services/resolvers/data/location-geographical-level.resolver';
+import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.resolver';
+import { FollowUpGenerationTeamAssignmentAlgorithmDataResolver } from '../../core/services/resolvers/data/follow-up-generation-team-assignment-algorithm.resolver';
+import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
+import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 
 const routes: Routes = [
   // Outbreaks list
@@ -18,6 +25,15 @@ const routes: Routes = [
       permissions: [
         PERMISSION.OUTBREAK_LIST
       ]
+    },
+    resolve: {
+      disease: DiseaseDataResolver,
+      country: CountryDataResolver,
+      geographicalLevel: LocationGeographicalLevelDataResolver,
+      yesNo: YesNoDataResolver,
+      yesNoAll: YesNoAllDataResolver,
+      followUpGenerationTeamAssignmentAlgorithm: FollowUpGenerationTeamAssignmentAlgorithmDataResolver,
+      user: UserDataResolver
     }
   },
   // Create Outbreak

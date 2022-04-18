@@ -1,238 +1,44 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import * as _ from 'lodash';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
-import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { DialogAnswer, DialogConfiguration, DialogField } from '../../../../shared/components/dialog/dialog.component';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { Router } from '@angular/router';
-import { catchError, map, share, switchMap } from 'rxjs/operators';
+import { ActivatedRoute, Router } from '@angular/router';
+import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { AnswerModel, QuestionModel } from '../../../../core/models/question.model';
-import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { IExtendedColDef } from '../../../../shared/components-v2/app-list-table-v2/models/extended-column.model';
+import { IV2BreadcrumbAction } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { IV2SideDialogConfigButtonType, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 
 @Component({
   selector: 'app-outbreak-list',
   templateUrl: './outbreak-list.component.html'
 })
 export class OutbreakListComponent extends ListComponent implements OnInit, OnDestroy {
-  // breadcrumbs: BreadcrumbItemModel[] = [
-  //   new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAKS_TITLE', '.', true)
-  // ];
+  // list of existing outbreaks
+  outbreaksList$: Observable<OutbreakModel[]>;
 
   // import constants into template
   Constants = Constants;
-  OutbreakModel = OutbreakModel;
-
-  // list of existing outbreaks
-  outbreaksList$: Observable<OutbreakModel[]>;
-  outbreaksListCount$: Observable<IBasicCount>;
-
-  // list of options from the Active dropdown
-  activeOptionsList$: Observable<any[]>;
-  // list of diseases
-  diseasesList$: Observable<any[]>;
-  // countries list
-  countriesList$: Observable<any[]>;
-  // yes/no option list for deleted
-  yesNoOptionsList$: Observable<any[]>;
-
-  // user list
-  userList$: Observable<UserModel[]>;
-
-  geographicalLevelsList$: Observable<any[]>;
-  followUpsTeamAssignmentAlgorithm$: Observable<any[]>;
-
-  // provide constants to template
-  ReferenceDataCategory = ReferenceDataCategory;
   UserSettings = UserSettings;
-
-  @ViewChild('topNav', { static: true }) topNav: TopnavComponent;
-
-  recordActions: HoverRowAction[] = [
-    // View Outbreak
-    new HoverRowAction({
-      icon: 'visibility',
-      iconTooltip: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_VIEW_OUTBREAK',
-      linkGenerator: (item: OutbreakModel): string[] => {
-        return ['/outbreaks', item.id, 'view'];
-      },
-      visible: (item: OutbreakModel): boolean => {
-        return !item.deleted &&
-                    OutbreakModel.canView(this.authUser);
-      }
-    }),
-
-    // Modify Outbreak
-    new HoverRowAction({
-      icon: 'settings',
-      iconTooltip: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_MODIFY_OUTBREAK',
-      linkGenerator: (item: OutbreakModel): string[] => {
-        return ['/outbreaks', item.id, 'modify'];
-      },
-      visible: (item: OutbreakModel): boolean => {
-        return !item.deleted &&
-                    OutbreakModel.canModify(this.authUser);
-      }
-    }),
-
-    // Make Outbreak active
-    new HoverRowAction({
-      icon: 'link',
-      iconTooltip: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE',
-      click: (item: OutbreakModel) => {
-        this.setActive(item);
-      },
-      visible: (item: OutbreakModel): boolean => {
-        return !item.deleted &&
-                    this.authUser &&
-                    item.id !== this.authUser.activeOutbreakId &&
-                    OutbreakModel.canMakeOutbreakActive(this.authUser);
-      }
-    }),
-
-    // Other actions
-    new HoverRowAction({
-      type: HoverRowActionType.MENU,
-      icon: 'moreVertical',
-      menuOptions: [
-        // Delete Outbreak
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_OUTBREAK',
-          click: (item: OutbreakModel) => {
-            this.delete(item);
-          },
-          visible: (item: OutbreakModel): boolean => {
-            return !item.deleted &&
-                            OutbreakModel.canDelete(this.authUser);
-          },
-          class: 'mat-menu-item-delete'
-        }),
-
-        // Divider
-        new HoverRowAction({
-          type: HoverRowActionType.DIVIDER,
-          visible: (item: OutbreakModel): boolean => {
-            // visible only if at least one of the previous...
-            return !item.deleted &&
-                            OutbreakModel.canDelete(this.authUser);
-          }
-        }),
-
-        // View Outbreak inconsistencies
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_VIEW_INCONSISTENCIES',
-          click: (item: OutbreakModel) => {
-            this.router.navigate(['/outbreaks', item.id, 'inconsistencies']);
-          },
-          visible: (item: OutbreakModel): boolean => {
-            return !item.deleted &&
-                            OutbreakModel.canSeeInconsistencies(this.authUser);
-          }
-        }),
-
-        // View Outbreak case form
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE',
-          click: (item: OutbreakModel) => {
-            this.router.navigate(['/outbreaks', item.id, 'case-questionnaire']);
-          },
-          visible: (item: OutbreakModel): boolean => {
-            return !item.deleted &&
-                            OutbreakModel.canModifyCaseQuestionnaire(this.authUser);
-          }
-        }),
-
-        // View Outbreak contact form
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE',
-          click: (item: OutbreakModel) => {
-            this.router.navigate(['/outbreaks', item.id, 'contact-questionnaire']);
-          },
-          visible: (item: OutbreakModel): boolean => {
-            return !item.deleted &&
-                            OutbreakModel.canModifyContactQuestionnaire(this.authUser);
-          }
-        }),
-
-        // View Outbreak contact follow-up form
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE',
-          click: (item: OutbreakModel) => {
-            this.router.navigate(['/outbreaks', item.id, 'contact-follow-up-questionnaire']);
-          },
-          visible: (item: OutbreakModel): boolean => {
-            return !item.deleted &&
-                            OutbreakModel.canModifyContactFollowUpQuestionnaire(this.authUser);
-          }
-        }),
-
-        // View Outbreak case lab result form
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE',
-          click: (item: OutbreakModel) => {
-            this.router.navigate(['/outbreaks', item.id, 'case-lab-results-questionnaire']);
-          },
-          visible: (item: OutbreakModel): boolean => {
-            return !item.deleted &&
-                            OutbreakModel.canModifyCaseLabResultQuestionnaire(this.authUser);
-          }
-        }),
-
-        // Divider
-        new HoverRowAction({
-          type: HoverRowActionType.DIVIDER,
-          visible: (item: OutbreakModel): boolean => {
-            // visible only if at least one of the previous...
-            return !item.deleted && (
-              OutbreakModel.canSeeInconsistencies(this.authUser) ||
-                            OutbreakModel.canModifyCaseQuestionnaire(this.authUser) ||
-                            OutbreakModel.canModifyContactFollowUpQuestionnaire(this.authUser) ||
-                            OutbreakModel.canModifyCaseLabResultQuestionnaire(this.authUser)
-            );
-          }
-        }),
-
-        // Clone Outbreak
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_OUTBREAK',
-          click: (item: OutbreakModel) => {
-            this.cloneOutbreak(item);
-          },
-          visible: (item: OutbreakModel): boolean => {
-            return !item.deleted &&
-                            OutbreakModel.canClone(this.authUser);
-          }
-        }),
-
-        // Restore deleted Outbreak
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_RESTORE_OUTBREAK',
-          click: (item: OutbreakModel) => {
-            this.restoreOutbreak(item);
-          },
-          visible: (item: OutbreakModel): boolean => {
-            return item.deleted &&
-                            OutbreakModel.canRestore(this.authUser);
-          },
-          class: 'mat-menu-item-restore'
-        })
-      ]
-    })
-  ];
 
   /**
      * Constructor
@@ -242,52 +48,25 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
     private outbreakDataService: OutbreakDataService,
     private userDataService: UserDataService,
     private authDataService: AuthDataService,
-    private genericDataService: GenericDataService,
-    private referenceDataDataService: ReferenceDataDataService,
     private toastV2Service: ToastV2Service,
-    private dialogService: DialogService,
     private i18nService: I18nService,
-    private router: Router
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private dialogV2Service: DialogV2Service
   ) {
     super(listHelperService);
   }
 
-  /**
-     * Component initialized
-     */
-  ngOnInit() {
-    this.followUpsTeamAssignmentAlgorithm$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM);
-    this.activeOptionsList$ = this.genericDataService.getFilterYesNoOptions();
-    this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
-    this.geographicalLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL);
-    this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
-    this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY)
-      .pipe(
-        map(
-          (countries) => _.map(countries, (country: LabelValuePair) => {
-            country.value = {
-              id: country.value
-            };
-            return country;
-          })
-        )
-      );
-
-    // retrieve users
-    this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
-
-    // initialize Side Table Columns
-    this.initializeTableColumns();
-
+  ngOnInit(): void {
     // initialize pagination
     this.initPaginator();
 
-    // refresh
+    // ...and re-load the list when the Selected Outbreak is changed
     this.needsRefreshList(true);
   }
 
   /**
-     * Release resources
+     * Component destroyed
      */
   ngOnDestroy() {
     // release parent resources
@@ -297,101 +76,895 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
   /**
      * Initialize Side Table Columns
      */
-  initializeTableColumns() {
+  protected initializeTableColumns()
+  {
     // default table columns
-    // this.tableColumns = [
-    //   new VisibleColumnModel({
-    //     field: 'name',
-    //     label: 'LNG_OUTBREAK_FIELD_LABEL_NAME'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'disease',
-    //     label: 'LNG_OUTBREAK_FIELD_LABEL_DISEASE',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'country',
-    //     label: 'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'reportingGeographicalLevelId',
-    //     label: 'LNG_OUTBREAK_FIELD_LABEL_LOCATION_GEOGRAPHICAL_LEVEL',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'startDate',
-    //     label: 'LNG_OUTBREAK_FIELD_LABEL_START_DATE'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'endDate',
-    //     label: 'LNG_OUTBREAK_FIELD_LABEL_END_DATE'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'active',
-    //     label: 'LNG_OUTBREAK_FIELD_LABEL_ACTIVE'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'generateFollowUpsTeamAssignmentAlgorithm',
-    //     label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'generateFollowUpsOverwriteExisting',
-    //     label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'generateFollowUpsKeepTeamAssignment',
-    //     label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'generateFollowUpsDateOfLastContact',
-    //     label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'isContactLabResultsActive',
-    //     label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_LAB_RESULTS_ACTIVE',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'isDateOfOnsetRequired',
-    //     label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'deleted',
-    //     label: 'LNG_OUTBREAK_FIELD_LABEL_DELETED',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'createdBy',
-    //     label: 'LNG_OUTBREAK_FIELD_LABEL_CREATED_BY',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'createdAt',
-    //     label: 'LNG_OUTBREAK_FIELD_LABEL_CREATED_AT',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'updatedBy',
-    //     label: 'LNG_OUTBREAK_FIELD_LABEL_UPDATED_BY',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'updatedAt',
-    //     label: 'LNG_OUTBREAK_FIELD_LABEL_UPDATED_AT',
-    //     visible: false
-    //   })
-    // ];
+    this.tableColumns = [
+      {
+        field: 'name',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_NAME',
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'disease',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DISEASE',
+        sortable: true,
+        notVisible: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          includeNoValue: true
+        }
+      },
+      {
+        field: 'countries.id',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES',
+        format: {
+          type: (outbreak: OutbreakModel) => {
+            return outbreak.countries ?
+              outbreak.countries.map((entry) => this.i18nService.instant((this.activatedRoute.snapshot.data.country as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[entry.id].value)).join(' / ') :
+              '';
+          }
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.country as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          includeNoValue: true
+        }
+      },
+      {
+        field: 'reportingGeographicalLevelId',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_LOCATION_GEOGRAPHICAL_LEVEL',
+        notVisible: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.geographicalLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        }
+      },
+      {
+        field: 'startDate',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_START_DATE',
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
+        field: 'endDate',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_END_DATE',
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
+        field: 'active',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_ACTIVE',
+        sortable: true,
+        format: {
+          type: (column: OutbreakModel) => {
+            return column &&
+              column.id &&
+              this.selectedOutbreak.id &&
+              column.id === this.authUser.activeOutbreakId ?
+              this.i18nService.instant('LNG_COMMON_LABEL_YES') :
+              this.i18nService.instant('LNG_COMMON_LABEL_NO');
+          }
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: '',
+          search: (column: IExtendedColDef) => {
+            // remove filter
+            this.queryBuilder.filter.remove('id');
+
+            // check if value is boolean. If not, remove filter
+            if (_.isBoolean(column.columnDefinition.filter.value)) {
+              // remove filter on the property to not add more conditions on the same property.
+              switch (column.columnDefinition.filter.value) {
+                case true : {
+                  this.queryBuilder.filter.where({
+                    id: {
+                      eq: this.authUser.activeOutbreakId ?
+                        this.authUser.activeOutbreakId :
+                        -1
+                    }
+                  });
+                  break;
+                }
+                case false : {
+                  this.queryBuilder.filter.where({
+                    id: {
+                      neq: this.authUser.activeOutbreakId
+                    }
+                  });
+                  break;
+                }
+              }
+            }
+
+            // refresh list
+            this.needsRefreshList(true);
+          }
+        }
+      },
+      {
+        field: 'generateFollowUpsTeamAssignmentAlgorithm',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM',
+        notVisible: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.followUpGenerationTeamAssignmentAlgorithm as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        }
+      },
+      {
+        field: 'generateFollowUpsOverwriteExisting',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN
+        }
+      },
+      {
+        field: 'generateFollowUpsKeepTeamAssignment',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN
+        }
+      },
+      {
+        field: 'isContactLabResultsActive',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_LAB_RESULTS_ACTIVE',
+        sortable: true,
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN
+        }
+      },
+      {
+        field: 'isDateOfOnsetRequired',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED',
+        sortable: true,
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN
+        }
+      },
+      {
+        field: 'generateFollowUpsDateOfLastContact',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT',
+        notVisible: true,
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN
+        }
+      },
+      {
+        field: 'deleted',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DELETED',
+        sortable: true,
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.DELETED,
+          value: false,
+          defaultValue: false
+        }
+      },
+      {
+        field: 'createdBy',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_CREATED_BY',
+        notVisible: true,
+        format: {
+          type: 'createdByUser.name'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
+        },
+        exclude: (): boolean => {
+          return !OutbreakModel.canView(this.authUser);
+        },
+        link: (data) => {
+          return data.createdBy ?
+            `/users/${data.createdBy}/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'createdAt',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_CREATED_AT',
+        sortable: true,
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
+        field: 'updatedBy',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_UPDATED_BY',
+        notVisible: true,
+        format: {
+          type: 'updatedByUser.name'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
+        },
+        exclude: (): boolean => {
+          return !OutbreakModel.canView(this.authUser);
+        },
+        link: (data) => {
+          return data.updatedBy ?
+            `/users/${data.updatedBy}/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'updatedAt',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_UPDATED_AT',
+        sortable: true,
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+
+      // actions
+      {
+        field: 'actions',
+        label: 'LNG_COMMON_LABEL_ACTIONS',
+        pinned: IV2ColumnPinned.RIGHT,
+        notResizable: true,
+        cssCellClass: 'gd-cell-no-focus',
+        format: {
+          type: V2ColumnFormat.ACTIONS
+        },
+        actions: [
+          // View Outbreak
+          {
+            type: V2ActionType.ICON,
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_VIEW_OUTBREAK',
+            action: {
+              link: (item: OutbreakModel): string[] => {
+                return ['/outbreaks', item.id, 'view'];
+              }
+            },
+            visible: (item: OutbreakModel): boolean => {
+              return !item.deleted && OutbreakModel.canView(this.authUser);
+            }
+          },
+
+          // Modify Outbreak
+          {
+            type: V2ActionType.ICON,
+            icon: 'edit',
+            iconTooltip: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_MODIFY_OUTBREAK',
+            action: {
+              link: (item: OutbreakModel): string[] => {
+                return ['/outbreaks', item.id, 'modify'];
+              }
+            },
+            visible: (item: OutbreakModel): boolean => {
+              return (
+                !item.deleted &&
+                OutbreakModel.canModify(this.authUser)
+              );
+            }
+          },
+
+          // Make Outbreak active
+          {
+            type: V2ActionType.ICON,
+            icon: 'link',
+            iconTooltip: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE',
+            action: {
+              click: (item: OutbreakModel): void => {
+                // show confirm dialog
+                this.dialogV2Service.showConfirmDialog({
+                  config: {
+                    title: {
+                      get: () => 'LNG_COMMON_LABEL_ACTIVE',
+                      data: () => ({
+                        name: item.name
+                      })
+                    },
+                    message: {
+                      get: () => 'LNG_DIALOG_CONFIRM_MAKE_OUTBREAK_ACTIVE',
+                      data: () => ({
+                        name: item.name
+                      })
+                    }
+                  }
+                }).subscribe((response) => {
+                  // canceled ?
+                  if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                    // finished
+                    return;
+                  }
+
+                  // show loading
+                  const loading = this.dialogV2Service.showLoadingDialog();
+
+                  // modify outbreak
+                  this.userDataService
+                    .modifyUser(
+                      this.authUser.id,
+                      {
+                        activeOutbreakId: item.id
+                      }
+                    )
+                    .pipe(
+                      catchError((err) => {
+                        this.toastV2Service.error(err);
+                        return throwError(err);
+                      })
+                    )
+                    .subscribe(() => {
+                      // reload user data to save the new active outbreak
+                      this.authDataService
+                        .reloadAndPersistAuthUser()
+                        .subscribe((authenticatedUser) => {
+                          this.authUser = authenticatedUser.user;
+                          this.outbreakDataService.checkActiveSelectedOutbreak();
+
+                          // refresh list of top nav outbreaks
+                          TopnavComponent.REFRESH_OUTBREAK_LIST();
+
+                          // success
+                          this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                          // hide loading
+                          loading.close();
+
+                          // reload data
+                          this.needsRefreshList(true);
+                        });
+                    });
+                });
+              }
+            },
+            visible: (item: OutbreakModel): boolean => {
+              return !item.deleted &&
+              this.authUser &&
+              item.id !== this.authUser.activeOutbreakId &&
+              OutbreakModel.canMakeOutbreakActive(this.authUser);
+            }
+          },
+
+          // Other actions
+          {
+            type: V2ActionType.MENU,
+            icon: 'more_horiz',
+            menuOptions: [
+              // Delete Outbreak
+              {
+                label: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_OUTBREAK',
+                cssClasses: 'gd-list-table-actions-action-menu-warning',
+                action: {
+                  click: (item: OutbreakModel): void => {
+                    // show confirm dialog
+                    this.dialogV2Service.showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_DELETE',
+                          data: () => ({
+                            name: item.name
+                          })
+                        },
+                        message: {
+                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_OUTBREAK',
+                          data: () => ({
+                            name: item.name
+                          })
+                        }
+                      }
+                    }).subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading = this.dialogV2Service.showLoadingDialog();
+
+                      // delete outbreak
+                      this.outbreakDataService
+                        .deleteOutbreak(item.id)
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            this.toastV2Service.error(err);
+
+                            // hide loading
+                            loading.close();
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+
+                          // reload user data to get the updated data regarding active outbreak
+                          this.authDataService
+                            .reloadAndPersistAuthUser()
+                            .subscribe((authenticatedUser) => {
+                              this.authUser = authenticatedUser.user;
+
+                              // success
+                              this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                              // hide loading
+                              loading.close();
+
+                              // reload data
+                              this.needsRefreshList(true);
+                            });
+                        });
+                    });
+                  }
+                },
+                visible: (item: OutbreakModel): boolean => {
+                  return !item.deleted &&
+                  OutbreakModel.canDelete(this.authUser);
+                }
+              },
+
+              // Divider
+              {
+                visible: (item: OutbreakModel): boolean => {
+                  // visible only if at least one of the first two items is visible
+                  return !item.deleted &&
+                    OutbreakModel.canDelete(this.authUser)
+                  ;
+                }
+              },
+
+              // View Outbreak inconsistencies
+              {
+                label: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_VIEW_INCONSISTENCIES',
+                action: {
+                  link: (item: OutbreakModel): string[] => {
+                    return ['/outbreaks', item.id, 'inconsistencies'];
+                  }
+                },
+                visible: (item: OutbreakModel): boolean => {
+                  return !item.deleted &&
+                    OutbreakModel.canSeeInconsistencies(this.authUser);
+                }
+              },
+
+              // View Outbreak case form
+              {
+                label: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE',
+                action: {
+                  link: (item: OutbreakModel): string[] => {
+                    return ['/outbreaks', item.id, 'case-questionnaire'];
+                  }
+                },
+                visible: (item: OutbreakModel): boolean => {
+                  return !item.deleted &&
+                    OutbreakModel.canModifyCaseQuestionnaire(this.authUser);
+                }
+              },
+
+              // View Outbreak contact form
+              {
+                label: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE',
+                action: {
+                  link: (item: OutbreakModel): string[] => {
+                    return ['/outbreaks', item.id, 'contact-questionnaire'];
+                  }
+                },
+                visible: (item: OutbreakModel): boolean => {
+                  return !item.deleted &&
+                    OutbreakModel.canModifyContactQuestionnaire(this.authUser);
+                }
+              },
+
+              // View Outbreak contact follow-up form
+              {
+                label: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE',
+                action: {
+                  link: (item: OutbreakModel): string[] => {
+                    return ['/outbreaks', item.id, 'contact-follow-up-questionnaire'];
+                  }
+                },
+                visible: (item: OutbreakModel): boolean => {
+                  return !item.deleted &&
+                    OutbreakModel.canModifyContactFollowUpQuestionnaire(this.authUser);
+                }
+              },
+
+              // View Outbreak case lab result form
+              {
+                label: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE',
+                action: {
+                  link: (item: OutbreakModel): string[] => {
+                    return ['/outbreaks', item.id, 'case-lab-results-questionnaire'];
+                  }
+                },
+                visible: (item: OutbreakModel): boolean => {
+                  return !item.deleted &&
+                    OutbreakModel.canModifyCaseLabResultQuestionnaire(this.authUser);
+                }
+              },
+
+              // Divider
+              {
+                visible: (item: OutbreakModel): boolean => {
+                  // visible only if at least one of the first two items is visible
+                  return !item.deleted &&
+                  (
+                    OutbreakModel.canSeeInconsistencies(this.authUser) ||
+                    OutbreakModel.canModifyCaseQuestionnaire(this.authUser) ||
+                    OutbreakModel.canModifyContactFollowUpQuestionnaire(this.authUser) ||
+                    OutbreakModel.canModifyCaseLabResultQuestionnaire(this.authUser)
+                  );
+                }
+              },
+
+              // Clone Outbreak
+              {
+                label: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_OUTBREAK',
+                action: {
+                  click: (item: OutbreakModel): void => {
+                    // determine what we need to clone
+                    this.dialogV2Service
+                      .showSideDialog({
+                        title: {
+                          get: () => 'LNG_COMMON_BUTTON_CLONE',
+                          data: () => ({
+                            name: item.name
+                          })
+                        },
+                        hideInputFilter: true,
+                        inputs: [{
+                          type: V2SideDialogConfigInputType.TEXT,
+                          name: 'cloneData',
+                          data: item,
+                          placeholder: 'LNG_DIALOG_FIELD_PLACEHOLDER_CLONED_OUTBREAK_NAME',
+                          value: this.i18nService.instant('LNG_PAGE_LIST_OUTBREAKS_CLONE_NAME', { name: item.name }),
+                          validators: {
+                            required: () => true
+                          }
+                        }],
+                        bottomButtons: [{
+                          type: IV2SideDialogConfigButtonType.OTHER,
+                          label: 'LNG_COMMON_BUTTON_CLONE',
+                          color: 'primary',
+                          key: 'apply',
+                          disabled: (_data, handler): boolean => {
+                            return !handler.form ||
+                              handler.form.invalid;
+                          }
+                        }],
+                        initialized: (handler) => {
+                          // display loading
+                          handler.loading.show();
+
+                          // get the outbreak to clone
+                          this.outbreakDataService
+                            .getOutbreak(handler.data.map.cloneData.data.id)
+                            .subscribe((outbreak: OutbreakModel) => {
+                              handler.data.map.cloneData.data = outbreak;
+
+                              // hide loading
+                              handler.loading.hide();
+                            });
+                        }
+                      })
+                      .subscribe((response) => {
+                        // canceled ?
+                        if ( response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+                          // finished
+                          return;
+                        }
+
+                        // show loading
+                        const loading =
+                          this.dialogV2Service.showLoadingDialog();
+
+                        // translate questionnaire questions
+                        const translateQuestionnaire = (questions: QuestionModel[]) => {
+                          _.each(questions, (question: QuestionModel) => {
+                            // translate question
+                            question.text = this.i18nService.instant(question.text);
+
+                            // translate answers & sub questions
+                            _.each(question.answers, (answer: AnswerModel) => {
+                              // translate answer
+                              answer.label = this.i18nService.instant(answer.label);
+
+                              // translate sub-question
+                              if (!_.isEmpty(answer.additionalQuestions)) {
+                                translateQuestionnaire(answer.additionalQuestions);
+                              }
+                            });
+                          });
+                        };
+
+                        const outbreakToClone = response.handler.data.map.cloneData.data;
+
+                        // delete the id from the parent outbreak
+                        delete outbreakToClone.id;
+
+                        // set the name for the cloned outbreak
+                        outbreakToClone.name = (response.handler.data.inputs[0] as any).value;
+
+                        // translate questionnaire questions - Case Form
+                        if (!_.isEmpty(outbreakToClone.caseInvestigationTemplate)) {
+                          translateQuestionnaire(outbreakToClone.caseInvestigationTemplate);
+                        }
+
+                        // translate questionnaire questions - Contact Form
+                        if (!_.isEmpty(outbreakToClone.contactInvestigationTemplate)) {
+                          translateQuestionnaire(outbreakToClone.contactInvestigationTemplate);
+                        }
+
+                        // translate questionnaire questions - Lab Results Form
+                        if (!_.isEmpty(outbreakToClone.labResultsTemplate)) {
+                          translateQuestionnaire(outbreakToClone.labResultsTemplate);
+                        }
+
+                        // translate questionnaire questions - Contact Follow-up
+                        if (!_.isEmpty(outbreakToClone.contactFollowUpTemplate)) {
+                          translateQuestionnaire(outbreakToClone.contactFollowUpTemplate);
+                        }
+
+                        this.outbreakDataService
+                          .createOutbreak(outbreakToClone)
+                          .pipe(
+                            catchError((err) => {
+                              this.toastV2Service.error(err);
+                              // hide loading
+                              loading.close();
+                              return throwError(err);
+                            }),
+                            switchMap((clonedOutbreak) => {
+                              // update language tokens to get the translation of submitted questions and answers
+                              return this.i18nService.loadUserLanguage()
+                                .pipe(
+                                  catchError((err) => {
+                                    this.toastV2Service.error(err);
+                                    // hide loading
+                                    loading.close();
+                                    return throwError(err);
+                                  }),
+                                  map(() => clonedOutbreak)
+                                );
+                            })
+                          )
+                          .subscribe((clonedOutbreak) => {
+
+                            this.toastV2Service.success(
+                              'LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_SUCCESS_MESSAGE'
+                            );
+
+                            // hide loading
+                            loading.close();
+
+                            // reload data
+                            this.needsRefreshList(true);
+
+                            // navigate to modify page of the new outbreak
+                            if (OutbreakModel.canModify(this.authUser)) {
+                              this.router.navigate([`/outbreaks/${clonedOutbreak.id}/modify`]);
+                            } else if (OutbreakModel.canView(this.authUser)) {
+                              this.router.navigate([`/outbreaks/${clonedOutbreak.id}/view`]);
+                            } else if (OutbreakModel.canList(this.authUser)) {
+                              this.router.navigate(['/outbreaks']);
+                            } else {
+                              // fallback to current page since we already know that we have access to this page
+                              // Don't redirect :)
+                            }
+                          });
+                      });
+                  }
+                },
+                visible: (item: OutbreakModel): boolean => {
+                  return !item.deleted &&
+                    OutbreakModel.canClone(this.authUser);
+                }
+              },
+
+              // Restore deleted Outbreak
+              {
+                label: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_RESTORE_OUTBREAK',
+                cssClasses: 'gd-list-table-actions-action-menu-warning',
+                action: {
+                  click: (item: OutbreakModel) => {
+                    // show confirm dialog to confirm the action
+                    this.dialogV2Service.showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_RESTORE',
+                          data: () => item as any
+                        },
+                        message: {
+                          get: () => 'LNG_DIALOG_CONFIRM_RESTORE_OUTBREAK',
+                          data: () => item as any
+                        }
+                      }
+                    }).subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading = this.dialogV2Service.showLoadingDialog();
+
+                      // restore
+                      this.outbreakDataService
+                        .restoreOutbreak(item.id)
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            this.toastV2Service.error(err);
+
+                            // hide loading
+                            loading.close();
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+                          // success
+                          this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAKS_RESTORE_SUCCESS_MESSAGE');
+
+                          // hide loading
+                          loading.close();
+
+                          // reload data
+                          this.needsRefreshList(true);
+                        });
+                    });
+                  }
+                },
+                visible: (item: OutbreakModel): boolean => {
+                  return item.deleted &&
+                  OutbreakModel.canRestore(this.authUser);
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ];
   }
 
   /**
    * Initialize Table Advanced Filters
    */
-  protected initializeTableAdvancedFilters(): void {}
+  protected initializeTableAdvancedFilters(): void {
+    // Outbreak
+    this.advancedFilters = [
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'name',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'disease',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DISEASE',
+        options: (this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'countries.id',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES',
+        options: (this.activatedRoute.snapshot.data.country as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'reportingGeographicalLevelId',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_LOCATION_GEOGRAPHICAL_LEVEL',
+        options: (this.activatedRoute.snapshot.data.geographicalLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'startDate',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_START_DATE',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'endDate',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_END_DATE',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'generateFollowUpsTeamAssignmentAlgorithm',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM',
+        options: (this.activatedRoute.snapshot.data.followUpGenerationTeamAssignmentAlgorithm as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'generateFollowUpsOverwriteExisting',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING',
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'generateFollowUpsKeepTeamAssignment',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT',
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'isContactLabResultsActive',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_LAB_RESULTS_ACTIVE',
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'isDateOfOnsetRequired',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED',
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'generateFollowUpsDateOfLastContact',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT',
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        sortable: true
+      }
+    ];
+  }
 
   /**
    * Initialize table quick actions
@@ -406,7 +979,19 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
   /**
    * Initialize table add action
    */
-  protected initializeAddAction(): void {}
+  protected initializeAddAction(): void {
+    this.addAction = {
+      type: V2ActionType.ICON_LABEL,
+      label: 'LNG_COMMON_BUTTON_ADD',
+      icon: 'add_circle_outline',
+      action: {
+        link: (): string[] => ['/outbreaks', 'create']
+      },
+      visible: (): boolean => {
+        return OutbreakModel.canCreate(this.authUser);
+      }
+    };
+  }
 
   /**
    * Initialize table grouped data
@@ -416,39 +1001,60 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
   /**
    * Initialize breadcrumbs
    */
-  initializeBreadcrumbs(): void {
+  protected initializeBreadcrumbs(): void {
+    // determine if outbreaks page should be linkable
+    const outbreakAction: IV2BreadcrumbAction = null;
+
+    // set breadcrumbs
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/version']
+        }
+      }, {
+        label: 'LNG_PAGE_LIST_OUTBREAKS_TITLE',
+        action: outbreakAction
+      }
+    ];
   }
 
   /**
    * Fields retrieved from api to reduce payload size
    */
   protected refreshListFields(): string[] {
-    return [];
+    return [
+      'id',
+      'name',
+      'disease',
+      'countries',
+      'reportingGeographicalLevelId',
+      'startDate',
+      'endDate',
+      'active',
+      'generateFollowUpsTeamAssignmentAlgorithm',
+      'generateFollowUpsOverwriteExisting',
+      'generateFollowUpsKeepTeamAssignment',
+      'isContactLabResultsActive',
+      'isDateOfOnsetRequired',
+      'generateFollowUpsDateOfLastContact',
+      'deleted',
+      'createdBy',
+      'createdAt',
+      'updatedBy',
+      'updatedAt'
+    ];
   }
 
   /**
-   * Re(load) the Outbreaks list
+   * Re(load) the Outbreaks list, based on the applied filter, sort criterias
    */
   refreshList() {
     // retrieve created user & modified user information
     this.queryBuilder.include('createdByUser', true);
     this.queryBuilder.include('updatedByUser', true);
-
-    // filter out questionnaire data
-    const outbreakObj: OutbreakModel = new OutbreakModel();
-    const removeFields: {
-      [propName: string]: boolean
-    } = {
-      caseInvestigationTemplate: true,
-      contactFollowUpTemplate: true,
-      labResultsTemplate: true
-    };
-    const fields: string[] = Object.getOwnPropertyNames(outbreakObj).filter((propName: string) => {
-      return !removeFields[propName];
-    });
-
-    // retrieve only specific fields
-    this.queryBuilder.fields(...fields);
 
     // retrieve the list of Outbreaks
     this.outbreaksList$ = this.outbreakDataService
@@ -457,14 +1063,25 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
         catchError((err) => {
           this.toastV2Service.error(err);
           return throwError(err);
-        })
+        } ),
+
+        // should be the last pipe
+        takeUntil(this.destroyed$)
       );
   }
 
   /**
      * Get total number of items, based on the applied filters
      */
-  refreshListCount() {
+  refreshListCount(applyHasMoreLimit?: boolean) {
+    // reset
+    this.pageCount = undefined;
+
+    // set apply value
+    if (applyHasMoreLimit !== undefined) {
+      this.applyHasMoreLimit = applyHasMoreLimit;
+    }
+
     // remove paginator from query builder
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
@@ -474,263 +1091,27 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
     if (this.queryBuilder.isDeletedEnabled()) {
       countQueryBuilder.filter.includeDeletedRecordsWhereField();
     }
-    this.outbreaksListCount$ = this.outbreakDataService
+
+    // apply has more limit
+    if (this.applyHasMoreLimit) {
+      countQueryBuilder.flag('applyHasMoreLimit', true);
+    }
+
+    // count
+    this.outbreakDataService
       .getOutbreaksCount(countQueryBuilder)
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
           return throwError(err);
         }),
-        share()
-      );
-  }
 
-  /**
-     * Delete an outbreak instance
-     * @param outbreak
-     */
-  delete(outbreak) {
-    this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_OUTBREAK', outbreak)
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          this.outbreakDataService
-            .deleteOutbreak(outbreak.id)
-            .pipe(
-              catchError((err) => {
-                this.toastV2Service.error(err);
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              // reload user data to get the updated data regarding active outbreak
-              this.authDataService
-                .reloadAndPersistAuthUser()
-                .subscribe((authenticatedUser) => {
-                  this.authUser = authenticatedUser.user;
-                });
-              this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_SUCCESS_MESSAGE');
-              this.needsRefreshList(true);
-            });
-        }
-      });
-  }
-
-  /**
-     * Restore specific outbreak
-     * @param {OutbreakModel} outbreakId
-     */
-  restoreOutbreak(outbreak: OutbreakModel) {
-    // show confirm dialog to confirm the action
-    this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_OUTBREAK', new OutbreakModel(outbreak))
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          // delete follow up
-          this.outbreakDataService
-            .restoreOutbreak(outbreak.id)
-            .pipe(
-              catchError((err) => {
-                this.toastV2Service.error(err);
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAKS_RESTORE_SUCCESS_MESSAGE');
-
-              // reload data
-              this.needsRefreshList(true);
-            });
-        }
-      });
-  }
-
-  setActive(outbreak) {
-    this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_MAKE_OUTBREAK_ACTIVE')
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          const userData = { 'activeOutbreakId': outbreak.id };
-          const userId = this.authUser.id;
-          this.userDataService
-            .modifyUser(userId, userData)
-            .pipe(
-              catchError((err) => {
-                this.toastV2Service.error(err);
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              // reload user data to save the new active outbreak
-              this.authDataService
-                .reloadAndPersistAuthUser()
-                .subscribe((authenticatedUser) => {
-                  this.authUser = authenticatedUser.user;
-                  this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE_SUCCESS_MESSAGE');
-                  this.outbreakDataService.checkActiveSelectedOutbreak();
-                  this.needsRefreshList(true);
-
-                  // refresh list of top nav outbreak
-                  if (this.topNav) {
-                    this.topNav.refreshOutbreaksList();
-                  }
-                });
-            });
-        }
-      });
-  }
-
-  /**
-     * Filters the outbreaks by Active property
-     * @param {string} property
-     * @param value
-     */
-  filterByActiveOutbreak(property: string, value: any) {
-    // check if value is boolean. If not, remove filter
-    if (!_.isBoolean(value.value)) {
-      // remove filter
-      this.queryBuilder.filter.remove(property);
-    } else {
-      // remove filter on the property to not add more conditions on the same property.
-      this.queryBuilder.filter.remove(property);
-      switch (value.value) {
-        case true : {
-          this.queryBuilder.filter.where({
-            id: {
-              'eq': this.authUser.activeOutbreakId ?
-                this.authUser.activeOutbreakId :
-                -1
-            }
-          });
-          break;
-        }
-        case false : {
-          this.queryBuilder.filter.where({
-            id: {
-              'neq': this.authUser.activeOutbreakId
-            }
-          });
-          break;
-        }
-      }
-    }
-    // refresh list
-    this.needsRefreshList(true);
-  }
-
-  /**
-     * Clone an existing outbreak
-     * @param {OutbreakModel} outbreakModel
-     */
-  cloneOutbreak(outbreakModel: OutbreakModel) {
-    // translate questionnaire questions
-    const translateQuestionnaire = (questions: QuestionModel[]) => {
-      _.each(questions, (question: QuestionModel) => {
-        // translate question
-        question.text = this.i18nService.instant(question.text);
-
-        // translate answers & sub questions
-        _.each(question.answers, (answer: AnswerModel) => {
-          // translate answer
-          answer.label = this.i18nService.instant(answer.label);
-
-          // translate sub-question
-          if (!_.isEmpty(answer.additionalQuestions)) {
-            translateQuestionnaire(answer.additionalQuestions);
-          }
-        });
-      });
-    };
-
-    // get the outbreak to clone
-    this.outbreakDataService
-      .getOutbreak(outbreakModel.id)
-      .subscribe((outbreak: OutbreakModel) => {
-        // create the clone of the parent outbreak
-        this.dialogService
-          .showInput(
-            new DialogConfiguration({
-              message: 'LNG_DIALOG_CONFIRM_CLONE_OUTBREAK',
-              yesLabel: 'LNG_COMMON_BUTTON_CLONE',
-              required: true,
-              fieldsList: [new DialogField({
-                name: 'clonedOutbreakName',
-                placeholder: 'LNG_DIALOG_FIELD_PLACEHOLDER_CLONED_OUTBREAK_NAME',
-                required: true,
-                type: 'text',
-                value: this.i18nService.instant('LNG_PAGE_LIST_OUTBREAKS_CLONE_NAME', { name: outbreak.name })
-              })]
-            }),
-            true
-          )
-          .subscribe((answer) => {
-            if (answer.button === DialogAnswerButton.Yes) {
-              // delete the id from the parent outbreak
-              delete outbreak.id;
-
-              // set the name for the cloned outbreak
-              outbreak.name = answer.inputValue.value.clonedOutbreakName;
-
-              // translate questionnaire questions - Case Form
-              if (!_.isEmpty(outbreak.caseInvestigationTemplate)) {
-                translateQuestionnaire(outbreak.caseInvestigationTemplate);
-              }
-
-              // translate questionnaire questions - Contact Form
-              if (!_.isEmpty(outbreak.contactInvestigationTemplate)) {
-                translateQuestionnaire(outbreak.contactInvestigationTemplate);
-              }
-
-              // translate questionnaire questions - Lab Results Form
-              if (!_.isEmpty(outbreak.labResultsTemplate)) {
-                translateQuestionnaire(outbreak.labResultsTemplate);
-              }
-
-              // translate questionnaire questions - Contact Follow-up
-              if (!_.isEmpty(outbreak.contactFollowUpTemplate)) {
-                translateQuestionnaire(outbreak.contactFollowUpTemplate);
-              }
-
-              // show loading
-              const loadingDialog = this.dialogService.showLoadingDialog();
-              this.outbreakDataService
-                .createOutbreak(outbreak)
-                .pipe(
-                  catchError((err) => {
-                    this.toastV2Service.error(err);
-                    loadingDialog.close();
-                    return throwError(err);
-                  }),
-                  switchMap((clonedOutbreak) => {
-                    // update language tokens to get the translation of submitted questions and answers
-                    return this.i18nService.loadUserLanguage()
-                      .pipe(
-                        catchError((err) => {
-                          this.toastV2Service.error(err);
-                          loadingDialog.close();
-                          return throwError(err);
-                        }),
-                        map(() => clonedOutbreak)
-                      );
-                  })
-                )
-                .subscribe((clonedOutbreak) => {
-                  this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_SUCCESS_MESSAGE');
-
-                  // hide dialog
-                  loadingDialog.close();
-
-                  // navigate to modify page of the new outbreak
-                  if (OutbreakModel.canModify(this.authUser)) {
-                    this.router.navigate([`/outbreaks/${clonedOutbreak.id}/modify`]);
-                  } else if (OutbreakModel.canView(this.authUser)) {
-                    this.router.navigate([`/outbreaks/${clonedOutbreak.id}/view`]);
-                  } else if (OutbreakModel.canList(this.authUser)) {
-                    this.router.navigate(['/outbreaks']);
-                  } else {
-                    // fallback to current page since we already know that we have access to this page
-                    // Don't redirect :)
-                  }
-                });
-            }
-          });
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      ).
+      subscribe( ( response ) =>
+      {
+        this.pageCount = response;
       });
   }
 }
