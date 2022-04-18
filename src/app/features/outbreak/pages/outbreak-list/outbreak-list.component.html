@@ -1,3 +1,31 @@
+<app-list-table-v2
+  [pageTitle]="'LNG_PAGE_LIST_OUTBREAKS_TITLE'"
+  [records$]="outbreaksList$"
+  [columns]="tableColumns"
+  [breadcrumbs]="breadcrumbs"
+  [addAction]="addAction"
+  [pageCount]="pageCount"
+  [pageSize]="pageSize"
+  [pageIndex]="pageIndex"
+  [pageSettingsKey]="UserSettings.OUTBREAK_FIELDS"
+  [sortColumn]="tableSortBy"
+  [filtersApplied]="filtersApplied"
+  (refreshData)="needsRefreshList(true, false)"
+  (refreshDataCount)="refreshListCount(false)"
+  (pageChange)="changePage($event)"
+  (sortBy)="sortBy($event)"
+  (filterBy)="filterBy($event)"
+  (resetHeaderFilters)="resetFiltersToSideFilters()"></app-list-table-v2>
+  <!-- NOTE: We don't have on Outbreak list the following -->
+<!-- [quickActions]="quickActions" -->
+<!-- [groupActions]="groupActions" -->
+<!-- [groupedData]="groupedData" -->
+<!-- [infos]="infos" -->
+<!-- [advancedFilterType]="Constants.APP_PAGE.CASES.value" -->
+<!-- [advancedFilters]="advancedFilters" -->
+<!-- (advancedFilterBy)="applySideFilters($event)"> -->
+
+
 <!--
 <app-topnav #topNav>
     <ng-container dynamic-section>
@@ -65,13 +93,13 @@
 <!--        [active]="!refreshingList"-->
 <!--    ></app-hover-row-actions>-->
 
-    <mat-table #table [dataSource]="outbreaksList$ | async" matSort (matSortChange)="sortBy($event)">
+    <!-- <mat-table #table [dataSource]="outbreaksList$ | async" matSort (matSortChange)="sortBy($event)"> -->
         <!-- Name -->
-        <ng-container matColumnDef="name">
+        <!-- <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_NAME' | translate}}</div>
-                    <div class="column-filter">
+                    <div class="column-filter"> -->
 <!--                        <app-form-input-->
 <!--                            name="nameFilter"-->
 <!--                            ngModel-->
@@ -80,21 +108,21 @@
 <!--                            app-reset-input-on-side-filter-->
 <!--                            [displayFilterIcon]="true">-->
 <!--                        </app-form-input>-->
-                    </div>
+                    <!-- </div>
                 </div>
             </mat-header-cell>
 
             <mat-cell *matCellDef="let outbreak">
                 {{outbreak.name}}
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Disease -->
-        <ng-container matColumnDef="disease">
+        <!-- <ng-container matColumnDef="disease">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_DISEASE' | translate}}</div>
-                    <div class="column-filter">
+                    <div class="column-filter"> -->
 <!--                        <app-form-select-->
 <!--                            name="diseaseFilter"-->
 <!--                            ngModel-->
@@ -107,7 +135,7 @@
 <!--                            [displayInvisibleItems]="true"-->
 <!--                            [displayFilterIcon]="true">-->
 <!--                        </app-form-select>-->
-                    </div>
+                    <!-- </div>
                 </div>
             </mat-header-cell>
 
@@ -117,14 +145,14 @@
                     [value]="outbreak.disease">
                 </app-reference-data-label>
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Country -->
-        <ng-container matColumnDef="country">
+        <!-- <ng-container matColumnDef="country">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES' | translate}}</div>
-                    <div class="column-filter">
+                    <div class="column-filter"> -->
 <!--                        <app-form-select-->
 <!--                            name="countriesFilter"-->
 <!--                            ngModel-->
@@ -136,24 +164,24 @@
 <!--                            [allowSelectionOfDisabledItems]="true"-->
 <!--                            [displayInvisibleItems]="true"-->
 <!--                            [displayFilterIcon]="true">-->
-<!--                        </app-form-select>-->
-                    </div>
+                       <!-- </app-form-select>-->
+                    <!-- </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let outbreak">
-                <app-reference-data-label
+            <mat-cell *matCellDef="let outbreak"> -->
+                <!-- <app-reference-data-label
                     [category]="ReferenceDataCategory.COUNTRY"
-                    [value]="outbreak.countries">
-                </app-reference-data-label>
-            </mat-cell>
-        </ng-container>
+                    [value]="this.selectedOutbreak.countries">
+                </app-reference-data-label> -->
+            <!-- </mat-cell>
+        </ng-container> -->
 
         <!-- Location Geographical Level -->
-        <ng-container matColumnDef="reportingGeographicalLevelId">
+        <!-- <ng-container matColumnDef="reportingGeographicalLevelId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_LOCATION_GEOGRAPHICAL_LEVEL' | translate}}</div>
-                    <div class="column-filter">
+                    <div class="column-filter"> -->
 <!--                        <app-form-select-->
 <!--                            name="geographicalLevelFilter"-->
 <!--                            ngModel-->
@@ -166,7 +194,7 @@
 <!--                            [displayInvisibleItems]="true"-->
 <!--                            [displayFilterIcon]="true">-->
 <!--                        </app-form-select>-->
-                    </div>
+                    <!-- </div>
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let outbreak">
@@ -175,52 +203,52 @@
                     [value]="outbreak.reportingGeographicalLevelId">
                 </app-reference-data-label>
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Start Date -->
-        <ng-container matColumnDef="startDate">
+        <!-- <ng-container matColumnDef="startDate">
             <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_START_DATE' | translate}}</div>
-                    <div class="column-filter">
+                    <div class="column-filter"> -->
 <!--                        <app-form-daterange-->
 <!--                            name="startDateFilter"-->
 <!--                            ngModel-->
 <!--                            (changed)="filterByDateRangeField('startDate', $event)"-->
 <!--                            app-reset-input-on-side-filter>-->
 <!--                        </app-form-daterange>-->
-                    </div>
+                    <!-- </div>
                 </div>
             </mat-header-cell>
 
             <mat-cell class="has-date-range-filter" *matCellDef="let outbreak">
                 {{outbreak.startDate | dateDefault }}
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- End Date -->
-        <ng-container matColumnDef="endDate">
+        <!-- <ng-container matColumnDef="endDate">
             <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_END_DATE' | translate}}</div>
-                    <div class="column-filter">
+                    <div class="column-filter"> -->
 <!--                        <app-form-daterange-->
 <!--                            name="endDateFilter"-->
 <!--                            ngModel-->
 <!--                            (changed)="filterByDateRangeField('endDate', $event)"-->
 <!--                            app-reset-input-on-side-filter>-->
 <!--                        </app-form-daterange>-->
-                    </div>
+                    <!-- </div>
                 </div>
             </mat-header-cell>
 
             <mat-cell class="has-date-range-filter" *matCellDef="let outbreak">
                 {{outbreak.endDate | dateDefault }}
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Active -->
-        <ng-container matColumnDef="active">
+        <!-- <ng-container matColumnDef="active">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_ACTIVE' | translate}}</div>
@@ -244,16 +272,16 @@
             <mat-cell *matCellDef="let outbreak">
                 <app-yes-no-label [value]="outbreak.id === authUser.activeOutbreakId"></app-yes-no-label>
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Generate follow-ups algorithm -->
-        <ng-container matColumnDef="generateFollowUpsTeamAssignmentAlgorithm">
+        <!-- <ng-container matColumnDef="generateFollowUpsTeamAssignmentAlgorithm">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div class="column-header">
                         {{'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM' | translate}}
                     </div>
-                    <div class="column-filter">
+                    <div class="column-filter"> -->
 <!--                        <app-form-select-->
 <!--                            name="generateFollowUpsTeamAssignmentAlgorithmFilter"-->
 <!--                            ngModel-->
@@ -266,23 +294,23 @@
 <!--                            [displayInvisibleItems]="true"-->
 <!--                            [displayFilterIcon]="true">-->
 <!--                        </app-form-select>-->
-                    </div>
+                    <!-- </div>
                 </div>
             </mat-header-cell>
 
             <mat-cell *matCellDef="let outbreak">
                 {{ outbreak.generateFollowUpsTeamAssignmentAlgorithm | translate }}
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Generate follow-ups overwrite -->
-        <ng-container matColumnDef="generateFollowUpsOverwriteExisting">
+        <!-- <ng-container matColumnDef="generateFollowUpsOverwriteExisting">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div class="column-header">
                         {{'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING' | translate}}
                     </div>
-                    <div class="column-filter">
+                    <div class="column-filter"> -->
 <!--                        <app-form-select-->
 <!--                            name="generateFollowUpsOverwriteExistingFilter"-->
 <!--                            [ngModel]="''"-->
@@ -294,23 +322,23 @@
 <!--                            [displayFilterIcon]="true"-->
 <!--                            [clearable]="false">-->
 <!--                        </app-form-select>-->
-                    </div>
+                    <!-- </div>
                 </div>
             </mat-header-cell>
 
             <mat-cell *matCellDef="let outbreak">
                 <app-yes-no-label [value]="outbreak.generateFollowUpsOverwriteExisting"></app-yes-no-label>
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Keep team assignment -->
-        <ng-container matColumnDef="generateFollowUpsKeepTeamAssignment">
+        <!-- <ng-container matColumnDef="generateFollowUpsKeepTeamAssignment">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div class="column-header">
                         {{'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT' | translate}}
                     </div>
-                    <div class="column-filter">
+                    <div class="column-filter"> -->
 <!--                        <app-form-select-->
 <!--                            name="generateFollowUpsKeepTeamAssignmentFilter"-->
 <!--                            [ngModel]="''"-->
@@ -322,22 +350,22 @@
 <!--                            [displayFilterIcon]="true"-->
 <!--                            [clearable]="false">-->
 <!--                        </app-form-select>-->
-                    </div>
+                    <!-- </div>
                 </div>
             </mat-header-cell>
 
             <mat-cell *matCellDef="let outbreak">
                 <app-yes-no-label [value]="outbreak.generateFollowUpsKeepTeamAssignment"></app-yes-no-label>
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
-        <ng-container matColumnDef="isContactLabResultsActive">
+        <!-- <ng-container matColumnDef="isContactLabResultsActive">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">
                         {{'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_LAB_RESULTS_ACTIVE' | translate}}
                     </div>
-                    <div class="column-filter">
+                    <div class="column-filter"> -->
 <!--                        <app-form-select-->
 <!--                            name="isContactLabResultsActiveFilter"-->
 <!--                            [ngModel]="''"-->
@@ -349,22 +377,22 @@
 <!--                            [displayFilterIcon]="true"-->
 <!--                            [clearable]="false">-->
 <!--                        </app-form-select>-->
-                    </div>
+                    <!-- </div>
                 </div>
             </mat-header-cell>
 
             <mat-cell *matCellDef="let outbreak">
                 <app-yes-no-label [value]="outbreak.isContactLabResultsActive"></app-yes-no-label>
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
-        <ng-container matColumnDef="isDateOfOnsetRequired">
+        <!-- <ng-container matColumnDef="isDateOfOnsetRequired">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">
                         {{'LNG_OUTBREAK_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED' | translate}}
                     </div>
-                    <div class="column-filter">
+                    <div class="column-filter"> -->
 <!--                        <app-form-select-->
 <!--                            name="isDateOfOnsetRequiredFilter"-->
 <!--                            [ngModel]="''"-->
@@ -376,23 +404,23 @@
 <!--                            [displayFilterIcon]="true"-->
 <!--                            [clearable]="false">-->
 <!--                        </app-form-select>-->
-                    </div>
+                    <!-- </div>
                 </div>
             </mat-header-cell>
 
             <mat-cell *matCellDef="let outbreak">
                 <app-yes-no-label [value]="outbreak.isDateOfOnsetRequired"></app-yes-no-label>
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Start contact follow-up on the date of last contact -->
-        <ng-container matColumnDef="generateFollowUpsDateOfLastContact">
+        <!-- <ng-container matColumnDef="generateFollowUpsDateOfLastContact">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">
                         {{'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT' | translate}}
                     </div>
-                    <div class="column-filter">
+                    <div class="column-filter"> -->
 <!--                        <app-form-select-->
 <!--                            name="generateFollowUpsDateOfLastContact"-->
 <!--                            [ngModel]="''"-->
@@ -404,20 +432,20 @@
 <!--                            [displayFilterIcon]="true"-->
 <!--                            [clearable]="false">-->
 <!--                        </app-form-select>-->
-                    </div>
+                    <!-- </div>
                 </div>
             </mat-header-cell>
 
             <mat-cell *matCellDef="let outbreak">
                 <app-yes-no-label [value]="outbreak.generateFollowUpsDateOfLastContact"></app-yes-no-label>
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
-        <ng-container matColumnDef="deleted">
+        <!-- <ng-container matColumnDef="deleted">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_DELETED' | translate}}</div>
-                    <div class="column-filter">
+                    <div class="column-filter"> -->
 <!--                        <app-form-select-->
 <!--                            name="deletedFilter"-->
 <!--                            [ngModel]="false"-->
@@ -429,23 +457,23 @@
 <!--                            [displayFilterIcon]="true"-->
 <!--                            [clearable]="false">-->
 <!--                        </app-form-select>-->
-                    </div>
+                    <!-- </div>
                 </div>
             </mat-header-cell>
 
             <mat-cell *matCellDef="let outbreak">
                 <app-yes-no-label [value]="outbreak.deleted"></app-yes-no-label>
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Created By -->
-        <ng-container matColumnDef="createdBy">
+        <!-- <ng-container matColumnDef="createdBy">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div class="column-header">
                         {{ 'LNG_OUTBREAK_FIELD_LABEL_CREATED_BY' | translate }}
                     </div>
-                    <div class="column-filter">
+                    <div class="column-filter"> -->
 <!--                        <app-form-select-->
 <!--                            name="createdByFilter"-->
 <!--                            ngModel-->
@@ -459,44 +487,44 @@
 <!--                            optionValueKey="id"-->
 <!--                            [multiple]="true">-->
 <!--                        </app-form-select>-->
-                    </div>
+                    <!-- </div>
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
                 {{ item.createdByUser?.name }}
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Created At -->
-        <ng-container matColumnDef="createdAt">
+        <!-- <ng-container matColumnDef="createdAt">
             <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">
                         {{ 'LNG_OUTBREAK_FIELD_LABEL_CREATED_AT' | translate }}
                     </div>
-                    <div class="column-filter">
+                    <div class="column-filter"> -->
 <!--                        <app-form-daterange-->
 <!--                            name="createdAtFilter"-->
 <!--                            ngModel-->
 <!--                            (changed)="filterByDateRangeField('createdAt', $event)"-->
 <!--                            app-reset-input-on-side-filter>-->
 <!--                        </app-form-daterange>-->
-                    </div>
+                    <!-- </div>
                 </div>
             </mat-header-cell>
             <mat-cell class="has-date-range-filter" *matCellDef="let item">
                 {{ item.createdAt | dateTimeDefault }}
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Modified By -->
-        <ng-container matColumnDef="updatedBy">
+        <!-- <ng-container matColumnDef="updatedBy">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div class="column-header">
                         {{ 'LNG_OUTBREAK_FIELD_LABEL_UPDATED_BY' | translate }}
                     </div>
-                    <div class="column-filter">
+                    <div class="column-filter"> -->
 <!--                        <app-form-select-->
 <!--                            name="updatedByFilter"-->
 <!--                            ngModel-->
@@ -510,45 +538,45 @@
 <!--                            optionValueKey="id"-->
 <!--                            [multiple]="true">-->
 <!--                        </app-form-select>-->
-                    </div>
+                    <!-- </div>
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
                 {{ item.updatedByUser?.name }}
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Updated At -->
-        <ng-container matColumnDef="updatedAt">
+        <!-- <ng-container matColumnDef="updatedAt">
             <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">
                         {{ 'LNG_OUTBREAK_FIELD_LABEL_UPDATED_AT' | translate }}
                     </div>
-                    <div class="column-filter">
+                    <div class="column-filter"> -->
 <!--                        <app-form-daterange-->
 <!--                            name="updatedAtFilter"-->
 <!--                            ngModel-->
 <!--                            (changed)="filterByDateRangeField('updatedAt', $event)"-->
 <!--                            app-reset-input-on-side-filter>-->
 <!--                        </app-form-daterange>-->
-                    </div>
+                    <!-- </div>
                 </div>
             </mat-header-cell>
             <mat-cell class="has-date-range-filter" *matCellDef="let item">
                 {{ item.updatedAt | dateTimeDefault }}
             </mat-cell>
-        </ng-container>
+        </ng-container> -->
 
-        <mat-header-row *matHeaderRowDef="[]"></mat-header-row>
-        <mat-row
-            *matRowDef="let item; columns: []">
-<!--            app-hover-row-actions-->
+        <!-- <mat-header-row *matHeaderRowDef="[]"></mat-header-row> -->
+        <!-- <mat-row
+            *matRowDef="let item; columns: []"> -->
+           <!-- app-hover-row-actions-->
 <!--            [hoverRowActionsComponent]="hoverRow"-->
 <!--            [hoverRowActions]="recordActions"-->
-<!--            [hoverRowActionData]="item"-->
-        </mat-row>
-    </mat-table>
+<!--            [hoverRowActionData]="item" -->
+        <!-- </mat-row> -->
+    <!-- </mat-table> -->
 
 <!--    <div-->
 <!--        *ngIf="refreshingList"-->
