@@ -48,6 +48,11 @@ interface CreateViewModifyV2TabInputText extends Omit<CreateViewModifyV2TabInput
   // required
   type: CreateViewModifyV2TabInputType.TEXT;
   value: CreateViewModifyV2TabInputValue<string>;
+
+  // optional
+  validators?: {
+    required?: () => boolean
+  }
 }
 
 /**
@@ -58,6 +63,11 @@ interface CreateViewModifyV2TabInputSingleSelect extends Omit<CreateViewModifyV2
   type: CreateViewModifyV2TabInputType.SELECT_SINGLE;
   options: ILabelValuePairModel[];
   value: CreateViewModifyV2TabInputValue<string>;
+
+  // optional
+  validators?: {
+    required?: () => boolean
+  }
 }
 
 /**

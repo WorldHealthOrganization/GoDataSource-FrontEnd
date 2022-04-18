@@ -174,6 +174,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               set: (value) => {
                 this.itemData.firstName = value;
               }
+            },
+            validators: {
+              required: () => true
             }
           }, {
             type: CreateViewModifyV2TabInputType.TEXT,

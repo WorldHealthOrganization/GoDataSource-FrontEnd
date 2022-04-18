@@ -76,6 +76,7 @@
               [tooltip]="input.description"
               [disabled]="input.disabled ? input.disabled(input) : undefined"
               autocomplete="off"
+              [required]="input.validators?.required ? input.validators?.required() : undefined"
               (ngModelChange)="input.value.set($event)"></app-form-input-v2>
 
             <!-- Dropdown - single -->
@@ -86,7 +87,9 @@
               [placeholder]="input.placeholder"
               [tooltip]="input.description"
               [options]="input.options"
+              [clearable]="true"
               [disabled]="input.disabled ? input.disabled(input) : undefined"
+              [required]="input.validators?.required ? input.validators?.required() : undefined"
               (ngModelChange)="input.value.set($event)"></app-form-select-single-v2>
 
             <!-- List -->
