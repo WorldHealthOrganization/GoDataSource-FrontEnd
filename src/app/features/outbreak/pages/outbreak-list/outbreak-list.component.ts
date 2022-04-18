@@ -1112,7 +1112,7 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
         // should be the last pipe
         takeUntil(this.destroyed$)
       )
-      .subscribe( ( response ) => {
+      .subscribe((response) => {
         this.pageCount = response;
       });
   }
