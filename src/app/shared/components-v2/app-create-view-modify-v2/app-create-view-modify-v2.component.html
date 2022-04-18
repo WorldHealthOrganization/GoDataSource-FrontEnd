@@ -61,7 +61,8 @@
         <!-- Input Template -->
         <ng-template
           #inputRender
-          let-input="input">
+          let-input="input"
+          let-parentName="parentName">
           <div
             class="gd-create-view-modify-bottom-section-content-input"
             [ngSwitch]="input.type">
@@ -70,7 +71,7 @@
             <app-form-input-v2
               *ngSwitchCase="CreateViewModifyV2TabInputType.TEXT"
               [ngModel]="input.value.get()"
-              [name]="input.name"
+              [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
               [placeholder]="input.placeholder"
               [tooltip]="input.description"
               [disabled]="input.disabled ? input.disabled(input) : undefined"
@@ -81,7 +82,7 @@
             <app-form-select-single-v2
               *ngSwitchCase="CreateViewModifyV2TabInputType.SELECT_SINGLE"
               [ngModel]="input.value.get()"
-              [name]="input.name"
+              [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
               [placeholder]="input.placeholder"
               [tooltip]="input.description"
               [options]="input.options"
@@ -116,7 +117,7 @@
                     <div
                       *ngFor="let inputDef of input.definition.inputs">
                       <ng-container
-                        *ngTemplateOutlet="inputRender; context: { input: inputDef }"></ng-container>
+                        *ngTemplateOutlet="inputRender; context: { input: inputDef, parentName: input.name + '[' + itemIndex + ']' }"></ng-container>
                     </div>
                   </div>
 
@@ -167,7 +168,7 @@
               *ngFor="let input of section.inputs"
               fxFlex>
               <ng-container
-                *ngTemplateOutlet="inputRender; context: { input }"></ng-container>
+                *ngTemplateOutlet="inputRender; context: { input, parentName: '' }"></ng-container>
             </div>
 
           </div>
