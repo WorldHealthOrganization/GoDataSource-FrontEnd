@@ -56,7 +56,10 @@
     <ng-template
       #sectionsRender
       let-tab="tab">
-      <form>
+      <form
+        #form="ngForm">
+        <!-- Hack to set form :) -->
+        {{ updateForm(tab, form) }}
 
         <!-- Input Template -->
         <ng-template
@@ -199,8 +202,22 @@
       #viewModify>
       <mat-tab-group>
         <mat-tab
-          *ngFor="let tab of tabs"
-          [label]="tab.label | translate">
+          *ngFor="let tab of tabs">
+
+          <!-- Label & valid -->
+          <ng-template
+            mat-tab-label>
+
+            <!-- Label -->
+            <span>{{tab.label | translate}}</span>
+
+            <!-- Invalid -->
+            <mat-icon
+              *ngIf="isModify && tab.form?.touched && tab.form?.invalid"
+              color="warn">warning</mat-icon>
+          </ng-template>
+
+          <!-- Content -->
           <ng-container
             *ngTemplateOutlet="sectionsRender; context: { tab }"></ng-container>
         </mat-tab>

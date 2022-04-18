@@ -4,6 +4,7 @@ import { CreateViewModifyV2Tab, CreateViewModifyV2TabInputList, CreateViewModify
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { NgForm } from '@angular/forms';
 
 /**
  * Component
@@ -135,5 +136,15 @@ export class AppCreateViewModifyV2Component {
       // remove item
       deleteItem();
     });
+  }
+
+  /**
+   * Update form
+   */
+  updateForm(
+    tab: CreateViewModifyV2Tab,
+    form: NgForm
+  ): void {
+    tab.form = form;
   }
 }

@@ -1,4 +1,5 @@
 import { ILabelValuePairModel } from '../../../forms-v2/core/label-value-pair.model';
+import { NgForm } from '@angular/forms';
 
 /**
  * Input type
@@ -114,4 +115,7 @@ export interface CreateViewModifyV2Tab {
   type: CreateViewModifyV2TabInputType.TAB;
   sections: CreateViewModifyV2Section[];
   label: string;
+
+  // optional
+  form?: NgForm;
 }
