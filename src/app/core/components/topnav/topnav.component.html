@@ -74,7 +74,8 @@
       (ngModelChange)="selectOutbreak($event)"
       [options]="outbreakListOptions"
       optionTooltipKey="details"
-      [disabled]="selectedOutbreakDisabled">
+      [disabled]="outbreakListOptionsLoading || selectedOutbreakDisabled"
+      [loading]="outbreakListOptionsLoading">
     </app-form-select-single-v2>
 
     <!-- Mobile responsive buttons -->
