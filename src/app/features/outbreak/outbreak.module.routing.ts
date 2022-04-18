@@ -32,7 +32,7 @@ const routes: Routes = [
       geographicalLevel: LocationGeographicalLevelDataResolver,
       yesNo: YesNoDataResolver,
       yesNoAll: YesNoAllDataResolver,
-      followUps: FollowUpGenerationTeamAssignmentAlgorithmDataResolver,
+      followUpGenerationTeamAssignmentAlgorithm: FollowUpGenerationTeamAssignmentAlgorithmDataResolver,
       user: UserDataResolver
     }
   },

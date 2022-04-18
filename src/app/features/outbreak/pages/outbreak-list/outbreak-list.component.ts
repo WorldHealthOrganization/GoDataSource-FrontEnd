@@ -26,6 +26,7 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { IV2SideDialogConfigButtonType, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 
 @Component({
   selector: 'app-outbreak-list',
@@ -54,6 +55,15 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
     private dialogV2Service: DialogV2Service
   ) {
     super(listHelperService);
+
+    setTimeout(() => {
+    // initialize pagination
+      this.initPaginator();
+
+      // ...and re-load the list when the Selected Outbreak is changed
+      this.needsRefreshList(true);
+    });
+
   }
 
   /**
@@ -62,17 +72,6 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
-  }
-
-  /**
-   * Selected outbreak was changed
-   */
-  selectedOutbreakChanged(): void {
-    // initialize pagination
-    this.initPaginator();
-
-    // ...and re-load the list when the Selected Outbreak is changed
-    this.needsRefreshList(true);
   }
 
   /**
@@ -95,7 +94,6 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
       {
         field: 'disease',
         label: 'LNG_OUTBREAK_FIELD_LABEL_DISEASE',
-        pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         notVisible: true,
         filter: {
@@ -123,7 +121,6 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
       {
         field: 'reportingGeographicalLevelId',
         label: 'LNG_OUTBREAK_FIELD_LABEL_LOCATION_GEOGRAPHICAL_LEVEL',
-        pinned: IV2ColumnPinned.LEFT,
         notVisible: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -161,7 +158,7 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
             return column &&
               column.id &&
               this.selectedOutbreak.id &&
-              column.id === this.selectedOutbreak.id ?
+              column.id === this.authUser.activeOutbreakId ?
               this.i18nService.instant('LNG_COMMON_LABEL_YES') :
               this.i18nService.instant('LNG_COMMON_LABEL_NO');
           }
@@ -181,7 +178,7 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
                 case true : {
                   this.queryBuilder.filter.where({
                     id: {
-                      'eq': this.authUser.activeOutbreakId ?
+                      eq: this.authUser.activeOutbreakId ?
                         this.authUser.activeOutbreakId :
                         -1
                     }
@@ -191,7 +188,7 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
                 case false : {
                   this.queryBuilder.filter.where({
                     id: {
-                      'neq': this.authUser.activeOutbreakId
+                      neq: this.authUser.activeOutbreakId
                     }
                   });
                   break;
@@ -210,7 +207,7 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
         notVisible: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.followUps as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+          options: (this.activatedRoute.snapshot.data.followUpGenerationTeamAssignmentAlgorithm as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
         }
       },
       {
@@ -430,10 +427,9 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
                   const loading = this.dialogV2Service.showLoadingDialog();
 
                   // modify outbreak
-                  const userData = { 'activeOutbreakId': item.id };
                   const userId = this.authUser.id;
                   this.userDataService
-                    .modifyUser(userId, userData)
+                    .modifyUser(userId, { 'activeOutbreakId': item.id })
                     .pipe(
                       catchError((err) => {
                         this.toastV2Service.error(err);
@@ -448,11 +444,7 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
                           this.authUser = authenticatedUser.user;
                           this.outbreakDataService.checkActiveSelectedOutbreak();
 
-                          // FIXME: We don't have acces to topNav anymore to refreh outbreaks drop-down (at CR announce Adrian)
-                          // refresh list of top nav outbreak
-                          // if (this.topNav) {
-                          //   this.topNav.refreshOutbreaksList();
-                          // }
+                          TopnavComponent.REFRESH_OUTBREAK_LIST();
 
                           // success
                           this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_SUCCESS_MESSAGE');
@@ -893,9 +885,10 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
         sortable: true
       },
       {
-        type: V2AdvancedFilterType.TEXT,
+        type: V2AdvancedFilterType.MULTISELECT,
         field: 'disease',
         label: 'LNG_OUTBREAK_FIELD_LABEL_DISEASE',
+        options: (this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         sortable: true
       },
       {
@@ -928,7 +921,7 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'generateFollowUpsTeamAssignmentAlgorithm',
         label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM',
-        options: (this.activatedRoute.snapshot.data.followUps as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        options: (this.activatedRoute.snapshot.data.followUpGenerationTeamAssignmentAlgorithm as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         sortable: true
       },
       {
@@ -1044,7 +1037,7 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
       'isDateOfOnsetRequired',
       'generateFollowUpsDateOfLastContact',
       'deleted',
-      'createdByUser',
+      'createdBy',
       'createdAt',
       'updatedBy',
       'updatedAt'
@@ -1058,22 +1051,6 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
     // retrieve created user & modified user information
     this.queryBuilder.include('createdByUser', true);
     this.queryBuilder.include('updatedByUser', true);
-
-    // filter out questionnaire data
-    const outbreakObj: OutbreakModel = new OutbreakModel();
-    const removeFields: {
-      [propName: string]: boolean
-    } = {
-      caseInvestigationTemplate: true,
-      contactFollowUpTemplate: true,
-      labResultsTemplate: true
-    };
-    const fields: string[] = Object.getOwnPropertyNames(outbreakObj).filter((propName: string) => {
-      return !removeFields[propName];
-    });
-
-    // retrieve only specific fields
-    this.queryBuilder.fields(...fields);
 
     // retrieve the list of Outbreaks
     this.outbreaksList$ = this.outbreakDataService
