@@ -115,7 +115,8 @@
                   <div
                     fxLayout="row wrap" fxLayoutGap="1.6rem">
                     <div
-                      *ngFor="let inputDef of input.definition.inputs">
+                      *ngFor="let inputDef of input.definition.inputs"
+                      fxFlex>
                       <ng-container
                         *ngTemplateOutlet="inputRender; context: { input: inputDef, parentName: input.name + '[' + itemIndex + ']' }"></ng-container>
                     </div>
