@@ -25,6 +25,7 @@ import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { IV2SideDialogConfigButtonType, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 
 @Component({
   selector: 'app-outbreak-list',
@@ -285,9 +286,12 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
         }
       },
       {
-        field: 'createdBy.name',
+        field: 'createdBy',
         label: 'LNG_OUTBREAK_FIELD_LABEL_CREATED_BY',
         notVisible: true,
+        format: {
+          type: 'createdByUser.name'
+        },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
           options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
@@ -315,7 +319,7 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
         }
       },
       {
-        field: 'updatedBy.name',
+        field: 'updatedBy',
         label: 'LNG_OUTBREAK_FIELD_LABEL_UPDATED_BY',
         notVisible: true,
         format: {
@@ -403,14 +407,12 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
                 this.dialogV2Service.showConfirmDialog({
                   config: {
                     title: {
-                      // FIXME: We don't have this translation token, should be added one on english_us.ts
                       get: () => 'LNG_COMMON_LABEL_ACTIVE',
                       data: () => ({
                         name: item.name
                       })
                     },
                     message: {
-                      // FIXME: Inside this translation we are getting a <br/> HTML element
                       get: () => 'LNG_DIALOG_CONFIRM_MAKE_OUTBREAK_ACTIVE',
                       data: () => ({
                         name: item.name
@@ -510,7 +512,7 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
                       // show loading
                       const loading = this.dialogV2Service.showLoadingDialog();
 
-                      // delete case
+                      // delete outbreak
                       this.outbreakDataService
                         .deleteOutbreak(item.id)
                         .pipe(
@@ -881,7 +883,91 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
   /**
    * Initialize Table Advanced Filters
    */
-  protected initializeTableAdvancedFilters(): void {}
+  protected initializeTableAdvancedFilters(): void {
+    // Outbreak
+    this.advancedFilters = [
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'name',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'disease',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DISEASE',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'countries.id',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES',
+        options: (this.activatedRoute.snapshot.data.country as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'reportingGeographicalLevelId',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_LOCATION_GEOGRAPHICAL_LEVEL',
+        options: (this.activatedRoute.snapshot.data.geographicalLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'startDate',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_START_DATE',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'endDate',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_END_DATE',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'generateFollowUpsTeamAssignmentAlgorithm',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM',
+        options: (this.activatedRoute.snapshot.data.followUps as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'generateFollowUpsOverwriteExisting',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING',
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'generateFollowUpsKeepTeamAssignment',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT',
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'isContactLabResultsActive',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_LAB_RESULTS_ACTIVE',
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'isDateOfOnsetRequired',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED',
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'generateFollowUpsDateOfLastContact',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT',
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        sortable: true
+      }
+    ];
+  }
 
   /**
    * Initialize table quick actions
@@ -919,7 +1005,7 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
    * Initialize breadcrumbs
    */
   protected initializeBreadcrumbs(): void {
-    // determine if cases page should be linkable
+    // determine if outbreaks page should be linkable
     const outbreakAction: IV2BreadcrumbAction = null;
 
     // set breadcrumbs
@@ -958,7 +1044,7 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
       'isDateOfOnsetRequired',
       'generateFollowUpsDateOfLastContact',
       'deleted',
-      'createdBy',
+      'createdByUser',
       'createdAt',
       'updatedBy',
       'updatedAt'

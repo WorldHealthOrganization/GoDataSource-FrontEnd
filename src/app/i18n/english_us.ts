@@ -40,7 +40,8 @@ export const EnglishUsLang = {
     'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_FOLLOWED_UP': 'Followed up',
     'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_FOLLOWED_UP': 'Not followed up',
     'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_TITLE': 'Followup status',
-    'LNG_CASE_FIELD_LABEL_DETAILS': 'Details'
+    'LNG_CASE_FIELD_LABEL_DETAILS': 'Details',
+    'LNG_COMMON_LABEL_ACTIVE': 'Activate {{name}}'
 
 
 
