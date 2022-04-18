@@ -248,6 +248,14 @@ export class Constants {
     EVENTS: {
       label: 'LNG_APP_PAGE_EVENTS',
       value: 'LNG_APP_PAGE_EVENTS'
+    },
+    OUTBREAKS: {
+      label: 'LNG_APP_PAGE_OUTBREAKS',
+      value: 'LNG_APP_PAGE_OUTBREAKS'
+    },
+    OUTBREAK_TEMPLATES: {
+      label: 'LNG_APP_PAGE_OUTBREAK_TEMPLATES',
+      value: 'LNG_APP_PAGE_OUTBREAK_TEMPLATES'
     }
   };
 
