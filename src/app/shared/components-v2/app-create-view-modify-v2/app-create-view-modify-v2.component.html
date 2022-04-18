@@ -109,9 +109,8 @@
                 fxLayout="row wrap" fxLayoutGap="1.6rem">
                 <div
                   *ngFor="let inputDef of input.definition.inputs">
-                  <ng-template
-                    [ngTemplateOutlet]="inputRender"
-                    [ngTemplateOutletContext]="{ input: inputDef }"></ng-template>
+                  <ng-container
+                    *ngTemplateOutlet="inputRender; context: { input: inputDef }"></ng-container>
                 </div>
               </div>
 
@@ -164,9 +163,8 @@
           <div
             *ngFor="let input of section.inputs"
             fxFlex>
-            <ng-template
-              [ngTemplateOutlet]="inputRender"
-              [ngTemplateOutletContext]="{ input }"></ng-template>
+            <ng-container
+              *ngTemplateOutlet="inputRender; context: { input }"></ng-container>
           </div>
 
         </div>
@@ -182,9 +180,11 @@
       <mat-step
         *ngFor="let tab of tabs"
         [label]="tab.label | translate">
-        <ng-template
-          [ngTemplateOutlet]="sectionsRender"
-          [ngTemplateOutletContext]="{ tab }"></ng-template>
+        <form
+          #form="ngForm">
+          <ng-container
+            *ngTemplateOutlet="sectionsRender; context: { tab }"></ng-container>
+        </form>
       </mat-step>
     </mat-horizontal-stepper>
 
@@ -195,9 +195,11 @@
         <mat-tab
           *ngFor="let tab of tabs"
           [label]="tab.label | translate">
-          <ng-template
-            [ngTemplateOutlet]="sectionsRender"
-            [ngTemplateOutletContext]="{ tab }"></ng-template>
+          <form
+            #form="ngForm">
+            <ng-container
+              *ngTemplateOutlet="sectionsRender; context: { tab }"></ng-container>
+          </form>
         </mat-tab>
       </mat-tab-group>
     </ng-template>
