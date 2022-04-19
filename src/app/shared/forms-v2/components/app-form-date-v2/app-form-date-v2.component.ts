@@ -16,6 +16,7 @@ import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/materia
 import { CustomDateAdapter } from '../../../angular-material/adapter/custom-date-adapter';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DEFAULT_FORMAT } from '../../../xt-forms/components/form-datepicker/form-datepicker.component';
+import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
 
 @Component({
   selector: 'app-form-date-v2',
@@ -64,6 +65,30 @@ export class AppFormDateV2Component
 
   // autocomplete
   @Input() autocomplete: string;
+
+  // tooltip
+  tooltipButton: IAppFormIconButtonV2;
+  private _tooltip: string;
+  tooltipTranslated: string;
+  @Input() set tooltip(tooltip: string) {
+    // set data
+    this._tooltip = tooltip;
+
+    // translate tooltip
+    this.tooltipTranslated = this._tooltip ?
+      this.translateService.instant(this._tooltip) :
+      this._tooltip;
+
+    // add / remove tooltip icon
+    this.tooltipButton = !this.tooltipTranslated ?
+      undefined : {
+        icon: 'help',
+        tooltip: this.tooltipTranslated
+      };
+  }
+  get tooltip(): string {
+    return this._tooltip;
+  }
 
   /**
    * Constructor

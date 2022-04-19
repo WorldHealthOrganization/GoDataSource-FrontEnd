@@ -5,6 +5,8 @@ import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { NgForm } from '@angular/forms';
+import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model';
+import { Constants } from '../../../core/models/constants';
 
 /**
  * Component
@@ -43,8 +45,29 @@ export class AppCreateViewModifyV2Component {
   // tabs to render
   @Input() tabs: CreateViewModifyV2Tab[];
 
+  // age - dob options
+  ageDOBOptions: ILabelValuePairModel[] = [
+    {
+      label: 'LNG_ENTITY_FIELD_LABEL_AGE',
+      value: true
+    }, {
+      label: 'LNG_ENTITY_FIELD_LABEL_DOB',
+      value: false
+    }
+  ];
+  ageTypeOptions: ILabelValuePairModel[] = [
+    {
+      label: 'LNG_AGE_FIELD_LABEL_YEARS',
+      value: true
+    }, {
+      label: 'LNG_AGE_FIELD_LABEL_MONTHS',
+      value: false
+    }
+  ];
+
   // constants
   CreateViewModifyV2TabInputType = CreateViewModifyV2TabInputType;
+  Constants = Constants;
 
   /**
    * Constructor

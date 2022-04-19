@@ -12,6 +12,7 @@ import { CreateViewModifyV2Tab, CreateViewModifyV2TabInputType } from '../../../
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { Constants } from '../../../../core/models/constants';
+import { AgeModel } from '../../../../core/models/age.model';
 
 /**
  * Component
@@ -244,6 +245,44 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                 get: () => this.itemData.occupation,
                 set: (value) => {
                   this.itemData.occupation = value;
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH,
+              name: {
+                age: 'age',
+                dob: 'dob'
+              },
+              description: {
+                age: 'LNG_CASE_FIELD_LABEL_AGE_DESCRIPTION',
+                dob: 'LNG_CASE_FIELD_LABEL_DOB_DESCRIPTION'
+              },
+              ageChecked: !this.itemData.dob,
+              ageTypeYears: this.itemData.age?.months < 1,
+              value: {
+                age: {
+                  years: {
+                    get: () => this.itemData.age?.years,
+                    set: (value) => {
+                      // set value
+                      this.itemData.age = this.itemData.age || new AgeModel();
+                      this.itemData.age.years = value;
+                    }
+                  },
+                  months: {
+                    get: () => this.itemData.age?.months,
+                    set: (value) => {
+                      // set value
+                      this.itemData.age = this.itemData.age || new AgeModel();
+                      this.itemData.age.months = value;
+                    }
+                  }
+                },
+                dob: {
+                  get: () => this.itemData.dob,
+                  set: (value) => {
+                    this.itemData.dob = value;
+                  }
                 }
               }
             }

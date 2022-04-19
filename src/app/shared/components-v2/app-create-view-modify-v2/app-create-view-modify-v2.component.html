@@ -102,6 +102,74 @@
                 [required]="input.validators?.required ? input.validators?.required() : undefined"
                 (ngModelChange)="input.value.set($event)"></app-form-select-single-v2>
 
+              <!-- Age - Dob -->
+              <div
+                *ngSwitchCase="CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH"
+                fxFlex fxLayout="row" fxLayoutGap="1.6rem">
+
+                <!-- Age / Dob option -->
+                <app-form-toggle-v2
+                  [(ngModel)]="input.ageChecked"
+                  [name]="parentName ? parentName + '[ageDob]' : 'ageDob'"
+                  [options]="ageDOBOptions"></app-form-toggle-v2>
+
+                <!-- Age -->
+                <div
+                  *ngIf="input.ageChecked; else dob"
+                  fxFlex fxLayout="row" fxLayoutGap="1.6rem">
+
+                  <!-- Years -->
+                  <app-form-number-v2
+                    *ngIf="input.ageTypeYears; else months"
+                    [ngModel]="input.value.age.years.get()"
+                    [name]="parentName ? parentName + '[' + input.name.age + '][years]' : (input.name.age + '[years]')"
+                    placeholder="LNG_AGE_FIELD_LABEL_YEARS"
+                    [tooltip]="input.description?.age"
+                    app-min-max-validator
+                    [minNumber]="0"
+                    [min]="0"
+                    [maxNumber]="Constants.DEFAULT_AGE_MAX_YEARS"
+                    [max]="Constants.DEFAULT_AGE_MAX_YEARS"
+                    (ngModelChange)="input.value.age.years.set($event)"></app-form-number-v2>
+
+                  <!-- Months -->
+                  <ng-template
+                    #months>
+                    <app-form-number-v2
+                      [ngModel]="input.value.age.months.get()"
+                      [name]="parentName ? parentName + '[' + input.name.age + '][months]' : (input.name.age + '[months]')"
+                      placeholder="LNG_AGE_FIELD_LABEL_MONTHS"
+                      [tooltip]="input.description?.age"
+                      app-min-max-validator
+                      [minNumber]="0"
+                      [min]="0"
+                      [maxNumber]="11"
+                      [max]="11"
+                      (ngModelChange)="input.value.age.months.set($event)"></app-form-number-v2>
+                  </ng-template>
+
+                  <!-- Type -->
+                  <app-form-select-single-v2
+                    [(ngModel)]="input.ageTypeYears"
+                    [name]="parentName ? parentName + '[ageDobType]' : 'ageDobType'"
+                    placeholder="LNG_AGE_FIELD_LABEL_TYPE"
+                    [options]="ageTypeOptions"></app-form-select-single-v2>
+
+                </div>
+
+                <!-- Dob -->
+                <ng-template
+                  #dob>
+                  <app-form-date-v2
+                    [ngModel]="input.value.dob.get()"
+                    [name]="parentName ? parentName + '[' + input.name.dob + ']' : input.name.dob"
+                    placeholder="LNG_ENTITY_FIELD_LABEL_DOB"
+                    [tooltip]="input.description?.dob"
+                    (ngModelChange)="input.value.dob.set($event)"></app-form-date-v2>
+                </ng-template>
+
+              </div>
+
               <!-- List -->
               <div
                 *ngSwitchCase="CreateViewModifyV2TabInputType.LIST">

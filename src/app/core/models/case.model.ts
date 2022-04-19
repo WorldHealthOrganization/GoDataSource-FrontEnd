@@ -7,7 +7,7 @@ import { AgeModel } from './age.model';
 import { CaseCenterDateRangeModel } from './case-center-date-range.model';
 import { IAnswerData } from './question.model';
 import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
-import { moment } from '../helperClasses/x-moment';
+import { Moment, moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
 import { VaccineModel } from './vaccine.model';
 import {
@@ -97,7 +97,7 @@ export class CaseModel
     people: any[]
   }[];
 
-  dob: string;
+  dob: string | Moment;
   age: AgeModel;
 
   inconsistencies: InconsistencyModel[];

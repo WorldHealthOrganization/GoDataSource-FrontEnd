@@ -10,12 +10,25 @@ export abstract class AppFormBaseErrorMsgV2 {
   static msg(
     translateService: TranslateService,
     errKey: string,
-    _errData: any
+    errData: any
   ): string {
     // dynamic error content, must generate string accordingly
     switch (errKey) {
       case 'required':
         return translateService.instant('LNG_FORM_VALIDATION_ERROR_FIELD_REQUIRED');
+
+      case 'minNumberValidator':
+        return translateService.instant(
+          'LNG_FORM_VALIDATION_ERROR_MIN_NUMBER', {
+            min: errData.min
+          }
+        );
+      case 'maxNumberValidator':
+        return translateService.instant(
+          'LNG_FORM_VALIDATION_ERROR_MAX_NUMBER', {
+            max: errData.max
+          }
+        );
 
       default:
         return '--- NOT HANDLED ---';

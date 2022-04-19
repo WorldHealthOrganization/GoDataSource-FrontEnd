@@ -1,5 +1,6 @@
 import { ILabelValuePairModel } from '../../../forms-v2/core/label-value-pair.model';
 import { NgForm } from '@angular/forms';
+import { Moment } from '../../../../core/helperClasses/x-moment';
 
 /**
  * Input type
@@ -8,6 +9,7 @@ export enum CreateViewModifyV2TabInputType {
   // inputs
   TEXT,
   SELECT_SINGLE,
+  AGE_DATE_OF_BIRTH,
 
   // input groups
   LIST,
@@ -57,6 +59,33 @@ interface CreateViewModifyV2TabInputText extends Omit<CreateViewModifyV2TabInput
 }
 
 /**
+ * Input - age - date of birth
+ */
+interface CreateViewModifyV2TabInputAgeOrDOB extends Omit<CreateViewModifyV2TabInputBase, 'name' | 'placeholder' | 'description' | 'value'> {
+  // required
+  type: CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH;
+  name: {
+    age: string,
+    dob: string
+  },
+  ageChecked: boolean,
+  ageTypeYears: boolean,
+  value: {
+    age: {
+      years: CreateViewModifyV2TabInputValue<number>,
+      months: CreateViewModifyV2TabInputValue<number>
+    },
+    dob: CreateViewModifyV2TabInputValue<string | Moment>
+  },
+
+  // optional
+  description?: {
+    age: string,
+    dob: string
+  }
+}
+
+/**
  * Input - select single
  */
 interface CreateViewModifyV2TabInputSingleSelect extends Omit<CreateViewModifyV2TabInputBase, 'value'> {
@@ -95,7 +124,7 @@ export interface CreateViewModifyV2TabInputList {
 /**
  * Input
  */
-type CreateViewModifyV2TabInput = CreateViewModifyV2TabInputText | CreateViewModifyV2TabInputSingleSelect | CreateViewModifyV2TabInputList;
+type CreateViewModifyV2TabInput = CreateViewModifyV2TabInputText | CreateViewModifyV2TabInputSingleSelect | CreateViewModifyV2TabInputAgeOrDOB | CreateViewModifyV2TabInputList;
 
 /**
  * Tab section
