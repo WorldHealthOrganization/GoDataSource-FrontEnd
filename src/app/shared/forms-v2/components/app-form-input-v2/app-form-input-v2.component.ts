@@ -36,6 +36,9 @@ export class AppFormInputV2Component
   // autocomplete
   @Input() autocomplete: string;
 
+  // view only
+  @Input() viewOnly: boolean;
+
   // tooltip
   tooltipButton: IAppFormIconButtonV2;
   private _tooltip: string;
