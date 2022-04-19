@@ -34,7 +34,8 @@ const createViewModifyFoundation: Route = {
     occupation: OccupationDataResolver,
     user: UserDataResolver,
     addressType: AddressTypeDataResolver,
-    outcome: OutcomeDataResolver
+    outcome: OutcomeDataResolver,
+    risk: RiskDataResolver
   }
 };
 

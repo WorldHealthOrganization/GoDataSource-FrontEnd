@@ -686,6 +686,18 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                 this.itemData.isDateOfReportingApproximate = value;
               }
             }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'riskLevel',
+            placeholder: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
+            description: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL_DESCRIPTION',
+            options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: {
+              get: () => this.itemData.riskLevel,
+              set: (value) => {
+                this.itemData.riskLevel = value;
+              }
+            }
           }]
         }
       ]
