@@ -108,6 +108,17 @@
                 [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
                 (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-select-single-v2>
 
+              <!-- Toggle checkbox -->
+              <app-form-toggle-checkbox-v2
+                *ngSwitchCase="CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX"
+                fxFlex
+                [ngModel]="input.value.get(parentItemIndex)"
+                [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                [placeholder]="input.placeholder"
+                [tooltip]="input.description"
+                [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-toggle-checkbox-v2>
+
               <!-- Age - Dob -->
               <div
                 *ngSwitchCase="CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH"

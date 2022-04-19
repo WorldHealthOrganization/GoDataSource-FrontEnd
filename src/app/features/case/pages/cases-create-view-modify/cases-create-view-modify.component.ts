@@ -482,6 +482,17 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                 'dateOfInfection'
               ]
             }
+          }, {
+            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+            name: 'isDateOfOnsetApproximate',
+            placeholder: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
+            description: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE_DESCRIPTION',
+            value: {
+              get: () => this.itemData.isDateOfOnsetApproximate,
+              set: (value) => {
+                this.itemData.isDateOfOnsetApproximate = value;
+              }
+            }
           }]
         }
       ]

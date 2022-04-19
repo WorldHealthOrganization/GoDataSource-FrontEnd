@@ -16,6 +16,7 @@ export enum CreateViewModifyV2TabInputType {
   AGE_DATE_OF_BIRTH,
   VISUAL_ID,
   DATE,
+  TOGGLE_CHECKBOX,
 
   // input groups
   LIST,
@@ -83,6 +84,15 @@ interface CreateViewModifyV2TabInputSingleSelect extends Omit<CreateViewModifyV2
   validators?: {
     required?: () => boolean
   }
+}
+
+/**
+ * Input - toggle checkbox
+ */
+interface CreateViewModifyV2TabInputToggleCheckbox extends Omit<CreateViewModifyV2TabInputBase, 'value'> {
+  // required
+  type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX;
+  value: CreateViewModifyV2TabInputValue<boolean>;
 }
 
 /**
@@ -192,8 +202,8 @@ export interface CreateViewModifyV2TabInputAddress {
 /**
  * Input
  */
-type CreateViewModifyV2TabInput = CreateViewModifyV2TabInputText | CreateViewModifyV2TabInputSingleSelect | CreateViewModifyV2TabInputAgeOrDOB
-| CreateViewModifyV2TabInputVisualID | CreateViewModifyV2TabInputDate | CreateViewModifyV2TabInputList
+type CreateViewModifyV2TabInput = CreateViewModifyV2TabInputText | CreateViewModifyV2TabInputSingleSelect | CreateViewModifyV2TabInputToggleCheckbox
+| CreateViewModifyV2TabInputAgeOrDOB | CreateViewModifyV2TabInputVisualID | CreateViewModifyV2TabInputDate | CreateViewModifyV2TabInputList
 | CreateViewModifyV2TabInputDocument | CreateViewModifyV2TabInputAddress;
 
 /**

@@ -5,6 +5,12 @@
     [checked]="value"
     (change)="value = !value">
 
+    <!-- Left - Icon buttons -->
+    <mat-icon
+      *ngIf="tooltipButton"
+      matPrefix
+      [matTooltip]="tooltipButton.tooltip">{{tooltipButton.icon}}</mat-icon>
+
     <!-- Icon -->
     <mat-icon>{{value ? 'toggle_on' : 'toggle_off'}}</mat-icon>
 
