@@ -198,9 +198,46 @@
         linear>
         <mat-step
           *ngFor="let tab of tabs"
-          [label]="tab.label | translate">
-          <ng-container
-            *ngTemplateOutlet="sectionsRender; context: { tab }"></ng-container>
+          [stepControl]="tab.form">
+
+          <!-- Tab Label -->
+          <div
+            *matStepLabel>
+            {{tab.label | translate}}
+          </div>
+
+          <!-- Content -->
+          <div
+            class="gd-create-view-modify-bottom-content">
+            <ng-container
+              *ngTemplateOutlet="sectionsRender; context: { tab }"></ng-container>
+          </div>
+
+          <!-- Bottom -->
+          <div
+            class="gd-create-view-modify-bottom-bottom"
+            fxLayoutAlign="end">
+            <!-- Next -->
+            <button
+              mat-flat-button color="primary"
+              matStepperNext
+              (click)="tab.form ? tab.form.ngSubmit.emit() : undefined">
+
+              <!-- Pending validators -->
+              <mat-progress-spinner
+                *ngIf="tab.form?.pending"
+                diameter="16"
+                mode="indeterminate"
+                color="primary">
+              </mat-progress-spinner>
+
+              <!-- Label -->
+              <span>
+                {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
+              </span>
+            </button>
+          </div>
+
         </mat-step>
       </mat-horizontal-stepper>
 
