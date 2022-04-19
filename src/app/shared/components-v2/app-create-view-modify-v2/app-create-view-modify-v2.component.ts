@@ -121,6 +121,11 @@ export class AppCreateViewModifyV2Component {
   addListItem(input: CreateViewModifyV2TabInputList): void {
     // add new item to list
     input.items.push(input.definition.add.newItem());
+
+    // trigger items changed
+    if (input.itemsChanged) {
+      input.itemsChanged(input);
+    }
   }
 
   /**
@@ -134,6 +139,11 @@ export class AppCreateViewModifyV2Component {
     const deleteItem = () => {
       // remove item
       input.items.splice(itemIndex, 1);
+
+      // trigger items changed
+      if (input.itemsChanged) {
+        input.itemsChanged(input);
+      }
 
       // re-render ui
       this.changeDetectorRef.detectChanges();

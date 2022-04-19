@@ -16,6 +16,8 @@ import { AgeModel } from '../../../../core/models/age.model';
 import { TimerCache } from '../../../../core/helperClasses/timer-cache';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { UserModel } from '../../../../core/models/user.model';
+import { DocumentModel } from '../../../../core/models/document.model';
+import { AddressModel } from '../../../../core/models/address.model';
 
 /**
  * Component
@@ -370,7 +372,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             definition: {
               add: {
                 label: 'LNG_DOCUMENT_LABEL_ADD_NEW_DOCUMENT',
-                newItem: () => new CaseModel()
+                newItem: () => new DocumentModel()
               },
               remove: {
                 label: 'LNG_COMMON_BUTTON_DELETE',
@@ -396,6 +398,40 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                   // #TODO
                   get: () => null,
                   set: () => {}
+                }
+              }]
+            }
+          }]
+        },
+
+        // Addresses
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_CASE_FIELD_LABEL_ADDRESSES',
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.LIST,
+            name: 'addresses',
+            items: [],
+            itemsChanged: (list) => {
+              // update addresses
+              this.itemData.addresses = list.items;
+            },
+            definition: {
+              add: {
+                label: 'LNG_ADDRESS_LABEL_ADD_NEW_ADDRESS',
+                newItem: () => new AddressModel()
+              },
+              remove: {
+                label: 'LNG_COMMON_BUTTON_DELETE',
+                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_ADDRESS'
+              },
+              inputs: [{
+                type: CreateViewModifyV2TabInputType.ADDRESS,
+                options: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                value: {
+                  get: (index: number) => {
+                    return this.itemData.addresses[index];
+                  }
                 }
               }]
             }

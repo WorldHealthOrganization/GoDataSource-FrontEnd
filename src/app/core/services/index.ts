@@ -74,10 +74,12 @@ import { CountryDataResolver } from './resolvers/data/country.resolver';
 import { TeamDataResolver } from './resolvers/data/team.resolver';
 import { SelectedOutbreakDataResolver } from './resolvers/data/selected-outbreak.resolver';
 import { DocumentTypeDataResolver } from './resolvers/data/document-type.resolver';
+import { AddressTypeDataResolver } from './resolvers/data/address-type.resolver';
 
 // export the list of services
 export const services: any[] = [
   // resolver services
+  AddressTypeDataResolver,
   ClassificationDataResolver,
   CountryDataResolver,
   DailyFollowUpStatusDataResolver,

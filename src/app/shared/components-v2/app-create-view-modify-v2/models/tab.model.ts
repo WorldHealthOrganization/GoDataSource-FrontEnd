@@ -3,6 +3,7 @@ import { NgForm } from '@angular/forms';
 import { Moment } from '../../../../core/helperClasses/x-moment';
 import { Observable } from 'rxjs';
 import { IGeneralAsyncValidatorResponse } from '../../../xt-forms/validators/general-async-validator.directive';
+import { AddressModel } from '../../../../core/models/address.model';
 
 /**
  * Input type
@@ -17,6 +18,7 @@ export enum CreateViewModifyV2TabInputType {
 
   // input groups
   LIST,
+  ADDRESS,
 
   // layout
   TAB,
@@ -27,8 +29,8 @@ export enum CreateViewModifyV2TabInputType {
  * Input - base value
  */
 interface CreateViewModifyV2TabInputValue<T> {
-  get: () => T;
-  set: (value: T) => void;
+  get: (index?: number) => T;
+  set: (value: T, index?: number) => void;
 }
 
 /**
@@ -151,13 +153,31 @@ export interface CreateViewModifyV2TabInputList {
       confirmLabel: string
     }
   };
+
+  // optional
+  itemsChanged?: (list: CreateViewModifyV2TabInputList) => void;
+}
+
+/**
+ * Input - address
+ */
+export interface CreateViewModifyV2TabInputAddress {
+  // required
+  type: CreateViewModifyV2TabInputType.ADDRESS;
+  options: ILabelValuePairModel[];
+  value: {
+    get: (index?: number) => AddressModel;
+  };
+
+  // optional
+  name?: string; // used for single address - event
 }
 
 /**
  * Input
  */
 type CreateViewModifyV2TabInput = CreateViewModifyV2TabInputText | CreateViewModifyV2TabInputSingleSelect | CreateViewModifyV2TabInputAgeOrDOB
-| CreateViewModifyV2TabInputVisualID | CreateViewModifyV2TabInputDate | CreateViewModifyV2TabInputList;
+| CreateViewModifyV2TabInputVisualID | CreateViewModifyV2TabInputDate | CreateViewModifyV2TabInputList | CreateViewModifyV2TabInputAddress;
 
 /**
  * Tab section

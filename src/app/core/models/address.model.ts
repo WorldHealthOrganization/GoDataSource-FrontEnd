@@ -5,7 +5,7 @@ import {
   RequestFilterGenerator,
   RequestQueryBuilder
 } from '../helperClasses/request-query-builder';
-import { moment } from '../helperClasses/x-moment';
+import { Moment, moment } from '../helperClasses/x-moment';
 
 // addresses types
 export enum AddressType {
@@ -20,7 +20,7 @@ export class AddressModel {
   addressLine1: string;
   locationId: string;
   location: LocationModel;
-  date: string;
+  date: string | Moment;
   geoLocation: { lat: number, lng: number };
   geoLocationAccurate: boolean = false;
   phoneNumber: string;
