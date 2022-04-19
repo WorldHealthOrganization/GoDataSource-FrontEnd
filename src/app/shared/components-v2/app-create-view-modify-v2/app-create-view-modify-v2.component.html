@@ -185,6 +185,18 @@
                 [maxlength]="255"
                 (ngModelChange)="input.value.set($event)"></app-form-input-v2>
 
+              <!-- Date -->
+              <app-form-date-v2
+                *ngSwitchCase="CreateViewModifyV2TabInputType.DATE"
+                [ngModel]="input.value.get()"
+                [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                [placeholder]="input.placeholder"
+                [tooltip]="input.description"
+                [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                autocomplete="off"
+                [required]="input.validators?.required ? input.validators?.required() : undefined"
+                (ngModelChange)="input.value.set($event)"></app-form-date-v2>
+
               <!-- List -->
               <div
                 *ngSwitchCase="CreateViewModifyV2TabInputType.LIST">

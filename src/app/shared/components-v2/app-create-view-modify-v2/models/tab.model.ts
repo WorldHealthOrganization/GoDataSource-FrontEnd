@@ -13,6 +13,7 @@ export enum CreateViewModifyV2TabInputType {
   SELECT_SINGLE,
   AGE_DATE_OF_BIRTH,
   VISUAL_ID,
+  DATE,
 
   // input groups
   LIST,
@@ -114,6 +115,20 @@ interface CreateViewModifyV2TabInputVisualID extends Omit<CreateViewModifyV2TabI
 }
 
 /**
+ * Input - date
+ */
+interface CreateViewModifyV2TabInputDate extends Omit<CreateViewModifyV2TabInputBase, 'value'> {
+  // required
+  type: CreateViewModifyV2TabInputType.DATE;
+  value: CreateViewModifyV2TabInputValue<string | Moment>;
+
+  // optional
+  validators?: {
+    required?: () => boolean
+  }
+}
+
+/**
 * Input - list
 */
 export interface CreateViewModifyV2TabInputList {
@@ -138,7 +153,7 @@ export interface CreateViewModifyV2TabInputList {
  * Input
  */
 type CreateViewModifyV2TabInput = CreateViewModifyV2TabInputText | CreateViewModifyV2TabInputSingleSelect | CreateViewModifyV2TabInputAgeOrDOB
-| CreateViewModifyV2TabInputVisualID | CreateViewModifyV2TabInputList;
+| CreateViewModifyV2TabInputVisualID | CreateViewModifyV2TabInputDate | CreateViewModifyV2TabInputList;
 
 /**
  * Tab section

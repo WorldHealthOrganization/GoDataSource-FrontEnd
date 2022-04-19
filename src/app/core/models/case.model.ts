@@ -69,7 +69,7 @@ export class CaseModel
     [variable: string]: IAnswerData[];
   };
   type: EntityType = EntityType.CASE;
-  dateOfReporting: string;
+  dateOfReporting: string | Moment;
   dateOfLastContact: string;
   isDateOfReportingApproximate: boolean;
   transferRefused: boolean;
