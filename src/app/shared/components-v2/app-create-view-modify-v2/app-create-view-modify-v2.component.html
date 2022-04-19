@@ -260,6 +260,15 @@
                   placeholder="LNG_ADDRESS_FIELD_LABEL_DATE"
                   tooltip="LNG_ADDRESS_FIELD_LABEL_DATE_DESCRIPTION"></app-form-date-v2>
 
+                <!-- Email address -->
+                <app-form-input-v2
+                  fxFlex
+                  [(ngModel)]="input.value.get(parentItemIndex).emailAddress"
+                  [name]="parentName ? parentName + '[emailAddress]' : (input.name + '[emailAddress]')"
+                  placeholder="LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS"
+                  tooltip="LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS_DESCRIPTION"
+                  app-email-validator></app-form-input-v2>
+
               </div>
 
               <!-- List -->
