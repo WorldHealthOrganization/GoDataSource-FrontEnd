@@ -543,8 +543,10 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
                 // reset data if not decease
                 if (this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED) {
-                  this.itemData.safeBurial = undefined;
-                  this.itemData.dateOfBurial = undefined;
+                  this.itemData.safeBurial = null;
+                  this.itemData.dateOfBurial = null;
+                  this.itemData.burialLocationId = null;
+                  this.itemData.burialPlaceName = null;
                 }
               }
             }
@@ -587,7 +589,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             placeholder: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
             description: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL_DESCRIPTION',
             value: {
-              get: () => this.itemData.outcomeId === Constants.OUTCOME_STATUS.DECEASED ?
+              get: () => this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
                 false :
                 this.itemData.safeBurial,
               set: (value) => {
@@ -595,7 +597,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               }
             },
             disabled: () => {
-              return this.itemData.outcomeId === Constants.OUTCOME_STATUS.DECEASED;
+              return this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
             }
           }, {
             type: CreateViewModifyV2TabInputType.DATE,
@@ -603,7 +605,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             placeholder: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL',
             description: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL_DESCRIPTION',
             value: {
-              get: () => this.itemData.outcomeId === Constants.OUTCOME_STATUS.DECEASED ?
+              get: () => this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
                 undefined :
                 this.itemData.dateOfBurial,
               set: (value) => {
@@ -620,7 +622,40 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               ]
             },
             disabled: () => {
-              return this.itemData.outcomeId === Constants.OUTCOME_STATUS.DECEASED;
+              return this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.LOCATION_SINGLE,
+            name: 'burialLocationId',
+            placeholder: 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL',
+            description: 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL_DESCRIPTION',
+            useOutbreakLocations: true,
+            value: {
+              get: () => this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
+                undefined :
+                this.itemData.burialLocationId,
+              set: (value) => {
+                this.itemData.burialLocationId = value;
+              }
+            },
+            disabled: () => {
+              return this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.TEXT,
+            name: 'burialPlaceName',
+            placeholder: 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME',
+            description: 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME_DESCRIPTION',
+            value: {
+              get: () => this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
+                undefined :
+                this.itemData.burialPlaceName,
+              set: (value) => {
+                this.itemData.burialPlaceName = value;
+              }
+            },
+            disabled: () => {
+              return this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
             }
           }]
         }

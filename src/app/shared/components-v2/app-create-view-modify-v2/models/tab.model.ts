@@ -17,6 +17,7 @@ export enum CreateViewModifyV2TabInputType {
   VISUAL_ID,
   DATE,
   TOGGLE_CHECKBOX,
+  LOCATION_SINGLE,
 
   // input groups
   LIST,
@@ -93,6 +94,18 @@ interface CreateViewModifyV2TabInputToggleCheckbox extends Omit<CreateViewModify
   // required
   type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX;
   value: CreateViewModifyV2TabInputValue<boolean>;
+}
+
+/**
+ * Input - location single
+ */
+interface CreateViewModifyV2TabInputLocationSingle extends Omit<CreateViewModifyV2TabInputBase, 'value'> {
+  // required
+  type: CreateViewModifyV2TabInputType.LOCATION_SINGLE;
+  value: CreateViewModifyV2TabInputValue<string>;
+
+  // optional
+  useOutbreakLocations?: boolean;
 }
 
 /**
@@ -203,8 +216,8 @@ export interface CreateViewModifyV2TabInputAddress {
  * Input
  */
 type CreateViewModifyV2TabInput = CreateViewModifyV2TabInputText | CreateViewModifyV2TabInputSingleSelect | CreateViewModifyV2TabInputToggleCheckbox
-| CreateViewModifyV2TabInputAgeOrDOB | CreateViewModifyV2TabInputVisualID | CreateViewModifyV2TabInputDate | CreateViewModifyV2TabInputList
-| CreateViewModifyV2TabInputDocument | CreateViewModifyV2TabInputAddress;
+| CreateViewModifyV2TabInputLocationSingle | CreateViewModifyV2TabInputAgeOrDOB | CreateViewModifyV2TabInputVisualID | CreateViewModifyV2TabInputDate
+| CreateViewModifyV2TabInputList | CreateViewModifyV2TabInputDocument | CreateViewModifyV2TabInputAddress;
 
 /**
  * Tab section
