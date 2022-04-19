@@ -493,6 +493,24 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                 this.itemData.isDateOfOnsetApproximate = value;
               }
             }
+          }, {
+            type: CreateViewModifyV2TabInputType.DATE,
+            name: 'dateBecomeCase',
+            placeholder: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
+            description: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE_DESCRIPTION',
+            value: {
+              get: () => this.itemData.dateBecomeCase,
+              set: (value) => {
+                this.itemData.dateBecomeCase = value;
+              }
+            },
+            maxDate: this._today,
+            validators: {
+              required: () => this.selectedOutbreak.isDateOfOnsetRequired,
+              dateSameOrBefore: () => [
+                this._today
+              ]
+            }
           }]
         }
       ]

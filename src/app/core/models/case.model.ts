@@ -57,7 +57,7 @@ export class CaseModel
   dateOfOnset: string | Moment;
   isDateOfOnsetApproximate: boolean;
   dateOfOutcome: string;
-  dateBecomeCase: string;
+  dateBecomeCase: string | Moment;
   safeBurial: boolean;
   dateOfBurial: string;
   dateRanges: CaseCenterDateRangeModel[];
