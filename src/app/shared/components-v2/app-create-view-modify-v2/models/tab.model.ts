@@ -1,6 +1,8 @@
 import { ILabelValuePairModel } from '../../../forms-v2/core/label-value-pair.model';
 import { NgForm } from '@angular/forms';
 import { Moment } from '../../../../core/helperClasses/x-moment';
+import { Observable } from 'rxjs';
+import { IGeneralAsyncValidatorResponse } from '../../../xt-forms/validators/general-async-validator.directive';
 
 /**
  * Input type
@@ -10,6 +12,7 @@ export enum CreateViewModifyV2TabInputType {
   TEXT,
   SELECT_SINGLE,
   AGE_DATE_OF_BIRTH,
+  VISUAL_ID,
 
   // input groups
   LIST,
@@ -59,6 +62,21 @@ interface CreateViewModifyV2TabInputText extends Omit<CreateViewModifyV2TabInput
 }
 
 /**
+ * Input - select single
+ */
+interface CreateViewModifyV2TabInputSingleSelect extends Omit<CreateViewModifyV2TabInputBase, 'value'> {
+  // required
+  type: CreateViewModifyV2TabInputType.SELECT_SINGLE;
+  options: ILabelValuePairModel[];
+  value: CreateViewModifyV2TabInputValue<string>;
+
+  // optional
+  validators?: {
+    required?: () => boolean
+  }
+}
+
+/**
  * Input - age - date of birth
  */
 interface CreateViewModifyV2TabInputAgeOrDOB extends Omit<CreateViewModifyV2TabInputBase, 'name' | 'placeholder' | 'description' | 'value'> {
@@ -86,18 +104,13 @@ interface CreateViewModifyV2TabInputAgeOrDOB extends Omit<CreateViewModifyV2TabI
 }
 
 /**
- * Input - select single
+ * Input - visual ID
  */
-interface CreateViewModifyV2TabInputSingleSelect extends Omit<CreateViewModifyV2TabInputBase, 'value'> {
+interface CreateViewModifyV2TabInputVisualID extends Omit<CreateViewModifyV2TabInputBase, 'value'> {
   // required
-  type: CreateViewModifyV2TabInputType.SELECT_SINGLE;
-  options: ILabelValuePairModel[];
+  type: CreateViewModifyV2TabInputType.VISUAL_ID;
   value: CreateViewModifyV2TabInputValue<string>;
-
-  // optional
-  validators?: {
-    required?: () => boolean
-  }
+  validator: Observable<boolean | IGeneralAsyncValidatorResponse>;
 }
 
 /**
@@ -124,7 +137,8 @@ export interface CreateViewModifyV2TabInputList {
 /**
  * Input
  */
-type CreateViewModifyV2TabInput = CreateViewModifyV2TabInputText | CreateViewModifyV2TabInputSingleSelect | CreateViewModifyV2TabInputAgeOrDOB | CreateViewModifyV2TabInputList;
+type CreateViewModifyV2TabInput = CreateViewModifyV2TabInputText | CreateViewModifyV2TabInputSingleSelect | CreateViewModifyV2TabInputAgeOrDOB
+| CreateViewModifyV2TabInputVisualID | CreateViewModifyV2TabInputList;
 
 /**
  * Tab section

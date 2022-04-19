@@ -82,6 +82,9 @@ export abstract class CreateViewModifyComponent<T extends BaseModel> {
 
     // initialize
     const initialize = () => {
+      // initialized data
+      this.initializedData();
+
       // initialize page title
       this.initializePageTitle();
 
@@ -151,6 +154,11 @@ export abstract class CreateViewModifyComponent<T extends BaseModel> {
    * Initialize page title
    */
   protected abstract retrieveItem(): Observable<T>;
+
+  /**
+   * Initialized data
+   */
+  protected abstract initializedData(): void;
 
   /**
    * Initialize page title

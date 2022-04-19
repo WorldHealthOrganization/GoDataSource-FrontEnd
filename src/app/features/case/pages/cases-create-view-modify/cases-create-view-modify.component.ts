@@ -13,6 +13,8 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { Constants } from '../../../../core/models/constants';
 import { AgeModel } from '../../../../core/models/age.model';
+import { TimerCache } from '../../../../core/helperClasses/timer-cache';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 
 /**
  * Component
@@ -22,6 +24,11 @@ import { AgeModel } from '../../../../core/models/age.model';
   templateUrl: './cases-create-view-modify.component.html'
 })
 export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<CaseModel> implements OnDestroy {
+  // case visual id mask
+  private _caseVisualIDMask: {
+    mask: string
+  };
+
   /**
    * Constructor
    */
@@ -62,6 +69,19 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         this.selectedOutbreak.id,
         this.activatedRoute.snapshot.params.caseId
       );
+  }
+
+  /**
+   * Data initialized
+   */
+  protected initializedData(): void {
+    // initialize visual ID mask
+    this._caseVisualIDMask = {
+      mask: CaseModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask)
+    };
+
+    // set visual id for case
+    this.itemData.visualId = this._caseVisualIDMask.mask;
   }
 
   /**
@@ -285,6 +305,39 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                   }
                 }
               }
+            }, {
+              type: CreateViewModifyV2TabInputType.VISUAL_ID,
+              name: 'visualId',
+              placeholder: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
+              description: this.translateService.instant(
+                'LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
+                this._caseVisualIDMask
+              ),
+              value: {
+                get: () => this.itemData.visualId,
+                set: (value) => {
+                  this.itemData.visualId = value;
+                }
+              },
+              validator: new Observable((observer) => {
+                // construct cache key
+                const cacheKey: string = 'CCA_' + this.selectedOutbreak.id +
+                  this._caseVisualIDMask.mask +
+                  this.itemData.visualId;
+
+                // get data from cache or execute validator
+                TimerCache.run(
+                  cacheKey,
+                  this.caseDataService.checkCaseVisualIDValidity(
+                    this.selectedOutbreak.id,
+                    this._caseVisualIDMask.mask,
+                    this.itemData.visualId
+                  )
+                ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                  observer.next(isValid);
+                  observer.complete();
+                });
+              })
             }
           ]
         },
