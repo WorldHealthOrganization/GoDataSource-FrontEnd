@@ -657,6 +657,35 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             disabled: () => {
               return this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
             }
+          }, {
+            type: CreateViewModifyV2TabInputType.DATE,
+            name: 'dateOfReporting',
+            placeholder: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
+            description: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION',
+            value: {
+              get: () => this.itemData.dateOfReporting,
+              set: (value) => {
+                this.itemData.dateOfReporting = value;
+              }
+            },
+            maxDate: this._today,
+            validators: {
+              required: () => true,
+              dateSameOrBefore: () => [
+                this._today
+              ]
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+            name: 'isDateOfReportingApproximate',
+            placeholder: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+            description: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION',
+            value: {
+              get: () => this.itemData.isDateOfReportingApproximate,
+              set: (value) => {
+                this.itemData.isDateOfReportingApproximate = value;
+              }
+            }
           }]
         }
       ]
