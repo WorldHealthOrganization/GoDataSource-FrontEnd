@@ -197,7 +197,7 @@
         *ngIf="isCreate; else viewModify"
         linear>
         <mat-step
-          *ngFor="let tab of tabs"
+          *ngFor="let tab of tabs; let tabIndex = index"
           [stepControl]="tab.form">
 
           <!-- Tab Label -->
@@ -217,6 +217,17 @@
           <div
             class="gd-create-view-modify-bottom-bottom"
             fxLayoutAlign="end">
+            <!-- Previous -->
+            <button
+              *ngIf="tabIndex > 0"
+              mat-flat-button color="primary"
+              matStepperPrevious>
+              <!-- Label -->
+              <span>
+                {{'LNG_STEPPER_BUTTON_BACK' | translate}}
+              </span>
+            </button>
+
             <!-- Next -->
             <button
               mat-flat-button color="primary"
