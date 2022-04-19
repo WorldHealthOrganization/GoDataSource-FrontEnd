@@ -562,7 +562,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             maxDate: this._today,
             validators: {
               dateSameOrBefore: () => [
-                this._today
+                this._today,
+                'dateOfBurial'
               ],
               dateSameOrAfter: () => [
                 'dateOfOnset',
