@@ -269,6 +269,23 @@
                   tooltip="LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS_DESCRIPTION"
                   app-email-validator></app-form-input-v2>
 
+                <!-- Phone number -->
+                <app-form-input-v2
+                  fxFlex
+                  [(ngModel)]="input.value.get(parentItemIndex).phoneNumber"
+                  [name]="parentName ? parentName + '[phoneNumber]' : (input.name + '[phoneNumber]')"
+                  placeholder="LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER"
+                  tooltip="LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER_DESCRIPTION"></app-form-input-v2>
+
+                <!-- Location -->
+                <app-form-select-location-single-v2
+                  fxFlex
+                  [(ngModel)]="input.value.get(parentItemIndex).locationId"
+                  [name]="parentName ? parentName + '[locationId]' : (input.name + '[locationId]')"
+                  placeholder="LNG_ADDRESS_FIELD_LABEL_LOCATION"
+                  useOutbreakLocations="true"
+                  required="true"></app-form-select-location-single-v2>
+
               </div>
 
               <!-- List -->
