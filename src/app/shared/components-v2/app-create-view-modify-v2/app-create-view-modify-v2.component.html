@@ -131,6 +131,16 @@
                 [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
                 (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-select-location-single-v2>
 
+              <!-- Textarea -->
+              <app-form-textarea-v2
+                *ngSwitchCase="CreateViewModifyV2TabInputType.TEXTAREA"
+                fxFlex
+                [ngModel]="input.value.get(parentItemIndex)"
+                [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                [placeholder]="input.placeholder"
+                [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-textarea-v2>
+
               <!-- Age - Dob -->
               <div
                 *ngSwitchCase="CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH"

@@ -11,6 +11,7 @@ import { AppFormSelectLocationSingleV2Component } from './app-form-select-locati
 import { AppFormSelectLocationMultipleV2Component } from './app-form-select-location-multiple-v2/app-form-select-location-multiple-v2.component';
 import { AppFormToggleV2Component } from './app-form-toggle-v2/app-form-toggle-v2.component';
 import { AppFormToggleCheckboxV2Component } from './app-form-toggle-checkbox-v2/app-form-toggle-checkbox-v2.component';
+import { AppFormTextareaV2Component } from './app-form-textarea-v2/app-form-textarea-v2.component';
 
 export const components: any[] = [
   AppFormCheckboxV2Component,
@@ -24,6 +25,7 @@ export const components: any[] = [
   AppFormSelectLocationSingleV2Component,
   AppFormSelectMultipleV2Component,
   AppFormSelectSingleV2Component,
+  AppFormTextareaV2Component,
   AppFormToggleCheckboxV2Component,
   AppFormToggleV2Component
 ];

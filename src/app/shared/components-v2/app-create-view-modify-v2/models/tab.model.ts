@@ -18,6 +18,7 @@ export enum CreateViewModifyV2TabInputType {
   DATE,
   TOGGLE_CHECKBOX,
   LOCATION_SINGLE,
+  TEXTAREA,
 
   // input groups
   LIST,
@@ -106,6 +107,15 @@ interface CreateViewModifyV2TabInputLocationSingle extends Omit<CreateViewModify
 
   // optional
   useOutbreakLocations?: boolean;
+}
+
+/**
+ * Input - textarea
+ */
+interface CreateViewModifyV2TabInputTextArea extends Omit<CreateViewModifyV2TabInputBase, 'value'> {
+  // required
+  type: CreateViewModifyV2TabInputType.TEXTAREA;
+  value: CreateViewModifyV2TabInputValue<string>;
 }
 
 /**
@@ -216,8 +226,8 @@ export interface CreateViewModifyV2TabInputAddress {
  * Input
  */
 type CreateViewModifyV2TabInput = CreateViewModifyV2TabInputText | CreateViewModifyV2TabInputSingleSelect | CreateViewModifyV2TabInputToggleCheckbox
-| CreateViewModifyV2TabInputLocationSingle | CreateViewModifyV2TabInputAgeOrDOB | CreateViewModifyV2TabInputVisualID | CreateViewModifyV2TabInputDate
-| CreateViewModifyV2TabInputList | CreateViewModifyV2TabInputDocument | CreateViewModifyV2TabInputAddress;
+| CreateViewModifyV2TabInputLocationSingle | CreateViewModifyV2TabInputTextArea | CreateViewModifyV2TabInputAgeOrDOB | CreateViewModifyV2TabInputVisualID
+| CreateViewModifyV2TabInputDate | CreateViewModifyV2TabInputList | CreateViewModifyV2TabInputDocument | CreateViewModifyV2TabInputAddress;
 
 /**
  * Tab section

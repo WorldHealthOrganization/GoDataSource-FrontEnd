@@ -698,6 +698,17 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                 this.itemData.riskLevel = value;
               }
             }
+          }, {
+            type: CreateViewModifyV2TabInputType.TEXTAREA,
+            name: 'riskReason',
+            placeholder: 'LNG_CASE_FIELD_LABEL_RISK_REASON',
+            description: 'LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION',
+            value: {
+              get: () => this.itemData.riskReason,
+              set: (value) => {
+                this.itemData.riskReason = value;
+              }
+            }
           }]
         }
       ]
