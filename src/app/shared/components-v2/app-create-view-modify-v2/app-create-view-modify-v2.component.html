@@ -441,8 +441,23 @@
                   [options]="input.typeOptions"
                   required="true"></app-form-select-single-v2>
 
-                <!-- Date range -->
-                <!-- #TODO -->
+                <!-- Date range - start -->
+                <app-form-date-v2
+                  fxFlex
+                  [(ngModel)]="input.value.get(parentItemIndex).startDate"
+                  [name]="parentName ? parentName + '[startDate]' : 'startDate'"
+                  placeholder="LNG_FORM_RANGE_FIELD_LABEL_FROM"
+                  app-date-validator
+                  [dateSameOrBefore]="parentName ? parentName + '[endDate]' : 'endDate'"></app-form-date-v2>
+
+                <!-- Date range - end -->
+                <app-form-date-v2
+                  fxFlex
+                  [(ngModel)]="input.value.get(parentItemIndex).endDate"
+                  [name]="parentName ? parentName + '[endDate]' : 'endDate'"
+                  placeholder="LNG_FORM_RANGE_FIELD_LABEL_TO"
+                  app-date-validator
+                  [dateSameOrAfter]="parentName ? parentName + '[startDate]' : 'startDate'"></app-form-date-v2>
 
                 <!-- Center name -->
                 <app-form-select-single-v2
