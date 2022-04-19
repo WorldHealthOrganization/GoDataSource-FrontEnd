@@ -529,6 +529,39 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                 'dateOfOnset'
               ]
             }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'outcomeId',
+            placeholder: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+            description: 'LNG_CASE_FIELD_LABEL_OUTCOME_DESCRIPTION',
+            options: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: {
+              get: () => this.itemData.outcomeId,
+              set: (value) => {
+                this.itemData.outcomeId = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.DATE,
+            name: 'dateOfOutcome',
+            placeholder: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
+            description: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME_DESCRIPTION',
+            value: {
+              get: () => this.itemData.dateOfOutcome,
+              set: (value) => {
+                this.itemData.dateOfOutcome = value;
+              }
+            },
+            maxDate: this._today,
+            validators: {
+              dateSameOrBefore: () => [
+                this._today
+              ],
+              dateSameOrAfter: () => [
+                'dateOfOnset',
+                'dateOfInfection'
+              ]
+            }
           }]
         }
       ]

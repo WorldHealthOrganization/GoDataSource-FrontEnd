@@ -56,7 +56,7 @@ export class CaseModel
   dateOfInfection: string | Moment;
   dateOfOnset: string | Moment;
   isDateOfOnsetApproximate: boolean;
-  dateOfOutcome: string;
+  dateOfOutcome: string | Moment;
   dateBecomeCase: string | Moment;
   safeBurial: boolean;
   dateOfBurial: string;

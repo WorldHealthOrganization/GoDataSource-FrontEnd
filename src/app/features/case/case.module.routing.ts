@@ -33,7 +33,8 @@ const createViewModifyFoundation: Route = {
     classification: ClassificationDataResolver,
     occupation: OccupationDataResolver,
     user: UserDataResolver,
-    addressType: AddressTypeDataResolver
+    addressType: AddressTypeDataResolver,
+    outcome: OutcomeDataResolver
   }
 };
 
