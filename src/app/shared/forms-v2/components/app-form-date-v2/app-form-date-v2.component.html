@@ -29,7 +29,8 @@
       [max]="maxDate"
       [min]="minDate"
       [matDatepicker]="pickerStartDate"
-      (blur)="onTouchItem()">
+      (blur)="onTouchItem()"
+      (ngModelChange)="onTouchItem()">
     <mat-datepicker-toggle
       matSuffix
       [for]="pickerStartDate"></mat-datepicker-toggle>

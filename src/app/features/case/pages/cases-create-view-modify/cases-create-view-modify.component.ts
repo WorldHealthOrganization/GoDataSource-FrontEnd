@@ -506,9 +506,27 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             },
             maxDate: this._today,
             validators: {
-              required: () => this.selectedOutbreak.isDateOfOnsetRequired,
               dateSameOrBefore: () => [
                 this._today
+              ]
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.DATE,
+            name: 'dateOfInfection',
+            placeholder: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
+            description: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION_DESCRIPTION',
+            value: {
+              get: () => this.itemData.dateOfInfection,
+              set: (value) => {
+                this.itemData.dateOfInfection = value;
+              }
+            },
+            maxDate: this._today,
+            validators: {
+              dateSameOrBefore: () => [
+                this._today,
+                'dateOfOutcome',
+                'dateOfOnset'
               ]
             }
           }]

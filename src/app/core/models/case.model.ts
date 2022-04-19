@@ -53,7 +53,7 @@ export class CaseModel
   burialPlaceName: string;
   burialLocationId: string;
   classification: string;
-  dateOfInfection: string;
+  dateOfInfection: string | Moment;
   dateOfOnset: string | Moment;
   isDateOfOnsetApproximate: boolean;
   dateOfOutcome: string;
