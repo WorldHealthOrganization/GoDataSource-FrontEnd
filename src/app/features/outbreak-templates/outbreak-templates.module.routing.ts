@@ -6,6 +6,10 @@ import * as fromPages from './pages';
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 import { OutbreakQestionnaireTypeEnum } from '../../core/enums/outbreak-qestionnaire-type.enum';
+import { DiseaseDataResolver } from '../../core/services/resolvers/data/disease.resolver';
+import { FollowUpGenerationTeamAssignmentAlgorithmDataResolver } from '../../core/services/resolvers/data/follow-up-generation-team-assignment-algorithm.resolver';
+import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.resolver';
+import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 
 const routes: Routes = [
   // outbreak templates list
@@ -17,6 +21,12 @@ const routes: Routes = [
       permissions: [
         PERMISSION.OUTBREAK_TEMPLATE_LIST
       ]
+    },
+    resolve: {
+      disease: DiseaseDataResolver,
+      followUpGenerationTeamAssignmentAlgorithm: FollowUpGenerationTeamAssignmentAlgorithmDataResolver,
+      yesNo: YesNoDataResolver,
+      yesNoAll: YesNoAllDataResolver
     }
   },
   // create outbreak template
