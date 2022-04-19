@@ -368,7 +368,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           inputs: [{
             type: CreateViewModifyV2TabInputType.LIST,
             name: 'documents',
-            items: [],
+            items: this.itemData.documents,
             itemsChanged: (list) => {
               // update documents
               this.itemData.documents = list.items;
@@ -402,7 +402,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           inputs: [{
             type: CreateViewModifyV2TabInputType.LIST,
             name: 'addresses',
-            items: [],
+            items: this.itemData.addresses,
             itemsChanged: (list) => {
               // update addresses
               this.itemData.addresses = list.items;

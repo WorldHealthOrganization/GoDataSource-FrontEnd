@@ -7,6 +7,8 @@ import { IV2BottomDialogConfigButtonType } from '../app-bottom-dialog-v2/models/
 import { NgForm } from '@angular/forms';
 import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model';
 import { Constants } from '../../../core/models/constants';
+import { AddressModel } from '../../../core/models/address.model';
+import { ILocation } from '../../forms-v2/core/app-form-location-base-v2';
 
 /**
  * Component
@@ -179,5 +181,47 @@ export class AppCreateViewModifyV2Component {
     form: NgForm
   ): void {
     tab.form = form;
+  }
+
+  /**
+   * Address location changed
+   */
+  addressLocationChanged(
+    address: AddressModel,
+    locationInfo: ILocation
+  ): void {
+    // should we copy location lat & lng ?
+    if (
+      locationInfo &&
+      locationInfo.geoLocation &&
+      locationInfo.geoLocation.lat &&
+      locationInfo.geoLocation.lng
+    ) {
+      this.dialogV2Service
+        .showConfirmDialog({
+          config: {
+            title: {
+              get: () => 'LNG_DIALOG_CONFIRM_REPLACE_GEOLOCATION'
+            },
+            message: {
+              get: () => 'LNG_DIALOG_CONFIRM_REPLACE_GEOLOCATION'
+            }
+          }
+        })
+        .subscribe((response) => {
+          // canceled ?
+          if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+            // finished
+            return;
+          }
+
+          // change location lat & lng
+          address.geoLocation.lat = locationInfo.geoLocation.lat;
+          address.geoLocation.lng = locationInfo.geoLocation.lng;
+
+          // update ui
+          this.changeDetectorRef.detectChanges();
+        });
+    }
   }
 }

@@ -284,7 +284,66 @@
                   [name]="parentName ? parentName + '[locationId]' : (input.name + '[locationId]')"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_LOCATION"
                   useOutbreakLocations="true"
-                  required="true"></app-form-select-location-single-v2>
+                  required="true"
+                  (selectedLocationChanged)="addressLocationChanged(input.value.get(parentItemIndex), $event)"></app-form-select-location-single-v2>
+
+                <!-- City -->
+                <app-form-input-v2
+                  fxFlex
+                  [(ngModel)]="input.value.get(parentItemIndex).city"
+                  [name]="parentName ? parentName + '[city]' : (input.name + '[city]')"
+                  placeholder="LNG_ADDRESS_FIELD_LABEL_CITY"
+                  tooltip="LNG_ADDRESS_FIELD_LABEL_CITY_DESCRIPTION"></app-form-input-v2>
+
+                <!-- Postal code -->
+                <app-form-input-v2
+                  fxFlex
+                  [(ngModel)]="input.value.get(parentItemIndex).postalCode"
+                  [name]="parentName ? parentName + '[postalCode]' : (input.name + '[postalCode]')"
+                  placeholder="LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE"
+                  tooltip="LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE_DESCRIPTION"></app-form-input-v2>
+
+                <!-- Address line 1 -->
+                <app-form-input-v2
+                  fxFlex
+                  [(ngModel)]="input.value.get(parentItemIndex).addressLine1"
+                  [name]="parentName ? parentName + '[addressLine1]' : (input.name + '[addressLine1]')"
+                  placeholder="LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1"
+                  tooltip="LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1_DESCRIPTION"></app-form-input-v2>
+
+                <!-- Lat & Lng -->
+                <div
+                  fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem">
+
+                  <!-- Lat -->
+                  <app-form-number-v2
+                    fxFlex
+                    [(ngModel)]="input.value.get(parentItemIndex).geoLocation.lat"
+                    [name]="parentName ? parentName + '[geoLocation][lat]' : (input.name + '[geoLocation][lat]')"
+                    placeholder="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT"
+                    tooltip="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT_DESCRIPTION"
+                    [required]="input.value.get(parentItemIndex).geoLocation.lng"
+                    app-min-max-validator
+                    [min]="-90"
+                    [minNumber]="-90"
+                    [max]="90"
+                    [maxNumber]="90"></app-form-number-v2>
+
+                  <!-- Lng -->
+                  <app-form-number-v2
+                    fxFlex
+                    [(ngModel)]="input.value.get(parentItemIndex).geoLocation.lng"
+                    [name]="parentName ? parentName + '[geoLocation][lng]' : (input.name + '[geoLocation][lng]')"
+                    placeholder="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG"
+                    tooltip="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG_DESCRIPTION"
+                    [required]="input.value.get(parentItemIndex).geoLocation.lat"
+                    app-min-max-validator
+                    [min]="-180"
+                    [minNumber]="-180"
+                    [max]="180"
+                    [maxNumber]="180"></app-form-number-v2>
+
+                </div>
 
               </div>
 
