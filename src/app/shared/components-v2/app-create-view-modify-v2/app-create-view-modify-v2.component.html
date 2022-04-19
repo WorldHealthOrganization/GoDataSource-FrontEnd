@@ -392,6 +392,40 @@
 
               </div>
 
+              <!-- Vaccine -->
+              <div
+                *ngSwitchCase="CreateViewModifyV2TabInputType.VACCINE"
+                fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem">
+
+                <!-- Vaccine -->
+                <app-form-select-single-v2
+                  fxFlex
+                  [(ngModel)]="input.value.get(parentItemIndex).vaccine"
+                  [name]="parentName ? parentName + '[vaccine]' : 'vaccine'"
+                  placeholder="LNG_ENTITY_FIELD_LABEL_VACCINE"
+                  [viewOnly]="isView"
+                  [options]="input.vaccineOptions"
+                  required="true"></app-form-select-single-v2>
+
+                <!-- Date -->
+                <app-form-date-v2
+                  fxFlex
+                  [(ngModel)]="input.value.get(parentItemIndex).date"
+                  [name]="parentName ? parentName + '[date]' : 'date'"
+                  placeholder="LNG_ENTITY_FIELD_LABEL_VACCINE_DATE"></app-form-date-v2>
+
+                <!-- Vaccine status -->
+                <app-form-select-single-v2
+                  fxFlex
+                  [(ngModel)]="input.value.get(parentItemIndex).status"
+                  [name]="parentName ? parentName + '[status]' : 'status'"
+                  placeholder="LNG_ENTITY_FIELD_LABEL_VACCINE_STATUS"
+                  [viewOnly]="isView"
+                  [options]="input.vaccineStatusOptions"
+                  required="true"></app-form-select-single-v2>
+
+              </div>
+
               <!-- List -->
               <div
                 *ngSwitchCase="CreateViewModifyV2TabInputType.LIST">

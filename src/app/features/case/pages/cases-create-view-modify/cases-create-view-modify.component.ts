@@ -19,6 +19,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { AddressModel } from '../../../../core/models/address.model';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
+import { VaccineModel } from '../../../../core/models/vaccine.model';
 
 /**
  * Component
@@ -707,6 +708,41 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               get: () => this.itemData.riskReason,
               set: (value) => {
                 this.itemData.riskReason = value;
+              }
+            }
+          }]
+        },
+
+        // Vaccines
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED_DETAILS',
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.LIST,
+            name: 'vaccinesReceived',
+            items: this.itemData.vaccinesReceived,
+            itemsChanged: (list) => {
+              // update documents
+              this.itemData.vaccinesReceived = list.items;
+            },
+            definition: {
+              add: {
+                label: 'LNG_COMMON_BUTTON_ADD_VACCINE',
+                newItem: () => new VaccineModel()
+              },
+              remove: {
+                label: 'LNG_COMMON_BUTTON_DELETE',
+                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_VACCINE'
+              },
+              input: {
+                type: CreateViewModifyV2TabInputType.VACCINE,
+                vaccineOptions: (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                vaccineStatusOptions: (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                value: {
+                  get: (index: number) => {
+                    return this.itemData.vaccinesReceived[index];
+                  }
+                }
               }
             }
           }]

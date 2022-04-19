@@ -35,7 +35,9 @@ const createViewModifyFoundation: Route = {
     user: UserDataResolver,
     addressType: AddressTypeDataResolver,
     outcome: OutcomeDataResolver,
-    risk: RiskDataResolver
+    risk: RiskDataResolver,
+    vaccine: VaccineDataResolver,
+    vaccineStatus: VaccineStatusDataResolver
   }
 };
 

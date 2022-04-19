@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { IGeneralAsyncValidatorResponse } from '../../../xt-forms/validators/general-async-validator.directive';
 import { AddressModel } from '../../../../core/models/address.model';
 import { DocumentModel } from '../../../../core/models/document.model';
+import { VaccineModel } from '../../../../core/models/vaccine.model';
 
 /**
  * Input type
@@ -24,6 +25,7 @@ export enum CreateViewModifyV2TabInputType {
   LIST,
   DOCUMENT,
   ADDRESS,
+  VACCINE,
 
   // layout
   TAB,
@@ -223,11 +225,25 @@ export interface CreateViewModifyV2TabInputAddress {
 }
 
 /**
+ * Input - vaccine
+ */
+export interface CreateViewModifyV2TabInputVaccine {
+  // required
+  type: CreateViewModifyV2TabInputType.VACCINE;
+  vaccineOptions: ILabelValuePairModel[];
+  vaccineStatusOptions: ILabelValuePairModel[];
+  value: {
+    get: (index?: number) => VaccineModel;
+  };
+}
+
+/**
  * Input
  */
 type CreateViewModifyV2TabInput = CreateViewModifyV2TabInputText | CreateViewModifyV2TabInputSingleSelect | CreateViewModifyV2TabInputToggleCheckbox
 | CreateViewModifyV2TabInputLocationSingle | CreateViewModifyV2TabInputTextArea | CreateViewModifyV2TabInputAgeOrDOB | CreateViewModifyV2TabInputVisualID
-| CreateViewModifyV2TabInputDate | CreateViewModifyV2TabInputList | CreateViewModifyV2TabInputDocument | CreateViewModifyV2TabInputAddress;
+| CreateViewModifyV2TabInputDate | CreateViewModifyV2TabInputList | CreateViewModifyV2TabInputDocument | CreateViewModifyV2TabInputAddress
+| CreateViewModifyV2TabInputVaccine;
 
 /**
  * Tab section
