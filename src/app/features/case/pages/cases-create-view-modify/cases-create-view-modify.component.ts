@@ -20,6 +20,7 @@ import { DocumentModel } from '../../../../core/models/document.model';
 import { AddressModel } from '../../../../core/models/address.model';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { VaccineModel } from '../../../../core/models/vaccine.model';
+import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-date-range.model';
 
 /**
  * Component
@@ -741,6 +742,41 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                 value: {
                   get: (index: number) => {
                     return this.itemData.vaccinesReceived[index];
+                  }
+                }
+              }
+            }
+          }]
+        },
+
+        // Date ranges
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS',
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.LIST,
+            name: 'dateRanges',
+            items: this.itemData.dateRanges,
+            itemsChanged: (list) => {
+              // update documents
+              this.itemData.dateRanges = list.items;
+            },
+            definition: {
+              add: {
+                label: 'LNG_COMMON_BUTTON_ADD_DATE_RANGE',
+                newItem: () => new CaseCenterDateRangeModel()
+              },
+              remove: {
+                label: 'LNG_COMMON_BUTTON_DELETE',
+                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_DATE_RANGE'
+              },
+              input: {
+                type: CreateViewModifyV2TabInputType.CENTER_DATE_RANGE,
+                typeOptions: (this.activatedRoute.snapshot.data.dateRangeType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                centerOptions: (this.activatedRoute.snapshot.data.dateRangeCenter as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                value: {
+                  get: (index: number) => {
+                    return this.itemData.dateRanges[index];
                   }
                 }
               }

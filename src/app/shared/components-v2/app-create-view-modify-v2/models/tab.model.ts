@@ -6,6 +6,7 @@ import { IGeneralAsyncValidatorResponse } from '../../../xt-forms/validators/gen
 import { AddressModel } from '../../../../core/models/address.model';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { VaccineModel } from '../../../../core/models/vaccine.model';
+import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-date-range.model';
 
 /**
  * Input type
@@ -26,6 +27,7 @@ export enum CreateViewModifyV2TabInputType {
   DOCUMENT,
   ADDRESS,
   VACCINE,
+  CENTER_DATE_RANGE,
 
   // layout
   TAB,
@@ -238,12 +240,25 @@ export interface CreateViewModifyV2TabInputVaccine {
 }
 
 /**
+ * Input - center date range
+ */
+export interface CreateViewModifyV2TabInputCenterDateRange {
+  // required
+  type: CreateViewModifyV2TabInputType.CENTER_DATE_RANGE;
+  typeOptions: ILabelValuePairModel[];
+  centerOptions: ILabelValuePairModel[];
+  value: {
+    get: (index?: number) => CaseCenterDateRangeModel;
+  };
+}
+
+/**
  * Input
  */
 type CreateViewModifyV2TabInput = CreateViewModifyV2TabInputText | CreateViewModifyV2TabInputSingleSelect | CreateViewModifyV2TabInputToggleCheckbox
 | CreateViewModifyV2TabInputLocationSingle | CreateViewModifyV2TabInputTextArea | CreateViewModifyV2TabInputAgeOrDOB | CreateViewModifyV2TabInputVisualID
 | CreateViewModifyV2TabInputDate | CreateViewModifyV2TabInputList | CreateViewModifyV2TabInputDocument | CreateViewModifyV2TabInputAddress
-| CreateViewModifyV2TabInputVaccine;
+| CreateViewModifyV2TabInputVaccine | CreateViewModifyV2TabInputCenterDateRange;
 
 /**
  * Tab section

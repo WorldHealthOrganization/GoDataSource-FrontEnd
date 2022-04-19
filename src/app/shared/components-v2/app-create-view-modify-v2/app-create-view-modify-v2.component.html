@@ -426,6 +426,50 @@
 
               </div>
 
+              <!-- Center date range -->
+              <div
+                *ngSwitchCase="CreateViewModifyV2TabInputType.CENTER_DATE_RANGE"
+                fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem">
+
+                <!-- Type -->
+                <app-form-select-single-v2
+                  fxFlex
+                  [(ngModel)]="input.value.get(parentItemIndex).typeId"
+                  [name]="parentName ? parentName + '[typeId]' : 'typeId'"
+                  placeholder="LNG_CASE_FIELD_LABEL_DATE_RANGE_TYPE_ID"
+                  [viewOnly]="isView"
+                  [options]="input.typeOptions"
+                  required="true"></app-form-select-single-v2>
+
+                <!-- Date range -->
+                <!-- #TODO -->
+
+                <!-- Center name -->
+                <app-form-select-single-v2
+                  fxFlex
+                  [(ngModel)]="input.value.get(parentItemIndex).centerName"
+                  [name]="parentName ? parentName + '[centerName]' : 'centerName'"
+                  placeholder="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME"
+                  [viewOnly]="isView"
+                  [options]="input.centerOptions"></app-form-select-single-v2>
+
+                <!-- Location -->
+                <app-form-select-location-single-v2
+                  fxFlex
+                  [(ngModel)]="input.value.get(parentItemIndex).locationId"
+                  [name]="parentName ? parentName + '[locationId]' : 'locationId'"
+                  placeholder="LNG_CASE_FIELD_LABEL_CENTER_DATES_LOCATION"
+                  useOutbreakLocations="true"></app-form-select-location-single-v2>
+
+                <!-- Comments -->
+                <app-form-textarea-v2
+                  fxFlex
+                  [(ngModel)]="input.value.get(parentItemIndex).comments"
+                  [name]="parentName ? parentName + '[comments]' : 'comments'"
+                  placeholder="LNG_CASE_FIELD_LABEL_CENTER_DATES_COMMENTS"></app-form-textarea-v2>
+
+              </div>
+
               <!-- List -->
               <div
                 *ngSwitchCase="CreateViewModifyV2TabInputType.LIST">
