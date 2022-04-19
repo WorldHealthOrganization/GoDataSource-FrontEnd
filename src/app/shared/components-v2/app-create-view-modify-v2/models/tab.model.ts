@@ -4,6 +4,7 @@ import { Moment } from '../../../../core/helperClasses/x-moment';
 import { Observable } from 'rxjs';
 import { IGeneralAsyncValidatorResponse } from '../../../xt-forms/validators/general-async-validator.directive';
 import { AddressModel } from '../../../../core/models/address.model';
+import { DocumentModel } from '../../../../core/models/document.model';
 
 /**
  * Input type
@@ -18,6 +19,7 @@ export enum CreateViewModifyV2TabInputType {
 
   // input groups
   LIST,
+  DOCUMENT,
   ADDRESS,
 
   // layout
@@ -143,7 +145,7 @@ export interface CreateViewModifyV2TabInputList {
   name: string;
   items: any[];
   definition: {
-    inputs: CreateViewModifyV2TabInput[],
+    input: CreateViewModifyV2TabInput,
     add: {
       label: string,
       newItem: () => any
@@ -153,9 +155,19 @@ export interface CreateViewModifyV2TabInputList {
       confirmLabel: string
     }
   };
+  itemsChanged: (list: CreateViewModifyV2TabInputList) => void;
+}
 
-  // optional
-  itemsChanged?: (list: CreateViewModifyV2TabInputList) => void;
+/**
+ * Input - document
+ */
+export interface CreateViewModifyV2TabInputDocument {
+  // required
+  type: CreateViewModifyV2TabInputType.DOCUMENT;
+  typeOptions: ILabelValuePairModel[];
+  value: {
+    get: (index?: number) => DocumentModel;
+  };
 }
 
 /**
@@ -164,7 +176,7 @@ export interface CreateViewModifyV2TabInputList {
 export interface CreateViewModifyV2TabInputAddress {
   // required
   type: CreateViewModifyV2TabInputType.ADDRESS;
-  options: ILabelValuePairModel[];
+  typeOptions: ILabelValuePairModel[];
   value: {
     get: (index?: number) => AddressModel;
   };
@@ -177,7 +189,8 @@ export interface CreateViewModifyV2TabInputAddress {
  * Input
  */
 type CreateViewModifyV2TabInput = CreateViewModifyV2TabInputText | CreateViewModifyV2TabInputSingleSelect | CreateViewModifyV2TabInputAgeOrDOB
-| CreateViewModifyV2TabInputVisualID | CreateViewModifyV2TabInputDate | CreateViewModifyV2TabInputList | CreateViewModifyV2TabInputAddress;
+| CreateViewModifyV2TabInputVisualID | CreateViewModifyV2TabInputDate | CreateViewModifyV2TabInputList
+| CreateViewModifyV2TabInputDocument | CreateViewModifyV2TabInputAddress;
 
 /**
  * Tab section

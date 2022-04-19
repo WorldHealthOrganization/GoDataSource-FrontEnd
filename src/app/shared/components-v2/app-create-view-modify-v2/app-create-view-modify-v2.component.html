@@ -210,7 +210,31 @@
                 (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-date-v2>
 
               <!-- Document -->
-              <!-- #TODO -->
+              <div
+                *ngSwitchCase="CreateViewModifyV2TabInputType.DOCUMENT"
+                fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem">
+
+                <!-- Type -->
+                <app-form-select-single-v2
+                  fxFlex
+                  [(ngModel)]="input.value.get(parentItemIndex).type"
+                  [name]="parentName ? parentName + '[type]' : 'type'"
+                  placeholder="LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE"
+                  tooltip="LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE_DESCRIPTION"
+                  [viewOnly]="isView"
+                  [options]="input.typeOptions"
+                  required="true"></app-form-select-single-v2>
+
+                <!-- Date -->
+                <app-form-input-v2
+                  fxFlex
+                  [(ngModel)]="input.value.get(parentItemIndex).number"
+                  [name]="parentName ? parentName + '[number]' : 'number'"
+                  placeholder="LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER"
+                  tooltip="LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER_DESCRIPTION"
+                  required="true"></app-form-input-v2>
+
+              </div>
 
               <!-- Address -->
               <div
@@ -225,7 +249,8 @@
                   placeholder="LNG_ADDRESS_FIELD_LABEL_TYPE"
                   tooltip="LNG_ADDRESS_FIELD_LABEL_TYPE_DESCRIPTION"
                   [viewOnly]="isView"
-                  [options]="input.options"></app-form-select-single-v2>
+                  [options]="input.typeOptions"
+                  required="true"></app-form-select-single-v2>
 
                 <!-- Date -->
                 <app-form-date-v2
@@ -263,10 +288,9 @@
                     <div
                       fxLayout="row wrap" fxLayoutGap="1.6rem">
                       <div
-                        *ngFor="let inputDef of input.definition.inputs"
                         fxFlex>
                         <ng-container
-                          *ngTemplateOutlet="inputRender; context: { input: inputDef, parentName: input.name + '[' + itemIndex + ']', parentItemIndex: itemIndex }"></ng-container>
+                          *ngTemplateOutlet="inputRender; context: { input: input.definition.input, parentName: input.name + '[' + itemIndex + ']', parentItemIndex: itemIndex }"></ng-container>
                       </div>
                     </div>
 

@@ -369,6 +369,10 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             type: CreateViewModifyV2TabInputType.LIST,
             name: 'documents',
             items: [],
+            itemsChanged: (list) => {
+              // update documents
+              this.itemData.documents = list.items;
+            },
             definition: {
               add: {
                 label: 'LNG_DOCUMENT_LABEL_ADD_NEW_DOCUMENT',
@@ -378,28 +382,15 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                 label: 'LNG_COMMON_BUTTON_DELETE',
                 confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_DOCUMENT'
               },
-              inputs: [{
-                type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-                name: 'type',
-                placeholder: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE',
-                description: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE_DESCRIPTION',
-                options: (this.activatedRoute.snapshot.data.documentType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              input: {
+                type: CreateViewModifyV2TabInputType.DOCUMENT,
+                typeOptions: (this.activatedRoute.snapshot.data.documentType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
                 value: {
-                  // #TODO
-                  get: () => null,
-                  set: () => {}
+                  get: (index: number) => {
+                    return this.itemData.documents[index];
+                  }
                 }
-              }, {
-                type: CreateViewModifyV2TabInputType.TEXT,
-                name: 'number',
-                placeholder: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER',
-                description: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER_DESCRIPTION',
-                value: {
-                  // #TODO
-                  get: () => null,
-                  set: () => {}
-                }
-              }]
+              }
             }
           }]
         },
@@ -425,15 +416,15 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                 label: 'LNG_COMMON_BUTTON_DELETE',
                 confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_ADDRESS'
               },
-              inputs: [{
+              input: {
                 type: CreateViewModifyV2TabInputType.ADDRESS,
-                options: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                typeOptions: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
                 value: {
                   get: (index: number) => {
                     return this.itemData.addresses[index];
                   }
                 }
-              }]
+              }
             }
           }]
         }
