@@ -90,7 +90,7 @@
                 [viewOnly]="isView"
                 [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
                 autocomplete="off"
-                [required]="input.validators?.required ? input.validators?.required() : undefined"
+                [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
                 (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-input-v2>
 
               <!-- Dropdown - single -->
@@ -105,7 +105,7 @@
                 [options]="input.options"
                 [clearable]="true"
                 [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
-                [required]="input.validators?.required ? input.validators?.required() : undefined"
+                [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
                 (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-select-single-v2>
 
               <!-- Age - Dob -->
@@ -206,10 +206,12 @@
                 [tooltip]="input.description"
                 [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
                 autocomplete="off"
-                [required]="input.validators?.required ? input.validators?.required() : undefined"
+                [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
                 [minDate]="input.minDate"
                 [maxDate]="input.maxDate"
                 app-date-validator
+                [dateSameOrBefore]="!isView && input.validators?.dateSameOrBefore ? input.validators?.dateSameOrBefore() : undefined"
+                [dateSameOrAfter]="!isView && input.validators?.dateSameOrAfter ? input.validators?.dateSameOrAfter() : undefined"
                 (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-date-v2>
 
               <!-- Document -->
@@ -325,7 +327,7 @@
                     [name]="parentName ? parentName + '[geoLocation][lat]' : (input.name + '[geoLocation][lat]')"
                     placeholder="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT"
                     tooltip="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT_DESCRIPTION"
-                    [required]="input.value.get(parentItemIndex).geoLocation.lng"
+                    [required]="!isView && input.value.get(parentItemIndex).geoLocation.lng"
                     app-min-max-validator
                     [min]="-90"
                     [minNumber]="-90"
@@ -339,7 +341,7 @@
                     [name]="parentName ? parentName + '[geoLocation][lng]' : (input.name + '[geoLocation][lng]')"
                     placeholder="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG"
                     tooltip="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG_DESCRIPTION"
-                    [required]="input.value.get(parentItemIndex).geoLocation.lat"
+                    [required]="!isView && input.value.get(parentItemIndex).geoLocation.lat"
                     app-min-max-validator
                     [min]="-180"
                     [minNumber]="-180"

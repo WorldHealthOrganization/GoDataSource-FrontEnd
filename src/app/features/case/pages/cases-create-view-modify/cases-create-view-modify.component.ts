@@ -18,7 +18,7 @@ import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/vali
 import { UserModel } from '../../../../core/models/user.model';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { AddressModel } from '../../../../core/models/address.model';
-import { moment } from '../../../../core/helperClasses/x-moment';
+import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 
 /**
  * Component
@@ -32,6 +32,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   private _caseVisualIDMask: {
     mask: string
   };
+
+  // today
+  private _today: Moment = moment();
 
   /**
    * Constructor
@@ -468,9 +471,16 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                 this.itemData.dateOfOnset = value;
               }
             },
-            maxDate: moment(),
+            maxDate: this._today,
             validators: {
-              required: () => this.selectedOutbreak.isDateOfOnsetRequired
+              required: () => this.selectedOutbreak.isDateOfOnsetRequired,
+              dateSameOrBefore: () => [
+                this._today,
+                'dateOfOutcome'
+              ],
+              dateSameOrAfter: () => [
+                'dateOfInfection'
+              ]
             }
           }]
         }
