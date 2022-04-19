@@ -1,0 +1,18 @@
+<div
+  class="gd-form-toggle-checkbox-v2">
+
+  <mat-button-toggle
+    [checked]="value"
+    (change)="value = !value">
+
+    <!-- Icon -->
+    <mat-icon>{{value ? 'toggle_on' : 'toggle_off'}}</mat-icon>
+
+    <!-- Label -->
+    <span>
+      {{placeholder | translate}}
+    </span>
+
+  </mat-button-toggle>
+
+</div>

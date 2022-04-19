@@ -345,6 +345,13 @@
 
                 </div>
 
+                <!-- Geo location accurate -->
+                <app-form-toggle-checkbox-v2
+                  fxFlex
+                  [(ngModel)]="input.value.get(parentItemIndex).geoLocationAccurate"
+                  [name]="parentName ? parentName + '[geoLocationAccurate]' : (input.name + '[geoLocationAccurate]')"
+                  placeholder="LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES"></app-form-toggle-checkbox-v2>
+
               </div>
 
               <!-- List -->
