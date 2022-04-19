@@ -71,7 +71,10 @@
             #inputRender
             let-input="input"
             let-parentName="parentName">
+
+            <!-- Input -->
             <div
+              *ngIf="!input.replace || !input.replace.condition(input); else replaceHtml"
               class="gd-create-view-modify-bottom-section-content-input"
               [ngSwitch]="input.type">
 
@@ -253,6 +256,14 @@
               </div>
 
             </div>
+
+            <!-- Input replaced with html -->
+            <ng-template
+              #replaceHtml>
+              <div
+                class="gd-create-view-modify-bottom-section-content-input-replaced"
+                [innerHTML]="input.replace.html | safeHtml"></div>
+            </ng-template>
           </ng-template>
 
 

@@ -30,7 +30,8 @@ const createViewModifyFoundation: Route = {
     pregnancyStatus: PregnancyStatusDataResolver,
     documentType: DocumentTypeDataResolver,
     classification: ClassificationDataResolver,
-    occupation: OccupationDataResolver
+    occupation: OccupationDataResolver,
+    user: UserDataResolver
   }
 };
 

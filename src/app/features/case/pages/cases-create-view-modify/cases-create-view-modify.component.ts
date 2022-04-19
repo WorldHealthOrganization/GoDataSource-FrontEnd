@@ -15,6 +15,7 @@ import { Constants } from '../../../../core/models/constants';
 import { AgeModel } from '../../../../core/models/age.model';
 import { TimerCache } from '../../../../core/helperClasses/timer-cache';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
+import { UserModel } from '../../../../core/models/user.model';
 
 /**
  * Component
@@ -338,6 +339,22 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                   observer.complete();
                 });
               })
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'responsibleUserId',
+              placeholder: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
+              description: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
+              options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              value: {
+                get: () => this.itemData.responsibleUserId,
+                set: (value) => {
+                  this.itemData.responsibleUserId = value;
+                }
+              },
+              replace: {
+                condition: () => !UserModel.canList(this.authUser),
+                html: this.translateService.instant('LNG_PAGE_CREATE_CASE_CANT_SET_RESPONSIBLE_ID_TITLE')
+              }
             }
           ]
         },
