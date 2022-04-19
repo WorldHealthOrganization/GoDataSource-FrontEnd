@@ -59,7 +59,7 @@ export class CaseModel
   dateOfOutcome: string | Moment;
   dateBecomeCase: string | Moment;
   safeBurial: boolean;
-  dateOfBurial: string;
+  dateOfBurial: string | Moment;
   dateRanges: CaseCenterDateRangeModel[];
   questionnaireAnswers: {
     [variable: string]: IAnswerData[];

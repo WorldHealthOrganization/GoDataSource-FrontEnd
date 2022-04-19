@@ -538,7 +538,14 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             value: {
               get: () => this.itemData.outcomeId,
               set: (value) => {
+                // set data
                 this.itemData.outcomeId = value;
+
+                // reset data if not decease
+                if (this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED) {
+                  this.itemData.safeBurial = undefined;
+                  this.itemData.dateOfBurial = undefined;
+                }
               }
             }
           }, {
@@ -561,6 +568,58 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                 'dateOfOnset',
                 'dateOfInfection'
               ]
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+            name: 'transferRefused',
+            placeholder: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
+            description: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED_DESCRIPTION',
+            value: {
+              get: () => this.itemData.transferRefused,
+              set: (value) => {
+                this.itemData.transferRefused = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+            name: 'safeBurial',
+            placeholder: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
+            description: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL_DESCRIPTION',
+            value: {
+              get: () => this.itemData.outcomeId === Constants.OUTCOME_STATUS.DECEASED ?
+                false :
+                this.itemData.safeBurial,
+              set: (value) => {
+                this.itemData.safeBurial = value;
+              }
+            },
+            disabled: () => {
+              return this.itemData.outcomeId === Constants.OUTCOME_STATUS.DECEASED;
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.DATE,
+            name: 'dateOfBurial',
+            placeholder: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL',
+            description: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL_DESCRIPTION',
+            value: {
+              get: () => this.itemData.outcomeId === Constants.OUTCOME_STATUS.DECEASED ?
+                undefined :
+                this.itemData.dateOfBurial,
+              set: (value) => {
+                this.itemData.dateOfBurial = value;
+              }
+            },
+            maxDate: this._today,
+            validators: {
+              dateSameOrBefore: () => [
+                this._today
+              ],
+              dateSameOrAfter: () => [
+                'dateOfOutcome'
+              ]
+            },
+            disabled: () => {
+              return this.itemData.outcomeId === Constants.OUTCOME_STATUS.DECEASED;
             }
           }]
         }
