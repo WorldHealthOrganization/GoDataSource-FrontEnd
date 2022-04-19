@@ -90,6 +90,10 @@ export class AppFormDateV2Component
     return this._tooltip;
   }
 
+  // date limits
+  @Input() maxDate: Moment | string;
+  @Input() minDate: Moment | string;
+
   /**
    * Constructor
    */

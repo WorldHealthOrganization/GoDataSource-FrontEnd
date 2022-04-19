@@ -26,6 +26,8 @@
       [required]="required"
       [placeholder]="neverFloatLabel ? (placeholder | translate) : undefined"
       [autocomplete]="autocomplete"
+      [max]="maxDate"
+      [min]="minDate"
       [matDatepicker]="pickerStartDate"
       (blur)="onTouchItem()">
     <mat-datepicker-toggle

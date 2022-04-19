@@ -134,6 +134,8 @@ interface CreateViewModifyV2TabInputDate extends Omit<CreateViewModifyV2TabInput
   validators?: {
     required?: () => boolean
   }
+  minDate?: Moment | string;
+  maxDate?: Moment | string;
 }
 
 /**

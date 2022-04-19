@@ -18,6 +18,7 @@ import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/vali
 import { UserModel } from '../../../../core/models/user.model';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { AddressModel } from '../../../../core/models/address.model';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 /**
  * Component
@@ -455,6 +456,21 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               set: (value) => {
                 this.itemData.classification = value;
               }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.DATE,
+            name: 'dateOfOnset',
+            placeholder: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
+            description: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET_DESCRIPTION',
+            value: {
+              get: () => this.itemData.dateOfOnset,
+              set: (value) => {
+                this.itemData.dateOfOnset = value;
+              }
+            },
+            maxDate: moment(),
+            validators: {
+              required: () => this.selectedOutbreak.isDateOfOnsetRequired
             }
           }]
         }
