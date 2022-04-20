@@ -109,7 +109,7 @@ export class AppFormSelectLocationMultipleV2Component
   /**
    * Update selected items
    */
-  updateSelected(): void {
+  updateSelected(emitEvent: boolean): void {
     // map selected item
     const selectedMap: {
       [id: string]: true
@@ -150,6 +150,8 @@ export class AppFormSelectLocationMultipleV2Component
     this.selectedLocations = newSelectedItems;
 
     // emit event
-    this.selectedLocationsChanged.emit(this.selectedLocations);
+    if (emitEvent) {
+      this.selectedLocationsChanged.emit(this.selectedLocations);
+    }
   }
 }
