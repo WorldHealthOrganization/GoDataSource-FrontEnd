@@ -23,6 +23,8 @@ import { VaccineModel } from '../../../../core/models/vaccine.model';
 import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-date-range.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ContactModel } from '../../../../core/models/contact.model';
+import { LabResultModel } from '../../../../core/models/lab-result.model';
+import { FollowUpModel } from '../../../../core/models/follow-up.model';
 
 /**
  * Component
@@ -214,7 +216,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             {
               label: 'LNG_PAGE_ACTION_ADD_CONTACT',
               action: {
-                link: () => ['/contacts/create'],
+                link: () => ['/contacts', 'create'],
                 queryParams: () => {
                   return {
                     entityType: EntityType.CASE,
@@ -223,6 +225,114 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                 }
               },
               visible: () => CaseModel.canCreateContact(this.authUser) && ContactModel.canCreate(this.authUser)
+            },
+
+            // Divider
+            {
+              visible: () => CaseModel.canCreateContact(this.authUser) && ContactModel.canCreate(this.authUser)
+            },
+
+            // View Questionnaire
+            {
+              label: 'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE',
+              action: {
+                link: () => ['/cases', this.itemData.id, 'view-questionnaire']
+              }
+            },
+
+            // Divider
+            {},
+
+            // Duplicate records marked as not duplicate
+            {
+              label: 'LNG_PAGE_MODIFY_CASE_ACTION_SEE_RECORDS_NOT_DUPLICATES',
+              action: {
+                link: () => ['/duplicated-records', 'cases', this.itemData.id, 'marked-not-duplicates']
+              },
+              visible: () => CaseModel.canList(this.authUser)
+            },
+
+            // contacts
+            {
+              label: 'LNG_COMMON_BUTTON_EXPOSURES_FROM',
+              action: {
+                link: () => ['/relationships', EntityType.CASE, this.itemData.id, 'contacts']
+              },
+              visible: () => CaseModel.canListRelationshipContacts(this.authUser)
+            },
+            // exposures
+            {
+              label: 'LNG_COMMON_BUTTON_EXPOSURES_TO',
+              action: {
+                link: () => ['/relationships', EntityType.CASE, this.itemData.id, 'exposures']
+              },
+              visible: () => CaseModel.canListRelationshipExposures(this.authUser)
+            },
+
+            // lab results
+            {
+              label: 'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS',
+              action: {
+                link: () => ['/lab-results', 'cases', this.itemData.id]
+              },
+              visible: () => LabResultModel.canList(this.authUser) && CaseModel.canListLabResult(this.authUser)
+            },
+
+            // follow-ups
+            {
+              label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS',
+              action: {
+                link: () => ['/contacts', 'case-related-follow-ups', this.itemData.id]
+              },
+              visible: () => FollowUpModel.canList(this.authUser)
+            },
+
+            // Divider
+            {
+              visible: () => CaseModel.canList(this.authUser) || CaseModel.canListRelationshipContacts(this.authUser) ||
+                CaseModel.canListRelationshipExposures(this.authUser) || (LabResultModel.canList(this.authUser) && CaseModel.canListLabResult(this.authUser)) ||
+                FollowUpModel.canList(this.authUser)
+            },
+
+            // movement map
+            {
+              label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_MOVEMENT',
+              action: {
+                link: () => ['/cases', this.itemData.id, 'movement']
+              },
+              visible: () => CaseModel.canViewMovementMap(this.authUser)
+            },
+
+            // chronology chart
+            {
+              label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CHRONOLOGY',
+              action: {
+                link: () => ['/cases', this.itemData.id, 'chronology']
+              },
+              visible: () => CaseModel.canViewChronologyChart(this.authUser)
+            },
+
+            // Divider
+            {
+              visible: () => CaseModel.canViewMovementMap(this.authUser) || CaseModel.canViewChronologyChart(this.authUser)
+            },
+
+            // case => contact questionnaire
+            {
+              label: 'LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE',
+              action: {
+                link: () => ['/cases', this.itemData.id, 'history']
+              },
+              visible: () => this.itemData.wasContact && this.itemData.hasQuestionnaireAnswersContact
+            },
+
+            // case => contact follow-ups
+            {
+              label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CONTACT_FOLLOW_UPS',
+              action: {
+                link: () => ['/contacts', 'case-follow-ups', this.itemData.id]
+              },
+              visible: () => this.itemData.wasContact && FollowUpModel.canList(this.authUser)
             }
           ]
         }
