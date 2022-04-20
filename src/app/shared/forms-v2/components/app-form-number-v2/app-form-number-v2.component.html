@@ -3,6 +3,7 @@
 
   <!-- Input data -->
   <mat-form-field
+    *ngIf="!viewOnly; else viewOnlyTemplate"
     appearance="outline">
 
     <!-- Place holder -->
@@ -38,4 +39,24 @@
     </mat-error>
 
   </mat-form-field>
+
+  <!-- View only -->
+  <ng-template
+    #viewOnlyTemplate>
+    <div
+      fxLayout="row" fxLayoutGap="1.6rem"
+      class="gd-form-number-v2-viewonly">
+      <!-- Label -->
+      <div
+        class="gd-form-number-v2-viewonly-label">
+        {{ placeholder | translate }}:
+      </div>
+
+      <!-- Value -->
+      <div
+        class="gd-form-number-v2-viewonly-value">
+        {{value ? value : '-'}}
+      </div>
+    </div>
+  </ng-template>
 </div>

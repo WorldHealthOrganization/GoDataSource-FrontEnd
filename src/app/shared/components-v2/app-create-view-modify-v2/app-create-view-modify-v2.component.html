@@ -148,6 +148,7 @@
 
                 <!-- Age / Dob option -->
                 <app-form-toggle-v2
+                  *ngIf="!isView"
                   [(ngModel)]="input.ageChecked"
                   [name]="parentName ? parentName + '[ageDob]' : 'ageDob'"
                   [options]="ageDOBOptions"></app-form-toggle-v2>
@@ -163,8 +164,9 @@
                     fxFlex
                     [ngModel]="input.value.age.years.get()"
                     [name]="parentName ? parentName + '[' + input.name.age + '][years]' : (input.name.age + '[years]')"
-                    placeholder="LNG_AGE_FIELD_LABEL_YEARS"
+                    [placeholder]="isView && input.ageChecked ? ('LNG_ENTITY_FIELD_LABEL_AGE' | translate) + ' - ' + ('LNG_AGE_FIELD_LABEL_YEARS' | translate) : 'LNG_AGE_FIELD_LABEL_YEARS'"
                     [tooltip]="input.description?.age"
+                    [viewOnly]="isView"
                     app-min-max-validator
                     [minNumber]="0"
                     [min]="0"
@@ -179,8 +181,9 @@
                       fxFlex
                       [ngModel]="input.value.age.months.get()"
                       [name]="parentName ? parentName + '[' + input.name.age + '][months]' : (input.name.age + '[months]')"
-                      placeholder="LNG_AGE_FIELD_LABEL_MONTHS"
+                      [placeholder]="isView && input.ageChecked ? ('LNG_ENTITY_FIELD_LABEL_AGE' | translate) + ' - ' + ('LNG_AGE_FIELD_LABEL_MONTHS' | translate) : 'LNG_AGE_FIELD_LABEL_MONTHS'"
                       [tooltip]="input.description?.age"
+                      [viewOnly]="isView"
                       app-min-max-validator
                       [minNumber]="0"
                       [min]="0"
@@ -191,11 +194,13 @@
 
                   <!-- Type -->
                   <app-form-select-single-v2
+                    *ngIf="!isView"
                     fxFlex
                     [(ngModel)]="input.ageTypeYears"
                     [name]="parentName ? parentName + '[ageDobType]' : 'ageDobType'"
                     placeholder="LNG_AGE_FIELD_LABEL_TYPE"
-                    [options]="ageTypeOptions"></app-form-select-single-v2>
+                    [options]="ageTypeOptions"
+                    (ngModelChange)="input.ageTypeYears ? input.value.age.months.set(0) : input.value.age.years.set(0)"></app-form-select-single-v2>
 
                 </div>
 
@@ -208,6 +213,7 @@
                     [name]="parentName ? parentName + '[' + input.name.dob + ']' : input.name.dob"
                     placeholder="LNG_ENTITY_FIELD_LABEL_DOB"
                     [tooltip]="input.description?.dob"
+                    [viewOnly]="isView"
                     (ngModelChange)="input.value.dob.set($event)"></app-form-date-v2>
                 </ng-template>
               </div>
@@ -296,7 +302,8 @@
                   [(ngModel)]="input.value.get(parentItemIndex).date"
                   [name]="parentName ? parentName + '[date]' : (input.name + '[date]')"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_DATE"
-                  tooltip="LNG_ADDRESS_FIELD_LABEL_DATE_DESCRIPTION"></app-form-date-v2>
+                  tooltip="LNG_ADDRESS_FIELD_LABEL_DATE_DESCRIPTION"
+                  [viewOnly]="isView"></app-form-date-v2>
 
                 <!-- Email address -->
                 <app-form-input-v2
@@ -305,6 +312,7 @@
                   [name]="parentName ? parentName + '[emailAddress]' : (input.name + '[emailAddress]')"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS"
                   tooltip="LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS_DESCRIPTION"
+                  [viewOnly]="isView"
                   app-email-validator></app-form-input-v2>
 
                 <!-- Phone number -->
@@ -313,7 +321,8 @@
                   [(ngModel)]="input.value.get(parentItemIndex).phoneNumber"
                   [name]="parentName ? parentName + '[phoneNumber]' : (input.name + '[phoneNumber]')"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER"
-                  tooltip="LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER_DESCRIPTION"></app-form-input-v2>
+                  tooltip="LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER_DESCRIPTION"
+                  [viewOnly]="isView"></app-form-input-v2>
 
                 <!-- Location -->
                 <app-form-select-location-single-v2
@@ -321,6 +330,7 @@
                   [(ngModel)]="input.value.get(parentItemIndex).locationId"
                   [name]="parentName ? parentName + '[locationId]' : (input.name + '[locationId]')"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_LOCATION"
+                  [viewOnly]="isView"
                   useOutbreakLocations="true"
                   required="true"
                   (selectedLocationChanged)="addressLocationChanged(input.value.get(parentItemIndex), $event)"></app-form-select-location-single-v2>
@@ -331,7 +341,8 @@
                   [(ngModel)]="input.value.get(parentItemIndex).city"
                   [name]="parentName ? parentName + '[city]' : (input.name + '[city]')"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_CITY"
-                  tooltip="LNG_ADDRESS_FIELD_LABEL_CITY_DESCRIPTION"></app-form-input-v2>
+                  tooltip="LNG_ADDRESS_FIELD_LABEL_CITY_DESCRIPTION"
+                  [viewOnly]="isView"></app-form-input-v2>
 
                 <!-- Postal code -->
                 <app-form-input-v2
@@ -339,7 +350,8 @@
                   [(ngModel)]="input.value.get(parentItemIndex).postalCode"
                   [name]="parentName ? parentName + '[postalCode]' : (input.name + '[postalCode]')"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE"
-                  tooltip="LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE_DESCRIPTION"></app-form-input-v2>
+                  tooltip="LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE_DESCRIPTION"
+                  [viewOnly]="isView"></app-form-input-v2>
 
                 <!-- Address line 1 -->
                 <app-form-input-v2
@@ -347,7 +359,8 @@
                   [(ngModel)]="input.value.get(parentItemIndex).addressLine1"
                   [name]="parentName ? parentName + '[addressLine1]' : (input.name + '[addressLine1]')"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1"
-                  tooltip="LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1_DESCRIPTION"></app-form-input-v2>
+                  tooltip="LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1_DESCRIPTION"
+                  [viewOnly]="isView"></app-form-input-v2>
 
                 <!-- Lat & Lng -->
                 <div
@@ -360,6 +373,7 @@
                     [name]="parentName ? parentName + '[geoLocation][lat]' : (input.name + '[geoLocation][lat]')"
                     placeholder="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT"
                     tooltip="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT_DESCRIPTION"
+                    [viewOnly]="isView"
                     [required]="!isView && input.value.get(parentItemIndex).geoLocation.lng"
                     app-min-max-validator
                     [min]="-90"
@@ -374,6 +388,7 @@
                     [name]="parentName ? parentName + '[geoLocation][lng]' : (input.name + '[geoLocation][lng]')"
                     placeholder="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG"
                     tooltip="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG_DESCRIPTION"
+                    [viewOnly]="isView"
                     [required]="!isView && input.value.get(parentItemIndex).geoLocation.lat"
                     app-min-max-validator
                     [min]="-180"
@@ -388,7 +403,8 @@
                   fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).geoLocationAccurate"
                   [name]="parentName ? parentName + '[geoLocationAccurate]' : (input.name + '[geoLocationAccurate]')"
-                  placeholder="LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES"></app-form-toggle-checkbox-v2>
+                  placeholder="LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES"
+                  [viewOnly]="isView"></app-form-toggle-checkbox-v2>
 
               </div>
 
@@ -412,7 +428,8 @@
                   fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).date"
                   [name]="parentName ? parentName + '[date]' : 'date'"
-                  placeholder="LNG_ENTITY_FIELD_LABEL_VACCINE_DATE"></app-form-date-v2>
+                  placeholder="LNG_ENTITY_FIELD_LABEL_VACCINE_DATE"
+                  [viewOnly]="isView"></app-form-date-v2>
 
                 <!-- Vaccine status -->
                 <app-form-select-single-v2
@@ -447,6 +464,7 @@
                   [(ngModel)]="input.value.get(parentItemIndex).startDate"
                   [name]="parentName ? parentName + '[startDate]' : 'startDate'"
                   placeholder="LNG_FORM_RANGE_FIELD_LABEL_FROM"
+                  [viewOnly]="isView"
                   app-date-validator
                   [dateSameOrBefore]="parentName ? parentName + '[endDate]' : 'endDate'"></app-form-date-v2>
 
@@ -456,6 +474,7 @@
                   [(ngModel)]="input.value.get(parentItemIndex).endDate"
                   [name]="parentName ? parentName + '[endDate]' : 'endDate'"
                   placeholder="LNG_FORM_RANGE_FIELD_LABEL_TO"
+                  [viewOnly]="isView"
                   app-date-validator
                   [dateSameOrAfter]="parentName ? parentName + '[startDate]' : 'startDate'"></app-form-date-v2>
 
@@ -496,6 +515,7 @@
 
                     <!-- Remove button -->
                     <div
+                      *ngIf="!isView"
                       fxLayoutAlign="end">
                       <button
                         type="button"
@@ -521,7 +541,8 @@
                 </div>
 
                 <!-- Add -->
-                <div>
+                <div
+                  *ngIf="!isView">
                   <button
                     type="button"
                     mat-flat-button color="text"

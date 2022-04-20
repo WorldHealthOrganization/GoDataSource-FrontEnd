@@ -30,6 +30,9 @@ export class AppFormNumberV2Component
   // float label
   @Input() neverFloatLabel: boolean = false;
 
+  // view only
+  @Input() viewOnly: boolean;
+
   // autocomplete
   @Input() autocomplete: string;
 

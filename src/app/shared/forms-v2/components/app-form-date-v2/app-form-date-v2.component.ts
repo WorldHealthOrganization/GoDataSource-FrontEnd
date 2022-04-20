@@ -63,6 +63,9 @@ export class AppFormDateV2Component
   // float label
   @Input() neverFloatLabel: boolean = false;
 
+  // view only
+  @Input() viewOnly: boolean;
+
   // autocomplete
   @Input() autocomplete: string;
 

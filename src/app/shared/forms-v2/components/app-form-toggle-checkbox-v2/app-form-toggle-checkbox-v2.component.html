@@ -1,7 +1,9 @@
 <div
   class="gd-form-toggle-checkbox-v2">
 
+  <!-- Input data -->
   <mat-button-toggle
+    *ngIf="!viewOnly; else viewOnlyTemplate"
     [checked]="value"
     [disabled]="disabled"
     (change)="value = !value">
@@ -22,4 +24,23 @@
 
   </mat-button-toggle>
 
+  <!-- View only -->
+  <ng-template
+    #viewOnlyTemplate>
+    <div
+      fxLayout="row" fxLayoutGap="1.6rem"
+      class="gd-form-toggle-checkbox-v2-viewonly">
+      <!-- Label -->
+      <div
+        class="gd-form-toggle-checkbox-v2-viewonly-label">
+        {{ placeholder | translate }}:
+      </div>
+
+      <!-- Value -->
+      <div
+        class="gd-form-toggle-checkbox-v2-viewonly-value">
+        {{(value ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO') | translate}}
+      </div>
+    </div>
+  </ng-template>
 </div>

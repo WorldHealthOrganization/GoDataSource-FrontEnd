@@ -35,6 +35,9 @@ import { AppFormLocationBaseV2, ILocation } from '../../core/app-form-location-b
 export class AppFormSelectLocationSingleV2Component
   extends AppFormLocationBaseV2<string> implements OnInit, OnDestroy {
 
+  // view only
+  @Input() viewOnly: boolean;
+
   // selected location
   selectedLocation: ILocation;
 

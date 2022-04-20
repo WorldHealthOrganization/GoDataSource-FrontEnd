@@ -26,6 +26,9 @@ import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
 })
 export class AppFormToggleCheckboxV2Component
   extends AppFormBaseV2<boolean> implements OnDestroy {
+  // view only
+  @Input() viewOnly: boolean;
+
   // tooltip
   tooltipButton: IAppFormIconButtonV2;
   private _tooltip: string;
