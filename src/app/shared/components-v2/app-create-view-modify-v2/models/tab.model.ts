@@ -327,6 +327,9 @@ interface ICreateViewModifyV2MenuGroup {
   type: CreateViewModifyV2MenuType.GROUP;
   label: string;
 
+  // optional
+  visible?: () => boolean;
+
   // never
   action?: never;
 }

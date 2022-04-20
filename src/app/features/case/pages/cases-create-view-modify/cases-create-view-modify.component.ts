@@ -334,7 +334,11 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             // Contact group
             {
               type: CreateViewModifyV2MenuType.GROUP,
-              label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CASE_WAS_CONTACT_TITLE'
+              label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CASE_WAS_CONTACT_TITLE',
+              visible: () => this.itemData.wasContact && (
+                this.itemData.hasQuestionnaireAnswersContact ||
+                FollowUpModel.canList(this.authUser)
+              )
             },
             // case => contact questionnaire
             {
