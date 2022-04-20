@@ -10,7 +10,7 @@ import { moment } from '../../../core/helperClasses/x-moment';
 import { Constants } from '../../../core/models/constants';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-import { IV2Column, IV2ColumnAction, IV2ColumnBasic, IV2ColumnBasicFormat, IV2ColumnButton, IV2ColumnColor, IV2ColumnPinned, IV2ColumnStatus, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from './models/column.model';
+import { IV2Column, IV2ColumnAction, IV2ColumnBasic, IV2ColumnBasicFormat, IV2ColumnButton, IV2ColumnColor, IV2ColumnIconMaterial, IV2ColumnPinned, IV2ColumnStatus, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from './models/column.model';
 import { AppListTableV2ActionsComponent } from './components/actions/app-list-table-v2-actions.component';
 import { IExtendedColDef } from './models/extended-column.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
@@ -795,8 +795,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
               this.translateService.instant('LNG_COMMON_LABEL_YES') :
               this.translateService.instant('LNG_COMMON_LABEL_NO');
 
-          // COLOR
+          // COLOR & ICON
           case V2ColumnFormat.COLOR:
+          case V2ColumnFormat.ICON_MATERIAL:
             return fieldValue;
 
           // nothing to do
@@ -913,6 +914,23 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           return value ?
             `<span class="gd-list-table-color"><div style="background-color: ${value}; display: inline-block; width: 2.4rem; height: 2.4rem;"></div> ${value}</span>` :
             this.translateService.instant(colorColumn.noColorLabel);
+        };
+      }
+
+      // icon ?
+      const iconColumn: IV2ColumnIconMaterial = column as IV2ColumnIconMaterial;
+      if (
+        iconColumn.format &&
+        iconColumn.format.type === V2ColumnFormat.ICON_MATERIAL
+      ) {
+        return (params: ValueFormatterParams) => {
+          // determine value
+          const value: string = this.formatValue(params);
+
+          // create color display
+          return value ?
+            `<span class="gd-list-table-icon-material"><span class="material-icons">${value}</span></span>` :
+            this.translateService.instant(iconColumn.noIconLabel);
         };
       }
 
