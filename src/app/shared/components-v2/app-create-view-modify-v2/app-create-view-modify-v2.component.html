@@ -592,7 +592,8 @@
                   placeholder="LNG_FORM_RANGE_FIELD_LABEL_FROM"
                   [viewOnly]="isView"
                   app-date-validator
-                  [dateSameOrBefore]="parentName ? parentName + '[endDate]' : 'endDate'"></app-form-date-v2>
+                  [dateSameOrBefore]="parentName ? parentName + '[endDate]' : 'endDate'"
+                  [dateSameOrAfter]="input.startDateValidators?.dateSameOrAfter ? input.startDateValidators?.dateSameOrAfter() : undefined"></app-form-date-v2>
 
                 <!-- Date range - end -->
                 <app-form-date-v2

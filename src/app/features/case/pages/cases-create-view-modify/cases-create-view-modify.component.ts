@@ -965,6 +965,11 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                   get: (index: number) => {
                     return this.itemData.dateRanges[index];
                   }
+                },
+                startDateValidators: {
+                  dateSameOrAfter: () => [
+                    'dateOfOnset'
+                  ]
                 }
               }
             }

@@ -193,7 +193,7 @@ export class DateValidatorDirective implements Validator {
               if ((localElement as any).onChange) {
                 (localElement as any).onChange((localElement as any).value);
               }
-            });
+            }, 50);
           })(element);
         }
 
