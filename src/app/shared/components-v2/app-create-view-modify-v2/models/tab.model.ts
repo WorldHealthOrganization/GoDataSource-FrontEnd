@@ -388,6 +388,7 @@ export interface ICreateViewModifyV2 {
   buttons: {
     view: ICreateViewModifyV2LinkButton,
     modify: ICreateViewModifyV2LinkButton,
+    createCancel: ICreateViewModifyV2LinkButton,
     viewCancel: ICreateViewModifyV2LinkButton,
     modifyCancel: ICreateViewModifyV2LinkButton,
     quickActions?: ICreateViewModifyV2Menu

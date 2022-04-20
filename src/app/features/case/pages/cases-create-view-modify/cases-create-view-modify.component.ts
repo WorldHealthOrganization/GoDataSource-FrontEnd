@@ -200,6 +200,11 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           },
           visible: () => CaseModel.canModify(this.authUser)
         },
+        createCancel: {
+          link: {
+            link: () => ['/cases']
+          }
+        },
         viewCancel: {
           link: {
             link: () => ['/cases']

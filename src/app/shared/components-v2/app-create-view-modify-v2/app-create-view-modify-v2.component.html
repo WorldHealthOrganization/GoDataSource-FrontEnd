@@ -61,14 +61,14 @@
           class="gd-create-view-modify-top-title-buttons-buttons">
 
           <!-- Cancel -->
-          <button
+          <a
             *ngIf="isView ? (!tabData.buttons.viewCancel.visible || tabData.buttons.viewCancel.visible()) : (!tabData.buttons.modifyCancel.visible || tabData.buttons.modifyCancel.visible())"
             type="button"
             mat-flat-button color="text"
             [routerLink]="isView ? tabData.buttons.viewCancel.link.link() : tabData.buttons.modifyCancel.link.link()"
             [queryParams]="isView ? (tabData.buttons.viewCancel.link.queryParams ? tabData.buttons.viewCancel.link.queryParams() : undefined) : (tabData.buttons.modifyCancel.link.queryParams ? tabData.buttons.modifyCancel.link.queryParams() : undefined)">
             {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
-          </button>
+          </a>
 
           <!-- Quick Actions -->
           <ng-container
@@ -158,14 +158,14 @@
           </button>
 
           <!-- Edit -->
-          <button
+          <a
             *ngIf="isView && (!tabData.buttons.modify.visible || tabData.buttons.modify.visible())"
             type="button"
             mat-flat-button color="primary"
             [routerLink]="tabData.buttons.modify.link.link()"
             [queryParams]="tabData.buttons.modify.link.queryParams ? tabData.buttons.modify.link.queryParams() : undefined">
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
-          </button>
+          </a>
         </div>
       </div>
 
@@ -752,37 +752,55 @@
           <!-- Bottom -->
           <div
             class="gd-create-view-modify-bottom-bottom"
-            fxLayoutAlign="end">
-            <!-- Previous -->
-            <button
-              *ngIf="tabIndex > 0"
-              mat-flat-button color="secondary"
-              matStepperPrevious>
-              <!-- Label -->
-              <span>
-                {{'LNG_STEPPER_BUTTON_BACK' | translate}}
-              </span>
-            </button>
+            fxLayoutAlign="space-between">
+            <!-- Left -->
+            <div
+              fxFlex>
+              <!-- Cancel -->
+              <a
+                *ngIf="!tabData.buttons.createCancel.visible || tabData.buttons.createCancel.visible()"
+                type="button"
+                mat-flat-button color="text"
+                [routerLink]="tabData.buttons.createCancel.link.link()"
+                [queryParams]="tabData.buttons.createCancel.link.queryParams ? tabData.buttons.createCancel.link.queryParams() : undefined">
+                {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
+              </a>
+            </div>
 
-            <!-- Next -->
-            <button
-              mat-flat-button color="primary"
-              matStepperNext
-              (click)="tab.form ? tab.form.ngSubmit.emit() : undefined">
+            <!-- Right -->
+            <div
+              fxFlex fxLayoutAlign="end">
+              <!-- Previous -->
+              <button
+                *ngIf="tabIndex > 0"
+                mat-flat-button color="secondary"
+                matStepperPrevious>
+                <!-- Label -->
+                <span>
+                  {{'LNG_STEPPER_BUTTON_BACK' | translate}}
+                </span>
+              </button>
 
-              <!-- Pending validators -->
-              <mat-progress-spinner
-                *ngIf="tab.form?.pending"
-                diameter="16"
-                mode="indeterminate"
-                color="primary">
-              </mat-progress-spinner>
+              <!-- Next -->
+              <button
+                mat-flat-button color="primary"
+                matStepperNext
+                (click)="tab.form ? tab.form.ngSubmit.emit() : undefined">
 
-              <!-- Label -->
-              <span>
-                {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
-              </span>
-            </button>
+                <!-- Pending validators -->
+                <mat-progress-spinner
+                  *ngIf="tab.form?.pending"
+                  diameter="16"
+                  mode="indeterminate"
+                  color="primary">
+                </mat-progress-spinner>
+
+                <!-- Label -->
+                <span>
+                  {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
+                </span>
+              </button>
+            </div>
           </div>
 
         </mat-step>
