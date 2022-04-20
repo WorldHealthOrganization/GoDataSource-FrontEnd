@@ -34,16 +34,23 @@
           background-color: var(--gd-primary);
           color: var(--gd-background);
         }
+
+        &.mat-step-icon-state-edit {
+          + .mat-step-label {
+            color: var(--gd-primary);
+
+            &.mat-step-label-active {
+              color: var(--gd-primary);
+            }
+          }
+        }
       }
 
       .mat-step-label {
         color: var(--gd-secondary);
-
-        &.mat-step-label-selected {
-          font-size: 1.6rem;
-          font-weight: normal;
-          line-height: $gd-line-height;
-        }
+        font-size: 1.6rem;
+        font-weight: normal;
+        line-height: $gd-line-height;
 
         &.mat-step-label-active {
           color: var(--gd-text);

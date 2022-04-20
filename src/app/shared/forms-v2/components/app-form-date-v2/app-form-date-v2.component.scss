@@ -70,6 +70,10 @@
           left: -0.4rem;
           top: 0.5rem;
 
+          + .mat-form-field-infix {
+            line-height: 1.125;
+          }
+
           .mat-icon {
             color: rgba(var(--gd-text-rgb), 0.75);
             text-align: center;
@@ -80,6 +84,7 @@
         .mat-form-field-infix {
           border-top: 0 none;
           @include flex(flex);
+          line-height: $gd-line-height;
           padding: 0.8rem 0;
 
           input {

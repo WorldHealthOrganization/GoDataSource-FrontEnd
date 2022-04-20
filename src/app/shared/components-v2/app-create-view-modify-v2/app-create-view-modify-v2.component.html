@@ -491,7 +491,7 @@
 
                   <!-- Lat -->
                   <app-form-number-v2
-                    fxFlex
+                    fxFlex="calc(50% - 0.8rem)"
                     [(ngModel)]="input.value.get(parentItemIndex).geoLocation.lat"
                     [name]="parentName ? parentName + '[geoLocation][lat]' : (input.name + '[geoLocation][lat]')"
                     placeholder="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT"
@@ -506,7 +506,7 @@
 
                   <!-- Lng -->
                   <app-form-number-v2
-                    fxFlex
+                    fxFlex="calc(50% - 0.8rem)"
                     [(ngModel)]="input.value.get(parentItemIndex).geoLocation.lng"
                     [name]="parentName ? parentName + '[geoLocation][lng]' : (input.name + '[geoLocation][lng]')"
                     placeholder="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG"
@@ -580,24 +580,32 @@
                   [options]="input.typeOptions"
                   required="true"></app-form-select-single-v2>
 
-                <!-- Date range - start -->
-                <app-form-date-v2
-                  [(ngModel)]="input.value.get(parentItemIndex).startDate"
-                  [name]="parentName ? parentName + '[startDate]' : 'startDate'"
-                  placeholder="LNG_FORM_RANGE_FIELD_LABEL_FROM"
-                  [viewOnly]="isView"
-                  app-date-validator
-                  [dateSameOrBefore]="parentName ? parentName + '[endDate]' : 'endDate'"
-                  [dateSameOrAfter]="input.startDateValidators?.dateSameOrAfter ? input.startDateValidators?.dateSameOrAfter() : undefined"></app-form-date-v2>
+                <!-- From & To -->
+                <div
+                  fxLayout="row wrap" fxLayoutGap="1.6rem">
 
-                <!-- Date range - end -->
-                <app-form-date-v2
-                  [(ngModel)]="input.value.get(parentItemIndex).endDate"
-                  [name]="parentName ? parentName + '[endDate]' : 'endDate'"
-                  placeholder="LNG_FORM_RANGE_FIELD_LABEL_TO"
-                  [viewOnly]="isView"
-                  app-date-validator
-                  [dateSameOrAfter]="parentName ? parentName + '[startDate]' : 'startDate'"></app-form-date-v2>
+                  <!-- Date range - start -->
+                  <app-form-date-v2
+                    fxFlex="calc(50% - 0.8rem)"
+                    [(ngModel)]="input.value.get(parentItemIndex).startDate"
+                    [name]="parentName ? parentName + '[startDate]' : 'startDate'"
+                    placeholder="LNG_FORM_RANGE_FIELD_LABEL_FROM"
+                    [viewOnly]="isView"
+                    app-date-validator
+                    [dateSameOrBefore]="parentName ? parentName + '[endDate]' : 'endDate'"
+                    [dateSameOrAfter]="input.startDateValidators?.dateSameOrAfter ? input.startDateValidators?.dateSameOrAfter() : undefined"></app-form-date-v2>
+
+                  <!-- Date range - end -->
+                  <app-form-date-v2
+                    fxFlex="calc(50% - 0.8rem)"
+                    [(ngModel)]="input.value.get(parentItemIndex).endDate"
+                    [name]="parentName ? parentName + '[endDate]' : 'endDate'"
+                    placeholder="LNG_FORM_RANGE_FIELD_LABEL_TO"
+                    [viewOnly]="isView"
+                    app-date-validator
+                    [dateSameOrAfter]="parentName ? parentName + '[startDate]' : 'startDate'"></app-form-date-v2>
+
+                </div>
 
                 <!-- Center name -->
                 <app-form-select-single-v2

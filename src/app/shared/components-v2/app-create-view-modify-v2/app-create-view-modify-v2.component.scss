@@ -59,6 +59,10 @@
               width: calc(50% - 1.6rem);
             }
 
+            &.gd-create-view-modify-bottom-section-content-input-has-textarea {
+              width: 100%;
+            }
+
             &.gd-create-view-modify-bottom-section-content-input-has-list {
               width: calc(100% - 1.6rem);
 
@@ -92,6 +96,10 @@
                         &:last-child {
                           margin-right: 1.6rem;
                         }
+                      }
+
+                      > app-form-textarea-v2 {
+                        width: 100%;
                       }
                     }
                   }
