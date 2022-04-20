@@ -198,6 +198,7 @@
               class="gd-create-view-modify-bottom-section-content-input"
               [class.gd-create-view-modify-bottom-section-content-input-has-textarea]="input.type === CreateViewModifyV2TabInputType.TEXTAREA"
               [class.gd-create-view-modify-bottom-section-content-input-has-age-dob]="input.type === CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH"
+              [class.gd-create-view-modify-bottom-section-content-input-has-list]="input.type === CreateViewModifyV2TabInputType.LIST"
               [ngSwitch]="input.type">
 
               <!-- Text -->
@@ -595,7 +596,8 @@
                   placeholder="LNG_FORM_RANGE_FIELD_LABEL_FROM"
                   [viewOnly]="isView"
                   app-date-validator
-                  [dateSameOrBefore]="parentName ? parentName + '[endDate]' : 'endDate'"></app-form-date-v2>
+                  [dateSameOrBefore]="parentName ? parentName + '[endDate]' : 'endDate'"
+                  [dateSameOrAfter]="input.startDateValidators?.dateSameOrAfter ? input.startDateValidators?.dateSameOrAfter() : undefined"></app-form-date-v2>
 
                 <!-- Date range - end -->
                 <app-form-date-v2
@@ -825,7 +827,7 @@
 
               <!-- Invalid -->
               <mat-icon
-                *ngIf="isModify && tab.form?.touched && tab.form?.invalid"
+                *ngIf="isModify && tab.form?.invalid"
                 color="warn"
                 [matTooltip]="'LNG_COMMON_LABEL_INVALID_TAB' | translate">warning</mat-icon>
             </ng-template>

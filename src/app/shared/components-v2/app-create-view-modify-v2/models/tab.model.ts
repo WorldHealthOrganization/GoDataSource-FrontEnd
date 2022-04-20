@@ -251,6 +251,11 @@ interface ICreateViewModifyV2TabInputCenterDateRange {
   value: {
     get: (index?: number) => CaseCenterDateRangeModel;
   };
+
+  // optional
+  startDateValidators?: {
+    dateSameOrAfter?: () => (Moment | string)[]
+  }
 }
 
 /**

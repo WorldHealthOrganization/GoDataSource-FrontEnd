@@ -31,6 +31,9 @@ export abstract class AppFormBaseErrorMsgV2 {
       case 'emailValidator':
         return translateService.instant('LNG_FORM_VALIDATION_ERROR_FIELD_EMAIL');
 
+      case 'invalidDateValidator':
+        return translateService.instant('LNG_FORM_VALIDATION_ERROR_INVALID_DATE');
+
       case 'dateValidator':
         return translateService.instant(
           'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE',

@@ -151,6 +151,11 @@ export class AppCreateViewModifyV2Component {
 
       // re-render ui
       this.changeDetectorRef.detectChanges();
+
+      // needed to update mat tab label warnings
+      if (this.isModify) {
+        this.changeDetectorRef.markForCheck();
+      }
     };
 
     // ask for confirmation

@@ -38,7 +38,8 @@ export enum UserSettings {
   HELP_CATEGORIES_LIST = 'helpCategoriesList',
   HELP_SEARCH = 'helpSearch',
   HELP_ITEMS_LIST = 'helpItemsList',
-  BACKUP_FIELDS = 'backupFields'
+  BACKUP_FIELDS = 'backupFields',
+  CLUSTER_FIELDS = 'clusterFields'
 }
 
 export enum PhoneNumberType {
