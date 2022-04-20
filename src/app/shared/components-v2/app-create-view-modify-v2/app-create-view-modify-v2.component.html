@@ -194,7 +194,10 @@
             <!-- Input -->
             <div
               *ngIf="!input.replace || !input.replace.condition(input); else replaceHtml"
+              fxFlex
               class="gd-create-view-modify-bottom-section-content-input"
+              [class.gd-create-view-modify-bottom-section-content-input-has-textarea]="input.type === CreateViewModifyV2TabInputType.TEXTAREA"
+              [class.gd-create-view-modify-bottom-section-content-input-has-age-dob]="input.type === CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH"
               [ngSwitch]="input.type">
 
               <!-- Text -->
@@ -655,11 +658,8 @@
                     <!-- Inputs -->
                     <div
                       fxLayout="row wrap" fxLayoutGap="1.6rem">
-                      <div
-                        fxFlex>
-                        <ng-container
-                          *ngTemplateOutlet="inputRender; context: { input: input.definition.input, parentName: input.name + '[' + itemIndex + ']', parentItemIndex: itemIndex }"></ng-container>
-                      </div>
+                      <ng-container
+                        *ngTemplateOutlet="inputRender; context: { input: input.definition.input, parentName: input.name + '[' + itemIndex + ']', parentItemIndex: itemIndex }"></ng-container>
                     </div>
 
                   </div>
@@ -714,12 +714,11 @@
               fxLayout="row wrap" fxLayoutGap="1.6rem">
 
               <!-- Input render -->
-              <div
-                *ngFor="let input of section.inputs"
-                fxFlex>
+              <ng-container
+                *ngFor="let input of section.inputs">
                 <ng-container
                   *ngTemplateOutlet="inputRender; context: { input, parentName: '', parentItemIndex: undefined }"></ng-container>
-              </div>
+              </ng-container>
 
             </div>
           </div>
