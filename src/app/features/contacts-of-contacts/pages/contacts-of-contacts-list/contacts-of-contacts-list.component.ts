@@ -599,7 +599,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
               // Delete Contact of contact
               {
                 label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_CONTACT_OF_CONTACT',
-                cssClasses: 'gd-list-table-actions-action-menu-warning',
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: ContactOfContactModel): void => {
                     // determine what we need to delete
@@ -746,7 +746,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
               // Restore a deleted Contact of contact
               {
                 label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_RESTORE_CONTACT_OF_CONTACTS',
-                cssClasses: 'gd-list-table-actions-action-menu-warning',
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: ContactOfContactModel) => {
                     // show confirm dialog to confirm the action

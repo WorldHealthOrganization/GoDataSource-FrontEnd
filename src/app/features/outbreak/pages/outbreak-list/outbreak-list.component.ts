@@ -398,7 +398,7 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
           // Make Outbreak active
           {
             type: V2ActionType.ICON,
-            icon: 'link',
+            icon: 'check',
             iconTooltip: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE',
             action: {
               click: (item: OutbreakModel): void => {
@@ -466,11 +466,15 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
                 });
               }
             },
-            visible: (item: OutbreakModel): boolean => {
-              return !item.deleted &&
-              this.authUser &&
-              item.id !== this.authUser.activeOutbreakId &&
-              OutbreakModel.canMakeOutbreakActive(this.authUser);
+            cssClasses: (item: OutbreakModel): string => {
+              return this.authUser &&
+                item.id === this.authUser.activeOutbreakId ?
+                'gd-list-table-actions-action-icon-active' :
+                '';
+            },
+            disable: (item: OutbreakModel): boolean => {
+              return this.authUser &&
+                item.id === this.authUser.activeOutbreakId;
             }
           },
 
@@ -482,7 +486,7 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
               // Delete Outbreak
               {
                 label: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_OUTBREAK',
-                cssClasses: 'gd-list-table-actions-action-menu-warning',
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: OutbreakModel): void => {
                     // show confirm dialog
@@ -814,7 +818,7 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
               // Restore deleted Outbreak
               {
                 label: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_RESTORE_OUTBREAK',
-                cssClasses: 'gd-list-table-actions-action-menu-warning',
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: OutbreakModel) => {
                     // show confirm dialog to confirm the action

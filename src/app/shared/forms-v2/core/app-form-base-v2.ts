@@ -61,6 +61,13 @@ export abstract class AppFormBaseV2<T> implements ControlValueAccessor {
     return control;
   }
 
+  /**
+   * Invalid ?
+   */
+  get invalid(): boolean {
+    return !this.control || this.control.invalid;
+  }
+
   // display error message?
   errMatcher = new AppFormBaseErrorStateMatcherV2(this);
 

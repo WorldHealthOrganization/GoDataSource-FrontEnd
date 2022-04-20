@@ -53,13 +53,13 @@ export class CaseModel
   burialPlaceName: string;
   burialLocationId: string;
   classification: string;
-  dateOfInfection: string;
-  dateOfOnset: string;
+  dateOfInfection: string | Moment;
+  dateOfOnset: string | Moment;
   isDateOfOnsetApproximate: boolean;
-  dateOfOutcome: string;
-  dateBecomeCase: string;
+  dateOfOutcome: string | Moment;
+  dateBecomeCase: string | Moment;
   safeBurial: boolean;
-  dateOfBurial: string;
+  dateOfBurial: string | Moment;
   dateRanges: CaseCenterDateRangeModel[];
   questionnaireAnswers: {
     [variable: string]: IAnswerData[];
@@ -69,7 +69,7 @@ export class CaseModel
     [variable: string]: IAnswerData[];
   };
   type: EntityType = EntityType.CASE;
-  dateOfReporting: string;
+  dateOfReporting: string | Moment;
   dateOfLastContact: string;
   isDateOfReportingApproximate: boolean;
   transferRefused: boolean;

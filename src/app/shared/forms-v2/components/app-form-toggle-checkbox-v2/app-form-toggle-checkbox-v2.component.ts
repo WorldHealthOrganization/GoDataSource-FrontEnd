@@ -5,7 +5,7 @@ import {
   Host, Input,
   OnDestroy,
   Optional,
-  SkipSelf, ViewEncapsulation
+  SkipSelf
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
@@ -13,32 +13,21 @@ import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
 
 @Component({
-  selector: 'app-form-number-v2',
-  templateUrl: './app-form-number-v2.component.html',
-  styleUrls: ['./app-form-number-v2.component.scss'],
-  providers: [{
-    provide: NG_VALUE_ACCESSOR,
-    useExisting: forwardRef(() => AppFormNumberV2Component),
-    multi: true
-  }],
-  encapsulation: ViewEncapsulation.None,
+  selector: 'app-form-toggle-checkbox-v2',
+  templateUrl: './app-form-toggle-checkbox-v2.component.html',
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => AppFormToggleCheckboxV2Component),
+      multi: true
+    }
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppFormNumberV2Component
-  extends AppFormBaseV2<number> implements OnDestroy {
-
-  // float label
-  @Input() neverFloatLabel: boolean = false;
-
+export class AppFormToggleCheckboxV2Component
+  extends AppFormBaseV2<boolean> implements OnDestroy {
   // view only
   @Input() viewOnly: boolean;
-
-  // autocomplete
-  @Input() autocomplete: string;
-
-  // min / max
-  @Input() min: number;
-  @Input() max: number;
 
   // tooltip
   tooltipButton: IAppFormIconButtonV2;

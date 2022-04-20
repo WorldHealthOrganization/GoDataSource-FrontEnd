@@ -859,7 +859,7 @@ export class TransmissionChainDataService {
                     sourceNode.model instanceof CaseModel
         ) {
           if (sourceNode.model.dateOfOnset) {
-            sourceDate = sourceNode.model.dateOfOnset;
+            sourceDate = sourceNode.model.dateOfOnset as string;
           }
         } else if (sourceNode.type === EntityType.CONTACT) {
           if (relationship.contactDate) {
@@ -879,7 +879,7 @@ export class TransmissionChainDataService {
                     targetNode.model instanceof CaseModel
         ) {
           if (targetNode.model.dateOfOnset) {
-            targetDate = targetNode.model.dateOfOnset;
+            targetDate = targetNode.model.dateOfOnset as string;
           }
         } else if (targetNode.type === EntityType.CONTACT) {
           if (relationship.contactDate) {

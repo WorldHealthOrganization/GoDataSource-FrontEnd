@@ -19,19 +19,29 @@ export abstract class AppFormBaseErrorMsgV2 {
 
       case 'minNumberValidator':
         return translateService.instant(
-          'LNG_FORM_VALIDATION_ERROR_MIN_NUMBER', {
-            min: errData.min
-          }
+          'LNG_FORM_VALIDATION_ERROR_MIN_NUMBER',
+          errData
         );
       case 'maxNumberValidator':
         return translateService.instant(
-          'LNG_FORM_VALIDATION_ERROR_MAX_NUMBER', {
-            max: errData.max
-          }
+          'LNG_FORM_VALIDATION_ERROR_MAX_NUMBER',
+          errData
+        );
+
+      case 'emailValidator':
+        return translateService.instant('LNG_FORM_VALIDATION_ERROR_FIELD_EMAIL');
+
+      case 'invalidDateValidator':
+        return translateService.instant('LNG_FORM_VALIDATION_ERROR_INVALID_DATE');
+
+      case 'dateValidator':
+        return translateService.instant(
+          'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE',
+          errData
         );
 
       default:
-        return '--- NOT HANDLED ---';
+        return `--- NOT HANDLED (${errKey}) ---`;
     }
   }
 }

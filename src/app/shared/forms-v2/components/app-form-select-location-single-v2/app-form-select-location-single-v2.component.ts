@@ -35,6 +35,9 @@ import { AppFormLocationBaseV2, ILocation } from '../../core/app-form-location-b
 export class AppFormSelectLocationSingleV2Component
   extends AppFormLocationBaseV2<string> implements OnInit, OnDestroy {
 
+  // view only
+  @Input() viewOnly: boolean;
+
   // selected location
   selectedLocation: ILocation;
 
@@ -105,13 +108,15 @@ export class AppFormSelectLocationSingleV2Component
   /**
    * Update selected items
    */
-  updateSelected(): void {
+  updateSelected(emitEvent: boolean): void {
     // update selected list
     this.selectedLocation = this.value && this.locationMap[this.value] ?
       this.locationMap[this.value] :
       this.selectedLocation;
 
     // emit event
-    this.selectedLocationChanged.emit(this.selectedLocation);
+    if (emitEvent) {
+      this.selectedLocationChanged.emit(this.selectedLocation);
+    }
   }
 }
