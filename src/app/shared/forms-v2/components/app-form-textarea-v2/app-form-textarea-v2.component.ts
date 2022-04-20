@@ -2,7 +2,7 @@ import {
   ChangeDetectionStrategy, ChangeDetectorRef,
   Component,
   forwardRef,
-  Host,
+  Host, Input,
   OnDestroy,
   Optional,
   SkipSelf
@@ -23,6 +23,9 @@ import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 })
 export class AppFormTextareaV2Component
   extends AppFormBaseV2<string> implements OnDestroy {
+  // view only
+  @Input() viewOnly: boolean;
+
   /**
    * Constructor
    */

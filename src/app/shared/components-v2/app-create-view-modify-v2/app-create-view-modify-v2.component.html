@@ -116,6 +116,7 @@
                 [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
                 [placeholder]="input.placeholder"
                 [tooltip]="input.description"
+                [viewOnly]="isView"
                 [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
                 (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-toggle-checkbox-v2>
 
@@ -126,6 +127,7 @@
                 [ngModel]="input.value.get(parentItemIndex)"
                 [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
                 [placeholder]="input.placeholder"
+                [viewOnly]="isView"
                 [useOutbreakLocations]="input.useOutbreakLocations"
                 [clearable]="true"
                 [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
@@ -138,6 +140,7 @@
                 [ngModel]="input.value.get(parentItemIndex)"
                 [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
                 [placeholder]="input.placeholder"
+                [viewOnly]="isView"
                 [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
                 (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-textarea-v2>
 
@@ -243,6 +246,7 @@
                 [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
                 [placeholder]="input.placeholder"
                 [tooltip]="input.description"
+                [viewOnly]="isView"
                 [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
                 autocomplete="off"
                 [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
@@ -276,6 +280,7 @@
                   [name]="parentName ? parentName + '[number]' : 'number'"
                   placeholder="LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER"
                   tooltip="LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER_DESCRIPTION"
+                  [viewOnly]="isView"
                   required="true"></app-form-input-v2>
 
               </div>
@@ -493,6 +498,7 @@
                   [(ngModel)]="input.value.get(parentItemIndex).locationId"
                   [name]="parentName ? parentName + '[locationId]' : 'locationId'"
                   placeholder="LNG_CASE_FIELD_LABEL_CENTER_DATES_LOCATION"
+                  [viewOnly]="isView"
                   useOutbreakLocations="true"></app-form-select-location-single-v2>
 
                 <!-- Comments -->
@@ -500,7 +506,8 @@
                   fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).comments"
                   [name]="parentName ? parentName + '[comments]' : 'comments'"
-                  placeholder="LNG_CASE_FIELD_LABEL_CENTER_DATES_COMMENTS"></app-form-textarea-v2>
+                  placeholder="LNG_CASE_FIELD_LABEL_CENTER_DATES_COMMENTS"
+                  [viewOnly]="isView"></app-form-textarea-v2>
 
               </div>
 
