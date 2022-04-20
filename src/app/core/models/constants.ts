@@ -256,6 +256,10 @@ export class Constants {
     OUTBREAK_TEMPLATES: {
       label: 'LNG_APP_PAGE_OUTBREAK_TEMPLATES',
       value: 'LNG_APP_PAGE_OUTBREAK_TEMPLATES'
+    },
+    CLUSTERS: {
+      label: 'LNG_APP_PAGE_CLUSTERS',
+      value: 'LNG_APP_PAGE_CLUSTERS'
     }
   };
 
