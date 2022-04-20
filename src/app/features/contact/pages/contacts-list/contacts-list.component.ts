@@ -1493,7 +1493,7 @@ export class ContactsListComponent
             }
           },
           visible: (): boolean => {
-            return ContactModel.canBulkModify(this.authUser);
+            return this.selectedOutbreakIsActive && ContactModel.canBulkModify(this.authUser);
           }
         },
 
@@ -1660,7 +1660,7 @@ export class ContactsListComponent
           }
         },
 
-        // Export daily follow up
+        // Export daily follow up form
         {
           label: 'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_BUTTON',
           action: {
@@ -1675,6 +1675,7 @@ export class ContactsListComponent
                   async: false,
                   method: ExportDataMethod.GET,
                   fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
+                  queryBuilder: this.queryBuilder,
                   allow: {
                     types: [ExportDataExtension.PDF]
                   }
@@ -2238,7 +2239,6 @@ export class ContactsListComponent
           id: contact.id,
           followUp: Object.assign(
             contact.followUp, {
-              // status: answer.inputValue.value.followUp.status
               status: (response.handler.data.map.statusesList as IV2SideDialogConfigInputText).value
             }
           )
@@ -2252,7 +2252,6 @@ export class ContactsListComponent
           )
           .pipe(
             catchError((err) => {
-              // this.closeLoadingDialog();
               this.toastV2Service.error(err);
               return throwError(err);
             })
@@ -2261,7 +2260,7 @@ export class ContactsListComponent
             // success message
             this.toastV2Service.success(
               'LNG_PAGE_BULK_MODIFY_CONTACTS_ACTION_MODIFY_CONTACTS_SUCCESS_MESSAGE', {
-                count: response.data.echo.recordsLIst.options.length.toLocaleString('en')
+                count: response.data.echo.recordsList.length.toLocaleString('en')
               }
             );
 
