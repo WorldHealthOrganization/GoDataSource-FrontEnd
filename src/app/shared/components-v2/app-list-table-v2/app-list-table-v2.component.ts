@@ -6,12 +6,11 @@ import { GridReadyEvent, ValueFormatterParams } from '@ag-grid-community/core';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { TranslateService } from '@ngx-translate/core';
 import * as _ from 'lodash';
-import { I18nService } from '../../../core/services/helper/i18n.service';
 import { moment } from '../../../core/helperClasses/x-moment';
 import { Constants } from '../../../core/models/constants';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-import { IV2Column, IV2ColumnAction, IV2ColumnBasic, IV2ColumnBasicFormat, IV2ColumnButton, IV2ColumnPinned, IV2ColumnStatus, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from './models/column.model';
+import { IV2Column, IV2ColumnAction, IV2ColumnBasic, IV2ColumnBasicFormat, IV2ColumnButton, IV2ColumnColor, IV2ColumnPinned, IV2ColumnStatus, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from './models/column.model';
 import { AppListTableV2ActionsComponent } from './components/actions/app-list-table-v2-actions.component';
 import { IExtendedColDef } from './models/extended-column.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
@@ -340,7 +339,6 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   constructor(
     protected changeDetectorRef: ChangeDetectorRef,
     protected translateService: TranslateService,
-    protected i18nService: I18nService,
     protected location: Location,
     protected renderer2: Renderer2,
     protected elementRef: ElementRef,
@@ -772,10 +770,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           // AGE
           case V2ColumnFormat.AGE:
             return fieldValue?.months > 0 ?
-              fieldValue?.months + ' ' + this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS') :
+              fieldValue?.months + ' ' + this.translateService.instant('LNG_AGE_FIELD_LABEL_MONTHS') :
               (
                 fieldValue?.years > 0 ?
-                  (fieldValue?.years + ' ' + this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS')) :
+                  (fieldValue?.years + ' ' + this.translateService.instant('LNG_AGE_FIELD_LABEL_YEARS')) :
                   ''
               );
 
@@ -794,8 +792,12 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           // BOOLEAN
           case V2ColumnFormat.BOOLEAN:
             return fieldValue ?
-              this.i18nService.instant('LNG_COMMON_LABEL_YES') :
-              this.i18nService.instant('LNG_COMMON_LABEL_NO');
+              this.translateService.instant('LNG_COMMON_LABEL_YES') :
+              this.translateService.instant('LNG_COMMON_LABEL_NO');
+
+          // COLOR
+          case V2ColumnFormat.COLOR:
+            return fieldValue;
 
           // nothing to do
           case V2ColumnFormat.STATUS:
@@ -897,6 +899,23 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           value;
       };
     } else {
+      // color ?
+      const colorColumn: IV2ColumnColor = column as IV2ColumnColor;
+      if (
+        colorColumn.format &&
+        colorColumn.format.type === V2ColumnFormat.COLOR
+      ) {
+        return (params: ValueFormatterParams) => {
+          // determine value
+          const value: string = this.formatValue(params);
+
+          // create color display
+          return value ?
+            `<span class="gd-list-table-color"><div style="background-color: ${value}; display: inline-block; width: 2.4rem; height: 2.4rem;"></div> ${value}</span>` :
+            this.translateService.instant(colorColumn.noColorLabel);
+        };
+      }
+
       // actions ?
       const actionColumn: IV2ColumnAction = column as IV2ColumnAction;
       if (
@@ -1663,7 +1682,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
                 // set info icons - readonly
                 if (item.readOnly) {
                   option.infos.push({
-                    label: this.i18nService.instant(
+                    label: this.translateService.instant(
                       'LNG_SIDE_FILTERS_LOAD_FILTER_READONLY_LABEL', {
                         name: item.createdByUser?.name ?
                           item.createdByUser?.name :
@@ -1677,7 +1696,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
                 // updated at
                 if (item.updatedAt) {
                   option.infos.push({
-                    label: this.i18nService.instant(
+                    label: this.translateService.instant(
                       'LNG_SIDE_FILTERS_LOAD_FILTER_UPDATED_AT_LABEL', {
                         datetime: moment(item.updatedAt).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT)
                       }
@@ -2769,7 +2788,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           (prefixOrder + '.') :
           ''
       ) + question.order;
-      const label: string = `${orderLabel} ${this.i18nService.instant(question.text)}`;
+      const label: string = `${orderLabel} ${this.translateService.instant(question.text)}`;
 
       // create option
       const options = {
