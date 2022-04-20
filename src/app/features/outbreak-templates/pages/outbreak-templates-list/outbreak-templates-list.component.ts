@@ -224,7 +224,7 @@ export class OutbreakTemplatesListComponent
               // Delete Outbreak template
               {
                 label: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_DELETE_OUTBREAK_TEMPLATE',
-                cssClasses: 'gd-list-table-actions-action-menu-warning',
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: OutbreakTemplateModel): void => {
                     // show confirm dialog
