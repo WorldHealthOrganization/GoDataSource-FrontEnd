@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { TranslateService } from '@ngx-translate/core';
-import { CreateViewModifyV2Tab, CreateViewModifyV2TabInputType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { Constants } from '../../../../core/models/constants';
@@ -173,19 +173,21 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    * Initialize tabs
    */
   protected initializeTabs(): void {
-    this.tabs = [
-      // Personal
-      this.initializeTabsPersonal(),
+    this.tabData = {
+      tabs: [
+        // Personal
+        this.initializeTabsPersonal(),
 
-      // Epidemiology
-      this.initializeTabsEpidemiology()
-    ];
+        // Epidemiology
+        this.initializeTabsEpidemiology()
+      ]
+    };
   }
 
   /**
    * Initialize tabs - Personal
    */
-  private initializeTabsPersonal(): CreateViewModifyV2Tab {
+  private initializeTabsPersonal(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
       label: 'LNG_PAGE_CREATE_CASE_TAB_PERSONAL_TITLE',
@@ -441,7 +443,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   /**
    * Initialize tabs - Epidemiology
    */
-  private initializeTabsEpidemiology(): CreateViewModifyV2Tab {
+  private initializeTabsEpidemiology(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
       label: 'LNG_PAGE_CREATE_CASE_TAB_INFECTION_TITLE',

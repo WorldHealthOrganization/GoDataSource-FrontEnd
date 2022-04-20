@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input } from '@angular/core';
 import { CreateViewModifyV2Action } from './models/action.model';
-import { CreateViewModifyV2Tab, CreateViewModifyV2TabInputList, CreateViewModifyV2TabInputType } from './models/tab.model';
+import { CreateViewModifyV2, CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputList } from './models/tab.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../app-bottom-dialog-v2/models/bottom-dialog-config.model';
@@ -45,7 +45,7 @@ export class AppCreateViewModifyV2Component {
   };
 
   // tabs to render
-  @Input() tabs: CreateViewModifyV2Tab[];
+  @Input() tabData: CreateViewModifyV2;
 
   // age - dob options
   ageDOBOptions: ILabelValuePairModel[] = [
@@ -120,7 +120,7 @@ export class AppCreateViewModifyV2Component {
   /**
    * Add new item to list
    */
-  addListItem(input: CreateViewModifyV2TabInputList): void {
+  addListItem(input: ICreateViewModifyV2TabInputList): void {
     // add new item to list
     input.items.push(input.definition.add.newItem());
 
@@ -134,7 +134,7 @@ export class AppCreateViewModifyV2Component {
    * Remove item from list
    */
   removeListItem(
-    input: CreateViewModifyV2TabInputList,
+    input: ICreateViewModifyV2TabInputList,
     itemIndex: number
   ): void {
     // delete method
@@ -177,7 +177,7 @@ export class AppCreateViewModifyV2Component {
    * Update form
    */
   updateForm(
-    tab: CreateViewModifyV2Tab,
+    tab: ICreateViewModifyV2Tab,
     form: NgForm
   ): void {
     tab.form = form;

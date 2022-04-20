@@ -33,11 +33,23 @@
         fxLayout="row"
         class="gd-create-view-modify-top-title-buttons">
 
-        <!-- Title -->
+        <!-- Title & view button -->
         <div
           fxFlex
           class="gd-create-view-modify-top-title-buttons-title">
-          {{pageTitle | translate:pageTitleData}}
+
+          <!-- Title -->
+          <span>
+            {{pageTitle | translate:pageTitleData}}
+          </span>
+
+          <!-- View button -->
+          <button
+            *ngIf="isModify"
+            type="button"
+            mat-icon-button>
+            <mat-icon>visibility</mat-icon>
+          </button>
         </div>
 
         <!-- Buttons -->
@@ -46,8 +58,31 @@
           fxFlex fxLayoutAlign="end" fxLayoutGap="0.8rem"
           class="gd-create-view-modify-top-title-buttons-buttons">
 
-          buttons...
+          <!-- Cancel -->
+          <button
+            type="button"
+            mat-flat-button color="text">
+            {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
+          </button>
 
+          <!-- Quick Actions -->
+          <!-- #TODO -->
+
+          <!-- Save -->
+          <button
+            *ngIf="isModify"
+            type="button"
+            mat-flat-button color="primary">
+            {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+          </button>
+
+          <!-- Edit -->
+          <button
+            *ngIf="isView"
+            type="button"
+            mat-flat-button color="primary">
+            {{'LNG_COMMON_BUTTON_EDIT' | translate}}
+          </button>
         </div>
       </div>
 
@@ -615,7 +650,7 @@
         *ngIf="isCreate; else viewModify"
         linear>
         <mat-step
-          *ngFor="let tab of tabs; let tabIndex = index"
+          *ngFor="let tab of tabData.tabs; let tabIndex = index"
           [stepControl]="tab.form">
 
           <!-- Tab Label -->
@@ -675,7 +710,7 @@
         #viewModify>
         <mat-tab-group>
           <mat-tab
-            *ngFor="let tab of tabs">
+            *ngFor="let tab of tabData.tabs">
 
             <!-- Label & valid -->
             <ng-template

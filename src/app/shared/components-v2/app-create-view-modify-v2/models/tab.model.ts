@@ -37,7 +37,7 @@ export enum CreateViewModifyV2TabInputType {
 /**
  * Input - base value
  */
-interface CreateViewModifyV2TabInputValue<T> {
+interface ICreateViewModifyV2TabInputValue<T> {
   get: (index?: number) => T;
   set: (value: T, index?: number) => void;
 }
@@ -45,7 +45,7 @@ interface CreateViewModifyV2TabInputValue<T> {
 /**
  * Input - base
  */
-interface CreateViewModifyV2TabInputBase {
+interface ICreateViewModifyV2TabInputBase {
   // required
   type: CreateViewModifyV2TabInputType;
   name: string;
@@ -66,10 +66,10 @@ interface CreateViewModifyV2TabInputBase {
 /**
  * Input - text
  */
-interface CreateViewModifyV2TabInputText extends Omit<CreateViewModifyV2TabInputBase, 'value'> {
+interface ICreateViewModifyV2TabInputText extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
   // required
   type: CreateViewModifyV2TabInputType.TEXT;
-  value: CreateViewModifyV2TabInputValue<string>;
+  value: ICreateViewModifyV2TabInputValue<string>;
 
   // optional
   validators?: {
@@ -80,11 +80,11 @@ interface CreateViewModifyV2TabInputText extends Omit<CreateViewModifyV2TabInput
 /**
  * Input - select single
  */
-interface CreateViewModifyV2TabInputSingleSelect extends Omit<CreateViewModifyV2TabInputBase, 'value'> {
+interface ICreateViewModifyV2TabInputSingleSelect extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
   // required
   type: CreateViewModifyV2TabInputType.SELECT_SINGLE;
   options: ILabelValuePairModel[];
-  value: CreateViewModifyV2TabInputValue<string>;
+  value: ICreateViewModifyV2TabInputValue<string>;
 
   // optional
   validators?: {
@@ -95,19 +95,19 @@ interface CreateViewModifyV2TabInputSingleSelect extends Omit<CreateViewModifyV2
 /**
  * Input - toggle checkbox
  */
-interface CreateViewModifyV2TabInputToggleCheckbox extends Omit<CreateViewModifyV2TabInputBase, 'value'> {
+interface ICreateViewModifyV2TabInputToggleCheckbox extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
   // required
   type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX;
-  value: CreateViewModifyV2TabInputValue<boolean>;
+  value: ICreateViewModifyV2TabInputValue<boolean>;
 }
 
 /**
  * Input - location single
  */
-interface CreateViewModifyV2TabInputLocationSingle extends Omit<CreateViewModifyV2TabInputBase, 'value'> {
+interface ICreateViewModifyV2TabInputLocationSingle extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
   // required
   type: CreateViewModifyV2TabInputType.LOCATION_SINGLE;
-  value: CreateViewModifyV2TabInputValue<string>;
+  value: ICreateViewModifyV2TabInputValue<string>;
 
   // optional
   useOutbreakLocations?: boolean;
@@ -116,16 +116,16 @@ interface CreateViewModifyV2TabInputLocationSingle extends Omit<CreateViewModify
 /**
  * Input - textarea
  */
-interface CreateViewModifyV2TabInputTextArea extends Omit<CreateViewModifyV2TabInputBase, 'value'> {
+interface ICreateViewModifyV2TabInputTextArea extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
   // required
   type: CreateViewModifyV2TabInputType.TEXTAREA;
-  value: CreateViewModifyV2TabInputValue<string>;
+  value: ICreateViewModifyV2TabInputValue<string>;
 }
 
 /**
  * Input - age - date of birth
  */
-interface CreateViewModifyV2TabInputAgeOrDOB extends Omit<CreateViewModifyV2TabInputBase, 'name' | 'placeholder' | 'description' | 'value'> {
+interface ICreateViewModifyV2TabInputAgeOrDOB extends Omit<ICreateViewModifyV2TabInputBase, 'name' | 'placeholder' | 'description' | 'value'> {
   // required
   type: CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH;
   name: {
@@ -136,10 +136,10 @@ interface CreateViewModifyV2TabInputAgeOrDOB extends Omit<CreateViewModifyV2TabI
   ageTypeYears: boolean,
   value: {
     age: {
-      years: CreateViewModifyV2TabInputValue<number>,
-      months: CreateViewModifyV2TabInputValue<number>
+      years: ICreateViewModifyV2TabInputValue<number>,
+      months: ICreateViewModifyV2TabInputValue<number>
     },
-    dob: CreateViewModifyV2TabInputValue<string | Moment>
+    dob: ICreateViewModifyV2TabInputValue<string | Moment>
   },
 
   // optional
@@ -152,20 +152,20 @@ interface CreateViewModifyV2TabInputAgeOrDOB extends Omit<CreateViewModifyV2TabI
 /**
  * Input - visual ID
  */
-interface CreateViewModifyV2TabInputVisualID extends Omit<CreateViewModifyV2TabInputBase, 'value'> {
+interface ICreateViewModifyV2TabInputVisualID extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
   // required
   type: CreateViewModifyV2TabInputType.VISUAL_ID;
-  value: CreateViewModifyV2TabInputValue<string>;
+  value: ICreateViewModifyV2TabInputValue<string>;
   validator: Observable<boolean | IGeneralAsyncValidatorResponse>;
 }
 
 /**
  * Input - date
  */
-interface CreateViewModifyV2TabInputDate extends Omit<CreateViewModifyV2TabInputBase, 'value'> {
+interface ICreateViewModifyV2TabInputDate extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
   // required
   type: CreateViewModifyV2TabInputType.DATE;
-  value: CreateViewModifyV2TabInputValue<string | Moment>;
+  value: ICreateViewModifyV2TabInputValue<string | Moment>;
 
   // optional
   validators?: {
@@ -180,7 +180,7 @@ interface CreateViewModifyV2TabInputDate extends Omit<CreateViewModifyV2TabInput
 /**
 * Input - list
 */
-export interface CreateViewModifyV2TabInputList {
+export interface ICreateViewModifyV2TabInputList {
   // required
   type: CreateViewModifyV2TabInputType.LIST;
   name: string;
@@ -196,13 +196,13 @@ export interface CreateViewModifyV2TabInputList {
       confirmLabel: string
     }
   };
-  itemsChanged: (list: CreateViewModifyV2TabInputList) => void;
+  itemsChanged: (list: ICreateViewModifyV2TabInputList) => void;
 }
 
 /**
  * Input - document
  */
-export interface CreateViewModifyV2TabInputDocument {
+interface ICreateViewModifyV2TabInputDocument {
   // required
   type: CreateViewModifyV2TabInputType.DOCUMENT;
   typeOptions: ILabelValuePairModel[];
@@ -214,7 +214,7 @@ export interface CreateViewModifyV2TabInputDocument {
 /**
  * Input - address
  */
-export interface CreateViewModifyV2TabInputAddress {
+interface ICreateViewModifyV2TabInputAddress {
   // required
   type: CreateViewModifyV2TabInputType.ADDRESS;
   typeOptions: ILabelValuePairModel[];
@@ -229,7 +229,7 @@ export interface CreateViewModifyV2TabInputAddress {
 /**
  * Input - vaccine
  */
-export interface CreateViewModifyV2TabInputVaccine {
+interface ICreateViewModifyV2TabInputVaccine {
   // required
   type: CreateViewModifyV2TabInputType.VACCINE;
   vaccineOptions: ILabelValuePairModel[];
@@ -242,7 +242,7 @@ export interface CreateViewModifyV2TabInputVaccine {
 /**
  * Input - center date range
  */
-export interface CreateViewModifyV2TabInputCenterDateRange {
+interface ICreateViewModifyV2TabInputCenterDateRange {
   // required
   type: CreateViewModifyV2TabInputType.CENTER_DATE_RANGE;
   typeOptions: ILabelValuePairModel[];
@@ -255,15 +255,15 @@ export interface CreateViewModifyV2TabInputCenterDateRange {
 /**
  * Input
  */
-type CreateViewModifyV2TabInput = CreateViewModifyV2TabInputText | CreateViewModifyV2TabInputSingleSelect | CreateViewModifyV2TabInputToggleCheckbox
-| CreateViewModifyV2TabInputLocationSingle | CreateViewModifyV2TabInputTextArea | CreateViewModifyV2TabInputAgeOrDOB | CreateViewModifyV2TabInputVisualID
-| CreateViewModifyV2TabInputDate | CreateViewModifyV2TabInputList | CreateViewModifyV2TabInputDocument | CreateViewModifyV2TabInputAddress
-| CreateViewModifyV2TabInputVaccine | CreateViewModifyV2TabInputCenterDateRange;
+type CreateViewModifyV2TabInput = ICreateViewModifyV2TabInputText | ICreateViewModifyV2TabInputSingleSelect | ICreateViewModifyV2TabInputToggleCheckbox
+| ICreateViewModifyV2TabInputLocationSingle | ICreateViewModifyV2TabInputTextArea | ICreateViewModifyV2TabInputAgeOrDOB | ICreateViewModifyV2TabInputVisualID
+| ICreateViewModifyV2TabInputDate | ICreateViewModifyV2TabInputList | ICreateViewModifyV2TabInputDocument | ICreateViewModifyV2TabInputAddress
+| ICreateViewModifyV2TabInputVaccine | ICreateViewModifyV2TabInputCenterDateRange;
 
 /**
  * Tab section
  */
-interface CreateViewModifyV2Section {
+interface ICreateViewModifyV2Section {
   // required
   type: CreateViewModifyV2TabInputType.SECTION;
   inputs: CreateViewModifyV2TabInput[];
@@ -273,12 +273,20 @@ interface CreateViewModifyV2Section {
 /**
  * Tab
  */
-export interface CreateViewModifyV2Tab {
+export interface ICreateViewModifyV2Tab {
   // required
   type: CreateViewModifyV2TabInputType.TAB;
-  sections: CreateViewModifyV2Section[];
+  sections: ICreateViewModifyV2Section[];
   label: string;
 
   // optional
   form?: NgForm;
+}
+
+/**
+ * Create view modify data
+ */
+export interface CreateViewModifyV2 {
+  // required
+  tabs: ICreateViewModifyV2Tab[];
 }
