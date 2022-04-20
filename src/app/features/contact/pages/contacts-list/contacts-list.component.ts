@@ -229,7 +229,7 @@ export class ContactsListComponent
         },
         link: (data) => {
           return data.mainAddress?.location?.name ?
-            `/locations/${ data.mainAddress.location.id }/view` :
+            `/locations/${data.mainAddress.location.id}/view` :
             undefined;
         }
       },
@@ -567,7 +567,7 @@ export class ContactsListComponent
         },
         link: (data) => {
           return data.responsibleUserId ?
-            `/users/${ data.responsibleUserId }/view` :
+            `/users/${data.responsibleUserId}/view` :
             undefined;
         }
       },
