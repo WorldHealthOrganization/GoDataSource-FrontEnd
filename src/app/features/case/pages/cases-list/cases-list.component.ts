@@ -804,7 +804,7 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
               // Delete Case
               {
                 label: 'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE',
-                cssClasses: 'gd-list-table-actions-action-menu-warning',
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: CaseModel): void => {
                     // data
@@ -916,7 +916,7 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
               // Convert Case To Contact
               {
                 label: 'LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT',
-                cssClasses: 'gd-list-table-actions-action-menu-warning',
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: CaseModel): void => {
                     // show confirm dialog to confirm the action
@@ -1238,7 +1238,7 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
               // Restore a deleted case
               {
                 label: 'LNG_PAGE_LIST_CASES_ACTION_RESTORE_CASE',
-                cssClasses: 'gd-list-table-actions-action-menu-warning',
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: CaseModel) => {
                     // show confirm dialog to confirm the action

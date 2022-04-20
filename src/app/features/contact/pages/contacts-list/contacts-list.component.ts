@@ -761,7 +761,7 @@ export class ContactsListComponent
               // Delete Contact
               {
                 label: 'LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_CONTACT',
-                cssClasses: 'gd-list-table-actions-action-menu-warning',
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: ContactModel): void => {
                     // determine what we need to delete
@@ -836,7 +836,7 @@ export class ContactsListComponent
               // Convert Contact to Contact
               {
                 label: 'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CASE',
-                cssClasses: 'gd-list-table-actions-action-menu-warning',
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: ContactModel): void => {
                     // show confirm dialog to confirm the action
@@ -1135,7 +1135,7 @@ export class ContactsListComponent
               // Restore a deleted contact
               {
                 label: 'LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_CONTACT',
-                cssClasses: 'gd-list-table-actions-action-menu-warning',
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: ContactModel) => {
                     // show confirm dialog to confirm the action

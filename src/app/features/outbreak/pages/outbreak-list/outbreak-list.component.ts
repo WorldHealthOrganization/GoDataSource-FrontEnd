@@ -486,7 +486,7 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
               // Delete Outbreak
               {
                 label: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_OUTBREAK',
-                cssClasses: 'gd-list-table-actions-action-menu-warning',
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: OutbreakModel): void => {
                     // show confirm dialog
@@ -818,7 +818,7 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
               // Restore deleted Outbreak
               {
                 label: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_RESTORE_OUTBREAK',
-                cssClasses: 'gd-list-table-actions-action-menu-warning',
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: OutbreakModel) => {
                     // show confirm dialog to confirm the action

@@ -76,7 +76,7 @@ interface IV2ActionMenuOption {
   action: IV2ActionClick | IV2ActionLink;
 
   // optional
-  cssClasses?: string;
+  cssClasses?: (data: any) => string;
   visible?: (data: any) => boolean;
   disable?: (data: any) => boolean;
 }

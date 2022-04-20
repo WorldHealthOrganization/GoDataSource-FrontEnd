@@ -52,7 +52,7 @@
               <a
                 *ngIf="menuOption.label; else divider"
                 mat-menu-item
-                class="gd-list-table-actions-action-menu-button {{menuOption.cssClasses}}"
+                class="gd-list-table-actions-action-menu-button {{menuOption.cssClasses ? menuOption.cssClasses(data) : ''}}"
                 [routerLink]="menuOption.action.link && (!menuOption.disable || !menuOption.disable(data)) ? menuOption.action.link(data) : undefined"
                 [queryParams]="menuOption.action.linkQueryParams ? menuOption.action.linkQueryParams(data) : undefined"
                 [disabled]="menuOption.disable && menuOption.disable(data)"
