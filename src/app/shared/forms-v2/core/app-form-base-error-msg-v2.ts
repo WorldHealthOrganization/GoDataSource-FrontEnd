@@ -40,6 +40,12 @@ export abstract class AppFormBaseErrorMsgV2 {
           errData
         );
 
+      case 'generalAsyncValidatorDirective':
+        return translateService.instant(
+          errData.err,
+          errData.details
+        );
+
       default:
         return `--- NOT HANDLED (${errKey}) ---`;
     }

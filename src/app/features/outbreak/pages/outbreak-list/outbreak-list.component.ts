@@ -24,9 +24,10 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
-import { IV2SideDialogConfigButtonType, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputText, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Component({
   selector: 'app-outbreak-list',
@@ -81,6 +82,16 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
    */
   protected initializeTableColumns()
   {
+    // validate clone outbreak name
+    let cloneOutbreakName: string;
+    const asyncValidateCloneOutbreakName: Observable<boolean | IGeneralAsyncValidatorResponse> = new Observable((observer) => {
+      this.outbreakDataService.checkOutbreakNameUniquenessValidity(cloneOutbreakName)
+        .subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+          observer.next(isValid);
+          observer.complete();
+        });
+    });
+
     // default table columns
     this.tableColumns = [
       {
@@ -673,7 +684,11 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
                           placeholder: 'LNG_DIALOG_FIELD_PLACEHOLDER_CLONED_OUTBREAK_NAME',
                           value: this.i18nService.instant('LNG_PAGE_LIST_OUTBREAKS_CLONE_NAME', { name: item.name }),
                           validators: {
-                            required: () => true
+                            required: () => true,
+                            async: (_data, _handler, input: IV2SideDialogConfigInputText) => {
+                              cloneOutbreakName = input.value;
+                              return asyncValidateCloneOutbreakName;
+                            }
                           }
                         }],
                         bottomButtons: [{
@@ -683,7 +698,8 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
                           key: 'apply',
                           disabled: (_data, handler): boolean => {
                             return !handler.form ||
-                              handler.form.invalid;
+                              handler.form.invalid ||
+                              handler.form.pending;
                           }
                         }],
                         initialized: (handler) => {
