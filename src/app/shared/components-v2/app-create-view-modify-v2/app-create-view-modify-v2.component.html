@@ -44,12 +44,14 @@
           </span>
 
           <!-- View button -->
-          <button
+          <a
             *ngIf="isModify"
             type="button"
-            mat-icon-button>
+            mat-icon-button
+            [routerLink]="tabData.buttons.view.link()"
+            [queryParams]="tabData.buttons.view.queryParams ? tabData.buttons.view.queryParams() : undefined">
             <mat-icon>visibility</mat-icon>
-          </button>
+          </a>
         </div>
 
         <!-- Buttons -->
@@ -61,7 +63,9 @@
           <!-- Cancel -->
           <button
             type="button"
-            mat-flat-button color="text">
+            mat-flat-button color="text"
+            [routerLink]="isView ? tabData.buttons.viewCancel.link() : tabData.buttons.modifyCancel.link()"
+            [queryParams]="isView ? (tabData.buttons.viewCancel.queryParams ? tabData.buttons.viewCancel.queryParams() : undefined) : (tabData.buttons.modifyCancel.queryParams ? tabData.buttons.modifyCancel.queryParams() : undefined)">
             {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
           </button>
 
@@ -80,7 +84,9 @@
           <button
             *ngIf="isView"
             type="button"
-            mat-flat-button color="primary">
+            mat-flat-button color="primary"
+            [routerLink]="tabData.buttons.modify.link()"
+            [queryParams]="tabData.buttons.modify.queryParams ? tabData.buttons.modify.queryParams() : undefined">
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
           </button>
         </div>

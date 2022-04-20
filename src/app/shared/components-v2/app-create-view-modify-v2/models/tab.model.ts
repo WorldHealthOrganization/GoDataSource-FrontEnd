@@ -7,6 +7,7 @@ import { AddressModel } from '../../../../core/models/address.model';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { VaccineModel } from '../../../../core/models/vaccine.model';
 import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-date-range.model';
+import { Params } from '@angular/router';
 
 /**
  * Input type
@@ -284,9 +285,26 @@ export interface ICreateViewModifyV2Tab {
 }
 
 /**
+ * Link
+ */
+interface CreateViewModifyV2Link {
+  // required
+  link: () => string[];
+
+  // optional
+  queryParams?: () => Params;
+}
+
+/**
  * Create view modify data
  */
 export interface CreateViewModifyV2 {
   // required
   tabs: ICreateViewModifyV2Tab[];
+  buttons: {
+    view: CreateViewModifyV2Link,
+    modify: CreateViewModifyV2Link,
+    viewCancel: CreateViewModifyV2Link,
+    modifyCancel: CreateViewModifyV2Link
+  }
 }

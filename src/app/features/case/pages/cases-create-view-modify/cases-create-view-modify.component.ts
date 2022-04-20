@@ -174,13 +174,30 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    */
   protected initializeTabs(): void {
     this.tabData = {
+      // tabs
       tabs: [
         // Personal
         this.initializeTabsPersonal(),
 
         // Epidemiology
         this.initializeTabsEpidemiology()
-      ]
+      ],
+
+      // buttons
+      buttons: {
+        view: {
+          link: () => ['/cases', this.itemData?.id, 'view']
+        },
+        modify: {
+          link: () => ['/cases', this.itemData?.id, 'modify']
+        },
+        viewCancel: {
+          link: () => ['/cases']
+        },
+        modifyCancel: {
+          link: () => ['/cases']
+        }
+      }
     };
   }
 
