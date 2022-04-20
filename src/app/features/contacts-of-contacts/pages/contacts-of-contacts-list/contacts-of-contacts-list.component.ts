@@ -16,7 +16,7 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { LocationModel } from '../../../../core/models/location.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { UserModel, UserSettings } from '../../../../core/models/user.model';
+import { UserModel } from '../../../../core/models/user.model';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -51,7 +51,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
   // constants
   Constants = Constants;
-  UserSettings = UserSettings;
 
   // anonymize fields
   private contactsOfContactsAnonymizeFields: ILabelValuePairModel[] = [

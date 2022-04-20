@@ -4,7 +4,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { UserModel, UserSettings } from '../../../../core/models/user.model';
+import { UserModel } from '../../../../core/models/user.model';
 import * as _ from 'lodash';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
@@ -39,7 +39,6 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
 
   // import constants into template
   Constants = Constants;
-  UserSettings = UserSettings;
 
   /**
      * Constructor

@@ -20,7 +20,7 @@ import { LocationModel } from '../../../../core/models/location.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { TeamModel } from '../../../../core/models/team.model';
-import { UserModel, UserSettings } from '../../../../core/models/user.model';
+import { UserModel } from '../../../../core/models/user.model';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
@@ -55,7 +55,6 @@ export class ContactsListComponent
   contactsList$: Observable<ContactModel[]>;
 
   // constants
-  UserSettings = UserSettings;
   Constants = Constants;
 
   // anonymize fields
