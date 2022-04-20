@@ -65,6 +65,17 @@
           }
         }
 
+        /* Select prefix */
+        .mat-form-field-prefix {
+          left: -0.4rem;
+          top: 0.5rem;
+
+          .mat-icon {
+            color: rgba(var(--gd-text-rgb), 0.75);
+            text-align: center;
+          }
+        }
+
         /* Form input middle */
         .mat-form-field-infix {
           border-top: 0 none;
@@ -119,7 +130,7 @@
       .mat-form-field-subscript-wrapper {
         font-size: 1.2rem;
         margin-top: 0.2rem;
-        padding: 0 1.6rem;
+        padding: 0;
       }
     }
 

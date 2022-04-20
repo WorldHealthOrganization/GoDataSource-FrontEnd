@@ -269,7 +269,7 @@
               <!-- Age - Dob -->
               <div
                 *ngSwitchCase="CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH"
-                fxFlex fxLayout="row" fxLayoutGap="1.6rem">
+                fxLayout="row" fxLayoutGap="1.6rem">
 
                 <!-- Age / Dob option -->
                 <div
@@ -413,11 +413,11 @@
               <!-- Address -->
               <div
                 *ngSwitchCase="CreateViewModifyV2TabInputType.ADDRESS"
-                fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem">
+                fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem"
+                class="gd-create-view-modify-bottom-section-content-input-list-multiple-rows">
 
                 <!-- Type -->
                 <app-form-select-single-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).typeId"
                   [name]="parentName ? parentName + '[typeId]' : (input.name + '[typeId]')"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_TYPE"
@@ -428,7 +428,6 @@
 
                 <!-- Date -->
                 <app-form-date-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).date"
                   [name]="parentName ? parentName + '[date]' : (input.name + '[date]')"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_DATE"
@@ -437,7 +436,6 @@
 
                 <!-- Email address -->
                 <app-form-input-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).emailAddress"
                   [name]="parentName ? parentName + '[emailAddress]' : (input.name + '[emailAddress]')"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS"
@@ -447,7 +445,6 @@
 
                 <!-- Phone number -->
                 <app-form-input-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).phoneNumber"
                   [name]="parentName ? parentName + '[phoneNumber]' : (input.name + '[phoneNumber]')"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER"
@@ -456,7 +453,6 @@
 
                 <!-- Location -->
                 <app-form-select-location-single-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).locationId"
                   [name]="parentName ? parentName + '[locationId]' : (input.name + '[locationId]')"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_LOCATION"
@@ -467,7 +463,6 @@
 
                 <!-- City -->
                 <app-form-input-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).city"
                   [name]="parentName ? parentName + '[city]' : (input.name + '[city]')"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_CITY"
@@ -476,7 +471,6 @@
 
                 <!-- Postal code -->
                 <app-form-input-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).postalCode"
                   [name]="parentName ? parentName + '[postalCode]' : (input.name + '[postalCode]')"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE"
@@ -485,7 +479,6 @@
 
                 <!-- Address line 1 -->
                 <app-form-input-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).addressLine1"
                   [name]="parentName ? parentName + '[addressLine1]' : (input.name + '[addressLine1]')"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1"
@@ -494,7 +487,7 @@
 
                 <!-- Lat & Lng -->
                 <div
-                  fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem">
+                  fxLayout="row wrap" fxLayoutGap="1.6rem">
 
                   <!-- Lat -->
                   <app-form-number-v2
@@ -530,7 +523,6 @@
 
                 <!-- Geo location accurate -->
                 <app-form-toggle-checkbox-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).geoLocationAccurate"
                   [name]="parentName ? parentName + '[geoLocationAccurate]' : (input.name + '[geoLocationAccurate]')"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES"
@@ -576,11 +568,11 @@
               <!-- Center date range -->
               <div
                 *ngSwitchCase="CreateViewModifyV2TabInputType.CENTER_DATE_RANGE"
-                fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem">
+                fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem"
+                class="gd-create-view-modify-bottom-section-content-input-list-multiple-rows">
 
                 <!-- Type -->
                 <app-form-select-single-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).typeId"
                   [name]="parentName ? parentName + '[typeId]' : 'typeId'"
                   placeholder="LNG_CASE_FIELD_LABEL_DATE_RANGE_TYPE_ID"
@@ -590,7 +582,6 @@
 
                 <!-- Date range - start -->
                 <app-form-date-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).startDate"
                   [name]="parentName ? parentName + '[startDate]' : 'startDate'"
                   placeholder="LNG_FORM_RANGE_FIELD_LABEL_FROM"
@@ -601,7 +592,6 @@
 
                 <!-- Date range - end -->
                 <app-form-date-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).endDate"
                   [name]="parentName ? parentName + '[endDate]' : 'endDate'"
                   placeholder="LNG_FORM_RANGE_FIELD_LABEL_TO"
@@ -611,7 +601,6 @@
 
                 <!-- Center name -->
                 <app-form-select-single-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).centerName"
                   [name]="parentName ? parentName + '[centerName]' : 'centerName'"
                   placeholder="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME"
@@ -620,7 +609,6 @@
 
                 <!-- Location -->
                 <app-form-select-location-single-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).locationId"
                   [name]="parentName ? parentName + '[locationId]' : 'locationId'"
                   placeholder="LNG_CASE_FIELD_LABEL_CENTER_DATES_LOCATION"
@@ -629,7 +617,6 @@
 
                 <!-- Comments -->
                 <app-form-textarea-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).comments"
                   [name]="parentName ? parentName + '[comments]' : 'comments'"
                   placeholder="LNG_CASE_FIELD_LABEL_CENTER_DATES_COMMENTS"
@@ -642,14 +629,17 @@
                 *ngSwitchCase="CreateViewModifyV2TabInputType.LIST">
 
                 <!-- List Items -->
-                <div>
+                <div
+                  class="gd-create-view-modify-bottom-section-content-input-list">
                   <div
-                    *ngFor="let item of input.items; let itemIndex = index">
+                    *ngFor="let item of input.items; let itemIndex = index"
+                    class="gd-create-view-modify-bottom-section-content-input-list-item">
 
                     <!-- Remove button -->
                     <div
                       *ngIf="!isView"
-                      fxLayoutAlign="end">
+                      fxLayoutAlign="end"
+                      class="gd-create-view-modify-bottom-section-content-input-list-item-delete">
                       <button
                         type="button"
                         mat-icon-button
@@ -662,7 +652,8 @@
 
                     <!-- Inputs -->
                     <div
-                      fxLayout="row wrap" fxLayoutGap="1.6rem">
+                      fxLayout="row wrap" fxLayoutGap="1.6rem"
+                      class="gd-create-view-modify-bottom-section-content-input-list-item-content">
                       <ng-container
                         *ngTemplateOutlet="inputRender; context: { input: input.definition.input, parentName: input.name + '[' + itemIndex + ']', parentItemIndex: itemIndex }"></ng-container>
                     </div>
@@ -833,8 +824,11 @@
             </ng-template>
 
             <!-- Content -->
-            <ng-container
-              *ngTemplateOutlet="sectionsRender; context: { tab }"></ng-container>
+            <div
+            class="gd-create-view-modify-bottom-content">
+              <ng-container
+                *ngTemplateOutlet="sectionsRender; context: { tab }"></ng-container>
+            </div>
           </mat-tab>
         </mat-tab-group>
       </ng-template>
