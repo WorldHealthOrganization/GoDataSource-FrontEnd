@@ -99,11 +99,19 @@
               <ng-container
                 *ngFor="let menuOption of tabData.buttons.quickActions.options">
                 <ng-container
-                  *ngIf="!menuOption.visible || menuOption.visible()">
+                  *ngIf="!menuOption.visible || menuOption.visible()"
+                  [ngSwitch]="menuOption.type">
+
+                  <!-- Group label -->
+                  <div
+                    *ngSwitchCase="CreateViewModifyV2MenuType.GROUP"
+                    (click)="$event.preventDefault(); $event.stopPropagation(); $event.stopImmediatePropagation();">
+                    {{menuOption.label | translate}}
+                  </div>
 
                   <!-- Child Menu link -->
                   <ng-container
-                    *ngIf="menuOption.label; else divider">
+                    *ngSwitchCase="CreateViewModifyV2MenuType.OPTION">
 
                     <!-- Link -->
                     <a
@@ -130,10 +138,8 @@
                   </ng-container>
 
                   <!-- Divider -->
-                  <ng-template
-                    #divider>
-                    <mat-divider></mat-divider>
-                  </ng-template>
+                  <mat-divider
+                    *ngSwitchCase="CreateViewModifyV2MenuType.DIVIDER"></mat-divider>
 
                 </ng-container>
               </ng-container>

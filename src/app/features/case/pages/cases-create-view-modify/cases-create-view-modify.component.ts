@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { TranslateService } from '@ngx-translate/core';
-import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import { CreateViewModifyV2MenuType, CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { Constants } from '../../../../core/models/constants';
@@ -214,6 +214,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           options: [
             // Add contact
             {
+              type: CreateViewModifyV2MenuType.OPTION,
               label: 'LNG_PAGE_ACTION_ADD_CONTACT',
               action: {
                 link: () => ['/contacts', 'create'],
@@ -229,11 +230,13 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
             // Divider
             {
+              type: CreateViewModifyV2MenuType.DIVIDER,
               visible: () => CaseModel.canCreateContact(this.authUser) && ContactModel.canCreate(this.authUser)
             },
 
             // View Questionnaire
             {
+              type: CreateViewModifyV2MenuType.OPTION,
               label: 'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE',
               action: {
                 link: () => ['/cases', this.itemData.id, 'view-questionnaire']
@@ -241,10 +244,13 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             },
 
             // Divider
-            {},
+            {
+              type: CreateViewModifyV2MenuType.DIVIDER
+            },
 
             // Duplicate records marked as not duplicate
             {
+              type: CreateViewModifyV2MenuType.OPTION,
               label: 'LNG_PAGE_MODIFY_CASE_ACTION_SEE_RECORDS_NOT_DUPLICATES',
               action: {
                 link: () => ['/duplicated-records', 'cases', this.itemData.id, 'marked-not-duplicates']
@@ -254,6 +260,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
             // contacts
             {
+              type: CreateViewModifyV2MenuType.OPTION,
               label: 'LNG_COMMON_BUTTON_EXPOSURES_FROM',
               action: {
                 link: () => ['/relationships', EntityType.CASE, this.itemData.id, 'contacts']
@@ -262,6 +269,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             },
             // exposures
             {
+              type: CreateViewModifyV2MenuType.OPTION,
               label: 'LNG_COMMON_BUTTON_EXPOSURES_TO',
               action: {
                 link: () => ['/relationships', EntityType.CASE, this.itemData.id, 'exposures']
@@ -271,6 +279,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
             // lab results
             {
+              type: CreateViewModifyV2MenuType.OPTION,
               label: 'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS',
               action: {
                 link: () => ['/lab-results', 'cases', this.itemData.id]
@@ -280,6 +289,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
             // follow-ups
             {
+              type: CreateViewModifyV2MenuType.OPTION,
               label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS',
               action: {
                 link: () => ['/contacts', 'case-related-follow-ups', this.itemData.id]
@@ -289,6 +299,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
             // Divider
             {
+              type: CreateViewModifyV2MenuType.DIVIDER,
               visible: () => CaseModel.canList(this.authUser) || CaseModel.canListRelationshipContacts(this.authUser) ||
                 CaseModel.canListRelationshipExposures(this.authUser) || (LabResultModel.canList(this.authUser) && CaseModel.canListLabResult(this.authUser)) ||
                 FollowUpModel.canList(this.authUser)
@@ -296,6 +307,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
             // movement map
             {
+              type: CreateViewModifyV2MenuType.OPTION,
               label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_MOVEMENT',
               action: {
                 link: () => ['/cases', this.itemData.id, 'movement']
@@ -305,6 +317,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
             // chronology chart
             {
+              type: CreateViewModifyV2MenuType.OPTION,
               label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CHRONOLOGY',
               action: {
                 link: () => ['/cases', this.itemData.id, 'chronology']
@@ -314,20 +327,27 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
             // Divider
             {
+              type: CreateViewModifyV2MenuType.DIVIDER,
               visible: () => CaseModel.canViewMovementMap(this.authUser) || CaseModel.canViewChronologyChart(this.authUser)
             },
 
+            // Contact group
+            {
+              type: CreateViewModifyV2MenuType.GROUP,
+              label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CASE_WAS_CONTACT_TITLE'
+            },
             // case => contact questionnaire
             {
+              type: CreateViewModifyV2MenuType.OPTION,
               label: 'LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE',
               action: {
                 link: () => ['/cases', this.itemData.id, 'history']
               },
               visible: () => this.itemData.wasContact && this.itemData.hasQuestionnaireAnswersContact
             },
-
             // case => contact follow-ups
             {
+              type: CreateViewModifyV2MenuType.OPTION,
               label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CONTACT_FOLLOW_UPS',
               action: {
                 link: () => ['/contacts', 'case-follow-ups', this.itemData.id]

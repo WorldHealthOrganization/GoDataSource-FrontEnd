@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input } from '@angular/core';
 import { CreateViewModifyV2Action } from './models/action.model';
-import { ICreateViewModifyV2, CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputList } from './models/tab.model';
+import { ICreateViewModifyV2, CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputList, CreateViewModifyV2MenuType } from './models/tab.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../app-bottom-dialog-v2/models/bottom-dialog-config.model';
@@ -70,6 +70,7 @@ export class AppCreateViewModifyV2Component {
   // constants
   CreateViewModifyV2TabInputType = CreateViewModifyV2TabInputType;
   Constants = Constants;
+  CreateViewModifyV2MenuType = CreateViewModifyV2MenuType;
 
   /**
    * Constructor

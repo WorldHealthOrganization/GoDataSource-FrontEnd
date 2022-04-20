@@ -311,10 +311,32 @@ interface ICreateViewModifyV2Click {
 }
 
 /**
+ * Menu type
+ */
+export enum CreateViewModifyV2MenuType {
+  GROUP,
+  OPTION,
+  DIVIDER
+}
+
+/**
+ * Menu group
+ */
+interface ICreateViewModifyV2MenuGroup {
+  // menu option
+  type: CreateViewModifyV2MenuType.GROUP;
+  label: string;
+
+  // never
+  action?: never;
+}
+
+/**
  * Menu option
  */
 interface ICreateViewModifyV2MenuOption {
   // menu option
+  type: CreateViewModifyV2MenuType.OPTION;
   label: string;
   action: ICreateViewModifyV2Link | ICreateViewModifyV2Click;
 
@@ -327,6 +349,7 @@ interface ICreateViewModifyV2MenuOption {
  */
 interface ICreateViewModifyV2MenuDivider {
   // optional
+  type: CreateViewModifyV2MenuType.DIVIDER;
   visible?: () => boolean;
 
   // never
@@ -339,7 +362,7 @@ interface ICreateViewModifyV2MenuDivider {
  */
 interface ICreateViewModifyV2Menu {
   // required
-  options: (ICreateViewModifyV2MenuOption | ICreateViewModifyV2MenuDivider)[]
+  options: (ICreateViewModifyV2MenuGroup | ICreateViewModifyV2MenuOption | ICreateViewModifyV2MenuDivider)[]
 }
 
 /**
