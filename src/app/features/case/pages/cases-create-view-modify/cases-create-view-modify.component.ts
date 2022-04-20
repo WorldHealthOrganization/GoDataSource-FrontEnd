@@ -21,6 +21,8 @@ import { AddressModel } from '../../../../core/models/address.model';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { VaccineModel } from '../../../../core/models/vaccine.model';
 import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-date-range.model';
+import { EntityType } from '../../../../core/models/entity-type';
+import { ContactModel } from '../../../../core/models/contact.model';
 
 /**
  * Component
@@ -186,16 +188,43 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       // buttons
       buttons: {
         view: {
-          link: () => ['/cases', this.itemData?.id, 'view']
+          link: {
+            link: () => ['/cases', this.itemData?.id, 'view']
+          }
         },
         modify: {
-          link: () => ['/cases', this.itemData?.id, 'modify']
+          link: {
+            link: () => ['/cases', this.itemData?.id, 'modify']
+          },
+          visible: () => CaseModel.canModify(this.authUser)
         },
         viewCancel: {
-          link: () => ['/cases']
+          link: {
+            link: () => ['/cases']
+          }
         },
         modifyCancel: {
-          link: () => ['/cases']
+          link: {
+            link: () => ['/cases']
+          }
+        },
+        quickActions: {
+          options: [
+            // Add contact
+            {
+              label: 'LNG_PAGE_ACTION_ADD_CONTACT',
+              action: {
+                link: () => ['/contacts/create'],
+                queryParams: () => {
+                  return {
+                    entityType: EntityType.CASE,
+                    entityId: this.itemData?.id
+                  };
+                }
+              },
+              visible: () => CaseModel.canCreateContact(this.authUser) && ContactModel.canCreate(this.authUser)
+            }
+          ]
         }
       }
     };

@@ -2,7 +2,7 @@ import { Observable, ReplaySubject, throwError } from 'rxjs';
 import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { OutbreakModel } from '../models/outbreak.model';
 import { UserModel } from '../models/user.model';
-import { CreateViewModifyV2 } from '../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import { ICreateViewModifyV2 } from '../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { ActivatedRoute } from '@angular/router';
 import { Directive } from '@angular/core';
 import { TopnavComponent } from '../components/topnav/topnav.component';
@@ -58,7 +58,7 @@ export abstract class CreateViewModifyComponent<T extends BaseModel> {
   }
 
   // tabs
-  tabData: CreateViewModifyV2;
+  tabData: ICreateViewModifyV2;
 
   /**
    * Constructor

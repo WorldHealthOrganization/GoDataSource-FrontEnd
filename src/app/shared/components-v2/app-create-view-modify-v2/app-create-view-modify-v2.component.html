@@ -45,11 +45,11 @@
 
           <!-- View button -->
           <a
-            *ngIf="isModify"
+            *ngIf="isModify && (!tabData.buttons.view.visible || tabData.buttons.view.visible())"
             type="button"
             mat-icon-button
-            [routerLink]="tabData.buttons.view.link()"
-            [queryParams]="tabData.buttons.view.queryParams ? tabData.buttons.view.queryParams() : undefined">
+            [routerLink]="tabData.buttons.view.link.link()"
+            [queryParams]="tabData.buttons.view.link.queryParams ? tabData.buttons.view.link.queryParams() : undefined">
             <mat-icon>visibility</mat-icon>
           </a>
         </div>
@@ -62,15 +62,86 @@
 
           <!-- Cancel -->
           <button
+            *ngIf="isView ? (!tabData.buttons.viewCancel.visible || tabData.buttons.viewCancel.visible()) : (!tabData.buttons.modifyCancel.visible || tabData.buttons.modifyCancel.visible())"
             type="button"
             mat-flat-button color="text"
-            [routerLink]="isView ? tabData.buttons.viewCancel.link() : tabData.buttons.modifyCancel.link()"
-            [queryParams]="isView ? (tabData.buttons.viewCancel.queryParams ? tabData.buttons.viewCancel.queryParams() : undefined) : (tabData.buttons.modifyCancel.queryParams ? tabData.buttons.modifyCancel.queryParams() : undefined)">
+            [routerLink]="isView ? tabData.buttons.viewCancel.link.link() : tabData.buttons.modifyCancel.link.link()"
+            [queryParams]="isView ? (tabData.buttons.viewCancel.link.queryParams ? tabData.buttons.viewCancel.link.queryParams() : undefined) : (tabData.buttons.modifyCancel.link.queryParams ? tabData.buttons.modifyCancel.link.queryParams() : undefined)">
             {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
           </button>
 
           <!-- Quick Actions -->
-          <!-- #TODO -->
+          <ng-container
+            *ngIf="tabData.buttons.quickActions">
+
+            <!-- Menu -->
+            <button
+              #quickMenuTrigger="matMenuTrigger"
+              class="gd-create-view-modify-top-title-buttons-buttons-quick"
+              [class.gd-create-view-modify-top-title-buttons-buttons-quick-expanded]="quickMenuTrigger.menuOpen"
+              type="button"
+              mat-flat-button color="secondary"
+              [matMenuTriggerFor]="quickMenu">
+
+              <!-- Label -->
+              <span>
+                {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}}
+              </span>
+
+              <!-- Icon -->
+              <mat-icon>expand_more</mat-icon>
+            </button>
+
+            <!-- Floating menu -->
+            <mat-menu
+              #quickMenu="matMenu"
+              class="gd-create-view-modify-top-title-buttons-buttons-quick-options">
+              <ng-container
+                *ngFor="let menuOption of tabData.buttons.quickActions.options">
+                <ng-container
+                  *ngIf="!menuOption.visible || menuOption.visible()">
+
+                  <!-- Child Menu link -->
+                  <ng-container
+                    *ngIf="menuOption.label; else divider">
+
+                    <!-- Link -->
+                    <a
+                      *ngIf="menuOption.action.link; else notLink"
+                      mat-menu-item
+                      class="gd-create-view-modify-top-title-buttons-buttons-quick-options-option"
+                      [routerLink]="menuOption.action.link()"
+                      [queryParams]="menuOption.action.queryParams ? menuOption.action.queryParams() : undefined">
+                      {{menuOption.label | translate}}
+                    </a>
+
+                    <!-- Button -->
+                    <ng-template
+                      #notLink>
+                      <button
+                        type="button"
+                        mat-menu-item
+                        class="gd-create-view-modify-top-title-buttons-buttons-quick-options-option"
+                        (click)="menuOption.action.click()">
+                        {{menuOption.label | translate}}
+                      </button>
+                    </ng-template>
+
+                  </ng-container>
+
+                  <!-- Divider -->
+                  <ng-template
+                    #divider>
+                    <mat-divider></mat-divider>
+                  </ng-template>
+
+                </ng-container>
+              </ng-container>
+            </mat-menu>
+
+          </ng-container>
+
+
 
           <!-- Save -->
           <button
@@ -82,11 +153,11 @@
 
           <!-- Edit -->
           <button
-            *ngIf="isView"
+            *ngIf="isView && (!tabData.buttons.modify.visible || tabData.buttons.modify.visible())"
             type="button"
             mat-flat-button color="primary"
-            [routerLink]="tabData.buttons.modify.link()"
-            [queryParams]="tabData.buttons.modify.queryParams ? tabData.buttons.modify.queryParams() : undefined">
+            [routerLink]="tabData.buttons.modify.link.link()"
+            [queryParams]="tabData.buttons.modify.link.queryParams ? tabData.buttons.modify.link.queryParams() : undefined">
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
           </button>
         </div>

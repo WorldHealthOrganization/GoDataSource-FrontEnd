@@ -287,24 +287,83 @@ export interface ICreateViewModifyV2Tab {
 /**
  * Link
  */
-interface CreateViewModifyV2Link {
+interface ICreateViewModifyV2Link {
   // required
   link: () => string[];
 
   // optional
   queryParams?: () => Params;
+
+  // never
+  click?: never;
+}
+
+/**
+ * Click
+ */
+interface ICreateViewModifyV2Click {
+  // required
+  click: () => void;
+
+  // never
+  link?: never;
+  queryParams?: never;
+}
+
+/**
+ * Menu option
+ */
+interface ICreateViewModifyV2MenuOption {
+  // menu option
+  label: string;
+  action: ICreateViewModifyV2Link | ICreateViewModifyV2Click;
+
+  // optional
+  visible?: () => boolean;
+}
+
+/**
+ * Menu divider
+ */
+interface ICreateViewModifyV2MenuDivider {
+  // optional
+  visible?: () => boolean;
+
+  // never
+  label?: never;
+  action?: never;
+}
+
+/**
+ * Menu types
+ */
+interface ICreateViewModifyV2Menu {
+  // required
+  options: (ICreateViewModifyV2MenuOption | ICreateViewModifyV2MenuDivider)[]
+}
+
+/**
+ * Button
+ */
+interface ICreateViewModifyV2LinkButton {
+  // required
+  link: ICreateViewModifyV2Link;
+
+  // optional
+  visible?: () => boolean;
 }
 
 /**
  * Create view modify data
  */
-export interface CreateViewModifyV2 {
+export interface ICreateViewModifyV2 {
   // required
   tabs: ICreateViewModifyV2Tab[];
   buttons: {
-    view: CreateViewModifyV2Link,
-    modify: CreateViewModifyV2Link,
-    viewCancel: CreateViewModifyV2Link,
-    modifyCancel: CreateViewModifyV2Link
+    view: ICreateViewModifyV2LinkButton,
+    modify: ICreateViewModifyV2LinkButton,
+    viewCancel: ICreateViewModifyV2LinkButton,
+    modifyCancel: ICreateViewModifyV2LinkButton,
+    quickActions?: ICreateViewModifyV2Menu
   }
 }
