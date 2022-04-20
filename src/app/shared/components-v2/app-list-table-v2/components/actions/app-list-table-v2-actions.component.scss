@@ -29,6 +29,11 @@
       .mat-icon {
         font-size: 1.6rem;
       }
+
+      &.gd-list-table-actions-action-icon-active {
+        background: var(--gd-primary),;
+        color: var(--gd-background);
+      }
     }
   }
 }

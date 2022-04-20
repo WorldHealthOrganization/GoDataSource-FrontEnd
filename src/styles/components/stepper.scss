@@ -1,0 +1,73 @@
+/* Stepper - Horizontal */
+.mat-stepper-horizontal {
+  background-color: var(--gd-background);
+  @include border-radius(0.4rem);
+  @include box-shadow(0 0.2rem 0.1rem -0.1rem rgb(0, 0, 0, 0.2),
+                      0 0.1rem 0.1rem 0 rgb(0, 0, 0, 0.14),
+                      0 0.1rem 0.3rem 0 rgb(0, 0, 0, 0.12));
+  font-family: $gd-font-family;
+
+  .mat-horizontal-stepper-header-container {
+    border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+
+    .mat-step-header {
+      @include box-sizing(border-box);
+      height: 5.6rem;
+      padding: 1.6rem;
+
+      &:hover:not([aria-disabled]),
+      &:hover[aria-disabled=false] {
+        background-color: var(--gd-background);
+      }
+
+      .mat-step-header-ripple {
+        display: none;
+      }
+
+      .mat-step-icon {
+        background-color: rgba(var(--gd-secondary-rgb), 0.25);
+        color: var(--gd-secondary);
+
+        &.mat-step-icon-selected,
+        &.mat-step-icon-state-done,
+        &.mat-step-icon-state-edit {
+          background-color: var(--gd-primary);
+          color: var(--gd-background);
+        }
+      }
+
+      .mat-step-label {
+        color: var(--gd-secondary);
+
+        &.mat-step-label-selected {
+          font-size: 1.6rem;
+          font-weight: normal;
+          line-height: $gd-line-height;
+        }
+
+        &.mat-step-label-active {
+          color: var(--gd-text);
+        }
+      }
+    }
+
+    .mat-stepper-horizontal-line {
+      border-top-color: rgba(var(--gd-secondary-rgb), 0.25);
+      margin: 0;
+    }
+  }
+
+  .mat-horizontal-content-container {
+    padding: 1.6rem;
+
+    .gd-create-view-modify-bottom-content {
+      margin-right: -1.6rem;
+    }
+
+    .gd-create-view-modify-bottom-bottom {
+      border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+      margin: 1.6rem -1.6rem 0;
+      padding: 1.6rem 1.6rem 0;
+    }
+  }
+}

@@ -16,6 +16,7 @@ import { ILocation } from '../../forms-v2/core/app-form-location-base-v2';
 @Component({
   selector: 'app-create-view-modify-v2',
   templateUrl: './app-create-view-modify-v2.component.html',
+  styleUrls: ['./app-create-view-modify-v2.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppCreateViewModifyV2Component {

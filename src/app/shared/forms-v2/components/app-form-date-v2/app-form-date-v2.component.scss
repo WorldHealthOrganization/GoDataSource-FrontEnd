@@ -9,7 +9,6 @@
     width: 100%;
     font-family: $gd-font-family;
     font-size: $gd-font-size;
-    line-height: $gd-line-height;
 
     .mat-form-field-wrapper {
       margin: 0;
@@ -76,6 +75,10 @@
             line-height: 2.4rem;
             margin-top: 0;
           }
+
+          .mat-input-element {
+            caret-color: var(--gd-text);
+          }
         }
 
         /* Form input suffix */
@@ -115,7 +118,7 @@
 
       .mat-form-field-subscript-wrapper {
         font-size: 1.2rem;
-        margin-top: 0.4rem;
+        margin-top: 0.2rem;
         padding: 0 1.6rem;
       }
     }
@@ -179,7 +182,7 @@
           background: rgba(var(--gd-danger-rgb), 0.15);
 
           .mat-form-field-outline {
-            color: rgba(var(--gd-danger-rgb), 0.5);
+            color: var(--gd-danger);
           }
 
           .mat-form-field-infix {

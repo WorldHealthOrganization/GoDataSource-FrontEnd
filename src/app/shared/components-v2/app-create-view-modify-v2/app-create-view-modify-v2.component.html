@@ -6,6 +6,7 @@
   <!-- Loading data -->
   <div
     *ngIf="loadingItemData; else dataLoaded"
+    fxLayout="row" fxLayoutAlign="center center"
     class="gd-create-view-modify-loading-data">
 
     <!-- Spinner -->
@@ -194,7 +195,6 @@
             <!-- Input -->
             <div
               *ngIf="!input.replace || !input.replace.condition(input); else replaceHtml"
-              fxFlex
               class="gd-create-view-modify-bottom-section-content-input"
               [class.gd-create-view-modify-bottom-section-content-input-has-textarea]="input.type === CreateViewModifyV2TabInputType.TEXTAREA"
               [class.gd-create-view-modify-bottom-section-content-input-has-age-dob]="input.type === CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH"
@@ -271,21 +271,24 @@
                 fxFlex fxLayout="row" fxLayoutGap="1.6rem">
 
                 <!-- Age / Dob option -->
-                <app-form-toggle-v2
-                  *ngIf="!isView"
-                  [(ngModel)]="input.ageChecked"
-                  [name]="parentName ? parentName + '[ageDob]' : 'ageDob'"
-                  [options]="ageDOBOptions"></app-form-toggle-v2>
+                <div
+                  fxFlex="calc(50% - 0.8rem)">
+                  <app-form-toggle-v2
+                    *ngIf="!isView"
+                    [(ngModel)]="input.ageChecked"
+                    [name]="parentName ? parentName + '[ageDob]' : 'ageDob'"
+                    [options]="ageDOBOptions"></app-form-toggle-v2>
+                </div>
 
                 <!-- Age -->
                 <div
                   *ngIf="input.ageChecked; else dob"
-                  fxFlex fxLayout="row" fxLayoutGap="1.6rem">
+                  fxFlex="calc(50% - 0.8rem)" fxLayout="row" fxLayoutGap="1.6rem">
 
                   <!-- Years -->
                   <app-form-number-v2
                     *ngIf="input.ageTypeYears; else months"
-                    fxFlex
+                    fxFlex="calc(50% - 0.8rem)"
                     [ngModel]="input.value.age.years.get()"
                     [name]="parentName ? parentName + '[' + input.name.age + '][years]' : (input.name.age + '[years]')"
                     [placeholder]="isView && input.ageChecked ? ('LNG_ENTITY_FIELD_LABEL_AGE' | translate) + ' - ' + ('LNG_AGE_FIELD_LABEL_YEARS' | translate) : 'LNG_AGE_FIELD_LABEL_YEARS'"
@@ -302,7 +305,7 @@
                   <ng-template
                     #months>
                     <app-form-number-v2
-                      fxFlex
+                      fxFlex="calc(50% - 0.8rem)"
                       [ngModel]="input.value.age.months.get()"
                       [name]="parentName ? parentName + '[' + input.name.age + '][months]' : (input.name.age + '[months]')"
                       [placeholder]="isView && input.ageChecked ? ('LNG_ENTITY_FIELD_LABEL_AGE' | translate) + ' - ' + ('LNG_AGE_FIELD_LABEL_MONTHS' | translate) : 'LNG_AGE_FIELD_LABEL_MONTHS'"
@@ -319,7 +322,7 @@
                   <!-- Type -->
                   <app-form-select-single-v2
                     *ngIf="!isView"
-                    fxFlex
+                    fxFlex="calc(50% - 0.8rem)"
                     [(ngModel)]="input.ageTypeYears"
                     [name]="parentName ? parentName + '[ageDobType]' : 'ageDobType'"
                     placeholder="LNG_AGE_FIELD_LABEL_TYPE"
@@ -332,7 +335,7 @@
                 <ng-template
                   #dob>
                   <app-form-date-v2
-                    fxFlex
+                    fxFlex="calc(50% - 0.8rem)"
                     [ngModel]="input.value.dob.get()"
                     [name]="parentName ? parentName + '[' + input.name.dob + ']' : input.name.dob"
                     placeholder="LNG_ENTITY_FIELD_LABEL_DOB"
@@ -670,7 +673,8 @@
                   *ngIf="!isView">
                   <button
                     type="button"
-                    mat-flat-button color="text"
+                    mat-flat-button
+                    color="text"
                     (click)="addListItem(input)">
 
                     <!-- + Icon -->
