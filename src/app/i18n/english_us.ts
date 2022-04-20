@@ -21,6 +21,7 @@ export const EnglishUsLang = {
     'LNG_COMMON_LABEL_DELETE': 'Delete "{{name}}"',
     'LNG_COMMON_LABEL_CONVERT': 'Convert "{{name}}" to {{type}}',
     'LNG_COMMON_LABEL_RESTORE': 'Restore "{{name}}"',
+    'LNG_COMMON_LABEL_INVALID_TAB': 'Invalid data',
     'LNG_COMMON_LABEL_NOTIFICATION_HISTORY': 'There are {{length}} error(s). Click here to see details',
     'LNG_COMMON_LABEL_HISTORY_TITLE': 'Errors',
     'LNG_COMMON_LABEL_STATUSES': 'Status',
@@ -40,7 +41,8 @@ export const EnglishUsLang = {
     'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_FOLLOWED_UP': 'Followed up',
     'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_FOLLOWED_UP': 'Not followed up',
     'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_TITLE': 'Followup status',
-    'LNG_CASE_FIELD_LABEL_DETAILS': 'Details'
+    'LNG_CASE_FIELD_LABEL_DETAILS': 'Details',
+    'LNG_COMMON_LABEL_ACTIVE': 'Activate {{name}}'
 
 
 
@@ -55,5 +57,8 @@ export const EnglishUsLang = {
     // LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER_DATE_FROM
     // LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER_DATE_TO
     // LNG_SAVED_FILTERS_FIELD_LABEL_NAME_DESCRIPTION
+    // ageButtonLabel="LNG_CASE_FIELD_LABEL_AGE_BUTTON"
+    // dobButtonLabel="LNG_CASE_FIELD_LABEL_DATE_OF_BIRTH_BUTTON"
+    // dobPlaceholder="LNG_CASE_FIELD_LABEL_DOB"
   }
 };

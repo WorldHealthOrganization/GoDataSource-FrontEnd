@@ -3,6 +3,7 @@
 
   <!-- Input data -->
   <mat-form-field
+    *ngIf="!viewOnly; else viewOnlyTemplate"
     appearance="outline">
 
     <!-- Place holder -->
@@ -139,6 +140,15 @@
 
     </mat-select>
 
+    <!-- Spinner -->
+    <mat-progress-spinner
+      *ngIf="loading || control?.pending"
+      matSuffix
+      diameter="16"
+      mode="indeterminate"
+      color="primary">
+    </mat-progress-spinner>
+
     <!-- Errors -->
     <mat-error
       *ngIf="control?.invalid && control?.touched">
@@ -146,4 +156,24 @@
     </mat-error>
 
   </mat-form-field>
+
+  <!-- View only -->
+  <ng-template
+    #viewOnlyTemplate>
+    <div
+      fxLayout="row" fxLayoutGap="1.6rem"
+      class="gd-form-input-v2-viewonly">
+      <!-- Label -->
+      <div
+        class="gd-form-input-v2-viewonly-label">
+        {{ placeholder | translate }}:
+      </div>
+
+      <!-- Value -->
+      <div
+        class="gd-form-input-v2-viewonly-value">
+        {{value ? (allOptionsMap[value]?.label | translate) : '-'}}
+      </div>
+    </div>
+  </ng-template>
 </div>

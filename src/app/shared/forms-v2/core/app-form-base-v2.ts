@@ -1,4 +1,4 @@
-import { AbstractControl, ControlContainer, ControlValueAccessor, FormGroup } from '@angular/forms';
+import { AbstractControl, ControlContainer, ControlValueAccessor, FormGroup, NgForm } from '@angular/forms';
 import { noop } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseErrorStateMatcherV2 } from './app-form-base-error-state-matcher-v2';
@@ -25,6 +25,9 @@ export abstract class AppFormBaseV2<T> implements ControlValueAccessor {
 
   // status changed subscription
   private statusChangesSubscription: Subscription;
+
+  // form submitted subscription
+  private formSubmittedSubscription: Subscription;
 
   // control
   public get control(): AbstractControl {
@@ -56,6 +59,13 @@ export abstract class AppFormBaseV2<T> implements ControlValueAccessor {
 
     // finished
     return control;
+  }
+
+  /**
+   * Invalid ?
+   */
+  get invalid(): boolean {
+    return !this.control || this.control.invalid;
   }
 
   // display error message?
@@ -109,7 +119,22 @@ export abstract class AppFormBaseV2<T> implements ControlValueAccessor {
     protected controlContainer: ControlContainer,
     protected translateService: TranslateService,
     protected changeDetectorRef: ChangeDetectorRef
-  ) {}
+  ) {
+    // on submit - do validation
+    if (
+      controlContainer &&
+      (controlContainer as NgForm).ngSubmit
+    ) {
+      // listen for submit
+      this.formSubmittedSubscription = (controlContainer as NgForm).ngSubmit.subscribe(() => {
+        // touch on submit
+        this.onTouchItem();
+
+        // validate
+        this.control?.updateValueAndValidity();
+      });
+    }
+  }
 
   /**
    * Release resources
@@ -119,6 +144,12 @@ export abstract class AppFormBaseV2<T> implements ControlValueAccessor {
     if (this.statusChangesSubscription) {
       this.statusChangesSubscription.unsubscribe();
       this.statusChangesSubscription = undefined;
+    }
+
+    // release form submit listener
+    if (this.formSubmittedSubscription) {
+      this.formSubmittedSubscription.unsubscribe();
+      this.formSubmittedSubscription = undefined;
     }
   }
 
@@ -137,7 +168,7 @@ export abstract class AppFormBaseV2<T> implements ControlValueAccessor {
 
       // construct error string
       this.errorsString = '';
-      const props = Object.keys(this.previousErrorsObject);
+      const props = this.previousErrorsObject ? Object.keys(this.previousErrorsObject) : [];
       for (const prop of props) {
         this.errorsString =
           (this.errorsString ? this.errorsString + AppFormBaseErrorMsgV2.SEPARATOR : '') +

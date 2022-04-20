@@ -203,7 +203,7 @@ export abstract class AppFormLocationBaseV2<T>
   }
 
   // update selected
-  abstract updateSelected(): void;
+  abstract updateSelected(emitEvent: boolean): void;
 
   /**
    * Constructor
@@ -389,7 +389,7 @@ export abstract class AppFormLocationBaseV2<T>
         this.locations = locationItems;
 
         // update selected location
-        this.updateSelected();
+        this.updateSelected(false);
 
         // re-render
         this.changeDetectorRef.detectChanges();

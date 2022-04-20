@@ -74,13 +74,18 @@ import { CountryDataResolver } from './resolvers/data/country.resolver';
 import { TeamDataResolver } from './resolvers/data/team.resolver';
 import { SelectedOutbreakDataResolver } from './resolvers/data/selected-outbreak.resolver';
 import { DocumentTypeDataResolver } from './resolvers/data/document-type.resolver';
+import { AddressTypeDataResolver } from './resolvers/data/address-type.resolver';
+import { PersonDateTypeDataResolver } from './resolvers/data/person-date-type.resolver';
+import { DateRangeCenterDataResolver } from './resolvers/data/date-range-center.resolver';
 
 // export the list of services
 export const services: any[] = [
   // resolver services
+  AddressTypeDataResolver,
   ClassificationDataResolver,
   CountryDataResolver,
   DailyFollowUpStatusDataResolver,
+  DateRangeCenterDataResolver,
   DiseaseDataResolver,
   DocumentTypeDataResolver,
   FinalFollowUpStatusDataResolver,
@@ -90,6 +95,7 @@ export const services: any[] = [
   LocationGeographicalLevelDataResolver,
   OccupationDataResolver,
   OutcomeDataResolver,
+  PersonDateTypeDataResolver,
   PregnancyStatusDataResolver,
   RiskDataResolver,
   SelectedOutbreakDataResolver,

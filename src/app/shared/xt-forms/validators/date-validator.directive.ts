@@ -2,17 +2,17 @@ import { Directive, forwardRef, Input } from '@angular/core';
 import { Validator, AbstractControl, NG_VALIDATORS, ControlContainer, NgForm, NgModel } from '@angular/forms';
 import * as _ from 'lodash';
 import { I18nService } from '../../../core/services/helper/i18n.service';
-import { ElementBase } from '../core';
 import { Constants } from '../../../core/models/constants';
 import { moment, Moment, MomentBuiltinFormat } from '../../../core/helperClasses/x-moment';
 import * as momentOriginal from 'moment';
+import { AppFormBaseV2 } from '../../forms-v2/core/app-form-base-v2';
 
 /**
  * Handle Date compare input
  */
 export class DateValidatorFieldComparator {
   constructor(
-    public compareItemValue: string | Moment | ElementBase<any>,
+    public compareItemValue: string | Moment | AppFormBaseV2<any>,
     public fieldLabel: string = null
   ) {
   }
@@ -65,9 +65,8 @@ export class DateValidatorDirective implements Validator {
   @Input() dateSameOrBefore: any;
 
   /**
-     * Constructor
-     * @param i18nService
-     */
+   * Constructor
+   */
   constructor(
     private i18nService: I18nService,
     private controlContainer: ControlContainer
@@ -75,12 +74,8 @@ export class DateValidatorDirective implements Validator {
   }
 
   /**
-     * Compare control date with provided dates
-     * @param propertyArray
-     * @param controlDate
-     * @param method
-     * @param methodLabel
-     */
+   * Compare control date with provided dates
+   */
   private compareDate(
     propertyArray: DateValidatorFieldComparator | DateValidatorFieldComparator[],
     controlDate: Moment,
@@ -102,12 +97,12 @@ export class DateValidatorDirective implements Validator {
             (compare as any[]).length > 1 ? compare[1] : null
           );
         } else if (
-          compare instanceof ElementBase ||
-                    compare instanceof momentOriginal ||
-                    _.isString(compare)
+          compare instanceof AppFormBaseV2 ||
+          compare instanceof momentOriginal ||
+          _.isString(compare)
         ) {
           compareItem = new DateValidatorFieldComparator(
-            compare as string | ElementBase<any> | Moment
+            compare as string | AppFormBaseV2<any> | Moment
           );
         } else {
           compareItem = compare as DateValidatorFieldComparator;
@@ -131,8 +126,8 @@ export class DateValidatorDirective implements Validator {
           // form control
           if (
             this.controlContainer &&
-                        this.controlContainer instanceof NgForm &&
-                        this.controlContainer.controls[compareItem.compareItemValue as string]
+            this.controlContainer instanceof NgForm &&
+            this.controlContainer.controls[compareItem.compareItemValue as string]
           ) {
             let directives = (this.controlContainer as any)._directives;
             directives = directives ? Array.from(directives) : directives;
@@ -141,7 +136,7 @@ export class DateValidatorDirective implements Validator {
                 directives, {
                   name: compareItem.compareItemValue as string
                 }
-              ) as NgModel).valueAccessor as ElementBase<any>,
+              ) as NgModel).valueAccessor as AppFormBaseV2<any>,
               fieldLabel
             );
           } else {
@@ -153,10 +148,10 @@ export class DateValidatorDirective implements Validator {
         }
 
         // check for element
-        let element: ElementBase<any> = null;
-        if (compareItem.compareItemValue instanceof ElementBase) {
+        let element: AppFormBaseV2<any> = null;
+        if (compareItem.compareItemValue instanceof AppFormBaseV2) {
           // retrieve component form control
-          element = compareItem.compareItemValue as ElementBase<any>;
+          element = compareItem.compareItemValue as AppFormBaseV2<any>;
 
           // value
           compareWithDate = element.value ? moment(element.value) : null;
@@ -164,6 +159,7 @@ export class DateValidatorDirective implements Validator {
           // label
           if (!fieldLabel) {
             fieldLabel = (element as any).placeholder;
+            fieldLabel = fieldLabel ? this.i18nService.instant(fieldLabel) : fieldLabel;
           }
         }
 
@@ -188,16 +184,16 @@ export class DateValidatorDirective implements Validator {
         // do we need to validate counterpart as well ?
         if (
           element &&
-                    element.invalid !== (invalid ? true : false)
+          element.invalid !== (invalid ? true : false)
         ) {
-          (function(localElement: ElementBase<any>) {
+          (function(localElement: AppFormBaseV2<any>) {
             setTimeout(() => {
               // trigger validation
               localElement.control.updateValueAndValidity();
               if ((localElement as any).onChange) {
-                (localElement as any).onChange();
+                (localElement as any).onChange((localElement as any).value);
               }
-            }, 500);
+            });
           })(element);
         }
 
@@ -213,9 +209,8 @@ export class DateValidatorDirective implements Validator {
   }
 
   /**
-     * Validate
-     * @param control
-     */
+   * Validate
+   */
   validate(control: AbstractControl): { [key: string]: any } {
     // no point in validating empty values, this is handled by required validator
     if (_.isEmpty(control.value)) {
@@ -249,7 +244,7 @@ export class DateValidatorDirective implements Validator {
       // after
       if (
         !invalid &&
-                this.dateAfter
+        this.dateAfter
       ) {
         invalid = this.compareDate(
           this.dateAfter,
@@ -262,7 +257,7 @@ export class DateValidatorDirective implements Validator {
       // same or after
       if (
         !invalid &&
-                this.dateSameOrAfter
+        this.dateSameOrAfter
       ) {
         invalid = this.compareDate(
           this.dateSameOrAfter,
@@ -275,7 +270,7 @@ export class DateValidatorDirective implements Validator {
       // same
       if (
         !invalid &&
-                this.dateSame
+        this.dateSame
       ) {
         invalid = this.compareDate(
           this.dateSame,
@@ -288,7 +283,7 @@ export class DateValidatorDirective implements Validator {
       // before
       if (
         !invalid &&
-                this.dateBefore
+        this.dateBefore
       ) {
         invalid = this.compareDate(
           this.dateBefore,
@@ -301,7 +296,7 @@ export class DateValidatorDirective implements Validator {
       // same or before
       if (
         !invalid &&
-                this.dateSameOrBefore
+        this.dateSameOrBefore
       ) {
         invalid = this.compareDate(
           this.dateSameOrBefore,

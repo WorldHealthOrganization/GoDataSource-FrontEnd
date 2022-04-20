@@ -532,7 +532,7 @@ export class EventsListComponent
               // Delete Event
               {
                 label: 'LNG_PAGE_LIST_EVENTS_ACTION_DELETE_EVENT',
-                cssClasses: 'gd-list-table-actions-action-menu-warning',
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: EventModel): void => {
                     // determine what we need to delete
@@ -718,7 +718,7 @@ export class EventsListComponent
               // Restore a deleted event
               {
                 label: 'LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_EVENT',
-                cssClasses: 'gd-list-table-actions-action-menu-warning',
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: EventModel) => {
                     // show confirm dialog to confirm the action

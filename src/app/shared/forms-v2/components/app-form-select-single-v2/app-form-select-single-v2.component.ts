@@ -38,6 +38,9 @@ export class AppFormSelectSingleV2Component
   // float label
   @Input() neverFloatLabel: boolean = false;
 
+  // view only
+  @Input() viewOnly: boolean;
+
   // clearable ?
   @Input() clearable: boolean = false;
 
@@ -46,6 +49,9 @@ export class AppFormSelectSingleV2Component
 
   // sort disabled
   @Input() sortDisabled: boolean;
+
+  // loading
+  @Input() loading: boolean;
 
   // tooltip
   tooltipButton: IAppFormIconButtonV2;
