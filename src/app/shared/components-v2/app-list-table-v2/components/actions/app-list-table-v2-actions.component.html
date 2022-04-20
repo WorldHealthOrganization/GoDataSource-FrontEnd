@@ -14,13 +14,13 @@
       <!-- Icon Type -->
       <a
         *ngIf="action.type === V2ActionType.ICON; else menuAction"
-        class="gd-list-table-actions-action-icon"
+        class="gd-list-table-actions-action-icon {{action.cssClasses ? action.cssClasses(data) : ''}}"
         mat-icon-button
         [routerLink]="action.action.link && (!action.disable || !action.disable(data)) ? action.action.link(data) : undefined"
         [queryParams]="action.action.linkQueryParams ? action.action.linkQueryParams(data) : undefined"
         [matTooltip]="action.iconTooltip | translate"
         [disabled]="action.disable && action.disable(data)"
-        (click)="action.action.click ? action.action.click(data) : undefined">
+        (click)="action.action.click && (!action.disable || !action.disable(data)) ? action.action.click(data) : undefined">
         <mat-icon>{{action.icon}}</mat-icon>
       </a>
 
@@ -56,7 +56,7 @@
                 [routerLink]="menuOption.action.link && (!menuOption.disable || !menuOption.disable(data)) ? menuOption.action.link(data) : undefined"
                 [queryParams]="menuOption.action.linkQueryParams ? menuOption.action.linkQueryParams(data) : undefined"
                 [disabled]="menuOption.disable && menuOption.disable(data)"
-                (click)="menuOption.action.click ? menuOption.action.click(data) : undefined">
+                (click)="menuOption.action.click && (!menuOption.disable || !menuOption.disable(data)) ? menuOption.action.click(data) : undefined">
                 {{menuOption.label | translate}}
               </a>
 

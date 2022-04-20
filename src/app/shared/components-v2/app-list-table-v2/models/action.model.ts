@@ -48,6 +48,7 @@ interface IV2ActionIcon {
   iconTooltip?: string;
   visible?: (data: any) => boolean;
   disable?: (data: any) => boolean;
+  cssClasses?: (data: any) => string;
 }
 
 /**
