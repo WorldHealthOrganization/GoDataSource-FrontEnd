@@ -62,7 +62,7 @@ export class GeneralAsyncValidatorDirective {
                     !isValid &&
                     this.asyncValidatorTouchOnError
                   ) {
-                    control.markAllAsTouched();
+                    control.markAsTouched();
                   }
 
                   // finished
@@ -82,7 +82,7 @@ export class GeneralAsyncValidatorDirective {
                     !data.isValid &&
                     this.asyncValidatorTouchOnError
                   ) {
-                    control.markAllAsTouched();
+                    control.markAsTouched();
                   }
 
                   // finished
