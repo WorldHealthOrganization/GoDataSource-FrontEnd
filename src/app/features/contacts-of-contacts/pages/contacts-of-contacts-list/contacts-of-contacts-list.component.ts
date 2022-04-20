@@ -49,9 +49,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
   // available side filters
   availableSideFilters: FilterModel[];
 
-  // constants
-  Constants = Constants;
-
   // anonymize fields
   private contactsOfContactsAnonymizeFields: ILabelValuePairModel[] = [
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME', value: 'firstName' },

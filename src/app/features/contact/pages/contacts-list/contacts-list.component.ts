@@ -54,9 +54,6 @@ export class ContactsListComponent
   // list of existing contacts
   contactsList$: Observable<ContactModel[]>;
 
-  // constants
-  Constants = Constants;
-
   // anonymize fields
   anonymizeFields: LabelValuePair[] = [
     new LabelValuePair('LNG_CONTACT_FIELD_LABEL_ID', 'id'),

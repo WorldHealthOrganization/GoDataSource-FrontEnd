@@ -7,7 +7,6 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { UserModel } from '../../../../core/models/user.model';
 import * as _ from 'lodash';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { Constants } from '../../../../core/models/constants';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -37,12 +36,9 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
   // list of existing outbreaks
   outbreaksList$: Observable<OutbreakModel[]>;
 
-  // import constants into template
-  Constants = Constants;
-
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
     private outbreakDataService: OutbreakDataService,
