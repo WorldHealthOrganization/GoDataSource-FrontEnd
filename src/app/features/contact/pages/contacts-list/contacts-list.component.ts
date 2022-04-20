@@ -1384,7 +1384,7 @@ export class ContactsListComponent
         {
           field: 'statusId',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
-          type: V2AdvancedFilterType.SELECT,
+          type: V2AdvancedFilterType.MULTISELECT,
           options: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           relationshipPath: ['followUps'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
