@@ -1,7 +1,6 @@
 import { Directive, forwardRef, Input } from '@angular/core';
 import { AbstractControl, NG_ASYNC_VALIDATORS, ValidationErrors } from '@angular/forms';
 import { Observable, timer, of } from 'rxjs';
-import * as _ from 'lodash';
 import { Constants } from '../../../core/models/constants';
 import { map, switchMap } from 'rxjs/operators';
 
@@ -34,9 +33,18 @@ export class GeneralAsyncValidatorDirective {
   };
 
   /**
-     * Validate
-     */
+   * Validate
+   */
   validate(control: AbstractControl): Observable<ValidationErrors | null> {
+    // no need to validate ?
+    // - requires job
+    if (
+      !control.value &&
+      control.value !== 0
+    ) {
+      return of(null);
+    }
+
     // wait for binding
     return timer(Constants.DEFAULT_DEBOUNCE_TIME_MILLISECONDS)
       .pipe(
@@ -44,7 +52,10 @@ export class GeneralAsyncValidatorDirective {
           // nothing to validate ?
           if (
             !this.asyncValidatorObservable ||
-            _.isEmpty(control.value) || (
+            (
+              !control.value &&
+              control.value !== 0
+            ) || (
               this.validateOnlyWhenDirty &&
               !control.dirty
             )
@@ -56,7 +67,7 @@ export class GeneralAsyncValidatorDirective {
           return this.asyncValidatorObservable
             .pipe(
               map((isValid: boolean | IGeneralAsyncValidatorResponse) => {
-                if (_.isBoolean(isValid)) {
+                if (typeof isValid === 'boolean') {
                   // not valid and we need to touch ?
                   if (
                     !isValid &&
