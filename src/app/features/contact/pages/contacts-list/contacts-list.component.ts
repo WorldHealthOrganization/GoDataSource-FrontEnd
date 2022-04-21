@@ -450,22 +450,29 @@ export class ContactsListComponent
             })
           },
 
-          // followed
+          // as per current date
           {
             title: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_TITLE',
             items: [{
               form: {
                 type: IV2ColumnStatusFormType.SQUARE,
-                color: 'var(--gd-followed-status)'
+                color: 'var(--gd-status-follow-up-not-started)'
               },
-              label: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_FOLLOWED_UP'
+              label: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_STARTED'
             },
             {
               form: {
                 type: IV2ColumnStatusFormType.SQUARE,
-                color: 'var(--gd-not-followed-status)'
+                color: 'var(--gd-status-under-follow-up)'
               },
-              label: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_FOLLOWED_UP'
+              label: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_UNDER_FOLLOW_UP'
+            },
+            {
+              form: {
+                type: IV2ColumnStatusFormType.SQUARE,
+                color: 'var(--gd-status-follow-up-ended)'
+              },
+              label: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_ENDED_FOLLOW_UP'
             }]
           },
 
@@ -498,19 +505,39 @@ export class ContactsListComponent
             });
           }
 
-          // follow up
-          if (data.dateOfLastContact && data.followUp?.endDate && moment().isBetween(data.dateOfLastContact, data.followUp.endDate, undefined, '[]') ) {
+          // as per current date
+          if (
+            data.followUp?.startDate &&
+            moment().isSameOrBefore(data.followUp?.startDate)
+          ) {
             forms.push({
               type: IV2ColumnStatusFormType.SQUARE,
-              color: 'var(--gd-followed-status)',
-              tooltip: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_FOLLOWED_UP')
+              color: 'var(--gd-status-follow-up-not-started)',
+              tooltip: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_STARTED')
             });
-          }
-          else {
+          } else if (
+            data.followUp?.startDate &&
+            data.followUp?.endDate &&
+            moment().isBetween(
+              data.followUp?.startDate,
+              data.followUp?.endDate,
+              undefined,
+              '[]'
+            )
+          ) {
             forms.push({
               type: IV2ColumnStatusFormType.SQUARE,
-              color: 'var(--gd-not-followed-status)',
-              tooltip: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_FOLLOWED_UP')
+              color: 'var(--gd-status-under-follow-up)',
+              tooltip: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_UNDER_FOLLOW_UP')
+            });
+          } else if (
+            data.followUp?.endDate &&
+            moment().isSameOrAfter(data.followUp?.endDate)
+          ) {
+            forms.push({
+              type: IV2ColumnStatusFormType.SQUARE,
+              color: 'var(--gd-status-follow-up-ended)',
+              tooltip: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_ENDED_FOLLOW_UP')
             });
           }
 
