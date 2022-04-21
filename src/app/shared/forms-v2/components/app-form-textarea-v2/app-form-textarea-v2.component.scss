@@ -1,14 +1,15 @@
 @import 'mixins';
 @import 'font';
 
-/* Date input */
-.gd-form-date-v2 {
+/* Form textarea */
+.gd-form-textarea-v2 {
   width: 100%;
 
   .mat-form-field {
     width: 100%;
     font-family: $gd-font-family;
     font-size: $gd-font-size;
+    line-height: $gd-line-height;
 
     .mat-form-field-wrapper {
       margin: 0;
@@ -18,7 +19,7 @@
         margin-top: 0;
         padding: 0 1.6rem;
 
-        /* Form input borders */
+        /* Form textarea borders */
         .mat-form-field-outline {
           color: var(--gd-secondary);
           top: 0;
@@ -42,7 +43,7 @@
           }
         }
 
-        /* Form input borders on focus */
+        /* Form textarea borders on focus */
         .mat-form-field-outline-thick {
           color: var(--gd-primary);
 
@@ -65,31 +66,34 @@
           }
         }
 
-        /* Select prefix */
+        /* Form textarea prefix */
         .mat-form-field-prefix {
           left: -0.4rem;
           top: 0.5rem;
-
-          + .mat-form-field-infix {
-            line-height: 1.125;
-          }
 
           .mat-icon {
             color: rgba(var(--gd-text-rgb), 0.75);
             text-align: center;
           }
+
+          .mat-icon-button {
+            font-size: 1.6rem;
+            height: 2.4rem;
+            width: 2.4rem;
+          }
         }
 
-        /* Form input middle */
+        /* Form textarea middle */
         .mat-form-field-infix {
           border-top: 0 none;
           @include flex(flex);
-          line-height: $gd-line-height;
           padding: 0.8rem 0;
 
-          input {
+          textarea {
             line-height: 2.4rem;
-            margin-top: 0;
+            margin: 0;
+            min-height: 2.4rem;
+            padding: 0;
           }
 
           .mat-input-element {
@@ -105,49 +109,36 @@
           }
         }
 
-        /* Form input suffix */
+        /* Form textarea suffix */
         .mat-form-field-suffix {
-          top: 0.6rem;
+          top: 0.3rem;
 
-          .mat-datepicker-toggle {
-            color: var(--gd-secondary);
+          .mat-icon {
+            color: rgba(var(--gd-text-rgb), 0.75);
+            font-size: 1.6rem;
+            height: 1.6rem;
+            line-height: 1;
+            text-align: center;
+          }
 
-            .mat-icon-button {
-              background: transparent;
-              font-size: 2rem;
-              height: 2.4rem;
-              min-width: 0;
-              padding: 0;
-              width: 2.4rem;
-
-              svg {
-                @include svg(var(--gd-secondary));
-                font-size: 2rem;
-                height: 2rem;
-                line-height: 1;
-                width: 2rem;
-              }
-            }
-
-            &.mat-datepicker-toggle-active {
-              .mat-icon-button {
-                svg {
-                  @include svg(var(--gd-primary));
-                }
-              }
-            }
+          .mat-icon-button {
+            font-size: 1.6rem;
+            height: 2.4rem;
+            min-width: 0;
+            padding: 0;
+            width: 2.4rem;
           }
         }
       }
 
       .mat-form-field-subscript-wrapper {
         font-size: 1.2rem;
-        margin-top: 0.5rem;
+        margin-top: 0.2rem;
         padding: 0;
       }
     }
 
-    /* Form input focused */
+    /* Form textarea focused */
     &:focus,
     &.mat-focused,
     &.mat-form-field-should-float {
@@ -166,7 +157,7 @@
       }
     }
 
-    /* Form input disabled */
+    /* Form textarea disabled */
     &.mat-form-field-disabled {
       .mat-form-field-wrapper {
         .mat-form-field-flex {
@@ -199,7 +190,7 @@
       }
     }
 
-    /* Form input invalid */
+    /* Form textarea invalid */
     &.mat-form-field-invalid {
       .mat-form-field-wrapper {
         .mat-form-field-flex {
@@ -221,8 +212,8 @@
     }
   }
 
-  .gd-form-date-v2-viewonly {
-    .gd-form-date-v2-viewonly-label {
+  .gd-form-textarea-v2-viewonly {
+    .gd-form-textarea-v2-viewonly-label {
       color: var(--gd-secondary);
     }
   }

@@ -21,6 +21,14 @@
             &.mat-tab-label-active {
               color: var(--gd-primary);
             }
+
+            .mat-tab-label-content {
+              .mat-icon {
+                height: 2.1rem;
+                margin-left: 0.8rem;
+                width: 2.1rem;
+              }
+            }
           }
         }
       }
@@ -72,6 +80,33 @@
             background-color: var(--gd-danger);
           }
         }
+      }
+    }
+  }
+}
+
+.gd-create-view-modify-modify,
+.gd-create-view-modify-view {
+  .gd-create-view-modify-bottom {
+    .mat-tab-group {
+      height: 100%;
+
+      .mat-tab-header {
+        margin: 0 -4rem 2.4rem;
+        padding: 0 4rem;
+      }
+
+      .mat-tab-body-wrapper {
+        background-color: var(--gd-background);
+        @include border-radius(0.4rem);
+        @include box-shadow(0 0.2rem 0.1rem -0.1rem rgb(0, 0, 0, 0.2),
+                            0 0.1rem 0.1rem 0 rgb(0, 0, 0, 0.14),
+                            0 0.1rem 0.3rem 0 rgb(0, 0, 0, 0.12));
+        display: block;
+        max-height: calc(100% - 6.2px);
+        min-height: 25rem;
+        overflow-y: overlay;
+        padding: 1.6rem;
       }
     }
   }

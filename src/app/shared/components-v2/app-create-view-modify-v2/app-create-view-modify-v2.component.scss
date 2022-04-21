@@ -24,10 +24,14 @@
           line-height: $gd-line-height;
         }
 
-        .mat-icon-button {}
+        .mat-icon-button {
+          font-size: 2.4rem;
+          height: auto;
+          min-width: 3rem;
+          padding: 0.4rem;
+          width: 3rem;
+        }
       }
-
-      .gd-create-view-modify-top-title-buttons-buttons {}
     }
   }
 
@@ -107,10 +111,57 @@
               }
             }
           }
+
+          > .gd-create-view-modify-bottom-section-content-input-replaced {
+            color: var(--gd-secondary);
+            font-style: italic;
+            line-height: 4rem;
+          }
         }
       }
     }
+  }
+}
 
-    .gd-create-view-modify-bottom-bottom {}
+/* View */
+.gd-create-view-modify-view {
+  .gd-create-view-modify-bottom {
+    .gd-create-view-modify-bottom-content {
+      .gd-create-view-modify-bottom-section {
+        + .gd-create-view-modify-bottom-section {
+          margin-top: 1.6rem;
+        }
+
+        .gd-create-view-modify-bottom-section-content {
+          > .gd-create-view-modify-bottom-section-content-input {
+            &:not(.gd-create-view-modify-bottom-section-content-input-has-list) {
+              margin-bottom: 1.6rem;
+            }
+
+            &.gd-create-view-modify-bottom-section-content-input-has-list {
+              .gd-create-view-modify-bottom-section-content-input-list {
+                .gd-create-view-modify-bottom-section-content-input-list-item {
+                  .gd-create-view-modify-bottom-section-content-input-list-item-content {
+                    > .gd-create-view-modify-bottom-section-content-input {
+                      > div:not(.gd-create-view-modify-bottom-section-content-input-list-multiple-rows) {
+                        > * {
+                          margin-bottom: 1.6rem;
+                        }
+                      }
+                    }
+
+                    .gd-create-view-modify-bottom-section-content-input-list-multiple-rows {
+                      > * {
+                        margin-bottom: 1.6rem;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
