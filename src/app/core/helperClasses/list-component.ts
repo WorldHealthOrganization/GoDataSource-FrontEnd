@@ -74,6 +74,7 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
 
   // constants
   UserSettings = UserSettings;
+  Constants = Constants;
 
   // table columns
   tableColumns: IV2Column[] = [];

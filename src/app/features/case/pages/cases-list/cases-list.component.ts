@@ -133,9 +133,6 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
   // used to filter cases
   notACaseFilter: boolean | '' = false;
 
-  // provide constants to template
-  Constants = Constants;
-
   /**
    * Constructor
    */

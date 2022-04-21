@@ -390,6 +390,12 @@ interface ICreateViewModifyV2LinkButton {
 export interface ICreateViewModifyV2 {
   // required
   tabs: ICreateViewModifyV2Tab[];
+  create: {
+    finalStep: {
+      buttonLabel: string,
+      message: () => string
+    }
+  };
   buttons: {
     view: ICreateViewModifyV2LinkButton,
     modify: ICreateViewModifyV2LinkButton,
@@ -397,5 +403,5 @@ export interface ICreateViewModifyV2 {
     viewCancel: ICreateViewModifyV2LinkButton,
     modifyCancel: ICreateViewModifyV2LinkButton,
     quickActions?: ICreateViewModifyV2Menu
-  }
+  };
 }

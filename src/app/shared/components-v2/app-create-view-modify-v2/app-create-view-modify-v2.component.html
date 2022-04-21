@@ -198,6 +198,7 @@
               class="gd-create-view-modify-bottom-section-content-input"
               [class.gd-create-view-modify-bottom-section-content-input-has-textarea]="input.type === CreateViewModifyV2TabInputType.TEXTAREA"
               [class.gd-create-view-modify-bottom-section-content-input-has-age-dob]="input.type === CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH"
+              [class.gd-create-view-modify-bottom-section-content-input-has-list]="input.type === CreateViewModifyV2TabInputType.LIST"
               [ngSwitch]="input.type">
 
               <!-- Text -->
@@ -274,7 +275,7 @@
                 <app-form-toggle-v2
                   *ngIf="!isView"
                   [(ngModel)]="input.ageChecked"
-                  [name]="parentName ? parentName + '[ageDob]' : 'ageDob'"
+                  [name]="FormHelperService.IGNORE_FIELD_PREFIX + (parentName ? parentName + '[ageDob]' : 'ageDob')"
                   [options]="ageDOBOptions"></app-form-toggle-v2>
 
                 <!-- Age -->
@@ -321,7 +322,7 @@
                     *ngIf="!isView"
                     fxFlex
                     [(ngModel)]="input.ageTypeYears"
-                    [name]="parentName ? parentName + '[ageDobType]' : 'ageDobType'"
+                    [name]="FormHelperService.IGNORE_FIELD_PREFIX + (parentName ? parentName + '[ageDobType]' : 'ageDobType')"
                     placeholder="LNG_AGE_FIELD_LABEL_TYPE"
                     [options]="ageTypeOptions"
                     (ngModelChange)="input.ageTypeYears ? input.value.age.months.set(0) : input.value.age.years.set(0)"></app-form-select-single-v2>
@@ -774,6 +775,7 @@
               <button
                 *ngIf="tabIndex > 0"
                 mat-flat-button color="secondary"
+                type="button"
                 matStepperPrevious>
                 <!-- Label -->
                 <span>
@@ -784,6 +786,7 @@
               <!-- Next -->
               <button
                 mat-flat-button color="primary"
+                type="button"
                 matStepperNext
                 (click)="tab.form ? tab.form.ngSubmit.emit() : undefined">
 
@@ -799,6 +802,74 @@
                 <span>
                   {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
                 </span>
+              </button>
+            </div>
+          </div>
+
+        </mat-step>
+
+        <!-- Final step -->
+        <mat-step>
+
+          <!-- Tab Label -->
+          <div
+            *matStepLabel>
+            {{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}
+          </div>
+
+          <!-- Content -->
+          <div
+            class="gd-create-view-modify-bottom-content">
+
+            <!-- Message -->
+            <div>
+              {{tabData.create.finalStep.message()}}
+            </div>
+
+            <!-- General details -->
+            <div
+              [innerHTML]="'LNG_STEPPER_FINAL_STEP_TEXT' | translate:tabData.create.finalStep | safeHtml"></div>
+
+          </div>
+
+          <!-- Bottom -->
+          <div
+            class="gd-create-view-modify-bottom-bottom"
+            fxLayoutAlign="space-between">
+            <!-- Left -->
+            <div
+              fxFlex>
+              <!-- Cancel -->
+              <a
+                *ngIf="!tabData.buttons.createCancel.visible || tabData.buttons.createCancel.visible()"
+                type="button"
+                mat-flat-button color="text"
+                [routerLink]="tabData.buttons.createCancel.link.link()"
+                [queryParams]="tabData.buttons.createCancel.link.queryParams ? tabData.buttons.createCancel.link.queryParams() : undefined">
+                {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
+              </a>
+            </div>
+
+            <!-- Right -->
+            <div
+              fxFlex fxLayoutAlign="end">
+              <!-- Previous -->
+              <button
+                mat-flat-button color="secondary"
+                type="button"
+                matStepperPrevious>
+                <!-- Label -->
+                <span>
+                  {{'LNG_STEPPER_BUTTON_BACK' | translate}}
+                </span>
+              </button>
+
+              <!-- Create -->
+              <button
+                mat-flat-button color="primary"
+                type="button"
+                (click)="create()">
+                {{tabData.create.finalStep.buttonLabel | translate}}
               </button>
             </div>
           </div>

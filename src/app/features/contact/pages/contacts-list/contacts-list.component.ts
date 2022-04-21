@@ -20,7 +20,7 @@ import { LocationModel } from '../../../../core/models/location.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { TeamModel } from '../../../../core/models/team.model';
-import { UserModel, UserSettings } from '../../../../core/models/user.model';
+import { UserModel } from '../../../../core/models/user.model';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
@@ -53,10 +53,6 @@ export class ContactsListComponent
 {
   // list of existing contacts
   contactsList$: Observable<ContactModel[]>;
-
-  // constants
-  UserSettings = UserSettings;
-  Constants = Constants;
 
   // anonymize fields
   anonymizeFields: LabelValuePair[] = [
@@ -233,7 +229,7 @@ export class ContactsListComponent
         },
         link: (data) => {
           return data.mainAddress?.location?.name ?
-            `/locations/${ data.mainAddress.location.id }/view` :
+            `/locations/${data.mainAddress.location.id}/view` :
             undefined;
         }
       },
@@ -571,7 +567,7 @@ export class ContactsListComponent
         },
         link: (data) => {
           return data.responsibleUserId ?
-            `/users/${ data.responsibleUserId }/view` :
+            `/users/${data.responsibleUserId}/view` :
             undefined;
         }
       },
@@ -1388,7 +1384,7 @@ export class ContactsListComponent
         {
           field: 'statusId',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
-          type: V2AdvancedFilterType.SELECT,
+          type: V2AdvancedFilterType.MULTISELECT,
           options: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           relationshipPath: ['followUps'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'

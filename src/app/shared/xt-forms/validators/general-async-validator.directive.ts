@@ -1,7 +1,6 @@
 import { Directive, forwardRef, Input } from '@angular/core';
 import { AbstractControl, NG_ASYNC_VALIDATORS, ValidationErrors } from '@angular/forms';
 import { Observable, timer, of } from 'rxjs';
-import * as _ from 'lodash';
 import { Constants } from '../../../core/models/constants';
 import { map, switchMap } from 'rxjs/operators';
 
@@ -25,6 +24,7 @@ export interface IGeneralAsyncValidatorResponse {
   ]
 })
 export class GeneralAsyncValidatorDirective {
+  @Input() asyncValidatorTouchOnError: boolean = false;
   @Input() validateOnlyWhenDirty: boolean = false;
   @Input() asyncValidatorObservable: Observable<boolean | IGeneralAsyncValidatorResponse>;
   @Input() asyncValidatorErrMsg: string = 'LNG_FORM_VALIDATION_ERROR_GENERAL_ASYNC';
@@ -33,9 +33,18 @@ export class GeneralAsyncValidatorDirective {
   };
 
   /**
-     * Validate
-     */
+   * Validate
+   */
   validate(control: AbstractControl): Observable<ValidationErrors | null> {
+    // no need to validate ?
+    // - requires job
+    if (
+      !control.value &&
+      control.value !== 0
+    ) {
+      return of(null);
+    }
+
     // wait for binding
     return timer(Constants.DEFAULT_DEBOUNCE_TIME_MILLISECONDS)
       .pipe(
@@ -43,9 +52,12 @@ export class GeneralAsyncValidatorDirective {
           // nothing to validate ?
           if (
             !this.asyncValidatorObservable ||
-                        _.isEmpty(control.value) || (
+            (
+              !control.value &&
+              control.value !== 0
+            ) || (
               this.validateOnlyWhenDirty &&
-                            !control.dirty
+              !control.dirty
             )
           ) {
             return of(null);
@@ -55,7 +67,16 @@ export class GeneralAsyncValidatorDirective {
           return this.asyncValidatorObservable
             .pipe(
               map((isValid: boolean | IGeneralAsyncValidatorResponse) => {
-                if (_.isBoolean(isValid)) {
+                if (typeof isValid === 'boolean') {
+                  // not valid and we need to touch ?
+                  if (
+                    !isValid &&
+                    this.asyncValidatorTouchOnError
+                  ) {
+                    control.markAsTouched();
+                  }
+
+                  // finished
                   return isValid ?
                     null : {
                       generalAsyncValidatorDirective: {
@@ -64,7 +85,18 @@ export class GeneralAsyncValidatorDirective {
                       }
                     };
                 } else {
+                  // process response
                   const data: IGeneralAsyncValidatorResponse = isValid as IGeneralAsyncValidatorResponse;
+
+                  // not valid and we need to touch ?
+                  if (
+                    !data.isValid &&
+                    this.asyncValidatorTouchOnError
+                  ) {
+                    control.markAsTouched();
+                  }
+
+                  // finished
                   return data.isValid ?
                     null : {
                       generalAsyncValidatorDirective: {

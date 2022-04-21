@@ -1,9 +1,10 @@
-import { Subscriber } from 'rxjs';
+import { Observable, Subscriber } from 'rxjs';
 import { ILabelValuePairModel } from '../../../forms-v2/core/label-value-pair.model';
 import { NgForm } from '@angular/forms';
 import { Params } from '@angular/router';
 import { V2AdvancedFilter } from '../../app-list-table-v2/models/advanced-filter.model';
 import { RequestFilterOperator } from '../../../../core/helperClasses/request-query-builder';
+import { IGeneralAsyncValidatorResponse } from '../../../xt-forms/validators/general-async-validator.directive';
 
 /**
  * Side dialog config
@@ -122,7 +123,9 @@ export interface IV2SideDialogConfigInputText extends IV2SideDialogConfigInput {
   value: string;
 
   // optional
-  validators?: IV2SideDialogConfigInputValidator;
+  validators?: IV2SideDialogConfigInputValidator | {
+    async?: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: V2SideDialogConfigInput) => Observable<boolean | IGeneralAsyncValidatorResponse>;
+  };
 }
 
 /**

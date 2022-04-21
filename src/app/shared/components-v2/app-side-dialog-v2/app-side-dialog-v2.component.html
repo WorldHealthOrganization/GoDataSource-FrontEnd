@@ -104,6 +104,9 @@
               [placeholder]="input.placeholder"
               [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
               [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
+              app-general-async-validator
+              [asyncValidatorObservable]="input.validators?.async ? input.validators?.async(dialogHandler.data, dialogHandler, input) : undefined"
+              asyncValidatorTouchOnError="true"
               (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-input-v2>
 
             <!-- Number -->

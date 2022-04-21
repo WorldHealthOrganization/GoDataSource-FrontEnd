@@ -9,6 +9,7 @@ import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model
 import { Constants } from '../../../core/models/constants';
 import { AddressModel } from '../../../core/models/address.model';
 import { ILocation } from '../../forms-v2/core/app-form-location-base-v2';
+import { FormHelperService } from '../../../core/services/helper/form-helper.service';
 
 /**
  * Component
@@ -71,6 +72,7 @@ export class AppCreateViewModifyV2Component {
   CreateViewModifyV2TabInputType = CreateViewModifyV2TabInputType;
   Constants = Constants;
   CreateViewModifyV2MenuType = CreateViewModifyV2MenuType;
+  FormHelperService = FormHelperService;
 
   /**
    * Constructor
@@ -78,7 +80,8 @@ export class AppCreateViewModifyV2Component {
   constructor(
     protected elementRef: ElementRef,
     protected changeDetectorRef: ChangeDetectorRef,
-    protected dialogV2Service: DialogV2Service
+    protected dialogV2Service: DialogV2Service,
+    protected formHelper: FormHelperService
   ) {}
 
   /**
@@ -229,5 +232,15 @@ export class AppCreateViewModifyV2Component {
           this.changeDetectorRef.detectChanges();
         });
     }
+  }
+
+  /**
+   * Create item
+   */
+  create(): void {
+    // determine form data
+    const forms: NgForm[] = this.tabData.tabs.map((tab) => tab.form).filter((item) => !!item);
+    const fieldData = this.formHelper.mergeFields(forms);
+    console.log(fieldData);
   }
 }

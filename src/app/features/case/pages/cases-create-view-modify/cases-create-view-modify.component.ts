@@ -187,6 +187,17 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         this.initializeTabsEpidemiology()
       ],
 
+      // create details
+      create: {
+        finalStep: {
+          buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_BUTTON'),
+          message: () => this.translateService.instant(
+            'LNG_STEPPER_FINAL_STEP_TEXT_CASE',
+            this.itemData
+          )
+        }
+      },
+
       // buttons
       buttons: {
         view: {
