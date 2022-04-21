@@ -56,7 +56,9 @@ export enum V2ColumnFormat {
   DATETIME,
   BOOLEAN,
   ACTIONS,
-  STATUS
+  STATUS,
+  COLOR,
+  ICON_MATERIAL
 }
 
 /**
@@ -103,6 +105,28 @@ interface IV2ColumnBoolean extends Omit<IV2ColumnBasic, 'format'> {
   format: Omit<IV2ColumnBasicFormat, 'type'> & {
     type: V2ColumnFormat.BOOLEAN
   };
+}
+
+/**
+ * Color column
+ */
+export interface IV2ColumnColor extends Omit<IV2ColumnBasic, 'format'> {
+  // required
+  format: Omit<IV2ColumnBasicFormat, 'type'> & {
+    type: V2ColumnFormat.COLOR
+  };
+  noColorLabel: string;
+}
+
+/**
+ * Color material icon
+ */
+export interface IV2ColumnIconMaterial extends Omit<IV2ColumnBasic, 'format'> {
+  // required
+  format: Omit<IV2ColumnBasicFormat, 'type'> & {
+    type: V2ColumnFormat.ICON_MATERIAL
+  };
+  noIconLabel: string;
 }
 
 /**
@@ -223,4 +247,4 @@ export interface IV2ColumnStatus {
 /**
  * Column
  */
-export type IV2Column = IV2ColumnBasic | IV2ColumnButton | IV2ColumnAge | IV2ColumnDate | IV2ColumnDatetime | IV2ColumnBoolean | IV2ColumnAction | IV2ColumnStatus;
+export type IV2Column = IV2ColumnBasic | IV2ColumnButton | IV2ColumnAge | IV2ColumnDate | IV2ColumnDatetime | IV2ColumnBoolean | IV2ColumnColor | IV2ColumnIconMaterial | IV2ColumnAction | IV2ColumnStatus;

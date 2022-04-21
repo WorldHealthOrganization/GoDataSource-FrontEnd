@@ -25,6 +25,7 @@ export interface IGeneralAsyncValidatorResponse {
   ]
 })
 export class GeneralAsyncValidatorDirective {
+  @Input() asyncValidatorTouchOnError: boolean = false;
   @Input() validateOnlyWhenDirty: boolean = false;
   @Input() asyncValidatorObservable: Observable<boolean | IGeneralAsyncValidatorResponse>;
   @Input() asyncValidatorErrMsg: string = 'LNG_FORM_VALIDATION_ERROR_GENERAL_ASYNC';
@@ -43,9 +44,9 @@ export class GeneralAsyncValidatorDirective {
           // nothing to validate ?
           if (
             !this.asyncValidatorObservable ||
-                        _.isEmpty(control.value) || (
+            _.isEmpty(control.value) || (
               this.validateOnlyWhenDirty &&
-                            !control.dirty
+              !control.dirty
             )
           ) {
             return of(null);
@@ -56,6 +57,15 @@ export class GeneralAsyncValidatorDirective {
             .pipe(
               map((isValid: boolean | IGeneralAsyncValidatorResponse) => {
                 if (_.isBoolean(isValid)) {
+                  // not valid and we need to touch ?
+                  if (
+                    !isValid &&
+                    this.asyncValidatorTouchOnError
+                  ) {
+                    control.markAsTouched();
+                  }
+
+                  // finished
                   return isValid ?
                     null : {
                       generalAsyncValidatorDirective: {
@@ -64,7 +74,18 @@ export class GeneralAsyncValidatorDirective {
                       }
                     };
                 } else {
+                  // process response
                   const data: IGeneralAsyncValidatorResponse = isValid as IGeneralAsyncValidatorResponse;
+
+                  // not valid and we need to touch ?
+                  if (
+                    !data.isValid &&
+                    this.asyncValidatorTouchOnError
+                  ) {
+                    control.markAsTouched();
+                  }
+
+                  // finished
                   return data.isValid ?
                     null : {
                       generalAsyncValidatorDirective: {

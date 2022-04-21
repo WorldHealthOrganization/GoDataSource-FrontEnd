@@ -50,9 +50,6 @@ export class EventsListComponent
   // list of existing events
   eventsList$: Observable<EventModel[]>;
 
-  // provide constants to template
-  Constants = Constants;
-
   // event anonymize fields
   private eventAnonymizeFields: ILabelValuePairModel[] = [
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_ID', value: 'id' },
