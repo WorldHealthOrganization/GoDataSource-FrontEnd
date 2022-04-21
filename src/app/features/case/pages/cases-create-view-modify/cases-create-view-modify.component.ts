@@ -24,7 +24,7 @@ import { TimerCache } from '../../../../core/helperClasses/timer-cache';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { UserModel } from '../../../../core/models/user.model';
 import { DocumentModel } from '../../../../core/models/document.model';
-import { AddressModel } from '../../../../core/models/address.model';
+import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { VaccineModel } from '../../../../core/models/vaccine.model';
 import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-date-range.model';
@@ -453,7 +453,13 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           inputs: [{
             type: CreateViewModifyV2TabInputType.LIST,
             name: 'addresses',
-            items: this.itemData.addresses,
+            items: this.isCreate ?
+              (
+                this.itemData.addresses = [new AddressModel({
+                  typeId: AddressType.CURRENT_ADDRESS
+                })]
+              ) :
+              this.itemData.addresses,
             itemsChanged: (list) => {
               // update addresses
               this.itemData.addresses = list.items;
