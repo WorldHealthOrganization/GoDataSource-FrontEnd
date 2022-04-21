@@ -1,7 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { UserSettings } from '../../../../core/models/user.model';
 import { Observable, throwError } from 'rxjs';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
@@ -16,13 +15,12 @@ import { V2FilterType, V2FilterTextType } from '../../../../shared/components-v2
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { IV2BreadcrumbAction } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
-import { Constants } from '../../../../core/models/constants';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
-import { V2SideDialogConfigInputType, IV2SideDialogConfigButtonType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { V2SideDialogConfigInputType, IV2SideDialogConfigButtonType, IV2SideDialogConfigInputText } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Component({
   selector: 'app-outbreak-templates-list',
@@ -33,10 +31,6 @@ export class OutbreakTemplatesListComponent
   implements OnDestroy {
   // list of existing outbreak templates
   outbreakTemplatesList$: Observable<OutbreakTemplateModel[]>;
-
-  // constants
-  UserSettings = UserSettings;
-  Constants = Constants;
 
   /**
      * Constructor
@@ -63,8 +57,8 @@ export class OutbreakTemplatesListComponent
   }
 
   /**
- * Component initialized
- */
+     * Component initialized
+     */
   initialized(): void {
     // initialize pagination
     this.initPaginator();
@@ -77,6 +71,16 @@ export class OutbreakTemplatesListComponent
      * Initialize Table Columns
      */
   protected initializeTableColumns() {
+    // validate clone outbreak template name
+    let cloneTemplateName: string;
+    const asyncValidateCloneOutbreakTemplateName: Observable<boolean | IGeneralAsyncValidatorResponse> = new Observable((observer) => {
+      this.outbreakTemplateDataService.checkOutbreakTemplateNameUniquenessValidity(cloneTemplateName)
+        .subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+          observer.next(isValid);
+          observer.complete();
+        });
+    });
+
     // default table columns
     this.tableColumns = [
       {
@@ -194,7 +198,7 @@ export class OutbreakTemplatesListComponent
             }
           },
 
-          // // Create outbreak from outbreak template
+          // Create outbreak from outbreak template
           {
             type: V2ActionType.ICON,
             icon: 'add',
@@ -320,7 +324,7 @@ export class OutbreakTemplatesListComponent
                 label: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE',
                 action: {
                   link: (item: OutbreakTemplateModel): string[] => {
-                    return ['/outbreaks', item.id, 'case-questionnaire'];
+                    return ['/outbreak-templates', item.id, 'contact-questionnaire'];
                   }
                 },
                 visible: (): boolean => {
@@ -362,7 +366,7 @@ export class OutbreakTemplatesListComponent
                 }
               },
 
-              //     // Clone Template Outbreak
+              // Clone Template Outbreak
               {
                 label: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTIONS_CLONE_OUTBREAK_TEMPLATE',
                 action: {
@@ -384,7 +388,11 @@ export class OutbreakTemplatesListComponent
                           placeholder: 'LNG_DIALOG_FIELD_PLACEHOLDER_CLONED_OUTBREAK_TEMPLATE_NAME',
                           value: this.i18nService.instant('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_CLONE_NAME', { name: item.name }),
                           validators: {
-                            required: () => true
+                            required: () => true,
+                            async: (_data, _handler, input: IV2SideDialogConfigInputText) => {
+                              cloneTemplateName = input.value;
+                              return asyncValidateCloneOutbreakTemplateName;
+                            }
                           }
                         }],
                         bottomButtons: [{
@@ -394,7 +402,8 @@ export class OutbreakTemplatesListComponent
                           key: 'apply',
                           disabled: (_data, handler): boolean => {
                             return !handler.form ||
-                                handler.form.invalid;
+                              handler.form.invalid ||
+                              handler.form.pending;
                           }
                         }],
                         initialized: (handler) => {
@@ -422,12 +431,14 @@ export class OutbreakTemplatesListComponent
                         // show loading
                         const loading = this.dialogV2Service.showLoadingDialog();
 
+                        // get the outbreak template to clone
                         const outbreakTemplateToClone = response.handler.data.map.cloneData.data;
 
                         // set the name for the cloned outbreak template
                         outbreakTemplateToClone.name = (response.handler.data.inputs[0] as any).value;
 
 
+                        // create outbreak template clone
                         this.outbreakTemplateDataService
                           .createOutbreakTemplate(outbreakTemplateToClone, outbreakTemplateToClone.id)
                           .pipe(
@@ -453,7 +464,7 @@ export class OutbreakTemplatesListComponent
                           .subscribe((clonedOutbreakTemplate) => {
 
                             this.toastV2Service.success(
-                              'LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_SUCCESS_MESSAGE'
+                              'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CLONE_SUCCESS_MESSAGE'
                             );
 
                             // hide loading
@@ -464,14 +475,14 @@ export class OutbreakTemplatesListComponent
 
                             // navigate to modify page of the new outbreak
                             if (OutbreakTemplateModel.canModify(this.authUser)) {
-                              this.router.navigate([`/outbreak-templates/${ clonedOutbreakTemplate.id }/modify`]);
+                              this.router.navigate([`/outbreak-templates/${clonedOutbreakTemplate.id}/modify`]);
                             } else if (OutbreakTemplateModel.canView(this.authUser)) {
-                              this.router.navigate([`/outbreak-templates/${ clonedOutbreakTemplate.id }/view`]);
+                              this.router.navigate([`/outbreak-templates/${clonedOutbreakTemplate.id}/view`]);
                             } else if (OutbreakTemplateModel.canList(this.authUser)) {
                               this.router.navigate(['/outbreak-templates']);
                             } else {
-                            // fallback to current page since we already know that we have access to this page
-                            // Don't redirect :)
+                              // fallback to current page since we already know that we have access to this page
+                              // Don't redirect :)
                             }
                           });
                       });
@@ -580,9 +591,6 @@ export class OutbreakTemplatesListComponent
    * Initialize breadcrumbs
    */
   protected initializeBreadcrumbs(): void {
-    // determine if outbreaks page should be linkable
-    const outbreakAction: IV2BreadcrumbAction = null;
-
     // set breadcrumbs
     this.breadcrumbs = [
       {
@@ -594,7 +602,7 @@ export class OutbreakTemplatesListComponent
         }
       }, {
         label: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE',
-        action: outbreakAction
+        action: null
       }
     ];
   }
@@ -613,22 +621,6 @@ export class OutbreakTemplatesListComponent
       'generateFollowUpsKeepTeamAssignment',
       'generateFollowUpsDateOfLastContact'
     ];
-  }
-
-  /**
-     * Attach default projection
-     */
-  clearedQueryBuilder(): void {
-    this.queryBuilder.fields(
-      'id',
-      'name',
-      'description',
-      'disease',
-      'generateFollowUpsTeamAssignmentAlgorithm',
-      'generateFollowUpsOverwriteExisting',
-      'generateFollowUpsKeepTeamAssignment',
-      'generateFollowUpsDateOfLastContact'
-    );
   }
 
   /**

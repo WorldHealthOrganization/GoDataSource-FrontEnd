@@ -44,7 +44,8 @@ export const EnglishUsLang = {
     'LNG_CASE_FIELD_LABEL_DETAILS': 'Details',
     'LNG_COMMON_LABEL_ACTIVE': 'Activate {{name}}',
     'LNG_STEPPER_FINAL_STEP_TEXT': 'If you want to change something you can go back to any step and change it.</br> If all data is correct, click "{{buttonLabel}}" to complete the process.',
-    'LNG_STEPPER_FINAL_STEP_TEXT_CASE': 'Data entry for "{{name}}" has been successfully completed!'
+    'LNG_STEPPER_FINAL_STEP_TEXT_CASE': 'Data entry for "{{name}}" has been successfully completed!',
+    'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CLONE_SUCCESS_MESSAGE': 'Outbreak template successfully cloned'
 
 
 
