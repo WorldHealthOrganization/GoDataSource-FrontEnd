@@ -1,5 +1,5 @@
 import { Directive, forwardRef, Input } from '@angular/core';
-import { Validator, AbstractControl, NG_VALIDATORS, ControlContainer, NgForm, NgModel } from '@angular/forms';
+import { Validator, AbstractControl, NG_VALIDATORS, ControlContainer, NgForm, NgModelGroup } from '@angular/forms';
 import * as _ from 'lodash';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { Constants } from '../../../core/models/constants';
@@ -127,16 +127,33 @@ export class DateValidatorDirective implements Validator {
           if (
             this.controlContainer &&
             this.controlContainer instanceof NgForm &&
-            this.controlContainer.controls[compareItem.compareItemValue as string]
+            this.controlContainer.controls[compareItem.compareItemValue as string] &&
+            (this.controlContainer.controls[compareItem.compareItemValue as string] as any)._gd_component
           ) {
-            let directives = (this.controlContainer as any)._directives;
-            directives = directives ? Array.from(directives) : directives;
             compareItem = new DateValidatorFieldComparator(
-              (_.find(
-                directives, {
-                  name: compareItem.compareItemValue as string
-                }
-              ) as NgModel).valueAccessor as AppFormBaseV2<any>,
+              (this.controlContainer.controls[compareItem.compareItemValue as string] as any)._gd_component,
+              fieldLabel
+            );
+          } else if (
+            this.controlContainer &&
+            (this.controlContainer instanceof NgModelGroup) &&
+            this.controlContainer.control &&
+            this.controlContainer.control.controls[compareItem.compareItemValue as string] &&
+            (this.controlContainer.control.controls[compareItem.compareItemValue as string] as any)._gd_component
+          ) {
+            compareItem = new DateValidatorFieldComparator(
+              (this.controlContainer.control.controls[compareItem.compareItemValue as string] as any)._gd_component,
+              fieldLabel
+            );
+          } else if (
+            this.controlContainer &&
+            (this.controlContainer instanceof NgModelGroup) &&
+            this.controlContainer.formDirective instanceof NgForm &&
+            this.controlContainer.formDirective.controls[compareItem.compareItemValue as string] &&
+            (this.controlContainer.formDirective.controls[compareItem.compareItemValue as string] as any)._gd_component
+          ) {
+            compareItem = new DateValidatorFieldComparator(
+              (this.controlContainer.formDirective.controls[compareItem.compareItemValue as string] as any)._gd_component,
               fieldLabel
             );
           } else {

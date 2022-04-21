@@ -393,28 +393,31 @@
               <!-- Document -->
               <div
                 *ngSwitchCase="CreateViewModifyV2TabInputType.DOCUMENT"
-                fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem">
+                fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem"
+                [ngModelGroup]="parentName !== undefined ? parentName + '[' + parentItemIndex + ']' : input.name">
 
                 <!-- Type -->
                 <app-form-select-single-v2
                   fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).type"
-                  [name]="parentName ? parentName + '[type]' : 'type'"
+                  name="type"
                   placeholder="LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE"
                   tooltip="LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE_DESCRIPTION"
                   [viewOnly]="isView"
                   [options]="input.typeOptions"
-                  required="true"></app-form-select-single-v2>
+                  required="true"
+                  (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-select-single-v2>
 
                 <!-- Date -->
                 <app-form-input-v2
                   fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).number"
-                  [name]="parentName ? parentName + '[number]' : 'number'"
+                  name="number"
                   placeholder="LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER"
                   tooltip="LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER_DESCRIPTION"
                   [viewOnly]="isView"
-                  required="true"></app-form-input-v2>
+                  required="true"
+                  (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
 
               </div>
 
@@ -422,86 +425,96 @@
               <div
                 *ngSwitchCase="CreateViewModifyV2TabInputType.ADDRESS"
                 fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem"
-                class="gd-create-view-modify-bottom-section-content-input-list-multiple-rows">
+                class="gd-create-view-modify-bottom-section-content-input-list-multiple-rows"
+                [ngModelGroup]="parentName !== undefined ? parentName + '[' + parentItemIndex + ']' : input.name">
 
                 <!-- Type -->
                 <app-form-select-single-v2
                   [(ngModel)]="input.value.get(parentItemIndex).typeId"
-                  [name]="parentName ? parentName + '[typeId]' : (input.name + '[typeId]')"
+                  name="typeId"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_TYPE"
                   tooltip="LNG_ADDRESS_FIELD_LABEL_TYPE_DESCRIPTION"
                   [viewOnly]="isView"
                   [options]="input.typeOptions"
-                  required="true"></app-form-select-single-v2>
+                  required="true"
+                  (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-select-single-v2>
 
                 <!-- Date -->
                 <app-form-date-v2
                   [(ngModel)]="input.value.get(parentItemIndex).date"
-                  [name]="parentName ? parentName + '[date]' : (input.name + '[date]')"
+                  name="date"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_DATE"
                   tooltip="LNG_ADDRESS_FIELD_LABEL_DATE_DESCRIPTION"
-                  [viewOnly]="isView"></app-form-date-v2>
+                  [viewOnly]="isView"
+                  (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-date-v2>
 
                 <!-- Email address -->
                 <app-form-input-v2
                   [(ngModel)]="input.value.get(parentItemIndex).emailAddress"
-                  [name]="parentName ? parentName + '[emailAddress]' : (input.name + '[emailAddress]')"
+                  name="emailAddress"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS"
                   tooltip="LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS_DESCRIPTION"
                   [viewOnly]="isView"
-                  app-email-validator></app-form-input-v2>
+                  app-email-validator
+                  (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
 
                 <!-- Phone number -->
                 <app-form-input-v2
                   [(ngModel)]="input.value.get(parentItemIndex).phoneNumber"
-                  [name]="parentName ? parentName + '[phoneNumber]' : (input.name + '[phoneNumber]')"
+                  name="phoneNumber"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER"
                   tooltip="LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER_DESCRIPTION"
-                  [viewOnly]="isView"></app-form-input-v2>
+                  [viewOnly]="isView"
+                  (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
 
                 <!-- Location -->
                 <app-form-select-location-single-v2
                   [(ngModel)]="input.value.get(parentItemIndex).locationId"
-                  [name]="parentName ? parentName + '[locationId]' : (input.name + '[locationId]')"
+                  name="locationId"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_LOCATION"
                   [viewOnly]="isView"
                   useOutbreakLocations="true"
                   required="true"
+                  (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"
                   (selectedLocationChanged)="addressLocationChanged(input.value.get(parentItemIndex), $event)"></app-form-select-location-single-v2>
 
                 <!-- City -->
                 <app-form-input-v2
                   [(ngModel)]="input.value.get(parentItemIndex).city"
-                  [name]="parentName ? parentName + '[city]' : (input.name + '[city]')"
+                  name="city"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_CITY"
                   tooltip="LNG_ADDRESS_FIELD_LABEL_CITY_DESCRIPTION"
-                  [viewOnly]="isView"></app-form-input-v2>
+                  [viewOnly]="isView"
+                  (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
 
                 <!-- Postal code -->
                 <app-form-input-v2
                   [(ngModel)]="input.value.get(parentItemIndex).postalCode"
-                  [name]="parentName ? parentName + '[postalCode]' : (input.name + '[postalCode]')"
+                  name="postalCode"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE"
                   tooltip="LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE_DESCRIPTION"
-                  [viewOnly]="isView"></app-form-input-v2>
+                  [viewOnly]="isView"
+                  (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
 
                 <!-- Address line 1 -->
                 <app-form-input-v2
                   [(ngModel)]="input.value.get(parentItemIndex).addressLine1"
-                  [name]="parentName ? parentName + '[addressLine1]' : (input.name + '[addressLine1]')"
+                  name="addressLine1"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1"
                   tooltip="LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1_DESCRIPTION"
-                  [viewOnly]="isView"></app-form-input-v2>
+                  [viewOnly]="isView"
+                  (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
 
                 <!-- Lat & Lng -->
                 <div
-                  fxLayout="row wrap" fxLayoutGap="1.6rem">
+                  fxLayout="row wrap" fxLayoutGap="1.6rem"
+                  ngModelGroup="geoLocation">
 
                   <!-- Lat -->
                   <app-form-number-v2
                     fxFlex="calc(50% - 0.8rem)"
                     [(ngModel)]="input.value.get(parentItemIndex).geoLocation.lat"
-                    [name]="parentName ? parentName + '[geoLocation][lat]' : (input.name + '[geoLocation][lat]')"
+                    name="lat"
                     placeholder="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT"
                     tooltip="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT_DESCRIPTION"
                     [viewOnly]="isView"
@@ -510,13 +523,14 @@
                     [min]="-90"
                     [minNumber]="-90"
                     [max]="90"
-                    [maxNumber]="90"></app-form-number-v2>
+                    [maxNumber]="90"
+                    (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-number-v2>
 
                   <!-- Lng -->
                   <app-form-number-v2
                     fxFlex="calc(50% - 0.8rem)"
                     [(ngModel)]="input.value.get(parentItemIndex).geoLocation.lng"
-                    [name]="parentName ? parentName + '[geoLocation][lng]' : (input.name + '[geoLocation][lng]')"
+                    name="lng"
                     placeholder="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG"
                     tooltip="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG_DESCRIPTION"
                     [viewOnly]="isView"
@@ -525,29 +539,32 @@
                     [min]="-180"
                     [minNumber]="-180"
                     [max]="180"
-                    [maxNumber]="180"></app-form-number-v2>
+                    [maxNumber]="180"
+                    (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-number-v2>
 
                 </div>
 
                 <!-- Geo location accurate -->
                 <app-form-toggle-checkbox-v2
                   [(ngModel)]="input.value.get(parentItemIndex).geoLocationAccurate"
-                  [name]="parentName ? parentName + '[geoLocationAccurate]' : (input.name + '[geoLocationAccurate]')"
+                  name="geoLocationAccurate"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES"
-                  [viewOnly]="isView"></app-form-toggle-checkbox-v2>
+                  [viewOnly]="isView"
+                  (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-toggle-checkbox-v2>
 
               </div>
 
               <!-- Vaccine -->
               <div
                 *ngSwitchCase="CreateViewModifyV2TabInputType.VACCINE"
-                fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem">
+                fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem"
+                [ngModelGroup]="parentName !== undefined ? parentName + '[' + parentItemIndex + ']' : input.name">
 
                 <!-- Vaccine -->
                 <app-form-select-single-v2
                   fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).vaccine"
-                  [name]="parentName ? parentName + '[vaccine]' : 'vaccine'"
+                  name="vaccine"
                   placeholder="LNG_ENTITY_FIELD_LABEL_VACCINE"
                   [viewOnly]="isView"
                   [options]="input.vaccineOptions"
@@ -557,7 +574,7 @@
                 <app-form-date-v2
                   fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).date"
-                  [name]="parentName ? parentName + '[date]' : 'date'"
+                  name="date"
                   placeholder="LNG_ENTITY_FIELD_LABEL_VACCINE_DATE"
                   [viewOnly]="isView"></app-form-date-v2>
 
@@ -565,7 +582,7 @@
                 <app-form-select-single-v2
                   fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).status"
-                  [name]="parentName ? parentName + '[status]' : 'status'"
+                  name="status"
                   placeholder="LNG_ENTITY_FIELD_LABEL_VACCINE_STATUS"
                   [viewOnly]="isView"
                   [options]="input.vaccineStatusOptions"
@@ -577,12 +594,13 @@
               <div
                 *ngSwitchCase="CreateViewModifyV2TabInputType.CENTER_DATE_RANGE"
                 fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem"
-                class="gd-create-view-modify-bottom-section-content-input-list-multiple-rows">
+                class="gd-create-view-modify-bottom-section-content-input-list-multiple-rows"
+                [ngModelGroup]="parentName !== undefined ? parentName + '[' + parentItemIndex + ']' : input.name">
 
                 <!-- Type -->
                 <app-form-select-single-v2
                   [(ngModel)]="input.value.get(parentItemIndex).typeId"
-                  [name]="parentName ? parentName + '[typeId]' : 'typeId'"
+                  name="typeId"
                   placeholder="LNG_CASE_FIELD_LABEL_DATE_RANGE_TYPE_ID"
                   [viewOnly]="isView"
                   [options]="input.typeOptions"
@@ -596,29 +614,29 @@
                   <app-form-date-v2
                     fxFlex="calc(50% - 0.8rem)"
                     [(ngModel)]="input.value.get(parentItemIndex).startDate"
-                    [name]="parentName ? parentName + '[startDate]' : 'startDate'"
+                    name="startDate"
                     placeholder="LNG_FORM_RANGE_FIELD_LABEL_FROM"
                     [viewOnly]="isView"
                     app-date-validator
-                    [dateSameOrBefore]="parentName ? parentName + '[endDate]' : 'endDate'"
+                    dateSameOrBefore="endDate"
                     [dateSameOrAfter]="input.startDateValidators?.dateSameOrAfter ? input.startDateValidators?.dateSameOrAfter() : undefined"></app-form-date-v2>
 
                   <!-- Date range - end -->
                   <app-form-date-v2
                     fxFlex="calc(50% - 0.8rem)"
                     [(ngModel)]="input.value.get(parentItemIndex).endDate"
-                    [name]="parentName ? parentName + '[endDate]' : 'endDate'"
+                    name="endDate"
                     placeholder="LNG_FORM_RANGE_FIELD_LABEL_TO"
                     [viewOnly]="isView"
                     app-date-validator
-                    [dateSameOrAfter]="parentName ? parentName + '[startDate]' : 'startDate'"></app-form-date-v2>
+                    dateSameOrAfter="startDate"></app-form-date-v2>
 
                 </div>
 
                 <!-- Center name -->
                 <app-form-select-single-v2
                   [(ngModel)]="input.value.get(parentItemIndex).centerName"
-                  [name]="parentName ? parentName + '[centerName]' : 'centerName'"
+                  name="centerName"
                   placeholder="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME"
                   [viewOnly]="isView"
                   [options]="input.centerOptions"></app-form-select-single-v2>
@@ -626,7 +644,7 @@
                 <!-- Location -->
                 <app-form-select-location-single-v2
                   [(ngModel)]="input.value.get(parentItemIndex).locationId"
-                  [name]="parentName ? parentName + '[locationId]' : 'locationId'"
+                  name="locationId"
                   placeholder="LNG_CASE_FIELD_LABEL_CENTER_DATES_LOCATION"
                   [viewOnly]="isView"
                   useOutbreakLocations="true"></app-form-select-location-single-v2>
@@ -634,7 +652,7 @@
                 <!-- Comments -->
                 <app-form-textarea-v2
                   [(ngModel)]="input.value.get(parentItemIndex).comments"
-                  [name]="parentName ? parentName + '[comments]' : 'comments'"
+                  name="comments"
                   placeholder="LNG_CASE_FIELD_LABEL_CENTER_DATES_COMMENTS"
                   [viewOnly]="isView"></app-form-textarea-v2>
 
@@ -643,6 +661,12 @@
               <!-- List -->
               <div
                 *ngSwitchCase="CreateViewModifyV2TabInputType.LIST">
+
+                <!-- Handle empty lists -->
+                <input
+                  type="hidden"
+                  [ngModel]="input.items"
+                  [name]="input.name" />
 
                 <!-- List Items -->
                 <div
@@ -661,7 +685,7 @@
                         mat-icon-button
                         color="warn"
                         [matTooltip]="input.definition.remove.label | translate"
-                        (click)="removeListItem(input, itemIndex)">
+                        (click)="removeListItem(input, itemIndex, form);">
                         <mat-icon>delete</mat-icon>
                       </button>
                     </div>
@@ -671,7 +695,7 @@
                       fxLayout="row wrap" fxLayoutGap="1.6rem"
                       class="gd-create-view-modify-bottom-section-content-input-list-item-content">
                       <ng-container
-                        *ngTemplateOutlet="inputRender; context: { input: input.definition.input, parentName: input.name + '[' + itemIndex + ']', parentItemIndex: itemIndex }"></ng-container>
+                        *ngTemplateOutlet="inputRender; context: { input: input.definition.input, parentName: input.name, parentItemIndex: itemIndex }"></ng-container>
                     </div>
 
                   </div>
@@ -684,7 +708,7 @@
                     type="button"
                     mat-flat-button
                     color="text"
-                    (click)="addListItem(input)">
+                    (click)="addListItem(input, form)">
 
                     <!-- + Icon -->
                     <mat-icon>add</mat-icon>

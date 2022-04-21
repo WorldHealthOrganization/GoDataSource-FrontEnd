@@ -128,7 +128,10 @@ export class AppCreateViewModifyV2Component {
   /**
    * Add new item to list
    */
-  addListItem(input: ICreateViewModifyV2TabInputList): void {
+  addListItem(
+    input: ICreateViewModifyV2TabInputList,
+    form: NgForm
+  ): void {
     // add new item to list
     input.items.push(input.definition.add.newItem());
 
@@ -136,6 +139,12 @@ export class AppCreateViewModifyV2Component {
     if (input.itemsChanged) {
       input.itemsChanged(input);
     }
+
+    // mark list as dirty
+    this.markArrayItemsAsDirty(
+      form,
+      input.name
+    );
   }
 
   /**
@@ -143,7 +152,8 @@ export class AppCreateViewModifyV2Component {
    */
   removeListItem(
     input: ICreateViewModifyV2TabInputList,
-    itemIndex: number
+    itemIndex: number,
+    form: NgForm
   ): void {
     // delete method
     const deleteItem = () => {
@@ -154,6 +164,12 @@ export class AppCreateViewModifyV2Component {
       if (input.itemsChanged) {
         input.itemsChanged(input);
       }
+
+      // mark list as dirty
+      this.markArrayItemsAsDirty(
+        form,
+        input.name
+      );
 
       // re-render ui
       this.changeDetectorRef.detectChanges();
@@ -307,35 +323,56 @@ export class AppCreateViewModifyV2Component {
     // determine form data
     const fieldData = this.formHelper.mergeDirtyFields(forms);
     if (_.isEmpty(fieldData)) {
+      // show message
+      this.toastV2Service.success('LNG_FORM_WARNING_NO_CHANGES');
+
+      // finished
       return;
     }
 
-    // console.log(fieldData);
+    // show loading
+    const loadingHandler = this.dialogV2Service.showLoadingDialog();
 
-    // // show loading
-    // const loadingHandler = this.dialogV2Service.showLoadingDialog();
-    //
-    // // call create
-    // this.tabData
-    //   .createOrUpdate(
-    //     CreateViewModifyV2ActionType.UPDATE,
-    //     fieldData,
-    //     (error, data) => {
-    //       // hide loading
-    //       loadingHandler.close();
-    //
-    //       // handle errors
-    //       if (error) {
-    //         // show error
-    //         this.toastV2Service.error(error);
-    //
-    //         // finished
-    //         return;
-    //       }
-    //
-    //       // redirect after create / update
-    //       this.tabData.redirectAfterCreateUpdate(data);
-    //     }
-    //   );
+    // call create
+    this.tabData
+      .createOrUpdate(
+        CreateViewModifyV2ActionType.UPDATE,
+        fieldData,
+        (error, data) => {
+          // hide loading
+          loadingHandler.close();
+
+          // handle errors
+          if (error) {
+            // show error
+            this.toastV2Service.error(error);
+
+            // finished
+            return;
+          }
+
+          // redirect after create / update
+          this.tabData.redirectAfterCreateUpdate(data);
+        }
+      );
+  }
+
+  /**
+   * Hack to mark an array of items as dirty since ngModelGroup isn't working with arrays
+   */
+  markArrayItemsAsDirty(
+    form: NgForm,
+    groupName: string
+  ): void {
+    // wait for form to catch up
+    setTimeout(() => {
+      // determine inputs that should become dirty
+      Object.keys(form.controls)
+        .filter((name) => name.startsWith(`${groupName}[`) || name === groupName)
+        .forEach((name) => {
+          // mark as dirty
+          form.controls[name].markAsDirty();
+        });
+    });
   }
 }

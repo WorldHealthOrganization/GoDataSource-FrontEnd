@@ -1,4 +1,4 @@
-import { AbstractControl, ControlContainer, ControlValueAccessor, FormGroup, NgForm } from '@angular/forms';
+import { AbstractControl, ControlContainer, ControlValueAccessor, FormGroup, NgForm, NgModelGroup } from '@angular/forms';
 import { noop } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseErrorStateMatcherV2 } from './app-form-base-error-state-matcher-v2';
@@ -41,20 +41,23 @@ export abstract class AppFormBaseV2<T> implements ControlValueAccessor {
     if (this.controlContainer.control instanceof FormGroup) {
       // FIX for dotted path, since get uses paths, but we don't always want to use paths
       control = this.controlContainer.control.controls[this.controlName];
-    } else {
+    } else if (this.controlContainer.control) {
       // default one
       control = this.controlContainer.control.get(this.controlName);
     }
 
-    // listen for status changes
-    if (
-      control &&
-      !this.statusChangesSubscription
-    ) {
-      this.statusChangesSubscription = control.statusChanges
-        .subscribe(() => {
-          this.changeDetectorRef.detectChanges();
-        });
+    // found control ?
+    if (control) {
+      // keep an instance
+      (control as any)._gd_component = this;
+
+      // listen for status changes
+      if (!this.statusChangesSubscription) {
+        this.statusChangesSubscription = control.statusChanges
+          .subscribe(() => {
+            this.changeDetectorRef.detectChanges();
+          });
+      }
     }
 
     // finished
@@ -121,12 +124,23 @@ export abstract class AppFormBaseV2<T> implements ControlValueAccessor {
     protected changeDetectorRef: ChangeDetectorRef
   ) {
     // on submit - do validation
+    let form: NgForm;
+    if (controlContainer) {
+      // ng model group ?
+      if (controlContainer instanceof NgModelGroup) {
+        form = controlContainer.formDirective as NgForm
+      } else {
+        form = controlContainer as NgForm;
+      }
+    }
+
+    // listen for form submit
     if (
-      controlContainer &&
-      (controlContainer as NgForm).ngSubmit
+      form &&
+      form.ngSubmit
     ) {
       // listen for submit
-      this.formSubmittedSubscription = (controlContainer as NgForm).ngSubmit.subscribe(() => {
+      this.formSubmittedSubscription = form.ngSubmit.subscribe(() => {
         // touch on submit
         this.onTouchItem();
 
