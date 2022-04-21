@@ -215,6 +215,7 @@
   .gd-form-textarea-v2-viewonly {
     .gd-form-textarea-v2-viewonly-label {
       color: var(--gd-secondary);
+      white-space: nowrap;
     }
   }
 }

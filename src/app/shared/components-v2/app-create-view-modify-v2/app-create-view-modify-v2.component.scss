@@ -79,6 +79,15 @@
                     button.mat-icon-button,
                     a.mat-icon-button {
                       @include border-radius(0.4rem 0.4rem 0 0);
+                      font-size: 1.6rem;
+                      height: 2.4rem;
+                      min-width: 2.4rem;
+                      padding: 0.4rem;
+                      width: 2.4rem;
+
+                      .mat-icon {
+                        font-size: 1.6rem;
+                      }
                     }
                   }
 
