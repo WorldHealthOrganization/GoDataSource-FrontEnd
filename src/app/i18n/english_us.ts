@@ -43,6 +43,7 @@ export const EnglishUsLang = {
     'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_TITLE': 'Followup status',
     'LNG_CASE_FIELD_LABEL_DETAILS': 'Details',
     'LNG_COMMON_LABEL_ACTIVE': 'Activate {{name}}',
+    'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CLONE_SUCCESS_MESSAGE': 'Outbreak template successfully cloned',
     'LNG_STEPPER_FINAL_STEP_TEXT': 'If you want to change something you can go back to any step and change it.</br> If all data is correct, click \'<span class="gd-message-button-label">{{buttonLabel}}</span>\' to complete the process.',
     'LNG_STEPPER_FINAL_STEP_TEXT_CASE': 'Data entry for \'<span class="gd-message-name">{{name}}</span>\' has been successfully completed!'
 
